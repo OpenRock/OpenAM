@@ -17,9 +17,9 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ReopeningFileOutputStream.java,v 1.1 2009/10/29 20:31:28 pbryan Exp $
+ * $Id: ReopeningFileOutputStream.java,v 1.2 2010/01/27 01:19:24 pbryan Exp $
  *
- * Copyright 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright 2009–2010 Sun Microsystems Inc. All Rights Reserved
  */
 
 package com.sun.identity.proxy.io;
@@ -128,7 +128,7 @@ public class ReopeningFileOutputStream extends OutputStream
      * @throws IOException if an I/O exception occurs.
      */
     private synchronized void open() throws IOException {
-        exists();
+        close();
         out = new FileOutputStream(file, append);
     }
 
