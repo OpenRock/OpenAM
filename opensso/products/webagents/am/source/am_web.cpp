@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: am_web.cpp,v 1.56 2009/12/01 21:52:54 subbae Exp $
+ * $Id: am_web.cpp,v 1.57 2009/12/19 00:05:46 subbae Exp $
  *
  */
 
@@ -3332,7 +3332,15 @@ am_web_result_attr_map_set(
                        cookie_name.append(const_cast<char*>(keyRef.c_str()));
                        attr_cookie.name =
                             const_cast<char*>(cookie_name.c_str());
-                       attr_cookie.value = const_cast<char*>(values.c_str());
+
+                       std::string encoded_values;
+                       if ((*agentConfigPtr)->encodeCookieSpecialChars == AM_TRUE ) {
+                           encoded_values = Http::cookie_encode(values);
+                           attr_cookie.value = (char*)encoded_values.c_str();
+                       } else {
+                           attr_cookie.value = (char*)values.c_str();
+                       }
+
                        attr_cookie.domain = NULL;
                        attr_cookie.max_age =
                            const_cast<char*>((*agentConfigPtr)->attrCookieMaxAge);
@@ -5465,7 +5473,15 @@ set_user_attributes(am_policy_result_t *result,
                    std::string cookie_name((*agentConfigPtr)->attrCookiePrefix);
                    cookie_name.append(key);
                    cookie_info.name = (char *)cookie_name.c_str();
-                   cookie_info.value = (char*)values.c_str();
+
+                   std::string encoded_values;
+                   if ((*agentConfigPtr)->encodeCookieSpecialChars == AM_TRUE ) {
+                       encoded_values = Http::cookie_encode(values);
+                       cookie_info.value = (char*)encoded_values.c_str();
+                   } else {
+                       cookie_info.value = (char*)values.c_str();
+                   }
+
                    cookie_info.domain = NULL;
                    cookie_info.max_age = (char *)(*agentConfigPtr)->attrCookieMaxAge;
                    cookie_info.path = const_cast<char*>("/");

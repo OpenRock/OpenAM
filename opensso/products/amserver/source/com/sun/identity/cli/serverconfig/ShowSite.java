@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ShowSite.java,v 1.4 2008/09/19 23:37:15 beomsuk Exp $
+ * $Id: ShowSite.java,v 1.5 2010/01/15 18:10:55 veiming Exp $
  *
  */
 
@@ -53,6 +53,7 @@ public class ShowSite extends ServerConfigBase {
      * @param rc Request Context.
      * @throw CLIException if the request cannot serviced.
      */
+    @Override
     public void handleRequest(RequestContext rc) 
         throws CLIException {
         super.handleRequest(rc);
@@ -76,6 +77,8 @@ public class ShowSite extends ServerConfigBase {
                     adminSSOToken, siteName);
                 Set failoverURLs = SiteConfiguration.getSiteSecondaryURLs(
                     adminSSOToken, siteName);
+                String siteId = SiteConfiguration.getSiteID(
+                    adminSSOToken, siteName);
                 Object[] args = {primaryURL};
                 outputWriter.printlnMessage(MessageFormat.format(
                     getResourceString("show-site-primaryURL"), args));
@@ -91,6 +94,10 @@ public class ShowSite extends ServerConfigBase {
                         getResourceString("show-site-no-secondaryURL"));
                 }
 
+                outputWriter.printlnMessage("");
+                args[0] = siteId;
+                outputWriter.printlnMessage(MessageFormat.format(
+                    getResourceString("show-site-ID"), args));
             } else {
                 outputWriter.printlnMessage(MessageFormat.format(
                     getResourceString("show-site-no-exists"),

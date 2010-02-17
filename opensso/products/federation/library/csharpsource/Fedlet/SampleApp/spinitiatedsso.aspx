@@ -23,7 +23,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: spinitiatedsso.aspx,v 1.1 2009/06/11 18:38:00 ggennaro Exp $
+ * $Id: spinitiatedsso.aspx,v 1.2 2010/01/26 01:20:14 ggennaro Exp $
  */
 --%>
 <%@ Page Language="C#" Debug="true" %>
@@ -92,6 +92,9 @@
      * IsPassive          True or false value indicating whether the IDP 
      *                    should authenticate passively.  Default is false.
      *                    
+     * RelayState         Destination URL to redirect the browser after successful
+     *                    login.
+     *
      * ReqBinding         URI value that identifies a SAML protocol binding to
      *                    used when sending the AuthnRequest. The supported 
      *                    values are:

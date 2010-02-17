@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ReferralManageHandler.java,v 1.3.2.1 2009/12/23 00:53:53 farble1670 Exp $
+ * $Id: ReferralManageHandler.java,v 1.4 2009/12/22 23:33:14 farble1670 Exp $
  */
 
 package com.sun.identity.admin.handler;

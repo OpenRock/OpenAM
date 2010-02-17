@@ -22,7 +22,7 @@
     your own identifying information:
     "Portions Copyrighted [year] [name of copyright owner]"
 
-    $Id: AuthenticationLogMessageIDs.xml,v 1.6 2009/11/18 20:52:18 qcheng Exp $
+    $Id: AuthenticationLogMessageIDs.xml,v 1.7 2010/01/25 22:09:16 qcheng Exp $
 
 -->
 
@@ -1518,8 +1518,7 @@
         loglevel="LL_INFO"
         description="Changing user password succeeded">
         <datainfo>
-            <item>authentication type</item>
-            <item>user name</item>
+            <item>message</item>
         </datainfo>
         <triggers>
             <item>Change user password in authentication screen due to directory server password policy.

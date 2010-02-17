@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AssertionManager.java,v 1.12.6.1 2010/01/09 19:42:26 qcheng Exp $
+ * $Id: AssertionManager.java,v 1.13 2010/01/09 19:41:06 qcheng Exp $
  *
  */
 

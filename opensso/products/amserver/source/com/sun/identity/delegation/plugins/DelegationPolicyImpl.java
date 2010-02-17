@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DelegationPolicyImpl.java,v 1.11 2009/11/21 01:54:26 veiming Exp $
+ * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
  */
 package com.sun.identity.delegation.plugins;
@@ -566,8 +566,8 @@ public class DelegationPolicyImpl implements DelegationInterface,
                                 (ActionDecision)ads.get(actionName);
                             if (ad != null) {
                                 Set values = ad.getValues();
-                                if ((values == null) ||
-                                    (values.contains(ACTION_DENY))) {
+                                if ((values == null) || values.isEmpty()
+                                         || values.contains(ACTION_DENY)) {
                                     result = false;
                                 }
                             } else {

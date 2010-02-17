@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ApplicationManager.java,v 1.6.2.1 2010/01/05 15:18:40 veiming Exp $
+ * $Id: ApplicationManager.java,v 1.11 2010/01/13 23:41:57 veiming Exp $
  */
 package com.sun.identity.entitlement;
 
@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -173,6 +174,9 @@ public final class ApplicationManager {
 
     private static boolean match(String value, String strPattern) {
         if ((strPattern != null) && (strPattern.length() > 0)) {
+            if ((value == null) || (value.trim().length() == 0)) {
+                return strPattern.equals("*");
+            }
             value = value.toLowerCase();
             strPattern = strPattern.toLowerCase();
             StringBuilder buff = new StringBuilder();
@@ -360,10 +364,17 @@ public final class ApplicationManager {
             throw new EntitlementException(326);
         }
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, realm);
-        ec.removeApplication(name);
-        clearCache(realm);
+        Application app = getApplication(adminSubject, realm, name);
+
+        if (app != null) {
+            if (!app.canBeDeleted()) {
+                throw new EntitlementException(404);
+            }
+            EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+                adminSubject, realm);
+            ec.removeApplication(name);
+            clearCache(realm);
+        }
     }
 
     /**
@@ -407,9 +418,26 @@ public final class ApplicationManager {
             principals.iterator().next().getName() : null;
 
         if (application.getCreationDate() == -1) {
-            application.setCreationDate(date.getTime());
-            if (principalName != null) {
-                application.setCreatedBy(principalName);
+            long creationDate = getApplicationCreationDate(realm,
+                application.getName());
+            if (creationDate == -1) {
+                application.setCreationDate(date.getTime());
+                if (principalName != null) {
+                    application.setCreatedBy(principalName);
+                }
+            } else {
+                application.setCreationDate(creationDate);
+                String createdBy = application.getCreatedBy();
+                if ((createdBy == null) || (createdBy.trim().length() == 0)) {
+                    createdBy = getApplicationCreatedBy(realm,
+                        application.getName());
+                    if ((createdBy == null) || (createdBy.trim().length() == 0))
+                    {
+                        application.setCreatedBy(principalName);
+                    } else {
+                        application.setCreatedBy(createdBy);
+                    }
+                }
             }
         }
         application.setLastModifiedDate(date.getTime());
@@ -422,6 +450,35 @@ public final class ApplicationManager {
         ec.storeApplication(application);
         clearCache(realm);
     }
+
+    private static String getApplicationCreatedBy(
+        String realm,
+        String applName
+    ) {
+        try {
+            Application appl = getApplication(PrivilegeManager.superAdminSubject,
+                realm, applName);
+            return (appl == null) ? null : appl.getCreatedBy();
+        } catch (EntitlementException ex) {
+            // new application.
+            return null;
+        }
+    }
+
+    private static long getApplicationCreationDate(
+        String realm,
+        String applName
+    ) {
+        try {
+            Application appl = getApplication(PrivilegeManager.superAdminSubject,
+                realm, applName);
+            return (appl == null) ? -1 : appl.getCreationDate();
+        } catch (EntitlementException ex) {
+            // new application.
+            return -1;
+        }
+    }
+
 
     private static boolean isReferredApplication(
         String realm,
@@ -518,7 +575,14 @@ public final class ApplicationManager {
     public static void clearCache(String realm) {
         readWriteLock.writeLock().lock();
         try {
-            applications.remove(realm);
+            for (Iterator<String> i = applications.keySet().iterator();
+                i.hasNext(); ) {
+                String name = i.next();
+                if (name.equalsIgnoreCase(realm)) {
+                    i.remove();
+                    break;
+                }
+            }
         } finally {
             readWriteLock.writeLock().unlock();
         }

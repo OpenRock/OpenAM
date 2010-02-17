@@ -22,13 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: JdbcSimpleUserDao.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
+ * $Id: JdbcSimpleUserDao.java,v 1.2 2009/12/22 19:11:54 veiming Exp $
  *
  */
 
 package com.sun.identity.idm.plugins.database;
 
-import com.sun.xml.rpc.encoding.soap.CollectionSerializer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,7 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -48,7 +46,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import java.sql.DriverManager;
-import javax.naming.NamingException;
 
 import com.sun.identity.shared.debug.Debug;
 

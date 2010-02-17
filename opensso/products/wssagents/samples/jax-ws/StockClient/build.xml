@@ -23,7 +23,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build.xml,v 1.6 2009/11/20 18:00:12 mrudul_uchil Exp $
+   $Id: build.xml,v 1.7 2010/01/15 18:54:36 mrudul_uchil Exp $
 
 -->
 
@@ -54,7 +54,7 @@
 		<fileset dir="${jaxws.lib}">
 			<include name="**/*.jar" />
 		</fileset>
-        <fileset dir="web/WEB-INF/lib">
+        <fileset dir="src/lib">
 			<include name="**/*.jar" />
 		</fileset>        
         <fileset dir="../../lib">
@@ -136,14 +136,14 @@
 	<target name="war-base">
 		<mkdir dir="dist"/>
 		<war destfile="dist/StockClient.war" 
-  	  	  basedir="web"
-              excludes="**/j2ee.jar">
+  	  	  basedir="web">
 		</war>
 	</target>
 
 	<!--Create the secure WAR file for the Stock Client -->
 	<target name="secure-war-base">
  		<!-- Create a new WAR -->
+        <mkdir dir="web/WEB-INF/lib" />
 		<copy todir="web/WEB-INF/lib" overwrite="true">
 			<fileset dir="../../lib"/>
 		</copy>
@@ -156,8 +156,7 @@
 
 		<mkdir dir="dist"/>
 		<war destfile="dist/StockClient.war" 
-		  basedir="web"
-              excludes="**/j2ee.jar">
+		  basedir="web">
 		</war>
         <copy file="../etc/config/StockClient/web_orig.xml"
               tofile="web/WEB-INF/web.xml" overwrite="true"/>
@@ -173,10 +172,8 @@
 		</delete>
 
 	<!-- Delete the existing jars added to secure the web-service-->
-		<delete>
-			<fileset dir="web/WEB-INF/lib" includes="**/*.jar"
-                     excludes="**/j2ee.jar"/>
-		</delete> 
+		<delete dir="web/WEB-INF/lib">
+		</delete>
 	</target>
 
 	<target name="usage">

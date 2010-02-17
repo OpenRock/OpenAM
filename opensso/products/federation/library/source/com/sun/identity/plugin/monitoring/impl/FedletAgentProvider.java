@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: FedletAgentProvider.java,v 1.1.2.1 2009/12/23 23:09:14 exu Exp $
+ * $Id: FedletAgentProvider.java,v 1.2 2009/12/23 23:32:49 exu Exp $
  *
  */
 

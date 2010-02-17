@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: WSSPolicyManager.java,v 1.1.2.1 2009/12/19 02:41:06 asyhuang Exp $
+ * $Id: WSSPolicyManager.java,v 1.2 2009/12/19 00:09:41 asyhuang Exp $
  *
  */
 package com.sun.identity.wss.policy;

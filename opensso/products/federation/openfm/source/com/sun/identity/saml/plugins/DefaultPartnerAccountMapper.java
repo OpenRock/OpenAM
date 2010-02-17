@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DefaultPartnerAccountMapper.java,v 1.6.8.1 2010/01/09 19:44:29 qcheng Exp $
+ * $Id: DefaultPartnerAccountMapper.java,v 1.7 2010/01/09 19:41:52 qcheng Exp $
  *
  */
 

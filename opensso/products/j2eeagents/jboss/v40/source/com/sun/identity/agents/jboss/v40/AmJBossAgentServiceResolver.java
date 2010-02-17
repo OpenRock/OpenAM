@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AmJBossAgentServiceResolver.java,v 1.3 2009/02/07 01:31:40 leiming Exp $
+ * $Id: AmJBossAgentServiceResolver.java,v 1.4 2010/02/05 00:30:20 leiming Exp $
  *
  */
 
@@ -54,7 +54,21 @@ public class AmJBossAgentServiceResolver extends ServiceResolver {
                 return J2EEAuthenticationHandler.class.getName();
             }
     }
-    
+
+    /* (non-Javadoc)
+     * @see ServiceResolver#getSSOTaskHandlerImpl()
+     */
+    public String getSSOTaskHandlerImpl() {
+        return AmJBossSSOTaskHandler.class.getName();
+    }
+
+    /* (non-Javadoc)
+     * @see ServiceResolver#getCDSSOTaskHandlerImpl()
+     */
+    public String getCDSSOTaskHandlerImpl() {
+        return AmJBossCDSSOTaskHandler.class.getName();
+    }
+
     /* (non-Javadoc)
      * @see ServiceResolver#getGlobalJ2EELogoutHandlerImpl()
      */

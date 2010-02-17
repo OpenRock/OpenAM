@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.1.2.1 2009/12/17 18:34:19 veiming Exp $
+ * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.3 2009/12/18 21:56:56 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -68,10 +68,13 @@ public class DelegationPrivilegeIdRepoAccessTest {
             "http://www.delegationprivilegeidrepoaccesstest.com/*";
     private static final String DELEGATED_USER =
         "DelegationPrivilegeIdRepoAccessTestDelegatedUser";
+    private static final String DELEGATED_USER1 =
+        "DelegationPrivilegeIdRepoAccessTestDelegatedUser1";
 
     protected SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private AMIdentity delegatedUser;
+    private AMIdentity delegatedUser1;
 
     public DelegationPrivilegeIdRepoAccessTest() {
     }
@@ -83,6 +86,7 @@ public class DelegationPrivilegeIdRepoAccessTest {
         orgMgr.createSubOrganization(SUB_REALM.substring(1),
             Collections.EMPTY_MAP);
         delegatedUser = IdRepoUtils.createUser(SUB_REALM, DELEGATED_USER);
+        delegatedUser1 = IdRepoUtils.createUser(SUB_REALM, DELEGATED_USER1);
 
         orgMgr = new OrganizationConfigManager(
             adminToken, SUB_REALM);
@@ -107,10 +111,12 @@ public class DelegationPrivilegeIdRepoAccessTest {
     public void cleanup() throws Exception {
         Set<AMIdentity> identities = new HashSet<AMIdentity>();
         identities.add(delegatedUser);
+        identities.add(delegatedUser1);
         IdRepoUtils.deleteIdentities(SUB_REALM, identities);
 
         ApplicationManager.deleteApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM, APPLICATION_NAME);
+            SubjectUtils.createSuperAdminSubject(), SUB_REALM,
+            APPLICATION_NAME);
 
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             SubjectUtils.createSuperAdminSubject());
@@ -127,28 +133,13 @@ public class DelegationPrivilegeIdRepoAccessTest {
             addPrivilege();
             SSOToken token = AuthUtils.authenticate(
                 SUB_REALM, DELEGATED_USER, DELEGATED_USER);
-            try {
-                AMIdentityRepository idrepo = new AMIdentityRepository(token, "/");
-                IdSearchResults result = idrepo.searchIdentities(
-                    IdType.USER, "*", new IdSearchControl());
-                result.getSearchResults();
-            } catch (IdRepoException e) {
-                // permission denied
-            }
+            testIdRepoAccess(token);
+            addUserToPrivilege();
+            testIdRepoAccess(token);
 
-            // ok to search current realm
-            AMIdentityRepository idrepo = new AMIdentityRepository(token,
-                SUB_REALM);
-            IdSearchResults result = idrepo.searchIdentities(
-                IdType.USER, "*", new IdSearchControl());
-            result.getSearchResults();
-
-            // ok to search sub realm
-            idrepo = new AMIdentityRepository(token,
-                SUB_REALM + "/" + SUB_SUB_REALM);
-            result = idrepo.searchIdentities(IdType.USER, "*",
-                new IdSearchControl());
-            result.getSearchResults();
+            SSOToken token1 = AuthUtils.authenticate(
+                SUB_REALM, DELEGATED_USER1, DELEGATED_USER1);
+            testIdRepoAccess(token1);
         } catch (EntitlementException e) {
             throw e;
         } finally {
@@ -156,11 +147,53 @@ public class DelegationPrivilegeIdRepoAccessTest {
         }
     }
 
+    private void testIdRepoAccess(SSOToken token) throws Exception {
+        try {
+            AMIdentityRepository idrepo = new AMIdentityRepository(token, "/");
+            IdSearchResults result = idrepo.searchIdentities(
+                IdType.USER, "*", new IdSearchControl());
+            result.getSearchResults();
+        } catch (IdRepoException e) {
+            // permission denied
+            }
+
+        // ok to search current realm
+        AMIdentityRepository idrepo = new AMIdentityRepository(token,
+            SUB_REALM);
+        IdSearchResults result = idrepo.searchIdentities(
+            IdType.USER, "*", new IdSearchControl());
+        result.getSearchResults();
+
+        // ok to search sub realm
+        idrepo = new AMIdentityRepository(token,
+            SUB_REALM + "/" + SUB_SUB_REALM);
+        result = idrepo.searchIdentities(IdType.USER, "*",
+            new IdSearchControl());
+        result.getSearchResults();
+    }
+
     private void removePrivilege() throws Exception {
         ApplicationPrivilegeManager mgr =
             ApplicationPrivilegeManager.getInstance(SUB_REALM,
             PrivilegeManager.superAdminSubject);
         mgr.removePrivilege(DELEGATE_PRIVILEGE_NAME);
+    }
+
+    private void addUserToPrivilege() throws EntitlementException  {
+        ApplicationPrivilegeManager mgr =
+            ApplicationPrivilegeManager.getInstance(SUB_REALM,
+            PrivilegeManager.superAdminSubject);
+        ApplicationPrivilege ap = mgr.getPrivilege(DELEGATE_PRIVILEGE_NAME);
+        Set<SubjectImplementation> eSubjects = new
+            HashSet<SubjectImplementation>();
+        OpenSSOUserSubject sbj = new OpenSSOUserSubject();
+        sbj.setID(delegatedUser.getUniversalId());
+        eSubjects.add(sbj);
+        OpenSSOUserSubject sbj1 = new OpenSSOUserSubject();
+        sbj1.setID(delegatedUser1.getUniversalId());
+        eSubjects.add(sbj1);
+        ap.setSubject(eSubjects);
+        mgr.replacePrivilege(ap);
     }
 
     private void addPrivilege() throws EntitlementException  {

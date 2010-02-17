@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RemoveAgentProperty.java,v 1.1.2.1 2009/12/22 18:10:28 veiming Exp $
+ * $Id: RemoveAgentProperty.java,v 1.2 2009/12/22 18:00:25 veiming Exp $
  */
 
 package com.sun.identity.idm;

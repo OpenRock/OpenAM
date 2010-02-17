@@ -1,6 +1,6 @@
 package com.sun.identity.admin;
 
-import com.iplanet.services.util.Base64;
+import com.sun.identity.shared.encode.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

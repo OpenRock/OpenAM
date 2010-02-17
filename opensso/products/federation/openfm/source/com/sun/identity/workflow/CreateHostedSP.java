@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CreateHostedSP.java,v 1.8 2008/06/25 05:50:01 qcheng Exp $
+ * $Id: CreateHostedSP.java,v 1.9 2010/01/04 19:10:50 veiming Exp $
  *
  */
 
@@ -132,7 +132,7 @@ public class CreateHostedSP
             }
         }
 
-        return getMessage("sp.configured", locale) + "|||realm=" + realm;
+        return "done|||realm=" + realm;
     }
     
     private String enableSigning(String metadata) {

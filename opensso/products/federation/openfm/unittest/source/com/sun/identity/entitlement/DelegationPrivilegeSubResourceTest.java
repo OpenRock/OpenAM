@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DelegationPrivilegeSubResourceTest.java,v 1.1.2.2 2009/12/22 18:10:27 veiming Exp $
+ * $Id: DelegationPrivilegeSubResourceTest.java,v 1.1 2009/12/22 18:00:24 veiming Exp $
  */
 
 package com.sun.identity.entitlement;

@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: userconsole.jsp,v 1.1 2009/11/20 19:25:15 huacui Exp $
+   $Id: userconsole.jsp,v 1.3 2010/01/20 17:51:38 huacui Exp $
 
 --%>
 
@@ -79,7 +79,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         <title>Authentication</title>
 
         <script type="text/javascript">
-            function makeithappen(oauthtk, cbk, id) {
+            function makeithappen(oauthtk, id) {
                 var path = window.location.pathname;
                 var strs = path.split("/");
                 var contextRoot = strs[1]; 
@@ -87,8 +87,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
                 redir += "//" + window.location.host;
                 redir += "/" + contextRoot;
                 redir += "/resources/1/oauth/AuthorizationFactory";
-                redir += "?oauth_callback=" + cbk.toString();
-                redir += "&oauth_token=" + oauthtk.toString();
+                redir += "?oauth_token=" + oauthtk.toString();
                 redir += "&id=" + id.toString();
                 window.location = redir;
             }
@@ -112,11 +111,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
             return;
         }
         otk = java.net.URLEncoder.encode(otk);
-        String cbk = request.getParameter("oauth_callback");
         String uid = null;
-        if (cbk != null) {
-            cbk = java.net.URLEncoder.encode(cbk);
-        }
 
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
@@ -170,9 +165,9 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
 
     <hr><br>
     <h2>Do you authorize the Service Consumer to access your resource?</h2>
-    <form>
-        <input type="button" onclick="revoke('<%= otk%>')" value="Revoke">
-        <input type="button" onclick="makeithappen('<%= otk%>', '<%= cbk%>', '<%= uid%>')" value="Authorize">
+    <form name="AuthoriseToken" >
+        <input type="button" onclick="revoke('<%= otk%>')" value="Revoke" name="Revoke">
+        <input type="button" onclick="makeithappen('<%= otk%>', '<%= uid%>')" value="Authorize" name="Authorize">
     </form>
 
     <hr>

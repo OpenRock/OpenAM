@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PWResetSuccessViewBean.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
+ * $Id: PWResetSuccessViewBean.java,v 1.3 2009/12/18 03:29:24 222713 Exp $
  *
  */
 
@@ -33,6 +33,7 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetSuccessModel;
 import com.sun.identity.password.ui.model.PWResetSuccessModelImpl;
@@ -129,6 +130,11 @@ public class PWResetSuccessViewBean extends PWResetViewBeanBase  {
      */
     public void forwardTo(RequestContext context) {
         PWResetSuccessModel model = (PWResetSuccessModel)getModel();
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(context.getRequest());
+        java.util.Locale locale = localeContext.getLocale();
+        model.setUserLocale(locale.toString());
+
         if (resetMsg == null || resetMsg.length() == 0) {
             PWResetUserValidationViewBean vb = (PWResetUserValidationViewBean)
                 getViewBean(PWResetUserValidationViewBean.class);

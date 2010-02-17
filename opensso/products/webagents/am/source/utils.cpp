@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: utils.cpp,v 1.15 2009/05/19 01:18:34 madan_ranganath Exp $
+ * $Id: utils.cpp,v 1.16 2010/02/09 20:21:33 dknab Exp $
  *
  */ 
 #include <stdexcept>
@@ -127,6 +127,25 @@ const entityRefTable eRefTable[] = { {FIRST_ENTITY_REF, "&amp;"},
 				     {'>', "&gt;"}
 				   };
 
+
+bool areCharEqual(const char *c1, const char *c2, bool caseignorecmp)
+{
+    bool result = false;
+    char d1 = (char)(*c1);
+    char d2 = (char)(*c2);
+    
+    if (caseignorecmp && isupper(d1)) {
+        d1 = tolower(d1);
+    }
+    if (caseignorecmp && isupper(d2)) {
+        d2 = tolower(d2);
+    }
+    if (d1 == d2) {
+        result = true;
+    }
+    return result;
+}
+
 am_resource_match_t
 Utils::match_patterns(const char *patbegin, const char *matchbegin,
 		      bool caseignorecmp, bool onelevelwildcard, 
@@ -134,44 +153,46 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
 
     const char *p1 = patbegin;
     
-    if (patbegin == NULL || matchbegin == NULL)
-	return AM_NO_MATCH;
-
-    if (*patbegin == '\0' && *matchbegin == '\0')
-	return AM_EXACT_MATCH;
-
+    if (patbegin == NULL || matchbegin == NULL) {
+        return AM_NO_MATCH;
+    }
+    if (*patbegin == '\0' && *matchbegin == '\0') {
+        return AM_EXACT_MATCH;
+    }
     while (*p1 != '\0' && *p1 !='*') { 
-	// check for one-level wild card pattern
+        // check for one-level wild card pattern
         if ((*p1 == '-') && (*(p1+1) == '*') && (*(p1+2) == '-')) {
             onelevelwildcard = true;
-	    break;
+            break;
         }
-	p1++;
+        p1++;
     }
-
     if (*p1 == '\0') {
-	if (caseignorecmp) {
-	    if (strcasecmp(patbegin, matchbegin) == 0)
-		return AM_EXACT_MATCH;
-	    else
-		return AM_NO_MATCH;
-	} else {
-	    if (strcmp(patbegin, matchbegin) == 0)
-		return AM_EXACT_MATCH;
-	    else
-		return AM_NO_MATCH;
-	}
+        if (caseignorecmp) {
+            if (strcasecmp(patbegin, matchbegin) == 0) {
+                return AM_EXACT_MATCH;
+            } else {
+                return AM_NO_MATCH;
+            }
+        } else {
+            if (strcmp(patbegin, matchbegin) == 0) {
+                return AM_EXACT_MATCH;
+            } else {
+                return AM_NO_MATCH;
+            }
+        }
     } else {
-	bool result; 
-	if (caseignorecmp)
-	    result = (strncasecmp(patbegin,
-				  matchbegin, p1 - patbegin) == 0);
-	else
-	    result = (strncmp(patbegin, matchbegin, p1 - patbegin) == 0);
-
-	if(result == false) return AM_NO_MATCH;
+        bool result; 
+        if (caseignorecmp) {
+            result = (strncasecmp(patbegin,
+                      matchbegin, p1 - patbegin) == 0);
+        } else {
+            result = (strncmp(patbegin, matchbegin, p1 - patbegin) == 0);
+        }
+        if(result == false) {
+            return AM_NO_MATCH;
+        }
     }
-
     if (onelevelwildcard) {
         // Incoming pattern has one level wild card in it (-*-) which
         // means the pattern -*- should match everything except /
@@ -191,18 +212,17 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
             char *p2 = NULL;  char *s2 = NULL;
             int count = 0; int match_position = 0;
             int char_match = 0; int match_count = 0; 
-	    int query_count = 0;
+            int query_count = 0;
                         
             while (*p1 == '-' || *p1 == '*') {
                 p1++;
             }
             
-	    if ((*p1 == '\0') && (*s1 == '\0')) {
+            if ((*p1 == '\0') && (*s1 == '\0')) {
                 // No more characters left to compare
                 // -*- matches with the remaining characters
                 return AM_EXACT_PATTERN_MATCH;
-	    }
-
+            }
             // Continue with the rest of the pattern
             string matchbegin(s1);
             if (*p1 == '\0') {
@@ -214,23 +234,24 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
                 // Check whether the pattern has a "?", need to 
                 // exclude "?" from the matchbegin
                 for (int j = 0, query_index; 
-	              (query_index = matchbegin.find('?',j)) != string::npos;
-		      j = query_index + 1) {
+                     (query_index = matchbegin.find('?',j)) != string::npos;
+                     j = query_index + 1)
+                {
                          query_count++;
                 }
                 // the pattern is ending with -*-
                 for (int i = 0, match_index; 
-	              (match_index = matchbegin.find('/',i)) != string::npos;
-		      i = match_index + 1) {
+                      (match_index = matchbegin.find('/',i)) != string::npos;
+                      i = match_index + 1) 
+                {
                          match_count++;
                 }
                 if ((query_count == 1) || ( match_count > 0))  {
                     return AM_NO_MATCH;
-	        } else {
+                } else {
                     return AM_EXACT_PATTERN_MATCH;
-	        }
+                }
             }
-            
             p2 = (char *) malloc(strlen(s1)+1);
             if (p2 != NULL) {
                 memset(p2, '\0', strlen(s1)+1);
@@ -239,7 +260,7 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
                 // if it exists or till the p1 is null
                 while ((*p1 != '-') && (*p1 != '*') && (*p1 != '\0')) {
                     p2[count++] = *p1++;
-                    char_match++;                    
+                    char_match++;
                 }
                 
                 string patternbegin(p2);
@@ -262,8 +283,8 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
                         string::size_type loc = s2_string.find(separator,0);
                         if (loc != string::npos) {
                             // Separator exists, return no match
-	                    free(p2); free(s2);
-	                    return AM_NO_MATCH;
+                            free(p2); free(s2);
+                            return AM_NO_MATCH;
                         }
                      } else {
                            // substring does not exist, return no match
@@ -274,9 +295,9 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
                      // Move pointer s1 upto the point where match 
                      // is complete
                      for (int i=0; i < (match_position + char_match); i++) {
-	                   s1++;
-                      }
-                      free(p2); free(s2);
+                            s1++;
+                     }
+                     free(p2); free(s2);
                 } else {
                    // Unable to allocate memory, return no match
                    free(p2);
@@ -291,30 +312,34 @@ Utils::match_patterns(const char *patbegin, const char *matchbegin,
     } else {
         const char *s1 = matchbegin;
         const char *s2 = matchbegin;
-
         // ignoring mulitple '*'s
         while (*p1 == '*') {
-	    p1++;
+            p1++;
         }
         /* pattern ends with *, so return true. */
-        if (*p1 == '\0') return AM_EXACT_PATTERN_MATCH; 
-
+        if (*p1 == '\0') {
+            return AM_EXACT_PATTERN_MATCH; 
+        }
         // find the end of the string.
         // we need to go backwards.
-        while (*(s1+1) != '\0') s1++;
-
-        while(*s2 != '\0' && *s2 != *p1)
-	    *s2++;
-
-        if (*s2 == '\0') return AM_NO_MATCH;
-
+        while (*(s1+1) != '\0') {
+            s1++;
+        }
+        while(*s2 != '\0' && !areCharEqual(s2, p1, caseignorecmp)) {
+            *s2++;
+        }
+        if (*s2 == '\0') {
+            return AM_NO_MATCH;
+        }
         for (; s1 >= s2; s1--) {
-	    if (*s1 == *p1) {
-	        if (Utils::match_patterns(p1, s1,
-		 		     caseignorecmp,onelevelwildcard,
-                                     separator) != AM_NO_MATCH)
-		return AM_EXACT_PATTERN_MATCH;
-	    }
+            if (areCharEqual(s1, p1, caseignorecmp)) {
+                if (Utils::match_patterns(p1, s1,
+                    caseignorecmp,onelevelwildcard,
+                    separator) != AM_NO_MATCH)
+                {
+                    return AM_EXACT_PATTERN_MATCH;
+                }
+            }
         }
         return AM_NO_MATCH;
     }

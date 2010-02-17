@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: am.h,v 1.22 2008/09/26 00:02:09 robertis Exp $
+ * $Id: am.h,v 1.23 2010/01/26 00:54:46 dknab Exp $
  *
  */
 
@@ -160,6 +160,9 @@ AM_BEGIN_EXTERN_C
  */
 AM_EXPORT am_status_t
 am_cleanup(void);
+
+AM_EXPORT am_status_t
+am_shutdown_nss(void); 
 
 AM_END_EXTERN_C
 

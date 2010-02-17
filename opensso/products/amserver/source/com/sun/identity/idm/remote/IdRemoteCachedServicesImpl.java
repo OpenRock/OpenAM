@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IdRemoteCachedServicesImpl.java,v 1.18 2009/08/25 06:50:53 hengming Exp $
+ * $Id: IdRemoteCachedServicesImpl.java,v 1.20 2010/01/28 00:45:25 bigfatrat Exp $
  *
  */
 
@@ -78,6 +78,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
     private static Stats stats;
 
+    private static com.sun.identity.monitoring.SsoServerIdRepoSvcImpl monIdRepo;
+
     private IdRemoteCachedServicesImpl() {
         super();
         initializeParams();
@@ -88,7 +90,12 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         stats = Stats.getInstance(getClass().getName());
         cacheStats = new IdCacheStats(IdConstants.IDREPO_CACHESTAT);
         stats.addStatsListener(cacheStats);
-
+        if (SystemProperties.isServerMode() &&
+            com.sun.identity.monitoring.Agent.isRunning())
+        {
+            monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean();
+        }
     }
     
     /**
@@ -341,6 +348,15 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         }
         
         cacheStats.incrementGetRequestCount(getSize());
+        if (SystemProperties.isServerMode() &&
+            com.sun.identity.monitoring.Agent.isRunning() && 
+            ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) != null))
+        {
+            long li = (long)getSize();
+            monIdRepo.incGetRqts(li);
+        }
+
         // Get the identity dn
         AMIdentity id = new AMIdentity(token, name, type, amOrgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
@@ -411,6 +427,16 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                         false, !isStringValues);
             } else { // All attributes found in cache
                 cacheStats.updateGetHitCount(getSize());
+                if (SystemProperties.isServerMode() &&
+                    com.sun.identity.monitoring.Agent.isRunning() && 
+                    ((monIdRepo = 
+                        (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                        com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) !=
+                           null))
+                {
+                    long li = (long)getSize();
+                    monIdRepo.incCacheHits(li);
+                }
                 if (getDebug().messageEnabled()) {
                     getDebug().message("IdRemoteCachedServicesImpl." + 
                             "getAttributes(): found all attributes in Cache.");
@@ -427,6 +453,14 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         throws IdRepoException, SSOException {
         
         cacheStats.incrementGetRequestCount(getSize());
+        if (SystemProperties.isServerMode() &&
+            com.sun.identity.monitoring.Agent.isRunning() && 
+            ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) != null))
+        {
+            long li = (long)getSize();
+            monIdRepo.incGetRqts(li);
+        }
         // Get identity DN
         AMIdentity id = new AMIdentity(token, name, type, amOrgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
@@ -439,6 +473,15 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         AMHashMap attributes;
         if ((cb != null) && cb.hasCompleteSet(principalDN)) {
             cacheStats.updateGetHitCount(getSize());
+            if (SystemProperties.isServerMode() &&
+                com.sun.identity.monitoring.Agent.isRunning() && 
+                ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                    com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) !=
+                        null))
+            {
+                long li = (long)getSize();
+                monIdRepo.incCacheHits(li);
+            }
             if (getDebug().messageEnabled()) {
                 getDebug().message("IdRemoteCachedServicesImpl."
                     + "getAttributes(): found all attributes in "
@@ -546,6 +589,14 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         // otherwise unix and anonymous login will fail.
         
         cacheStats.incrementSearchRequestCount(getSize());
+        if (SystemProperties.isServerMode() &&
+            com.sun.identity.monitoring.Agent.isRunning() && 
+            ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) != null))
+        {
+            long li = (long)getSize();
+            monIdRepo.incSearchRqts(li);
+        }
         if ((pattern.indexOf('*') == -1) &&
             ServiceManager.isRealmEnabled()) {
             // First check if the specific identity is in cache.
@@ -563,6 +614,16 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 Map attributes;
                 try {
                     cacheStats.updateSearchHitCount(getSize());
+                    if (SystemProperties.isServerMode() &&
+                        com.sun.identity.monitoring.Agent.isRunning() && 
+                        ((monIdRepo =
+                        (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
+                        com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) !=
+                             null))
+                    {
+                        long li = (long)getSize();
+                        monIdRepo.incSearchCacheHits(li);
+                    }
                     if (ctrl.isGetAllReturnAttributesEnabled()) {
                         attributes = getAttributes(token, type, pattern,
                             orgName, null);

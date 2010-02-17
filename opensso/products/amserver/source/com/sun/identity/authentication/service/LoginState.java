@@ -23,7 +23,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LoginState.java,v 1.56 2009/11/25 12:04:19 manish_rustagi Exp $
+ * $Id: LoginState.java,v 1.57 2010/01/20 21:30:40 qcheng Exp $
  *
  */
 
@@ -1480,7 +1480,7 @@ public class LoginState {
                 }
             }
             if ((userSessionMapping != null) && 
-                !(userSessionMapping.isEmpty())) {
+                !(userSessionMapping.isEmpty()) && !ignoreUserProfile) {
                 Iterator tmpIterator = userSessionMapping.iterator();
                 while (tmpIterator.hasNext()) {
                     String mapping = (String) tmpIterator.next();

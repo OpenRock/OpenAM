@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CommandManager.java,v 1.36 2009/09/01 17:11:45 bigfatrat Exp $
+ * $Id: CommandManager.java,v 1.37 2010/01/28 00:47:10 bigfatrat Exp $
  *
  */
 
@@ -111,6 +111,10 @@ public class CommandManager {
                 Bootstrap.load();
                 // Initialize AdminTokenAction
                 AdminTokenAction.getInstance().authenticationInitialized();
+		System.setProperty("java.util.logging.config.class",
+		    "com.sun.identity.log.s1is.LogConfigReader");
+		System.setProperty("java.util.logging.manager",
+		    "com.sun.identity.log.LogManager");
             } catch (ConfiguratorException ex) {
                 bBootstrapped = false;
                 if ((argv.length > 0) &&

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: NotificationServlet.java,v 1.1 2009/08/19 05:40:35 veiming Exp $
+ * $Id: NotificationServlet.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -31,6 +31,7 @@ import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.ReferredApplicationManager;
 import java.io.IOException;
 import java.io.Writer;
 import javax.servlet.ServletException;
@@ -103,6 +104,7 @@ public class NotificationServlet extends HttpServlet {
 
     private void handleReferralPrivilegeAdded(HttpServletRequest req) {
         String realm = req.getParameter(ATTR_REALM_NAME);
+        ReferredApplicationManager.getInstance().clearCache();
         dataStore.clearIndexCount(realm, true);
     }
 
@@ -128,6 +130,7 @@ public class NotificationServlet extends HttpServlet {
     private void handleReferralPrivilegeDeleted(HttpServletRequest req) {
         String referralName = req.getParameter(ATTR_NAME);
         String realm = req.getParameter(ATTR_REALM_NAME);
+        ReferredApplicationManager.getInstance().clearCache();
 
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
             PrivilegeManager.superAdminSubject, realm);

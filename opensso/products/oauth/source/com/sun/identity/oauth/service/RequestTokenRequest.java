@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RequestTokenRequest.java,v 1.2 2009/12/15 01:27:48 huacui Exp $
+ * $Id: RequestTokenRequest.java,v 1.3 2010/01/20 17:51:37 huacui Exp $
  *
  */
 
@@ -38,7 +38,9 @@ import com.sun.jersey.oauth.signature.OAuthSignature;
 import com.sun.jersey.oauth.signature.OAuthSignatureException;
 import com.sun.jersey.oauth.signature.RSA_SHA1;
 import com.sun.identity.oauth.service.util.UniqueRandomString;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,21 @@ public class RequestTokenRequest implements OAuthServiceConstants {
                       "Signature Method is missing."), BAD_REQUEST);
             }
 
+            String callback = params.get(OAUTH_CALLBACK);
+            if ((callback == null) || (callback.isEmpty())) {
+                throw new WebApplicationException(new Throwable(
+                      "Callback URL is missing."), BAD_REQUEST);
+            }
+
+            if (!callback.equals(OAUTH_OOB)) {
+                try {
+                    URL url = new URL(callback);
+                } catch (MalformedURLException me) {
+                    throw new WebApplicationException(new Throwable(
+                      "Callback URL is not valid."), BAD_REQUEST);
+                }
+            }
+
             Map<String, String> searchMap = new HashMap<String, String>();
             searchMap.put(CONSUMER_KEY, conskey);
             List<Consumer> consumers = oauthResMgr.searchConsumers(searchMap);
@@ -150,12 +167,15 @@ public class RequestTokenRequest implements OAuthServiceConstants {
             rt.setReqtSecret(new UniqueRandomString().getString());
             // Same value for now
             rt.setReqtVal(loc.toString());
+            // Set the callback URL
+            rt.setCallback(callback);
 
             //oauthResMgr.createConsumer(null, cons);
             oauthResMgr.createRequestToken(null, rt);
 
             String resp = OAUTH_TOKEN + "=" + rt.getReqtVal() 
-                  + "&" + OAUTH_TOKEN_SECRET + "=" + rt.getReqtSecret();
+                  + "&" + OAUTH_TOKEN_SECRET + "=" + rt.getReqtSecret()
+                  + "&" + OAUTH_CALLBACK_CONFIRMED + "=true";
             return Response.created(loc).entity(resp)
                    .type(MediaType.APPLICATION_FORM_URLENCODED).build();
         } catch (OAuthServiceException e) {

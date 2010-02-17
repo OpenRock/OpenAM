@@ -23,7 +23,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build.xml,v 1.4 2009/11/20 18:00:13 mrudul_uchil Exp $
+   $Id: build.xml,v 1.5 2010/01/15 18:54:37 mrudul_uchil Exp $
 
 -->
 
@@ -100,7 +100,7 @@
 	</target>
 
     <!-- Delete all Tomcat specific files from the "web" folder-->
-	<target name="tomcat-clean" depends="clean">
+	<target name="tomcat-clean">
 		<delete file="web/WEB-INF/sun-jaxws.xml"/>
 
 		<copy file="../etc/config/StockService/web_orig.xml"

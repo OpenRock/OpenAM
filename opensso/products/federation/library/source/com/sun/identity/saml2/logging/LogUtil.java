@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LogUtil.java,v 1.11 2009/10/14 23:58:35 exu Exp $
+ * $Id: LogUtil.java,v 1.12 2010/01/23 00:07:41 exu Exp $
  *
  */
 
@@ -360,6 +360,7 @@ public class LogUtil {
     public static final String POST_RESPONSE_INVALID_SIGNATURE =
                                 "POST_RESPONSE_INVALID_SIGNATURE";
     public static final String BINDING_NOT_SUPPORTED = "BINDING_NOT_SUPPORTED";
+    public static final String SP_SSO_FAILED = "SP_SSO_FAILED";
                                           
     private static final String SAML2_LOG = "SAML2";
     private static Logger logger = null;

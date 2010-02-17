@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: EntitlementService.java,v 1.10.2.1 2010/01/05 15:18:40 veiming Exp $
+ * $Id: EntitlementService.java,v 1.13 2010/01/08 23:59:32 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -74,7 +74,6 @@ public class EntitlementService extends EntitlementConfiguration {
         "subjectAttributeNames";
     private static final String ATTR_NAME_META = "meta";
     private static final String CONFIG_APPLICATIONS = "registeredApplications";
-    private static final String CONFIG_APPLICATION = "application";
     private static final String CONFIG_APPLICATION_DESC = "description";
     private static final String SCHEMA_APPLICATIONS = "applications";
     private static final String CONFIG_APPLICATIONTYPE = "applicationType";
@@ -124,6 +123,21 @@ public class EntitlementService extends EntitlementConfiguration {
      */
     public Set<String> getConfiguration(String attrName) {
         return getConfiguration(adminToken, attrName);
+    }
+
+    public static int getConfiguration(String attrName, int defaultValue) {
+        Set<String> values = getConfiguration(adminToken, attrName);
+        if ((values == null) || values.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(values.iterator().next());
+        } catch (NumberFormatException e) {
+            PrivilegeManager.debug.error(
+                "EntitlementService.getConfiguration: attribute name=" +
+                attrName, e);
+            return defaultValue;
+        }
     }
 
     private static Set<String> getConfiguration(
@@ -1447,6 +1461,16 @@ public class EntitlementService extends EntitlementConfiguration {
         }
     }
 
+    public boolean doesRealmExist() {
+        try {
+            OrganizationConfigManager mgr = new OrganizationConfigManager(
+                adminToken, realm);
+            return true;
+        } catch (SMSException ex) {
+            return false;
+        }
+    }
+
     public Set<String> getParentAndPeerRealmNames()
         throws EntitlementException {
         Set<String> results = new HashSet<String>();
@@ -1464,11 +1488,10 @@ public class EntitlementService extends EntitlementConfiguration {
                 results.add(DNMapper.orgNameToRealmName(o));
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.warning("EntitlementService.getSubRealmNames",
+            PrivilegeManager.debug.error("EntitlementService.getSubRealmNames",
                 ex);
             // realm no longer exist
         }
-
         return results;
     }
 

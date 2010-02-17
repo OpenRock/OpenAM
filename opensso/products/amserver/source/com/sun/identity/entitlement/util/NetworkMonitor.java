@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: NetworkMonitor.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
+ * $Id: NetworkMonitor.java,v 1.2 2009/12/17 18:03:51 veiming Exp $
  */
 
 package com.sun.identity.entitlement.util;
@@ -231,7 +231,7 @@ public class NetworkMonitor extends HttpServlet {
             }
             writer.write(']');
         } else {
-            writer.write("Unknow StatsMonitor: " + path);
+            writer.write("Unknown StatsMonitor: " + path);
         }
     }
 

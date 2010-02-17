@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: EntitlementConfiguration.java,v 1.5 2009/11/19 01:02:03 veiming Exp $
+ * $Id: EntitlementConfiguration.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -49,7 +49,7 @@ public abstract class EntitlementConfiguration {
 
     static {
         try {
-            //TODO load different configuration plugin
+            //RFE: load different configuration plugin
             clazz = Class.forName(
                 "com.sun.identity.entitlement.opensso.EntitlementService");
         } catch (ClassNotFoundException e) {
@@ -277,4 +277,6 @@ public abstract class EntitlementConfiguration {
         throws EntitlementException;
 
     public abstract String getRealmName(String realm);
+
+    public abstract boolean doesRealmExist();
 }

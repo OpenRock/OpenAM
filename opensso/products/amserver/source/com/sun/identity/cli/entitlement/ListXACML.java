@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ListXACML.java,v 1.2.2.1 2009/12/19 00:40:08 dillidorai Exp $
+ * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
  */
 
@@ -45,8 +45,11 @@ import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 
@@ -62,7 +65,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.xml.bind.JAXBException;
+
 import javax.security.auth.Subject;
+
+import org.json.JSONException;
 
 /**
  * Gets policies in a realm.
@@ -200,6 +207,7 @@ public class ListXACML extends AuthenticatedCommand {
         String currentPrivilegeName = null;
         try {
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, adminSubject);
+            ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, adminSubject);
 
             String[] parameters = new String[1];
             parameters[0] = realm;
@@ -207,8 +215,17 @@ public class ListXACML extends AuthenticatedCommand {
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_TO_GET_POLICY_NAMES_IN_REALM", parameters);
             
-            Set<String> privilegeNames = pm.searchPrivilegeNames(
-                    getFilters(filters));
+            Set<SearchFilter> filterSet = getFilters(filters);
+            Set<String> privilegeNames = pm.searchPrivilegeNames(filterSet);
+            
+            Set<String> referralPrivilegeNames = rpm.searchReferralPrivilegeNames(
+                    filterSet);
+            if (referralPrivilegeNames != null & !referralPrivilegeNames.isEmpty()) {
+                if (privilegeNames == null) {
+                    privilegeNames = new HashSet<String>();
+                }
+                privilegeNames.addAll(referralPrivilegeNames);
+            }
             
             if ((privilegeNames != null) && !privilegeNames.isEmpty()) {
                 FileOutputStream fout = null;
@@ -293,10 +310,17 @@ public class ListXACML extends AuthenticatedCommand {
             String[] parameters = new String[1];
             parameters[0] = realm;
 
-            Set<String> privilegeNames = pm.searchPrivilegeNames(
-                    getFilters(filters));
-            
-            if ((privilegeNames != null) && !privilegeNames.isEmpty()) {
+            Set<SearchFilter> filterSet = getFilters(filters);
+
+            Set<String> privilegeNames = pm.searchPrivilegeNames(filterSet);
+
+            ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, 
+                    adminSubject); 
+            Set<String> referralNames = rpm.searchReferralPrivilegeNames(
+                    filterSet);
+
+            if (((privilegeNames != null) && !privilegeNames.isEmpty())
+                    || ((referralNames != null) && !referralNames.isEmpty())) {
                 FileOutputStream fout = null;
                 PrintWriter pwout = null;
                 
@@ -330,17 +354,34 @@ public class ListXACML extends AuthenticatedCommand {
                 String[] params = new String[2];
                 params[0] = realm;
 
-                Set<Privilege> privileges = new HashSet<Privilege>();
-                for (Iterator i = privilegeNames.iterator(); i.hasNext(); ) {
-                    currentPrivilegeName = (String)i.next();
-                    params[1] = currentPrivilegeName;
-                    writeLog(LogWriter.LOG_ACCESS, Level.INFO,
-                        "ATTEMPT_GET_POLICY_IN_REALM", params);
-                    Privilege privilege = pm.getPrivilege(currentPrivilegeName, adminSubject);
-                    privileges.add(privilege);
+                PolicySet policySet = null;
+                if ((privilegeNames != null) && !privilegeNames.isEmpty()) {
+                    Set<Privilege> privileges = new HashSet<Privilege>();
+                    for (Iterator i = privilegeNames.iterator(); i.hasNext(); ) {
+                        currentPrivilegeName = (String)i.next();
+                        params[1] = currentPrivilegeName;
+                        writeLog(LogWriter.LOG_ACCESS, Level.INFO,
+                            "ATTEMPT_GET_POLICY_IN_REALM", params);
+                        Privilege privilege = pm.getPrivilege(currentPrivilegeName, adminSubject);
+                        privileges.add(privilege);
+                    }
+                    policySet = XACMLPrivilegeUtils.privilegesToPolicySet(realm, privileges);
                 }
-                PolicySet policySet 
-                        = XACMLPrivilegeUtils.privilegesToPolicySet(realm, privileges);
+
+                if ((referralNames != null) && !referralNames.isEmpty()) {
+                    if (policySet == null) {
+                        policySet = XACMLPrivilegeUtils.newPolicySet(realm); 
+                    }
+                    for (Iterator i = referralNames.iterator(); i.hasNext(); ) {
+                        currentPrivilegeName = (String)i.next();
+                        params[1] = currentPrivilegeName;
+                        writeLog(LogWriter.LOG_ACCESS, Level.INFO,
+                            "ATTEMPT_GET_POLICY_IN_REALM", params);
+                        ReferralPrivilege referralPrivilege = rpm.getReferral(currentPrivilegeName); 
+                        Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
+                        XACMLPrivilegeUtils.addPolicyToPolicySet(policy, policySet);
+                    }
+                }
 
                 if (pwout != null) {
                     pwout.write(XACMLPrivilegeUtils.toXML(policySet));
@@ -372,6 +413,18 @@ public class ListXACML extends AuthenticatedCommand {
             }
             
         } catch (EntitlementException e) {
+            String[] args = {realm, currentPrivilegeName, e.getMessage()};
+            debugError("ListXACML.handleRequest", e);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO,
+                "FAILED_GET_POLICY_IN_REALM", args);
+            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        } catch (JAXBException e) {
+            String[] args = {realm, currentPrivilegeName, e.getMessage()};
+            debugError("ListXACML.handleRequest", e);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO,
+                "FAILED_GET_POLICY_IN_REALM", args);
+            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        } catch (JSONException e) {
             String[] args = {realm, currentPrivilegeName, e.getMessage()};
             debugError("ListXACML.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SecurityTokenServiceViewBean.java,v 1.4.2.1 2009/12/19 02:41:49 asyhuang Exp $
+ * $Id: SecurityTokenServiceViewBean.java,v 1.6 2009/12/19 02:17:03 asyhuang Exp $
  *
  */
 package com.sun.identity.console.service;

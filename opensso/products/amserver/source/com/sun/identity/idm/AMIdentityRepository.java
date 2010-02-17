@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AMIdentityRepository.java,v 1.20 2009/01/28 05:34:58 ww203982 Exp $
+ * $Id: AMIdentityRepository.java,v 1.21 2010/01/06 01:58:26 veiming Exp $
  *
  */
 
@@ -567,12 +567,7 @@ public final class AMIdentityRepository {
     public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
             String orgName) throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
-        if (idServices instanceof IdServicesImpl) {
-            // Implementation for server side only
-            return ((IdServicesImpl) idServices).getSpecialIdentities(
-                token, type, orgName);
-        }
-        return (new IdSearchResults(IdType.USER, ""));
+        return idServices.getSpecialIdentities(token, type, orgName);
     }
     
     /**

@@ -24,7 +24,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build-tools.xml,v 1.26.2.1 2010/01/11 18:25:56 veiming Exp $
+   $Id: build-tools.xml,v 1.28 2010/01/11 17:34:32 veiming Exp $
 
 -->
 
@@ -108,9 +108,55 @@
                 
         <copy todir="${amadm.package.dir}"
             overwrite="yes" filtering="true">
-            <fileset dir="${amserver.res.dir}/locale"
+            <fileset dir="${amserver.res.i18n.dir}"
                 includes="amadmtoolssetup.properties"/>
         </copy>
+        <copy tofile="${amadm.package.dir}/amadmtoolssetup_en.properties"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}"
+                includes="amadmtoolssetup.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/de_DE"
+                includes="amadmtoolssetup_de.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/es_ES"
+                includes="amadmtoolssetup_es.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/fr_FR"
+                includes="amadmtoolssetup_fr.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/ja_JP"
+                includes="amadmtoolssetup_ja.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/ko_KR"
+                includes="amadmtoolssetup_ko.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/ko_KR"
+                includes="amadmtoolssetup_ko.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/zh_CN"
+                includes="amadmtoolssetup_zh.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/zh_TW"
+                includes="amadmtoolssetup_zh_TW.properties"/>
+        </copy>
+
         <jar destfile="${amadm.lib.dir}/amadm_setup.jar"
             basedir="${amadm.classes.dir}">
             <manifest>

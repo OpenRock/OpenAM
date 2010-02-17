@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RequestToken.java,v 1.1 2009/11/20 19:31:57 huacui Exp $
+ * $Id: RequestToken.java,v 1.2 2010/01/20 17:51:38 huacui Exp $
  *
  */
 
@@ -43,6 +43,8 @@ public class RequestToken {
     private String reqtPpalid;
     private Date reqtLifetime;
     private Consumer consumerId;
+    private String callback;
+    private String verifier;
     private String etag;
 
     private static long lifeTime = 86400; // default life time in seconds
@@ -115,6 +117,22 @@ public class RequestToken {
 
     public void setConsumerId(Consumer consumerId) {
         this.consumerId = consumerId;
+    }
+
+    public String getCallback() {
+        return callback;
+    }
+
+    public void setCallback(String callback) {
+        this.callback = callback;
+    }
+
+    public String getVerifier() {
+        return verifier;
+    }
+
+    public void setVerifier(String verifier) {
+        this.verifier = verifier;
     }
 
     public String getEtag() {

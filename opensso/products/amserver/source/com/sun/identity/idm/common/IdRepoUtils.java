@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IdRepoUtils.java,v 1.2 2009/11/19 20:36:53 hengming Exp $
+ * $Id: IdRepoUtils.java,v 1.3 2010/01/06 22:31:55 veiming Exp $
  */
 
 package com.sun.identity.idm.common;
@@ -336,7 +336,7 @@ public class IdRepoUtils {
         return null;
     }
 
-    private static LDAPConnection getLDAPConnection(Map attrValues)
+    private static LDAPConnection getLDAPConnection(Map attrValues) 
         throws Exception {
         String s = CollectionHelper.getMapAttr(attrValues,
             "sun-idrepo-ldapv3-config-ssl-enabled");
@@ -348,10 +348,20 @@ public class IdRepoUtils {
 
         String hostPort = CollectionHelper.getMapAttr(attrValues,
             "sun-idrepo-ldapv3-config-ldap-server");
+        if ((hostPort == null) || (hostPort.trim().length() == 0)) {
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
+
         String bindDn = CollectionHelper.getMapAttr(attrValues,
             "sun-idrepo-ldapv3-config-authid");
+        if ((bindDn == null) || (bindDn.trim().length() == 0)) {
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
         String bindPwd = CollectionHelper.getMapAttr(attrValues,
             "sun-idrepo-ldapv3-config-authpw");
+        if ((bindPwd == null) || (bindPwd.trim().length() == 0)) {
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
+        }
 
         // hostPort contains port so 389 will be ignored
         ld.connect(3, hostPort, 389, bindDn, bindPwd);

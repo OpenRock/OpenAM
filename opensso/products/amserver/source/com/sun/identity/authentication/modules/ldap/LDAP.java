@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LDAP.java,v 1.16 2009/11/18 20:50:02 qcheng Exp $
+ * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
  *
  */
 
@@ -82,6 +82,7 @@ public class LDAP extends AMLoginModule {
     protected String validatedUserID;
     private String userName;
     private String userPassword;
+    private int requiredPasswordLength = 0;
     private String regEx;
     private String currentConfigName;
     private String bindDN;
@@ -203,6 +204,15 @@ public class LDAP extends AMLoginModule {
                     debug.error("BaseDN for search is invalid: " + baseDN);
                 }
                 
+                String pLen = CollectionHelper.getMapAttr(currentConfig,
+                    "iplanet-am-auth-ldap-min-password-length"); 
+                if (pLen != null) {
+                    try {
+                        requiredPasswordLength = Integer.parseInt(pLen);
+                    } catch (NumberFormatException ex) {
+                        debug.error("LDAP.initializeLDAP : " + pLen, ex);
+                    }
+                } 
                 bindDN = CollectionHelper.getMapAttr(currentConfig,
                     "iplanet-am-auth-ldap-bind-dn", "");
                 String bindPassword = CollectionHelper.getMapAttr(
@@ -293,6 +303,7 @@ public class LDAP extends AMLoginModule {
                     isProfileCreationEnabled);
                 if (debug.messageEnabled()) {
                     debug.message("bindDN-> " + bindDN +
+                    "\nrequiredPasswordLength-> " + requiredPasswordLength +
                     "\nbaseDN-> " + baseDN +
                     "\nuserNamingAttr-> " + userNamingAttr +
                     "\nuserSearchAttr(s)-> " + userSearchAttrs +
@@ -490,21 +501,39 @@ public class LDAP extends AMLoginModule {
                     callbacks[2]).getPassword(), callbacks[2]);
                     try{
                         validatePassword(newPassword);
-                        ldapUtil.changePassword(oldPassword, newPassword,
-                        confirmPassword);
-                        newState = ldapUtil.getState();
-                        String logMsg = ldapUtil.getLogMessage();
-                        if (newState == 
-                            LDAPAuthUtils.PASSWORD_UPDATED_SUCCESSFULLY){
-                            // log change password success
-                            getLoginState("LDAP").logSuccess(
-                                "changePasswdSucceeded",
-                                "CHANGE_USER_PASSWORD_SUCCEEDED");
-                        } else if ((logMsg != null) && (newState ==
-                            LDAPAuthUtils.PASSWORD_MIN_CHARACTERS)) {
+                        // check minimal password length requirement
+                        int newPasswordLength = 0;
+                        if (newPassword != null) {
+                            newPasswordLength = newPassword.length();
+                        }
+                        if (newPasswordLength < requiredPasswordLength) {
+                            if (debug.messageEnabled()) {
+                                debug.message("LDAP.process: new password less"
+                                    + " than the minimal length of " 
+                                    + requiredPasswordLength);
+                            }
+                            newState = LDAPAuthUtils.PASSWORD_MIN_CHARACTERS;
                             // add log
-                            getLoginState("LDAP").logFailed(logMsg,
+                            getLoginState("LDAP").logFailed(
+                                bundle.getString("PasswdMinChars"),
                                 "CHANGE_USER_PASSWORD_FAILED", false, null);
+                        } else {
+                            ldapUtil.changePassword(oldPassword, newPassword,
+                                confirmPassword);
+                            newState = ldapUtil.getState();
+                            String logMsg = ldapUtil.getLogMessage();
+                            if (newState == 
+                                LDAPAuthUtils.PASSWORD_UPDATED_SUCCESSFULLY){
+                                // log change password success
+                                getLoginState("LDAP").logSuccess(
+                                    "changePasswdSucceeded",
+                                    "CHANGE_USER_PASSWORD_SUCCEEDED");
+                            } else if ((logMsg != null) && (newState ==
+                                LDAPAuthUtils.PASSWORD_MIN_CHARACTERS)) {
+                                // add log
+                                getLoginState("LDAP").logFailed(logMsg,
+                                    "CHANGE_USER_PASSWORD_FAILED", false, null);
+                            }
                         }
                         processPasswordScreen(newState);
                         if (debug.messageEnabled()) {

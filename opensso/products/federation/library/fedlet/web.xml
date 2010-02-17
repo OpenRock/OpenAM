@@ -24,7 +24,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: web.xml,v 1.4 2009/06/17 03:07:37 exu Exp $
+   $Id: web.xml,v 1.5 2010/01/07 00:22:19 exu Exp $
 
 -->
 
@@ -33,6 +33,10 @@
     <display-name>Fedlet Sample Application</display-name>
     <distributable/>
 
+    <welcome-file-list>
+         <welcome-file>index.jsp</welcome-file>
+         <welcome-file>index.html</welcome-file>
+     </welcome-file-list>
     <!-- Add one servlet entry like this per module -->
     <servlet>
         <servlet-name>fedletapplication</servlet-name>

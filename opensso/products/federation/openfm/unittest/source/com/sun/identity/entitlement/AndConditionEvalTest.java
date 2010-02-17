@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AndConditionEvalTest.java,v 1.1 2009/09/05 00:24:03 veiming Exp $
+ * $Id: AndConditionEvalTest.java,v 1.2 2010/01/12 21:29:58 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -125,7 +125,7 @@ public class AndConditionEvalTest {
     @Test
     public void negativeTest() throws Exception {
         Map<String, Set<String>> environment = getEnvironment(
-                "210.100.100.200", "www.AndConditionEvalTest.com");
+                "210.100.100.200", "www.wrong.com");
 
         Evaluator evaluator = new Evaluator(adminSubject,
                 ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
@@ -161,8 +161,21 @@ public class AndConditionEvalTest {
         if (!adv.equals(IPCondition.REQUEST_IP + "=" + START_IP + "-" + END_IP)
         ) {
             throw new Exception(
-                    "AndConditionEvalTest.negativeTest: incorrect decision");
+                "AndConditionEvalTest.negativeTest: advice for IP Condition");
         }
+
+        advice = advices.get(DNSNameCondition.class.getName());
+        if ((advice == null) || advice.isEmpty()) {
+            throw new Exception(
+                "AndConditionEvalTest.negativeTest: no advice for DNS Condition.");
+        }
+
+        adv = advice.iterator().next();
+        if (!adv.equals(DNSNameCondition.REQUEST_DNS_NAME + "=" + DNS_MASK)) {
+            throw new Exception(
+                "AndConditionEvalTest.negativeTest: incorrect advice for DNS Condition");
+        }
+
     }
 
     private Map<String, Set<String>> getEnvironment(String ipAddr, String dns) {

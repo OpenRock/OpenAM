@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
- * $Id: AuthnRequest.cs,v 1.1 2009/06/11 18:37:58 ggennaro Exp $
+ * $Id: AuthnRequest.cs,v 1.2 2010/01/19 18:23:09 ggennaro Exp $
  */
 
 using System;
@@ -59,9 +59,17 @@ namespace Sun.Identity.Saml2
         /// <summary>
         /// Initializes a new instance of the AuthnRequest class.
         /// </summary>
-        /// <param name="serviceProvider">ServiceProvider to issue the AuthnRequest</param>
-        /// <param name="parameters">NameValueCollection of varying parameters for use in the construction of the AuthnRequest.</param>
-        public AuthnRequest(ServiceProvider serviceProvider, NameValueCollection parameters)
+        /// <param name="identityProvider">
+        /// IdentityProvider to receive the AuthnRequest
+        /// </param>
+        /// <param name="serviceProvider">
+        /// ServiceProvider to issue the AuthnRequest
+        /// </param>
+        /// <param name="parameters">
+        /// NameValueCollection of varying parameters for use in the 
+        /// construction of the AuthnRequest.
+        /// </param>
+        public AuthnRequest(IdentityProvider identityProvider, ServiceProvider serviceProvider, NameValueCollection parameters)
         {
             this.xml = new XmlDocument();
             this.xml.PreserveWhitespace = true;
@@ -104,6 +112,19 @@ namespace Sun.Identity.Saml2
             if (String.IsNullOrEmpty(this.AssertionConsumerServiceIndex) && String.IsNullOrEmpty(assertionConsumerSvcUrl))
             {
                 throw new Saml2Exception(Resources.AuthnRequestAssertionConsumerServiceNotDefined);
+            }
+
+            // If destination not specified, use SSO location by binding
+            if (string.IsNullOrEmpty(this.Destination))
+            {
+                this.Destination 
+                    = identityProvider.GetSingleSignOnServiceLocation(parameters[Saml2Constants.RequestBinding]);
+
+                if (string.IsNullOrEmpty(this.Destination)) 
+                {
+                    // default to HttpRedirect
+                    this.Destination = identityProvider.GetSingleSignOnServiceLocation(Saml2Constants.HttpRedirectProtocolBinding);
+                }
             }
 
             // Get RequestedAuthnContext if parameters are available...

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SiteConfiguration.java,v 1.11 2009/10/28 23:33:16 veiming Exp $
+ * $Id: SiteConfiguration.java,v 1.12 2010/01/15 18:10:55 veiming Exp $
  *
  */
 
@@ -396,6 +396,28 @@ public class SiteConfiguration extends ConfigurationBase {
             created = true;
         }
         return created;
+    }
+
+    /**
+     * Returns the primary URL of a site.
+     *
+     * @param ssoToken Single Sign-On Token which is used to access to the
+     *        service management datastore.
+     * @param siteName Name of the site.
+     * @return the primary URL of a site.
+     * @throws SMSException if errors access in the service management
+     *         datastore.
+     * @throws SSOException if the <code>ssoToken</code> is not valid.
+     */
+    public static String getSiteID(SSOToken ssoToken, String siteName)
+        throws SMSException, SSOException {
+        ServiceConfig rootNode = getRootSiteConfig(ssoToken);
+        ServiceConfig sc = rootNode.getSubConfig(siteName);
+        ServiceConfig accessPoint = sc.getSubConfig(SUBCONFIG_ACCESS_URL);
+
+        Map map = accessPoint.getAttributes();
+        Set set = (Set)map.get(ATTR_PRIMARY_SITE_ID);
+        return (String)set.iterator().next();
     }
 
     /**

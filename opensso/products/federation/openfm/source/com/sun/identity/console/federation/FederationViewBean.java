@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: FederationViewBean.java,v 1.25.2.1 2009/12/25 09:27:21 babysunil Exp $
+ * $Id: FederationViewBean.java,v 1.27 2010/01/07 19:11:12 asyhuang Exp $
  *
  */
 
@@ -432,7 +432,11 @@ public  class FederationViewBean
 
                 // get cot status
                 String status = desc.getCircleOfTrustStatus();
-                tableModel.setValue (COT_STATUS_VALUE, status);
+                if((status !=null) && status.equals("active")){
+                    tableModel.setValue (COT_STATUS_VALUE, "label.active");
+                } else {
+                    tableModel.setValue (COT_STATUS_VALUE, "label.inactive");
+                }
 
                 cache.add (name + "," + realm);
             }

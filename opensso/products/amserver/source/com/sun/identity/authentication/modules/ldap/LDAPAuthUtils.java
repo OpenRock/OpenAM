@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LDAPAuthUtils.java,v 1.20 2009/11/20 23:52:52 ww203982 Exp $
+ * $Id: LDAPAuthUtils.java,v 1.21 2009/12/28 03:01:26 222713 Exp $
  *
  */
 
@@ -519,9 +519,12 @@ public class LDAPAuthUtils {
         LDAPConnection  modCtx = null;
         try {
             LDAPModificationSet mods =new LDAPModificationSet();
+            LDAPAttribute attrOldPwd = new LDAPAttribute("userpassword",
+               oldPwd);
+            mods.add(LDAPModification.DELETE, attrOldPwd);
             LDAPAttribute attrPwd = new LDAPAttribute("userpassword",
                 password);
-            mods.add(LDAPModification.REPLACE,attrPwd);
+            mods.add(LDAPModification.ADD,attrPwd);
             try {
                 LDAPBindRequest bindRequest =
                     LDAPRequestParser.parseBindRequest(version, userDN, oldPwd);

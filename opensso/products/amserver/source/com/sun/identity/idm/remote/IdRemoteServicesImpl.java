@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IdRemoteServicesImpl.java,v 1.22 2009/08/25 06:53:14 hengming Exp $
+ * $Id: IdRemoteServicesImpl.java,v 1.23 2010/01/06 01:58:26 veiming Exp $
  *
  */
 
@@ -796,5 +796,26 @@ public class IdRemoteServicesImpl implements IdServices {
             AdminTokenAction.getInstance());
         return token.getTokenID().toString() + " " +
             appToken.getTokenID().toString();
+    }
+
+    
+    public IdSearchResults getSpecialIdentities(
+        SSOToken token,
+        IdType type,
+        String orgName
+    ) throws IdRepoException, SSOException {
+        Map res = null;
+
+        try {
+            Object[] objs = {getTokenString(token), type.getName(), orgName};
+            res = ((Map)client.send(client.encodeMessage(
+                    "getSpecialIdentities_idrepo", objs),
+                    Session.getLBCookie(token.getTokenID().toString()), null));
+
+        } catch (Exception ex) {
+            processException(ex);
+        }
+
+        return mapToIdSearchResults(token, type, orgName, res);
     }
 }

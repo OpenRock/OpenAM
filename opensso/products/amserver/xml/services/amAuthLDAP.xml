@@ -24,7 +24,7 @@
     your own identifying information:
     "Portions Copyrighted [year] [name of copyright owner]"
 
-    $Id: amAuthLDAP.xml,v 1.7 2008/12/13 01:40:08 veiming Exp $
+    $Id: amAuthLDAP.xml,v 1.8 2010/01/25 22:09:17 qcheng Exp $
 
 -->
 
@@ -162,6 +162,14 @@
                         <Value>*|(|)|&amp;|!</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-ldap-min-password-length"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a115">
+                    <DefaultValues>
+                        <Value>8</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="iplanet-am-auth-ldap-server"
                         type="list"
@@ -277,13 +285,21 @@
                         i18nKey="a114">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-invalid-chars"
-                    type="list"
-                    syntax="string"
-                    i18nKey="">
-                    <DefaultValues>
-                        <Value>*|(|)|&amp;|!</Value>
-                    </DefaultValues>
-                </AttributeSchema>
+                        type="list"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>*|(|)|&amp;|!</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-ldap-min-password-length"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a115">
+                        <DefaultValues>
+                            <Value>8</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Main.java,v 1.10 2008/10/21 03:12:58 veiming Exp $
+ * $Id: Main.java,v 1.11 2010/01/14 23:38:25 veiming Exp $
  *
  */
 
@@ -121,8 +121,18 @@ public class Main implements SetupConstants{
                     System.out.println(bundle.getString("message.error.dir"));
                     System.exit(1);
                 }
-                new File(debugPath).mkdirs();
-                new File(logPath).mkdirs();
+                boolean created = new File(debugPath).mkdirs();
+                if (!created) {
+                    System.out.println(bundle.getString(
+                        "message.error.debug.dir.not.writable"));
+                    System.exit(1);                        
+                }
+                created = new File(logPath).mkdirs();
+                if (!created) {
+                    System.out.println(bundle.getString(
+                        "message.error.log.dir.not.writable"));
+                    System.exit(1);                        
+                }
 
                 if (!configPath.endsWith(FILE_SEPARATOR)) {
                     configPath = configPath + FILE_SEPARATOR;

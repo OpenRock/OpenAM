@@ -24,7 +24,7 @@
     your own identifying information:
     "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: amAuthHOTP.xml,v 1.1 2009/03/24 23:52:13 pluo Exp $
+   $Id: amAuthHOTP.xml,v 1.2 2010/01/27 21:46:02 qcheng Exp $
 
 -->
 
@@ -66,9 +66,9 @@
                         <Value>smtp.gmail.com</Value>
                     </DefaultValues>
                 </AttributeSchema>
-               <AttributeSchema name="sunAMAuthHOTPSMTPHostPort"
+                <AttributeSchema name="sunAMAuthHOTPSMTPHostPort"
                     type="single"
-                    syntax="string"
+                    syntax="number_range" rangeStart="0" rangeEnd="65535"
                     i18nKey="a503">
                     <DefaultValues>
                         <Value>465</Value>
@@ -144,6 +144,91 @@
                         i18nKey="a500">
                         <DefaultValues>
                             <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMSGatewayImplClassName"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a501">
+                        <DefaultValues>
+                            <Value>com.sun.identity.authentication.modules.hotp.DefaultSMSGatewayImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPHostName"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a502">
+                        <DefaultValues>
+                            <Value>smtp.gmail.com</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPHostPort"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="65535"
+                        i18nKey="a503">
+                        <DefaultValues>
+                            <Value>465</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPUserName"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a504">
+                        <DefaultValues>
+                            <Value>opensso.sun</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPUserPassword"
+                        type="single"
+                        syntax="password"
+                        i18nKey="a505">
+                        <DefaultValues>
+                            <Value>sunopensso</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPSSLEnabled"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a506">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
+                            <ChoiceValue i18nKey="nonssl">Non SSL</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>SSL</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPPasswordValidityDuration"
+                        type="single"
+                        syntax="number_range" rangeStart="1" rangeEnd="30"
+                        i18nKey="a507">
+                        <DefaultValues>
+                            <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPPasswordLength"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a508">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="6digits">6</ChoiceValue>
+                            <ChoiceValue i18nKey="8digits">8</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>8</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPasswordDelivery"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a509">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="sms">SMS</ChoiceValue>
+                            <ChoiceValue i18nKey="email">E-mail</ChoiceValue>
+                            <ChoiceValue i18nKey="both">SMS and E-mail</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>SMS and E-mail</Value>
                         </DefaultValues>
                     </AttributeSchema>
                  </SubSchema>

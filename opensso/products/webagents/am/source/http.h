@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: http.h,v 1.5 2009/08/27 21:41:30 subbae Exp $
+ * $Id: http.h,v 1.6 2009/12/19 00:05:46 subbae Exp $
  *
  *
  * Abstract:
@@ -202,6 +202,8 @@ namespace Http {
 
     std::string decode(const std::string& encodedString);
     std::string encode(const std::string& rawString);
+    std::string cookie_encode(const std::string& rawString);
+
 }
 
 END_PRIVATE_NAMESPACE

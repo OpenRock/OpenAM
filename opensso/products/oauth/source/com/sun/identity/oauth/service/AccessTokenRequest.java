@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AccessTokenRequest.java,v 1.2 2009/12/15 01:27:48 huacui Exp $
+ * $Id: AccessTokenRequest.java,v 1.3 2010/01/20 17:51:37 huacui Exp $
  *
  */
 
@@ -93,7 +93,15 @@ public class AccessTokenRequest implements OAuthServiceConstants {
 
             if (params.getToken() == null)
                 throw new WebApplicationException(new Throwable(
-                          OAUTH_TOKEN + " MUST be present."), BAD_REQUEST);
+                     OAUTH_TOKEN + " MUST be present."), BAD_REQUEST);
+            
+            // Check the existence of oauth verifier
+            String requestVerifier = params.get(OAUTH_VERIFIER);
+            if ((requestVerifier == null) || (requestVerifier.isEmpty())) {
+                throw new WebApplicationException(new Throwable(
+                     OAUTH_VERIFIER + " MUST be present."), BAD_REQUEST);
+            }
+
             Map<String, String> searchMap = new HashMap<String, String>();
             searchMap.put(REQUEST_TOKEN_URI, params.getToken());
             List<RequestToken> reqTokens= oauthResMgr.searchRequestTokens(searchMap);
@@ -102,19 +110,27 @@ public class AccessTokenRequest implements OAuthServiceConstants {
                 rt = reqTokens.get(0);
             }
             if (rt == null) {
-                throw new WebApplicationException(new Throwable("Token invalid."));
+                throw new WebApplicationException(new Throwable(
+                    "Token invalid."), BAD_REQUEST);
             }
 
             String conskey = params.getConsumerKey();
             if (conskey == null) {
                 throw new WebApplicationException(new Throwable(
-                            "Consumer key is missing."), BAD_REQUEST);
+                    "Consumer key is missing."), BAD_REQUEST);
             }
 
             String signatureMethod = params.getSignatureMethod();
             if (signatureMethod == null) {
                 throw new WebApplicationException(new Throwable(
-                      "Signature Method is missing."), BAD_REQUEST);
+                    "Signature Method is missing."), BAD_REQUEST);
+            }
+
+            // Check that the verifiers match
+            String reqTokenVerifier = rt.getVerifier();
+            if (!requestVerifier.equals(reqTokenVerifier)) {
+                throw new WebApplicationException(new Throwable(
+                    "The oauth_verifier parameter is not valid."), BAD_REQUEST);
             }
 
             cons = rt.getConsumerId();
@@ -140,7 +156,7 @@ public class AccessTokenRequest implements OAuthServiceConstants {
 
             if (!sigIsOk) {
                 throw new WebApplicationException(new Throwable(
-                               "Signature invalid."), BAD_REQUEST);
+                     "Signature invalid."), BAD_REQUEST);
             }
 
             // We're good to go.

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
- * $Id: LogoutRequest.cs,v 1.1 2009/11/11 18:13:39 ggennaro Exp $
+ * $Id: LogoutRequest.cs,v 1.2 2010/01/19 18:23:09 ggennaro Exp $
  */
 
 using System;
@@ -114,11 +114,15 @@ namespace Sun.Identity.Saml2
 
                 string sessionIndex = null;
                 string subjectNameId = null;
+                string binding = null;
+                string destination = null;
 
                 if (parameters != null)
                 {
                     sessionIndex = parameters[Saml2Constants.SessionIndex];
                     subjectNameId = parameters[Saml2Constants.SubjectNameId];
+                    binding = parameters[Saml2Constants.Binding];
+                    destination = parameters[Saml2Constants.Destination];
                 }
 
                 if (String.IsNullOrEmpty(sessionIndex))
@@ -138,16 +142,33 @@ namespace Sun.Identity.Saml2
                     throw new Saml2Exception(Resources.LogoutRequestIdentityProviderIsNull);
                 }
 
+                if (string.IsNullOrEmpty(destination))
+                {
+                    destination = identityProvider.GetSingleLogoutServiceLocation(binding);
+
+                    if (string.IsNullOrEmpty(destination))
+                    {
+                        // default with HttpRedirect
+                        destination = identityProvider.GetSingleLogoutServiceLocation(Saml2Constants.HttpRedirectProtocolBinding);
+                    }
+                }
+
                 StringBuilder rawXml = new StringBuilder();
-                rawXml.Append("<samlp:LogoutRequest xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\" ");
-                rawXml.Append(" ID=\"" + Saml2Utils.GenerateId() + "\" ");
-                rawXml.Append(" Version=\"2.0\" ");
-                rawXml.Append(" IssueInstant=\"" + Saml2Utils.GenerateIssueInstant() + "\" ");
+                rawXml.Append("<samlp:LogoutRequest xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\"");
+                rawXml.Append(" ID=\"" + Saml2Utils.GenerateId() + "\"");
+                rawXml.Append(" Version=\"2.0\"");
+                rawXml.Append(" IssueInstant=\"" + Saml2Utils.GenerateIssueInstant() + "\"");
+
+                if (!String.IsNullOrEmpty(destination))
+                {
+                    rawXml.Append(" Destination=\"" + destination + "\"");
+                }
+
                 rawXml.Append(" >");
-                rawXml.Append(" <saml:NameID xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\" ");
-                rawXml.Append("  Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\" ");
+                rawXml.Append(" <saml:NameID xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\"");
+                rawXml.Append("  Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:transient\"");
                 rawXml.Append("  NameQualifier=\"" + identityProvider.EntityId + "\">" + subjectNameId + "</saml:NameID> ");
-                rawXml.Append(" <saml:SessionIndex xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\" >" + sessionIndex + "</saml:SessionIndex> ");
+                rawXml.Append(" <saml:SessionIndex xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">" + sessionIndex + "</saml:SessionIndex>");
                 rawXml.Append(" <saml:Issuer xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">" + serviceProvider.EntityId + "</saml:Issuer>");
                 rawXml.Append("</samlp:LogoutRequest>");
 

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: OAuthServiceConstants.java,v 1.2 2009/12/15 01:27:48 huacui Exp $
+ * $Id: OAuthServiceConstants.java,v 1.3 2010/01/20 17:51:37 huacui Exp $
  *
  */
 
@@ -54,6 +54,8 @@ public interface OAuthServiceConstants {
     public static final String REQUEST_TOKEN_SECRET = "reqt_secret";
     public static final String REQUEST_TOKEN_PPAL_ID = "reqt_ppalid";
     public static final String REQUEST_TOKEN_LIFETIME = "reqt_lifetime";
+    public static final String REQUEST_TOKEN_CALLBACK = "reqt_callback";
+    public static final String REQUEST_TOKEN_VERIFIER = "reqt_verifier";
 
     // Access Token attributes
     public static final String ACCESS_TOKEN_URI = "acct_uri";
@@ -73,6 +75,9 @@ public interface OAuthServiceConstants {
     public static final String OAUTH_TOKEN_SECRET = "oauth_token_secret";
     public static final String OAUTH_SUBJECT = "subject";
     public static final String OAUTH_SHARED_SECRET = "shared_secret";
+    public static final String OAUTH_OOB = "oob";
+    public static final String OAUTH_CALLBACK_CONFIRMED = "oauth_callback_confirmed";
+    public static final String OAUTH_VERIFIER = "oauth_verifier";
 
     public static final String C_NAME = "name";
     public static final String C_CERT = "certificate";

@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\idp.xml" />
+    <Content Include="exportmetadata.aspx" />
     <Content Include="logout.aspx" />
     <Content Include="spinitiatedslo.aspx" />
     <Content Include="default.aspx" />

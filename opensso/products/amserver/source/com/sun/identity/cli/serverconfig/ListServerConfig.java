@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ListServerConfig.java,v 1.6 2008/11/07 20:27:04 veiming Exp $
+ * $Id: ListServerConfig.java,v 1.7 2010/01/15 18:10:55 veiming Exp $
  *
  */
 
@@ -40,6 +40,7 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.sm.SMSException;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -54,6 +55,7 @@ public class ListServerConfig extends ServerConfigBase {
      * @param rc Request Context.
      * @throw CLIException if the request cannot serviced.
      */
+    @Override
     public void handleRequest(RequestContext rc) 
         throws CLIException {
         super.handleRequest(rc);
@@ -80,6 +82,7 @@ public class ListServerConfig extends ServerConfigBase {
             } else {
                 Properties prop = ServerConfiguration.getServerInstance(
                     adminSSOToken, serverName);
+
                 if ((prop != null) && !prop.isEmpty()) {
                     if (isOptionSet(OPTION_WITH_DEFAULTS)) {
                         Properties defProp = ServerConfiguration.getDefaults(
@@ -89,6 +92,23 @@ public class ListServerConfig extends ServerConfigBase {
                     }
                     outputWriter.printlnMessage(
                         FormatUtils.formatProperties(prop));
+
+                    String siteName = ServerConfiguration.getServerSite(
+                        adminSSOToken, serverName);
+                    if (siteName != null) {
+                        Object[] args = {siteName};
+                        outputWriter.printlnMessage(MessageFormat.format(
+                            getResourceString("list-server-site-name"), args));
+                    }
+
+                    String serverId = ServerConfiguration.getServerID(
+                        adminSSOToken, serverName);
+                    if (serverId != null) {
+                        Object[] args = {serverId};
+                        outputWriter.printlnMessage(MessageFormat.format(
+                            getResourceString("list-server-id"), args));
+                    }
+
                 } else {
                     outputWriter.printlnMessage(getResourceString(
                         "list-server-config-no-results"));

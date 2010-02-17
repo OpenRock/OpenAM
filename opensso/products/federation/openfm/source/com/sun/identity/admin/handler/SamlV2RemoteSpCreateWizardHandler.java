@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SamlV2RemoteSpCreateWizardHandler.java,v 1.1 2009/08/19 05:40:47 veiming Exp $
+ * $Id: SamlV2RemoteSpCreateWizardHandler.java,v 1.2 2009/12/23 18:21:37 farble1670 Exp $
  */
 package com.sun.identity.admin.handler;
 
@@ -35,6 +35,7 @@ import com.sun.identity.admin.Resources;
 import com.sun.identity.admin.dao.SamlV2CreateSharedDao;
 import com.sun.identity.admin.dao.SamlV2RemoteSpCreateDao;
 import com.sun.identity.admin.effect.InputFieldErrorEffect;
+import com.sun.identity.admin.model.AttributeMappingSamlV2RemoteSpCreateWizardStepValidator;
 import com.sun.identity.admin.model.CotSamlV2RemoteSpCreateWizardStepValidator;
 import com.sun.identity.admin.model.MessageBean;
 import com.sun.identity.admin.model.MetadataSamlV2RemoteSpCreateWizardStepValidator;
@@ -66,6 +67,7 @@ public class SamlV2RemoteSpCreateWizardHandler
     public void initWizardStepValidators() {
         getWizardStepValidators()[SamlV2RemoteSpCreateWizardStep.COT.toInt()] = new CotSamlV2RemoteSpCreateWizardStepValidator(getWizardBean());
         getWizardStepValidators()[SamlV2RemoteSpCreateWizardStep.METADATA.toInt()] = new MetadataSamlV2RemoteSpCreateWizardStepValidator(getWizardBean());
+        getWizardStepValidators()[SamlV2RemoteSpCreateWizardStep.ATTRIBUTEMAPPING.toInt()] = new AttributeMappingSamlV2RemoteSpCreateWizardStepValidator(getWizardBean());
     }
 
     public void setSamlV2RemoteSpCreateDao(SamlV2RemoteSpCreateDao samlV2RemoteSpCreateDao) {

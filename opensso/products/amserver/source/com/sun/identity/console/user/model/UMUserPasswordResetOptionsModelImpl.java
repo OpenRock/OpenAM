@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: UMUserPasswordResetOptionsModelImpl.java,v 1.4 2009/12/05 05:07:07 bhavnab Exp $
+ * $Id: UMUserPasswordResetOptionsModelImpl.java,v 1.5 2010/01/27 18:21:37 veiming Exp $
  *
  */
 
@@ -332,18 +332,18 @@ public class UMUserPasswordResetOptionsModelImpl
             UMUserPasswordResetOptionsData data =
                 (UMUserPasswordResetOptionsData)userAnswers.get(qn);
             if (data != null) {
-                if (data.isPersonalQuestion()) {
-                    personalQn = data;
-                } else {
-                    mapQuestionAnswer.add(data);
-                    selectedQns.add(qn);
-                }
+                mapQuestionAnswer.add(data);
+                selectedQns.add(qn);
             } else {
                 mapQuestionAnswer.add(
                     new UMUserPasswordResetOptionsData(qn, 
                         (String)localizedQuestions.get(qn),
                         "", UMUserPasswordResetOptionsData.DEFAULT_OFF));
             }
+        }
+
+        if (personalQn == null) {
+            personalQn = getPersonalQuestionAnswer(userAnswers);
         }
 
         if (showUserQn) {
@@ -355,6 +355,16 @@ public class UMUserPasswordResetOptionsModelImpl
         }
 
         return mapQuestionAnswer;
+    }
+
+    private UMUserPasswordResetOptionsData getPersonalQuestionAnswer(
+        Map<String, UMUserPasswordResetOptionsData> userAnswers) {
+        for (UMUserPasswordResetOptionsData data : userAnswers.values()) {
+            if (data.isPersonalQuestion()) {
+                return data;
+            }
+        }
+        return null;
     }
 
     private Map parseUserQuestionAnswers(

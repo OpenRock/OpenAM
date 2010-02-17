@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
- * $Id: ServiceProviderUtility.cs,v 1.7 2009/11/11 18:13:39 ggennaro Exp $
+ * $Id: ServiceProviderUtility.cs,v 1.9 2010/01/26 01:20:14 ggennaro Exp $
  */
 
 using System;
@@ -136,6 +136,23 @@ namespace Sun.Identity.Saml2
                 Uri artifactResolutionSvcUri = new Uri(artifactResolutionSvcLoc);
                 request = (HttpWebRequest)WebRequest.Create(artifactResolutionSvcUri);
                 XmlDocument artifactResolveXml = (XmlDocument)artifactResolve.XmlDom;
+
+                if (idp.WantArtifactResolveSigned)
+                {
+                    if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                    {
+                        throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                    }
+                    else
+                    {
+                        Saml2Utils.SignXml(
+                            this.ServiceProvider.SigningCertificateAlias,
+                            artifactResolveXml,
+                            artifactResolve.Id,
+                            true);
+                    }
+                }
+
                 string soapMessage = Saml2Utils.CreateSoapMessage(artifactResolveXml.InnerXml);
 
                 byte[] byteArray = Encoding.UTF8.GetBytes(soapMessage);
@@ -148,9 +165,8 @@ namespace Sun.Identity.Saml2
                 requestStream.Write(byteArray, 0, byteArray.Length);
                 requestStream.Close();
 
-                XmlDocument xmlDoc = (XmlDocument)artifactResolve.XmlDom;
                 StringBuilder logMessage = new StringBuilder();
-                logMessage.Append("ArtifactResolve:\r\n").Append(xmlDoc.OuterXml);
+                logMessage.Append("ArtifactResolve:\r\n").Append(artifactResolveXml.OuterXml);
                 FedletLogger.Info(logMessage.ToString());
 
                 response = (HttpWebResponse)request.GetResponse();
@@ -430,10 +446,13 @@ namespace Sun.Identity.Saml2
         /// AuthnRequest to packaged for a POST.
         /// </param>
         /// <param name="idpEntityId">Entity ID of the IDP.</param>
+        /// <param name="parameters">
+        /// NameVallueCollection of additional parameters.
+        /// </param>
         /// <returns>
         /// HTML with auto-form submission with POST of the AuthnRequest
         /// </returns>
-        public string GetAuthnRequestPostHtml(AuthnRequest authnRequest, string idpEntityId)
+        public string GetAuthnRequestPostHtml(AuthnRequest authnRequest, string idpEntityId, NameValueCollection parameters)
         {
             if (authnRequest == null)
             {
@@ -452,7 +471,34 @@ namespace Sun.Identity.Saml2
                 throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdpSingleSignOnSvcLocNotDefined);
             }
 
-            string packagedAuthnRequest = Saml2Utils.ConvertToBase64(((XmlDocument)authnRequest.XmlDom).InnerXml);
+            string relayState = null;
+            if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
+            {
+                relayState = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(relayState, this.ServiceProvider.RelayStateUrlList);
+            }
+
+
+            XmlDocument authnRequestXml = (XmlDocument)authnRequest.XmlDom;
+            if (this.ServiceProvider.AuthnRequestsSigned || idp.WantAuthnRequestsSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    Saml2Utils.SignXml(
+                        this.ServiceProvider.SigningCertificateAlias,
+                        authnRequestXml,
+                        authnRequest.Id,
+                        true);
+                    FedletLogger.Info("Signed AuthnRequest:\r\n" + authnRequestXml.InnerXml);
+                }
+            }
+
+            string packagedAuthnRequest = Saml2Utils.ConvertToBase64(authnRequestXml.InnerXml);
+            string inputFieldFormat = "<input type=\"hidden\" name=\"{0}\" value=\"{1}\" />";
 
             StringBuilder html = new StringBuilder();
             html.Append("<html><head><title>OpenSSO - SP initiated SSO</title></head>");
@@ -465,6 +511,16 @@ namespace Sun.Identity.Saml2
             html.Append("\" value=\"");
             html.Append(packagedAuthnRequest);
             html.Append("\" />");
+
+            if (!string.IsNullOrEmpty(relayState))
+            {
+                html.Append(string.Format(
+                                          CultureInfo.InvariantCulture,
+                                          inputFieldFormat,
+                                          Saml2Constants.RelayState,
+                                          HttpUtility.HtmlEncode(relayState)));
+            }
+            
             html.Append("</form>");
             html.Append("</body>");
             html.Append("</html>");
@@ -480,10 +536,13 @@ namespace Sun.Identity.Saml2
         /// AuthnRequest to packaged for a redirect.
         /// </param>
         /// <param name="idpEntityId">Entity ID of the IDP.</param>
+        /// <param name="parameters">
+        /// NameVallueCollection of additional parameters.
+        /// </param>
         /// <returns>
         /// URL with query string parameter for the specified IDP.
         /// </returns>
-        public string GetAuthnRequestRedirectLocation(AuthnRequest authnRequest, string idpEntityId)
+        public string GetAuthnRequestRedirectLocation(AuthnRequest authnRequest, string idpEntityId, NameValueCollection parameters)
         {
             if (authnRequest == null)
             {
@@ -503,13 +562,36 @@ namespace Sun.Identity.Saml2
             }
 
             string packagedAuthnRequest = Saml2Utils.CompressConvertToBase64UrlEncode(authnRequest.XmlDom);
+            string queryString = Saml2Constants.RequestParameter + "=" + packagedAuthnRequest;
+
+            if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
+            {
+                string relayState = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(relayState, this.ServiceProvider.RelayStateUrlList);
+                queryString += "&" + Saml2Constants.RelayState;
+                queryString += "=" + HttpUtility.UrlEncode(relayState);
+            }
+
+            if (this.ServiceProvider.AuthnRequestsSigned || idp.WantAuthnRequestsSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    queryString += "&" + Saml2Constants.SignatureAlgorithm;
+                    queryString += "=" + HttpUtility.UrlEncode(Saml2Constants.SignatureAlgorithmRsa);
+                    queryString = Saml2Utils.SignQueryString(this.ServiceProvider.SigningCertificateAlias, queryString);
+                }
+            }
 
             StringBuilder redirectUrl = new StringBuilder();
             redirectUrl.Append(ssoRedirectLocation);
-            redirectUrl.Append("?");
-            redirectUrl.Append(Saml2Constants.RequestParameter);
-            redirectUrl.Append("=");
-            redirectUrl.Append(packagedAuthnRequest);
+            redirectUrl.Append(Saml2Utils.GetQueryStringDelimiter(ssoRedirectLocation));
+            redirectUrl.Append(queryString);
+
+            FedletLogger.Info("AuthnRequest via Redirect:\r\n" + redirectUrl);
 
             return redirectUrl.ToString();
         }
@@ -546,7 +628,32 @@ namespace Sun.Identity.Saml2
                 throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdpSingleLogoutSvcLocNotDefined);
             }
 
-            string packagedLogoutRequest = Saml2Utils.ConvertToBase64(((XmlDocument)logoutRequest.XmlDom).InnerXml);
+            string relayState = null;
+            if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
+            {
+                relayState = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(relayState, this.ServiceProvider.RelayStateUrlList);
+            }
+
+            XmlDocument logoutRequestXml = (XmlDocument)logoutRequest.XmlDom;
+
+            if (idp.WantLogoutRequestSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    Saml2Utils.SignXml(
+                        this.ServiceProvider.SigningCertificateAlias,
+                        logoutRequestXml,
+                        logoutRequest.Id,
+                        true);
+                }
+            }
+
+            string packagedLogoutRequest = Saml2Utils.ConvertToBase64(logoutRequestXml.InnerXml);
             string inputFieldFormat = "<input type=\"hidden\" name=\"{0}\" value=\"{1}\" />";
 
             StringBuilder html = new StringBuilder();
@@ -561,13 +668,13 @@ namespace Sun.Identity.Saml2
             html.Append(packagedLogoutRequest);
             html.Append("\" />");
 
-            if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
+            if (!string.IsNullOrEmpty(relayState))
             {
                 html.Append(string.Format(
                                           CultureInfo.InvariantCulture,
                                           inputFieldFormat,
                                           Saml2Constants.RelayState,
-                                          HttpUtility.HtmlEncode(parameters[Saml2Constants.RelayState])));
+                                          HttpUtility.HtmlEncode(relayState)));
             }
 
             html.Append("</form>");
@@ -610,22 +717,37 @@ namespace Sun.Identity.Saml2
                 throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdpSingleLogoutSvcLocNotDefined);
             }
 
-            string packagedAuthnRequest = Saml2Utils.CompressConvertToBase64UrlEncode(logoutRequest.XmlDom);
-
-            StringBuilder redirectUrl = new StringBuilder();
-            redirectUrl.Append(sloRedirectLocation);
-            redirectUrl.Append("?");
-            redirectUrl.Append(Saml2Constants.RequestParameter);
-            redirectUrl.Append("=");
-            redirectUrl.Append(packagedAuthnRequest);
+            string packagedLogoutRequest = Saml2Utils.CompressConvertToBase64UrlEncode(logoutRequest.XmlDom);
+            string queryString = Saml2Constants.RequestParameter + "=" + packagedLogoutRequest;
 
             if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
             {
-                redirectUrl.Append("&");
-                redirectUrl.Append(Saml2Constants.RelayState);
-                redirectUrl.Append("=");
-                redirectUrl.Append(HttpUtility.UrlEncode(parameters[Saml2Constants.RelayState]));
+                string relayState = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(relayState, this.ServiceProvider.RelayStateUrlList);
+                queryString += "&" + Saml2Constants.RelayState;
+                queryString += "=" + HttpUtility.UrlEncode(relayState);
             }
+
+            if (idp.WantLogoutRequestSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    queryString += "&" + Saml2Constants.SignatureAlgorithm;
+                    queryString += "=" + HttpUtility.UrlEncode(Saml2Constants.SignatureAlgorithmRsa);
+                    queryString = Saml2Utils.SignQueryString(this.ServiceProvider.SigningCertificateAlias, queryString);
+                }
+            }
+
+            StringBuilder redirectUrl = new StringBuilder();
+            redirectUrl.Append(sloRedirectLocation);
+            redirectUrl.Append(Saml2Utils.GetQueryStringDelimiter(sloRedirectLocation));
+            redirectUrl.Append(queryString);
+
+            FedletLogger.Info("LogoutRequest via Redirect:\r\n" + redirectUrl);
 
             return redirectUrl.ToString();
         }
@@ -662,7 +784,32 @@ namespace Sun.Identity.Saml2
                 throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdpSingleLogoutSvcResLocNotDefined);
             }
 
-            string packagedLogoutResponse = Saml2Utils.ConvertToBase64(((XmlDocument)logoutResponse.XmlDom).InnerXml);
+            string relayState = null;
+            if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
+            {
+                relayState = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(relayState, this.ServiceProvider.RelayStateUrlList);
+            }
+
+            XmlDocument logoutResponseXml = (XmlDocument)logoutResponse.XmlDom;
+
+            if (idp.WantLogoutResponseSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    Saml2Utils.SignXml(
+                        this.ServiceProvider.SigningCertificateAlias,
+                        logoutResponseXml,
+                        logoutResponse.Id,
+                        true);
+                }
+            }
+
+            string packagedLogoutResponse = Saml2Utils.ConvertToBase64(logoutResponseXml.InnerXml);
             string inputFieldFormat = "<input type=\"hidden\" name=\"{0}\" value=\"{1}\" />";
 
             StringBuilder html = new StringBuilder();
@@ -677,13 +824,13 @@ namespace Sun.Identity.Saml2
             html.Append(packagedLogoutResponse);
             html.Append("\" />");
 
-            if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
+            if (!string.IsNullOrEmpty(relayState))
             {
                 html.Append(string.Format(
                                           CultureInfo.InvariantCulture,
                                           inputFieldFormat,
                                           Saml2Constants.RelayState,
-                                          HttpUtility.HtmlEncode(parameters[Saml2Constants.RelayState])));
+                                          HttpUtility.HtmlEncode(relayState)));
             }
 
             html.Append("</form>");
@@ -727,21 +874,36 @@ namespace Sun.Identity.Saml2
             }
 
             string packagedLogoutResponse = Saml2Utils.CompressConvertToBase64UrlEncode(logoutResponse.XmlDom);
-
-            StringBuilder redirectUrl = new StringBuilder();
-            redirectUrl.Append(sloRedirectResponseLocation);
-            redirectUrl.Append("?");
-            redirectUrl.Append(Saml2Constants.ResponseParameter);
-            redirectUrl.Append("=");
-            redirectUrl.Append(packagedLogoutResponse);
+            string queryString = Saml2Constants.ResponseParameter + "=" + packagedLogoutResponse;
 
             if (parameters != null && !string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
             {
-                redirectUrl.Append("&");
-                redirectUrl.Append(Saml2Constants.RelayState);
-                redirectUrl.Append("=");
-                redirectUrl.Append(HttpUtility.UrlEncode(parameters[Saml2Constants.RelayState]));
+                string relayState = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(relayState, this.ServiceProvider.RelayStateUrlList);
+                queryString += "&" + Saml2Constants.RelayState;
+                queryString += "=" + HttpUtility.UrlEncode(relayState);
             }
+
+            if (idp.WantLogoutResponseSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    queryString += "&" + Saml2Constants.SignatureAlgorithm;
+                    queryString += "=" + HttpUtility.UrlEncode(Saml2Constants.SignatureAlgorithmRsa);
+                    queryString = Saml2Utils.SignQueryString(this.ServiceProvider.SigningCertificateAlias, queryString);
+                }
+            }
+
+            StringBuilder redirectUrl = new StringBuilder();
+            redirectUrl.Append(sloRedirectResponseLocation);
+            redirectUrl.Append(Saml2Utils.GetQueryStringDelimiter(sloRedirectResponseLocation));
+            redirectUrl.Append(queryString);
+
+            FedletLogger.Info("LogoutResponse via Redirect:\r\n" + redirectUrl);
 
             return redirectUrl.ToString();
         }
@@ -764,12 +926,18 @@ namespace Sun.Identity.Saml2
         /// </param>
         public void SendAuthnRequest(HttpContext context, string idpEntityId, NameValueCollection parameters)
         {
+            IdentityProvider idp = (IdentityProvider)this.IdentityProviders[idpEntityId];
+            if (idp == null)
+            {
+                throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdentityProviderNotFound);
+            }
+
             if (parameters == null)
             {
                 parameters = new NameValueCollection();
             }
 
-            AuthnRequest authnRequest = new AuthnRequest(this.ServiceProvider, parameters);
+            AuthnRequest authnRequest = new AuthnRequest(idp, this.ServiceProvider, parameters);
             XmlDocument xmlDoc = (XmlDocument)authnRequest.XmlDom;
             StringBuilder logMessage = new StringBuilder();
             logMessage.Append("AuthnRequest:\r\n").Append(xmlDoc.OuterXml);
@@ -781,13 +949,13 @@ namespace Sun.Identity.Saml2
             // Send with Redirect or Post based on the 'reqBinding' parameter.
             if (parameters[Saml2Constants.RequestBinding] == Saml2Constants.HttpPostProtocolBinding)
             {
-                string postHtml = this.GetAuthnRequestPostHtml(authnRequest, idpEntityId);
+                string postHtml = this.GetAuthnRequestPostHtml(authnRequest, idpEntityId, parameters);
                 context.Response.Write(postHtml);
                 context.Response.End();
             }
             else
             {
-                string redirectUrl = this.GetAuthnRequestRedirectLocation(authnRequest, idpEntityId);
+                string redirectUrl = this.GetAuthnRequestRedirectLocation(authnRequest, idpEntityId, parameters);
                 context.Response.Redirect(redirectUrl.ToString(), true);
             }
         }
@@ -879,6 +1047,23 @@ namespace Sun.Identity.Saml2
                 Uri soapLogoutSvcUri = new Uri(idp.GetSingleLogoutServiceLocation(Saml2Constants.HttpSoapProtocolBinding));
                 request = (HttpWebRequest)WebRequest.Create(soapLogoutSvcUri);
                 XmlDocument logoutRequestXml = (XmlDocument)logoutRequest.XmlDom;
+
+                if (idp.WantLogoutRequestSigned)
+                {
+                    if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                    {
+                        throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                    }
+                    else
+                    {
+                        Saml2Utils.SignXml(
+                            this.ServiceProvider.SigningCertificateAlias,
+                            logoutRequestXml,
+                            logoutRequest.Id,
+                            true);
+                    }
+                }
+
                 string soapMessage = Saml2Utils.CreateSoapMessage(logoutRequestXml.InnerXml);
 
                 byte[] byteArray = Encoding.UTF8.GetBytes(soapMessage);
@@ -1003,17 +1188,38 @@ namespace Sun.Identity.Saml2
         {
             IdentityProvider idp = (IdentityProvider)this.IdentityProviders[logoutRequest.Issuer];
 
+            if (idp == null)
+            {
+                throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdentityProviderNotFound);
+            }
+
             NameValueCollection parameters = new NameValueCollection();
             parameters[Saml2Constants.Binding] = Saml2Constants.HttpSoapProtocolBinding;
 
             LogoutResponse logoutResponse = new LogoutResponse(idp, this.ServiceProvider, logoutRequest, parameters);
+            XmlDocument logoutResponseXml = (XmlDocument)logoutResponse.XmlDom;
 
-            XmlDocument xmlDoc = (XmlDocument)logoutResponse.XmlDom;
+            if (idp.WantLogoutResponseSigned)
+            {
+                if (string.IsNullOrEmpty(this.ServiceProvider.SigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    Saml2Utils.SignXml(
+                        this.ServiceProvider.SigningCertificateAlias,
+                        logoutResponseXml,
+                        logoutResponse.Id,
+                        true);
+                }
+            }
+
             StringBuilder logMessage = new StringBuilder();
-            logMessage.Append("LogoutResponse:\r\n").Append(xmlDoc.OuterXml);
+            logMessage.Append("LogoutResponse:\r\n").Append(logoutResponseXml.OuterXml);
             FedletLogger.Info(logMessage.ToString());
 
-            string soapMessage = Saml2Utils.CreateSoapMessage(xmlDoc.OuterXml);
+            string soapMessage = Saml2Utils.CreateSoapMessage(logoutResponseXml.OuterXml);
 
             context.Response.ContentType = "text/xml";
             context.Response.Write(soapMessage);

@@ -24,7 +24,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
   
-   $Id: index.jsp,v 1.1 2009/11/20 19:37:09 huacui Exp $
+   $Id: index.jsp,v 1.2 2010/01/11 07:05:45 nithyas Exp $
 --%>
 
 <%--
@@ -46,11 +46,23 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     </head>
     <body>
 
+    <script type="text/javascript">
+    function submitForm()
+    {
+      document.GetQuote.submit();
+    }
+    </script>
     <h1>Stock Quote Client Sample</h1>
     
     <form name="GetQuote" action="GetQuote" method="GET">
         Stock Symbol: <input type="text" name="symbol" value="JAVA" size="12" />
-        <p><input type="submit" value="GetQuote" name="quote" />
+        <p>
+        Signature Method:  <select name="sig" id="sig" size="3" >
+ 				<option value="HMAC-SHA1" SELECTED>HMAC-SHA1</option>
+				<option value="RSA-SHA1">RSA-SHA1</option>
+				<option value="PLAINTEXT">PLAINTEXT</option>
+			   </select>
+        <p><input type="button" value="GetQuote" name="quote" onClick="submitForm()"/>
     </form>
 <!--
     <p><hr>

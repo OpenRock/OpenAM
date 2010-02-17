@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: FedletConfigurationImpl.java,v 1.4 2008/08/06 17:28:13 exu Exp $
+ * $Id: FedletConfigurationImpl.java,v 1.5 2010/01/26 21:31:59 madan_ranganath Exp $
  *
  */
 
@@ -32,8 +32,12 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.plugin.configuration.ConfigurationException;
 import com.sun.identity.plugin.configuration.ConfigurationInstance;
 import com.sun.identity.plugin.configuration.ConfigurationListener;
-import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement; 
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
+import com.sun.identity.saml2.meta.SAML2MetaConstants;
+import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +55,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The <code>FedletConfigurationImpl</code> class is the implementation for 
@@ -200,6 +208,8 @@ public class FedletConfigurationImpl implements ConfigurationInstance {
         if (metaXML == null) {
             return;
         }
+
+        metaXML = workaroundAbstractRoleDescriptor(metaXML);
         String entityId = getEntityID(metaXML);
         if (entityId == null) {
             return;
@@ -226,6 +236,44 @@ public class FedletConfigurationImpl implements ConfigurationInstance {
         }
     }
 
+    private String workaroundAbstractRoleDescriptor(String metaXML) {
+        Document doc = XMLUtils.toDOMDocument(metaXML, debug);
+        if (doc != null) {
+            NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(
+                                         SAML2MetaConstants.NS_METADATA,
+                                         SAML2MetaConstants.ROLE_DESCRIPTOR);
+            int length = nl.getLength();
+            for (int i = 0; i < length; i++) {
+                Element child = (Element)nl.item(i);
+                String type = child.getAttributeNS(SAML2Constants.NS_XSI,
+                                                   "type");
+                if ((type != null) && (type.equals(
+                    SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE)) ||
+                    (type.endsWith(":" +
+                    SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE))) {
+                     metaXML = metaXML.replaceAll(
+                                              SAML2Constants.XSI_DECLARE_STR,
+                                              "");
+                    metaXML = metaXML.replaceAll(
+                           "xsi:type=\"query:AttributeQueryDescriptorType\"",
+                           "");
+                    metaXML = metaXML.replaceAll("<" +
+                               SAML2MetaConstants.ROLE_DESCRIPTOR,
+                               "<" + SAML2MetaSecurityUtils.PREFIX_MD_QUERY
+                               + ":" +
+                               SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR);
+                    metaXML = metaXML.replaceAll("</" +
+                               SAML2MetaConstants.ROLE_DESCRIPTOR,
+                               "</" +
+                               SAML2MetaSecurityUtils.PREFIX_MD_QUERY
+                               + ":" +
+                               SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR);
+                }
+            }
+        }
+        return metaXML;
+    }
+    
     private String getEntityID(String metaXML) {
         try {
             Object obj = SAML2MetaUtils.convertStringToJAXB(metaXML);

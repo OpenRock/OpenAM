@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ReferralWizardBean.java,v 1.2 2009/10/09 20:17:14 farble1670 Exp $
+ * $Id: ReferralWizardBean.java,v 1.3 2010/01/19 19:43:48 farble1670 Exp $
  */
 package com.sun.identity.admin.model;
 
@@ -113,8 +113,29 @@ public abstract class ReferralWizardBean extends WizardBean {
         for (ViewApplication va : viewApplicationsBean.getViewApplications().values()) {
             ApplicationResource ar = new ApplicationResource();
             ar.setName(va.getName());
-            ar.getViewEntitlement().setResources(ar.getViewEntitlement().getAvailableResources());
 
+            List<Resource> resources = referralBean.getResources();
+            int i = -1;
+            if (resources != null) {
+                i = referralBean.getResources().indexOf(ar);
+            }
+
+            if (i == -1) {
+                // new referral
+                // set all resources selected
+                ar.getViewEntitlement().setResources(ar.getViewEntitlement().getAvailableResources());
+            } else {
+                // existing referral
+                // set selected resources according to referral bean settings
+                ApplicationResource selectedAr = (ApplicationResource) referralBean.getResources().get(i);
+                List<Resource> selectedResources = selectedAr.getViewEntitlement().getResources();
+                ar.getViewEntitlement().setResources(selectedResources);
+                for (Resource r: selectedResources) {
+                    if (!ar.getViewEntitlement().getAvailableResources().contains(r)) {
+                        ar.getViewEntitlement().getAvailableResources().add(r);
+                    }
+                }
+            }
             availableResources.add(ar);
         }
     }

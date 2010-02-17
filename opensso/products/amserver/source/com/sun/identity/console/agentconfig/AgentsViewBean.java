@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AgentsViewBean.java,v 1.17 2009/08/11 18:16:14 asyhuang Exp $
+ * $Id: AgentsViewBean.java,v 1.18 2009/12/22 17:49:04 veiming Exp $
  *
  */
 
@@ -646,8 +646,9 @@ public class AgentsViewBean
                         }
                     } else if (combinedType) {
                         try {
-                            tblModel.setValue(TBL_DATA_TYPE, model.getAgentType(
-                                entity));
+                            tblModel.setValue(TBL_DATA_TYPE, 
+                                model.getLocalizedString("agenttype." +
+                                model.getAgentType(entity)));
                         } catch (AMConsoleException e) {
                             setInlineAlertMessage(CCAlert.TYPE_ERROR, 
                                 "message.error", model.getErrorString(e));
@@ -684,7 +685,8 @@ public class AgentsViewBean
                     if (combinedType) {
                         try {
                             tblGroupModel.setValue(TBL_DATA_TYPE_GROUP, 
-                                model.getAgentType(entity));
+                                model.getLocalizedString("agenttype." +
+                                model.getAgentType(entity)));
                         } catch (AMConsoleException e) {
                             setInlineAlertMessage(CCAlert.TYPE_ERROR,
                                 "message.error", model.getErrorString(e));

@@ -75,7 +75,7 @@ LDFLAGS += -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR)
 $(STD_LIB)_LDLIBS := $(NSS_LIBS) $(NSPR_LIBS)
 LDLIBS += $(LDFLAGS) $(LIBXML_LIBS) $($(STD_LIB)_LDLIBS) $(SYSTEM_LIBS)
 LDLIBS += -L../../am
-LDLIBS += -Bstatic -lamsdk
+LDLIBS += -Wl,-Bstatic -lamsdk -Wl,-Bdynamic
 
 
 all: depends export_libs 

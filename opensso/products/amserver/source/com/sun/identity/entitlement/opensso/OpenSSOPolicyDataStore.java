@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: OpenSSOPolicyDataStore.java,v 1.5 2009/11/19 01:02:03 veiming Exp $
+ * $Id: OpenSSOPolicyDataStore.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -130,9 +130,13 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
 
                 PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
                     dsameUserSubject, realm);
-                pis.add(PrivilegeUtils.policyObjectToPrivileges(policy));
+                Set<IPrivilege> privileges = new HashSet<IPrivilege>();
+                privileges.add(privilege);
+                pis.add(privileges);
             } else {
-                //TODO: log error, unsupported policy type
+                PrivilegeManager.debug.error(
+                    "OpenSSOPolicyDataStore.addPolicy: unknown class " +
+                    policy.getClass().getName(), null);
             }
         } catch (PolicyException e) {
             String[] logParams = {DNMapper.orgNameToRealmName(realm),

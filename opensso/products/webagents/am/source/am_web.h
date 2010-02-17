@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: am_web.h,v 1.30 2009/11/04 22:11:56 leiming Exp $
+ * $Id: am_web.h,v 1.31 2009/12/19 00:05:46 subbae Exp $
  *
  */
 
@@ -161,6 +161,7 @@ AM_BEGIN_EXTERN_C
 
 #define AM_WEB_CONVERT_MBYTE_ENABLE AM_COMMON_PROPERTY_PREFIX  "convert.mbyte.enable"
 #define AM_WEB_ENCODE_URL_SPECIAL_CHARS AM_COMMON_PROPERTY_PREFIX  "encode.url.special.chars.enable"
+#define AM_WEB_ENCODE_COOKIE_SPECIAL_CHARS AM_COMMON_PROPERTY_PREFIX  "encode.cookie.special.chars.enable"
 #define AM_WEB_OVERRIDE_PROTOCOL AM_COMMON_PROPERTY_PREFIX  "override.protocol"
 #define AM_WEB_OVERRIDE_HOST AM_COMMON_PROPERTY_PREFIX  "override.host"
 #define AM_WEB_OVERRIDE_PORT AM_COMMON_PROPERTY_PREFIX  "override.port"

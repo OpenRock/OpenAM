@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: XACMLPrivilegeUtils.java,v 1.3 2009/11/25 18:54:09 dillidorai Exp $
+ * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -32,6 +32,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
 
 import com.sun.identity.entitlement.UserSubject;
@@ -54,8 +55,10 @@ import com.sun.identity.entitlement.xacml3.core.Target;
 import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
 import com.sun.identity.entitlement.xacml3.core.Version;
 
+import com.sun.identity.shared.JSONUtils;
 
 import com.sun.identity.sm.ServiceManager;
+
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -72,6 +75,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Class with utility methods to map from
@@ -902,8 +909,7 @@ public class XACMLPrivilegeUtils {
         return policySet; 
     }
 
-
-    private static PolicySet policiesToPolicySetInternal(String realm, Set<Policy> policies) 
+    public static PolicySet newPolicySet(String realm)
             throws JAXBException {
         PolicySet policySet = new PolicySet();
 
@@ -918,7 +924,32 @@ public class XACMLPrivilegeUtils {
         version.setValue(sdf.format(System.currentTimeMillis()));
         policySet.setVersion(version);
 
-        // FIXME: is there a better choice? 
+        // FIXME: is there a better choice?
+        // policySet could contain policies for different applications
+        policySet.setPolicyCombiningAlgId(XACMLConstants.XACML_RULE_DENY_OVERRIDES);
+
+        Target target = new Target();
+        policySet.setVersion(version);
+        policySet.setTarget(target);
+
+        return policySet;
+    }
+    private static PolicySet policiesToPolicySetInternal(String realm, Set<Policy> policies)
+            throws JAXBException {
+        PolicySet policySet = new PolicySet();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String currentTime = sdf.format(System.currentTimeMillis());
+        String policySetId  = realm + ":" + currentTime;
+
+        policySet.setPolicySetId(policySetId);
+
+        Version version = new Version();
+        version.setValue(sdf.format(System.currentTimeMillis()));
+        policySet.setVersion(version);
+
+        // FIXME: is there a better choice?
         // policySet could contain policies for different applications
         policySet.setPolicyCombiningAlgId(XACMLConstants.XACML_RULE_DENY_OVERRIDES);
 
@@ -930,7 +961,7 @@ public class XACMLPrivilegeUtils {
         JAXBContext jaxbContext = JAXBContext.newInstance(
                 XACMLConstants.XACML3_CORE_PKG);
 
-       List<JAXBElement<?>> pList 
+       List<JAXBElement<?>> pList
             = policySet.getPolicySetOrPolicyOrPolicySetIdReference();
         if (policies != null) {
             for (Policy policy : policies) {
@@ -939,6 +970,23 @@ public class XACMLPrivilegeUtils {
                 pList.add(policyElement);
             }
         }
+        return policySet;
+    }
+
+    public static PolicySet addPolicyToPolicySet(Policy policy,
+            PolicySet policySet)
+            throws JAXBException {
+        if (policySet == null || policy == null) {
+            return policySet;
+        }
+        ObjectFactory objectFactory = new ObjectFactory();
+        JAXBContext jaxbContext = JAXBContext.newInstance(
+                XACMLConstants.XACML3_CORE_PKG);
+
+        List<JAXBElement<?>> pList
+                = policySet.getPolicySetOrPolicyOrPolicySetIdReference();
+        JAXBElement<Policy> policyElement = objectFactory.createPolicy(policy);
+        pList.add(policyElement);
         return policySet;
     }
 
@@ -954,6 +1002,7 @@ public class XACMLPrivilegeUtils {
         }
         return matches;
     }
+
     static Set<String> getResourceNamesFromMatches(List<Match> matches) {
         if (matches == null) {
             return null;
@@ -1018,6 +1067,34 @@ public class XACMLPrivilegeUtils {
             }
         }
         return actionNames;
+    }
+    
+    static JSONObject getRealmsAppsResources(List<Match> matches)
+            throws JSONException {
+        if (matches == null) {
+            return null;
+        }
+        JSONObject jo = null;
+        String jsonString = null;
+        for (Match match : matches) {
+            String matchId = match.getMatchId();
+            if ((matchId != null) && matchId.equals(
+                    XACMLConstants.JSON_REALMS_APPS_RESOURCES_MATCH)) {
+                AttributeValue attributeValue = match.getAttributeValue();
+                if (attributeValue != null) {
+                    List<Object> contentList = attributeValue.getContent();
+                    if ((contentList != null) && !contentList.isEmpty()) {
+                        Object obj = contentList.get(0);
+                        jsonString =obj.toString();
+                        break;
+                    }
+                } 
+            }
+        }
+        if (jsonString != null) {
+            jo = new JSONObject(jsonString);
+        }
+        return jo;
     }
 
     static List<Rule> getRules(Policy policy) {
@@ -1265,6 +1342,225 @@ public class XACMLPrivilegeUtils {
                     + "hit exception", e);
         }
         return ob;
+    }
+
+    public static Policy referralToPolicy(ReferralPrivilege privilege) throws JSONException {
+        Policy policy = null;
+        try {
+            policy = referralToPolicyInternal(privilege);
+        } catch (JAXBException je) {
+            PrivilegeManager.debug.error(
+                "JAXBException while mapping referral to policy:", je);
+        }
+        return policy;
+    }
+
+    public static Policy referralToPolicyInternal(ReferralPrivilege privilege) 
+            throws JAXBException, JSONException {
+ 
+        if (privilege == null) {
+            return null;
+        }
+
+        Policy policy = new Policy();
+
+        String privilegeName = privilege.getName();
+
+        String policyId = privilegeNameToPolicyId(privilegeName,
+                null);
+        policy.setPolicyId(policyId);
+
+        String description = privilege.getDescription();
+        policy.setDescription(description);
+
+        List<Object> vrList 
+            = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
+
+        ObjectFactory objectFactory = new ObjectFactory();
+        JAXBContext jaxbContext = JAXBContext.newInstance(
+                XACMLConstants.XACML3_CORE_PKG);
+
+        VariableDefinition createdBy = new VariableDefinition();
+        vrList.add(createdBy);
+        createdBy.setVariableId(XACMLConstants.PRIVILEGE_CREATED_BY);
+        AttributeValue cbv = new AttributeValue();
+        cbv.setDataType(XACMLConstants.XS_STRING);
+        cbv.getContent().add(privilege.getCreatedBy());
+        JAXBElement<AttributeValue> cbve 
+                = objectFactory.createAttributeValue(cbv);
+        createdBy.setExpression(cbve);
+
+        VariableDefinition lastModifiedBy = new VariableDefinition();
+        vrList.add(lastModifiedBy);
+        lastModifiedBy.setVariableId(XACMLConstants.PRIVILEGE_LAST_MODIFIED_BY);
+        AttributeValue lmbv = new AttributeValue();
+        lmbv.setDataType(XACMLConstants.XS_STRING);
+        lmbv.getContent().add(privilege.getLastModifiedBy());
+        JAXBElement<AttributeValue> lmbve 
+                = objectFactory.createAttributeValue(lmbv);
+        lastModifiedBy.setExpression(cbve);
+
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss.SSS");
+        SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
+        sdf1.setTimeZone(TimeZone.getTimeZone("GMT"));
+        sdf2.setTimeZone(TimeZone.getTimeZone("GMT"));
+        sdf3.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        VariableDefinition creationDate = new VariableDefinition();
+        vrList.add(creationDate); 
+        creationDate.setVariableId(XACMLConstants.PRIVILEGE_CREATION_DATE);
+        AttributeValue cdv = new AttributeValue();
+        cdv.setDataType(XACMLConstants.XS_DATE_TIME);
+        cdv.getContent().add(
+                sdf1.format(privilege.getCreationDate())
+                + "T"
+                + sdf2.format(privilege.getCreationDate()));
+        JAXBElement<AttributeValue> cdve 
+                = objectFactory.createAttributeValue(cdv);
+        creationDate.setExpression(cdve);
+
+        VariableDefinition lastModifiedDate = new VariableDefinition();
+        vrList.add(lastModifiedDate); 
+        lastModifiedDate.setVariableId(
+                XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
+        AttributeValue lmdv = new AttributeValue();
+        lmdv.setDataType(XACMLConstants.XS_DATE_TIME);
+        lmdv.getContent().add(
+                sdf1.format(privilege.getLastModifiedDate())
+                + "T"
+                + sdf2.format(privilege.getLastModifiedDate()));
+        JAXBElement<AttributeValue> lmdve 
+                = objectFactory.createAttributeValue(lmdv);
+        lastModifiedDate.setExpression(lmdve);
+
+        VariableDefinition isReferralPolicy = new VariableDefinition();
+        vrList.add(isReferralPolicy);
+        isReferralPolicy.setVariableId(
+                XACMLConstants.IS_REFERRAL_POLICY);
+        AttributeValue irdv = new AttributeValue();
+        irdv.setDataType(XACMLConstants.XS_BOOLEAN_TYPE);
+        irdv.getContent().add(XACMLConstants.XS_BOOLEAN_TRUE);
+        JAXBElement<AttributeValue> irdve
+                = objectFactory.createAttributeValue(irdv);
+        isReferralPolicy.setExpression(irdve);
+
+        // PolicyIssuer policyIssuer = null;  // optional, TODO
+
+        Version version = new Version();
+
+        // TODO: use privilege version in future
+        version.setValue(sdf3.format(privilege.getLastModifiedDate())); 
+        policy.setVersion(version);
+
+        // Defaults policyDefaults = null; // optional, TODO
+
+        policy.setRuleCombiningAlgId(XACMLConstants.XACML_RULE_DENY_OVERRIDES);
+
+        // XACML Target contains a  list of AnyOf(s)
+        // XACML AnyOf contains a list of AllOf(s)
+        // XACML AllOf contains a list of Match(s)
+
+        Target target = new Target();
+        policy.setTarget(target);
+
+        List<AnyOf> targetAnyOfList = target.getAnyOf();
+
+        Set<String> realms = privilege.getRealms();
+        Map<String, Set<String>> appsResources
+                = privilege.getOriginalMapApplNameToResources();
+        
+
+        AnyOf anyOfRealmsAppsResources
+                = realmsAppsResourcesToAnyOf(realms, appsResources);
+        if (anyOfRealmsAppsResources != null) {
+            targetAnyOfList.add(anyOfRealmsAppsResources);
+        }
+
+        Rule permitRule = new Rule();
+        vrList.add(permitRule);
+        permitRule.setRuleId(privilegeName + ":"
+                + XACMLConstants.PREMIT_RULE_SUFFIX);
+        permitRule.setDescription(XACMLConstants.PERMIT_RULE_DESCRIPTION);
+        permitRule.setEffect(EffectType.PERMIT);
+        Target permitTarget = new Target();
+        permitRule.setTarget(permitTarget);
+
+        return policy;
+
+    }
+
+    public static boolean isReferralPolicy(Policy policy) {
+        String s = getVariableById(policy, XACMLConstants.IS_REFERRAL_POLICY);
+        return XACMLConstants.XS_BOOLEAN_TRUE.equalsIgnoreCase(s);
+    }
+
+    public static ReferralPrivilege policyToReferral(Policy policy)
+            throws EntitlementException, JSONException {
+        String policyId = policy.getPolicyId();
+        String privilegeName = policyIdToPrivilegeName(policyId);
+        String description = policy.getDescription();
+
+        String createdBy = getVariableById(policy,
+                XACMLConstants.PRIVILEGE_CREATED_BY);
+
+        long createdAt = dateStringToLong(getVariableById(policy,
+                XACMLConstants.PRIVILEGE_CREATION_DATE));
+
+        String lastModifiedBy = getVariableById(policy,
+                XACMLConstants.PRIVILEGE_LAST_MODIFIED_BY);
+
+        long lastModifiedAt = dateStringToLong(getVariableById(policy,
+                XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
+
+        List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
+        JSONObject jo = getRealmsAppsResources(policyMatches);
+
+        Set<String> realms = JSONUtils.getSet(jo, "realms");
+        Map<String, Set<String>> appsResources
+                = JSONUtils.getMapStringSetString(jo, "appsResources");
+        ReferralPrivilege  referral = new ReferralPrivilege(privilegeName,
+                appsResources, realms);
+        referral.setCreatedBy(createdBy);
+        referral.setCreationDate(createdAt);
+        referral.setLastModifiedBy(lastModifiedBy);
+        referral.setLastModifiedDate(lastModifiedAt);
+ 
+        return referral;
+    }
+
+    public static AnyOf realmsAppsResourcesToAnyOf(Set<String> realms,
+            Map<String, Set<String>> appsResources) throws JSONException {
+        AnyOf anyOf = new AnyOf();
+        List<AllOf> allOfList = anyOf.getAllOf();
+        AllOf allOf = new AllOf();
+        allOfList.add(allOf);
+        List<Match> matchList = allOf.getMatch();
+        Match match = new Match();
+        matchList.add(match);
+        match.setMatchId(XACMLConstants.JSON_REALMS_APPS_RESOURCES_MATCH); //FIXME
+
+        AttributeValue attributeValue = new AttributeValue();
+        String dataType = XACMLConstants.JSON_REALMS_APPS_RESOURCES_DATATYPE; //FIXME
+        attributeValue.setDataType(dataType);
+        JSONObject jo = new JSONObject();
+        jo.put("realms", realms);
+        jo.put("appsResources", appsResources);
+        attributeValue.getContent().add(jo.toString());
+
+        AttributeDesignator attributeDesignator = new AttributeDesignator();
+        String category = XACMLConstants.REALMS_APPS_RESOURCES_CATEGORY; 
+        attributeDesignator.setCategory(category);
+        String attributeId = XACMLConstants.JSON_REALMS_APPS_RESOURCES_ID; 
+        attributeDesignator.setAttributeId(attributeId);
+        attributeDesignator.setDataType(dataType);
+        boolean mustBePresent = false;
+        attributeDesignator.setMustBePresent(mustBePresent);
+
+        match.setAttributeValue(attributeValue);
+        match.setAttributeDesignator(attributeDesignator);
+
+        return anyOf;
     }
 
 }

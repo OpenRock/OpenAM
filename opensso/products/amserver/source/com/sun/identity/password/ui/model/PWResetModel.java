@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PWResetModel.java,v 1.4 2008/08/19 19:09:13 veiming Exp $
+ * $Id: PWResetModel.java,v 1.5 2009/12/18 03:26:59 222713 Exp $
  *
  */
 
@@ -269,4 +269,11 @@ public interface PWResetModel {
      * @return label for Java logo.
      */
     String getJavaLogoLabel();
+
+    /**
+     * Sets the user locale.
+     *
+     * @param value localeString.
+     */
+    void setUserLocale(String localeString);
 }

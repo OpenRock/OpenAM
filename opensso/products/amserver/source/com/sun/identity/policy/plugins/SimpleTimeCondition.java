@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SimpleTimeCondition.java,v 1.4 2008/06/25 05:43:52 qcheng Exp $
+ * $Id: SimpleTimeCondition.java,v 1.5 2010/01/05 22:00:26 dillidorai Exp $
  *
  */
 
@@ -613,6 +613,17 @@ public class SimpleTimeCondition implements Condition {
                 cal.setTime(new Date(dayEnd));
                 cal.roll(Calendar.WEEK_OF_YEAR, true);
                 dayEnd = cal.getTime().getTime();
+                if (dayEnd <= dayStart) {
+                    // week is rolling over year, see issue 4326 
+                    int ye = cal.get(Calendar.YEAR);
+                    cal.set(Calendar.YEAR, ye + 1);
+                    cal.set(Calendar.DAY_OF_WEEK, endDay);
+                    cal.set(Calendar.HOUR_OF_DAY, 24);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
+                    dayEnd = cal.getTime().getTime();
+                }
             }
         }
 

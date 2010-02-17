@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SetupConstants.java,v 1.45.2.1 2009/12/23 01:27:17 goodearth Exp $
+ * $Id: SetupConstants.java,v 1.46 2009/12/23 00:21:38 goodearth Exp $
  *
  */
 

@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: amAccessControl.xml,v 1.21 2009/03/13 21:31:21 asyhuang Exp $
+   $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
 -->
 
@@ -529,4 +529,8 @@
     <neednodealwith classname="com.sun.identity.console.task.ConfigureGoogleAppsViewBean" />
     <neednodealwith classname="com.sun.identity.console.task.ConfigureGoogleAppsWarningViewBean" />
     <neednodealwith classname="com.sun.identity.console.task.ConfigureGoogleAppsCompleteViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLSiteIDEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.ConfigureSalesForceAppsCompleteViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLSetTrustedPartnerTypeViewBean" />
+
 </accesscontrols>

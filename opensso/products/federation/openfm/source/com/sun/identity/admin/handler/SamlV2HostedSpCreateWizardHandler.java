@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SamlV2HostedSpCreateWizardHandler.java,v 1.2 2009/12/08 00:02:09 babysunil Exp $
+ * $Id: SamlV2HostedSpCreateWizardHandler.java,v 1.3 2009/12/23 18:21:37 farble1670 Exp $
  */
 package com.sun.identity.admin.handler;
 
@@ -32,13 +32,12 @@ import com.icesoft.faces.context.effects.Effect;
 import com.sun.identity.admin.Resources;
 import com.sun.identity.admin.dao.SamlV2HostedSpCreateDao;
 import com.sun.identity.admin.effect.InputFieldErrorEffect;
+import com.sun.identity.admin.model.AttributeMappingSamlV2HostedSpCreateWizardStepValidator;
 import com.sun.identity.admin.model.CotSamlV2HostedSpCreateWizardStepValidator;
 import com.sun.identity.admin.model.MessageBean;
 import com.sun.identity.admin.model.MetadataSamlV2HostedSpCreateWizardStepValidator;
 import com.sun.identity.admin.model.SamlV2HostedSpCreateWizardBean;
 import com.sun.identity.admin.model.SamlV2HostedSpCreateWizardStep;
-import com.sun.identity.admin.model.SamlV2ViewAttribute;
-import com.sun.identity.admin.model.ViewAttribute;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -63,6 +62,7 @@ public class SamlV2HostedSpCreateWizardHandler
                 new CotSamlV2HostedSpCreateWizardStepValidator(getWizardBean());
         getWizardStepValidators()[SamlV2HostedSpCreateWizardStep.METADATA.toInt()] = 
                 new MetadataSamlV2HostedSpCreateWizardStepValidator(getWizardBean());
+        getWizardStepValidators()[SamlV2HostedSpCreateWizardStep.ATTRIBUTEMAPPING.toInt()] = new AttributeMappingSamlV2HostedSpCreateWizardStepValidator(getWizardBean());
     }
 
     public void setSamlV2HostedSpCreateDao(SamlV2HostedSpCreateDao samlV2HostedSpCreateDao) {

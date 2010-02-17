@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: http.cpp,v 1.5 2009/10/30 00:34:00 robertis Exp $
+ * $Id: http.cpp,v 1.6 2009/12/19 00:05:46 subbae Exp $
  *
  */ 
 #include <cstdio>
@@ -774,6 +774,41 @@ std::string Http::encode(const std::string& rawString)
 	    encodingBuffer[2] = convertToHexDigit(temp % 0x10);
 	    encodedString += encodingBuffer;
 	}
+    }
+
+    return encodedString;
+}
+
+/*
+ * Eencoding of the cookies which has special characters. 
+ * Useful when profile, session and response  attributes contain 
+ * special chars and attributes fetch mode is set to HTTP_COOKIE.
+ */
+std::string Http::cookie_encode(const std::string& rawString)
+{
+    std::size_t rawLen = rawString.size();
+    std::string encodedString;
+    char encodingBuffer[4] = { '%', '\0', '\0', '\0' };
+
+    encodedString.reserve(rawLen);
+
+    for (std::size_t i = 0; i < rawLen; ++i) {
+        char curChar = rawString[i];
+
+        if (curChar == ' ') {
+            encodedString += '+';
+        }
+        else if (isAlpha(curChar) || isDigit(curChar) ||
+                    isSpecial(curChar)) {
+            encodedString += curChar;
+        }
+        else {
+            unsigned int temp = static_cast<unsigned int>(curChar);
+
+            encodingBuffer[1] = convertToHexDigit((temp>>4)& 0x0f);
+            encodingBuffer[2] = convertToHexDigit(temp % 0x10);
+            encodedString += encodingBuffer;
+        }
     }
 
     return encodedString;

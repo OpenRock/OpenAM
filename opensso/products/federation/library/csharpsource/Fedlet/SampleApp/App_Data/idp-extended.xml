@@ -7,5 +7,14 @@
         <Attribute name="cotlist">
             <Value>cot.example.com</Value>
         </Attribute>
+        <Attribute name="wantArtifactResolveSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantLogoutRequestSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantLogoutResponseSigned">
+            <Value></Value>
+        </Attribute>
     </IDPSSOConfig>
 </EntityConfig>

@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: SAML2LogMessageIDs.xml,v 1.8 2009/10/15 00:02:40 exu Exp $
+   $Id: SAML2LogMessageIDs.xml,v 1.9 2010/01/23 00:06:23 exu Exp $
 
 -->
 
@@ -2178,6 +2178,21 @@
         </triggers>
         <actions>
             <item>Check Provider metadata</item>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SP_SSO_FAILED" id="166"
+        loglevel="LL_INFO"
+        description="Single Sign-On Failed at Service Provider.">
+        <datainfo>
+            <item>Hosted Service Provider Entity ID</item>
+            <item>Error message</item>
+            <item>Response received from IDP if the log level was set to LL_FINE at run time</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On failed</item>
+        </triggers>
+        <actions>
             <item>Check debug file for detailed info</item>
         </actions>
     </logmessage>

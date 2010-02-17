@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: PMDefaultAuthSchemeConditionEdit.jsp,v 1.3 2008/06/25 05:44:42 qcheng Exp $
+   $Id: PMDefaultAuthSchemeConditionEdit.jsp,v 1.4 2010/01/27 10:44:32 si224302 Exp $
 
 --%>
 
@@ -74,6 +74,11 @@
                 sel.options[i] = null;
             }
         }
+    }
+    
+    function addOption(label, value) {
+        var o = new Option(label, value);
+        return o;
     }
 </script>
 

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AMSDKRepo.java,v 1.27.2.1 2009/12/25 05:51:16 hengming Exp $
+ * $Id: AMSDKRepo.java,v 1.28 2009/12/25 05:54:05 hengming Exp $
  *
  */
 
@@ -1765,6 +1765,7 @@ public class AMSDKRepo extends IdRepo {
 
         op2Set.remove(IdOperation.SERVICE);
         supportedOps.put(IdType.GROUP, Collections.unmodifiableSet(op2Set));
+
         try {
             ServiceSchemaManager ssm = new ServiceSchemaManager(adminToken,
                 IdConstants.REPO_SERVICE, "1.0");
@@ -1779,6 +1780,7 @@ public class AMSDKRepo extends IdRepo {
         } catch (SSOException ssoe) {
             // should not happen
         }
+
         Set op3Set = new HashSet(opSet);
         op3Set.remove(IdOperation.CREATE);
         op3Set.remove(IdOperation.DELETE);

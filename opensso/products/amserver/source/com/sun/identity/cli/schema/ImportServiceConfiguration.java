@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- *  $Id: ImportServiceConfiguration.java,v 1.9.2.1 2010/01/11 18:25:57 veiming Exp $
+ * $Id: ImportServiceConfiguration.java,v 1.10 2010/01/11 17:34:33 veiming Exp $
  *
  */
 

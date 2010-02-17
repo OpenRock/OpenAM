@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PWResetModelImpl.java,v 1.4 2009/11/18 20:51:24 qcheng Exp $
+ * $Id: PWResetModelImpl.java,v 1.5 2009/12/18 03:28:29 222713 Exp $
  *
  */
 
@@ -817,5 +817,14 @@ public class PWResetModelImpl
     protected SSOToken getSSOToken() {
         return (SSOToken)AccessController.doPrivileged(
             AdminTokenAction.getInstance());
+    }
+
+    /**
+     * Sets the user locale.
+     *
+     * @param value localeString.
+     */
+    public void setUserLocale(String localeString) {
+        localeContext.setUserLocale(localeString);
     }
 }

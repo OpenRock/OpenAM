@@ -23,7 +23,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: application-manage-view-options-popup.xhtml,v 1.1 2009/09/21 20:35:12 farble1670 Exp $
+   $Id: application-manage-view-options-popup.xhtml,v 1.2 2010/01/11 18:39:42 farble1670 Exp $
 
 -->
 
@@ -62,6 +62,18 @@
                     <f:selectItem 
                         itemValue="applicationType"
                         itemLabel="#{resources['application-manage-view-options-popup.applicationType']}"/>
+                    <f:selectItem
+                        itemValue="author"
+                        itemLabel="#{resources['application-manage-view-options-popup.author']}"/>
+                    <f:selectItem
+                        itemValue="birth"
+                        itemLabel="#{resources['application-manage-view-options-popup.birth']}"/>
+                    <f:selectItem
+                        itemValue="modifier"
+                        itemLabel="#{resources['application-manage-view-options-popup.modifier']}"/>
+                    <f:selectItem
+                        itemValue="modified"
+                        itemLabel="#{resources['application-manage-view-options-popup.modified']}"/>
                     <f:selectItem 
                         itemValue="resources"
                         itemLabel="#{resources['application-manage-view-options-popup.resources']}"/>
@@ -99,9 +111,21 @@
                     <ice:checkbox 
                         for="columns-visible"
                         index="5"/>
-                    <ice:checkbox 
+                    <ice:checkbox
                         for="columns-visible"
                         index="6"/>
+                    <ice:checkbox
+                        for="columns-visible"
+                        index="7"/>
+                    <ice:checkbox
+                        for="columns-visible"
+                        index="8"/>
+                    <ice:checkbox
+                        for="columns-visible"
+                        index="9"/>
+                    <ice:checkbox
+                        for="columns-visible"
+                        index="10"/>
                 </ice:panelGrid>
             </ice:panelGroup>
             <ice:panelGroup>

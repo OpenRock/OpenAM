@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ConfigMonitoring.java,v 1.5 2009/11/10 01:31:40 bigfatrat Exp $
+ * $Id: ConfigMonitoring.java,v 1.6 2009/12/23 23:50:21 bigfatrat Exp $
  *
  */
 
@@ -1081,6 +1081,13 @@ public class ConfigMonitoring {
 
     private String getValFromSet (Map values, String valAttr) {
         Set set = (Set)values.get(valAttr);
+        if (set == null) {
+            if (debug.warningEnabled()) {
+                debug.warning("ConfigMonitoring.getValFromSet: " +
+                    "Null return for attribute " + valAttr);
+            }
+            return "NONE";
+        }
         if (set.size() > 0) {
             return ((String)set.iterator().next());
         } else {

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AssertionToken.java,v 1.9 2009/08/29 03:05:56 mallas Exp $
+ * $Id: AssertionToken.java,v 1.11 2010/01/23 00:20:26 mrudul_uchil Exp $
  *
  */
 
@@ -69,7 +69,6 @@ import com.sun.identity.saml.assertion.AttributeStatement;
 import com.sun.identity.saml.assertion.Attribute;
 import com.sun.identity.saml.assertion.Conditions;
 import com.sun.identity.saml.assertion.AudienceRestrictionCondition;
-
 
 /**
  * This class implements the interface <code>SecurityToken</code> for the 
@@ -310,7 +309,7 @@ public class AssertionToken implements SecurityToken {
       public Element toDocumentElement() throws SecurityException {
 
           if(assertionE != null) {
-             return assertionE; 
+             return WSSUtils.getCanonicalElement(assertionE);
           }
           Document document = XMLUtils.toDOMDocument(
                    assertion.toString(true, true), WSSUtils.debug); 
@@ -318,7 +317,7 @@ public class AssertionToken implements SecurityToken {
              throw new SecurityException(
                  WSSUtils.bundle.getString("cannotConvertToDocument"));
           }
-          return document.getDocumentElement();
+          return WSSUtils.getCanonicalElement(document.getDocumentElement());
       }
 
       public AssertionToken(Element element) 

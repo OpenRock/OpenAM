@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* $Id: IdServicesImpl.java,v 1.59.2.3 2010/01/20 20:18:55 goodearth Exp $
+* $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
 *
 */
 
@@ -530,6 +530,9 @@ public class IdServicesImpl implements IdServices {
 
        Iterator it = configuredPluginClasses.iterator();
        int noOfSuccess = configuredPluginClasses.size();
+       if (!name.equalsIgnoreCase(IdConstants.ANONYMOUS_USER)) {
+           noOfSuccess--;
+       }
        IdRepo idRepo;
        while (it.hasNext()) {
            idRepo = (IdRepo) it.next();
@@ -564,13 +567,12 @@ public class IdServicesImpl implements IdServices {
                        + ide.getMessage());
                }
                noOfSuccess--;
-               if (!ide.getErrorCode().equalsIgnoreCase("220")
-                   || (origEx == null)) {
+               if (!ide.getErrorCode().equalsIgnoreCase("220")) {
                    origEx = ide;
                }
            }
        }
-       if (noOfSuccess == 0) {
+       if ((noOfSuccess <= 0) && (origEx != null)) {
            if (getDebug().warningEnabled()) {
                getDebug().warning(
                    "IdServicesImpl.delete: "

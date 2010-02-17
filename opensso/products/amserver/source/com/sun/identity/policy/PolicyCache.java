@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PolicyCache.java,v 1.8 2009/10/01 17:39:40 dillidorai Exp $
+ * $Id: PolicyCache.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
  */
 
@@ -391,34 +391,8 @@ public class PolicyCache implements ServiceListener {
                 DEBUG.error ("SMS Notification- unsupported change type : "
                         + changeType);
             }
-            Iterator iter = policyListenersMap.keySet().iterator();
-            while ( iter.hasNext() ) {
-                String listenerServiceName = (String) iter.next();
-                Set affectedResourceNames = new HashSet();
-                try {
-                    if ( oldPolicy != null ) {
-                        affectedResourceNames.addAll(oldPolicy.getResourceNames(
-                                listenerServiceName));
-                    }
-                    if ( newPolicy != null ) {
-                        affectedResourceNames.addAll(newPolicy.getResourceNames(
-                                listenerServiceName));
-                    }
-                }
-                catch(SSOException ssoe) {
-                    DEBUG.error(ResBundleUtils.getString("invalid_sso_token"), 
-                            ssoe );
-                }
-                catch(NameNotFoundException nnfe) {
-                    String objs[] = { listenerServiceName };
-                    DEBUG.error(ResBundleUtils.getString(
-                            "service_name_not_found", objs), nnfe );
-                }
-                if( !affectedResourceNames.isEmpty() ) {
-                    firePolicyChanged(listenerServiceName, 
-                        affectedResourceNames, changeType);
-                }
-            }
+
+            sendPolicyChangeNotification(oldPolicy, newPolicy, changeType);
         }
 
         if ( serviceComponent.startsWith(RESOURCES_COMPONENT)) {
@@ -449,6 +423,39 @@ public class PolicyCache implements ServiceListener {
                         + orgName);
             }
             realmSubjectsChanged(orgName);
+        }
+    }
+
+    public void sendPolicyChangeNotification(
+        Policy oldPolicy,
+        Policy newPolicy,
+        int changeType
+    ) {
+        for (Iterator i = policyListenersMap.keySet().iterator(); i.hasNext();
+        ) {
+            String listenerServiceName = (String) i.next();
+            Set affectedResourceNames = new HashSet();
+            try {
+                if (oldPolicy != null) {
+                    affectedResourceNames.addAll(oldPolicy.getResourceNames(
+                        listenerServiceName));
+                }
+                if (newPolicy != null) {
+                    affectedResourceNames.addAll(newPolicy.getResourceNames(
+                        listenerServiceName));
+                }
+            } catch (SSOException ssoe) {
+                DEBUG.error(ResBundleUtils.getString("invalid_sso_token"),
+                    ssoe);
+            } catch (NameNotFoundException nnfe) {
+                String objs[] = {listenerServiceName};
+                DEBUG.error(ResBundleUtils.getString(
+                    "service_name_not_found", objs), nnfe);
+            }
+            if (!affectedResourceNames.isEmpty()) {
+                firePolicyChanged(listenerServiceName,
+                    affectedResourceNames, changeType);
+            }
         }
     }
 

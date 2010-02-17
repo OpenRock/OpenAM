@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Entitlement.java,v 1.5.2.1 2009/12/22 18:04:36 veiming Exp $
+ * $Id: Entitlement.java,v 1.7 2010/01/25 23:48:14 veiming Exp $
  */
 package com.sun.identity.entitlement;
 
@@ -776,15 +776,24 @@ public class Entitlement {
         String realm
     ) throws EntitlementException {
         ResourceSaveIndexes result = null;
-        ApplicationType applType = getApplication(
-            adminSubject, realm).getApplicationType();
+        Application appl = getApplication(adminSubject, realm);
 
-        for (String r : resourceNames) {
-            ResourceSaveIndexes rsi = applType.getResourceSaveIndex(r);
-            if (result == null) {
-                result = rsi;
-            } else {
-                result.addAll(rsi);
+        // application can be null if the referred privilege is removed.
+        // get the application from root realm
+        if (appl == null) {
+            appl = getApplication(adminSubject, "/");
+        }
+
+        if (appl != null) {
+            ApplicationType applType = appl.getApplicationType();
+
+            for (String r : resourceNames) {
+                ResourceSaveIndexes rsi = applType.getResourceSaveIndex(r);
+                if (result == null) {
+                    result = rsi;
+                } else {
+                    result.addAll(rsi);
+                }
             }
         }
         return result;

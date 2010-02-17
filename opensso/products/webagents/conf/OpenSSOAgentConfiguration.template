@@ -667,6 +667,16 @@ com.sun.identity.agents.config.convert.mbyte.enable = false
 com.sun.identity.agents.config.encode.url.special.chars.enable = false
 
 #
+# ENCODE COOKIE SPECIAL CHARACTERS
+#   The following property is used whether to do encoding of the cookies 
+#   which has special characters. Useful when profile, session and response 
+#   attributes contain special chars and attributes fetch mode is set to HTTP_COOKIE.
+#
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.encode.cookie.special.chars.enable = false
+
+#
 # IGNORE URL PATH
 #   When the not enforced list or policy has a wildcard '*' character, agent 
 #   strips the path info from the request URI and uses the resulting request 

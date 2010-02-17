@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Step3.java,v 1.38 2009/04/01 03:29:59 kevinserwin Exp $
+ * $Id: Step3.java,v 1.39 2009/12/17 17:43:39 goodearth Exp $
  *
  */
 package com.sun.identity.config.wizard;
@@ -257,7 +257,10 @@ public class Step3 extends LDAPStoreWizardPage {
        String host = toString("configStoreHost");
 
        if (host == null) {
-           writeToResponse("missing.required.field");
+           writeToResponse(
+                getLocalizedString("missing.required.field"));
+           setPath(null);
+           return false;
        } else {
            getContext().setSessionAttribute(
                "configStoreHost", host);

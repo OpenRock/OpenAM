@@ -2,6 +2,7 @@ SUNW_1.0 {
 	global:
 		am_agent_init;
 		am_cleanup;
+		am_shutdown_nss;
 
 		am_http_cookie_encode;
 		am_http_cookie_decode;

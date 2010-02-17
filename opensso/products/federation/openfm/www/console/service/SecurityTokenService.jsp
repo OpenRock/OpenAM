@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: SecurityTokenService.jsp,v 1.2.2.1 2009/12/19 02:42:33 asyhuang Exp $
+   $Id: SecurityTokenService.jsp,v 1.3 2009/12/19 00:10:28 asyhuang Exp $
 
 --%>
 

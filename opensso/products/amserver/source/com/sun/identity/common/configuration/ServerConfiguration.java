@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ServerConfiguration.java,v 1.15 2009/09/30 17:19:06 goodearth Exp $
+ * $Id: ServerConfiguration.java,v 1.16 2010/01/15 18:10:55 veiming Exp $
  *
  */
 
@@ -68,10 +68,6 @@ import org.xml.sax.SAXException;
  * This manages server configuration information.
  */
 public class ServerConfiguration extends ConfigurationBase {
-    private static final String NAME_SERVER_CONFIG = "ServerConfig";
-    private static final int LEN_NAME_SERVER_CONFIG = 
-        NAME_SERVER_CONFIG.length();
-    
     private static final String ATTR_PARENT_SITE_ID = "parentsiteid";
     private static final String ATTR_SERVER_CONFIG = "serverconfig";
     private static final String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
@@ -339,7 +335,29 @@ public class ServerConfiguration extends ConfigurationBase {
         }
         return map;
     }
-    
+
+    /**
+     * Returns server Identifier.
+     *
+     * @return server Identifier. Returns null if server Id is not stored in
+     *         centralized datastore.
+     */
+    public static String getServerID(
+        SSOToken ssoToken,
+        String instanceName
+    ) throws SMSException, SSOException {
+        String serverId = null;
+        if (!isLegacy(ssoToken)) {
+            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+            if (cfg != null) {
+                Map map = cfg.getAttributes();
+                Set set = (Set)map.get(ATTR_SERVER_ID);
+                serverId = (String)set.iterator().next();
+            }
+        }
+        return serverId;
+    }
+
     /**
      * Returns server configuration XML.
      *

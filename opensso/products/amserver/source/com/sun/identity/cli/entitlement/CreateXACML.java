@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CreateXACML.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
+ * $Id: CreateXACML.java,v 1.3 2010/01/11 01:21:01 dillidorai Exp $
  *
  */
 
@@ -44,8 +44,12 @@ import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.ReferralPrivilegeManager;
+
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 
+import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 
@@ -59,6 +63,7 @@ import java.util.logging.Level;
 import javax.security.auth.Subject;
 import javax.xml.bind.JAXBException;
 
+import org.json.JSONException;
 
 /**
  * Creates policy in a realm.
@@ -119,11 +124,18 @@ public class CreateXACML extends AuthenticatedCommand {
             }
 
             if (ps != null) {
-                PrivilegeManager pm = PrivilegeManager.getInstance(realm, adminSubject);
-                Set<Privilege> privileges = XACMLPrivilegeUtils.policySetToPrivileges(ps);
-                if (privileges != null) {
-                    for (Privilege p : privileges) {
-                       pm.addPrivilege(p);
+                PrivilegeManager pm = PrivilegeManager.getInstance(
+                        realm, adminSubject);
+                ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(
+                        realm, adminSubject);
+                Set<Policy> policies
+                        = XACMLPrivilegeUtils.getPoliciesFromPolicySet(ps);
+                for (Policy policy : policies) {
+                    if (XACMLPrivilegeUtils.isReferralPolicy(policy)) {
+                        rpm.add(XACMLPrivilegeUtils.policyToReferral(policy));
+                    } else {
+                        pm.addPrivilege(
+                                XACMLPrivilegeUtils.policyToPrivilege(policy));
                     }
                 }
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
@@ -140,6 +152,12 @@ public class CreateXACML extends AuthenticatedCommand {
                 outputWriter.printlnMessage("policy set is null");
             }
         } catch (JAXBException e) {
+            String[] args = {realm, e.getMessage()};
+            debugError("CreateXACML.handleRequest", e);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO,
+                "FAILED_CREATE_POLICY_IN_REALM", args);
+            throw new CLIException(e ,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        } catch (JSONException e) {
             String[] args = {realm, e.getMessage()};
             debugError("CreateXACML.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,

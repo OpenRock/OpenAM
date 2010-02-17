@@ -456,4 +456,6 @@ com/iplanet/am/util/JSSPasswordCallback.class
 com/iplanet/am/util/JSSSecureRandomFactoryImpl.class
 
 com/sun/identity/protocol/AMURLStreamHandlerFactory.class
+com/sun/identity/monitoring/Agent.class
+com/sun/identity/monitoring/SsoServerIdRepoSvcImpl.class
 

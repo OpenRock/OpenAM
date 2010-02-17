@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AMSendMail.java,v 1.5 2009/07/30 17:37:59 qcheng Exp $
+ * $Id: AMSendMail.java,v 1.6 2009/12/22 19:57:19 qcheng Exp $
  *
  */
 package com.iplanet.am.util;
@@ -165,7 +165,7 @@ public class AMSendMail {
         moduleProps.put("mail.smtp.socketFactory.fallback", "false");
 
            // create some properties and get the default mail Session
-        Session session = Session.getDefaultInstance(moduleProps,
+        Session session = Session.getInstance(moduleProps,
                 new AMUserNamePasswordAuthenticator(user, password));
 
         session.setDebug(debug);

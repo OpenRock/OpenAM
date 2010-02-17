@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Policy.java,v 1.8 2009/11/10 00:16:43 veiming Exp $
+ * $Id: Policy.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
  */
 
@@ -1814,7 +1814,9 @@ public class Policy implements Cloneable {
         Iterator ruleIterator = rules.values().iterator();
         while (ruleIterator.hasNext()) {
             Rule rule = (Rule) ruleIterator.next();
-            if (rule.getServiceType().getName().equals(serviceTypeName)) {
+            String rSvcTypeName = (rule.getServiceType() == null) ?
+                rule.getServiceTypeName() : rule.getServiceType().getName();
+            if (rSvcTypeName.equals(serviceTypeName)) {
                 String ruleResource = rule.getResourceName();
                 resourceNames.add(ruleResource);
             }

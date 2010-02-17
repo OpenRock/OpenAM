@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IdRepoAttributeValidatorManager.java,v 1.1 2009/11/10 01:48:01 hengming Exp $
+ * $Id: IdRepoAttributeValidatorManager.java,v 1.2 2010/01/26 00:04:38 hengming Exp $
  */
 package com.sun.identity.idm.server;
 
@@ -95,6 +95,7 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
             return validator;
         }
 
+        Map<String, Set<String>> configParams = new HashMap();
         synchronized (validatorCache) {
             try {
                 ServiceConfig orgConfig =
@@ -106,7 +107,6 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
                 Set<String> attrValues = 
                     attrMap.get(ATTR_IDREPO_ATTRIBUTE_VALIDATOR);
                 String className = null;
-                Map<String, Set<String>> configParams = new HashMap();
                 for(String attrValue: attrValues) {
                     int index = attrValue.indexOf("=");
                     if (index != -1) {
@@ -127,7 +127,6 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
                 Class validatorClass = Class.forName(className);
                 validator = (IdRepoAttributeValidator)
                     validatorClass.newInstance();
-                validator.initialize(configParams);
             } catch (Exception ex) {
                 if (debug.warningEnabled()) {
                     debug.warning("IdRepoAttributeValidatorManager." +
@@ -138,6 +137,7 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
             if (validator == null) {
                 validator = new IdRepoAttributeValidatorImpl();
             }
+            validator.initialize(configParams);
         }
 
         return validator;

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: STSExportPolicyModelImpl.java,v 1.1.2.2 2009/12/19 02:41:50 asyhuang Exp $
+ * $Id: STSExportPolicyModelImpl.java,v 1.1 2009/12/19 00:14:56 asyhuang Exp $
  *
  */
 package com.sun.identity.console.service.model;

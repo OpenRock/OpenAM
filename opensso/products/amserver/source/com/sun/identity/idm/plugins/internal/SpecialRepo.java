@@ -22,11 +22,15 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SpecialRepo.java,v 1.18 2009/10/14 01:23:49 hengming Exp $
+ * $Id: SpecialRepo.java,v 1.19 2010/01/06 17:41:00 veiming Exp $
  *
  */
 package com.sun.identity.idm.plugins.internal;
 
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.configuration.ConfigurationException;
+import com.sun.identity.common.configuration.UnknownPropertyNameException;
+import java.io.IOException;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +45,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 
 import com.iplanet.services.ldap.ServerConfigMgr;
+import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.AuthSubject;
@@ -49,6 +54,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
+import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -61,8 +67,10 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
@@ -70,6 +78,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.security.Principal;
 
 public class SpecialRepo extends IdRepo implements ServiceListener {
 
@@ -92,6 +101,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
     private static final String addrAttribute = "postalAddress";
     private static final String msisdnAttribute = "sunIdentityMSISDNNumber";
     private static final String phoneAttribute = "telephoneNumber";
+    private static final String URL_ACCESS_AGENT = "amService-URLAccessAgent";
 
     IdRepoListener repoListener;
 
@@ -613,6 +623,14 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
     public void setAttributes(SSOToken token, IdType type, String name,
         Map attributes, boolean isAdd) throws IdRepoException, SSOException {
         if (isSpecialUser(type, name)) {
+            boolean isUrlAccessAgent = isUrlAccessAgent(type, name);
+            String urlAccessAgentCryptPwd = null;
+            if (isUrlAccessAgent && !isAmAdminUser(token)) {
+                Object args[] = { name };
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "231",
+                    args);
+            }
+
             try {
                 ServiceConfig userConfig = getUserConfig();
                 // For performance reason check if the user entry
@@ -633,6 +651,13 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                             String val = (String) it.next();
                             hashedVals.add(Hash.hash(val));
                             newPassword = val;
+
+                            // if user is URL Access Agent,
+                            // urlAccessAgentCryptPwd will be set; otherwise
+                            // urlAccessAgentCryptPwd will be null.
+                            if (isUrlAccessAgent) {
+                                urlAccessAgentCryptPwd = Crypt.encode(val);
+                            }
                         }
                         attrs.put("userPassword", hashedVals);
                     }
@@ -711,6 +736,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                                     + "changing password", e);
                         }
                     }
+                    updateServiceConfiguration(urlAccessAgentCryptPwd);
                 } else {
                     Object args[] = { name };
                     throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "202",
@@ -727,6 +753,41 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
             Object args[] = {NAME, IdOperation.EDIT.getName()};
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
                 "305", args);
+        }
+    }
+
+    private void updateServiceConfiguration(String urlAccessAgentCryptPwd)
+        throws IdRepoException, SSOException {
+        if (urlAccessAgentCryptPwd != null) {
+            Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+            Set<String> set = new HashSet<String>();
+            set.add(urlAccessAgentCryptPwd);
+            map.put(Constants.AM_SERVICES_SECRET, set);
+            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                AdminTokenAction.getInstance());
+            String instance = SystemProperties.getServerInstanceName();
+
+            try {
+                ServerConfiguration.setServerInstance(adminToken, instance,
+                    map);
+            } catch (SMSException e) {
+                debug.error("SpecialRepo.updateServiceConfiguration", e);
+                Object args[] = {NAME, IdOperation.EDIT.getName()};
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    "232", args);
+            } catch (IOException e) {
+                debug.error("SpecialRepo.updateServiceConfiguration", e);
+                Object args[] = {NAME, IdOperation.EDIT.getName()};
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    "232", args);
+            } catch (ConfigurationException e) {
+                debug.error("SpecialRepo.updateServiceConfiguration", e);
+                Object args[] = {NAME, IdOperation.EDIT.getName()};
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                    "232", args);
+            } catch (UnknownPropertyNameException e) {
+                // never happen
+            }
         }
     }
 
@@ -763,6 +824,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
      * @see com.sun.identity.idm.IdRepo#getSupportedOperations(
      *      com.sun.identity.idm.IdType)
      */
+    @Override
     public Set getSupportedOperations(IdType type) {
         return (Set) supportedOps.get(type);
     }
@@ -772,6 +834,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
      * 
      * @see com.sun.identity.idm.IdRepo#getSupportedTypes()
      */
+    @Override
     public Set getSupportedTypes() {
         return supportedOps.keySet();
     }
@@ -781,6 +844,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
      * 
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
+    @Override
     public void initialize(Map configParams) {
         super.initialize(configParams);
     }
@@ -791,6 +855,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
      * @see com.sun.identity.idm.IdRepo#isActive(com.iplanet.sso.SSOToken,
      *      com.sun.identity.idm.IdType, java.lang.String)
      */
+    @Override
     public boolean isActive(SSOToken token, IdType type, String name)
         throws IdRepoException, SSOException {
         Map attributes = getAttributes(token, type, name);
@@ -832,6 +897,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
      * 
      * @see com.sun.identity.idm.IdRepo#shutdown()
      */
+    @Override
     public void shutdown() {
         if (scm != null) {
             scm.removeListener(scmListenerId);
@@ -839,6 +905,25 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
         if (ssm != null) {
             ssm.removeListener(ssmListenerId);
         }
+    }
+
+    private boolean isUrlAccessAgent(IdType type, String name) {
+        return (type.equals(IdType.USER)) && name.equalsIgnoreCase(
+            URL_ACCESS_AGENT);
+    }
+
+    private boolean isAmAdminUser(SSOToken token) throws SSOException {
+        Principal p = token.getPrincipal();
+        String principalName = p.getName();
+        if (DN.isDN(principalName)) {
+            String dsameuserDN = "id=amadmin,ou=user," +
+                SMSEntry.getRootSuffix();
+            DN principalDN = new DN(principalName);
+            DN dsameuser = new DN(dsameuserDN);
+            return principalDN.equals(dsameuser);
+        }
+
+        return false;
     }
 
     private boolean isSpecialUser(IdType type, String name)
@@ -985,6 +1070,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
         // Notifications need not be sent
     }
 
+    @Override
     public String getFullyQualifiedName(SSOToken token, IdType type,
         String name) throws IdRepoException, SSOException {
         if (isSpecialUser(type, name)) {
@@ -993,6 +1079,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
         return (null);
     }
 
+    @Override
     public boolean supportsAuthentication() {
         return (true);
     }

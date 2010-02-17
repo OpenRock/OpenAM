@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IdServices.java,v 1.9 2009/07/02 20:33:30 hengming Exp $
+ * $Id: IdServices.java,v 1.10 2010/01/06 01:58:26 veiming Exp $
  *
  */
 
@@ -160,4 +160,7 @@ public interface IdServices {
 
     public Set getFullyQualifiedNames(SSOToken token, IdType type,
         String name, String orgName) throws IdRepoException, SSOException;
+
+    public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
+            String orgName) throws IdRepoException, SSOException;
 }

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PolicyPrivilegeManager.java,v 1.8 2009/12/15 00:44:19 veiming Exp $
+ * $Id: PolicyPrivilegeManager.java,v 1.9 2010/01/26 20:10:15 dillidorai Exp $
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -325,6 +325,30 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         */
         //TODO: remove the tempoarary work around 29may09
         xmlString = XACMLPrivilegeUtils.toXACML(getPrivilege(name));
+        return xmlString;
+    }
+
+    /**
+     * Returns the XML representation of this privilege.
+     *
+     * @param names Name of Privileges to export as XML.
+     * @return XML representation of the specified privileges
+     * @throws EntitlementException if a specified privilege is not found, or cannot
+     * be obtained.
+     */
+    @Override
+    public String getPrivilegesXML(Set<String> names)
+            throws EntitlementException {
+        String xmlString = "";
+        if (names == null || names.isEmpty()) {
+            return xmlString;
+        }
+        Set<Privilege> privileges = new HashSet<Privilege>();
+        for (String name : names) {
+            privileges.add(getPrivilege(name));
+        }
+        xmlString = XACMLPrivilegeUtils.toXML(
+                XACMLPrivilegeUtils.privilegesToPolicySet(realm, privileges)); 
         return xmlString;
     }
 

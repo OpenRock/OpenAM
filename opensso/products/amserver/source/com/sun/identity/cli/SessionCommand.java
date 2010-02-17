@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SessionCommand.java,v 1.8 2009/01/28 05:34:54 ww203982 Exp $
+ * $Id: SessionCommand.java,v 1.9 2010/01/04 18:59:21 veiming Exp $
  *
  */
 
@@ -56,6 +56,7 @@ import com.sun.identity.shared.ldap.util.DN;
 public class SessionCommand extends AuthenticatedCommand {
     private static final String ARGUMENT_HOST_NAME = "host";
     private final static String USER_ID = "UserId";
+    private final static String QUIET_PARAM = "quiet";
 
     private Session curSession;
     private SessionID curSessionID;
@@ -68,7 +69,8 @@ public class SessionCommand extends AuthenticatedCommand {
         AuthContext lc = auth.sessionBasedLogin(
             getCommandManager(), bindUser, getAdminPassword());
         try {
-            handleRequest(lc.getSSOToken());
+            boolean isQuiet = isOptionSet(QUIET_PARAM);
+            handleRequest(lc.getSSOToken(), isQuiet);
 
             try {
                 lc.logout();
@@ -81,7 +83,7 @@ public class SessionCommand extends AuthenticatedCommand {
         }
     }
 
-    private void handleRequest(SSOToken ssoToken)
+    private void handleRequest(SSOToken ssoToken, boolean isQuiet)
         throws CLIException {
         IOutput ouputWriter = getOutputWriter();
 
@@ -91,7 +93,7 @@ public class SessionCommand extends AuthenticatedCommand {
             for (Iterator i= sList.iterator(); i.hasNext(); ) {
                 printSessionInformation(ouputWriter, (SessionData)i.next());
             }
-            if (sList.size() > 1) {
+            if ((sList.size() > 1) && !isQuiet) {
                 promptForInvalidation(ouputWriter, sList);
             }
         } else {

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AuthViewBeanBase.java,v 1.12 2009/01/16 06:29:39 hengming Exp $
+ * $Id: AuthViewBeanBase.java,v 1.13 2010/01/22 03:31:35 222713 Exp $
  *
  */
 
@@ -58,7 +58,7 @@ import java.io.UnsupportedEncodingException;
  */
 public abstract class AuthViewBeanBase extends ViewBeanBase {
     private static String[] ignoreList = {
-        "goto", "encoded", "IDtoken0", "IDtoken1", "IDtoken2", "IDButton", "AMAuthCookie"
+        "goto", "encoded", "IDtoken0", "IDtoken1", "IDtoken2", "IDButton", "AMAuthCookie", "IDToken3"
     };
 
     private  java.util.Locale accLocale ;

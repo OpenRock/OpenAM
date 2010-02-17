@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ApplicationPrivilegeManager.java,v 1.4 2009/11/19 01:02:02 veiming Exp $
+ * $Id: ApplicationPrivilegeManager.java,v 1.5 2010/01/07 00:19:10 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -44,7 +44,7 @@ public abstract class ApplicationPrivilegeManager {
     public static final String ACTION_DELEGATE =
         ApplicationPrivilege.Action.DELEGATE.toString();
 
-    //TOFIX
+    // RFE: implementation class to be pluggable
     private static String DEFAULT_IMPL_CLASS =
         "com.sun.identity.entitlement.opensso.OpenSSOApplicationPrivilegeManager";
     private static Class DEFAULT_IMPL;

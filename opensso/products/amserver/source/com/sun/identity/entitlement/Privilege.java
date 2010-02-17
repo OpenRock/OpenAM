@@ -22,11 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Privilege.java,v 1.12 2009/12/15 00:44:18 veiming Exp $
+ * $Id: Privilege.java,v 1.14 2010/01/08 22:20:47 veiming Exp $
  */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.JSONUtils;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +42,11 @@ import org.json.JSONObject;
  * Class representing entitlement privilege
  */
 public abstract class Privilege implements IPrivilege {
+    /**
+     * application index key
+     */
+    public static final String APPLICATION_ATTRIBUTE = "application";
+
     /**
      * Created by index key
      */
@@ -97,11 +103,12 @@ public abstract class Privilege implements IPrivilege {
     private String lastModifiedBy;
     private long creationDate;
     private long lastModifiedDate;
+    private Set<String> applicationIndexes;
 
 
     static {
         try {
-            //TODO: should be customizable
+            //REF: should be customizable
             privilegeClass = Class.forName(
                 "com.sun.identity.entitlement.opensso.OpenSSOPrivilege");
         } catch (ClassNotFoundException ex) {
@@ -871,5 +878,13 @@ public abstract class Privilege implements IPrivilege {
     }
 
 
+    public void setApplicationIndexes(Set<String> indexes) {
+        applicationIndexes = indexes;
+    }
+
+    public Set<String> getApplicationIndexes() {
+        return (applicationIndexes == null) ? Collections.EMPTY_SET :
+            applicationIndexes;
+    }
 }
 

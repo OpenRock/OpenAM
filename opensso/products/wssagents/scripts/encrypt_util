@@ -23,9 +23,9 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
-# $Id: encrypt_util,v 1.3 2009/11/10 08:37:30 mrudul_uchil Exp $
+# $Id: encrypt_util,v 1.4 2010/01/15 23:29:23 mrudul_uchil Exp $
 #
 #
 JAVA_HOME=$JAVA_HOME
-CLASSPATH=../lib/openssoclientsdk.jar:../resources
+CLASSPATH=../lib/openssoclientsdk.jar:../resources:../config
 ${JAVA_HOME}/bin/java -Xms64m -Xmx256m -classpath ${CLASSPATH} com.sun.identity.wssagents.common.util.EncryptionUtil $@

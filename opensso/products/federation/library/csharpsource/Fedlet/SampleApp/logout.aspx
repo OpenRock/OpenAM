@@ -23,7 +23,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: logout.aspx,v 1.1 2009/11/11 18:13:40 ggennaro Exp $
+ * $Id: logout.aspx,v 1.2 2010/01/26 01:20:14 ggennaro Exp $
  */
 --%>
 <%@ Page Language="C#" Debug="true" %>
@@ -78,6 +78,7 @@
             if (!string.IsNullOrEmpty(parameters[Saml2Constants.RelayState]))
             {
                 string redirectUrl = parameters[Saml2Constants.RelayState];
+                Saml2Utils.ValidateRelayState(redirectUrl, serviceProviderUtility.ServiceProvider.RelayStateUrlList);
                 Response.Redirect(redirectUrl);
             }
             else

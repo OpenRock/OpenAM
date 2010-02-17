@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: EntityModelImpl.java,v 1.19.2.1 2009/12/25 09:27:22 babysunil Exp $
+ * $Id: EntityModelImpl.java,v 1.20 2009/12/25 09:13:22 babysunil Exp $
  *
  */
 

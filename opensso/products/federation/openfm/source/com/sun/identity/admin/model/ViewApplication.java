@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ViewApplication.java,v 1.7 2009/12/16 18:16:32 farble1670 Exp $
+ * $Id: ViewApplication.java,v 1.9 2010/01/13 18:41:54 farble1670 Exp $
  */
 
 package com.sun.identity.admin.model;
@@ -37,6 +37,7 @@ import com.sun.identity.entitlement.Application;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,46 @@ public class ViewApplication implements Serializable {
 
     public void setWritable(boolean writable) {
         this.writable = writable;
+    }
+
+    public Date getBirth() {
+        return birth;
+    }
+
+    public void setBirth(Date birth) {
+        this.birth = birth;
+    }
+
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setModified(Date modified) {
+        this.modified = modified;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
+    }
+
+    public boolean isInUse() {
+        return inUse;
+    }
+
+    public void setInUse(boolean inUse) {
+        this.inUse = inUse;
     }
 
     public static class NameComparator extends TableColumnComparator {
@@ -133,6 +174,78 @@ public class ViewApplication implements Serializable {
         }
     }
 
+    public static class BirthComparator extends TableColumnComparator {
+
+        public BirthComparator(boolean ascending) {
+            super(ascending);
+        }
+
+        public int compare(Object o1, Object o2) {
+            ViewApplication va1 = (ViewApplication) o1;
+            ViewApplication va2 = (ViewApplication) o2;
+
+            if (!isAscending()) {
+                return va1.getBirth().compareTo(va2.getBirth());
+            } else {
+                return va2.getBirth().compareTo(va1.getBirth());
+            }
+        }
+    }
+
+    public static class ModifiedComparator extends TableColumnComparator {
+
+        public ModifiedComparator(boolean ascending) {
+            super(ascending);
+        }
+
+        public int compare(Object o1, Object o2) {
+            ViewApplication va1 = (ViewApplication) o1;
+            ViewApplication va2 = (ViewApplication) o2;
+
+            if (!isAscending()) {
+                return va1.getModified().compareTo(va2.getModified());
+            } else {
+                return va2.getModified().compareTo(va1.getModified());
+            }
+        }
+    }
+
+    public static class AuthorComparator extends TableColumnComparator {
+
+        public AuthorComparator(boolean ascending) {
+            super(ascending);
+        }
+
+        public int compare(Object o1, Object o2) {
+            ViewApplication va1 = (ViewApplication) o1;
+            ViewApplication va2 = (ViewApplication) o2;
+
+            if (!isAscending()) {
+                return va1.getAuthor().compareTo(va2.getAuthor());
+            } else {
+                return va2.getAuthor().compareTo(va1.getAuthor());
+            }
+        }
+    }
+
+    public static class ModifierComparator extends TableColumnComparator {
+
+        public ModifierComparator(boolean ascending) {
+            super(ascending);
+        }
+
+        public int compare(Object o1, Object o2) {
+            ViewApplication va1 = (ViewApplication) o1;
+            ViewApplication va2 = (ViewApplication) o2;
+
+            if (!isAscending()) {
+                return va1.getModifier().compareTo(va2.getModifier());
+            } else {
+                return va2.getModifier().compareTo(va1.getModifier());
+            }
+        }
+    }
+
     private String name;
     private String description;
     private ViewApplicationType viewApplicationType;
@@ -144,6 +257,11 @@ public class ViewApplication implements Serializable {
     private OverrideRule overrideRule = OverrideRule.DENY_OVERRIDE;
     private boolean selected;
     private boolean writable = true;
+    private Date birth;
+    private Date modified;
+    private String author;
+    private String modifier;
+    private boolean inUse = false;
 
     public ViewApplication() {
         booleanActionsHandler.setBooleanActionsBean(booleanActionsBean);
@@ -157,9 +275,16 @@ public class ViewApplication implements Serializable {
         name = a.getName();
         description = a.getDescription();
 
+
         // application type
         Map<String, ViewApplicationType> entitlementApplicationTypeToViewApplicationTypeMap = (Map<String, ViewApplicationType>) mbr.resolve("entitlementApplicationTypeToViewApplicationTypeMap");
         viewApplicationType = entitlementApplicationTypeToViewApplicationTypeMap.get(a.getApplicationType().getName());
+
+        // birth, modified, author, modifier
+        birth = new Date(a.getCreationDate());
+        modified = new Date(a.getLastModifiedDate());
+        author = a.getCreatedBy();
+        modifier = a.getLastModifiedBy();
 
         // resources
         for (String resourceString : a.getResources()) {
@@ -413,5 +538,10 @@ public class ViewApplication implements Serializable {
 
     public String getConditionTypesToFormattedString() {
         return new ListFormatter(conditionTypes).toFormattedString();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DelegationManageHandler.java,v 1.1.2.1 2009/12/23 00:53:53 farble1670 Exp $
+ * $Id: DelegationManageHandler.java,v 1.2 2009/12/22 23:33:14 farble1670 Exp $
  */
 package com.sun.identity.admin.handler;
 
@@ -146,7 +146,7 @@ public class DelegationManageHandler implements Serializable {
         int size = delegationManageBean.getDelegationBeans().size();
         int first = delegationManageBean.getDataPaginator().getFirstRow();
         int rows = delegationManageBean.getDataPaginator().getRows();
-        int last = Math.min(first + rows, size);
+        int last = Math.min(first+rows, size);
 
         for (int i = first; i < last; i++) {
             DelegationBean db = delegationManageBean.getDelegationBeans().get(i);
@@ -225,11 +225,8 @@ public class DelegationManageHandler implements Serializable {
             MessageBean mb = new MessageBean();
             Resources r = new Resources();
             mb.setSummary(r.getString(this, "noApplicationsSummary"));
-
             mb.setDetail(r.getString(this, "noApplicationsDetail"));
-
             mb.setSeverity(FacesMessage.SEVERITY_ERROR);
-
             messagesBean.addMessageBean(mb);
 
             return null;

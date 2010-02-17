@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SAML11AssertionValidator.java,v 1.7 2009/11/11 17:17:16 huacui Exp $
+ * $Id: SAML11AssertionValidator.java,v 1.8 2010/01/15 18:54:34 mrudul_uchil Exp $
  *
  */
 
@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.saml.assertion.Assertion;
@@ -49,6 +50,8 @@ import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.wss.sts.STSConstants;
 import java.security.cert.X509Certificate;
+import com.sun.identity.saml.xmlsig.XMLSignatureManager;
+import com.sun.identity.wss.sts.config.FAMSTSConfiguration;
 
 /**
  * This class provides validation functionality for SAML1.x assertions.
@@ -59,15 +62,15 @@ public class SAML11AssertionValidator {
     private static Debug debug = WSSUtils.debug;
     private Map<String, String> attributeMap = new HashMap<String, String>();
     private String subjectName = null;      
-    private Map config = null;
+    private FAMSTSConfiguration stsConfig = null;
     private X509Certificate cert = null;
           
     public SAML11AssertionValidator(Element assertionE,
-            Map config) throws SecurityException {
+        FAMSTSConfiguration stsConfig) throws SecurityException {
         
         debug.message("SAML11AssertionValidator.constructor..");
-        this.config = config;
-        if(config == null) {
+        this.stsConfig = stsConfig;
+        if(stsConfig == null) {
            throw new SecurityException(
                  WSSUtils.bundle.getString("nullConfig"));
         }
@@ -83,13 +86,70 @@ public class SAML11AssertionValidator {
             if(issuer == null) {
                throw new SecurityException(
                        WSSUtils.bundle.getString("nullIssuer"));
-            }            
-            Set trustedIssuers = (Set)config.get(STSConstants.TRUSTED_ISSUERS);
-            if(trustedIssuers != null && !trustedIssuers.isEmpty()) {
-               if(!trustedIssuers.contains(issuer)) {
-                  throw new SecurityException(
-                          WSSUtils.bundle.getString("issuerNotTrusted"));
-               }
+            }
+
+            Set trustedIssuers = stsConfig.getTrustedIssuers();
+            String issuerAlias = null;
+            boolean issuerTrusted = false;
+            if (trustedIssuers != null && !trustedIssuers.isEmpty()) {
+               Iterator iterator = trustedIssuers.iterator();
+               while (iterator.hasNext()){
+                    String aliasIssuer = (String)iterator.next();
+                    if (aliasIssuer.length() > 0) {
+                    int index = aliasIssuer.indexOf(":");
+                    if (index == -1) {
+                        throw new SecurityException(
+                            WSSUtils.bundle.getString("issuerOrAliasNull"));
+                    } else {
+                        issuerAlias = aliasIssuer.substring(0, index).trim();
+                        if (issuerAlias.length() > 0) {
+                            String configIssuer =
+                                    aliasIssuer.substring(index + 1).trim();
+                            if (configIssuer.length() > 0) {
+                                if (issuer.equals(configIssuer)) {
+                                    issuerTrusted = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    }
+                }
+            }
+
+            if(!issuerTrusted) {
+                throw new SecurityException(
+                    WSSUtils.bundle.getString("issuerNotTrusted"));
+            }
+
+            //Verify signature on Assertion
+            try {
+                XMLSignatureManager sigManager =
+                    WSSUtils.getXMLSignatureManager();
+                Document document = XMLUtils.newDocument();
+                document.appendChild(document.importNode(assertionE, true));
+                if(WSSUtils.debug.messageEnabled()) {
+                    WSSUtils.debug.message("SAML11AssertionValidator:"+
+                        " Assertion to be verified" + XMLUtils.print(assertionE));
+                }
+                if(!sigManager.verifyXMLSignature(document, issuerAlias)){
+                    if(WSSUtils.debug.messageEnabled()) {
+                        WSSUtils.debug.message("SAML11AssertionValidator:"
+                            + " Signature verification for the assertion failed");
+                    }
+                    throw new SecurityException(
+                        WSSUtils.bundle.getString("assertionSigNotVerified"));
+                } else {
+                    if(WSSUtils.debug.messageEnabled()) {
+                        WSSUtils.debug.message("SAML11AssertionValidator: "
+                            + "Signature verification successful for the Assertion");
+                    }
+                }
+            } catch (Exception ex) {
+                WSSUtils.debug.error("SAML11AssertionValidator:Signature" +
+                   " validation on Assertion failed", ex);
+                throw new SecurityException(
+                    WSSUtils.bundle.getString("signatureValidationFailed"));
             }
                        
             if(!saml11Assertion.isTimeValid()) {               
@@ -140,7 +200,7 @@ public class SAML11AssertionValidator {
         }
         if(ipAddress != null) {
             /* TODO check for the valid IP addresses.
-           if(!config.getTrustedIPAddresses().contains(ipAddress)) {
+           if(!stsConfig.getTrustedIPAddresses().contains(ipAddress)) {
               throw new SecurityException(
                     WSSUtils.bundle.getString("invalidIPAddress"));
            }*/

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DirectoryManagerIF.java,v 1.8 2009/07/02 20:26:16 hengming Exp $
+ * $Id: DirectoryManagerIF.java,v 1.9 2010/01/06 01:58:26 veiming Exp $
  *
  */
 
@@ -351,4 +351,7 @@ public interface DirectoryManagerIF extends Remote {
 
     public Set objectsChanged_idrepo(int time) throws RemoteException;
 
+    public Map getSpecialIdentities_idrepo(String token,
+        String type, String orgName)
+        throws RemoteException, IdRepoException, SSOException;
 }

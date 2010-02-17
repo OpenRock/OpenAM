@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: FAMSTSTokenProvider.java,v 1.17 2009/09/14 23:04:22 huacui Exp $
+ * $Id: FAMSTSTokenProvider.java,v 1.18 2010/01/15 18:54:35 mrudul_uchil Exp $
  *
  */
 
@@ -487,11 +487,7 @@ public class FAMSTSTokenProvider implements STSTokenProvider {
         
         String subjectName = null;
         Map attributeMap = null;
-        Map config = new HashMap();
         FAMSTSConfiguration stsConfig = new FAMSTSConfiguration();
-        config.put(STSConstants.TRUSTED_ISSUERS, stsConfig.getTrustedIssuers());
-        config.put(STSConstants.TRUSTED_IPADDRESSES,
-                                   stsConfig.getTrustedIPAddresses());
         
         Iterator iter = subject.getPublicCredentials().iterator();
         while(iter.hasNext()) {
@@ -507,7 +503,7 @@ public class FAMSTSTokenProvider implements STSTokenProvider {
                            new STSClientUserToken(famToken);
                    String tokenID = oboToken.getTokenId();
                    assertionE = XMLUtils.toDOMDocument(
-                           tokenID, STSUtils.debug).getDocumentElement();                   
+                           tokenID, STSUtils.debug).getDocumentElement();
                } catch (FAMSTSException se) {
                    throw new WSTrustException(se.getMessage());
                }
@@ -521,13 +517,13 @@ public class FAMSTSTokenProvider implements STSTokenProvider {
                       if(SAMLConstants.assertionSAMLNameSpaceURI.equals(
                               namespace)) {                
                          SAML11AssertionValidator validator = 
-                             new SAML11AssertionValidator(assertionE, config);
+                             new SAML11AssertionValidator(assertionE, stsConfig);
                          subjectName = validator.getSubjectName();
                          attributeMap = validator.getAttributes();                      
                       } else if (SAML2Constants.ASSERTION_NAMESPACE_URI.equals(
                               namespace)) {
                          SAML2AssertionValidator validator =
-                             new SAML2AssertionValidator(assertionE, config);
+                             new SAML2AssertionValidator(assertionE, stsConfig);
                          subjectName = validator.getSubjectName();
                          attributeMap = validator.getAttributes();
                       }

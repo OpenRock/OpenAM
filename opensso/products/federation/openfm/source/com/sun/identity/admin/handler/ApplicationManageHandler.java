@@ -22,10 +22,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ApplicationManageHandler.java,v 1.6 2009/12/11 23:59:33 farble1670 Exp $
+ * $Id: ApplicationManageHandler.java,v 1.7 2010/01/13 18:41:54 farble1670 Exp $
  */
 package com.sun.identity.admin.handler;
 
+import com.sun.identity.admin.ListFormatter;
 import com.sun.identity.admin.Resources;
 import com.sun.identity.admin.dao.ViewApplicationDao;
 import com.sun.identity.admin.model.ApplicationManageBean;
@@ -37,7 +38,9 @@ import com.sun.identity.admin.model.QueuedActionBean;
 import com.sun.identity.admin.model.ViewApplication;
 import com.sun.identity.admin.model.ViewFilterType;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.faces.application.FacesMessage;
@@ -51,7 +54,7 @@ public class ApplicationManageHandler implements Serializable {
     private QueuedActionBean queuedActionBean;
     private ViewApplicationDao viewApplicationDao;
     private MessagesBean messagesBean;
-    private Map<String,ViewFilterType> viewFilterTypes;
+    private Map<String, ViewFilterType> viewFilterTypes;
 
     public ViewApplication getViewApplication(ActionEvent event) {
         ViewApplication va = (ViewApplication) event.getComponent().getAttributes().get("viewApplication");
@@ -97,7 +100,7 @@ public class ApplicationManageHandler implements Serializable {
         int size = applicationManageBean.getViewApplications().size();
         int first = applicationManageBean.getDataPaginator().getFirstRow();
         int rows = applicationManageBean.getDataPaginator().getRows();
-        int last = Math.min(first+rows, size);
+        int last = Math.min(first + rows, size);
 
         for (int i = first; i < last; i++) {
             ViewApplication va = applicationManageBean.getViewApplications().get(i);
@@ -145,30 +148,63 @@ public class ApplicationManageHandler implements Serializable {
                 mb.setDetail(r.getString(this, "removeNoneSelectedDetail"));
                 mb.setSeverity(FacesMessage.SEVERITY_ERROR);
                 messagesBean.addMessageBean(mb);
-            } else if (isNonWritableSelected()) {
+                return;
+            }
+
+            List<ViewApplication> nonWritableApps = isNonWritableSelected();
+            if (nonWritableApps.size() != 0) {
+                ListFormatter lf = new ListFormatter(nonWritableApps);
                 MessageBean mb = new MessageBean();
                 Resources r = new Resources();
                 mb.setSummary(r.getString(this, "nonWritableSelectedSummary"));
-                mb.setDetail(r.getString(this, "nonWritableSelectedDetail"));
+                mb.setDetail(r.getString(this, "nonWritableSelectedDetail", lf.toString()));
                 mb.setSeverity(FacesMessage.SEVERITY_ERROR);
                 messagesBean.addMessageBean(mb);
-            } else {
-                applicationManageBean.setRemovePopupVisible(true);
+                return;
             }
+
+            List<ViewApplication> inUseApps = isInUseSelected();
+            if (inUseApps.size() != 0) {
+                ListFormatter lf = new ListFormatter(inUseApps);
+                MessageBean mb = new MessageBean();
+                Resources r = new Resources();
+                mb.setSummary(r.getString(this, "inUseSelectedSummary"));
+                mb.setDetail(r.getString(this, "inUseSelectedDetail", lf.toString()));
+                mb.setSeverity(FacesMessage.SEVERITY_ERROR);
+                messagesBean.addMessageBean(mb);
+                return;
+            }
+
+            applicationManageBean.setRemovePopupVisible(true);
         } else {
             applicationManageBean.setRemovePopupVisible(false);
         }
     }
 
-    private boolean isNonWritableSelected() {
+    private List<ViewApplication> isNonWritableSelected() {
+        List<ViewApplication> apps = new ArrayList<ViewApplication>();
+
         for (ViewApplication va : applicationManageBean.getViewApplications()) {
             if (va.isSelected()) {
                 if (!va.isWritable()) {
-                    return true;
+                    apps.add(va);
                 }
             }
         }
-        return false;
+        return apps;
+    }
+
+    private List<ViewApplication> isInUseSelected() {
+        List<ViewApplication> apps = new ArrayList<ViewApplication>();
+
+        for (ViewApplication va : applicationManageBean.getViewApplications()) {
+            if (va.isSelected()) {
+                if (va.isInUse()) {
+                    apps.add(va);
+                }
+            }
+        }
+        return apps;
     }
 
     public void removePopupOkListener(ActionEvent event) {

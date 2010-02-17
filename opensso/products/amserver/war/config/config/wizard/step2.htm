@@ -58,7 +58,11 @@
 
     function validateCookieDomain() {
 	field = "cookieDomain";
-        validateServerFields();     
+        var callUrl = "$context$path?actionLink=validateCookieDomain&domain=" +
+            escape($(field).value);
+        ie7fix++;
+        callUrl = callUrl + "&ie7fix=" + ie7fix;
+        AjaxUtils.call(callUrl, serverFieldValidated);
     } 
 
 </script>

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PrivilegeManagerTest.java,v 1.2 2009/09/25 05:52:56 veiming Exp $
+ * $Id: PrivilegeManagerTest.java,v 1.3 2010/01/26 20:10:16 dillidorai Exp $
  */
 package com.sun.identity.entitlement;
 
@@ -36,6 +36,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.unittest.UnittestLog;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ public class PrivilegeManagerTest {
         "PrivilegeManagerTestReferral";
     private static final String PRIVILEGE_NAME = "PrivilegeManagerTest";
     private static final String PRIVILEGE_NAME1 = "PrivilegeManagerTest1";
+    private static final String PRIVILEGE_NAME2 = "PrivilegeManagerTest2";
     private static final String PRIVILEGE_DESC = "Test Description";
     private static final String startIp = "100.100.100.100";
     private static final String endIp = "200.200.200.200";
@@ -343,6 +345,63 @@ public class PrivilegeManagerTest {
                 }
             }
         }
+    }
+
+    @Test(dependsOnMethods = {"testAddPrivilege"})
+    public void testAddPrivilege2() throws Exception {
+        if (!migrated) {
+            return;
+        }
+        privilege = createPrivilege();
+        privilege.setName(PRIVILEGE_NAME2);
+        PrivilegeManager prm = PrivilegeManager.getInstance("/",
+            SubjectUtils.createSubject(adminToken));
+        prm.addPrivilege(privilege);
+        Thread.sleep(1000);
+
+        Privilege p = prm.getPrivilege(PRIVILEGE_NAME2);
+
+        IPCondition ipc1 = (IPCondition) p.getCondition();
+        if (!ipc1.getStartIp().equals(startIp)) {
+            throw new Exception(
+                "PrivilegeManagerTest.testAddPrivlege():" + "READ startIp "
+                + " does not equal set startIp");
+        }
+        if (!ipc1.getEndIp().equals(endIp)) {
+            throw new Exception(
+                "PrivilegeManagerTest.testAddPrivlege():" + "READ endIp "
+                + " does not equal set endIp");
+        }
+        if (!privilege.equals(p)) {
+            throw new Exception("PrivilegeManagerTest.testAddPrivlege():"
+                + "read privilege not"
+                + "equal to saved privilege");
+        }
+
+        {
+            EntitlementSubject subjectCollections = privilege.getSubject();
+            if (subjectCollections instanceof OrSubject) {
+                OrSubject orSbj = (OrSubject)subjectCollections;
+                Set<EntitlementSubject> subjs = orSbj.getESubjects();
+                for (EntitlementSubject sbj : subjs) {
+                    if (!sbj.equals(ua1) && !sbj.equals(ua2)) {
+                        throw new Exception(
+            "PrivilegeManagerTest.testAddPrivilege: Subject does not matched.");
+                    }
+                }
+            }
+        }
+    }
+
+    @Test(dependsOnMethods = {"testAddPrivilege", "testAddPrivilege2"})
+    public void testGetPrivilegesXML() throws Exception {
+        PrivilegeManager prm = PrivilegeManager.getInstance("/",
+            SubjectUtils.createSubject(adminToken));
+        Set<String> names = new HashSet<String>();
+        names.add(PRIVILEGE_NAME);
+        names.add(PRIVILEGE_NAME2);
+        String xml = prm.getPrivilegesXML(names);
+        UnittestLog.logMessage("PrivilegeManagerTest.testGetPrivilegesXML():\n" + xml);
     }
 
     @Test(dependsOnMethods = {"testAddPrivilege"})

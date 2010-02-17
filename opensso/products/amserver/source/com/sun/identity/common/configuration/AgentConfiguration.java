@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AgentConfiguration.java,v 1.50 2009/11/12 18:37:37 veiming Exp $
+ * $Id: AgentConfiguration.java,v 1.52 2010/01/07 18:07:39 veiming Exp $
  *
  */
 
@@ -43,9 +43,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -287,7 +285,6 @@ public class AgentConfiguration {
      * @throws SSOException if the Single Sign On token is invalid or has
      *         expired.
      * @throws SMSException if there are errors in service management layers.
-     * @throws MalformedURLException if server or agent URL is invalid.
      * @throws ConfigurationException if there are missing information in
      *         server or agent URL; or invalid agent type.
      */
@@ -300,7 +297,7 @@ public class AgentConfiguration {
         String serverURL,
         String agentURL
     ) throws IdRepoException, SSOException, SMSException,
-        MalformedURLException, ConfigurationException {
+        ConfigurationException {
         if ((serverURL == null) || (serverURL.trim().length() == 0)) {
             throw new ConfigurationException(
                 "create.agent.invalid.server.url", null);
@@ -310,8 +307,24 @@ public class AgentConfiguration {
                 "create.agent.invalid.agent.url", null);
         }
 
+        FQDNUrl serverFQDNURL = null;
+        FQDNUrl agentFQDNURL = null;
+        try {
+            serverFQDNURL = new FQDNUrl(serverURL);
+        } catch (MalformedURLException e) {
+            throw new ConfigurationException(
+                "create.agent.invalid.server.url", null);
+        }
+
+        try {
+            agentFQDNURL = new FQDNUrl(agentURL);
+        } catch (MalformedURLException e) {
+            throw new ConfigurationException(
+                "create.agent.invalid.agent.url", null);
+        }
+
         createAgentEx(ssoToken, realm, agentName, agentType, attrValues,
-            new FQDNUrl(serverURL), new FQDNUrl(agentURL));
+            serverFQDNURL, agentFQDNURL);
     }
 
     /**
@@ -512,15 +525,6 @@ public class AgentConfiguration {
             Object[] param = { Integer.toString(port) };
             throw new ConfigurationException(
                     "agent.root.url.port.out.of.range", param);
-        }
-
-        String hostName = url.getHost();
-        try {
-            InetAddress.getByName(hostName);
-        } catch (UnknownHostException e) {
-            Object[] param = { hostName };
-            throw new ConfigurationException(
-                    "agent.root.url.unknown.host", param);
         }
     }
 

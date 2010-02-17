@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CreateFedletJavaArtifacts.java,v 1.2.2.2 2010/01/08 22:39:05 exu Exp $
+ * $Id: CreateFedletJavaArtifacts.java,v 1.4 2010/01/08 22:41:38 exu Exp $
  *
  */
 

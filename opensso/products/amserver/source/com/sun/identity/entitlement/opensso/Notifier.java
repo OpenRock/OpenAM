@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Notifier.java,v 1.2 2009/11/11 23:53:22 veiming Exp $
+ * $Id: Notifier.java,v 1.3 2010/01/07 00:19:11 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -44,14 +44,18 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.AccessController;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class Notifier implements Runnable {
-    private static final int CONN_TIMEOUT = 1000; //TOFIX
-    private static final int NUM_RETRY = 3; //TOFIX
-    private static final int WAIT_BETWEEN_RETRY = 100; //TOFIX
+    private static final int CONN_TIMEOUT = 
+        EntitlementService.getConfiguration("entitlement-notifier-conn-timeout",
+        1000);
+    private static final int NUM_RETRY =
+        EntitlementService.getConfiguration("entitlement-notifier-retries", 3);
+    private static final int WAIT_BETWEEN_RETRY = 
+        EntitlementService.getConfiguration(
+        "entitlement-notifier-duration-between-retries", 100);
 
     private static final String currentServerInstance =
         SystemProperties.getServerInstanceName();

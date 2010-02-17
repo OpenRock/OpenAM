@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Step2.java,v 1.14 2009/01/17 02:05:35 kevinserwin Exp $
+ * $Id: Step2.java,v 1.15 2010/01/04 19:08:36 veiming Exp $
  *
  */
 package com.sun.identity.config.wizard;
@@ -37,6 +37,8 @@ import net.sf.click.control.ActionLink;
 public class Step2 extends AjaxPage {
     public ActionLink validateConfigDirLink = 
         new ActionLink("validateConfigDir", this, "validateConfigDir");
+    public ActionLink validateCookieDomainLink = 
+        new ActionLink("validateCookieDomain", this, "validateCookieDomain");
     
     public Step2() {
     }
@@ -114,6 +116,23 @@ public class Step2 extends AjaxPage {
         }
         setPath(null);        
         return false;    
+    }
+
+    public boolean validateCookieDomain() {
+        String domain = toString("domain");
+        
+        if (domain == null) {
+            writeToResponse(getLocalizedString("missing.required.field"));
+        } else if (domain.indexOf(':') != -1) {
+            writeToResponse(getLocalizedString(
+                "configuration.wizard.step2.invalid.cookie.domain"));
+        } else {
+            getContext().setSessionAttribute(
+                SessionAttributeNames.COOKIE_DOMAIN, domain);
+            writeToResponse("true");
+        }
+        setPath(null);
+        return false;
     }
 
     private String getServerURL() {        

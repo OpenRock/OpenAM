@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ReferralPrivilege.java,v 1.6 2009/12/05 01:24:46 veiming Exp $
+ * $Id: ReferralPrivilege.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -427,51 +427,60 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             application.getEntitlementCombiner();
         entitlementCombiner.init(adminSubject, "/",
             applicationName, resourceName, actionNames, recursive);
-
         for (String rlm : realms) {
-            for (String app : mapApplNameToResources.keySet()) {
-                if (app.equals(applicationName)) {
-                    Set<String> resourceNames = mapApplNameToResources.get(app);
-                    ResourceName comp = getResourceComparator(adminSubject, rlm,
-                        app);
-                    String resName = comp.canonicalize(resourceName)
-                        .toLowerCase();
-                    Set<String> resources = tagswapResourceNames(subject,
-                        resourceNames);
+            EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+                PrivilegeManager.superAdminSubject, rlm);
+            if (ec.doesRealmExist()) {
+                for (String app : mapApplNameToResources.keySet()) {
+                    if (app.equals(applicationName)) {
+                        Set<String> resourceNames = mapApplNameToResources.get(
+                            app);
+                        ResourceName comp = getResourceComparator(adminSubject,
+                            rlm,
+                            app);
+                        String resName = comp.canonicalize(resourceName).
+                            toLowerCase();
+                        Set<String> resources = tagswapResourceNames(subject,
+                            resourceNames);
 
-                    boolean applicable = false;
-                    for (String r : resources) {
-                        ResourceMatch match = comp.compare(resName,
-                            comp.canonicalize(r), true);
-                        if (!recursive) {
-                            applicable = match.equals(ResourceMatch.EXACT_MATCH) ||
-                                match.equals(ResourceMatch.WILDCARD_MATCH) ||
-                                match.equals(ResourceMatch.SUB_RESOURCE_MATCH);
-                        } else {
-                            applicable = !match.equals(ResourceMatch.NO_MATCH);
+                        boolean applicable = false;
+                        for (String r : resources) {
+                            ResourceMatch match = comp.compare(resName,
+                                comp.canonicalize(r), true);
+                            if (!recursive) {
+                                applicable = match.equals(
+                                    ResourceMatch.EXACT_MATCH) ||
+                                    match.equals(ResourceMatch.WILDCARD_MATCH) ||
+                                    match.equals(
+                                    ResourceMatch.SUB_RESOURCE_MATCH);
+                            } else {
+                                applicable = !match.equals(
+                                    ResourceMatch.NO_MATCH);
+                            }
+                            if (applicable) {
+                                break;
+                            }
                         }
+
                         if (applicable) {
-                            break;
-                        }
-                    }
+                            PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
 
-                    if (applicable) {
-                        PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
+                            // create subject for sub realm by copying subject for
+                            // this realm and clear the public credentials.
+                            // this needs to be revisited later if public
+                            // credentials contains realm-independent credentals
+                            Subject subjectSubRealm = new Subject(false,
+                                subject.getPrincipals(), new HashSet(),
+                                subject.getPrivateCredentials());
 
-                        // create subject for sub realm by copying subject for
-                        // this realm and clear the public credentials.
-                        // this needs to be revisited later if public 
-                        // credentials contains realm-independent credentals
-                        Subject subjectSubRealm = new Subject(false,
-                            subject.getPrincipals(), new HashSet(),
-                            subject.getPrivateCredentials());
-
-                        List<Entitlement> entitlements = evaluator.evaluate(rlm,
-                            adminSubject, subjectSubRealm, applicationName,
-                            resName, environment, recursive);
-                        if (entitlements != null) {
-                            entitlementCombiner.add(entitlements);
-                            results = entitlementCombiner.getResults();
+                            List<Entitlement> entitlements = evaluator.evaluate(
+                                rlm,
+                                adminSubject, subjectSubRealm, applicationName,
+                                resName, environment, recursive);
+                            if (entitlements != null) {
+                                entitlementCombiner.add(entitlements);
+                                results = entitlementCombiner.getResults();
+                            }
                         }
                     }
                 }

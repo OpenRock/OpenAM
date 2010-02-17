@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: EmbeddedOpenDS.java,v 1.26 2009/10/27 05:33:39 hengming Exp $
+ * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
  */
 
@@ -1036,8 +1036,6 @@ public class EmbeddedOpenDS {
             (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
             "--index",
             "sunxmlkeyvalue",
-            "--index",
-            "sunOrganizationAlias",
             "--index",
             "memberof",
             "--index",

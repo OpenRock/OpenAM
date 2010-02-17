@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LDAPv3EventService.java,v 1.18 2009/09/28 21:47:34 ww203982 Exp $
+ * $Id: LDAPv3EventService.java,v 1.19 2009/12/22 19:11:55 veiming Exp $
  *
  */
 
@@ -62,7 +62,6 @@ import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOToken;

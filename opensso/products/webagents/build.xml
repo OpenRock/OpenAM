@@ -22,13 +22,18 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build.xml,v 1.22 2009/12/07 20:45:32 leiming Exp $
+   $Id: build.xml,v 1.24 2010/02/05 00:56:01 leiming Exp $
 
 -->
 
 <project name="open-source-web-agents" default="usage">
                 
     <description>Open Web Single Sign-On Web Agents</description>
+
+    <!-- overridable properties -->
+    <!-- build.debug is used for c code. valid values are: optimize, full -->
+    <property name="build.debug" value="optimize"/>
+
 
     <import file="../products.xml" />
     <import file="../installtools/installtools.xml" />
@@ -98,10 +103,6 @@
 
     <!-- agent version number appended to end of agent zip file name -->
     <property name="agentversion" value="3"/>
-
-    <!-- overridable properties -->
-    <!-- build.debug is used for c code. valid values are: optimize, full -->
-    <property name="build.debug" value="optimize"/>
 
     <target name="preparebuild">
         <mkdir dir="${webagents.built.dir}"/>

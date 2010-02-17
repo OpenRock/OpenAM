@@ -1258,6 +1258,7 @@
 ./WEB-INF/lib/icefaces-facelets.jar
 ./WEB-INF/lib/jersey-core-1.1.1-ea.jar
 ./WEB-INF/lib/jersey-server-1.1.1-ea.jar
+./WEB-INF/lib/esapiport.jar
 ./WEB-INF/wsdl/IdentityManagementServices.wsdl
 ./WEB-INF/wsdl/IdentityServices.wsdl
 ./WEB-INF/wsdl/famsts.wsdl

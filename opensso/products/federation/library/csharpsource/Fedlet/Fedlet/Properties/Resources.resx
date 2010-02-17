@@ -345,4 +345,58 @@
   <data name="LogoutResponseXmlException" xml:space="preserve">
     <value>Specified SAML logout response threw an XML exception.</value>
   </data>
+  <data name="FedletCertificateFactoryGetByFriendlyNameFailed" xml:space="preserve">
+    <value>An error occurred in retrieving the certificate by friendly name.</value>
+  </data>
+  <data name="ServiceProviderCantSignMetadataWithoutCertificateAlias" xml:space="preserve">
+    <value>Can not sign metadata since service provider's signing certificate alias was not found or not present.</value>
+  </data>
+  <data name="ServiceProviderSpSsoDescriptorNodeNotFound" xml:space="preserve">
+    <value>SPSSODescriptor element could not be found in the metadata.</value>
+  </data>
+  <data name="ServiceProviderCertNotFound" xml:space="preserve">
+    <value>Certificate could not be found for the specified metadata value.</value>
+  </data>
+  <data name="SignedQueryStringCertHasNoPrivateKey" xml:space="preserve">
+    <value>Specified certificate does not have a private key.</value>
+  </data>
+  <data name="SignedQueryStringCertNotFound" xml:space="preserve">
+    <value>Signing certificate not found based on provided alias.</value>
+  </data>
+  <data name="SignedQueryStringInvalidCertFriendlyName" xml:space="preserve">
+    <value>Invalid certificate friendly name specified.</value>
+  </data>
+  <data name="SignedQueryStringInvalidQueryString" xml:space="preserve">
+    <value>Invalid query string specified.</value>
+  </data>
+  <data name="SignedQueryStringSigAlgMissing" xml:space="preserve">
+    <value>Signature algorithm parameter not found in the query string.</value>
+  </data>
+  <data name="SignedQueryStringSigAlgNotSupported" xml:space="preserve">
+    <value>Specified signature algorithm currently not supported for signing query strings.</value>
+  </data>
+  <data name="SignedXmlCertNotFound" xml:space="preserve">
+    <value>Specified certificate not found based on provided alias.</value>
+  </data>
+  <data name="SignedXmlInvalidCertFriendlyName" xml:space="preserve">
+    <value>Invalid certificate friendly name specified.</value>
+  </data>
+  <data name="SignedXmlInvalidTargetRefId" xml:space="preserve">
+    <value>Invalid target reference ID specified.</value>
+  </data>
+  <data name="SignedXmlInvalidXml" xml:space="preserve">
+    <value>Invalid XML specified.</value>
+  </data>
+  <data name="ServiceProviderEntityDescriptorNodeNotFound" xml:space="preserve">
+    <value>EntityDescriptor element could not be found in the metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilitySignFailedNoCertAlias" xml:space="preserve">
+    <value>XML can not be signed due to either empty or unknown signature certificate alias in extended metadata.</value>
+  </data>
+  <data name="InvalidRelayState" xml:space="preserve">
+    <value>Invalid relay state specified.</value>
+  </data>
+  <data name="MalformedRelayState" xml:space="preserve">
+    <value>RelayState is not a valid URI.</value>
+  </data>
 </root>

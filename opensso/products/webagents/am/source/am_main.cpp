@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: am_main.cpp,v 1.11 2009/10/28 21:56:20 subbae Exp $
+ * $Id: am_main.cpp,v 1.12 2010/01/26 00:54:46 dknab Exp $
  *
  */
 
@@ -152,6 +152,13 @@ void PRIVATE_NAMESPACE_NAME::base_init(const Properties &propertiesRef, boolean_
 			      status);
     }
     return;
+}
+
+extern "C"
+am_status_t am_shutdown_nss(void)
+{
+    am_status_t status = Connection::shutdown();
+    return status;
 }
 
 extern "C"

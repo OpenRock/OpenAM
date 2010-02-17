@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ApplicationManageTableBean.java,v 1.6 2009/11/18 17:14:31 farble1670 Exp $
+ * $Id: ApplicationManageTableBean.java,v 1.7 2010/01/11 18:39:41 farble1670 Exp $
  */
 
 package com.sun.identity.admin.model;
@@ -73,6 +73,14 @@ public class ApplicationManageTableBean implements Serializable {
         comparators.put(new TableSortKey("applicationType", false), new ViewApplication.ApplicationTypeComparator(false));
         comparators.put(new TableSortKey("overrideRule", true), new ViewApplication.OverrideRuleComparator(false));
         comparators.put(new TableSortKey("overrideRule", false), new ViewApplication.OverrideRuleComparator(false));
+        comparators.put(new TableSortKey("birth", true), new ViewApplication.BirthComparator(true));
+        comparators.put(new TableSortKey("birth", false), new ViewApplication.BirthComparator(false));
+        comparators.put(new TableSortKey("author", true), new ViewApplication.AuthorComparator(true));
+        comparators.put(new TableSortKey("author", false), new ViewApplication.AuthorComparator(false));
+        comparators.put(new TableSortKey("modified", true), new ViewApplication.ModifiedComparator(true));
+        comparators.put(new TableSortKey("modified", false), new ViewApplication.ModifiedComparator(false));
+        comparators.put(new TableSortKey("modifier", true), new ViewApplication.ModifierComparator(true));
+        comparators.put(new TableSortKey("modifier", false), new ViewApplication.ModifierComparator(false));
     }
 
     public ApplicationManageTableBean() {
@@ -123,5 +131,21 @@ public class ApplicationManageTableBean implements Serializable {
 
     public boolean isOverrideRuleColumnVisible() {
         return columnsVisible.contains("overrideRule");
+    }
+
+    public boolean isBirthColumnVisible() {
+        return getColumnsVisible().contains("birth");
+    }
+
+    public boolean isModifiedColumnVisible() {
+        return getColumnsVisible().contains("modified");
+    }
+
+    public boolean isAuthorColumnVisible() {
+        return getColumnsVisible().contains("author");
+    }
+
+    public boolean isModifierColumnVisible() {
+        return getColumnsVisible().contains("modifier");
     }
 }

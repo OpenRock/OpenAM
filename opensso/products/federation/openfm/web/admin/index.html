@@ -23,14 +23,19 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: index.html,v 1.1 2009/08/19 05:41:07 veiming Exp $
+   $Id: index.html,v 1.2 2009/12/22 15:29:43 farble1670 Exp $
 
 -->
 
 <html>
     <body>
         <script type="text/javascript">
-            document.location = 'facelet/home.xhtml';
+            var loc = 'facelet/home.xhtml';
+            var qs = window.location.search.substring(1);
+            if (qs != "") {
+                loc += '?'+window.location.search.substring(1);
+            }
+            document.location = loc;
         </script>
     </body>
 </html>

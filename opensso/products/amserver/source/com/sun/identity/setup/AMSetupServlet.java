@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AMSetupServlet.java,v 1.115 2009/11/16 21:52:57 mallas Exp $
+ * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
  */
 
@@ -116,6 +116,7 @@ import java.net.Socket;
 import java.security.AccessController;
 import java.security.SecureRandom;
 import java.util.Enumeration;
+import java.util.ServiceLoader;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -165,7 +166,8 @@ public class AMSetupServlet extends HttpServlet {
 
     /*
      * Initializes the servlet.
-     */  
+     */
+    @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         System.setProperty("file.separator", "/");
@@ -174,6 +176,7 @@ public class AMSetupServlet extends HttpServlet {
         }
         checkConfigProperties();
         LoginLogoutMapping.setProductInitialized(isConfiguredFlag);
+        registerListeners();
         
         if (isConfiguredFlag && !ServerConfiguration.isLegacy()) { 
             // this will sync up bootstrap file will serverconfig,xml
@@ -302,6 +305,7 @@ public class AMSetupServlet extends HttpServlet {
             
     }
 
+    @Override
     public void doPost(HttpServletRequest request,
         HttpServletResponse response)
         throws IOException, ServletException, ConfiguratorException {
@@ -365,7 +369,7 @@ public class AMSetupServlet extends HttpServlet {
             }
             tmp = (String)request.getParameter("USERSTORE_SSL");
             store.put(SetupConstants.USER_STORE_SSL, tmp);
-            tmp = (String)request.getParameter("USERSTORE_SUFFIX"); ;
+            tmp = (String)request.getParameter("USERSTORE_SUFFIX");
             if (tmp == null || tmp.length() == 0) {
                 if (domainName != null && domainName.length() > 0) {
                     String umRootSuffix = dnsDomainToDN(domainName);
@@ -448,6 +452,7 @@ public class AMSetupServlet extends HttpServlet {
                 postInitialize(getAdminSSOToken());
             }
             LoginLogoutMapping.setProductInitialized(isConfiguredFlag);
+            registerListeners();
             
             if (isConfiguredFlag) {
                 boolean legacy = ServerConfiguration.isLegacy();
@@ -2479,7 +2484,7 @@ public class AMSetupServlet extends HttpServlet {
             String myDSPort = null;
             // Get server list
             Set serverSet = ServerConfiguration.getServers(adminToken);
-            if (serverSet == null || serverSet.size() < 2) {
+            if (serverSet == null) { 
                 return true;
             }
 
@@ -2677,4 +2682,14 @@ public class AMSetupServlet extends HttpServlet {
 
        return hostAndPort;
    }
+
+    private static void registerListeners() {
+        if (isConfiguredFlag) {
+            ServiceLoader<SetupListener> listeners = ServiceLoader.load(
+                SetupListener.class);
+            for (SetupListener p : listeners) {
+                p.addListener();
+            }
+        }
+    }
 }

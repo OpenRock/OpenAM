@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IdentityServicesImpl.java,v 1.19 2009/12/15 00:34:57 veiming Exp $
+ * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
  */
 
@@ -949,7 +949,7 @@ public class IdentityServicesImpl
                         attrsToGet = new ArrayList();
                     }
 
-                    attrsToGet.add(attrName);;
+                    attrsToGet.add(attrName);
                 }
             }
         }
@@ -1209,9 +1209,12 @@ public class IdentityServicesImpl
                     Iterator iter = members.iterator();
 
                     while (iter.hasNext()) {
-                        AMIdentity member = (AMIdentity)iter.next();
-
-                        removeMember(repo, amIdentity, member);
+                        try {
+                            AMIdentity member = (AMIdentity)iter.next();
+                            removeMember(repo, amIdentity, member);
+                        } catch (IdRepoException ex) {
+                            //ignore this, member maybe already removed.
+                        }
                     }
                 }
 

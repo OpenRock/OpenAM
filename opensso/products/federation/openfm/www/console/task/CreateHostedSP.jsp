@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: CreateHostedSP.jsp,v 1.14 2009/07/20 23:03:23 asyhuang Exp $
+   $Id: CreateHostedSP.jsp,v 1.15 2010/01/04 19:10:50 veiming Exp $
 
 --%>
 
@@ -372,8 +372,7 @@
                 var idx = result.indexOf('|||');
                 data = result.substring(idx +3);
                 result = result.substring(0, idx);
-                msg = '<center><p>' + result + '</p></center>';
-                msg = msg + '<center>' +  msgConfigured + '</center>';
+                msg = '<center>' +  msgConfigured + '</center>';
             } else {
                 msg = '<center><p>' + result + '</p></center>';
 		msg = msg + '<center>' +  closeBtn + '</center>';

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LogFactory.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
+ * $Id: LogFactory.java,v 1.2 2010/01/07 00:19:12 veiming Exp $
  */
 
 package com.sun.identity.entitlement.util;
@@ -39,7 +39,7 @@ public class LogFactory {
 
     private LogFactory() {
         try {
-            //TODO load different log provider.
+            //RFE: load different log provider.
             Class clazz = Class.forName(
                 "com.sun.identity.entitlement.opensso.LogProvider");
             impl = (ILogProvider)clazz.newInstance();

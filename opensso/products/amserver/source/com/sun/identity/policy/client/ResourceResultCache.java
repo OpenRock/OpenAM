@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ResourceResultCache.java,v 1.20 2009/11/26 17:06:06 veiming Exp $
+ * $Id: ResourceResultCache.java,v 1.21 2010/01/21 22:18:01 dillidorai Exp $
  *
  */
 
@@ -630,6 +630,8 @@ class ResourceResultCache implements SSOTokenListener {
             }
             resourceResults = jsonResourceContentToResourceResults(
                 jsonString, serviceName);
+        } catch (InvalidAppSSOTokenException e) {
+            throw e;
         } catch (Exception e) {
             String[] args = {e.getMessage()};
             throw new PolicyEvaluationException(
@@ -1682,6 +1684,7 @@ class ResourceResultCache implements SSOTokenListener {
             conn.setDoOutput(true);
             conn.setUseCaches(false);
             conn.setRequestMethod("GET");
+            conn.setInstanceFollowRedirects(false);
             setCookieAndHeader(conn, appToken, userToken);
             conn.connect();
 
@@ -1693,7 +1696,21 @@ class ResourceResultCache implements SSOTokenListener {
                 sb.append(buf, 0, len);
             }
             int responseCode = conn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP) { // got a 302
+                        if (debug.warningEnabled()) {
+                            debug.warning("ResourceResultCache.getResourceContent():"
+                                    + "got 302 redirect");
+                            debug.warning("ResourceResultCache.getResourceContent():"
+                                    + "throwing InvalidAppSSOTokenException");
+                        }
+
+                        String[] args = {conn.getResponseMessage()};
+                        throw new InvalidAppSSOTokenException(
+                                ResBundleUtils.rbName,
+                                "rest_call_to_server_caused_302",
+                                args, null);
+            
+            } else if (responseCode != HttpURLConnection.HTTP_OK) {
                 if (debug.warningEnabled()) {
                     debug.warning(
                         "ResourceResultCache.getResourceContent():" +
@@ -1751,7 +1768,17 @@ class ResourceResultCache implements SSOTokenListener {
             String jsonResourceContent, String serviceName) 
             throws JSONException, PolicyException {
         Set<ResourceResult> resourceResults = null;
-        JSONObject jsonObject = new JSONObject(jsonResourceContent);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonResourceContent);
+        } catch(JSONException e) {
+            debug.error("ResourceResultCache.jsonResourceContentToResourceResults():"
+                    + "json parsing error of response: " + jsonResourceContent);
+            throw new PolicyEvaluationException(
+                    ResBundleUtils.rbName,
+                    "error_rest_reponse", 
+                    null, null);
+        }
         int statusCode = jsonObject.optInt("statusCode");
         if (statusCode != 200) {
             debug.error("ResourceResultCache.jsonResourceContentToResourceResults():"

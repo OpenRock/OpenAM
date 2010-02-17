@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PolicyManager.java,v 1.17 2009/11/19 01:02:03 veiming Exp $
+ * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
  */
 
@@ -58,6 +58,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceAlreadyExistsException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -627,6 +628,8 @@ public final class PolicyManager {
                     refpm.addApplicationToSubRealm(
                         (ReferralPrivilege)privileges.iterator().next());
                 }
+                policyCache.sendPolicyChangeNotification(null, policy,
+                    ServiceListener.ADDED);
             } else {
                 // do the addition in resources tree
                 //rm.addPolicyToResourceTree(policy);
@@ -848,15 +851,20 @@ public final class PolicyManager {
 
                 if (policy != null) {
                     if (isMigratedToEntitlementService()) {
+                        // should use super admin token to remove the index store
+                        // entry
                         PrivilegeIndexStore pis = PrivilegeIndexStore.
                             getInstance(
-                            SubjectUtils.createSubject(token),
+                            SubjectUtils.createSuperAdminSubject(),
                             getOrganizationDN());
                         if (policy.isReferralPolicy()) {
                             pis.deleteReferral((policyName));
                         } else {
-                            pis.delete(PrivilegeUtils.policyToPrivileges(policy));
+                            pis.delete(
+                                PrivilegeUtils.policyToPrivileges(policy));
                         }
+                        policyCache.sendPolicyChangeNotification(null, policy,
+                            ServiceListener.REMOVED);
                     } else {
                         // do the removal in resources tree
                         rim.removePolicyFromResourceTree(svtm, token, policy);

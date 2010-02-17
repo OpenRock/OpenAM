@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: agent_configuration.cpp,v 1.20 2009/11/04 22:11:56 leiming Exp $
+ * $Id: agent_configuration.cpp,v 1.21 2009/12/19 00:05:46 subbae Exp $
  *
  * Abstract:
  * AgentConfiguration: This class creates/delets the agent configuration 
@@ -1150,6 +1150,14 @@ am_status_t AgentConfiguration::populateAgentProperties()
                     &this->attrCookieMaxAge);
         am_web_log_debug("%s: Using cookie max-age %s.",
                          thisfunc, attrCookieMaxAge);
+    }
+
+    if (AM_SUCCESS == status) {
+        parameter = AM_WEB_ENCODE_COOKIE_SPECIAL_CHARS;
+        status = am_properties_get_boolean_with_default(this->properties,
+                parameter,
+                AM_FALSE,
+                &this->encodeCookieSpecialChars);
     }
 
     if (AM_SUCCESS == status) {

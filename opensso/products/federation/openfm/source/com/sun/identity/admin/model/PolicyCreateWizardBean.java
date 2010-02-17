@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PolicyCreateWizardBean.java,v 1.1.2.1 2009/12/23 23:57:13 farble1670 Exp $
+ * $Id: PolicyCreateWizardBean.java,v 1.2 2009/12/23 23:54:41 farble1670 Exp $
  */
 
 package com.sun.identity.admin.model;

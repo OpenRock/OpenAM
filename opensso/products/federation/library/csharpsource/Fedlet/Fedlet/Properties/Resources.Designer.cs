@@ -277,6 +277,15 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred in retrieving the certificate by friendly name..
+        /// </summary>
+        public static string FedletCertificateFactoryGetByFriendlyNameFailed {
+            get {
+                return ResourceManager.GetString("FedletCertificateFactoryGetByFriendlyNameFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specified home folder for the identity provider could not be found..
         /// </summary>
         public static string IdentityProviderDirNotFound {
@@ -327,6 +336,15 @@ namespace Sun.Identity.Properties {
         public static string InvalidIssuer {
             get {
                 return ResourceManager.GetString("InvalidIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid relay state specified..
+        /// </summary>
+        public static string InvalidRelayState {
+            get {
+                return ResourceManager.GetString("InvalidRelayState", resourceCulture);
             }
         }
         
@@ -493,6 +511,15 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RelayState is not a valid URI..
+        /// </summary>
+        public static string MalformedRelayState {
+            get {
+                return ResourceManager.GetString("MalformedRelayState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Neither AuthnContextClassRef or AuthnContextDeclRef defined..
         /// </summary>
         public static string RequestedAuthnContextClassRefOrDeclRefNotDefined {
@@ -511,6 +538,24 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can not sign metadata since service provider&apos;s signing certificate alias was not found or not present..
+        /// </summary>
+        public static string ServiceProviderCantSignMetadataWithoutCertificateAlias {
+            get {
+                return ResourceManager.GetString("ServiceProviderCantSignMetadataWithoutCertificateAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Certificate could not be found for the specified metadata value..
+        /// </summary>
+        public static string ServiceProviderCertNotFound {
+            get {
+                return ResourceManager.GetString("ServiceProviderCertNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specified home folder for the service provider could not be found..
         /// </summary>
         public static string ServiceProviderDirNotFound {
@@ -520,11 +565,29 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EntityDescriptor element could not be found in the metadata..
+        /// </summary>
+        public static string ServiceProviderEntityDescriptorNodeNotFound {
+            get {
+                return ResourceManager.GetString("ServiceProviderEntityDescriptorNodeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Metadata for the service provider could not be found..
         /// </summary>
         public static string ServiceProviderFileNotFound {
             get {
                 return ResourceManager.GetString("ServiceProviderFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SPSSODescriptor element could not be found in the metadata..
+        /// </summary>
+        public static string ServiceProviderSpSsoDescriptorNodeNotFound {
+            get {
+                return ResourceManager.GetString("ServiceProviderSpSsoDescriptorNodeNotFound", resourceCulture);
             }
         }
         
@@ -646,6 +709,15 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to XML can not be signed due to either empty or unknown signature certificate alias in extended metadata..
+        /// </summary>
+        public static string ServiceProviderUtilitySignFailedNoCertAlias {
+            get {
+                return ResourceManager.GetString("ServiceProviderUtilitySignFailedNoCertAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specified logout binding is not supported..
         /// </summary>
         public static string ServiceProviderUtilityUnsupportedLogoutBinding {
@@ -673,11 +745,47 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specified certificate does not have a private key..
+        /// </summary>
+        public static string SignedQueryStringCertHasNoPrivateKey {
+            get {
+                return ResourceManager.GetString("SignedQueryStringCertHasNoPrivateKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Certifcate not provided for checking query string signature..
         /// </summary>
         public static string SignedQueryStringCertIsNull {
             get {
                 return ResourceManager.GetString("SignedQueryStringCertIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signing certificate not found based on provided alias..
+        /// </summary>
+        public static string SignedQueryStringCertNotFound {
+            get {
+                return ResourceManager.GetString("SignedQueryStringCertNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid certificate friendly name specified..
+        /// </summary>
+        public static string SignedQueryStringInvalidCertFriendlyName {
+            get {
+                return ResourceManager.GetString("SignedQueryStringInvalidCertFriendlyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid query string specified..
+        /// </summary>
+        public static string SignedQueryStringInvalidQueryString {
+            get {
+                return ResourceManager.GetString("SignedQueryStringInvalidQueryString", resourceCulture);
             }
         }
         
@@ -709,6 +817,24 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Signature algorithm parameter not found in the query string..
+        /// </summary>
+        public static string SignedQueryStringSigAlgMissing {
+            get {
+                return ResourceManager.GetString("SignedQueryStringSigAlgMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified signature algorithm currently not supported for signing query strings..
+        /// </summary>
+        public static string SignedQueryStringSigAlgNotSupported {
+            get {
+                return ResourceManager.GetString("SignedQueryStringSigAlgNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signed query string specified an unsupported signature algorithm..
         /// </summary>
         public static string SignedQueryStringUnsupportedSigAlg {
@@ -727,6 +853,15 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specified certificate not found based on provided alias..
+        /// </summary>
+        public static string SignedXmlCertNotFound {
+            get {
+                return ResourceManager.GetString("SignedXmlCertNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signed XML did not have the correct signature..
         /// </summary>
         public static string SignedXmlCheckSignatureFailed {
@@ -736,11 +871,38 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid certificate friendly name specified..
+        /// </summary>
+        public static string SignedXmlInvalidCertFriendlyName {
+            get {
+                return ResourceManager.GetString("SignedXmlInvalidCertFriendlyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signed XML did not have the desired reference ID..
         /// </summary>
         public static string SignedXmlInvalidReference {
             get {
                 return ResourceManager.GetString("SignedXmlInvalidReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid target reference ID specified..
+        /// </summary>
+        public static string SignedXmlInvalidTargetRefId {
+            get {
+                return ResourceManager.GetString("SignedXmlInvalidTargetRefId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid XML specified..
+        /// </summary>
+        public static string SignedXmlInvalidXml {
+            get {
+                return ResourceManager.GetString("SignedXmlInvalidXml", resourceCulture);
             }
         }
     }

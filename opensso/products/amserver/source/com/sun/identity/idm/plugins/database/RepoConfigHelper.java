@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RepoConfigHelper.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
+ * $Id: RepoConfigHelper.java,v 1.2 2009/12/22 19:11:54 veiming Exp $
  *
  */
 
@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdOperation;
 

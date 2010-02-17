@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PWResetQuestionViewBean.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
+ * $Id: PWResetQuestionViewBean.java,v 1.3 2009/12/18 03:30:13 222713 Exp $
  *
  */
 
@@ -36,6 +36,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.Button;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetQuestionModel;
@@ -167,7 +168,10 @@ public class PWResetQuestionViewBean extends PWResetViewBeanBase  {
     public void forwardTo(RequestContext context) {
         String orgDN = (String)getPageSessionAttribute(ORG_DN);
         String userDN = (String)getPageSessionAttribute(USER_DN);
-        String loc = (String)getPageSessionAttribute(URL_LOCALE);
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(context.getRequest());
+        java.util.Locale locale = localeContext.getLocale();
+
         if (orgDN == null || orgDN.length() == 0 ||
             userDN == null || userDN.length() == 0) 
         {
@@ -177,6 +181,7 @@ public class PWResetQuestionViewBean extends PWResetViewBeanBase  {
         } else {
             PWResetQuestionModel model = (PWResetQuestionModel)getModel();
             model.readPWResetProfile(orgDN);
+            model.setUserLocale(locale.toString());
 	    populateQuestionsList(userDN, orgDN);
 	    super.forwardTo(context);
         }
@@ -194,7 +199,13 @@ public class PWResetQuestionViewBean extends PWResetViewBeanBase  {
 
         String orgDN = (String)getPageSessionAttribute(ORG_DN);
         String userDN = (String)getPageSessionAttribute(USER_DN);
-	String locale = (String)getPageSessionAttribute(URL_LOCALE);
+
+        RequestContext reqContext = event.getRequestContext();
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(reqContext.getRequest());
+        java.util.Locale localeObj = localeContext.getLocale();
+        String locale = localeObj.toString();
+        model.setUserLocale(locale);
 
         PWResetQuestionTiledView tView =
             (PWResetQuestionTiledView) getChild(PASSWORD_RESET_TILEDVIEW);

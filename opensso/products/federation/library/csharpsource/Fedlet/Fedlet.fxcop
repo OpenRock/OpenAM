@@ -147,6 +147,38 @@
              </Message>
             </Messages>
            </Member>
+           <Member Name="#WantLogoutRequestSigned">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2010-01-13 18:45:47Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'IdentityProvider.WantLogoutRequestSigned'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="8" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#WantLogoutResponseSigned">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2010-01-13 18:45:47Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'IdentityProvider.WantLogoutResponseSigned'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="16" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
           </Members>
          </Type>
          <Type Name="LogoutRequest">
@@ -660,6 +692,7 @@
     <Note Id="5" Modified="2009-10-30 15:19:58Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="6" Modified="2009-11-09 16:46:33Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="7" Modified="2009-10-30 15:22:30Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="8" Modified="2010-01-13 18:46:42Z">Logout is used and acceptable in the SAML specification.</Note>
     <Note Id="9" Modified="2009-11-03 17:32:54Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="10" Modified="2009-11-03 17:32:59Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="11" Modified="2009-11-03 23:52:00Z">Logout is a preferred term in the OpenSSO community.</Note>
@@ -667,6 +700,7 @@
     <Note Id="13" Modified="2009-11-03 23:52:13Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="14" Modified="2009-11-03 23:52:18Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="15" Modified="2009-11-03 23:52:23Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="16" Modified="2010-01-13 18:46:47Z">Logout is used and acceptable in the SAML specification.</Note>
     <Note Id="17" Modified="2009-11-03 23:52:39Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="18" Modified="2009-11-03 23:52:44Z">Logout is a preferred term in the OpenSSO community.</Note>
     <Note Id="19" Modified="2009-11-03 23:52:48Z">Logout is a preferred term in the OpenSSO community.</Note>

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AuthClientUtils.java,v 1.38 2009/11/21 02:08:04 manish_rustagi Exp $
+ * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
  */
 
@@ -165,7 +165,7 @@ public class AuthClientUtils {
     private static String serverURL = null;
     static Debug utilDebug = Debug.getInstance("amAuthClientUtils");
     private static String[] ignoreList = {
-        "IDtoken0", "IDtoken1", "IDtoken2", "IDButton", "AMAuthCookie", "encoded"
+        "IDtoken0", "IDtoken1", "IDtoken2", "IDButton", "AMAuthCookie", "encoded", "IDToken3"
     };
     private static boolean useCache = Boolean.getBoolean(SystemProperties.get(
         com.sun.identity.shared.Constants.URL_CONNECTION_USE_CACHE, "false"));
@@ -2924,24 +2924,40 @@ public class AuthClientUtils {
         return data;
     }
     
-    
+
     private static String getCharDecodedField(String strIn, String charset,
             Debug debug) {
 
         if (strIn == null) {
             return strIn;
         }
-        String strOut = null;        
+        String strOut = null;
         try {
+            // Translate the individual field values in the encoding value.
+            // Do not use getBytes() instead convert unicode into bytes by
+            // casting. Using getBytes() results in conversion into platform
+            // encoding. It appears to work in C locale because default
+            // encoding is 8859-1 but fails in other locales like Japanese,
+            // Chinese.
+            int len = strIn.length();
+            byte buf[] = new byte[len];
+
+            int i = 0;
+            int offset = 0;
+            char[] carr = strIn.toCharArray();
+            while (i < len) {
+                byte b = (byte) carr[i];
+                buf[offset++] = (byte) carr[i++];
+            }
             if (charset == null || charset.length() == 0) {
-                strOut = new String(strIn.getBytes(), "UTF-8");
+                strOut = new String(buf, 0, offset, "UTF-8");
             } else {
-                strOut = new String(strIn.getBytes(), charset);
+                strOut = new String(buf, 0, offset, charset);
             }
         } catch (Exception ex) {
             debug.error("AuthClientUtils.getCharDecodedField():", ex);
             strOut = strIn;
         }
         return strOut;
-    }    
+    } 
 }

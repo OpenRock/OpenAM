@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AMConfiguration.java,v 1.8.8.1 2009/12/23 20:04:51 mrudul_uchil Exp $
+ * $Id: AMConfiguration.java,v 1.9 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
  */
 

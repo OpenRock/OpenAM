@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DomainXMLBase.java,v 1.12 2008/08/04 20:02:32 huacui Exp $
+ * $Id: DomainXMLBase.java,v 1.14 2010/02/16 22:01:06 hari44 Exp $
  *
  */
 
@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.io.*;
+import java.io.File;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
 import com.sun.identity.install.tools.configurator.InstallConstants;
@@ -39,7 +41,9 @@ import com.sun.identity.install.tools.util.ConfigUtil;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.xml.XMLDocument;
 import com.sun.identity.install.tools.util.xml.XMLElement;
+import com.sun.identity.install.tools.util.FileUtils;
 import com.sun.identity.agents.install.appserver.IConfigKeys;
+import com.sun.identity.install.tools.util.OSChecker;
 
 /**
  * The class used by the installer to make changes in domain.xml file
@@ -81,36 +85,94 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants
         }
         return status;
     }
-    
+
+     private boolean getVersion(IStateAccess stateAccess) {
+         String ConfigDir = (String)stateAccess.get(STR_KEY_AS_INST_CONFIG_DIR);
+         String command;
+         boolean version = false;
+         String line = null;
+         try{
+            if(OSChecker.isWindows())
+                command = ConfigDir + "/../../../bin/asadmin.bat version";
+            else
+                command = ConfigDir + "/../../../bin/asadmin version";
+            Process p = Runtime.getRuntime().exec(command);
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((line = input.readLine()) != null) {
+                  if(line.startsWith("Version") && line.indexOf( "v3" ) > -1) {
+                     version = true;
+                     Debug.log("Identified Glassfish server version:" + line); 
+                  }
+		  else{
+		     Debug.log("Info:" + line);	
+                  }
+            }
+         }catch (IOException e){ 
+              Debug.log("Version check: Error - Unable to identify Glassfish server version");
+          }
+       return version;
+      }
+
     private String appendAgentClassPath(String classpath, 
-        IStateAccess stateAccess) {               
+        IStateAccess stateAccess) throws Exception{               
         StringBuffer sb = new StringBuffer(classpath);        
         String[] agentEntries =  getAgentClasspathEntries(stateAccess);
-        int count = agentEntries.length;        
-        for (int i = 0; i < count; i++) {
-            sb.append(STR_SERVER_CLASSPATH_SEP);
-            sb.append(agentEntries[i]);
+        int count = agentEntries.length;       
+        if(getVersion(stateAccess)) {
+           String ConfigDir = (String)stateAccess.get(STR_KEY_AS_INST_CONFIG_DIR);
+           String LibDir = ConfigDir + "/../lib";
+           String libPath = ConfigUtil.getLibPath();
+           String localeDir = ConfigUtil.getLocaleDirPath();
+           String LibClassDir = LibDir + FILE_SEP + "classes";
+           File srcDir = new File(localeDir);
+           File desDir = new File(LibClassDir);
+           FileUtils.copyJarFile(libPath,LibDir,STR_AGENT_JAR);
+           FileUtils.copyJarFile(libPath,LibDir,STR_FM_CLIENT_SDK_JAR);
+           FileUtils.copyDirContents(srcDir,desDir);
+           StringBuffer buffer = new StringBuffer(256);
+           buffer.append(ConfigUtil.getHomePath()).append(FILE_SEP);
+           buffer.append(getAgentInstanceName(stateAccess)).append(FILE_SEP);
+           buffer.append(INSTANCE_CONFIG_DIR_NAME);
+           sb.append(STR_SERVER_CLASSPATH_SEP).append(buffer.toString());
+           Debug.log("DomainXMLBase.appendAgentClassPath(): Copied jar files" +
+                     LibDir + "and resource files to" + LibClassDir);
         }
-        
+        else { 
+           for (int i = 0; i < count; i++) {
+               sb.append(STR_SERVER_CLASSPATH_SEP);
+               sb.append(agentEntries[i]);
+            }
+        }
         String resultClasspath = sb.toString();
         Debug.log("DomainXMLBase.appendAgentClassPath() Original " +
                 "classpath: " + classpath + "\nResult classpath: " + 
                 resultClasspath);
         
-        return resultClasspath;
+      return resultClasspath;
     }
     
     private void addAgentJVMOptions(XMLDocument domainXMLDoc, 
         XMLElement javaConfig, IStateAccess stateAccess) throws Exception {           
         Iterator iter = getAgentJVMOptions(stateAccess).iterator();
         StringBuffer sb = new StringBuffer(256);
-        while (iter.hasNext()) {
-            String option = (String) iter.next();
-            sb.append("<jvm-options>").append(option).append("</jvm-options>");
-            XMLElement jvmOption = domainXMLDoc.newElementFromXMLFragment(
-                sb.toString());
-            javaConfig.addChildElement(jvmOption, true);
-            sb.delete(0, sb.length()); // clear the buffer
+        if(getVersion(stateAccess)){
+           String LOG_FILE = (String)stateAccess.get(STR_KEY_AS_INST_CONFIG_DIR) + FILE_SEP + "logging.properties";
+           while (iter.hasNext()) {
+               String option = (String) iter.next();
+               sb.append("java ").append(option).append("\n");
+               FileUtils.appendDataToFile(LOG_FILE,sb.toString());
+               sb.delete(0, sb.length());
+               Debug.log("DomainXMLBase.addAgentJVMOptions: Addedd log options to" + LOG_FILE);
+            }
+        } else{
+           while (iter.hasNext()) {
+              String option = (String) iter.next();
+              sb.append("<jvm-options>").append(option).append("</jvm-options>");
+              XMLElement jvmOption = domainXMLDoc.newElementFromXMLFragment(
+                  sb.toString());
+              javaConfig.addChildElement(jvmOption, true);
+              sb.delete(0, sb.length()); // clear the buffer
+           }
         }
     }
         
@@ -176,16 +238,31 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants
                     "Error: Missing '" + classPathTag + "' " +
                     "attribute");                
             }            
-            
-            // Remove the Agent JVMOptions. If error occurs Exception is thrown
-            removeAgentJVMOptions(javaConfig, stateAccess);
-            
+           if (getVersion(stateAccess)) {
+               removeAgentFiles(stateAccess);
+               removeAgentLogOptions(stateAccess);
+            }
+            else {
+               // Remove the Agent JVMOptions. If error occurs Exception is thrown
+               removeAgentJVMOptions(javaConfig, stateAccess);
+            }
         } else {
             Debug.log("DomainXMLBase.removeAgentClasspath() - Error:" + 
                 " Missing '" + STR_JAVA_CONFIG_ELEMENT + "' element.");
         }
                 
         return status;
+    }
+
+    private void removeAgentFiles(IStateAccess stateAccess) {
+          String ConfigDir = (String)stateAccess.get(STR_KEY_AS_INST_CONFIG_DIR);
+          String LibDir = ConfigDir + FILE_SEP + "../lib";
+          String LibClassDir = LibDir + FILE_SEP + "classes";
+          String localeDir = ConfigUtil.getLocaleDirPath();
+          FileUtils.removeJarFiles(LibDir,STR_AGENT_JAR);
+          FileUtils.removeJarFiles(LibDir,STR_FM_CLIENT_SDK_JAR);
+          FileUtils.removeFiles(localeDir,LibClassDir);
+          Debug.log("DomainXMLBase.removeAgentFiles: Deleted Agent files from" + LibDir);
     }
 
     private String deleteAgentClasspath(String classpath, 
@@ -221,6 +298,13 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants
                 resultClasspath);
                 
         return resultClasspath;
+    }
+
+    private void removeAgentLogOptions(IStateAccess stateAccess) throws Exception{
+         String LOG_FILE = (String)stateAccess.get(STR_KEY_AS_INST_CONFIG_DIR) + FILE_SEP + "logging.properties";
+         FileUtils.removeLines(LOG_FILE,STR_LOG_COMPATMODE_OPTION);
+         FileUtils.removeLines(LOG_FILE,STR_LOG_CONFIG_FILE_OPTION_PREFIX);
+         Debug.log("DomainXMLBase.removeAgentLogOptions: Removed Agent log options from" + LOG_FILE);
     }
     
     private void removeAgentJVMOptions(XMLElement javaConfig, 

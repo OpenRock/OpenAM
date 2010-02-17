@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: STSClientUserToken.java,v 1.12.12.1 2010/01/05 01:38:13 mrudul_uchil Exp $
+ * $Id: STSClientUserToken.java,v 1.13 2009/12/23 22:32:29 mrudul_uchil Exp $
  *
  */
 
@@ -192,5 +192,4 @@ public class STSClientUserToken implements ClientUserToken {
     public String getAppTokenID() {
         return appTokenID;
     }
-    
 }

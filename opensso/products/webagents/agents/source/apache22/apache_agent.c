@@ -998,6 +998,14 @@ int dsame_check_access(request_rec *r) {
     return ret;
 }
 
+static void shutdownNSS(void *data)
+{    
+    am_status_t status = am_shutdown_nss();
+    if (status != AM_SUCCESS) {
+       am_web_log_error("shutdownNSS(): Failed to shutdown NSS.");
+    } 
+}
+
 static void register_hooks(apr_pool_t *p) {
     ap_hook_access_checker(dsame_check_access, NULL, NULL, APR_HOOK_MIDDLE);
 
@@ -1011,6 +1019,9 @@ static void register_hooks(apr_pool_t *p) {
     // This saves each child from having to read from the properties file
     // when it is first started.
     ap_hook_post_config(init_dsame, NULL, NULL, APR_HOOK_LAST);
+
+    // NSS needs to be shutdown when a child process exits
+    apr_pool_cleanup_register(p, NULL, shutdownNSS, dummy_cleanup_func);
 
     // register hook for agent cleanup.
     // A hook for child_init is still needed to register cleanup_dsame

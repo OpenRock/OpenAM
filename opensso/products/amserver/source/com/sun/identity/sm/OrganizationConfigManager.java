@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: OrganizationConfigManager.java,v 1.28 2009/10/14 19:21:33 hengming Exp $
+ * $Id: OrganizationConfigManager.java,v 1.31 2010/01/20 17:01:36 veiming Exp $
  *
  */
 

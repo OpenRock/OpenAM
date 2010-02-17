@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LDAPv3Repo.java,v 1.71.2.2 2010/01/20 20:18:56 goodearth Exp $
+ * $Id: LDAPv3Repo.java,v 1.74 2010/01/20 01:08:36 goodearth Exp $
  *
  */
 
@@ -66,7 +66,6 @@ import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPUrl;
 import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.shared.ldap.LDAPv3;
-import com.sun.identity.shared.ldap.controls.LDAPPasswordExpiredControl;
 import com.sun.identity.shared.ldap.controls.LDAPPasswordExpiringControl;
 import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
@@ -81,7 +80,6 @@ import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.AMURLEncDec;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.util.Base64;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
@@ -4043,18 +4041,24 @@ public class LDAPv3Repo extends IdRepo {
         }
 
         LDAPModificationSet ldapModSet = new LDAPModificationSet();
+        LDAPAttribute theOldAttr = new LDAPAttribute(attrName);
         LDAPAttribute theAttr = new LDAPAttribute(attrName);
         if (attrName.equals(unicodePwd) &&
-            dsType.equalsIgnoreCase(LDAPv3Config_LDAPV3AD)) {
+            (dsType.equalsIgnoreCase(LDAPv3Config_LDAPV3AD) ||
+            dsType.equalsIgnoreCase(LDAPv3Config_LDAPV3ADAM))) {
 
+            byte[] encodedOldPwd = encodeADPwd(oldPassword);
+            theOldAttr.addValue(encodedOldPwd);
             byte[] encodedNewPwd = encodeADPwd(newPassword);
             theAttr.addValue(encodedNewPwd);
         } else {
+            theOldAttr.addValue(oldPassword);
             theAttr.addValue(newPassword);
         }
 
         String eDN = getDN(type, name);
-        ldapModSet.add(LDAPModification.REPLACE, theAttr);
+        ldapModSet.add(LDAPModification.DELETE, theOldAttr);
+        ldapModSet.add(LDAPModification.ADD, theAttr);
 
         LDAPConnection ldc = null;
         int resultCode = 0;
@@ -5991,11 +5995,8 @@ public class LDAPv3Repo extends IdRepo {
             ide.setLDAPErrorCode(ldapError);
             throw ide;
         } else if (errorMessage !=null && errorMessage.length() > 0 ) {
-            args[0] = CLASS_NAME;
-            args[1] = ldapError;
-            args[2] = errorMessage; 
             IdRepoException ide = new IdRepoException(
-                IdRepoBundle.BUNDLE_NAME, "313", args);
+                IdRepoBundle.BUNDLE_NAME, "311", args);
             ide.setLDAPErrorCode(ldapError);
             throw ide;
         } else if (resultCode == LDAPException.NO_SUCH_OBJECT) {

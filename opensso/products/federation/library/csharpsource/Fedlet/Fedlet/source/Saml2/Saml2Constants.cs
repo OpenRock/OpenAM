@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
- * $Id: Saml2Constants.cs,v 1.5 2009/11/11 18:13:39 ggennaro Exp $
+ * $Id: Saml2Constants.cs,v 1.6 2010/01/12 18:04:54 ggennaro Exp $
  */
 
 namespace Sun.Identity.Saml2
@@ -85,6 +85,16 @@ namespace Sun.Identity.Saml2
         public const string Binding = "Binding";
 
         /// <summary>
+        /// Constant for specifying certificate usage for encryption.
+        /// </summary>
+        public const string CertificateForEncryption = "encryption";
+
+        /// <summary>
+        /// Constant for specifying certificate usage for signing.
+        /// </summary>
+        public const string CertificateForSigning = "signing";
+
+        /// <summary>
         /// Constant for the request parameter to specify the consent
         /// in a SAML request.
         /// </summary>
@@ -138,6 +148,21 @@ namespace Sun.Identity.Saml2
         /// AuthnRequest is passive.
         /// </summary>
         public const string IsPassive = "IsPassive";
+
+        /// <summary>
+        /// Constant for the SAMLv2 namespace for metadata.
+        /// </summary>
+        public const string NamespaceMetadata = "urn:oasis:names:tc:SAML:2.0:metadata";
+
+        /// <summary>
+        /// Constant for the SAMLv2 namespace for assertion.
+        /// </summary>
+        public const string NamespaceSamlAssertion = "urn:oasis:names:tc:SAML:2.0:assertion";
+
+        /// <summary>
+        /// Constant for the SAMLv2 namespace for protocol.
+        /// </summary>
+        public const string NamespaceSamlProtocol = "urn:oasis:names:tc:SAML:2.0:protocol";
 
         /// <summary>
         /// Constant for the RelayState parameter.

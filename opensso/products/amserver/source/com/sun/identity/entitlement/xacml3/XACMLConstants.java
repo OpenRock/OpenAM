@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: XACMLConstants.java,v 1.2 2009/11/18 23:54:25 dillidorai Exp $
+ * $Id: XACMLConstants.java,v 1.3 2010/01/10 06:39:42 dillidorai Exp $
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -131,6 +131,22 @@ public static final String XACML_RULE_PERMIT_UNLESS_DENY
         = "urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-unless-deny";
 public static final String XACML_POLICY_PERMIT_UNLESS_DENY
         = "urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-unless-deny";
+
+public static final String JSON_REALMS_APPS_RESOURCES_ID 
+        = "urn:sun:opensso:entitlement:json-realms-apps-resources-id";
+public static final String JSON_REALMS_APPS_RESOURCES_DATATYPE 
+        = "urn:sun:opensso:entitlement:json-realms-apps-resources-datatype";
+public static final String REALMS_APPS_RESOURCES_CATEGORY 
+        = "urn:sun:opensso:entitlement:realms-apps-resources-category";
+public static final String JSON_REALMS_APPS_RESOURCES_MATCH 
+        = "urn:sun:opensso:entitlement:json-realms-apps-resources-match";
+
+public static final String IS_REFERRAL_POLICY
+        = "urn:sun:opensso:entitlement:is-referral-policy";
+public static final String XS_BOOLEAN_TYPE
+        = "http://www.w3.org/2001/XMLSchema#boolean";
+public static final String XS_BOOLEAN_TRUE
+        = "true";
 
 }
 

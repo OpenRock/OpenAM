@@ -24,7 +24,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build-session-tools.xml,v 1.6 2009/08/19 05:40:29 veiming Exp $
+   $Id: build-session-tools.xml,v 1.7 2010/01/12 21:23:35 veiming Exp $
 
 -->
 
@@ -105,7 +105,7 @@
         <copy todir="${amsession.locale.dir}"
             overwrite="yes" encoding="UTF-8">
             <fileset dir="${amserver.built.res.dir}"
-                includes="amSessionDB.properties"/>
+                includes="amSessionDB*.properties"/>
         </copy>
         <copy todir="${amsession.tools.dir}" overwrite="yes" flatten="yes"
             encoding="UTF-8">

@@ -162,49 +162,51 @@ all: $(ZIP_FILE)
 endif
 
 ifeq ($(OS_ARCH), HP-UX)
-ZIP_FILE := $(PKG_DIR).zip
-ZIP_DIRS := bin config debug include lib samples
+ZIP_FILE := $(ZIP_DIR).zip
+ZIP_DIR := $(PKG_DIR)/is_csdk
+ZIP_SUB_DIRS := bin config debug include lib samples
 EXTRA_PACKAGE_FILES += $(DEST_LIB_DIR)/libamsdk.sl \
 	$(LIBXML_LIB_DIR)/libxml2.sl $(NSS_BIN_DIR)/certutil
 
 $(ZIP_FILE): $(DEST_PACKAGE_SCRATCH_DIR) $(EXPORTED_HEADERS) $(EXPORTED_LIBS) $(EXTRA_PACKAGE_FILES)
-	$(RM) -rf $(PKG_DIR)
-	$(MKDIR) $(patsubst %, $(PKG_DIR)/%, $(ZIP_DIRS))
-	$(CP) $(USERX_ROOT)/am/source/crypt_util $(PKG_DIR)/bin
-	$(CP) comlib_HP-UX $(PKG_DIR)/lib/comlib
-	$(CP) $(filter %$(SO_EXT), $^) $(PKG_DIR)/lib
-	$(CP) THIRD_PARTY_LICENSE.TXT $(PKG_DIR)
-	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentBootstrap.template $(PKG_DIR)/config/OpenSSOAgentBootstrap.template.orig
-	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentConfiguration.template $(PKG_DIR)/config/OpenSSOAgentConfiguration.template.orig
-	$(CP) $(filter %.h, $^) $(PKG_DIR)/include
-	$(CP) $(filter %README.TXT, $^) $(PKG_DIR)/samples
-	$(CP) $(filter %.c, $^) $(PKG_DIR)/samples
-	$(CP) $(filter %.mk, $^) $(PKG_DIR)/samples/Makefile
-	cd $(PKG_DIR); zip -r ../$(notdir $@) *
+	$(RM) -rf $(ZIP_DIR)
+	$(MKDIR) $(patsubst %, $(ZIP_DIR)/%, $(ZIP_SUB_DIRS))
+	$(CP) $(USERX_ROOT)/am/source/crypt_util $(ZIP_DIR)/bin
+	$(CP) comlib_HP-UX $(ZIP_DIR)/lib/comlib
+	$(CP) $(filter %$(SO_EXT), $^) $(ZIP_DIR)/lib
+	$(CP) THIRD_PARTY_LICENSE.TXT $(ZIP_DIR)
+	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentBootstrap.template $(ZIP_DIR)/config/OpenSSOAgentBootstrap.template.orig
+	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentConfiguration.template $(ZIP_DIR)/config/OpenSSOAgentConfiguration.template.orig
+	$(CP) $(filter %.h, $^) $(ZIP_DIR)/include
+	$(CP) $(filter %README.TXT, $^) $(ZIP_DIR)/samples
+	$(CP) $(filter %.c, $^) $(ZIP_DIR)/samples
+	$(CP) $(filter %.mk, $^) $(ZIP_DIR)/samples/Makefile
+	cd $(ZIP_DIR); zip -r ../$(notdir $@) *
 
 all: $(ZIP_FILE)
 endif
 
 ifeq ($(OS_ARCH), AIX)
-ZIP_FILE := $(PKG_DIR).zip
-ZIP_DIRS := bin config debug include lib samples
+ZIP_FILE := $(ZIP_DIR).zip
+ZIP_DIR := $(PKG_DIR)/is_csdk
+ZIP_SUB_DIRS := bin config debug include lib samples
 EXTRA_PACKAGE_FILES += $(DEST_LIB_DIR)/libamsdk.so \
 	$(LIBXML_LIB_DIR)/libxml2.so.2 $(NSS_BIN_DIR)/certutil
 
 $(ZIP_FILE): $(DEST_PACKAGE_SCRATCH_DIR) $(EXPORTED_HEADERS) $(EXPORTED_LIBS) $(EXTRA_PACKAGE_FILES)
-	$(RM) -rf $(PKG_DIR)
-	$(MKDIR) $(patsubst %, $(PKG_DIR)/%, $(ZIP_DIRS))
-	$(CP) $(USERX_ROOT)/am/source/crypt_util $(PKG_DIR)/bin
-	$(CP) comlib_AIX $(PKG_DIR)/lib/comlib
-	$(CP) $(filter %$(SO_EXT), $^) $(PKG_DIR)/lib
-	$(CP) THIRD_PARTY_LICENSE.TXT $(PKG_DIR)
-	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentBootstrap.template $(PKG_DIR)/config/OpenSSOAgentBootstrap.template.orig
-	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentConfiguration.template $(PKG_DIR)/config/OpenSSOAgentConfiguration.template.orig
-	$(CP) $(filter %.h, $^) $(PKG_DIR)/include
-	$(CP) $(filter %README.TXT, $^) $(PKG_DIR)/samples
-	$(CP) $(filter %.c, $^) $(PKG_DIR)/samples
-	$(CP) $(filter %.mk, $^) $(PKG_DIR)/samples/Makefile
-	cd $(PKG_DIR); zip -r ../$(notdir $@) *
+	$(RM) -rf $(ZIP_DIR)
+	$(MKDIR) $(patsubst %, $(ZIP_DIR)/%, $(ZIP_SUB_DIRS))
+	$(CP) $(USERX_ROOT)/am/source/crypt_util $(ZIP_DIR)/bin
+	$(CP) comlib_AIX $(ZIP_DIR)/lib/comlib
+	$(CP) $(filter %$(SO_EXT), $^) $(ZIP_DIR)/lib
+	$(CP) THIRD_PARTY_LICENSE.TXT $(ZIP_DIR)
+	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentBootstrap.template $(ZIP_DIR)/config/OpenSSOAgentBootstrap.template.orig
+	$(CP) $(USERX_ROOT)/conf/OpenSSOAgentConfiguration.template $(ZIP_DIR)/config/OpenSSOAgentConfiguration.template.orig
+	$(CP) $(filter %.h, $^) $(ZIP_DIR)/include
+	$(CP) $(filter %README.TXT, $^) $(ZIP_DIR)/samples
+	$(CP) $(filter %.c, $^) $(ZIP_DIR)/samples
+	$(CP) $(filter %.mk, $^) $(ZIP_DIR)/samples/Makefile
+	cd $(ZIP_DIR); zip -r ../$(notdir $@) *
 
 all: $(ZIP_FILE)
 endif

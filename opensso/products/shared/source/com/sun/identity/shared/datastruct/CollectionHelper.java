@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CollectionHelper.java,v 1.5 2008/06/25 05:53:01 qcheng Exp $
+ * $Id: CollectionHelper.java,v 1.6 2010/01/06 22:31:55 veiming Exp $
  *
  */
 
@@ -50,10 +50,10 @@ public class CollectionHelper {
      * @return String from a map of string of set of string
      */
     public static String getMapAttr(Map map, String name) {
-        String retVal = null;
         Set s = (Set)map.get(name);
-        return ((s == null) || s.isEmpty()) ? null :
-            ((String)s.iterator().next()).trim();
+        String retVal = ((s == null) || s.isEmpty()) ? null :
+            ((String)s.iterator().next());
+        return (retVal != null) ? retVal.trim() : null;
     }
 
     /**

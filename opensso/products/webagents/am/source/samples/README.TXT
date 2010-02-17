@@ -65,12 +65,17 @@ Building Sample Program on UNIX platforms
       3.76 or higher.
 
    2. Make sure you have gcc or any other compliant C compiler program
-      available on Linux and Sun Studio 11 C/C++ compiler on Solaris.
+      available on Linux, Sun Studio 11 C/C++ compiler on Solaris, 
+      IBM C/C++ compiler on AIX and HP C/C++ compiler aCC on HP-UX.
 
    3. Under install directory>/is_csdk/lib, please do the following
 
        ln -s libamsdk.so.3 libamsdk.so
        ln -s libxml2.so.2 libxml2.so (if libxml2.so.2 is present)
+	
+      Note: For HP-UX platform, please do the following
+
+       ln -s libxml2.so libxml2.so.9
 
    4. Include directory>/is_csdk/lib in LD_LIBRARY_PATH
 
@@ -96,6 +101,7 @@ Building Sample Program on UNIX platforms
    7. Rename ../config/OpenSSOAgentBootstrap.template.orig as ../config/OpenSSOAgentBootstrap.properties and update the tags appropriately.
    8. Rename ../config/OpenSSOAgentConfiguration.template.orig as ../config/OpenSSOAgentConfiguration.properties and update the tags appropriately.
 
+   Note: Only 32-bit machines are supported for HP-UX and AIX platforms.
 
 Building Sample Program on Windows
 ----------------------------------
@@ -329,6 +335,26 @@ Executing the Sample Program on Linux
    the generated executables on the command line. 
 
    Note: Set the LD_LIBRARY_PATH environment variable to include the
+   directory, <install-location>/agent/lib, which contains 
+   libamsdk.so, libxml2.so, libssl3.so, libnss3.so, libplc4.so, 
+   libplds4.so and libnspr4.so. 
+
+Executing the Sample Program on AIX
+---------------------------------------
+   On AIX you can run the sample programs by launching
+   the generated executables on the command line. 
+
+   Note: Set the LIBPATH environment variable to include the
+   directory, <install-location>/agent/lib, which contains 
+   libamsdk.so, libxml2.so, libssl3.so, libnss3.so, libplc4.so, 
+   libplds4.so and libnspr4.so. 
+
+Executing the Sample Program on HP-UX
+---------------------------------------
+   On HP-UX you can run the sample programs by launching
+   the generated executables on the command line. 
+
+   Note: Set the SHLIB_PATH environment variable to include the
    directory, <install-location>/agent/lib, which contains 
    libamsdk.so, libxml2.so, libssl3.so, libnss3.so, libplc4.so, 
    libplds4.so and libnspr4.so. 

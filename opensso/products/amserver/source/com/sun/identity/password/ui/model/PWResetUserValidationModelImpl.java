@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PWResetUserValidationModelImpl.java,v 1.2 2008/06/25 05:43:43 qcheng Exp $
+ * $Id: PWResetUserValidationModelImpl.java,v 1.3 2010/01/28 08:17:10 bina Exp $
  *
  */
 
@@ -411,11 +411,15 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
      * @throws PWResetException if unable to get realm or realm does not exists
      */
     public String getRealm(String realm) throws PWResetException {
+        String classMethod = "PWResetUserValidationModelImpl:getRealm: ";
+	String orgName = realm;
         if ((realm != null) && (realm.length() > 0)) {
             try {
-                OrganizationConfigManager mgr = new OrganizationConfigManager(
-                    ssoToken, realm);
-            } catch (SMSException e) {
+		orgName = IdUtils.getOrganization(ssoToken,realm);
+                if (debug.messageEnabled()) {
+                    debug.message(classMethod +"realm is :" + orgName);
+                }
+            } catch (Exception e) {
                 debug.warning("PWResetUserValidationModelImpl.getRealm", e);
                 errorMsg = getErrorString(e);
                 throw new PWResetException(errorMsg);
@@ -423,8 +427,8 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
         } else {
             realm = "/";
         }
-        setValidRealm(realm);
-        return realm;
+        setValidRealm(orgName);
+        return orgName;
     }
     
     /**

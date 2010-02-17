@@ -121,5 +121,7 @@
         <Attribute name="useIntroductionForIDPProxy">
             <Value>false</Value>
         </Attribute>
+        <Attribute name="relayStateUrlList">
+        </Attribute>
     </SPSSOConfig>
 </EntityConfig>

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AjaxPage.java,v 1.23 2009/01/05 23:17:10 veiming Exp $
+ * $Id: AjaxPage.java,v 1.24 2010/01/04 19:15:16 veiming Exp $
  *
  */
 package com.sun.identity.config.util;
@@ -187,6 +187,11 @@ public abstract class AjaxPage extends Page {
                 // do nothing
             }
        }
+    }
+
+    public String getQuoteEscapedLocalizedString(String i18nKey) {
+        String value = getLocalizedString(i18nKey);
+        return value.replace("'", "\\'");
     }
 
     public String getLocalizedString(String i18nKey) {

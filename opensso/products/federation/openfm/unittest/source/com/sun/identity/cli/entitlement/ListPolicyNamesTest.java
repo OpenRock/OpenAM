@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ListPolicyNamesTest.java,v 1.1.2.2 2009/12/19 00:40:10 dillidorai Exp $
+ * $Id: ListPolicyNamesTest.java,v 1.1 2009/12/18 07:13:28 dillidorai Exp $
  */
 
 package com.sun.identity.cli.entitlement;

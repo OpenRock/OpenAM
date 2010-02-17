@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CreateMetaDataModelImpl.java,v 1.6 2009/11/10 01:19:49 exu Exp $
+ * $Id: CreateMetaDataModelImpl.java,v 1.7 2010/01/06 23:11:25 veiming Exp $
  *
  */
 
@@ -93,9 +93,9 @@ public class CreateMetaDataModelImpl extends AMModelBase
                 createExtendedDataTemplate(entityId, values, requestURL);
             ImportSAML2MetaData.importData(realm, metadata, extendedData);
         } catch (WorkflowException ex) {
-            throw new AMConsoleException(ex.getMessage());
+            throw new AMConsoleException(getErrorString(ex));
         } catch (SAML2MetaException ex) {
-            throw new AMConsoleException(ex.getMessage());
+            throw new AMConsoleException(getErrorString(ex));
         }
     }
 

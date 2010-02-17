@@ -23,7 +23,7 @@
 : your own identifying information:
 : "Portions Copyrighted [year] [name of copyright owner]"
 :
-: $Id: encrypt_util.bat,v 1.2 2009/11/10 08:37:30 mrudul_uchil Exp $
+: $Id: encrypt_util.bat,v 1.3 2010/01/15 23:29:23 mrudul_uchil Exp $
 :
 
 
@@ -35,7 +35,7 @@ shift
 goto WHILE
 :WEND
 
-set CLASSPATH=../lib/openssoclientsdk.jar;../resources
+set CLASSPATH=../lib/openssoclientsdk.jar;../resources;../config
 
 "%JAVA_HOME%/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH%  com.sun.identity.wssagents.common.util.EncryptionUtil %PARAMS%
 

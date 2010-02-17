@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ReferralPrivilegeManager.java,v 1.6 2009/11/19 01:02:03 veiming Exp $
+ * $Id: ReferralPrivilegeManager.java,v 1.7 2010/01/20 17:01:35 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -204,7 +204,10 @@ public final class ReferralPrivilegeManager {
         PolicyDataStore pdb = PolicyDataStore.getInstance();
         pdb.removeReferral(adminSubject, realm, referral);
         pdb.addReferral(adminSubject, realm, referral);
-        ReferredApplicationManager.getInstance().clearCache(realm);
+
+        for (String r : referral.getRealms()) {
+            ReferredApplicationManager.getInstance().clearCache(r);
+        }
         notifyPrivilegeChanged(orig, referral);
     }
 

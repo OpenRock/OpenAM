@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,10 +22,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
- * $Id: Saml2Utils.cs,v 1.5 2009/11/11 18:13:39 ggennaro Exp $
+ * $Id: Saml2Utils.cs,v 1.8 2010/01/26 01:20:14 ggennaro Exp $
  */
 
 using System;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
@@ -34,6 +35,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
@@ -189,6 +191,29 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
+        /// Gets the delimeter in the context of a query string depending
+        /// on the existence of a question mark within the given URL.
+        /// </summary>
+        /// <param name="location">
+        /// URL location to check for the presence of the question mark.
+        /// </param>
+        /// <returns>
+        /// Returns &quot; if it doesn't currently exist in the given URL, otherwise
+        /// &amp; is returned.
+        /// </returns>
+        public static string GetQueryStringDelimiter(string location)
+        {
+            if (location.Contains("?"))
+            {
+                return "&";
+            }
+            else
+            {
+                return "?";
+            }
+        }
+
+        /// <summary>
         /// Compresses, converts to Base64, then URL encodes the given 
         /// parameter and returns the ensuing string.
         /// </summary>
@@ -237,6 +262,212 @@ namespace Sun.Identity.Saml2
             streamReader.Close();
 
             return decompressedMessage;
+        }
+
+        /// <summary>
+        /// Signs the specified query string with the certificate found in the
+        /// local machine matching the provided friendly name.  The algorithm
+        /// is expected to be one of the parameters in the query string.
+        /// </summary>
+        /// <param name="certFriendlyName">
+        /// Friendly Name of the X509Certificate to be retrieved
+        /// from the LocalMachine keystore and used to sign the xml document.
+        /// Be sure to have appropriate permissions set on the keystore.
+        /// </param>
+        /// <param name="queryString">Query string to sign.</param>
+        /// <returns>
+        /// A signed query string where a digital signature is added.
+        /// </returns>
+        public static string SignQueryString(string certFriendlyName, string queryString)
+        {
+            if (string.IsNullOrEmpty(certFriendlyName))
+            {
+                throw new Saml2Exception(Resources.SignedQueryStringInvalidCertFriendlyName);
+            }
+
+            if (string.IsNullOrEmpty(queryString))
+            {
+                throw new Saml2Exception(Resources.SignedQueryStringInvalidQueryString);
+            }
+
+            char[] queryStringSep = { '&' };
+            NameValueCollection queryParams = new NameValueCollection();
+            foreach (string pairs in queryString.Split(queryStringSep))
+            {
+                string key = pairs.Substring(0, pairs.IndexOf("=", StringComparison.Ordinal));
+                string value = pairs.Substring(pairs.IndexOf("=", StringComparison.Ordinal) + 1);
+
+                queryParams[key] = value;
+            }
+
+            if (string.IsNullOrEmpty(queryParams[Saml2Constants.SignatureAlgorithm]))
+            {
+                throw new Saml2Exception(Resources.SignedQueryStringSigAlgMissing);
+            }
+
+            X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(certFriendlyName);
+            if (cert == null)
+            {
+                throw new Saml2Exception(Resources.SignedQueryStringCertNotFound);
+            }
+
+            if (!cert.HasPrivateKey)
+            {
+                throw new Saml2Exception(Resources.SignedQueryStringCertHasNoPrivateKey);
+            }
+
+            string encodedSignature = string.Empty;
+            string signatureAlgorithm = HttpUtility.UrlDecode(queryParams[Saml2Constants.SignatureAlgorithm]);
+
+            if (signatureAlgorithm == Saml2Constants.SignatureAlgorithmRsa)
+            {
+                RSACryptoServiceProvider privateKey = (RSACryptoServiceProvider)cert.PrivateKey;
+                byte[] signature = privateKey.SignData(
+                                                Encoding.UTF8.GetBytes(queryString.ToString()),
+                                                new SHA1CryptoServiceProvider());
+
+                encodedSignature = Convert.ToBase64String(signature);
+            }
+            else
+            {
+                throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
+            }
+
+            string signedQueryString 
+                        = queryString 
+                        + "&" + Saml2Constants.Signature 
+                        + "=" + HttpUtility.UrlEncode(encodedSignature);
+
+            return signedQueryString;
+        }
+
+        /// <summary>
+        /// Signs the specified xml document with the certificate found in
+        /// the local machine matching the provided friendly name and 
+        /// referring to the specified target reference ID.
+        /// </summary>
+        /// <param name="certFriendlyName">
+        /// Friendly Name of the X509Certificate to be retrieved
+        /// from the LocalMachine keystore and used to sign the xml document.
+        /// Be sure to have appropriate permissions set on the keystore.
+        /// </param>
+        /// <param name="xmlDoc">
+        /// XML document to be signed.
+        /// </param>
+        /// <param name="targetReferenceId">
+        /// Reference element that will be specified as signed.
+        /// </param>
+        /// <param name="includePublicKey">
+        /// Flag to determine whether to include the public key in the 
+        /// signed xml.
+        /// </param>
+        public static void SignXml(string certFriendlyName, IXPathNavigable xmlDoc, string targetReferenceId, bool includePublicKey)
+        {
+            if (string.IsNullOrEmpty(certFriendlyName))
+            {
+                throw new Saml2Exception(Resources.SignedXmlInvalidCertFriendlyName);
+            }
+
+            if (xmlDoc == null)
+            {
+                throw new Saml2Exception(Resources.SignedXmlInvalidXml);
+            }
+
+            if (string.IsNullOrEmpty(targetReferenceId))
+            {
+                throw new Saml2Exception(Resources.SignedXmlInvalidTargetRefId);
+            }
+
+            X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(certFriendlyName);
+            if (cert == null)
+            {
+                throw new Saml2Exception(Resources.SignedXmlCertNotFound);
+            }
+
+            XmlDocument xml = (XmlDocument)xmlDoc;
+            SignedXml signedXml = new SignedXml(xml);
+            signedXml.SigningKey = cert.PrivateKey;
+
+            if (includePublicKey)
+            {
+                KeyInfo keyInfo = new KeyInfo();
+                keyInfo.AddClause(new KeyInfoX509Data(cert));
+                signedXml.KeyInfo = keyInfo;
+            }
+
+            Reference reference = new Reference();
+            reference.Uri = "#" + targetReferenceId;
+
+            XmlDsigEnvelopedSignatureTransform envelopSigTransform = new XmlDsigEnvelopedSignatureTransform();
+            reference.AddTransform(envelopSigTransform);
+
+            signedXml.AddReference(reference);
+            signedXml.ComputeSignature();
+
+            XmlElement xmlSignature = signedXml.GetXml();
+
+            XmlNamespaceManager nsMgr = new XmlNamespaceManager(xml.NameTable);
+            nsMgr.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);
+            nsMgr.AddNamespace("saml", Saml2Constants.NamespaceSamlAssertion);
+            nsMgr.AddNamespace("samlp", Saml2Constants.NamespaceSamlProtocol);
+
+            XmlNode issuerNode = xml.DocumentElement.SelectSingleNode("saml:Issuer", nsMgr);
+            if (issuerNode != null)
+            {
+                xml.DocumentElement.InsertAfter(xmlSignature, issuerNode);
+            }
+            else
+            {
+                // Insert as a child to the target reference id
+                XmlNode targetNode = xml.DocumentElement.SelectSingleNode("//*[@ID='" + targetReferenceId + "']", nsMgr);
+                targetNode.PrependChild(xmlSignature);
+            }
+        }
+
+        /// <summary>
+        /// Validates a relay state URL with a list of allowed relay states,
+        /// each expected to be written as a regular expression pattern. If
+        /// the list is empty, then by default all are allowed.
+        /// </summary>
+        /// <param name="relayState">The relay state URL to check</param>
+        /// <param name="allowedRelayStates">
+        /// ArrayList of allowed relay states written as a regular expression pattern
+        /// </param>
+        /// <exception cref="Saml2Exception">
+        /// Throws Saml2Exception if a relay state is provided and does not
+        /// match any of the allowed relay states.
+        /// </exception>
+        public static void ValidateRelayState(string relayState, ArrayList allowedRelayStates)
+        {
+            if (string.IsNullOrEmpty(relayState) || allowedRelayStates == null || allowedRelayStates.Count == 0)
+            {
+                // If none specified, default to valid for backwards compatability
+                return;
+            }
+
+            try
+            {
+                Uri relayStateUrl = new Uri(relayState);
+            }
+            catch (UriFormatException)
+            {
+                throw new Saml2Exception(Resources.MalformedRelayState);
+            }
+            
+            bool valid = false;
+            foreach (string pattern in allowedRelayStates)
+            {
+                if (!string.IsNullOrEmpty(pattern) && Regex.IsMatch(relayState, pattern))
+                {
+                    valid = true;
+                    break;
+                }
+            }
+
+            if (!valid)
+            {
+                throw new Saml2Exception(Resources.InvalidRelayState);
+            }
         }
 
         /// <summary>

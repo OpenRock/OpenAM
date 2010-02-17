@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DelegationPrivilegeTest.java,v 1.4 2009/11/12 18:37:39 veiming Exp $
+ * $Id: DelegationPrivilegeTest.java,v 1.5 2009/12/17 18:03:51 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -106,15 +106,24 @@ public class DelegationPrivilegeTest {
             HashSet<SubjectImplementation>();
         subjects.add(sbj);
         ap.setSubject(subjects);
-        
+
+        String delResource = testParams.get("DELEGATED_RESOURCE");
         Map<String, Set<String>> appRes = new HashMap<String, Set<String>>();
         Set<String> res = new HashSet<String>();
         appRes.put(ApplicationTypeManager.URL_APPLICATION_TYPE_NAME, res);
-        res.add(testParams.get("DELEGATED_RESOURCE"));
+        res.add(delResource);
         ap.setApplicationResources(appRes);
         ap.setActionValues(
             ApplicationPrivilege.PossibleAction.READ_MODIFY_DELEGATE);
         mgr.addPrivilege(ap);
+
+        Application app = ApplicationManager.getApplication(
+            PrivilegeManager.superAdminSubject, realm,
+            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        if (app.getResources().contains(delResource)) {
+            throw new Exception("DelegationPrivilegeTest.testAdd:" +
+                "application resources should not have delegated resource");
+        }
     }
 
     @Test (dependsOnMethods = {"testAdd"})

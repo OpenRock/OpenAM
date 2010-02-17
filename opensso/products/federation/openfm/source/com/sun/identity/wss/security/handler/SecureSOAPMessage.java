@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SecureSOAPMessage.java,v 1.28.2.1 2010/01/05 01:38:12 mrudul_uchil Exp $
+ * $Id: SecureSOAPMessage.java,v 1.30 2010/01/23 00:20:27 mrudul_uchil Exp $
  *
  */
 
@@ -1019,8 +1019,7 @@ public class SecureSOAPMessage {
                           " alias list");
                   return false; 
                }
-               Element assertionE = SAMLUtils.getCanonicalElement(
-                   securityToken.toDocumentElement());
+               Element assertionE = securityToken.toDocumentElement();
                Document document = XMLUtils.newDocument();
                document.appendChild(document.importNode(assertionE, true));
                if(WSSUtils.debug.messageEnabled()) {

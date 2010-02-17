@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AccessManager.java,v 1.112.2.1 2009/12/19 00:40:08 dillidorai Exp $
+ * $Id: AccessManager.java,v 1.115 2010/01/15 18:10:54 veiming Exp $
  *
  */
 
@@ -80,7 +80,7 @@ public class AccessManager {
         description="Do multiple requests in one command.",
         webSupport="true",
         mandatoryOptions={
-            "batchfile|D|s|Name of file that contains commands and options."},
+            "batchfile|Z|s|Name of file that contains commands and options."},
         optionAliases={},
         macro="authentication",
         optionalOptions={
@@ -2142,6 +2142,8 @@ public class AccessManager {
             "withdefaults|w|u|Set this flag to get default configuration."
             },
         resourceStrings={
+            "list-server-site-name=Site Name: {0}",
+            "list-server-id=Server ID: {0}",
             "list-server-config-no-results=There were no configuration."
         }
     )
@@ -2367,6 +2369,7 @@ public class AccessManager {
         macro="authentication",
         resourceStrings={
             "show-site-primaryURL=Site primary URL: {0}.",
+            "show-site-ID=Site ID: {0}.",
             "show-site-no-secondaryURL=There were no secondary URLs.",
             "show-site-secondaryURL=Site secondary URLs:",
             "show-site-no-exists=Site did not exist."

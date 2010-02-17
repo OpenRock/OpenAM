@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ReferredApplicationManager.java,v 1.1 2009/11/19 01:02:03 veiming Exp $
+ * $Id: ReferredApplicationManager.java,v 1.2 2010/01/20 17:01:35 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -30,6 +30,7 @@ package com.sun.identity.entitlement;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -80,6 +81,7 @@ public class ReferredApplicationManager {
         rwlock.writeLock().lock();
         try {
             mapRealmToReferredAppls.remove(realm);
+            ApplicationManager.clearCache(realm);
         } finally {
             rwlock.writeLock().unlock();
         }
@@ -88,8 +90,18 @@ public class ReferredApplicationManager {
     public void clearCache() {
         rwlock.writeLock().lock();
         try {
-            mapRealmToReferredAppls.clear();
-            mapRealmToReferredAppls.put("/", Collections.EMPTY_SET);
+            if (mapRealmToReferredAppls.isEmpty()) {
+                mapRealmToReferredAppls.put("/", Collections.EMPTY_SET);
+            } else {
+                for (Iterator<String> i = mapRealmToReferredAppls.keySet().
+                    iterator(); i.hasNext();) {
+                    String realm = i.next();
+                    if (!realm.equals("/")) {
+                        i.remove();
+                        ApplicationManager.clearCache(realm);
+                    }
+                }
+            }
         } finally {
             rwlock.writeLock().unlock();
         }

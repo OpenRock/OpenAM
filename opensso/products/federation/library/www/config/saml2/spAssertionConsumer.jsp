@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: spAssertionConsumer.jsp,v 1.16 2009/11/24 22:05:43 madan_ranganath Exp $
+   $Id: spAssertionConsumer.jsp,v 1.17 2010/01/23 00:07:06 exu Exp $
 
 --%>
 
@@ -37,6 +37,7 @@ com.sun.identity.saml.common.SAMLUtils,
 com.sun.identity.saml2.common.SAML2Constants,
 com.sun.identity.saml2.common.SAML2Exception,
 com.sun.identity.saml2.common.SAML2Utils,
+com.sun.identity.saml2.logging.LogUtil,
 com.sun.identity.saml2.meta.SAML2MetaException,
 com.sun.identity.saml2.meta.SAML2MetaManager,
 com.sun.identity.saml2.meta.SAML2MetaUtils,
@@ -46,7 +47,8 @@ com.sun.identity.saml2.profile.IDPProxyUtil,
 com.sun.identity.saml2.protocol.Response,
 com.sun.identity.plugin.session.SessionManager,
 com.sun.identity.plugin.session.SessionProvider,
-com.sun.identity.plugin.session.SessionException
+com.sun.identity.plugin.session.SessionException,
+java.util.logging.Level
 "
 %>
 
@@ -190,6 +192,14 @@ com.sun.identity.plugin.session.SessionException
             orgName, hostEntityId, metaManager);
     } catch (SAML2Exception se) {
         SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
+        String[] data = {hostEntityId,se.getMessage(),""};
+        if (LogUtil.isErrorLoggable(Level.FINE)) {
+            data[2] = respInfo.getResponse().toXMLString(true, true);
+        }
+        LogUtil.error(Level.INFO,
+                    LogUtil.SP_SSO_FAILED,
+                    data,
+                    null);
         if (se.isRedirectionDone()) {
             // response had been redirected already.
             return;

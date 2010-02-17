@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DebugFactory.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
+ * $Id: DebugFactory.java,v 1.2 2010/01/07 00:19:12 veiming Exp $
  */
 
 package com.sun.identity.entitlement.util;
@@ -40,7 +40,7 @@ public final class DebugFactory {
     private IDebugProvider impl;
 
     private DebugFactory() {
-        //TODO load different debug provider.
+        //RFE: load different debug provider.
         impl = DebugAdaptor.getProvider();
     }
 

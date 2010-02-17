@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PolicyCreateWizardHandler.java,v 1.1 2009/08/19 05:40:46 veiming Exp $
+ * $Id: PolicyCreateWizardHandler.java,v 1.2 2009/12/22 23:33:14 farble1670 Exp $
  */
 
 package com.sun.identity.admin.handler;
@@ -63,7 +63,6 @@ public class PolicyCreateWizardHandler extends PolicyWizardHandler {
             return "policy-create";
         }
     }
-
 
     public void doFinishNext() {
         NextPopupBean npb = NextPopupBean.getInstance();

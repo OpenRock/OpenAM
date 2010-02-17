@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: exportmetadata.jsp,v 1.7.2.1 2009/12/23 23:08:14 exu Exp $
+   $Id: exportmetadata.jsp,v 1.8 2009/12/23 23:13:23 exu Exp $
 
 
    NOTE : remove this JSP from the OpenSSO WAR if you don't want to 

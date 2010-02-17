@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Application.java,v 1.6 2009/12/07 19:46:45 veiming Exp $
+ * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -739,5 +739,16 @@ public class Application implements Cloneable {
 
     protected void setRealm(String realm) {
         this.realm = realm;
+    }
+
+    public boolean canBeDeleted() {
+        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
+            PrivilegeManager.superAdminSubject, realm);
+        try {
+            return !pis.hasPrivilgesWithApplication(realm, name);
+        } catch (EntitlementException ex) {
+            PrivilegeManager.debug.error("Application.canBeDeleted", ex);
+            return false;
+        }
     }
 }

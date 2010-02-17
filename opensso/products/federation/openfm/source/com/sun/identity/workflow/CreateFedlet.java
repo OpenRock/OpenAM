@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CreateFedlet.java,v 1.18.2.2 2010/01/08 22:38:38 exu Exp $
+ * $Id: CreateFedlet.java,v 1.20 2010/01/08 22:41:43 exu Exp $
  *
  */
 
@@ -115,10 +115,10 @@ public class CreateFedlet
         FedConfigTagSwapOrder.add("@DATASTORE_PROVIDER_CLASS@");
         FedConfigTagSwapOrder.add("@LOG_PROVIDER_CLASS@");
         FedConfigTagSwapOrder.add("@SESSION_PROVIDER_CLASS@"); 
-        FedConfigTagSwapOrder.add("@MONAGENT_PROVIDER_CLASS@"); 
-        FedConfigTagSwapOrder.add("@MONSAML1_PROVIDER_CLASS@"); 
-        FedConfigTagSwapOrder.add("@MONSAML2_PROVIDER_CLASS@"); 
-        FedConfigTagSwapOrder.add("@MONIDFF_PROVIDER_CLASS@"); 
+        FedConfigTagSwapOrder.add("@MONAGENT_PROVIDER_CLASS@");
+        FedConfigTagSwapOrder.add("@MONSAML1_PROVIDER_CLASS@");
+        FedConfigTagSwapOrder.add("@MONSAML2_PROVIDER_CLASS@");
+        FedConfigTagSwapOrder.add("@MONIDFF_PROVIDER_CLASS@");
         FedConfigTagSwapOrder.add("@XML_SIGNATURE_PROVIDER@");
         FedConfigTagSwapOrder.add("@XMLSIG_KEY_PROVIDER@");
         FedConfigTagSwapOrder.add("@PASSWORD_DECODER_CLASS@");

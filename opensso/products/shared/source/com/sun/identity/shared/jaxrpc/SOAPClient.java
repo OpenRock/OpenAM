@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SOAPClient.java,v 1.18.2.1 2010/01/19 22:42:58 veiming Exp $
+ * $Id: SOAPClient.java,v 1.18 2009/11/19 18:17:28 bhavnab Exp $
  *
  */
 
@@ -143,7 +143,7 @@ public class SOAPClient {
     private SOAPResponseObject call(String message, String cookies) 
         throws Exception {
         if (debug.messageEnabled()) {
-            debug.message("SOAP Client: Message being sent.");
+            debug.message("SOAP Client: Message being sent:" + message);
         }
         // Setup the connection, support for failover
         String url = null;
@@ -266,7 +266,8 @@ public class SOAPClient {
                 inbuf.append(line).append("\n");
             }
             String data = new String(inbuf);
-            debug.message("SOAP Client: Response received.");
+            debug.message("SOAP Client: Input: " + message + "\nOutput: "
+                    + data);
             in_buf = new ByteArrayInputStream(data.getBytes("UTF-8"));
         }
         return (new SOAPResponseObject(in_buf, isException));

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ListFormatter.java,v 1.2 2009/12/16 18:16:31 farble1670 Exp $
+ * $Id: ListFormatter.java,v 1.3 2010/01/13 18:41:54 farble1670 Exp $
  */
 package com.sun.identity.admin;
 
@@ -58,7 +58,7 @@ public class ListFormatter {
                 b.append(o.toString());
             }
             if (i.hasNext()) {
-                b.append(",");
+                b.append(", ");
             }
 
         }

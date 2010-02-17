@@ -24,7 +24,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: entitlement.xml,v 1.8.2.1 2010/01/05 18:48:39 farble1670 Exp $
+   $Id: entitlement.xml,v 1.9 2010/01/07 00:19:12 veiming Exp $
 
 -->
 
@@ -96,6 +96,79 @@
                         <Value>100000</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
+                <!-- entitlement notification, Connection timeout in millisec,
+                     max 5 mins -->
+                <AttributeSchema name="entitlement-notifier-conn-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="entitlement-notifier-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="50"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <!-- duration between retries in millisec, max 5 mins -->
+                <AttributeSchema name="entitlement-notifier-duration-between-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- Privilege change notification
+                     Connection timeout in millisec, max 5 mins -->
+                <AttributeSchema name="privilege-notifier-conn-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="privilege-notifier-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="50"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <!-- duration between retries in millisec, max 5 mins -->
+                <AttributeSchema name="privilege-notifier-duration-between-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>3000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="privilege-notifier-threadpool-size"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="20"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+
                 <AttributeSchema name="listeners"
                     type="list"
                     syntax="string"
@@ -313,7 +386,6 @@
                             <Value>com.sun.identity.entitlement.PrefixResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <!--
                     <SubConfiguration name="banking"
                         id="applicationType">
                         <AttributeValuePair>
@@ -333,7 +405,6 @@
                             <Value>com.sun.identity.entitlement.ExactMatchResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    -->
                     <SubConfiguration name="webservices"
                         id="applicationType">
                         <AttributeValuePair>
@@ -512,7 +583,6 @@
                             <Value>com.sun.identity.entitlement.DenyOverride</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <!--
                     <SubConfiguration name="paycheck"
                         id="application">
                         <AttributeValuePair>
@@ -547,8 +617,6 @@
                             <Value>com.sun.identity.entitlement.DenyOverride</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    -->
-                    <!--
                     <SubConfiguration name="calendar"
                         id="application">
                         <AttributeValuePair>
@@ -586,8 +654,6 @@
                             <Value>com.sun.identity.entitlement.DenyOverride</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    -->
-                    <!--
                     <SubConfiguration name="im"
                         id="application">
                         <AttributeValuePair>
@@ -617,8 +683,6 @@
                             <Value>com.sun.identity.entitlement.DenyOverride</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    -->
-                    <!--
                     <SubConfiguration name="sunBank"
                         id="application">
                         <AttributeValuePair>
@@ -654,7 +718,6 @@
                             <Value>com.sun.identity.entitlement.DenyOverride</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    -->
                 </SubConfiguration>
                 <SubConfiguration name="subjectAttributesCollectors"
                     id="subjectAttributesCollectors">

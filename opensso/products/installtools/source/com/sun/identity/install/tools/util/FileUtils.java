@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: FileUtils.java,v 1.2 2008/06/25 05:51:29 qcheng Exp $
+ * $Id: FileUtils.java,v 1.3 2010/02/09 21:34:01 hari44 Exp $
  *
  */
 
@@ -33,6 +33,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -229,6 +230,72 @@ public class FileUtils {
 
         return status;
     }
+
+
+    /**
+     * Method removeJarFiles. jar files will be removed from source directory
+     *
+     * @param srcDir - Source directory
+     * @param filename - file to be deleted
+     *
+     */
+    public static void removeJarFiles(String srcDir, String fileName) { 
+     
+      String src = srcDir + FILE_SEP + fileName; 
+      File file = new File(src);
+      if (file.exists()) {
+          file.delete();
+      }
+      else
+          Debug.log("FileUtils.removeJarFiles() Unable to remove file");
+    }
+ 
+
+    /**
+     * Method removeFiles. All the files existing in source directory 
+     * will be removed from Destination Directory
+     *
+     * @param srcDir  - Source directory to compare files
+     * @param desDir  - Destination directory to remove files
+     *
+     */
+    public static void removeFiles(String srcDir, String desDir) {
+      File srcFile = new File(srcDir); 
+      String[] list = srcFile.list();
+      if (list != null) {
+         int count = list.length;
+         for (int i = 0; i < count; i++) {
+             String fileName = list[i];
+             File file = new File(desDir, fileName);
+             if (file.isFile()) {
+                 file.delete();
+             }else {
+               Debug.log("FileUtils.removeFiles() Unable to delete file");
+             }
+         }
+      }
+    }   
+
+   
+    public static void removeLines(String fileName, String value) throws Exception {
+      ArrayList list = new ArrayList();
+      BufferedReader in   = new BufferedReader(new FileReader(fileName));
+      String lines;
+      while((lines = in.readLine()) != null) {
+            list.add(lines);
+      }
+      in.close();
+      FileWriter fw = new FileWriter(fileName);
+      for(int i=0; i<list.size(); i++) {
+          String linedata = (String)list.get(i);
+          if(!(linedata.contains(value))) {
+             fw.write(linedata + "\n");
+          }
+      }
+      fw.close();
+    }
+
+   
 
     public static void appendDataToFile(String fileName, String data)
             throws Exception {

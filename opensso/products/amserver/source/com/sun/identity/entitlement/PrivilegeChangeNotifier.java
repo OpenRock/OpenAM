@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PrivilegeChangeNotifier.java,v 1.4 2009/12/15 00:44:18 veiming Exp $
+ * $Id: PrivilegeChangeNotifier.java,v 1.5 2010/01/07 00:19:11 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -44,13 +44,49 @@ import org.json.JSONObject;
 public class PrivilegeChangeNotifier {
     private static PrivilegeChangeNotifier instance = new
         PrivilegeChangeNotifier();
-    private static int POOL_SIZE = 5; // TOFIX
-    private static int HTTP_TIMEOUT = 1000; // TOFIX
-    private static int NUM_RETRY = 3; // TOFIX
-    private static int RETRY_INTERVAL = 3000; // TOFIX
-    
+    private static int POOL_SIZE = 5;
+    private static int HTTP_TIMEOUT = 1000;
+    private static int NUM_RETRY = 3;
+    private static int RETRY_INTERVAL = 3000;
+
+    static {
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+            PrivilegeManager.superAdminSubject, "/");
+        POOL_SIZE = getConfiguration(ec,
+            "privilege-notifier-threadpool-size", 5);
+        HTTP_TIMEOUT = getConfiguration(ec,
+            "privilege-notifier-conn-timeout", 1000);
+        NUM_RETRY = getConfiguration(ec,
+            "privilege-notifier-retries", 3);
+        RETRY_INTERVAL = getConfiguration(ec,
+            "privilege-notifier-duration-between-retries", 3000);
+    }
+
+    private static int getConfiguration(
+        EntitlementConfiguration ec,
+        String name,
+        int defaultVal
+    ) {
+        Set<String> values = ec.getConfiguration(name);
+        if ((values == null) || values.isEmpty()) {
+            return defaultVal;
+        }
+
+        try {
+            return Integer.parseInt(values.iterator().next());
+        } catch (NumberFormatException e) {
+            PrivilegeManager.debug.error(
+                "PrivilegeChangeNotifier.getConfiguration: attribute name=" +
+                name, e);
+            return defaultVal;
+        }
+    }
+
+
     private static EntitlementThreadPool thrdPool =
         new EntitlementThreadPool(POOL_SIZE);
+
+
 
     private PrivilegeChangeNotifier() {
     }

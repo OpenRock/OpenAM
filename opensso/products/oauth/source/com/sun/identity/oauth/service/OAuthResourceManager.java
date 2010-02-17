@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: OAuthResourceManager.java,v 1.1 2009/11/20 19:31:57 huacui Exp $
+ * $Id: OAuthResourceManager.java,v 1.2 2010/01/20 17:51:37 huacui Exp $
  *
  */
 
@@ -126,6 +126,12 @@ public class OAuthResourceManager implements OAuthServiceConstants {
         attributes.put(REQUEST_TOKEN_PPAL_ID, reqTokenPPalId);
         Date reqTokenExpiry = requestToken.getReqtLifetime();
         attributes.put(REQUEST_TOKEN_LIFETIME, DateUtils.toUTCDateFormat(reqTokenExpiry));
+        String reqTokenCBK = requestToken.getCallback();
+        attributes.put(REQUEST_TOKEN_CALLBACK, reqTokenCBK);
+        String reqTokenVerifier = requestToken.getVerifier();
+        if ((reqTokenVerifier != null) && reqTokenVerifier.trim().length() > 0) {
+            attributes.put(REQUEST_TOKEN_VERIFIER, reqTokenVerifier);
+        }
         String consumerId = requestToken.getConsumerId().getId();
         attributes.put(CONSUMER_ID, consumerId);
         String reqTokenId = em.createEntity(REQUEST_TOKEN_TYPE, entitySubject,
@@ -255,6 +261,14 @@ public class OAuthResourceManager implements OAuthServiceConstants {
                 throw new OAuthServiceException("invalid request token expiry", pe);
             }
         }
+        String reqTokenCBK = attributes.get(REQUEST_TOKEN_CALLBACK);
+        if ((reqTokenCBK == null) || (reqTokenCBK.trim().length()== 0)) {
+            throw new OAuthServiceException("Invalid request token callback");
+        }
+        reqToken.setCallback(reqTokenCBK);
+        String reqTokenVerifier = attributes.get(REQUEST_TOKEN_VERIFIER);
+        reqToken.setVerifier(reqTokenVerifier);
+
         String consumerId = attributes.get(CONSUMER_ID);
         if ((consumerId == null) || (consumerId.trim().length()== 0)) {
             throw new OAuthServiceException("Invalid request token consumer id");
@@ -377,6 +391,12 @@ public class OAuthResourceManager implements OAuthServiceConstants {
         attributes.put(REQUEST_TOKEN_PPAL_ID, reqTokenPPalId);
         Date reqTokenExpiry = requestToken.getReqtLifetime();
         attributes.put(REQUEST_TOKEN_LIFETIME, DateUtils.toUTCDateFormat(reqTokenExpiry));
+        String reqTokenCBK = requestToken.getCallback();
+        attributes.put(REQUEST_TOKEN_CALLBACK, reqTokenCBK);
+        String reqTokenVerifier = requestToken.getVerifier();
+        if ((reqTokenVerifier != null) && reqTokenVerifier.trim().length() > 0) {
+            attributes.put(REQUEST_TOKEN_VERIFIER, reqTokenVerifier);
+        }
         String consumerId = requestToken.getConsumerId().getId();
         attributes.put(CONSUMER_ID, consumerId);
         String etag = requestToken.getEtag();

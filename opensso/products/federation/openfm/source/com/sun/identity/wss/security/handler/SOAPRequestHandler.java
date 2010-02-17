@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SOAPRequestHandler.java,v 1.45.2.1 2010/01/05 01:38:12 mrudul_uchil Exp $
+ * $Id: SOAPRequestHandler.java,v 1.47 2010/01/15 18:54:34 mrudul_uchil Exp $
  *
  */
 
@@ -53,6 +53,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ResourceBundle;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFault;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -200,16 +201,37 @@ public class SOAPRequestHandler implements SOAPRequestHandlerInterface {
             HttpServletResponse response)
             throws SecurityException {
 
-        if ( sharedState == null || sharedState.isEmpty() ) {
-            sharedState = new HashMap();
-        }
         ProviderConfig config = null;
         STSRemoteConfig stsConfig = null;
         if(debug.messageEnabled()) {
            debug.message("SOAPRequestHandler.validateRequest: " +
-                   "Before validation: " 
+                   "Received SOAP message Before validation: "
                    + WSSUtils.print(soapRequest.getSOAPPart())); 
         }
+
+        try {
+            if (soapRequest.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                SOAPFault fault =
+                    soapRequest.getSOAPPart().getEnvelope().getBody().getFault();
+                String code = fault.getFaultCode();
+                String errorString = fault.getFaultString();
+                if(debug.messageEnabled()) {
+                    debug.message("SOAPRequestHandler.validateRequest - " +
+                        "SOAPFault code : " + code);
+                    debug.message("SOAPRequestHandler.validateRequest - " +
+                        "SOAPFault errorString : " + errorString);
+                }
+                throw new SecurityException(
+                    bundle.getString("notAuthorizedByServer"));
+            }
+        } catch (SOAPException se) {
+            throw new SecurityException(se.getMessage());
+        }
+
+        if ( sharedState == null || sharedState.isEmpty() ) {
+            sharedState = new HashMap();
+        }
+
         if (LogUtil.isLogEnabled()) {
             String[] data = {WSSUtils.print(soapRequest.getSOAPPart())};
             LogUtil.access(Level.FINE,
@@ -293,7 +315,7 @@ public class SOAPRequestHandler implements SOAPRequestHandlerInterface {
         String uri = securityMechanism.getURI();
         if(debug.messageEnabled()) {
            debug.message("SOAPRequestHandler.validateRequest: " +
-                   "soap message security mechanism: "); 
+                   "soap message security mechanism: " + uri);
         }
         
         if ( ((config != null) && (config.isRequestSignEnabled())) ){
@@ -438,8 +460,27 @@ public class SOAPRequestHandler implements SOAPRequestHandlerInterface {
 
         if(debug.messageEnabled()) {            
             debug.message("SOAPRequestHandler.secureResponse - " + 
-                "Input SOAP message : " + 
+                "Input SOAP message before securing : " +
                 WSSUtils.print(soapMessage.getSOAPPart()));
+        }
+
+        try {
+            if (soapMessage.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                SOAPFault fault =
+                    soapMessage.getSOAPPart().getEnvelope().getBody().getFault();
+                String code = fault.getFaultCode();
+                String errorString = fault.getFaultString();
+                if(debug.messageEnabled()) {
+                    debug.message("SOAPRequestHandler.secureResponse - " +
+                        "SOAPFault code : " + code);
+                    debug.message("SOAPRequestHandler.secureResponse - " +
+                        "SOAPFault errorString : " + errorString);
+                }
+                throw new SecurityException(
+                    bundle.getString("notAuthorizedByServer"));
+            }
+        } catch (SOAPException se) {
+            throw new SecurityException(se.getMessage());
         }
 
         if ( sharedState == null || sharedState.isEmpty() ) {
@@ -790,6 +831,25 @@ public class SOAPRequestHandler implements SOAPRequestHandlerInterface {
             debug.message("SOAPRequestHandler.validateResponse - " + 
                 "Input SOAP message : " + 
                 WSSUtils.print(soapMessage.getSOAPPart()));
+        }
+
+        try {
+            if (soapMessage.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                SOAPFault fault =
+                    soapMessage.getSOAPPart().getEnvelope().getBody().getFault();
+                String code = fault.getFaultCode();
+                String errorString = fault.getFaultString();
+                if(debug.messageEnabled()) {
+                    debug.message("SOAPRequestHandler.validateResponse - " +
+                        "SOAPFault code : " + code);
+                    debug.message("SOAPRequestHandler.validateResponse - " +
+                        "SOAPFault errorString : " + errorString);
+                }
+                throw new SecurityException(
+                    bundle.getString("notAuthorizedByServer"));
+            }
+        } catch (SOAPException se) {
+            throw new SecurityException(se.getMessage());
         }
         
         if (LogUtil.isLogEnabled()) {

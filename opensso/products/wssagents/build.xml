@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build.xml,v 1.33 2009/12/03 18:57:50 mrudul_uchil Exp $
+   $Id: build.xml,v 1.34 2010/01/15 18:54:35 mrudul_uchil Exp $
 
 -->
 
@@ -216,9 +216,15 @@
         <copy todir="${zip.temp.dir}/lib">
             <fileset dir="${extlib.dir}" includes="xmlsec.jar" />
         </copy>
+
         <copy todir="${zip.temp.dir}/samples">
             <fileset file="${wssagents.samples.dir}/jax-ws/**" />
         </copy>
+        <mkdir dir="${zip.temp.dir}/samples/StockClient/src/lib" />
+        <copy todir="${zip.temp.dir}/samples/StockClient/src/lib">
+            <fileset dir="${extlib.dir}" includes="j2ee.jar" />
+        </copy>
+
         <copy todir="${zip.temp.dir}/config">
             <fileset file="${wssagents.xml.dir}/jax-ws/*.xml" />
             <fileset dir="${wssagents.config.dir}" includes="WSSAgentInputData.properties" />
@@ -286,6 +292,10 @@
         <replaceregexp byline="true"
             file="${zip.temp.dir}/config/AMConfig.properties.template"
             match="com.sun.identity.saml.xmlsig.keypass=@BASE_DIR@/.keypass"
+            replace=""/>
+        <replaceregexp byline="true"
+            file="${zip.temp.dir}/config/AMConfig.properties.template"
+            match="com.sun.identity.saml.xmlsig.certalias=test"
             replace=""/>
         <replaceregexp byline="true"
             file="${zip.temp.dir}/config/AMConfig.properties.template"

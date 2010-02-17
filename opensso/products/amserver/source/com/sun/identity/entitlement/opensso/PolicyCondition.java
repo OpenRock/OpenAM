@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PolicyCondition.java,v 1.1.2.1 2010/01/08 22:13:57 farble1670 Exp $
+ * $Id: PolicyCondition.java,v 1.2 2010/01/08 22:12:49 farble1670 Exp $
  */
 
 package com.sun.identity.entitlement.opensso;

@@ -22,18 +22,20 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DataStore.java,v 1.8.2.2 2010/01/05 15:29:03 veiming Exp $
+ * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.ReferredApplicationManager;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SubjectAttributesManager;
@@ -100,6 +102,8 @@ public class DataStore {
         NetworkMonitor.getInstance("dbLookupPrivileges");
     private static final NetworkMonitor DB_MONITOR_REFERRAL =
         NetworkMonitor.getInstance("dbLookupReferrals");
+    private static final String HIDDEN_REALM_DN =
+        "o=sunamhiddenrealmdelegationservicepermissions,ou=services,";
     
     // count of number of policies per realm
     private static ReadWriteLock countRWLock = new ReentrantReadWriteLock();
@@ -415,6 +419,13 @@ public class DataStore {
                 info.add(data);
                 info.add("|" + data);
             }
+
+            Entitlement ent = p.getEntitlement();
+            info.add(Privilege.APPLICATION_ATTRIBUTE + "=" +
+                ent.getApplicationName());
+            for (String a : p.getApplicationIndexes()) {
+                info.add(Privilege.APPLICATION_ATTRIBUTE + "=" + a);
+            }
             map.put("ou", info);
 
             s.setAttributes(map);
@@ -536,7 +547,9 @@ public class DataStore {
                 realm)) {
                 info.add(REFERRAL_APPLS + "=" + n);
             }
-
+            for (String n : referral.getMapApplNameToResources().keySet()) {
+                info.add(Privilege.APPLICATION_ATTRIBUTE + "=" + n);
+            }
             map.put("ou", info);
 
             s.setAttributes(map);
@@ -635,6 +648,8 @@ public class DataStore {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(NotificationServlet.ATTR_NAME, name);
                 params.put(NotificationServlet.ATTR_REALM_NAME, realm);
+
+                ReferredApplicationManager.getInstance().clearCache();
                 Notifier.submit(NotificationServlet.REFERRAL_DELETED,
                     params);
             }
@@ -645,7 +660,6 @@ public class DataStore {
             throw new EntitlementException(10, null, e);
         }
     }
-
 
     /**
      * Returns a set of privilege names that satifies a search filter.
@@ -757,6 +771,58 @@ public class DataStore {
         return dnObj1.equals(dnObj2);
     }
 
+     public boolean hasPrivilgesWithApplication(
+        Subject adminSubject,
+        String realm,
+        String applName
+    ) throws EntitlementException {
+        SSOToken token = getSSOToken(adminSubject);
+
+         //Search privilege
+         String filter = "(ou=" + Privilege.APPLICATION_ATTRIBUTE + "=" +
+             applName + ")";
+         String baseDN = getSearchBaseDN(realm, null);
+         if (hasEntries(token, baseDN, filter)) {
+             return true;
+         }
+
+         //Search referral privilege
+         baseDN = getSearchBaseDN(realm, REFERRAL_STORE);
+         if (hasEntries(token, baseDN, filter)) {
+             return true;
+         }
+         
+         //Search delegation privilege
+         baseDN = getSearchBaseDN(getHiddenRealmDN(), null);
+         if (hasEntries(token, baseDN, filter)) {
+             return true;
+         }
+
+         return false;
+    }
+
+     private static String getHiddenRealmDN() {
+        return HIDDEN_REALM_DN + SMSEntry.getRootSuffix();
+    }
+
+    private boolean hasEntries(SSOToken token, String baseDN, String filter)
+        throws EntitlementException {
+         if (SMSEntry.checkIfEntryExists(baseDN, token)) {
+             try {
+                 Set<String> dns = SMSEntry.search(token, baseDN, filter,
+                     0, 0, false, false);
+                 if ((dns != null) && !dns.isEmpty()) {
+                     return true;
+                 }
+             } catch (SMSException e) {
+                 Object[] arg = {baseDN};
+                 throw new EntitlementException(52, arg, e);
+             }
+         }
+         return false;
+    }
+
+
     /**
      * Returns a set of privilege that satifies the resource and subject
      * indexes.
@@ -814,11 +880,6 @@ public class DataStore {
         }
 
         if (filter != null) {
-//            if (adminToken == null) {
-//                Object[] arg = {baseDN};
-//                throw new EntitlementException(56, arg);
-//            }
-
             SSOToken token = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
 
@@ -885,10 +946,6 @@ public class DataStore {
         }
 
         if (filter != null) {
-/*            if (adminToken == null) {
-                Object[] arg = {baseDN};
-                throw new EntitlementException(56, arg);
-            }*/
             SSOToken token = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
             long start = DB_MONITOR_REFERRAL.start();
@@ -1019,5 +1076,31 @@ public class DataStore {
             return adminToken;
         }
         return SubjectUtils.getSSOToken(subject);
+    }
+
+    static Set<String> getReferralNames(String realm, String referredRealm)
+        throws EntitlementException {
+        try {
+            Set<String> results = new HashSet<String>();
+            String filter = "(ou=" + REFERRAL_REALMS + "=" + 
+                DNMapper.orgNameToRealmName(referredRealm) + ")";
+            String baseDN = getSearchBaseDN(realm, REFERRAL_STORE);
+
+            if (SMSEntry.checkIfEntryExists(baseDN, adminToken)) {
+                Set<String> dns = SMSEntry.search(adminToken, baseDN, filter,
+                    0, 0, false, false);
+                for (String dn : dns) {
+                    if (!areDNIdentical(baseDN, dn)) {
+                        String rdns[] = LDAPDN.explodeDN(dn, true);
+                        if ((rdns != null) && rdns.length > 0) {
+                            results.add(rdns[0]);
+                        }
+                    }
+                }
+            }
+            return results;
+        } catch (SMSException ex) {
+            throw new EntitlementException(215, ex);
+        }
     }
 }

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: agent_configuration.h,v 1.15 2009/11/04 22:11:56 leiming Exp $
+ * $Id: agent_configuration.h,v 1.16 2009/12/19 00:05:46 subbae Exp $
  *
  */
 
@@ -163,6 +163,7 @@ public:
     PRBool doRemoteLog; //utility member to determine whether to remote log or not
     const char * clientIPHeader;
     const char * clientHostnameHeader;
+    PRBool encodeCookieSpecialChars; 
     
     AgentConfiguration();
     AgentConfiguration(am_properties_t properties);
@@ -253,6 +254,7 @@ public:
         this->doRemoteLog = AM_FALSE;
         this->clientIPHeader = NULL;
         this->clientHostnameHeader = NULL;
+        this->encodeCookieSpecialChars = AM_FALSE;
 
     }
     

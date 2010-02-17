@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: OpenSSOIndexStore.java,v 1.9.2.1 2010/01/15 19:07:06 veiming Exp $
+ * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -43,6 +43,7 @@ import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ReferredApplicationManager;
+import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SequentialThreadPool;
 import com.sun.identity.entitlement.SubjectAttributesManager;
@@ -278,15 +279,16 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 dn = deleteReferral(p.getName(), true);
             }
             if (indexCacheSize > 0) {
-                if (p instanceof Privilege) {
-                    indexCache.clear(p.getResourceSaveIndexes(
-                        adminSubject, DNMapper.orgNameToRealmName(realm)), dn);
-                } else {
-                    referralIndexCache.clear(p.getResourceSaveIndexes(
-                        adminSubject, DNMapper.orgNameToRealmName(realm)), dn);
+                ResourceSaveIndexes sIndex = p.getResourceSaveIndexes(
+                    adminSubject, DNMapper.orgNameToRealmName(realm));
+                if (sIndex != null) {
+                    if (p instanceof Privilege) {
+                        indexCache.clear(sIndex, dn);
+                    } else {
+                        referralIndexCache.clear(sIndex, dn);
+                    }
                 }
             }
-
         }
     }
 
@@ -395,7 +397,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         if (bReferral) {
             String tmp = (DN.isDN(realm)) ?
                 DNMapper.orgNameToRealmName(realm) : realm;
-            if (tmp.equals("/")) {
+            if (tmp.equals("/")) { 
                 ReferralPrivilege ref = getOrgAliasReferral(indexes);
                 if (ref != null) {
                     iterator.add(ref);
@@ -436,9 +438,11 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                         map, realms);
                 }
             } catch (SSOException e) {
-                //TOFIX
+                PrivilegeManager.debug.error(
+                    "OpenSSOIndexStore.getOrgAliasReferral", e);
             } catch (SMSException e) {
-                //TOFIX
+                PrivilegeManager.debug.error(
+                    "OpenSSOIndexStore.getOrgAliasReferral", e);
             }
         }
         return result;
@@ -886,9 +890,14 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         return referralCache.getCount();
     }
 
+    @Override
+    public boolean hasPrivilgesWithApplication(
+        String realm, String applName) throws EntitlementException {
+        return dataStore.hasPrivilgesWithApplication(getAdminSubject(), realm,
+            applName);
+    }
 
     public class SearchTask implements Runnable {
-
         private OpenSSOIndexStore parent;
         private BufferedIterator iterator;
         private ResourceSearchIndexes indexes;

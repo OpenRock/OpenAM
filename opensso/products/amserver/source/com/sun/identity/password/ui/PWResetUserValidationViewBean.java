@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: PWResetUserValidationViewBean.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
+ * $Id: PWResetUserValidationViewBean.java,v 1.4 2010/01/28 08:17:10 bina Exp $
  *
  */
 
@@ -38,11 +38,13 @@ import com.iplanet.jato.view.html.Button;
 import com.iplanet.jato.view.html.HiddenField;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.jato.view.html.TextField;
+import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetUserValidationModel;
 import com.sun.identity.password.ui.model.PWResetUserValidationModelImpl;
 import javax.servlet.http.HttpServletRequest;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * <code>PWResetUserValidationViewBean</code> validates user's identity for
@@ -50,6 +52,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class PWResetUserValidationViewBean extends PWResetViewBeanBase  {
 
+    private final Debug debug = Debug.getInstance("PasswordReset");
     /**
      * Name of title peer component
      */
@@ -80,7 +83,15 @@ public class PWResetUserValidationViewBean extends PWResetViewBeanBase  {
      */
     public static final String FLD_USER_ATTR = "fldUserAttr";
 
+    /** 
+     * Name of org attribute  
+     */
     private static final String ORG = "org";
+
+    /** 
+     * Name of realm attribute  
+     */
+    private static final String REALM = "realm";
 
 
     /** 
@@ -176,15 +187,34 @@ public class PWResetUserValidationViewBean extends PWResetViewBeanBase  {
      * @param context  request context
      */
     public void forwardTo(RequestContext context) {
+        String classMethod = "PWResetUserValidationViewBean:forwardTo : ";
         HttpServletRequest req = context.getRequest();
         PWResetUserValidationModel model = 
             (PWResetUserValidationModel)getModel();
+
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(req);
+        java.util.Locale locale = localeContext.getLocale();
+        model.setUserLocale(locale.toString());
+
         String orgDN = (String)getPageSessionAttribute(ORG_DN);
         if (orgDN == null) {
             String orgName = req.getParameter(ORG);
+            if (debug.messageEnabled()) {
+	        debug.message(classMethod + "org parameter is:" + orgName);
+            }
+	    if (orgName == null || orgName.length() <= 0) {
+		orgName = req.getParameter(REALM);
+                if (debug.messageEnabled()) {
+	            debug.error(classMethod + "realmParameter is:" + orgName);
+                }
+	    }
             try {
                  orgDN = model.getRealm(orgName);
-                 setPageSessionAttribute(ORG_DN,  orgDN);
+                 if (debug.messageEnabled()) {
+		     debug.message(classMethod + "orgDN is :" + orgDN);
+                 }
+                 setPageSessionAttribute(ORG_DN,orgDN);
                  /*
                   * Set the flag to indicate that user enter the orgname in
                   * the url.
@@ -220,7 +250,13 @@ public class PWResetUserValidationViewBean extends PWResetViewBeanBase  {
         String userAttrName = (String) hf.getValue();
         String orgDN = (String)getPageSessionAttribute(ORG_DN);
         String orgDNFlag = (String)getPageSessionAttribute(ORG_DN_FLAG);
-	String locale = (String) getPageSessionAttribute(URL_LOCALE);
+
+        RequestContext reqContext = event.getRequestContext();
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(reqContext.getRequest());
+        java.util.Locale localeObj = localeContext.getLocale();
+        String locale = localeObj.toString();
+        model.setUserLocale(locale);
 
         if (orgDNFlag != null && orgDNFlag.equals (STRING_TRUE)) {
             model.setRealmFlag(true);

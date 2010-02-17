@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RegisterServices.java,v 1.20.8.1 2010/01/05 18:26:45 goodearth Exp $
+ * $Id: RegisterServices.java,v 1.21 2010/01/05 18:11:34 goodearth Exp $
  *
  */
 
@@ -103,7 +103,6 @@ public class RegisterServices {
                 content =
                     ServicesDefaultValues.tagSwap(content, true);
             }
-
             if (tagswap) {
                 strXML = ServicesDefaultValues.tagSwap(strXML, true);
             }

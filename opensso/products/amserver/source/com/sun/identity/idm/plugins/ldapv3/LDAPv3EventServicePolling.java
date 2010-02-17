@@ -22,18 +22,14 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: LDAPv3EventServicePolling.java,v 1.6 2009/01/28 05:34:59 ww203982 Exp $
+ * $Id: LDAPv3EventServicePolling.java,v 1.7 2009/12/22 19:11:55 veiming Exp $
  *
  */
 
 package com.sun.identity.idm.plugins.ldapv3;
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPMessage;
@@ -45,9 +41,6 @@ import com.sun.identity.common.PeriodicGroupMap;
 import com.sun.identity.common.ScheduleableGroupAction;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
-import com.sun.identity.idm.IdRepoListener;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 
 /**

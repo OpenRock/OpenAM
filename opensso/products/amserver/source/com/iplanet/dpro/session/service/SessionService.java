@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SessionService.java,v 1.36 2009/11/13 05:23:41 bina Exp $
+ * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  */
 
@@ -813,8 +813,11 @@ public class SessionService {
      * @return a boolean
      */
     public boolean isSessionPresent(SessionID sid) {
-        return sessionTable.get(sid) != null
-                || restrictedTokenMap.get(sid) != null;
+        boolean isPresent  = sessionTable.get(sid) != null
+                || restrictedTokenMap.get(sid) != null
+                || sessionHandleTable.get(sid) != null;
+
+	return isPresent;
     }
 
     /**
@@ -1086,6 +1089,7 @@ public class SessionService {
             sess.setState(Session.DESTROYED);
             sendEvent(sess, SessionEvent.DESTROY);
         }
+	Session.removeSID(sid);
     }
 
     /**

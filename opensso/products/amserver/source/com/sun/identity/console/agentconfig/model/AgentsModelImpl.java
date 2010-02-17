@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AgentsModelImpl.java,v 1.21 2009/04/21 18:09:01 veiming Exp $
+ * $Id: AgentsModelImpl.java,v 1.22 2009/12/23 00:18:20 veiming Exp $
  *
  */
 
@@ -403,11 +403,6 @@ public class AgentsModelImpl
                 type, map, serverURL, agentURL);
             logEvent("SUCCEED_CREATE_AGENT", params);
         } catch (ConfigurationException e) {
-            String[] paramsEx = {realmName, name, type, getErrorString(e)};
-            logEvent("EXCEPTION_CREATE_AGENT", paramsEx);
-            debug.warning("AgentsModelImpl.createAgent", e);
-            throw new AMConsoleException(getErrorString(e));
-        } catch (MalformedURLException e) {
             String[] paramsEx = {realmName, name, type, getErrorString(e)};
             logEvent("EXCEPTION_CREATE_AGENT", paramsEx);
             debug.warning("AgentsModelImpl.createAgent", e);

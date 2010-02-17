@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: WebServiceProviderEditViewBean.java,v 1.9.2.1 2009/12/19 02:41:49 asyhuang Exp $
+ * $Id: WebServiceProviderEditViewBean.java,v 1.10 2009/12/19 00:06:54 asyhuang Exp $
  *
  */
 

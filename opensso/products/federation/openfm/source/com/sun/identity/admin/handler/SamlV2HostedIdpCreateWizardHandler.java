@@ -22,12 +22,10 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SamlV2HostedIdpCreateWizardHandler.java,v 1.2 2009/12/08 00:02:09 babysunil Exp $
+ * $Id: SamlV2HostedIdpCreateWizardHandler.java,v 1.3 2009/12/23 18:21:37 farble1670 Exp $
  */
 package com.sun.identity.admin.handler;
 
-import com.icesoft.faces.component.dragdrop.DndEvent;
-import com.icesoft.faces.component.dragdrop.DropEvent;
 import com.icesoft.faces.component.inputfile.FileInfo;
 import com.icesoft.faces.component.inputfile.InputFile;
 import com.icesoft.faces.context.effects.Effect;
@@ -35,6 +33,7 @@ import com.sun.identity.admin.dao.SamlV2HostedIdpCreateDao;
 import com.sun.identity.admin.effect.InputFieldErrorEffect;
 import com.sun.identity.admin.model.MessageBean;
 import com.sun.identity.admin.Resources;
+import com.sun.identity.admin.model.AttributeMappingSamlV2HostedIdpCreateWizardStepValidator;
 import com.sun.identity.admin.model.CotSamlV2HostedIdpCreateWizardStepValidator;
 import com.sun.identity.admin.model.MetadataSamlV2HostedIdpCreateWizardStepValidator;
 import com.sun.identity.admin.model.SamlV2HostedIdpCreateWizardBean;
@@ -59,6 +58,7 @@ public class SamlV2HostedIdpCreateWizardHandler
     public void initWizardStepValidators() {
         getWizardStepValidators()[SamlV2HostedIdpCreateWizardStep.COT.toInt()] = new CotSamlV2HostedIdpCreateWizardStepValidator(getWizardBean());
         getWizardStepValidators()[SamlV2HostedIdpCreateWizardStep.METADATA.toInt()] = new MetadataSamlV2HostedIdpCreateWizardStepValidator(getWizardBean());
+        getWizardStepValidators()[SamlV2HostedIdpCreateWizardStep.ATTRIBUTEMAPPING.toInt()] = new AttributeMappingSamlV2HostedIdpCreateWizardStepValidator(getWizardBean());
     }
 
     public void setSamlV2HostedIdpCreateDao(

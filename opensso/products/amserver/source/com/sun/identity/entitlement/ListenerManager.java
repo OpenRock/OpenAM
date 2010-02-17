@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: ListenerManager.java,v 1.2 2009/12/15 00:44:18 veiming Exp $
+ * $Id: ListenerManager.java,v 1.3 2010/01/07 00:19:11 veiming Exp $
  */
 
 package com.sun.identity.entitlement;
@@ -42,17 +42,17 @@ public final class ListenerManager {
     private static IEntitlementListenerRegistry registry;
 
     static {
-        //TOFIX: configurable
+        //RFE: make it pluggable
         try {
             Class clazz = Class.forName(
                 "com.sun.identity.entitlement.opensso.OpenSSOEntitlementListener");
             registry = (IEntitlementListenerRegistry)clazz.newInstance();
         } catch (InstantiationException ex) {
-            // TOFIX
+            PrivilegeManager.debug.error("ListenerManager.<init>", ex);
         } catch (IllegalAccessException ex) {
-            // TOFIX
+            PrivilegeManager.debug.error("ListenerManager.<init>", ex);
         } catch (ClassNotFoundException ex) {
-            // TOFIX
+            PrivilegeManager.debug.error("ListenerManager.<init>", ex);
         }
         
     }

@@ -129,10 +129,10 @@
                 var message = "";
                 if (resp.replication == "true") {
                     document.getElementById("existingRepPort").disabled = true;
-		    message = '<small>$page.getLocalizedString("existing.port.values.replication")</small>';
+		    message = '<small>$page.getQuoteEscapedLocalizedString("existing.port.values.replication")</small>';
                 } else {
                     document.getElementById("existingRepPort").disabled = false; 
-		    message='<small>$page.getLocalizedString("existing.port.values.noreplication")</small>';
+		    message='<small>$page.getQuoteEscapedLocalizedString("existing.port.values.noreplication")</small>';
                 }   
                 document.getElementById("replicationMessage").innerHTML= message;
                 document.getElementById("existingRepPort").value = resp.replicationPort;
@@ -162,7 +162,7 @@
     }
     
     function validateHostName() {
-        $('existingHostStatus').innerHTML = '$page.getLocalizedString("validating.url.string")';
+        $('existingHostStatus').innerHTML = '$page.getQuoteEscapedLocalizedString("validating.url.string")';
         var call = "$context$path?actionLink=validateHostName";
         var hostname = "&hostName=" + $('existingHost').value;
         $('nextTabButton').disabled = true;
@@ -172,16 +172,14 @@
     }
 
     function localPortResponse(response) {
-        var image = okImage;
         var message = response.responseText;
-        if (message == "true") {
-             message = $page.getLocalizedString("ok.string");
+        if (message == "ok") {
+            $('localConfigPortStatus').innerHTML = okString;
         } else {
-            image = errorImage;
+            $('localConfigPortStatus').innerHTML = errorImage +
+                '<small>' + message + '</small>';
+            $('nextTabButton').disabled = true;
         }
-        
-        $('localConfigPortStatus').innerHTML = image +
-            '<small>' + message + '</small>';
     }
     
     function validateLocalConfigPort() {        

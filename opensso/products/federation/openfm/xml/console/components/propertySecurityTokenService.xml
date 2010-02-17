@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: propertySecurityTokenService.xml,v 1.5.2.1 2009/12/23 00:26:25 babysunil Exp $
+   $Id: propertySecurityTokenService.xml,v 1.7 2009/12/23 00:20:59 babysunil Exp $
 
 -->
 
@@ -86,7 +86,7 @@
     
     <section name="Security" defaultValue="web.services.security.token.security.section.title">
         <property >
-            <label name="lblSecurityMech" defaultValue="Security Mechanism" labelFor="SecurityMech" />
+            <label name="lblSecurityMech" defaultValue="web.services.security.token.Security.Mechanism" labelFor="SecurityMech" />
             <cc name="SecurityMech" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag">
             </cc>
         </property>

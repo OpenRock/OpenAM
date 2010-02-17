@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
- * $Id: AssemblyInfo.cs,v 1.9 2009/11/11 18:13:42 ggennaro Exp $
+ * $Id: AssemblyInfo.cs,v 1.12 2010/01/26 01:20:15 ggennaro Exp $
  */
 
 using System;
@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sun Microsystems")]
 [assembly: AssemblyProduct("OpenSSO Fedlet for ASP.NET")]
-[assembly: AssemblyCopyright("Copyright ©  2009")]
+[assembly: AssemblyCopyright("Copyright © 2009-2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -61,6 +61,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.11.11")]
-[assembly: AssemblyFileVersion("1.0.11.11")]
+[assembly: AssemblyVersion("1.1.1.22")]
+[assembly: AssemblyFileVersion("1.1.1.22")]
 [assembly: NeutralResourcesLanguageAttribute("")]

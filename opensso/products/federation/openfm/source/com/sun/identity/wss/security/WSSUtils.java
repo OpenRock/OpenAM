@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: WSSUtils.java,v 1.22 2009/11/16 21:52:58 mallas Exp $
+ * $Id: WSSUtils.java,v 1.23 2010/01/23 00:20:26 mrudul_uchil Exp $
  *
  */
 
@@ -110,6 +110,9 @@ import com.sun.org.apache.xml.internal.security.encryption.EncryptedKey;
 import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
 import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
 import com.sun.identity.wss.provider.ProviderConfig;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 
 /**
  * This class provides util methods for the web services security. 
@@ -1113,6 +1116,34 @@ public class WSSUtils {
             return null;
         } catch (Exception ex) {
             debug.error("WSSUtils.getConfigByEndpoint: Exception", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Gets input Node Canonicalized
+     *
+     * @param node Node
+     * @return Canonical element if the operation succeeded.
+     *         Otherwise, return null.
+     */
+    public static Element getCanonicalElement(Node node) {
+        try {
+            Canonicalizer c14n = Canonicalizer.getInstance(
+                "http://www.w3.org/2001/10/xml-exc-c14n#");
+            byte outputBytes[] = c14n.canonicalizeSubtree(node);
+            DocumentBuilderFactory dfactory =
+                DocumentBuilderFactory.newInstance();
+            dfactory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = dfactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(
+                new ByteArrayInputStream(outputBytes));
+            Element result = doc.getDocumentElement();
+            return result;
+        } catch (Exception e) {
+            debug.error("WSSUtils:getCanonicalElement: " +
+                "Error while performing canonicalization on " +
+                "the input Node." , e);
             return null;
         }
     }

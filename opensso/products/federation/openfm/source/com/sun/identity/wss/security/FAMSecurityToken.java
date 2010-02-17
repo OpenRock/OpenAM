@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: FAMSecurityToken.java,v 1.5.12.1 2010/01/05 01:38:11 mrudul_uchil Exp $
+ * $Id: FAMSecurityToken.java,v 1.6 2009/12/23 22:32:28 mrudul_uchil Exp $
  *
  */
 package com.sun.identity.wss.security;
@@ -165,6 +165,6 @@ public class FAMSecurityToken implements SecurityToken {
 
          }
          Document document = XMLUtils.toDOMDocument(sb.toString(), debug);
-         return document.getDocumentElement();
+         return document.getDocumentElement();          
      }
 }
