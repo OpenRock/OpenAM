@@ -1,8 +1,0 @@
-lib
-.DS_Store
-opensso
-.Makefile.swp
-.README.txt.swp
-build
-Makefile
-dist
