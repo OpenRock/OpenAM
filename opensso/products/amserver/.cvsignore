@@ -1,0 +1,7 @@
+.DS_Store
+.classpath
+tracker.properties
+built
+*.swp
+extlib/\*.jar
+.project

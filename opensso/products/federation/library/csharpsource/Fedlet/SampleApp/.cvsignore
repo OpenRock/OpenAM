@@ -1,0 +1,5 @@
+StyleCop.Cache
+obj
+bin
+*.csproj.user
+*.Publish.xml
