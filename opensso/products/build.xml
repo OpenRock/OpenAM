@@ -208,7 +208,7 @@
     </target>        
     
     <target name="create-checksum" depends="set-zipname">         
-        <checksum file="${prd.nightly.dist.dir}/openfm/opensso_${zipname.set}.zip"
+        <checksum file="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
             algorithm="SHA" fileext=".sha" />
     </target>
 
@@ -232,7 +232,7 @@
         </jar>              
        <copy file="${prd.nightly.dist.dir}/opensso/opensso/deployable-war/opensso.war"
            todir="${prd.nightly.dist.dir}/openfm"/>
-       <zip destfile="${prd.nightly.dist.dir}/openfm/openam_instant${zipname.set}.zip"
+       <zip destfile="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
             whenempty="create">
             <zipfileset dir="${prd.nightly.dist.dir}/opensso">
                <exclude name="**/**/ssoupgrade*"/>
