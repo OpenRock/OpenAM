@@ -139,7 +139,7 @@ public class RoleEditServiceViewBean
         RoleModel model = (RoleModel)getModel();
         String[] tmp = { service } ;
         ptModel.setPageTitleText(
-            MessageFormat.format(model.getLocalizedString(title), tmp));
+            MessageFormat.format(model.getLocalizedString(title), (Object[])tmp));
     }
 
     protected AMModel getModelInternal() {

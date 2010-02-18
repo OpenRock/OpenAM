@@ -61,20 +61,24 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;						
-import java.util.List;
+import java.util.Iterator;				
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
+
+/*
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
+
+        */
 
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;
@@ -616,8 +620,8 @@ public class UserModelImpl
             Set users = pc.createUsers(attrMap, serviceNames);
 
             if ((users != null) && !users.isEmpty()) {
-                AMUser user = (AMUser)users.iterator().next();
-                String createdUserDN = user.getDN();
+                AMUser amuser = (AMUser)users.iterator().next();
+                String createdUserDN = amuser.getDN();
                 Set userDN = new HashSet(2);
                 userDN.add(createdUserDN);
                 String errorStr = assignUserToGroup(
@@ -627,7 +631,7 @@ public class UserModelImpl
                  * to nested group.
                  */
                 if (errorStr == null) {
-                    assignDefaultRolesToUser(user);
+                    assignDefaultRolesToUser(amuser);
 		    logEvent("ATTEMPT_DIR_MGR_CREATE_USER", params);
                 } else {
 		    String[] paramsEx = {location, name, ""};
@@ -695,7 +699,7 @@ public class UserModelImpl
         if (errMsg != null) {
             String[] param = {userName, errMsg};
             errMsg = MessageFormat.format(
-                getLocalizedString("cannotAssignUserToGroup"), param);
+                getLocalizedString("cannotAssignUserToGroup"), (Object[])param);
             
             //TBD LOG USER ASSIGNED TO GROUP
             //logEvent("SUCCEED_ASSIGN_GROUP_TO_USER", params);
@@ -764,8 +768,8 @@ public class UserModelImpl
         try {
             String[] params = {name};
             logEvent("ATTEMPT_DIR_MGR_GET_USER_ATTR_VALUES", params);
-            AMUser user = getAMStoreConnection().getUser(name);
-            map = correctAttributeNames(user.getAttributes());
+            AMUser amuser = getAMStoreConnection().getUser(name);
+            map = correctAttributeNames(amuser.getAttributes());
             validateUserStatusEntry(map);
             logEvent("SUCCEED_DIR_MGR_GET_USER_ATTR_VALUES", params);
         } catch (AMException e) {

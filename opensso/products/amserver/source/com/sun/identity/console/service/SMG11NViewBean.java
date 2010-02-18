@@ -590,7 +590,7 @@ public class SMG11NViewBean
         String[] arg = {model.getLocalizedServiceName(
             AMAdminConstants.G11N_SERVICE_NAME)};
         return MessageFormat.format(model.getLocalizedString(
-            "breadcrumbs.services.edit"), arg);
+            "breadcrumbs.services.edit"), (Object[])arg);
     }
 
     protected boolean startPageTrail() {

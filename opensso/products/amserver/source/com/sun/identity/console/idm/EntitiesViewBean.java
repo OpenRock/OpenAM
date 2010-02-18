@@ -181,13 +181,13 @@ public class EntitiesViewBean
 
         String[] param = {getDisplayIDType()};
         ptModel.setPageTitleText(MessageFormat.format(
-            model.getLocalizedString("page.title.entities"), param));
+            model.getLocalizedString("page.title.entities"), (Object[])param));
         tblModel.setTitle(MessageFormat.format(
-            model.getLocalizedString("table.entities.title.name"), param));
+            model.getLocalizedString("table.entities.title.name"), (Object[])param));
         tblModel.setTitleLabel(MessageFormat.format(
-            model.getLocalizedString("table.entities.title.name"), param));
+            model.getLocalizedString("table.entities.title.name"), (Object[])param));
         tblModel.setSummary(MessageFormat.format(
-            model.getLocalizedString("table.entities.summary"), param));
+            model.getLocalizedString("table.entities.summary"),(Object[]) param));
 
         getEntityNames();
         addEntitiesTab();

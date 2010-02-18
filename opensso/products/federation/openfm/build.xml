@@ -80,7 +80,7 @@
             debug="${build.debug}" debuglevel="${build.debuglevel}"
             srcdir="${openfm.src.dir}">
             <classpath refid="build.class.path"/>
-            <compilerarg value="-Xlint:deprecation" />
+            <compilerarg value="-Xlint:none" />
         </javac>
 
         <java classname="com.sun.identity.cli.tools.CLIDefinitionGenerator">
@@ -97,8 +97,7 @@
             srcdir="${openfm.src.dir}"
             includes="com/sun/identity/federation/cli/tools/**,com/sun/identity/federation/cli/definition/FederationManager.java">
             <classpath refid="build.class.path"/>
-            <compilerarg value="-Xlint:deprecation" />
-            <compilerarg value="-Xlint:unchecked" />
+            <compilerarg value="-Xlint:none" />
         </javac>
         <java classname="com.sun.identity.federation.cli.tools.WebHelperCreator">
             <classpath refid="build.class.path"/>

@@ -128,7 +128,7 @@ public class GroupContainerGeneralViewBean
         GroupContainerModel model = (GroupContainerModel)getModel();
         String[] tmp = {getDisplayName()} ;
         ptModel.setPageTitleText(MessageFormat.format(
-            model.getLocalizedString(title), tmp));
+            model.getLocalizedString(title), (Object[])tmp));
     }
 
     private String getDisplayName() {
@@ -142,10 +142,10 @@ public class GroupContainerGeneralViewBean
     }
 
     protected String getBreadCrumbDisplayName() {
-	GroupContainerModel model = (GroupContainerModel)getModel();
+	GroupContainerModel lmodel = (GroupContainerModel)getModel();
 	String[] arg = {getDisplayName()};
-	return MessageFormat.format(model.getLocalizedString(
-	    "breadcrumbs.directorymanager.groupcontainer.edit"), arg);
+	return MessageFormat.format(lmodel.getLocalizedString(
+	    "breadcrumbs.directorymanager.groupcontainer.edit"), (Object[])arg);
     }
 
     protected boolean startPageTrail() {

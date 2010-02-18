@@ -73,8 +73,8 @@ public class ServicesAddViewBean
 
     public void forwardTo(RequestContext reqContext)
         throws NavigationException {
-        String serviceName = (String)getPageSessionAttribute(SERVICE_NAME);
-        initialize(serviceName);
+        String lserviceName = (String)getPageSessionAttribute(SERVICE_NAME);
+        initialize(lserviceName);
         super.forwardTo(reqContext);
     }
 
@@ -138,11 +138,11 @@ public class ServicesAddViewBean
 
     protected String getPageTitle() {
         EntitiesModel model = (EntitiesModel)getModel();
-        String serviceName = model.getLocalizedServiceName(
+        String lserviceName = model.getLocalizedServiceName(
             (String)getPageSessionAttribute(SERVICE_NAME));
-        String[] param = {serviceName};
+        String[] param = {lserviceName};
         return MessageFormat.format(
-            model.getLocalizedString("page.title.entities.addservice"), param);
+            model.getLocalizedString("page.title.entities.addservice"), (Object[])param);
     }
 
     protected boolean isCreateViewBean() {
@@ -154,14 +154,14 @@ public class ServicesAddViewBean
     {        
         Map values = null;
         EntitiesModel model = (EntitiesModel)getModel();
-        String serviceName = (String)getPageSessionAttribute(SERVICE_NAME);
+        String lserviceName = (String)getPageSessionAttribute(SERVICE_NAME);
         String universalId = (String)getPageSessionAttribute(
             EntityEditViewBean.UNIVERSAL_ID);
         Map defaultValues = null;
 
         try {
             defaultValues = model.getServiceAttributeValues(
-                universalId, serviceName);
+                universalId, lserviceName);
             if (defaultValues.isEmpty()) {
                 defaultValues = getDefaultValuesForIdentity(universalId, model);
             }

@@ -144,7 +144,7 @@ public abstract class UserPropertiesBase
         String[] tmp = { AMFormatUtils.DNToName(model, name)  } ;
         ptModel.setPageTitleText(MessageFormat.format(
 	    model.getLocalizedString(title), 
-	    tmp));
+	    (Object[])tmp));
     }
 
     protected String getUserName() {
@@ -168,12 +168,12 @@ public abstract class UserPropertiesBase
     }
 
     protected String getBreadCrumbDisplayName() {
-        UserModel model = (UserModel)getModel();
+        UserModel lmodel = (UserModel)getModel();
         String name = (String)getPageSessionAttribute(
             AMAdminConstants.CURRENT_PROFILE);
-      String[] arg = {AMFormatUtils.DNToName(model, name)};
-      return MessageFormat.format(model.getLocalizedString(
-          "breadcrumbs.directorymanager.user.edit"), arg);
+      String[] arg = {AMFormatUtils.DNToName(lmodel, name)};
+      return MessageFormat.format(lmodel.getLocalizedString(
+          "breadcrumbs.directorymanager.user.edit"), (Object[])arg);
     }
 
     /**

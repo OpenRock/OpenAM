@@ -91,7 +91,7 @@ public class PrivilegeXMLBuilder
                     String name = (String)iter.next();
                     String[] params = {name, name};
                     xml.append(
-                        MessageFormat.format(PRIVILEGE_PROPERTY_TAG, params));
+                        MessageFormat.format(PRIVILEGE_PROPERTY_TAG, (Object[])params));
                 }
 
                 xml.append(SECTION_END_TAG)

@@ -786,7 +786,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             }
 
             request.append(MessageFormat.format(
-                AuthXMLTags.XML_REQUEST_PREFIX, authHandles));
+                AuthXMLTags.XML_REQUEST_PREFIX, (Object[])authHandles));
             if (appSSOToken != null) {
                 request.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
                 request.append(appSSOToken.getTokenID().toString()).
@@ -1132,7 +1132,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 String[] authHandles = new String[1];
                 authHandles[0] = getAuthenticationHandle(receivedDocument);
                 xml.append(MessageFormat.format(
-                    AuthXMLTags.XML_REQUEST_PREFIX,authHandles));
+                    AuthXMLTags.XML_REQUEST_PREFIX,(Object[])authHandles));
                 if (appSSOToken != null) {
                     xml.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
                     xml.append(appSSOToken.getTokenID().toString()).
@@ -1186,7 +1186,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             String[] authHandles = new String[1];
             authHandles[0] = getAuthenticationHandle(receivedDocument);
             xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
-            authHandles));
+            (Object[])authHandles));
             if (appSSOToken != null) {
                 xml.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
                 xml.append(appSSOToken.getTokenID().toString()).
@@ -1255,11 +1255,11 @@ public class AuthContext extends Object implements java.io.Serializable {
                 throw new L10NMessageImpl(amAuthContext, "noStatusNode", null);
             }
             
-            String ssoTokenID = XMLUtils.getNodeAttributeValue(loginStatusNode,
+            String ssoTokenIDTmp = XMLUtils.getNodeAttributeValue(loginStatusNode,
                 AuthXMLTags.SSOTOKEN);
             try {
                 return new com.iplanet.sso.providers.dpro.SSOProviderImpl().
-                    createSSOToken(ssoTokenID, true);
+                    createSSOToken(ssoTokenIDTmp, true);
             } catch (SSOException ssoe) {
                 throw new L10NMessageImpl(
                     amAuthContext, "createSSOTokenError", null);
@@ -1445,7 +1445,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             String[] authHandles = new String[1];
             authHandles[0] = getAuthenticationHandle(receivedDocument);
             xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
-            authHandles));
+            (Object[])authHandles));
             if (appSSOToken != null) {
                 xml.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
                 xml.append(appSSOToken.getTokenID().toString()).
@@ -1658,7 +1658,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             authHandles[0] = getAuthHandle();
             
             xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
-            authHandles));
+            (Object[])authHandles));
             if (appSSOToken != null) {
                 xml.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
                 xml.append(appSSOToken.getTokenID().toString()).

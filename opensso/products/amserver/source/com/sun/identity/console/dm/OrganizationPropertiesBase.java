@@ -127,7 +127,7 @@ public  abstract class OrganizationPropertiesBase
         }
         String[] tmp = { AMFormatUtils.DNToName(model, name)  } ;
         ptModel.setPageTitleText(MessageFormat.format(
-	    model.getLocalizedString(title), tmp));
+	    model.getLocalizedString(title), (Object[])tmp));
     }
 
     protected String getBreadCrumbDisplayName() {
@@ -136,7 +136,7 @@ public  abstract class OrganizationPropertiesBase
             AMAdminConstants.CURRENT_PROFILE);
 	String[] arg = {AMFormatUtils.DNToName(model, name)};
 	return MessageFormat.format(model.getLocalizedString(
-	    "breadcrumbs.directorymanager.organization.edit"), arg);
+	    "breadcrumbs.directorymanager.organization.edit"), (Object[])arg);
     }
 
     protected boolean startPageTrail() {

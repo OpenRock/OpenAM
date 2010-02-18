@@ -131,24 +131,24 @@ public class ContainerPropertiesBase
         String[] tmp = {getDisplayName()} ;
         ptModel.setPageTitleText(MessageFormat.format(
             model.getLocalizedString(title),
-            tmp));
+            (Object[])tmp));
     }
 
     protected String getBreadCrumbDisplayName() {
-	AMModel model = getModel();
-	String[] arg = {getDisplayName()};
-	return MessageFormat.format(model.getLocalizedString(
-          "breadcrumbs.directorymanager.container.edit"), arg);
+	AMModel lmodel = getModel();
+	String[] larg = {getDisplayName()};
+	return MessageFormat.format(lmodel.getLocalizedString(
+          "breadcrumbs.directorymanager.container.edit"), (Object[])larg);
     }
 
     private String getDisplayName() {
         String name =  (String)getPageSessionAttribute(
             AMAdminConstants.CURRENT_PROFILE);
-        AMModel model = getModel();
+        AMModel lmodel = getModel();
         if (name == null || name.length() == 0) {
-            name = model.getStartDSDN();
+            name = lmodel.getStartDSDN();
         }
-	return AMFormatUtils.DNToName(model, name);
+	return AMFormatUtils.DNToName(lmodel, name);
     }
 
     /**

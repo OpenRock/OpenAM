@@ -721,7 +721,7 @@ public class SCPlatformViewBean
         String[] arg = {
             model.getLocalizedServiceName(AMAdminConstants.PLATFORM_SERVICE)};
         return MessageFormat.format(model.getLocalizedString(
-            "breadcrumbs.services.edit"), arg);
+            "breadcrumbs.services.edit"), (Object[])arg);
     }
 
     protected boolean startPageTrail() {

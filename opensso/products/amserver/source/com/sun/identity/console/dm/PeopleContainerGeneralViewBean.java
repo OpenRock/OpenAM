@@ -107,7 +107,7 @@ public class PeopleContainerGeneralViewBean
         String[] tmp = {getDisplayName()} ;
         ptModel.setPageTitleText(MessageFormat.format(
             model.getLocalizedString(title),
-            tmp));
+            (Object[])tmp));
     }
 
     private void createPageTitleModel() {
@@ -143,7 +143,7 @@ public class PeopleContainerGeneralViewBean
 	AMModel model = getModel();
 	String[] arg = {getDisplayName()};
 	return MessageFormat.format(model.getLocalizedString(
-	    "breadcrumbs.directorymanager.peoplecontainer.edit"), arg);
+	    "breadcrumbs.directorymanager.peoplecontainer.edit"), (Object[])arg);
     }
 
     protected boolean startPageTrail() {

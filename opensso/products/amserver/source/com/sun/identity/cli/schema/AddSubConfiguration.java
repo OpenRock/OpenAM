@@ -177,7 +177,7 @@ public class AddSubConfiguration extends SchemaCommand {
                 String[] ar = {serviceName};
                 String message = MessageFormat.format(
                     getResourceString("add-sub-configuration-no-global-config"),
-                    ar);
+                    (Object[])ar);
                 throw new CLIException(message,
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }

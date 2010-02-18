@@ -122,7 +122,7 @@ public  abstract class GroupPropertiesBase
         model = (GroupModel)getModel();
         String[] tmp = {getDisplayName()};
         ptModel.setPageTitleText(MessageFormat.format(
-	    model.getLocalizedString(title), tmp));
+	    model.getLocalizedString(title), (Object[])tmp));
     }
 
     private String getDisplayName() {
@@ -139,7 +139,7 @@ public  abstract class GroupPropertiesBase
         model = (GroupModel)getModel();
 	String[] arg = {getDisplayName()};
 	return MessageFormat.format(model.getLocalizedString(
-	    "breadcrumbs.directorymanager.group.edit"), arg);
+	    "breadcrumbs.directorymanager.group.edit"), (Object[])arg);
     }
 
     /**

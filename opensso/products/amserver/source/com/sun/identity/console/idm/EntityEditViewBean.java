@@ -445,7 +445,7 @@ public class EntityEditViewBean
         String[] arg ={AMFormatUtils.getIdentityDisplayName(
             model, universalId)};
         return MessageFormat.format(model.getLocalizedString(
-            "breadcrumbs.editentities"), arg);
+            "breadcrumbs.editentities"), (Object[])arg);
     }
 
     /**

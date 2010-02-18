@@ -31,7 +31,7 @@ package com.sun.identity.console.dm;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.AMViewConfig;
-import com.sun.identity.console.base.model.AMFormatUtils;
+/*import com.sun.identity.console.base.model.AMFormatUtils;  */
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.dm.model.RoleModel;
@@ -123,7 +123,7 @@ public  abstract class RolePropertiesBase
         RoleModel model = (RoleModel)getModel();
         String[] tmp = {getDisplayName()};
         ptModel.setPageTitleText(MessageFormat.format(
-	    model.getLocalizedString(title), tmp));
+	    model.getLocalizedString(title), (Object[])tmp));
     }
 
     private String getDisplayName() {
@@ -137,10 +137,10 @@ public  abstract class RolePropertiesBase
     }
 
     protected String getBreadCrumbDisplayName() {
-        RoleModel model = (RoleModel)getModel();
+        RoleModel lmodel = (RoleModel)getModel();
 	String[] arg = {getDisplayName()};
-	return MessageFormat.format(model.getLocalizedString(
-	    "breadcrumbs.directorymanager.role.edit"), arg);
+	return MessageFormat.format(lmodel.getLocalizedString(
+	    "breadcrumbs.directorymanager.role.edit"), (Object[])arg);
     }
 
     /**

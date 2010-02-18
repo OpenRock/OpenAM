@@ -250,7 +250,7 @@ public class SubConfigEditViewBean
         String[] param = {parentId};
         ptModel.setPageTitleText(MessageFormat.format(
             model.getLocalizedString("page.title.services.edit.subconfig"),
-            param));
+            (Object[])param));
     }
 
     private String getParentId() {

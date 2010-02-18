@@ -57,7 +57,7 @@
         <java classname="com.sun.tools.xjc.Driver" 
             maxmemory="128m" failonerror="true" fork="true">
             <classpath refid="build.class.path"/>
-            <arg line="-b ${xsd.liberty.dir}/binding.xjb -extension -d ${library.src.dir} ${xsd.liberty.files}"/> 
+            <arg line="-nv -b ${xsd.liberty.dir}/binding.xjb -extension -d ${library.src.dir} ${xsd.liberty.files}"/> 
         </java>
         <property name="library.xsd.liberty.done" value="true" />
         <concat destfile="${libtracker}" append="true">library.xsd.liberty.done=true&#10;</concat>
@@ -67,7 +67,7 @@
         <java classname="com.sun.tools.xjc.Driver" 
             maxmemory="128m" failonerror="true" fork="true">
             <classpath refid="build.class.path"/>
-            <arg line="-b ${xsd.saml2.dir}/binding.xjb -extension -d ${library.src.dir} ${xsd.saml2.files}"/> 
+            <arg line="-nv -b ${xsd.saml2.dir}/binding.xjb -extension -d ${library.src.dir} ${xsd.saml2.files}"/> 
         </java>
         <replace file="${jaxb.saml2}/metadata/impl/RoleDescriptorTypeImpl.java" token="&quot;&quot;, &quot;type&quot;" value="&quot;http://www.w3.org/2001/XMLSchema-instance&quot;, &quot;type&quot;"/>
         <replace file="${jaxb.saml2}/metadata/impl/RoleDescriptorTypeImpl.java" token="(&quot;type&quot; == ___local)&amp;&amp;(&quot;&quot; == ___uri)" value="(&quot;type&quot; == ___local)&amp;&amp;(&quot;http://www.w3.org/2001/XMLSchema-instance&quot; == ___uri)"/>
@@ -79,7 +79,7 @@
         <java classname="com.sun.tools.xjc.Driver" 
             maxmemory="128m" failonerror="true" fork="true">
             <classpath refid="build.class.path"/>
-            <arg line="-b ${xsd.wsfederation.dir}/binding.xjb -extension -verbose -d ${library.src.dir} ${xsd.wsfederation.files}"/> 
+            <arg line="-nv -b ${xsd.wsfederation.dir}/binding.xjb -extension -verbose -d ${library.src.dir} ${xsd.wsfederation.files}"/> 
         </java>
         <property name="library.xsd.wsfederation.done" value="true" />
         <concat destfile="${libtracker}" append="true">library.xsd.wsfederation.done=true&#10;</concat>
@@ -103,6 +103,7 @@
 	    debug="${build.debug}" debuglevel="${build.debuglevel}">
             <src path="${library.src.dir}"/>
             <classpath refid="build.class.path"/>
+            <compilerarg value="-Xlint:none" />
 	</javac>
     </target>
 
@@ -119,7 +120,7 @@
             debug="${build.debug}" debuglevel="${build.debuglevel}"
             srcdir="${library.src.dir}" >
             <classpath refid="build.class.path"/>
-            <compilerarg value="-Xlint:deprecation" />
+            <compilerarg value="-Xlint:none" />
         </javac>
 
         <antcall target="jaxb.properties" />

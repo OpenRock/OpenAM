@@ -28,23 +28,26 @@
 
 package com.sun.identity.console.dm.model;
 
-import com.iplanet.am.sdk.AMAssignableDynamicGroup;
-import com.iplanet.am.sdk.AMDynamicGroup;
+/*import com.iplanet.am.sdk.AMAssignableDynamicGroup;
+ *import com.iplanet.am.sdk.AMDynamicGroup;
+ *import com.iplanet.am.sdk.AMFilteredRole;
+ *import com.iplanet.am.sdk.AMPeopleContainer;
+ * import com.iplanet.am.sdk.AMStaticGroup;
+ * import com.iplanet.services.util.Crypt;
+ * import java.security.PrivilegedAction;
+ *
+ * */
 import com.iplanet.am.sdk.AMEntity;
 import com.iplanet.am.sdk.AMException;
-import com.iplanet.am.sdk.AMFilteredRole;
 import com.iplanet.am.sdk.AMGroup;
 import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMOrganization;
 import com.iplanet.am.sdk.AMOrganizationalUnit;
-import com.iplanet.am.sdk.AMPeopleContainer;
 import com.iplanet.am.sdk.AMRole;
 import com.iplanet.am.sdk.AMSearchControl;
 import com.iplanet.am.sdk.AMSearchResults;
 import com.iplanet.am.sdk.AMStoreConnection;
-import com.iplanet.am.sdk.AMStaticGroup;
 import com.iplanet.am.sdk.AMTemplate;
-import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.admin.AdminInterfaceUtils;
@@ -70,7 +73,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.RequiredValueValidator;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -537,9 +539,9 @@ public class DMModelBase
     public String getAttributeValue(String objectDN, String attrName) {
         String value = "";
         if (resultsMap != null && !resultsMap.isEmpty()) {
-            Map values = (Map)resultsMap.get(objectDN);
-            if (values != null && !values.isEmpty()) {
-                Set attrValues = (Set)values.get(attrName);
+            Map lvalues = (Map)resultsMap.get(objectDN);
+            if (lvalues != null && !lvalues.isEmpty()) {
+                Set attrValues = (Set)lvalues.get(attrName);
                 if (attrValues != null && !attrValues.isEmpty()) {
                     value = getMultiValue(attrValues);
                 }
@@ -1852,7 +1854,7 @@ public class DMModelBase
 		    String[] arg = {
 			Locale.getString(rb, as.getI18NKey(), debug)};
 		    throw new AMConsoleException(MessageFormat.format(
-			expMsg, arg));
+			expMsg, (Object[])arg));
 		}
 	    }
 	}
@@ -2624,11 +2626,11 @@ public class DMModelBase
         String message = null;
 
         if (results != null) {
-            int errorCode = results.getErrorCode();
+            int lerrorCode = results.getErrorCode();
 
-            if (errorCode == AMSearchResults.SIZE_LIMIT_EXCEEDED) {
+            if (lerrorCode == AMSearchResults.SIZE_LIMIT_EXCEEDED) {
                 message = getLocalizedString("sizeLimitExceeded.message");
-            } else if (errorCode == AMSearchResults.TIME_LIMIT_EXCEEDED) {
+            } else if (lerrorCode == AMSearchResults.TIME_LIMIT_EXCEEDED) {
                 message = getLocalizedString("timeLimitExceeded.message");
             }
         }

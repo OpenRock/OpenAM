@@ -244,7 +244,7 @@ public class MAPCreateDeviceModelImpl
         if (getClientCapDataIntInstance().isClientPresent(clientType)) {
             String[] param = {clientType};
             String msg = MessageFormat.format(
-                getLocalizedString("mapClientExist.message"), param);
+                getLocalizedString("mapClientExist.message"), (Object[])param);
             throw new AMConsoleException(msg);
         }
 

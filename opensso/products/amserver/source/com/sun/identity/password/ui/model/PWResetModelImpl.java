@@ -603,7 +603,7 @@ public class PWResetModelImpl
      */
     public void writeLog(String msgId, String msg, String userDN) {
         String[] obj = {userDN};
-        logger.doLog(MessageFormat.format(getLocalizedString(msgId), obj) 
+        logger.doLog(MessageFormat.format(getLocalizedString(msgId), (Object[])obj) 
             + " " + msg);
     }
 

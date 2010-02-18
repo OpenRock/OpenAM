@@ -91,7 +91,7 @@
             source="${target.jdk.set}" target="${target.jdk.set}"
             debug="${build.debug}" debuglevel="${build.debuglevel}">
             <src path="${installtools.source.dir}"/>
-            <compilerarg value="-Xlint:deprecation" />
+            <compilerarg value="-Xlint:none" />
         </javac>
     </target>
 

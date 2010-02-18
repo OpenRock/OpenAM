@@ -165,8 +165,8 @@ public class EntitiesModelImpl
             * For user identities we will modify the search filter so that
             * we can search on a non naming attribute. 
             */
-            IdType type = IdUtils.getType(strType);
-            if (type.equals(IdType.USER) && !pattern.equals("*")) {
+            IdType ltype = IdUtils.getType(strType);
+            if (ltype.equals(IdType.USER) && !pattern.equals("*")) {
                 Map searchMap = new HashMap(2);
                 Set patternSet = new HashSet(2);
                 patternSet.add(pattern);
@@ -190,7 +190,7 @@ public class EntitiesModelImpl
             AMIdentityRepository repo = new AMIdentityRepository(
                 getUserSSOToken(), realmName);
             IdSearchResults results = repo.searchIdentities(
-                type, pattern, idsc);
+                ltype, pattern, idsc);
 
             logEvent("SUCCEED_SEARCH_IDENTITY", params);
             return results;
@@ -534,7 +534,7 @@ public class EntitiesModelImpl
         if (entityName.trim().length() == 0) {
             String msg = getLocalizedString("entities.missing.entityName");
             String[] param = {getLocalizedString(idType)};
-            throw new AMConsoleException(MessageFormat.format(msg, param));
+            throw new AMConsoleException(MessageFormat.format(msg, (Object[])param));
         }
 
         if (realmName == null) {
@@ -586,9 +586,9 @@ public class EntitiesModelImpl
                     Class clazz = Class.forName(
                         "com.sun.identity.wss.security.SecurityMechanism");
                     Method mtd = clazz.getDeclaredMethod(
-                        "getAllWSPSecurityMechanisms", null);
-                    Method mtdGetURI = clazz.getDeclaredMethod("getURI", null);
-                    List securityMech = (List)mtd.invoke(null, null);
+                        "getAllWSPSecurityMechanisms", (Class)null);
+                    Method mtdGetURI = clazz.getDeclaredMethod("getURI", (Class)null);
+                    List securityMech = (List)mtd.invoke(null, (Class)null);
                     StringBuffer securityMechStr = new StringBuffer();
                     boolean first = true;
 
@@ -600,7 +600,7 @@ public class EntitiesModelImpl
                             securityMechStr.append(",");
                         }
                         securityMechStr.append(
-                            (String)mtdGetURI.invoke(mech, null));
+                            (String)mtdGetURI.invoke(mech, (Class)null));
                     }
                     Set agentValues = new HashSet(6);
                     agentValues.add("SecurityMech=" + securityMechStr);
@@ -751,7 +751,7 @@ public class EntitiesModelImpl
                     String[] arg = {
                         Locale.getString(rb, as.getI18NKey(), debug)};
                     throw new AMConsoleException(MessageFormat.format(
-                        expMsg, arg));
+                        expMsg, (Object[])arg));
                 }
             }
         }
@@ -824,16 +824,16 @@ public class EntitiesModelImpl
     public Set getIdTypeMemberOf(String realmName, String idType)
         throws AMConsoleException {
         try {
-            IdType type = IdUtils.getType(idType);
+            IdType ltype = IdUtils.getType(idType);
             Set memberOfs = new HashSet();
-            memberOfs.addAll(type.canBeMemberOf());
+            memberOfs.addAll(ltype.canBeMemberOf());
             discardUnsupportedIdType(realmName, memberOfs);
 
             for (Iterator i = memberOfs.iterator(); i.hasNext(); ) {
                 IdType t = (IdType)i.next();
                 Set canAdd = t.canAddMembers();
 
-                if (!canAdd.contains(type)) {
+                if (!canAdd.contains(ltype)) {
                     i.remove();
                 }
             }

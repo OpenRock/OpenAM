@@ -113,8 +113,8 @@ public class AMCertPath {
             Class trustMgrClass = Class.forName(
                   "com.sun.identity.security.keystore.AMX509TrustManager");
             Object trustMgr = (Object) trustMgrClass.newInstance();
-            Method method = trustMgrClass.getMethod("getKeyStore", null);
-            KeyStore keystore = (KeyStore) method.invoke(trustMgr, null);
+            Method method = trustMgrClass.getMethod("getKeyStore", (Class)null);
+            KeyStore keystore = (KeyStore) method.invoke(trustMgr, (Object)null);
             PKIXParameters pkixparams= new PKIXParameters(keystore);
             if (debug.messageEnabled()) {
                 debug.message("AMCertPath.verify: crlEnabled ---> " + crlEnabled);

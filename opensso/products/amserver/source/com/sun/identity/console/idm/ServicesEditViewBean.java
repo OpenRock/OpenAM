@@ -53,9 +53,9 @@ public class ServicesEditViewBean
      */
     public ServicesEditViewBean() {
         super("ServicesEdit", DEFAULT_DISPLAY_URL, null);
-        String serviceName = (String)getPageSessionAttribute(SERVICE_NAME);
-        if (serviceName != null) {
-            initialize(serviceName);
+        String lserviceName = (String)getPageSessionAttribute(SERVICE_NAME);
+        if (lserviceName != null) {
+            initialize(lserviceName);
         }
     }
 
@@ -130,11 +130,11 @@ public class ServicesEditViewBean
 
     protected String getPageTitle() {
         EntitiesModel model = (EntitiesModel)getModel();
-        String serviceName = model.getLocalizedServiceName(
+        String lserviceName = model.getLocalizedServiceName(
             (String)getPageSessionAttribute(SERVICE_NAME));
-        String[] param = {serviceName};
+        String[] param = {lserviceName};
         return MessageFormat.format(
-            model.getLocalizedString("page.title.entities.editservice"), param);
+            model.getLocalizedString("page.title.entities.editservice"), (Object[])param);
     }
 
     protected boolean isCreateViewBean() {
@@ -143,11 +143,11 @@ public class ServicesEditViewBean
 
     protected String getBreadCrumbDisplayName() {
         EntitiesModel model = (EntitiesModel)getModel();
-        String serviceName = model.getLocalizedServiceName(
+        String lserviceName = model.getLocalizedServiceName(
             (String)getPageSessionAttribute(SERVICE_NAME));
-        String[] param = {serviceName};
+        String[] param = {lserviceName};
         return MessageFormat.format(model.getLocalizedString(
-            "breadcrumbs.editentities.editservice"), param);
+            "breadcrumbs.editentities.editservice"), (Object[])param);
     }
 
     protected boolean startPageTrail() {

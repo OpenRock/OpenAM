@@ -400,7 +400,7 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
         String obj[] = new String[1];
         obj[0] = attrValue;
         return MessageFormat.format(
-            getLocalizedString("pwQuestion.title"), obj);
+            getLocalizedString("pwQuestion.title"), (Object[])obj);
     }
 
     /**
@@ -591,7 +591,7 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
         } else if (warningCount > 0) {
             String obj[] = { String.valueOf(warningCount) };
             errorMsg = MessageFormat.format(
-                getLocalizedString("lockoutWarning.message"), obj);
+                getLocalizedString("lockoutWarning.message"), (Object[])obj);
             warnUser = true;
         }
         return warnUser;

@@ -125,7 +125,7 @@ public class EmailPassword implements NotifyPassword {
 	ResourceBundle rb = PWResetResBundleCacher.getBundle(
                  bundleName,userLocale);
         String msg = MessageFormat.format(
-            rb.getString("resetPassMail.message"), obj);
+            rb.getString("resetPassMail.message"), (Object[])obj);
         String subject = rb.getString("resetSubject.message");
         String to[] = new String[1];
         to[0] = emailAddress;
