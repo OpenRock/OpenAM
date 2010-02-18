@@ -1,3 +1,0 @@
-document.write("<A HREF=\"http://download.java.net/general/opensso/nightly/latest/opensso/opensso_@ZIPNAME@.zip\">opensso_@ZIPNAME@.zip</A>");
-document.write("<br>");
-document.write("<A HREF=\"http://download.java.net/general/opensso/nightly/latest/opensso/opensso_@ZIPNAME@.zip.sha\">[SHA]</A>");

@@ -232,7 +232,7 @@
         </jar>              
        <copy file="${prd.nightly.dist.dir}/opensso/opensso/deployable-war/opensso.war"
            todir="${prd.nightly.dist.dir}/openfm"/>
-       <zip destfile="${prd.nightly.dist.dir}/openfm/opensso_${zipname.set}.zip"
+       <zip destfile="${prd.nightly.dist.dir}/openfm/openam_instant${zipname.set}.zip"
             whenempty="create">
             <zipfileset dir="${prd.nightly.dist.dir}/opensso">
                <exclude name="**/**/ssoupgrade*"/>
@@ -245,8 +245,12 @@
 	</zip>        
         <filter token="ZIPNAME" value="${zipname.set}" />
         
-        <copy file="opensso_link.js.template"
-            tofile="${prd.nightly.dist.dir}/openfm/opensso_link.js" filtering="true"/>
+        <copy file="openam_link.js.template"
+            tofile="${prd.nightly.dist.dir}/openfm/openam_link.js" filtering="true"/>
+        <filter token="BUILD_DATE" value="${time.stamp}" />
+        <copy file="build_date.js.template"
+            tofile="${prd.nightly.dist.dir}/openfm/build_date.js" filtering="true"/>
+
         
         <delete file="${prd.nightly.dist.dir}/openfm/opensso.zip" />
     </target>
