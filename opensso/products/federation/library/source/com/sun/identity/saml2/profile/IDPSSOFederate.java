@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2010 ForgeRock AS
+ *
  * $Id: IDPSSOFederate.java,v 1.27 2009/10/14 23:59:09 exu Exp $
  *
  */
@@ -1017,8 +1019,8 @@ public class IDPSSOFederate {
         // of redirection, forward needs a relative URI.
         StringBuffer gotoURL ;
         if(forward){
-            gotoURL = new StringBuffer(getRelativePath(request.getRequestURL().
-                    toString(),appliRootUrl.toString()));
+            gotoURL = new StringBuffer(getRelativePath(request.getRequestURI(),
+                   request.getContextPath())); 
         }else{
             gotoURL = request.getRequestURL();
         }
