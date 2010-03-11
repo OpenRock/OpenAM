@@ -122,6 +122,7 @@ public class FederationManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
+            "realm|e|s|Realm where entity resides.",
             "spscertalias|a|s|Service provider signing certificate alias",
             "idpscertalias|b|s|Identity provider signing certificate alias",
             "specertalias|r|s|Service provider encryption certificate alias",
