@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.authentication.spi;
 
 import java.io.IOException;
@@ -631,6 +635,45 @@ public abstract class AMLoginModule implements LoginModule {
                     headerWithReplaceTag.indexOf("<BR></BR>")) + "<BR></BR>" + header;
                 pc.setHeader(newHeader);            	
             }
+        }
+    }
+
+    /**
+     * Use this method to replace the header text from the XML file with new
+     * text. This method can be used multiple times on the same state replacing
+     * text with new text each time. Useful for modules that control their own
+     * error handling.
+     *
+     * @param state state state in which the Callback[] to be reset
+     * @param header The text of the header to be replaced
+     * @throws AuthLoginException if state is out of bounds
+     * @supported.api
+     */
+    public void substituteHeader(int state, String header)
+    throws AuthLoginException {
+        if (debug.messageEnabled()) {
+            debug.message("substituteHeader : state=" + state + ", header=" +
+            header);
+        }
+        // check state length
+        if (state > stateLength) {
+            throw new AuthLoginException(bundleName, "invalidState",
+            new Object[]{new Integer(state)});
+        }
+        // check callback length for the state
+        Callback[] ext = getCallback(state);
+        if (ext.length<=0) {
+            throw new AuthLoginException(bundleName, "invalidCallbackIndex",
+            null);
+        }
+
+        // in internal, first Callback is always PagePropertiesCallback
+        if ((header!=null)&&(header.length() != 0)) {
+            PagePropertiesCallback pc =
+            (PagePropertiesCallback)((Callback[]) internal.get(state-1))[0];
+
+            // substitute string
+            pc.setHeader(header);
         }
     }
     
