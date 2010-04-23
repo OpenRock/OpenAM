@@ -1138,12 +1138,16 @@ public class LoginState {
             // Create a new session upon successful authentication 
             // instead using old session and change state from INVALID
             // to VALID only.  
-            SessionID oldSessId = session.getID(); 
-            session = ad.newSession(getOrgDN(), null); 
-            sid = session.getID();
+	    //  THIS IS A DAMBASS FIX
+      	    // IT Breaks Everything.  Revert to proir code....
+            //         SessionID oldSessId = session.getID(); 
+            //         session = ad.newSession(getOrgDN(), null); 
+            //         sid = session.getID();
             if (AuthD.isHttpSessionUsed()) {
+		session = ad.newSession(getOrgDN(), null);
                 //save the AuthContext object in Session
-                //session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, ac);
+                sid = session.getID();
+		//session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, ac);
                 if (hsession != null) {
                     hsession.removeAttribute(
                         ISAuthConstants.AUTH_CONTEXT_OBJ);
@@ -1155,7 +1159,7 @@ public class LoginState {
             }
 
             this.subject = addSSOTokenPrincipal(subject);
-            AuthD.getSS().destroyInternalSession(oldSessId); 
+            //		AuthD.getSS().destroyInternalSession(oldSessId); 
             setSessionProperties(session);
             if ((modulesInSession) && (loginContext != null)) {
                 session.setObject(ISAuthConstants.LOGIN_CONTEXT,
