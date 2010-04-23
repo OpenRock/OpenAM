@@ -1520,7 +1520,8 @@ public class LoginViewBean extends AuthViewBeanBase {
     
     
     // Method to generate HTML page from Callback objects
-    protected void addLoginCallbackMessage(Callback[] callbacks) {
+    protected void addLoginCallbackMessage(Callback[] callbacks)
+    throws Exception {
         loginDebug.message("In addLoginCallbackMessage()");
         buttonOptions = null;
         pageState = null;
@@ -1558,6 +1559,13 @@ public class LoginViewBean extends AuthViewBeanBase {
                         + " image : " + pageImage + " Required list : "
                         + requiredList + " List size : " + lsize
                         + " Page State : " + pageState);
+                }
+
+                // empty callback processing
+                if (callbacks.length == 1) {
+                    onePageLogin = true;
+                    processLoginDisplay();
+                    break;
                 }
             }
         }
