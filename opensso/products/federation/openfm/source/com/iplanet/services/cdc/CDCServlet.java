@@ -132,6 +132,10 @@ public class CDCServlet extends HttpServlet {
     private static final String SELF_PROVIDER_ID =
         FSServiceUtils.getBaseURL() + CDCURI;
     private static final String LOGIN_URI = "loginURI";
+    private static final String RESPONSE_HEADER_ALERT =
+            "X-DSAME-Assertion-Form";
+    private static final String RESPONSE_HEADER_ALERT_VALUE =
+            "true";
     
     private static final List adviceParams = new ArrayList();
     private static HashSet invalidSet = new HashSet();
@@ -853,7 +857,7 @@ public class CDCServlet extends HttpServlet {
             
             response.setContentType("text/html");
             response.setHeader("Pragma", "no-cache");
-            response.setHeader("cdcservlet_auto_post", "true");
+            response.setHeader(RESPONSE_HEADER_ALERT, RESPONSE_HEADER_ALERT_VALUE);
             
             Object[] params = {destURL, b64Resp};
             PrintWriter out = response.getWriter();

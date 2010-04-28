@@ -103,6 +103,10 @@ extends HttpServlet {
     private static final String LOGIN_URI = "loginURI";
     private static String cdcAuthURI;
     private static final String AUTHURI	= "/UI/Login";
+    private static final String RESPONSE_HEADER_ALERT =
+            "X-DSAME-Assertion-Form";
+    private static final String RESPONSE_HEADER_ALERT_VALUE =
+            "true";
     static Debug debug = Debug.getInstance(DEBUG_FILE_NAME);
 
     static {
@@ -696,6 +700,7 @@ extends HttpServlet {
             }
             response.setContentType("text/html");
             response.setHeader("Pragma", "no-cache");
+            response.setHeader(RESPONSE_HEADER_ALERT, RESPONSE_HEADER_ALERT_VALUE);
             PrintWriter out = response.getWriter();
             out.println(authnResponse);
             out.close();
