@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.services.cdc;
 
 import com.iplanet.dpro.session.SessionException;
@@ -127,6 +131,7 @@ public class CDCServlet extends HttpServlet {
     private static final String RELAY_STATE = "RelayState";
     private static final String SELF_PROVIDER_ID =
         FSServiceUtils.getBaseURL() + CDCURI;
+    private static final String LOGIN_URI = "loginURI";
     
     private static final List adviceParams = new ArrayList();
     private static HashSet invalidSet = new HashSet();
@@ -138,6 +143,7 @@ public class CDCServlet extends HttpServlet {
     private static final String JAVASCRIPT              = "javascript:";
     private static final String DELIM                   = ",";
     private static final String DEBUG_FILE_NAME         = "amCDC";
+    private static final char	QUESTION_MARK = '?';
     static Debug  debug = Debug.getInstance(DEBUG_FILE_NAME);
     static {
         adviceParams.add("module");
@@ -559,9 +565,28 @@ public class CDCServlet extends HttpServlet {
                         .append("?").append(TARGET_PARAMETER)
                         .append("=").append(URLEncDec.encode(finalURL))
                         .append("&").append(getParameterString(request));
-                
+
                     // Construct the login URL
-                    redirectURL.append(AUTHURI).append("?");
+                    String loginURI = request.getParameter(LOGIN_URI);
+                    String cdcUrl;
+
+                    if (loginURI != null && !finalURL.equals("")) {
+                        if (debug.messageEnabled()) {
+                            debug.message("CDCServlet.redirectForAuthentication"
+                                +":found " + LOGIN_URI + "=" + loginURI);
+                        }
+
+                        cdcUrl = loginURI;
+                    } else {
+                        cdcUrl = AUTHURI;
+                    }
+
+                    if (debug.messageEnabled()) {
+                        debug.message("CDCServlet init redirect URL is" +
+                            "set to= " + cdcUrl);
+                    }
+                    
+                    redirectURL.append(cdcUrl).append(QUESTION_MARK);
                     // check if this is resource based auth case
                     String resourceAuth = request.getParameter(
                         ISAuthConstants.IP_RESOURCE_ENV_PARAM);
