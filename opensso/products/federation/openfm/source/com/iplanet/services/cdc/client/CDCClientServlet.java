@@ -42,7 +42,6 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -50,11 +49,9 @@ import com.iplanet.sso.SSOTokenManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.URLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,11 +59,6 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.federation.common.IFSConstants;
-import com.sun.identity.federation.services.util.FSServiceUtils;
-
-
-
 
 /**
  * The <code>CDCClientServlet</code> is the heart of the Cross Domain Single
@@ -151,8 +143,6 @@ extends HttpServlet {
     private static String authURLCookieName;
     private static String authURLCookieDomain;
     private static String deployDescriptor;
-    private String policyAdviceList;
-    private String requestParams;
     boolean serverMode = Boolean.valueOf(System.getProperty(
         Constants.SERVER_MODE, SystemProperties.get(Constants.SERVER_MODE, 
         "false"))).booleanValue();
@@ -228,7 +218,7 @@ extends HttpServlet {
      *                             the servlet handles the GET request
      * @exception IOException if the request for the GET could not be handled
      */
-    private void doGetPost( HttpServletRequest  request, 
+    private void doGetPost(HttpServletRequest request, 
             HttpServletResponse response) throws ServletException, IOException {
         if (debug.messageEnabled()) {
             debug.message("CDCClientServlet.doGetPost:Query String received= "
@@ -274,15 +264,13 @@ extends HttpServlet {
         // or if the token is invalid, redirect the user for authentication.
         // Also re-direct if there are policy advices in the query string
         SSOToken token = getSSOToken(request, response);
-        if (token == null) {
-            policyAdviceList = null;
-        }
-        // collect advices in policyAdviceList String and rest of params
-        // other than original goto url in "requestParams" String.
-        parseRequestParams(request);
-        if ((token == null) || (policyAdviceList != null)) {
+        // collect advices in parsedRequestParams[0] String and rest of params
+        // other than original goto url in parsedRequestParams[1] String.
+        String[] parsedRequestParams = parseRequestParams(request);
+
+        if ((token == null) || (parsedRequestParams[0] != null)) {
              // Redirect to authentication
-             redirectForAuthentication(request, response);
+             redirectForAuthentication(request, response, parsedRequestParams[0], parsedRequestParams[1]);
         } else {
 
             // tunnel request to AM
@@ -449,17 +437,18 @@ extends HttpServlet {
 
     /**
      * Gathers the parameters in the request as a HTTP URL string.
-     * to form <code>requestParams</code> String.
+     * to form request parameters and policy advice String array.
      * It collects all the parameters from the original request except
      * the original goto url and any advice parameters.
      * Note: All the paramters will be url decoded by default., we should
      * make sure that these values are encoded again
-     * It also putsthe advice params in a separate <code>policyAdviceList</code>
-     * String.
+     * 
      * @param request an HttpServletRequest object that contains the request
      *                the client has made of the servlet.
+     * @return An String array, index 0 is policy advice, index 1 is rest of the
+     *                request parameters
      */
-    private void parseRequestParams(HttpServletRequest request) {
+    private String[] parseRequestParams(HttpServletRequest request) {
 	StringBuffer adviceList = null;
         StringBuffer parameterString = new StringBuffer(100);
 	for (Enumeration e = request.getParameterNames(); e.hasMoreElements();){
@@ -491,16 +480,23 @@ extends HttpServlet {
                   debug.message("CDCClientServlet.parseRequestParams:"
                       +"Parameter String is = " +  parameterString.toString());
          }
+
+         String policyAdviceList;
+         String requestParams;
+
          if (adviceList == null) { 
             policyAdviceList= null;
          } else {
             policyAdviceList = adviceList.toString();
          }
+
 	 if (parameterString.length() > 0 ) {
              requestParams=  (parameterString.deleteCharAt(0).toString());
 	 } else {
              requestParams = parameterString.toString();
          }
+
+         return new String[] { policyAdviceList, requestParams };
     }
 
     /**
@@ -513,7 +509,8 @@ extends HttpServlet {
      * @exception IOException If an input or output exception occurs
      */
     private void redirectForAuthentication(HttpServletRequest  request,
-        HttpServletResponse response) throws IOException {
+        HttpServletResponse response, String policyAdviceList, String requestParams)
+    throws IOException {
         if (debug.messageEnabled()) {
             debug.message("CDCClientServlet.redirectForAuthentication: "
                 +"requestURL="+request.getRequestURL());
