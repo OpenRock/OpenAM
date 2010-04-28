@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.iplanet.services.cdc.client;
 
@@ -97,7 +99,20 @@ extends HttpServlet {
     private static final String JAVASCRIPT              = "javascript:";
     private static final String DELIM                   = ",";
     private static final String DEBUG_FILE_NAME         = "amCDC";
-    static Debug  debug = Debug.getInstance(DEBUG_FILE_NAME);
+    private static final char	QUESTION_MARK = '?';
+    private static final char	AMPERSAND = '&';
+    private static final char	EQUAL_TO = '=';
+    private static final char   SEMI_COLON = ';';
+    private static final char   SPACE = ' ';
+    private static final char   DOUBLE_QUOTE = '"';
+    private static final String GOTO_PARAMETER = "goto";
+    private static final String TARGET_PARAMETER = "TARGET";
+    private static final String CDCURI	= "/cdcservlet";
+    private static final String LOGIN_URI = "loginURI";
+    private static String cdcAuthURI;
+    private static final String AUTHURI	= "/UI/Login";
+    static Debug debug = Debug.getInstance(DEBUG_FILE_NAME);
+
     static {
     	adviceParams.add("module");
     	adviceParams.add("authlevel");
@@ -127,7 +142,10 @@ extends HttpServlet {
                 }
             }
         }
+        String urlFromProps = SystemProperties.get(Constants.CDCSERVLET_LOGIN_URL);
+        cdcAuthURI = (urlFromProps != null) ? urlFromProps: AUTHURI;
     }
+
     private static SSOTokenManager tokenManager;
     private static String sessionServiceName = "iPlanetAMSessionService";
     private static String authURLCookieName;
@@ -417,9 +435,10 @@ extends HttpServlet {
                 if (cookieStr == null) {
                     cookieStr = new StringBuffer();
                 } else {
-                    cookieStr.append(";");
+                    cookieStr.append(SEMI_COLON).append(SPACE);
                 }
-                cookieStr.append(cookieName).append(EQUAL_TO).append(cookieVal);
+                cookieStr.append(cookieName).append(EQUAL_TO).append(DOUBLE_QUOTE);
+                cookieStr.append(cookieVal).append(DOUBLE_QUOTE);
             }
         }
         if (cookieStr != null) {
@@ -536,24 +555,27 @@ extends HttpServlet {
                     .append(AMPERSAND).append(requestParams);
                     
                 // Construct the login URL
-                String cdcurl = 
-                    SystemProperties.get(Constants.CDCSERVLET_LOGIN_URL);
-                if (cdcurl != null && cdcurl.length() > 0) {
-                    if (cdcurl.indexOf("?") == -1) {
-                        redirectURLStr = cdcurl + QUESTION_MARK;
-                    } else {
-                        redirectURLStr = cdcurl + AMPERSAND;
+                String loginURI = request.getParameter(LOGIN_URI);
+                String cdcUrl;
+
+                if (loginURI != null && !finalURL.equals("")) {
+                    if (debug.messageEnabled()) {
+                        debug.message("CDCClientServlet.redirectForAuthentication"
+                            +":found " + LOGIN_URI + "=" + loginURI);
                     }
+
+                    cdcUrl = loginURI;
                 } else {
-                    redirectURLStr = AUTHURI + QUESTION_MARK;
+                    cdcUrl = cdcAuthURI;
                 }
+
                 if (debug.messageEnabled()) {
                     debug.message("CDCClientServlet init redirect URL is" +
-                        "set to= "+redirectURLStr);
+                        "set to= " + cdcUrl);
                 }
-                
-                
-                redirectURL.append(redirectURLStr);
+                           
+                redirectURL.append(cdcUrl).append(QUESTION_MARK);
+
                 if (policyAdviceList != null) {
                      redirectURL.append(policyAdviceList).append(AMPERSAND);
                 }
@@ -688,14 +710,5 @@ extends HttpServlet {
         } catch(IOException ioe){
             debug.error("CDCServlet.sendAuthnResponse:" + ioe.getMessage());
         }
-    }
-
-    private static final char	QUESTION_MARK = '?';
-    private static final char	AMPERSAND = '&';
-    private static final char	EQUAL_TO = '=';
-    private static final String GOTO_PARAMETER = "goto";
-    private static final String TARGET_PARAMETER = "TARGET";
-    private static final String CDCURI	= "/cdcservlet";
-    private static final String AUTHURI	= "/UI/Login";
-    private static String redirectURLStr = "";    
-}   // CDCServlet
+    }   
+}
