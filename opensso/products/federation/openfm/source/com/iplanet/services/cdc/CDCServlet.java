@@ -143,7 +143,9 @@ public class CDCServlet extends HttpServlet {
     private static final String JAVASCRIPT              = "javascript:";
     private static final String DELIM                   = ",";
     private static final String DEBUG_FILE_NAME         = "amCDC";
-    private static final char	QUESTION_MARK = '?';
+    private static final char	QUESTION_MARK           = '?';
+    private static final char	AMP                     = '&';
+    private static final char	EQUALS                  = '=';
     static Debug  debug = Debug.getInstance(DEBUG_FILE_NAME);
     static {
         adviceParams.add("module");
@@ -196,7 +198,6 @@ public class CDCServlet extends HttpServlet {
     private String authURLCookieName;
     private String authURLCookieDomain;
     private String deployDescriptor;
-    private String policyAdviceList;
     private String responseID;
     private boolean uniqueCookieEnabled;
     
@@ -341,13 +342,10 @@ public class CDCServlet extends HttpServlet {
          * Also re-direct if there are policy advices in the query string
          */
         SSOToken token = getSSOToken(request, response);
-        if (token == null) {
-            policyAdviceList = null;
-        }
 
-        policyAdviceList = checkForPolicyAdvice(request, response);
+        String policyAdviceList = checkForPolicyAdvice(request, response);
         if ((token == null) || (policyAdviceList != null)) {
-            redirectForAuthentication(request, response);
+            redirectForAuthentication(request, response, policyAdviceList);
         } else {
             redirectWithAuthNResponse(request, response, token);
         }
@@ -478,9 +476,9 @@ public class CDCServlet extends HttpServlet {
                 String[] values = request.getParameterValues(paramName);
                 if (values != null) {
                     for (int i = 0; i < values.length; i++) {
-                        parameterString.append("&")
+                        parameterString.append(AMP)
                             .append(paramName)
-                            .append("=")
+                            .append(EQUALS)
                             .append(URLEncDec.encode(values[i]));
                     }
                 }
@@ -504,12 +502,12 @@ public class CDCServlet extends HttpServlet {
                 if (adviceList == null) {
                     adviceList = new StringBuffer();
                 } else {
-                    adviceList.append("&");
+                    adviceList.append(AMP);
                 }
                 String[] values = request.getParameterValues(paramName);
                 if (values != null) {
                     for (int i = 0; i < values.length; i++) {
-                        adviceList.append(paramName).append("=")
+                        adviceList.append(paramName).append(EQUALS)
                             .append(values[i]);
                     }
                 }
@@ -535,7 +533,8 @@ public class CDCServlet extends HttpServlet {
      */
     private void redirectForAuthentication(
         HttpServletRequest  request,
-        HttpServletResponse response
+        HttpServletResponse response,
+        String policyAdviceList
     ) throws IOException {
         StringBuffer redirectURL = new StringBuffer(1024);
         
@@ -562,9 +561,9 @@ public class CDCServlet extends HttpServlet {
                 if (finalURL != null) {
                     StringBuffer gotoURL = new StringBuffer(1024);
                     gotoURL.append(deployDescriptor).append(CDCURI)
-                        .append("?").append(TARGET_PARAMETER)
-                        .append("=").append(URLEncDec.encode(finalURL))
-                        .append("&").append(getParameterString(request));
+                        .append(QUESTION_MARK).append(TARGET_PARAMETER)
+                        .append(EQUALS).append(URLEncDec.encode(finalURL))
+                        .append(AMP).append(getParameterString(request));
 
                     // Construct the login URL
                     String loginURI = request.getParameter(LOGIN_URI);
@@ -595,30 +594,30 @@ public class CDCServlet extends HttpServlet {
                         // this is the resource based authentication case,
                         // append resourceURL since original goto is modified
                         redirectURL.append(ISAuthConstants.RESOURCE_URL_PARAM)
-                                .append("=");
+                                .append(EQUALS);
                         // check if resourceURL is present : J2EE agent case
                         String resourceUrl = request.getParameter(
                             ISAuthConstants.RESOURCE_URL_PARAM);
                         if (resourceUrl == null) {
                             // not presnet, use goto/TARGET as the resource URL
                             redirectURL.append(URLEncDec.encode(finalURL))
-                                .append("&");
+                                .append(AMP);
                         } else {
                             // resourceURL present in request
                             redirectURL.append(URLEncDec.encode(resourceUrl))
-                                .append("&");
+                                .append(AMP);
                         }
                     }
                     if (policyAdviceList != null) {
-                        redirectURL.append(policyAdviceList).append("&");
+                        redirectURL.append(policyAdviceList).append(AMP);
                     }
                     redirectURL.append(GOTO_PARAMETER)
-                        .append("=")
+                        .append(EQUALS)
                         .append(URLEncDec.encode(gotoURL.toString()));
                     
                     // Check for policy advices
                     if (policyAdviceList != null) {
-                        redirectURL.append("&").append(policyAdviceList);
+                        redirectURL.append(AMP).append(policyAdviceList);
                     }
                     if (debug.messageEnabled()) {
                         debug.message("CDCServlet.redirectForAuthentication:" +
@@ -631,7 +630,7 @@ public class CDCServlet extends HttpServlet {
             } else {
                 // Redirect the user to the authenticated URL
                 redirectURL.append(authURL).append(deployDescriptor)
-                    .append(CDCURI).append("?")
+                    .append(CDCURI).append(QUESTION_MARK)
                     .append(request.getQueryString());
                 
                 /*
