@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.distUI;
 
@@ -1186,6 +1189,14 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         // redirect to 'goto' parameter or SPI hook or default
                         // redirect URL.
                         redirect_url = gotoUrl;
+
+                        SSOTokenManager.getInstance().refreshSession(ac.getSSOToken());
+                        String successURLFromSession = ac.getSSOToken().getProperty(ISAuthConstants.POST_PROCESS_SUCCESS_URL);
+
+                        if (successURLFromSession != null) {
+                            redirect_url = successURLFromSession;
+                        }
+
                         if ((gotoUrl == null) || (gotoUrl.length() == 0) ||
                         (gotoUrl.equalsIgnoreCase("null")) ) {
                             redirect_url = ac.getSuccessURL();
