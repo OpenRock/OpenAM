@@ -28,6 +28,8 @@
 #
 #
 
+# "Portions Copyrighted [2010] [ForgeRock AS]"
+
 override BUILD_MODULE=USERX
 
 USERX_ROOT = ../..
@@ -169,6 +171,9 @@ endif
 
 ifeq ($(OS_ARCH), Linux)
 SYSTEM_LIBS := -lpthread -ldl
+	ifeq ($(BUILD_TYPE), 32)
+	SYSTEM_LIBS += -m32
+	endif
 endif
 
 INCLUDE_FLAGS := -I$(REAL_SRC_DIR) -I$(NSPR_INC_DIR) -I$(NSS_INC_DIR) -I$(LIBXML_INC_DIR)

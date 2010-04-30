@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+"Portions Copyrighted [2010] [ForgeRock AS]"
+-->
+
 <project name="open-source-web-agents" default="usage">
                 
     <description>Open Web Single Sign-On Web Agents</description>
@@ -88,6 +92,7 @@
         <fileset dir="${webagents.container.extlib.dir}">
             <include name="**/*.jar"/>
         </fileset>
+	<pathelement location="../installtools/built/classes"/>
     </path>
 
     <target name="preparebuild">
