@@ -452,7 +452,9 @@ public class Logger extends java.util.logging.Logger {
 
         if (loggerExists)  {
             result = (Logger) lm.getLogger(name);
-            return result;
+            if (result != null) {
+                return result;
+            }
         }
         java.util.logging.Logger newLog = (java.util.logging.Logger)
             java.util.logging.Logger.getLogger(name);
@@ -511,7 +513,11 @@ public class Logger extends java.util.logging.Logger {
         Enumeration e = lm.getLoggerNames();
         while (e.hasMoreElements()) {
             if (((String) e.nextElement()).equals(name)) {
-                loggerExists = true;
+                // The LoggerName is in the list, but we should check whether the
+                // referenced Logger still exists, see OPENAM-14
+                if (lm.getLogger(name) != null) {
+                    loggerExists = true;
+                }
             }
         }
         Logger result = (Logger)
