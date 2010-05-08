@@ -1296,6 +1296,12 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         + requiredList + " List size : " + lsize
                         + " Page State : " + pageState);
                 }
+
+                if (callbacks.length == 1) {
+                    onePageLogin = true;
+                    processLoginDisplay();
+                    break; 
+                }
             } else if (callbacks[i] instanceof X509CertificateCallback) {
                 onePageLogin = true;
                 processLoginDisplay();
