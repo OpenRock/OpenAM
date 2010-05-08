@@ -619,10 +619,6 @@ public class CDCServlet extends HttpServlet {
                         .append(EQUALS)
                         .append(URLEncDec.encode(gotoURL.toString()));
                     
-                    // Check for policy advices
-                    if (policyAdviceList != null) {
-                        redirectURL.append(AMP).append(policyAdviceList);
-                    }
                     if (debug.messageEnabled()) {
                         debug.message("CDCServlet.redirectForAuthentication:" +
                             " final forward URL=" + redirectURL.toString());

@@ -559,7 +559,7 @@ extends HttpServlet {
                 String loginURI = request.getParameter(LOGIN_URI);
                 String cdcUrl;
 
-                if (loginURI != null && !finalURL.equals("")) {
+                if (loginURI != null && !loginURI.equals("")) {
                     if (debug.messageEnabled()) {
                         debug.message("CDCClientServlet.redirectForAuthentication"
                             +":found " + LOGIN_URI + "=" + loginURI);
@@ -584,10 +584,6 @@ extends HttpServlet {
                     .append(EQUAL_TO)
                     .append(URLEncDec.encode(gotoURL.toString()));
 
-                // Check for policy advices
-                if (policyAdviceList != null) {
-                    redirectURL.append(AMPERSAND).append(policyAdviceList);
-                }
                 if (debug.messageEnabled()) {
                     debug.message("CDCClientServlet.redirectForAuthentication"
                         +":redirectURL before dispatching is="+redirectURL);
