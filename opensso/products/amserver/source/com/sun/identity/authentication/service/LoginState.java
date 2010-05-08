@@ -27,6 +27,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.service;
 
@@ -2940,7 +2943,7 @@ public class LoginState {
             this.token = ((Principal)p.next()).getName();
             if (this.token != null && !containsToken(pList, token)) {
                 pList.append(this.token).append("|");
-                String tmpDN = DNUtils.normalizeDN(this.token);
+                String tmpDN = (isSessionUpgrade()) ? DNUtils.normalizeDNIgnoringCase(this.token) : DNUtils.normalizeDN(this.token);
                 if (tmpDN != null) {
                     this.userDN = tmpDN;
                     this.token = DNUtils.DNtoName(this.token);

@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.common;
 
 import com.sun.identity.shared.ldap.util.DN;
@@ -53,6 +57,26 @@ public class DNUtils {
                 newDN = null;
             }
         }
+        return newDN;
+    }
+
+    /**
+     * Returns the normalized DN string.
+     * @param dn string needs to be normalized.
+     * @return returns the normalized DN string if the passed in string is in
+     *   DN format otherwise returns null.
+     */
+    public static String normalizeDNIgnoringCase(String dn) {
+        String newDN = null;
+
+        if (dn != null) {
+            newDN = new DN(dn).toRFCString();
+            // in case dn is not a DN, the return value will be "".
+            if (newDN.length() == 0) {
+                newDN = null;
+            }
+        }
+
         return newDN;
     }
 
