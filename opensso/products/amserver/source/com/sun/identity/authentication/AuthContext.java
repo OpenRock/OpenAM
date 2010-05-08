@@ -1207,6 +1207,51 @@ public class AuthContext extends Object implements java.io.Serializable {
             loginException = le;
         }
     }
+
+    /**
+     * Logs out the user and also invalidates the single sign on token
+     * associated with this <code>AuthContext</code>.
+	 *
+	 * This method causes the logout to happen on the server and the 
+	 * correct SPI hooks to be called.
+     *
+     * @throws AuthLoginException if an error occurred during logout.
+     *
+     * @supported.api
+     */
+    public void logoutUsingTokenID()
+    throws AuthLoginException {
+        if (localFlag) {
+            return;
+        }
+
+        // Construct the XML
+        try {
+            StringBuffer xml = new StringBuffer(100);
+            String[] authHandles = new String[1];
+            authHandles[0] = ssoToken.getTokenID().toString();
+            xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
+            (Object[]) authHandles));
+            if (appSSOToken != null) {
+                xml.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
+                xml.append(appSSOToken.getTokenID().toString()).
+                    append(AuthXMLTags.APPSSOTOKEN_END);
+            }
+            xml.append(AuthXMLTags.LOGOUT_BEGIN)
+            .append(AuthXMLTags.LOGOUT_END)
+            .append(AuthXMLTags.XML_REQUEST_SUFFIX);
+
+            // Send the request to be processes
+            receivedDocument = processRequest(xml.toString());
+
+            // Check set the login status
+            checkAndSetLoginStatus();
+        } catch (AuthLoginException le) {
+            // Login has failed
+            loginStatus = Status.FAILED;
+            loginException = le;
+        }
+    }
     
     /**
      * Returns login exception, if any, during the authentication process.

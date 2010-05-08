@@ -135,7 +135,11 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     indexName = AuthClientUtils.getIndexName(ssoToken, indexType);
                 }
             }
-            manager.destroyToken(ssoToken);
+
+            AuthContext ac = new AuthContext(ssoToken);
+            ac.login();
+            ac.logoutUsingTokenID();
+            //manager.destroyToken(ssoToken);
             logoutDebug.message("logout successfully");
             rb =  rbCache.getResBundle(bundleName, locale);
             ResultVal = rb.getString("logout.successful");
