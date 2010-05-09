@@ -790,16 +790,13 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
             if (credentials != null) {
                 onePageLogin = true;
-                userCredentials = new String[2];
-                userCredentials[0] =  XMLUtils.escapeSpecialCharacters(
-                        (String)reqDataHash.get(
-                        tokenType + ((Integer)credentials.get(0)).toString()));
-                if (credentials.size() >= 2) {
-                    userCredentials[1] = XMLUtils.escapeSpecialCharacters(
-                        (String)reqDataHash.get(tokenType + 
-                         ((Integer)credentials.get(1)).toString()));
-                } else {
-                    userCredentials[1] = "";
+                userCredentials = new String[credentials.size()];
+                
+                for (int c = 0; c < userCredentials.length; c++) {
+                    userCredentials[c] = XMLUtils.escapeSpecialCharacters(
+							(String)reqDataHash.get(
+                            tokenType + ((Integer)credentials.get(c)).toString()));
+						loginDebug.message("STEVE" + userCredentials[c]);
                 }
             }
         }
