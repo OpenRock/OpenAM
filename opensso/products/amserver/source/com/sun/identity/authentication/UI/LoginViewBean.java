@@ -1594,7 +1594,8 @@ public class LoginViewBean extends AuthViewBeanBase {
         } else if ( reqDataHash.get("role") != null ) {
             indexType = AuthContext.IndexType.ROLE;
             indexName = (String)reqDataHash.get("role");
-        } else if ( reqDataHash.get("service") != null ) {
+	} else if ( reqDataHash.get("service") != null &&
+		    reqDataHash.get(Constants.COMPOSITE_ADVICE) == null) {
             indexType = AuthContext.IndexType.SERVICE;
             indexName = (String)reqDataHash.get("service");
         } else if ( (reqModule != null) && 
