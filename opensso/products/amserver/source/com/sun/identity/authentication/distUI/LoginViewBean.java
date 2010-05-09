@@ -303,7 +303,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             // will be used to retrieve the session for session upgrade
             SessionID sessionID = AuthClientUtils.getSessionIDFromRequest(request);
             ssoToken = AuthClientUtils.getExistingValidSSOToken(sessionID);
-            orgName = AuthClientUtils.getDomainNameByRequest(reqDataHash);	 
+	     orgName = AuthClientUtils.getDomainNameByRequest(request, reqDataHash);	 
             prepareLoginParams();
             //Check for session Timeout
             if((ssoToken == null) && (sessionID != null) &&
