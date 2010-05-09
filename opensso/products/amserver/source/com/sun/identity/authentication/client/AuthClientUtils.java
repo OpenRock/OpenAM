@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.client;
 
@@ -824,7 +827,8 @@ public class AuthClientUtils {
                 if (!isContain(value, tmp)) {
                     upgrade = true;
                 }
-            } else if (reqDataHash.get("service")!=null) {
+	            } else if (reqDataHash.get("service")!=null &&
+	                    reqDataHash.get(Constants.COMPOSITE_ADVICE) == null) {
                 if(utilDebug.messageEnabled()) {
                     utilDebug.message("AuthClientUtils.checkSessionUpgrade:"
                          +" service");
