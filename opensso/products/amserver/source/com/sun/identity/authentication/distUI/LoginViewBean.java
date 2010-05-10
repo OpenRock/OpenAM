@@ -796,7 +796,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     userCredentials[c] = XMLUtils.escapeSpecialCharacters(
 							(String)reqDataHash.get(
                             tokenType + ((Integer)credentials.get(c)).toString()));
-						loginDebug.message("STEVE" + userCredentials[c]);
                 }
             }
         }
@@ -1475,7 +1474,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             String orgName = ssoToken.getProperty("Organization");
             String orgParam = AuthClientUtils.getOrgParam(reqDataHash);
             String queryOrg = (orgParam != null)? orgParam : "/";
-            String newOrgName = AuthClientUtils.getDomainNameByRequest(reqDataHash);
+            String newOrgName = AuthClientUtils.getDomainNameByRequest(request,reqDataHash);
             if (loginDebug.messageEnabled()) {
                 loginDebug.message("original org is : " + orgName);
                 loginDebug.message("query org is : " + queryOrg);
