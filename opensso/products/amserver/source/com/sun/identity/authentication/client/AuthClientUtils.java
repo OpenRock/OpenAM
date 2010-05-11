@@ -501,7 +501,46 @@ public class AuthClientUtils {
             utilDebug.message("createCookie Cookie is set : " + cookie);
         }
         return (cookie);
-    }    
+    }
+
+    /**
+     * Creates a Cookie with the <code>cookieName</code>,
+     * <code>cookieValue</code> for the cookie domains specified.
+     *
+     * @param cookieName is the name of the cookie
+     * @param cookieValue is the value fo the cookie
+     * @param cookieDomain Domain for which the cookie is to be set.
+     * @param path The path into which the cookie shall be set
+     * @return the cookie object.
+     */
+    public static Cookie createCookie(String cookieName,
+                               String cookieValue,
+                               String cookieDomain,
+                               String path) {
+        if (utilDebug.messageEnabled()) {
+            utilDebug.message("cookieName   : " + cookieName);
+            utilDebug.message("cookieValue  : " + cookieValue);
+            utilDebug.message("cookieDomain : " + cookieDomain);
+            utilDebug.message("path : " + path);
+        }
+
+        Cookie cookie = null;
+
+        try {
+            cookie = CookieUtils.newCookie(cookieName, cookieValue,
+                        path, cookieDomain);
+        } catch (Exception ex) {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("Error creating cookie. : " + ex.getMessage());
+            }
+        }
+
+        if (utilDebug.messageEnabled()) {
+            utilDebug.message("createCookie Cookie is set : " + cookie);
+        }
+
+        return cookie;
+    }
 
     public static void clearlbCookie(HttpServletRequest request,
             HttpServletResponse response) {
@@ -2365,56 +2404,70 @@ public class AuthClientUtils {
             if (key != null && (key.equalsIgnoreCase("Set-cookie") ||
                 (key.equalsIgnoreCase("Cookie")))) {
                 List list = (List)me.getValue();
+
                 if (list == null || list.isEmpty()) {
                     continue;
                 }
+
                 Cookie cookie = null;
                 String domain = null;
                 String path = null;
+                String cookieName = null;
+                String cookieValue = null;
+
                 for (Iterator it = list.iterator(); it.hasNext(); ) {
                     String cookieStr = (String)it.next();
+
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("processCookies : cookie : " 
                                           + cookieStr);
                     }
+
                     StringTokenizer stz = new StringTokenizer(cookieStr, ";");
-                    if (stz.hasMoreTokens()) {
+
+                    while (stz.hasMoreTokens()) {
                         String nameValue = (String)stz.nextToken();
                         int index = nameValue.indexOf("=");
+
                         if (index == -1) {
                             continue;
                         }
-                        String tmpName = nameValue.substring(0, index).trim();
-                        String value = nameValue.substring(index + 1);
+
+                        String nameofParam = nameValue.substring(0, index).trim();
+                        String nameOfValue = nameValue.substring(index + 1);
 
                         /* decode the cookie if it is already URLEncoded,
                          * we have to pass non URLEncoded cookie to 
                          * createCookie method
                          */
-                        if (isURLEncoded(value)) {
+                        if (isURLEncoded(nameOfValue)) {
                             try {
-                                value = URLDecoder.decode(value, "UTF-8");
+                                nameOfValue = URLDecoder.decode(nameOfValue, "UTF-8");
                             } catch (java.io.UnsupportedEncodingException e) {
                                 // this would not happen for UTF-8
                             }
                         }
 
-                        Set domains = getCookieDomainsForReq(request);
-                        if (!domains.isEmpty()) {
-                            for (Iterator itcd = 
-                                 domains.iterator(); itcd.hasNext(); ) {
-                                domain = (String)itcd.next();
-                                cookie = createCookie(tmpName, value, domain);
-                                if("LOGOUT".equals(value)){
-                                    cookie.setMaxAge(0);
-                                }                    
-                                response.addCookie(cookie);
-                            }
+                        if (nameofParam.equalsIgnoreCase("Domain")) {
+                            domain = nameOfValue;
+                        } else if (nameofParam.equalsIgnoreCase("Expires")) {
+                            // we don't care about the cookie expiry
+                            continue;
+                        } else if (nameofParam.equalsIgnoreCase("Path")) {
+                            path = nameOfValue;
                         } else {
-                            cookie = createCookie(tmpName, value, null);
-                            response.addCookie(cookie);
+                            cookieName = nameofParam;
+                            cookieValue = nameOfValue;
                         }
                     }
+
+                    cookie = createCookie(cookieName, cookieValue, domain, path);
+
+                    if("LOGOUT".equals(cookieValue)){
+                        cookie.setMaxAge(0);
+                    }
+
+                    response.addCookie(cookie);
                 }
             }
         }
