@@ -2299,6 +2299,48 @@ public abstract class AMLoginModule implements LoginModule {
          }
     }
 
+    /**
+     * Get the maximum number failed login attempts permitted for a user
+     * before when their account is locked out.
+     *
+     * @return the maximum number of failed attempts
+     * @supported.api
+     */
+    public int getMaximumFailCount()
+    throws AuthenticationException {
+        if (loginState == null) {
+            loginState = getLoginState();
+
+            if (loginState == null) {
+                throw new AuthenticationException(bundleName, "nullLoginState",
+                    null);
+            }
+        }
+
+        return loginState.getLoginFailureLockoutCount();
+    }
+
+    /**
+     * Increments the fail count for the given user.
+     *
+     * @throws AuthenticationException if the user name passed in is not valid
+     * or null, or for any other error condition.
+     * @supported.api
+     */
+    public void incrementFailCount(String userName)
+    throws AuthenticationException {
+        if (loginState == null) {
+            loginState = getLoginState();
+
+            if (loginState == null) {
+                throw new AuthenticationException(bundleName, "nullLoginState",
+                    null);
+            }
+        }
+
+        loginState.incrementFailCount(userName);
+    }
+
     /* returns the normalized DN  */
     private String normalizeDN(String userDN) {
         String normalizedDN = userDN;
