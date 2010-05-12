@@ -65,6 +65,9 @@ public class Locale {
 
     private static final SimpleDateFormat normalizedDateFormat;
 
+    private static final String UNDERSCORE = "_";
+    private static final String HYPHEN = "-";
+
     /*
      * The list of characters that are not encoded have been determined by
      * referencing O'Reilly's "HTML: The Definitive Guide" (page 164).
@@ -106,29 +109,43 @@ public class Locale {
 
     /**
      * Gets the locale object for the specified localized string format.
+     *
+     * RFC4646 states that the subtags are distinguished from each other using
+     * a hyphen. The current implementation uses an underscore. This fix allows
+     * both.
      * 
      * @param stringformat
      *            String representation of the locale. Examples:
-     *            <code>en_US, en_UK, ja_JP</code>.
+     *            <code>en_US, en_UK, ja_JP, fr-CA</code>.
      * @return the <code>java.util.locale</code> object.
      */
     public static java.util.Locale getLocale(String stringformat) {
         if (stringformat == null)
             return java.util.Locale.getDefault();
 
-        StringTokenizer tk = new StringTokenizer(stringformat, "_");
+        StringTokenizer tk = null;
         String lang = "";
         String country = "";
         String variant = "";
 
-        if (tk.hasMoreTokens())
-            lang = tk.nextToken();
-        if (tk.hasMoreTokens())
-            country = tk.nextToken();
-        if (tk.hasMoreTokens())
-            variant = tk.nextToken();
+        if (stringformat.contains(HYPHEN)) {
+            tk = new StringTokenizer(stringformat, HYPHEN);
+        } else {
+            tk = new StringTokenizer(stringformat, UNDERSCORE);
+        }
 
-        return new java.util.Locale(lang, country, variant);
+        if (tk != null) {
+            if (tk.hasMoreTokens())
+                lang = tk.nextToken();
+            if (tk.hasMoreTokens())
+                country = tk.nextToken();
+            if (tk.hasMoreTokens())
+                variant = tk.nextToken();
+
+            return new java.util.Locale(lang, country, variant);
+        } else {
+            return java.util.Locale.getDefault();
+        }
     }
 
     /**
