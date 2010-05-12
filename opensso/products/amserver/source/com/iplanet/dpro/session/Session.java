@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
@@ -867,7 +871,41 @@ public class Session extends GeneralTaskRunnable {
         else
             return false;
     }
-    
+
+    /**
+     * This method will use the session service to determine the master token id
+     * for the given restricted token id.
+     *
+     * @param s The authorizing session, must be amadmin token
+     * @param restrictedId The SSOTokenID string of the restricted token
+     * @return The master token id
+     * @throws SessionException If the master token is not found
+     */
+    public String dereferenceRestrictedTokenID(Session s, String restrictedId)
+    throws SessionException {
+        String masterSID = null;
+
+        try {
+            masterSID = sessionService.deferenceRestrictedID(s, restrictedId);
+        }
+        catch (Exception e) {
+            sessionDebug.error("unable to find master token for  " + restrictedId, e);
+            throw new SessionException(e);
+        }
+
+        return masterSID;
+    }
+
+    /**
+     * Returns true if this token is has a restriction.
+     *
+     * @return true if the token is restricted, false otherwise
+     * @throws SessionException Unable to fetch restriction
+     */
+    public boolean isRestricted() throws SessionException {
+        return (this.getRestriction() != null ? true : false);
+    }
+
     /**
      * Gets the Session Service URL for this session object.
      * 

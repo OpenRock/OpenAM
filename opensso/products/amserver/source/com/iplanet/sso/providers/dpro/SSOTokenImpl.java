@@ -26,9 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.sso.providers.dpro;
 
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionListener;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -568,5 +573,51 @@ class SSOTokenImpl implements SSOToken {
      */
     Session getSession() {
         return SSOSession;
+    }
+
+    /**
+     * Determines if the token to which this instance refers represents a
+     * restricted token. This is use since property manipulations are
+     * forbidden on a restricted token.
+     *
+     * Uses the isRestricted method on the underlying Session instance.
+     *
+     * @return true if this token is restricted, false otherwise
+     * @throws SSOException If the token's level of restriction cannot be determined
+     */
+    public boolean isTokenRestricted()
+    throws SSOException {
+        boolean restricted = false;
+
+        try {
+            restricted = SSOSession.isRestricted();
+        } catch (SessionException se) {
+            throw new SSOException(se);
+        }
+
+        return restricted;
+    }
+
+    /**
+     * De-references a restricted id to the associated master token id. This method
+     * will only work on the OpenAM server itself and not in the OpenAM Client SDK.
+     *
+     * @param requester Represents an amadmin SSOToken
+     * @param restrictedId The SSOTokenID string of the restricted token to be de-referenced
+     * @return The master token id that 'owns' the restricted token
+     * @throws SSOException Unable to de-reference the restricted token idq
+     */
+    public String dereferenceRestrictedTokenID(SSOToken requester, String restrictedId)
+    throws SSOException {
+        String masterSID = null;
+
+        try {
+            masterSID = SSOSession.dereferenceRestrictedTokenID(((SSOTokenImpl)requester).getSession(), restrictedId);
+        } catch (Exception e) {
+            SSOProviderImpl.debug.error("Can't dereference master token for id :  " + restrictedId, e);
+            throw new SSOException(e);
+        }
+
+        return masterSID;
     }
 }

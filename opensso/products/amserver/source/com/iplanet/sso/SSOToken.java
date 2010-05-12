@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.sso;
 
 
@@ -227,4 +231,28 @@ public interface SSOToken {
      *                if URL cannot be encoded.
      */
     public String encodeURL(String url) throws SSOException;
+
+    /**
+     * Determines if the token to which this instance refers represents a
+     * restricted token. This is use since property manipulations are
+     * forbidden on a restricted token.
+     *
+     * @return true if this token is restricted, false otherwise
+     * @throws SSOException If the token's level of restriction cannot be determined
+     */
+    public boolean isTokenRestricted()
+    throws SSOException;
+
+    /**
+     * De-references a restricted id to the associated master token id. This method
+     * will only work on the OpenAM server itself and not in the OpenAM Client SDK.
+     *
+     * @param requester Represents an amadmin SSOToken
+     * @param restrictedId The SSOTokenID string of the restricted token to be de-referenced
+     * @return The master token id that 'owns' the restricted token
+     * @throws SSOException Unable to de-reference the restricted token id
+     */
+    public String dereferenceRestrictedTokenID(SSOToken requester, String restrictedId)
+    throws SSOException;
+
 }
