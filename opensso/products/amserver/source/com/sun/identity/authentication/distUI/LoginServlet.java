@@ -37,13 +37,14 @@ import com.iplanet.jato.ViewBeanManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -154,6 +155,22 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                             (String)origRequestData.get("OUTPUT_DATA");
                         clientType =
                             (String)origRequestData.get("AM_CLIENT_TYPE");
+                    } else {
+                        Set domainsList = AuthClientUtils.getCookieDomains();
+
+                        if (domainsList != null) {
+                            Iterator domains = domainsList.iterator();
+                            String domain = null;
+
+                            while (domains.hasNext()) {
+                                domain = (String) domains.next();
+                                response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
+
+                                if (debug.messageEnabled()) {
+                                    debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                                }
+                            }
+                        }
                     }
                     if (((redirect_url != null) && !redirect_url.equals("")) &&
                         AuthClientUtils.isGenericHTMLClient(clientType)) {
@@ -169,6 +186,22 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                     if (debug.messageEnabled()) {
                         debug.message("LoginServlet error in Request Routing : "
                             + e.toString());
+                    }
+
+                    Set domainsList = AuthClientUtils.getCookieDomains();
+
+                    if (domainsList != null) {
+                        Iterator domains = domainsList.iterator();
+                        String domain = null;
+
+                        while (domains.hasNext()) {
+                            domain = (String) domains.next();
+                            response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
+
+                            if (debug.messageEnabled()) {
+                                debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                            }
+                        }
                     }
                 }
                 throw new CompleteRequestException();
