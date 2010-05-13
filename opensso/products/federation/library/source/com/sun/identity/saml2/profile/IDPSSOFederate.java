@@ -30,7 +30,6 @@
 
 package com.sun.identity.saml2.profile;
 
-import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.multiprotocol.MultiProtocolUtils;
 import com.sun.identity.multiprotocol.SingleLogoutManager;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
@@ -55,11 +54,9 @@ import com.sun.identity.saml2.plugins.IDPAuthnContextInfo;
 import com.sun.identity.saml2.plugins.IDPAuthnContextMapper;
 import com.sun.identity.saml2.plugins.IDPECPSessionMapper;
 import com.sun.identity.saml2.protocol.AuthnRequest;
-import com.sun.identity.saml2.protocol.RequestedAuthnContext;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
-import com.sun.identity.saml2.protocol.Scoping;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
@@ -71,7 +68,6 @@ import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.Iterator;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
@@ -85,6 +81,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.servlet.ServletException;
 import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 
 /**
  * This class handles the federation and/or single sign on request
@@ -140,7 +137,7 @@ public class IDPSSOFederate {
         if (FSUtils.needSetLBCookieAndRedirect(request, response, true)) {
             return;
         }
-        String preferredIDP = null; 
+        String preferredIDP = null;
         Map paramsMap = new HashMap(); 
         //IDP Proxy with introduction cookie case. 
         //After reading the introduction cookie, it redirects to here. 
@@ -651,6 +648,79 @@ public class IDPSSOFederate {
                             IDPCache.relayStateCache.put(reqID, relayState);
                         }
 
+                        //IDP Proxy: Initiate proxying when session upgrade is requested
+                        // Session upgrade could be requested by asking a greater AuthnContext
+                        try {
+                            boolean isProxy = IDPProxyUtil.isIDPProxyEnabled(
+                                    authnReq, realm);
+                            if (isProxy) {
+                                preferredIDP = IDPProxyUtil.getPreferredIDP(
+                                        authnReq, idpEntityID, realm, request,
+                                        response);
+                                if (preferredIDP != null) {
+                                    if ((SPCache.reqParamHash != null)
+                                            && (!(SPCache.reqParamHash.containsKey(preferredIDP)))) {
+                                        // IDP Proxy with configured proxy list
+                                        if (SAML2Utils.debug.messageEnabled()) {
+                                            SAML2Utils.debug.message(classMethod
+                                                    + "IDP to be proxied" + preferredIDP);
+                                        }
+                                        IDPProxyUtil.sendProxyAuthnRequest(
+                                                authnReq, preferredIDP, spSSODescriptor,
+                                                idpEntityID, request, response, realm,
+                                                relayState, binding);
+                                        return;
+                                    } else {
+                                        // IDP proxy with introduction cookie
+                                        paramsMap = (Map) SPCache.reqParamHash.get(preferredIDP);
+                                        paramsMap.put("authnReq", authnReq);
+                                        paramsMap.put("spSSODescriptor",
+                                                spSSODescriptor);
+                                        paramsMap.put("idpEntityID", idpEntityID);
+                                        paramsMap.put("realm", realm);
+                                        paramsMap.put("relayState", relayState);
+                                        paramsMap.put("binding", binding);
+                                        SPCache.reqParamHash.put(preferredIDP,
+                                                paramsMap);
+                                        return;
+                                    }
+                                }
+                            }
+                            //else continue for the local authentication.
+                        } catch (SAML2Exception re) {
+                            if (SAML2Utils.debug.messageEnabled()) {
+                                SAML2Utils.debug.message(classMethod
+                                        + "Redirecting for the proxy handling error: "
+                                        + re.getMessage());
+                            }
+                            sendError(request, response,
+                                    SAML2Constants.SERVER_FAULT,
+                                    "UnableToRedirectToPreferredIDP", re.getMessage(),
+                                    isFromECP);
+                        }
+                        // End of IDP Proxy: Initiate proxying when session upgrade is requested
+
+                        // Invoke the IDP Adapter when a session upgrade has been requested
+                        try {
+                            SAML2Utils.debug.message(classMethod + " Invoking the " +
+                                    "IDP Adapter after session upgrade requested");
+                            // Get the IDP Adapter
+                            SAML2IdentityProviderAdapter idpAdapter =
+                                    IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                            if (idpAdapter != null) {
+                                // If the preSendResponse method returns true we end here
+                                if (idpAdapter.preSendResponse(authnReq, idpEntityID,
+                                        realm, request, response, session, reqID, relayState)) {
+                                    return;
+                                }  // else we continue with the logic. Beware of loops
+                            }
+                        } catch (SAML2Exception se2) {
+                            SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
+                                    + "the preSendResponse of the IDP Adapter " +
+                                    "during the session upgrade request: ", se2);
+                        }
+                        // End of block for IDP Adapter invocation
+
                         try {
                              redirectAuthentication(request, response, reqID,
                                  idpAuthnContextInfo, realm, idpEntityID,
@@ -680,8 +750,50 @@ public class IDPSSOFederate {
                     // redirecting to authentication url.
                     // generate assertion response
                     if (!sessionUpgrade) {
-                         // call multi-federation protocol to set the protocol
-                         MultiProtocolUtils.addFederationProtocol(session, 
+                        // IDP Adapter invocation, to be sure that we can execute the logic
+                        // even if there is a new request with the same session
+                        
+                        // save the AuthnRequest in the IDPCache so that it can be
+                        // retrieved later when the user successfully authenticates                        
+                        synchronized (IDPCache.authnRequestCache) {
+                            IDPCache.authnRequestCache.put(reqID,
+                                    new CacheObject(authnReq));
+                        }
+
+                        // save the AuthnContext in the IDPCache so that it can be
+                        // retrieved later when the user successfully authenticates
+                        synchronized (IDPCache.idpAuthnContextCache) {
+                            IDPCache.idpAuthnContextCache.put(reqID,
+                                    new CacheObject(matchingAuthnContext));
+                        }
+
+                        // save the relay state in the IDPCache so that it can be
+                        // retrieved later when the user successfully authenticates
+                        if (relayState != null && relayState.trim().length() != 0) {
+                            IDPCache.relayStateCache.put(reqID, relayState);
+                        }
+
+                        try {
+                            SAML2Utils.debug.message(classMethod + " Invoking the " +
+                                    "IDP Adapter after NO session upgrade requested");
+                            SAML2IdentityProviderAdapter idpAdapter =
+                                    IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                            if (idpAdapter != null) {
+                                // If the preSendResponse returns true we end here
+                                if (idpAdapter.preSendResponse(authnReq, idpEntityID,
+                                        realm, request, response, session, reqID, relayState)) {
+                                    return;
+                                }  // else we continue with the logic. Beware of loops
+                            }
+                        } catch (SAML2Exception se2) {
+                            SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
+                                    + "the preSendResponse of the IDP Adapter " +
+                                    "during the session upgrade request: ", se2);
+                        }
+                        // preSendResponse IDP adapter invocation ended
+
+                        // call multi-federation protocol to set the protocol                       
+                        MultiProtocolUtils.addFederationProtocol(session, 
                              SingleLogoutManager.SAML2);
                         NameIDPolicy policy = authnReq.getNameIDPolicy();
                         String nameIDFormat =
@@ -704,7 +816,45 @@ public class IDPSSOFederate {
             } else {
                 // the second visit, the user has already authenticated
                 // retrieve the cache authn request and relay state
+
+                // We need the session to pass it to the IDP Adapter preSendResponse
+                SessionProvider sessionProvider = SessionManager.getProvider();
+                session = sessionProvider.getSession(request);
+
+                // Get the cached Authentication Request and Relay State before
+                // invoking the IDP Adapter
+
                 CacheObject cacheObj = null;
+                synchronized (IDPCache.authnRequestCache) {
+                    cacheObj =
+                        (CacheObject)IDPCache.authnRequestCache.get(reqID);
+                }
+                if (cacheObj != null) {
+                    authnReq = (AuthnRequest)cacheObj.getObject();
+                }
+
+                relayState =(String)IDPCache.relayStateCache.get(reqID);
+
+                // Invoke the IDP Adapter after the user has been authenticated
+                try {
+                        SAML2Utils.debug.message(classMethod + " Invoking the " +
+                                    "IDP Adapter after the user has been authenticated");
+                        SAML2IdentityProviderAdapter idpAdapter =
+                                IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                        if (idpAdapter != null) {
+                            // Id adapter returns true we end here
+                            if (idpAdapter.preSendResponse(authnReq, idpEntityID,
+                                    realm, request, response, session, reqID, relayState)) {
+                                return;
+                            }  // else we continue with the logic. Beware of loops
+                        }           
+                } catch (SAML2Exception se2) {
+                    SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
+                                    + "the preSendResponse of the IDP Adapter " +
+                                    "after the user authenticated: ", se2);
+                }
+                // End of block for IDP Adapter invocation
+
                 synchronized (IDPCache.authnRequestCache) {
                     cacheObj =
                         (CacheObject)IDPCache.authnRequestCache.remove(reqID);
@@ -741,8 +891,6 @@ public class IDPSSOFederate {
                         isSessionUpgrade =  true;
                     }
                 }
-                SessionProvider sessionProvider = SessionManager.getProvider();
-                session = sessionProvider.getSession(request);
                 if (isSessionUpgrade) {
                     IDPSession oldSess = 
                         (IDPSession)IDPCache.oldIDPSessionCache.remove(reqID);
@@ -764,6 +912,7 @@ public class IDPSSOFederate {
                     MultiProtocolUtils.addFederationProtocol(session, 
                         SingleLogoutManager.SAML2);
                 }
+                
                 // generate assertion response
                 String spEntityID = authnReq.getIssuer().getValue();
                 NameIDPolicy policy = authnReq.getNameIDPolicy();
@@ -885,6 +1034,7 @@ public class IDPSSOFederate {
                         bis = new ByteArrayInputStream(raw);
                         Document doc = XMLUtils.toDOMDocument(bis,
                             SAML2Utils.debug);
+                        SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: decoded SAMl2 Authn Request: " + XMLUtils.print(doc.getDocumentElement()));
                         if (doc != null) {
                             authnRequest = ProtocolFactory.getInstance().
                                 createAuthnRequest(doc.getDocumentElement());
@@ -1020,7 +1170,7 @@ public class IDPSSOFederate {
         StringBuffer gotoURL ;
         if(forward){
             gotoURL = new StringBuffer(getRelativePath(request.getRequestURI(),
-                   request.getContextPath())); 
+                   request.getContextPath()));
         }else{
             gotoURL = request.getRequestURL();
         }

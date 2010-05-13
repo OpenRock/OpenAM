@@ -217,6 +217,7 @@
         <copy file="${openfm.dir}/www/jsp/validatorFooter.jsp" todir="${war.package.dir}" />
         <copy file="${openfm.dir}/www/jsp/validatorRpt.jsp" todir="${war.package.dir}" />
         <copy file="${openfm.dir}/www/jsp/validatorAuthFail.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/proxyidpfinder.jsp" todir="${war.package.dir}" />
 
         <copy file="${library.dir}/www/config/federation/index.html" todir="${war.package.dir}/config/federation" />
 

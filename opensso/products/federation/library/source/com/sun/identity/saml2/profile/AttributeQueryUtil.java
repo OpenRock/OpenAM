@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2010 ForgeRock AS
+ *
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
  */
@@ -63,6 +65,7 @@ import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.Subject;
+import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
@@ -70,8 +73,11 @@ import com.sun.identity.saml2.jaxb.assertion.AttributeElement;
 import com.sun.identity.saml2.jaxb.assertion.AttributeValueElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeAuthorityConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeQueryConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AttributeAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.AttributeServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.NameIDMappingServiceElement;
 import com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement;
 import com.sun.identity.saml2.key.EncInfo;
 import com.sun.identity.saml2.key.KeyUtil;
@@ -85,6 +91,7 @@ import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.saml2.xmlenc.EncManager;
+import java.io.IOException;
 
 
 /**
@@ -171,8 +178,77 @@ public class AttributeQueryUtil {
         }
     }
 
+     /**
+     * Sends the <code>AttributeQuery</code> to specifiied
+     * attribute authority and returns <code>Response</code> coming
+     * from the attribute authority.
+     *
+     * @param attrQuery the <code>AttributeQuery</code> object
+     * @param request the HTTP Request
+     * @param  response the HTTP Response
+     * @param attrAuthorityEntityID entity ID of attribute authority
+     * @param realm the realm of hosted entity
+     * @param attrQueryProfile the attribute query profile or null to ignore
+     * @param attrProfile the attribute profile
+     * @param binding the binding
+     *
+     * @return the <code>Response</code> object
+     * @exception SAML2Exception if the operation is not successful
+     *
+     * @supported.api
+     */
+     public static void sendAttributeQuery(AttributeQuery attrQuery,
+        HttpServletRequest request, HttpServletResponse response,
+        String attrAuthorityEntityID, String realm, String attrQueryProfile,
+        String attrProfile, String binding) throws SAML2Exception {
+
+        AttributeAuthorityDescriptorElement aad = null;
+        try {
+             aad = metaManager.getAttributeAuthorityDescriptor(
+                realm, attrAuthorityEntityID);
+        } catch (SAML2MetaException sme) {
+            SAML2Utils.debug.error("AttributeQueryUtil.sendAttributeQuery:",
+                sme);
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("metaDataError"));
+        }
+
+        if (aad == null) {
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("attrAuthorityNotFound"));
+        }
+
+        if (binding == null) {
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("unsupportedBinding"));
+        }
+
+        String location = findLocation(aad, binding, attrQueryProfile,
+             attrProfile);
+
+        if (location == null) {
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("attrAuthorityNotFound"));
+        }
+
+        if (binding.equalsIgnoreCase(SAML2Constants.HTTP_POST)) {
+            signAttributeQuery(attrQuery, realm, false);
+            String encodedReqMsg = SAML2Utils.encodeForPOST(attrQuery.toXMLString(true, true));
+            try {
+                SAML2Utils.postToTarget(response, "SAMLRequest",
+                                encodedReqMsg, null, null, location);
+            } catch (IOException ptte) {
+                SAML2Utils.bundle.getBundle("errorSendingAttributeQuery");
+            }
+        } else {
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("unsupportedBinding"));
+        }
+    }
+
+
     /**
-     * Rrocesses the <code>AttributeQuery</code> coming
+     * Processes the <code>AttributeQuery</code> coming
      * from a requester.
      *
      * @param attrQuery the <code>AttributeQuery</code> object
@@ -263,9 +339,11 @@ public class AttributeQueryUtil {
                 null, null);
         }
 
-        
-
-        List desiredAttrs = attrQuery.getAttributes();
+        // Addition to support changing of desired attributes list
+        List desiredAttrs = (List)request.getAttribute("AttributeQueryUtil-desiredAttrs");
+        if (desiredAttrs == null) {
+            desiredAttrs = attrQuery.getAttributes();
+        }
         try {
             desiredAttrs = verifyDesiredAttributes(aad.getAttribute(),
                 desiredAttrs);
@@ -277,6 +355,10 @@ public class AttributeQueryUtil {
 
         List attributes = attrAuthorityMapper.getAttributes(identity,
             attrQuery, attrAuthorityEntityID, realm);
+
+        if (request.getAttribute("AttributeQueryUtil-storeAllAttributes") != null) {
+            request.setAttribute("AttributeQueryUtil-allAttributes", attributes);
+        }
 
         attributes = filterAttributes(attributes, desiredAttrs);
 
@@ -528,9 +610,44 @@ public class AttributeQueryUtil {
         }
 
         String nameIDFormat = nameID.getFormat();
+        // NameIDFormat is "transient"
         if (SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat)) {
             return (String)IDPCache.userIDByTransientNameIDValue.get(
                 nameID.getValue());
+        } else  
+          // NameIDFormat is "unspecified"
+          if (SAML2Constants.UNSPECIFIED.equals(nameIDFormat)) {
+            Map userIDsSearchMap = new HashMap();
+            Set userIDValuesSet = new HashSet();
+            userIDValuesSet.add(nameID.getValue());
+            String userId = "uid";
+
+            IDPSSOConfigElement config = SAML2Utils.getSAML2MetaManager().getIDPSSOConfig(
+                    realm, attrAuthorityEntityID);
+            Map attrs = SAML2MetaUtils.getAttributes(config);
+
+            List nimAttrs = (List)attrs.get(SAML2Constants.NAME_ID_FORMAT_MAP);
+
+
+            for (Iterator i = nimAttrs.iterator(); i.hasNext(); ) {
+                String attrName = (String)i.next();
+                if (attrName != null && attrName.length()>2 && attrName.startsWith(nameIDFormat)) {
+                    int eqPos = attrName.indexOf('=');
+                    if (eqPos != -1 && eqPos<attrName.length()-2) {
+                        userId = attrName.substring(eqPos+1);
+                        SAML2Utils.debug.message("AttributeQueryUtil.getIdentity: NameID attribute from map: " + userId);
+                        break;
+                    }
+                }
+            }
+            userIDsSearchMap.put(userId, userIDValuesSet);
+            try {
+                return dsProvider.getUserID(realm, userIDsSearchMap);
+            } catch (DataStoreProviderException dse) {
+                SAML2Utils.debug.error(
+                    "AttributeQueryUtil.getIdentityFromDataStore1:", dse);
+                throw new SAML2Exception(dse.getMessage());
+            }
         } else {
             String requestedEntityID = attrQuery.getIssuer().getValue();
 
@@ -552,83 +669,84 @@ public class AttributeQueryUtil {
  
         String requestedEntityID = attrQuery.getIssuer().getValue();
 
-            Map configMap = SAML2Utils.getConfigAttributeMap(realm,
-                requestedEntityID, SAML2Constants.SP_ROLE);
+        Map configMap = SAML2Utils.getConfigAttributeMap(realm,
+            requestedEntityID, SAML2Constants.SP_ROLE);
+        if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message(
+                "AttributeQueryUtil.getUserAttributes: " +
+                "remote SP attribute map = " + configMap);
+        }
+        if (configMap == null || configMap.isEmpty()) {
+            configMap = SAML2Utils.getConfigAttributeMap(realm,
+                attrAuthorityEntityID, SAML2Constants.IDP_ROLE);
+            if (configMap == null || configMap.isEmpty()) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(
+                        "AttributeQueryUtil.getUserAttributes:" +
+                        "Configuration map is not defined.");
+                }
+                return null;
+            }
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                     "AttributeQueryUtil.getUserAttributes: " +
-                    "remote SP attribute map = " + configMap);
+                    "hosted IDP attribute map=" + configMap);
             }
-            if (configMap == null || configMap.isEmpty()) {
-                configMap = SAML2Utils.getConfigAttributeMap(realm,
-                    attrAuthorityEntityID, SAML2Constants.IDP_ROLE);
-                if (configMap == null || configMap.isEmpty()) {
+        }
+
+        List attributes = new ArrayList();
+
+        Set localAttributes = new HashSet();
+        localAttributes.addAll(configMap.values());
+        Map valueMap = null;
+
+        try {
+            valueMap = dsProvider.getAttributes(userId, localAttributes);
+        } catch (DataStoreProviderException dse) {
+            if (SAML2Utils.debug.warningEnabled()) {
+                SAML2Utils.debug.warning(
+                    "AttributeQueryUtil.getUserAttributes:", dse);
+            }
+        }
+
+        Iterator iter = configMap.keySet().iterator();
+        while(iter.hasNext()) {
+            String samlAttribute = (String)iter.next();
+            String localAttribute = (String)configMap.get(samlAttribute);
+            String[] localAttributeValues = null;
+            if ((valueMap != null) && (!valueMap.isEmpty())) {
+                Set values = (Set)valueMap.get(localAttribute);
+                if ((values == null) || values.isEmpty()) {
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message(
                             "AttributeQueryUtil.getUserAttributes:" +
-                            "Configuration map is not defined.");
+                            " user profile does not have value for " +
+                            localAttribute);
                     }
-                    return null;
+                } else {
+                    localAttributeValues = (String[])
+                        values.toArray(new String[values.size()]);
                 }
+            }
+
+            if ((localAttributeValues == null) ||
+                (localAttributeValues.length == 0)) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message(
-                        "AttributeQueryUtil.getUserAttributes: " +
-                        "hosted IDP attribute map=" + configMap);
+                        "AttributeQueryUtil.getUserAttributes:" +
+                        " user does not have " + localAttribute);
                 }
+                continue;
             }
 
-            List attributes = new ArrayList();
-            
-            Set localAttributes = new HashSet();
-            localAttributes.addAll(configMap.values());
-            Map valueMap = null;
-
-            try {
-                valueMap = dsProvider.getAttributes(userId, localAttributes); 
-            } catch (DataStoreProviderException dse) {
-                if (SAML2Utils.debug.warningEnabled()) {
-                    SAML2Utils.debug.warning(
-                        "AttributeQueryUtil.getUserAttributes:", dse);
-                }
-            }
-
-            Iterator iter = configMap.keySet().iterator();
-            while(iter.hasNext()) {
-                String samlAttribute = (String)iter.next();
-                String localAttribute = (String)configMap.get(samlAttribute);
-                String[] localAttributeValues = null;
-                if ((valueMap != null) && (!valueMap.isEmpty())) {
-                    Set values = (Set)valueMap.get(localAttribute); 
-                    if ((values == null) || values.isEmpty()) {
-                        if (SAML2Utils.debug.messageEnabled()) {
-                            SAML2Utils.debug.message(
-                                "AttributeQueryUtil.getUserAttributes:" +
-                                " user profile does not have value for " + 
-                                localAttribute);
-                        }
-                    } else {
-                        localAttributeValues = (String[])
-                            values.toArray(new String[values.size()]);
-                    }
-                } 
-
-                if ((localAttributeValues == null) ||
-                    (localAttributeValues.length == 0)) {
-                    if (SAML2Utils.debug.messageEnabled()) {
-                        SAML2Utils.debug.message(
-                            "AttributeQueryUtil.getUserAttributes:" +
-                            " user does not have " + localAttribute);
-                    }
-                    continue;
-                }
-
-                attributes.add(SAML2Utils.getSAMLAttribute(samlAttribute,
-                    localAttributeValues));
-            }
-            return attributes;      
+            Attribute attr = SAML2Utils.getSAMLAttribute(samlAttribute,
+                localAttributeValues);
+            attributes.add(attr);
+        }
+        return attributes;
     }
 
-    private static void signResponse(Response response,
+    public static void signResponse(Response response,
         String attrAuthorityEntityID, String realm, boolean includeCert)
         throws SAML2Exception {
         
@@ -807,9 +925,11 @@ public class AttributeQueryUtil {
     private static List filterAttributes(List attributes, List desiredAttrs) {
 
         if ((attributes == null) || (attributes.isEmpty())) {
+            SAML2Utils.debug.message("AttributeQueryUtil.filterAttributes: attributes are null");
             return attributes;
         }
         if ((desiredAttrs == null) || (desiredAttrs.isEmpty())) {
+            SAML2Utils.debug.message("AttributeQueryUtil.filterAttributes: desired attributes are null");
             return attributes;
         }
 
@@ -824,9 +944,18 @@ public class AttributeQueryUtil {
                     if (isSameAttribute(attr, attrD) ) {
                         attr = filterAttributeValues(attr, attrD);
                         if (attr != null) {
+                            //let's copy FriendlyName if exists
+                            String fName = attrD.getFriendlyName();
+                            if (fName != null && fName.length() > 0){
+                                try {
+                                    attr.setFriendlyName(fName);
+                                } catch (SAML2Exception e) {
+                                    //do nothing, attribute will be sent without
+                                    //friendlyName set
+                                }
+                            }
                             returnAttributes.add(attr);
                         }
-                        iter.remove();
                         break;
                     }
                 }
@@ -838,7 +967,6 @@ public class AttributeQueryUtil {
     }
 
     private static boolean isSameAttribute(Attribute attr1, Attribute attr2) {
-
         if (!attr1.getName().equals(attr2.getName())) {
             return false;
         }
@@ -1041,15 +1169,19 @@ public class AttributeQueryUtil {
     private static String findLocation(
         AttributeAuthorityDescriptorElement aad, String binding,
         String attrQueryProfile, String attrProfile) {
-
+        SAML2Utils.debug.message("AttributeQueryUtil.findLocation entering...");
         List attrProfiles = aad.getAttributeProfile();
         if ((attrProfiles == null) || (attrProfiles.isEmpty())) {
+            SAML2Utils.debug.message("AttributeQueryUtil.findLocation: attrProfiles is null or empty");
             if (attrProfile != null) {
+                SAML2Utils.debug.message("AttributeQueryUtil.findLocation: attrProfiles is null or empty and attrProfile is null");
                 return null;
             }
         } else if (!attrProfiles.contains(attrProfile)) {
+            SAML2Utils.debug.message("AttributeQueryUtil.findLocation: attrProfile not found in the attrProfiles");
             return null;
         }
+        SAML2Utils.debug.message("AttributeQueryUtil.findLocation: entering...");
 
         List attrServices = aad.getAttributeService();
         for(Iterator iter = attrServices.iterator(); iter.hasNext(); ) {
@@ -1057,9 +1189,11 @@ public class AttributeQueryUtil {
                 (AttributeServiceElement)iter.next();
             if (isValidAttributeService(binding, attrService,
                 attrQueryProfile)) {
+                SAML2Utils.debug.message("AttributeQueryUtil.findLocation: found valid service");
                 return attrService.getLocation();
             }
         }
+        SAML2Utils.debug.message("AttributeQueryUtil.findLocation: nothing found, leaving last line with null");
 
         return null;
     }

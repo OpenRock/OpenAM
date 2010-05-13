@@ -87,11 +87,11 @@ import java.math.BigInteger;
 
 public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     private SAML2MetaManager metaManager;
-    private static Map extendedMetaIdpMap = new HashMap(50);
+    private static Map extendedMetaIdpMap = new HashMap(53);
     private static Map extendedACMetaIdpMap = new HashMap(34);
     private static Map extendedAPMetaIdpMap = new HashMap(14);
     private static Map extendedSMetaIdpMap = new HashMap(2);
-    private static Map extendedAdMetaIdpMap = new HashMap(6);
+    private static Map extendedAdMetaIdpMap = new HashMap(9);
     private static Map extendedMetaSpMap = new HashMap(64);
     private static Map extendedACMetaSpMap = new HashMap(36);
     private static Map extendedAPMetaSpMap = new HashMap(30);
@@ -137,6 +137,12 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaIdpMap.put(COT_LIST, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_META_ALIAS, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_SESSION_SYNC_ENABLED, Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(ENABLE_PROXY_IDP_FINDER_FOR_ALL_SPS,
+                Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(PROXY_IDP_FINDER_JSP,
+                Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(PROXY_IDP_FINDER_CLASS,
+                Collections.EMPTY_SET);
 
         // ECP
         extendedMetaIdpMap.put(ATTR_IDP_ECP_SESSION_MAPPER,
@@ -200,6 +206,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaSpMap.put(IDP_PROXY_LIST, Collections.EMPTY_SET);
         extendedMetaSpMap.put(IDP_PROXY_COUNT, Collections.EMPTY_SET);
         extendedMetaSpMap.put(IDP_PROXY_INTROD, Collections.EMPTY_SET);
+        extendedMetaSpMap.put(IDP_PROXY_FINDER, Collections.EMPTY_SET);
         
         //ECP
         extendedMetaSpMap.put(ATTR_ECP_REQUEST_IDP_LIST_FINDER_IMPL,
@@ -277,6 +284,12 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedAdMetaIdpMap.put(IDP_SESSION_SYNC_ENABLED, Collections.EMPTY_SET);
         extendedAdMetaIdpMap.put(ATTR_RELAY_STATE_IDP_URL_LIST,
                 Collections.EMPTY_SET);
+        extendedAdMetaIdpMap.put(ENABLE_PROXY_IDP_FINDER_FOR_ALL_SPS,
+                Collections.EMPTY_SET);
+        extendedAdMetaIdpMap.put(PROXY_IDP_FINDER_JSP,
+                Collections.EMPTY_SET);
+        extendedAdMetaIdpMap.put(PROXY_IDP_FINDER_CLASS,
+                Collections.EMPTY_SET);
     }
     
     //extended Assertion Content metadata attributes for sp only    
@@ -337,6 +350,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedAdMetaSpMap.put(IDP_PROXY_LIST, Collections.EMPTY_SET);
         extendedAdMetaSpMap.put(IDP_PROXY_COUNT, Collections.EMPTY_SET);
         extendedAdMetaSpMap.put(IDP_PROXY_INTROD, Collections.EMPTY_SET);
+        extendedAdMetaSpMap.put(IDP_PROXY_FINDER, Collections.EMPTY_SET);
         
         //ECP
         extendedAdMetaSpMap.put(ATTR_ECP_REQUEST_IDP_LIST_FINDER_IMPL,

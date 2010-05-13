@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2010 ForgeRock AS
+ *
  * $Id: SAML2MetaCache.java,v 1.4 2008/07/08 01:08:43 exu Exp $
  *
  */
@@ -34,6 +36,9 @@ import com.sun.identity.shared.debug.Debug;
 
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
+import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
+import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
+import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
 
 /**
  * The <code>SAML2MetaCache</code> provides metadata cache.

@@ -173,6 +173,11 @@ public interface SAMLv2Model
         "metaAlias";
     public static final String IDP_SESSION_SYNC_ENABLED =
         "idpSessionSyncEnabled";
+    public static final String PROXY_IDP_FINDER_CLASS = "proxyIDPFinderClass";
+    public static final String ENABLE_PROXY_IDP_FINDER_FOR_ALL_SPS =
+            "enableProxyIDPFinderForAllSPs";
+    public static final String PROXY_IDP_FINDER_JSP =
+            "proxyIDPFinderJSP";
 
     
     //SAML2 SP Extended Attributes
@@ -230,6 +235,8 @@ public interface SAMLv2Model
     public static final String IDP_PROXY_COUNT = "idpProxyCount";
     public static final String IDP_PROXY_INTROD =
         "useIntroductionForIDPProxy";
+    public static final String IDP_PROXY_FINDER =
+        "useIDPFinder";
     
     //ECP IDP
     public static final String ATTR_IDP_ECP_SESSION_MAPPER =

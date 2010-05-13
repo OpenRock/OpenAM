@@ -100,13 +100,13 @@ a:hover, a:active {
 
 /* Rounded Corners div styling */
 .xtop, .xbottom {display:block; background:transparent;}
-.xt1, .xt2, .xt3, .xt4, .xb1, .xb2, .xb3, .xb4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #5382a1; border-right:1px solid #5382a1;}
-.xt1, .xt2, .xt3, .xt4 {background:#5382a1;}
+.xt1, .xt2, .xt3, .xt4, .xb1, .xb2, .xb3, .xb4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #f58220; border-right:1px solid #f58220;}
+.xt1, .xt2, .xt3, .xt4 {background:#f58220;}
 .xt1, .xb4 {margin:0 4px; border: 0;}
 .xt2, .xb3 {margin:0 3px;}
 .xt3, .xb2 {margin:0 2px;}
 .xt4, .xb1 {height:2px; margin:0 1px;}
-.xb4 {background:#5382a1;}
+.xb4 {background:#f58220;}
 
 .balloonIcon {
     width: 14px;
@@ -333,7 +333,8 @@ button:disabled{
 }
 
 .blue{
-	color:#60a2e1;
+/*	color:#60a2e1;  */
+ color:#f58221;
 	font-size:15px;	
 }
 .blueSmall{
@@ -500,9 +501,9 @@ div.borderPopUpGray{
 
 /*Gray Boxes */
 .headerBox{
-	background-color: #5382a1;
+	background-color: #f58220;
 	color: white;
-	border: 1px solid #5382a1;
+	border: 1px solid #f58220;
 	border-top: none;
 	font-size: 100%;
 	font-weight: bold;
@@ -510,19 +511,22 @@ div.borderPopUpGray{
 	margin: 0;
 }
 .bodyBox{
-	background-color: #e5e9ed;
-	padding:10px;
-	padding: 1em;
-	border: 1px solid #5382a1;
-	border-bottom: none;
+        /* background-color: #e5e9ed;  */
+        background-color: #f5e9ed;
+        padding:10px;
+        padding: 1em;
+        /* border: 1px solid #5382a1; */
+        border: 1px solid #f58220;
+        border-bottom: none;
 }
 /*Corners bottom*/
-.xbGray1, .xbGray2, .xbGray3, .xbGray4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #5382a1; border-right:1px solid #5382a1;}
+.xbGray1, .xbGray2, .xbGray3, .xbGray4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #f58220; border-right:1px solid #f58220;}
 .xbGray4 {margin:0 4px; border: 0;}
 .xbGray3 {margin:0 3px;}
 .xbGray2 {margin:0 2px;}
 .xbGray1 {height:2px; margin:0 1px;}
-.xbGray4 {background:#5382a1;}
+/*  .xbGray4 {background:#5382a1;}  */
+.xbGray4 {background:#f58220;}
 .xbGray1, .xbGray2, .xbGray3{background:#e5e9ed;}
 /*.xb1, .xb2, .xb3{background:#e5e9ed;}*/
 

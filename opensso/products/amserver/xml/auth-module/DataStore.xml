@@ -22,6 +22,7 @@
     with the fields enclosed by brackets [] replaced by
     your own identifying information:
     "Portions Copyrighted [year] [name of copyright owner]"
+    Portions Copyrighted 2010 ForgeRock AS
 
     $Id: DataStore.xml,v 1.4 2009/05/05 20:31:42 manish_rustagi Exp $
 
@@ -32,7 +33,7 @@
 
 
 <ModuleProperties moduleName="DataStore" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenSSO" >
+    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM" >
         <NameCallback>
             <Prompt> User Name: </Prompt>
         </NameCallback>

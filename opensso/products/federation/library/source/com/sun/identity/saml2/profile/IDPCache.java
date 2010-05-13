@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2010 ForgeRock AS
+ * 
  * $Id: IDPCache.java,v 1.18 2009/05/14 17:23:45 exu Exp $
  *
  */
@@ -149,6 +151,20 @@ public class IDPCache {
      * Value : idp ecp session mapper object
      */
     public static Hashtable idpECPSessionMapperCache = new Hashtable(); 
+
+     /**
+     * Cache saves the IDP Proxy Finder.
+     * Key : IDP Proxy Finder class name
+     * Value : IDP Proxy Finder mapper object
+     */
+    public static Hashtable idpProxyFinderCache = new Hashtable();
+
+    /**
+     * Cache saves the IDP Adapter.
+     * Key : IDP Adapter class name
+     * Value : IDP Adapter mapper object
+     */
+    public static Hashtable idpAdapterCache = new Hashtable();
 
     /**
      * Cache saves information needed after coming back from COT cookie setting.

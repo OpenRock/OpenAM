@@ -1345,8 +1345,48 @@ public interface SAML2Constants {
      * Default class name of IDP Proxy finder   
      */     
     public String  DEFAULT_IDP_PROXY_FINDER = 
-        "com.sun.identity.saml2.plugins.SAML2IDPProxyImpl"; 
-        
+        "com.sun.identity.saml2.plugins.SAML2IDPProxyImpl";
+
+    /**
+     * IDP Proxy finder attribute name in the IDP Extended metadata
+     */
+    public String IDP_PROXY_FINDER_ATTR_NAME = "idpProxyFinder";
+
+    /**
+     * IDP Proxy finder implmentation classe attribute name
+     * in the IDP Extended metadata
+     */
+    public static final String PROXY_IDP_FINDER_CLASS = "proxyIDPFinderClass";
+    
+    /**
+     * Flag to indicate if the IdP must enable the IdP Finder
+     * This is the name of the attribute flag in the IDP Extended metadata
+     */
+    public static final String ENABLE_PROXY_IDP_FINDER_FOR_ALL_SPS =
+            "enableProxyIDPFinderForAllSPs";
+    
+    /**
+     * Attribute Name in the extended metadata that takes the value of
+     * the JSP that will present the list of IdPs to the user
+     */
+    public static final String PROXY_IDP_FINDER_JSP =
+            "proxyIDPFinderJSP";
+
+    /**
+     * Default IDP Proxy Finder JSP
+     */
+    public static final String DEFAULT_PROXY_IDP_FINDER = "proxyidpfinder.jsp";
+
+    /**
+     * IDP Adapter class attribute name
+     */
+    public static final String IDP_ADAPTER_CLASS = "idpAdapter";
+
+    /**
+     * Default IDP Adapter class
+     */
+    public static final String DEFAULT_IDP_ADAPTER = "com.sun.identity.saml2.plugins.DefaultIDPAdapter";
+
     /**
      * Key used to save IDP Session in a map
      */    

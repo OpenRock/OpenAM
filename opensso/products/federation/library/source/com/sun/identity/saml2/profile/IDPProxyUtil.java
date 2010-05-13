@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2010 ForgeRock AS
+ *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
  */
@@ -52,6 +54,9 @@ import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
+import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
+import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
@@ -90,7 +95,7 @@ import org.w3c.dom.Element;
 public class IDPProxyUtil { 
 
     // IDP proxy finder 
-    private static SAML2IDPFinder proxyFinder = null;
+    // private static SAML2IDPFinder proxyFinder = null;
     
     private static SAML2MetaManager sm = null;
     
@@ -100,11 +105,11 @@ public class IDPProxyUtil {
         try {
              sm = new SAML2MetaManager();
              sessionProvider = SessionManager.getProvider();
-             String proxyFinderClass = SystemConfigurationUtil.getProperty(
-                 SAML2Constants.IDP_PROXY_FINDER_NAME, 
-                 SAML2Constants.DEFAULT_IDP_PROXY_FINDER);
-             Class proxyClass = Class.forName(proxyFinderClass);
-             proxyFinder = (SAML2IDPFinder)proxyClass.newInstance();
+//             String proxyFinderClass = SystemConfigurationUtil.getProperty(
+//                 SAML2Constants.IDP_PROXY_FINDER_NAME,
+//                 SAML2Constants.DEFAULT_IDP_PROXY_FINDER);
+//             Class proxyClass = Class.forName(proxyFinderClass);
+//             proxyFinder = (SAML2IDPFinder)proxyClass.newInstance();
          } catch (Exception ex) {
              SAML2Utils.debug.error("IDPSSOFederate:Static Init Failed", ex);
          }
@@ -129,6 +134,7 @@ public class IDPProxyUtil {
         HttpServletResponse response)
         throws SAML2Exception
     {
+        SAML2IDPFinder  proxyFinder = getIDPProxyFinder(realm, hostedEntityId);
         List idpProviderIDs = proxyFinder.getPreferredIDP(
             authnRequest, hostedEntityId, realm, 
             request, response);
@@ -1025,5 +1031,54 @@ public class IDPProxyUtil {
         } catch (SessionException se) {
             return null;
         } 
-    }      
+    }
+
+   /**
+     * Returns an <code>IDPProxyFinder</code>
+     *
+     * @param realm the realm name
+     * @param idpEntityID the entity id of the identity provider
+     *
+     * @return the <code>IDPProxyFinder</code>
+     * @exception SAML2Exception if the operation is not successful
+     */
+    static SAML2IDPFinder getIDPProxyFinder(
+                                 String realm, String idpEntityID)
+        throws SAML2Exception {
+        String classMethod = "IDPProxyUtil.getIDPProxyFinder: ";
+        String idpProxyFinderName = null;
+        SAML2IDPFinder idpProxyFinder = null;
+        try {
+            idpProxyFinderName = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
+                realm, idpEntityID, SAML2Constants.PROXY_IDP_FINDER_CLASS);
+            if (idpProxyFinderName == null) {
+                idpProxyFinderName =
+                    SAML2Constants.DEFAULT_IDP_PROXY_FINDER;
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + "use " +
+                    SAML2Constants.DEFAULT_IDP_PROXY_FINDER);
+                }
+            }
+            idpProxyFinder = (SAML2IDPFinder)
+                IDPCache.idpProxyFinderCache.get(
+                                           idpProxyFinderName);
+            if (idpProxyFinder == null) {
+                idpProxyFinder = (SAML2IDPFinder)
+                    Class.forName(idpProxyFinderName).newInstance();
+                IDPCache.idpProxyFinderCache.put(
+                    idpProxyFinderName, idpProxyFinder);
+            } else {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod +
+                        "got the IDPProxyFinder from cache");
+                }
+            }
+        } catch (Exception ex) {
+            SAML2Utils.debug.error(classMethod +
+                "Unable to get IDP Proxy Finder.", ex);
+            throw new SAML2Exception(ex);
+        }
+
+        return idpProxyFinder;
+    }
 }

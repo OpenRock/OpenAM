@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2010 ForgeRock AS
+ *
  * $Id: IDPSSOUtil.java,v 1.56 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  */
@@ -38,7 +40,6 @@ import com.sun.identity.cot.CircleOfTrustDescriptor;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.multiprotocol.MultiProtocolUtils;
 import com.sun.identity.multiprotocol.SingleLogoutManager;
-import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Assertion;
@@ -90,9 +91,7 @@ import com.sun.identity.saml2.protocol.Artifact;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
-import com.sun.identity.saml2.protocol.RequestAbstract;
 import com.sun.identity.saml2.protocol.Response;
-import com.sun.identity.saml2.protocol.Scoping;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
@@ -101,10 +100,9 @@ import com.sun.identity.plugin.monitoring.MonitorManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.Date;
@@ -116,7 +114,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 /**
@@ -1308,7 +1305,7 @@ public class IDPSSOUtil {
                 "Unable to get principal name from the session.", se);
             throw new SAML2Exception(
                    SAML2Utils.bundle.getString("invalidSSOToken")); 
-        }    
+        }
         boolean allowCreate = true; // allow create is the default
         String remoteEntityID = null;
         String spNameQualifier = null;
@@ -2251,7 +2248,7 @@ public class IDPSSOUtil {
         return authUrl;
     }
 
-    private static String getAttributeValueFromIDPSSOConfig(
+    public static String getAttributeValueFromIDPSSOConfig(
                              String realm,
                              String hostEntityId,
                              String attrName)
@@ -2305,7 +2302,7 @@ public class IDPSSOUtil {
         // Pass spEntityID to IdP Auth Module
         if (spEntityID != null) {
             if (newURL.indexOf("?") == -1) {
-                newURL.append("&");
+                newURL.append("?");
             } else {
                 newURL.append("&");
             }
@@ -2876,4 +2873,53 @@ public class IDPSSOUtil {
             response.sign(kp.getPrivateKey(idpSignCertAlias),
                            kp.getX509Certificate(idpSignCertAlias));
         }
+
+    /**
+     * Returns a <code>SAML2IdentityProviderAdapter</code>
+     *
+     * @param realm the realm name
+     * @param idpEntityID the entity id of the identity provider
+     *
+     * @return the <code>SAML2IdenityProviderAdapter</code>
+     * @exception SAML2Exception if the operation is not successful
+     */
+    static SAML2IdentityProviderAdapter getIDPAdapterClass(
+                                 String realm, String idpEntityID)
+        throws SAML2Exception {
+        String classMethod = "SAML2Utils.getIDPAdapterClass: ";
+        String idpAdapterName = null;
+        SAML2IdentityProviderAdapter idpAdapter = null;
+        try {
+            idpAdapterName = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
+                realm, idpEntityID, SAML2Constants.IDP_ADAPTER_CLASS);
+            if (idpAdapterName == null) {
+                idpAdapterName =
+                    SAML2Constants.DEFAULT_IDP_ADAPTER;
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + "use " +
+                    SAML2Constants.DEFAULT_IDP_ADAPTER);
+                }
+            }
+            idpAdapter = (SAML2IdentityProviderAdapter)
+                IDPCache.idpAdapterCache.get(
+                                           idpAdapterName);
+            if (idpAdapter == null) {
+                idpAdapter = (SAML2IdentityProviderAdapter)
+                    Class.forName(idpAdapterName).newInstance();
+                IDPCache.idpAdapterCache.put(
+                    idpAdapterName, idpAdapter);
+            } else {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod +
+                        "got the IDPAdapter from cache");
+                }
+            }
+        } catch (Exception ex) {
+            SAML2Utils.debug.error(classMethod +
+                "Unable to get IDP Adapter.", ex);
+            throw new SAML2Exception(ex);
+        }
+
+        return idpAdapter;
+    }
 }

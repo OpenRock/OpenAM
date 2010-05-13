@@ -3786,8 +3786,25 @@ public class SAML2Utils extends SAML2SDKUtils {
          AssertionFactory factory = AssertionFactory.getInstance();
          Attribute attribute =  factory.createAttribute();
 
-         attribute.setName(name);
-         attribute.setNameFormat(SAML2Constants.BASIC_NAME_FORMAT);
+         //samlAttribute might be in format: NameFormat|Name
+        int pipePos = name.indexOf('|');
+        String realName = null;
+        String nameFormat = null;
+        if (pipePos != -1) {
+            if (pipePos < name.length()-1) {
+                nameFormat = name.substring(0,pipePos);
+                realName = name.substring(pipePos+1);
+            } else {
+                //TO DO: Put the message in the bundle libSAML2_XX.properties
+                throw new SAML2Exception("Wrong format of the attribute Name");
+            }
+        } else {
+            realName = name;
+            nameFormat = SAML2Constants.BASIC_NAME_FORMAT;
+        }
+        attribute.setName(realName);
+        attribute.setNameFormat(nameFormat);
+
          if (values != null) {
              List list = new ArrayList();
              for (int i=0; i<values.length; i++) {

@@ -32,7 +32,7 @@
 
 
 <ModuleProperties moduleName="DataStore" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="OpenSSO에 로그인" >
+    <Callbacks length="2" order="1" timeout="120" header="OpenAM에 로그인" >
         <NameCallback>
             <Prompt> 사용자 이름: </Prompt>
         </NameCallback>
