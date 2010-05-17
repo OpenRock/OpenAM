@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.cot.COTConstants;
@@ -1554,5 +1558,13 @@ public interface SAML2Constants {
      */
     public String ACS_SERVICE = "acs";
 
+    /**
+     * Map key used in SLO request redirect code
+     */
+    public static final String AM_REDIRECT_URL = "AM_REDIRECT_URL";
 
+    /**
+     * Map key used in SLO request redirect code
+     */
+    public static final String OUTPUT_DATA = "OUTPUT_DATA";
 } 

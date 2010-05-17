@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.saml2.common;
 
@@ -38,7 +41,7 @@ import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.CircleOfTrustDescriptor;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.federation.common.FSUtils;
-
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.datastore.DataStoreProviderManager;
@@ -106,16 +109,19 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -184,9 +190,18 @@ public class SAML2Utils extends SAML2SDKUtils {
         SystemPropertiesManager.get(Constants.AM_SERVER_PORT);
     private static String server_uri = SystemPropertiesManager.get(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+    private static String sessionCookieName = SystemPropertiesManager.get(
+        Constants.AM_COOKIE_NAME);
     private static String localURL = server_protocol + "://" + server_host +
             ":" + server_port + server_uri;
     private static int int_server_port = 0;
+    private static final String GET_METHOD = "GET";
+    private static final String LOCATION = "Location";
+    private static final String EMPTY = "";
+    private static final char AMP = '&';
+    private static final char EQUALS = '=';
+    private static final char SEMI_COLON = ';';
+    private static final char DOUBLE_QUOTE = '"';
 
     public static SOAPConnectionFactory scf = null;
     private static String bufferLen = (String) SAML2ConfigService.
@@ -1620,6 +1635,24 @@ public class SAML2Utils extends SAML2SDKUtils {
         
         return id;
     }
+
+	/**
+	 * Returns the server id of the local server
+	 */
+	public static String getLocalServerID() {
+		String serverId = null;
+		
+        try {
+            serverId = SystemConfigurationUtil.getServerID(
+                server_protocol, server_host, int_server_port, server_uri);
+		} catch (Exception ex) {
+	    	if (debug.messageEnabled()) {
+	        	debug.message("SAML2Utils.getLocalServerID:", ex);
+	        }
+	    }
+
+	    return serverId;
+	}
     
     /**
      * Creates <code>SOAPMessage</code> with the input XML String
@@ -4179,10 +4212,17 @@ public class SAML2Utils extends SAML2SDKUtils {
                 if (cookieStr == null) {
                     cookieStr = new StringBuffer();
                 } else {
-                    cookieStr.append(";");
+                    cookieStr.append(SEMI_COLON).append(SAMLConstants.SPACE);
                 }
-                cookieStr.append(cookies[nCookie].getName())
-                    .append("=").append(cookies[nCookie].getValue());
+				
+				if (cookies[nCookie].getName().equals(sessionCookieName)) {
+                	cookieStr.append(cookies[nCookie].getName())
+	                    .append(EQUALS).append(DOUBLE_QUOTE)
+						.append(cookies[nCookie].getValue()).append(DOUBLE_QUOTE);
+				} else {
+					cookieStr.append(cookies[nCookie].getName())
+	                    .append(EQUALS).append(cookies[nCookie].getValue());	
+				}
             }
         }
         if (cookieStr != null) {
@@ -4409,5 +4449,259 @@ public class SAML2Utils extends SAML2SDKUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Sends the request to the original Federation server and receives the result
+     * data.
+     *
+     * @param request HttpServletRequest to be sent
+     * @param response HttpServletResponse to be received
+     * @param sloServerUrl URL of the original federation server to be
+     * connected
+     *
+     * @return HashMap of the result data from the original server's response
+     *
+     */
+    public static HashMap sendRequestToOrigServer(HttpServletRequest request,
+        HttpServletResponse response, String sloServerUrl) {
+        HashMap origRequestData = new HashMap();
+
+        // Print request Headers
+        if (debug.messageEnabled()) {
+            for (Enumeration requestHeaders = request.getHeaderNames() ; requestHeaders.hasMoreElements();) {
+                String name = (String) requestHeaders.nextElement();
+                Enumeration value = (Enumeration) request.getHeaders(name);
+                debug.message("Header name = " + name + " Value = " + value);
+            }
+        }
+
+        // Open URL connection
+        HttpURLConnection conn = null;
+        String strCookies = null;
+
+        try {
+            URL sloRoutingURL = new URL(sloServerUrl);
+
+            if (debug.messageEnabled()) {
+                debug.message("Connecting to : " + sloRoutingURL);
+            }
+
+            conn = HttpURLConnectionManager.getConnection(sloRoutingURL);
+            conn.setRequestMethod(GET_METHOD);
+            conn.setFollowRedirects(false);
+            conn.setInstanceFollowRedirects(false);
+
+            // replay cookies
+            strCookies = getCookiesString(request);
+
+            if (strCookies != null) {
+                if (debug.messageEnabled()) {
+                    debug.message("Sending cookies : " + strCookies);
+                }
+                conn.setRequestProperty("Cookie", strCookies);
+            }
+
+            conn.setRequestProperty("Host", request.getHeader("host"));
+            conn.setRequestProperty(ISAuthConstants.ACCEPT_LANG_HEADER, request.getHeader(ISAuthConstants.ACCEPT_LANG_HEADER));
+
+			// do the remote connection
+			conn.connect();
+
+            // Receiving input from Original Federation server...
+            if (debug.messageEnabled()) {
+				debug.message("RECEIVING DATA ... ");
+                debug.message("Response Code: " + conn.getResponseCode());
+                debug.message("Response Message: " + conn.getResponseMessage());
+                debug.message("Follow redirect : " + conn.getFollowRedirects());
+            }
+
+            // Check response code
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                // Input from Original servlet...
+                StringBuffer in_buf = new StringBuffer();
+                BufferedReader in = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                int len;
+                char[] buf = new char[1024];
+
+                while ((len = in.read(buf,0,buf.length)) != -1) {
+                    in_buf.append(buf,0,len);
+                }
+
+                String in_string = in_buf.toString();
+
+                if (debug.messageEnabled()) {
+                    debug.message("Received response data : " + in_string);
+                }
+
+                origRequestData.put(SAML2Constants.OUTPUT_DATA, in_string);
+            } else {
+                debug.message("Response code NOT OK");
+            }
+
+            String redirect_url = conn.getHeaderField(LOCATION);
+
+            if (redirect_url != null) {
+                origRequestData.put(SAML2Constants.AM_REDIRECT_URL, redirect_url);
+            }
+
+            // retrieves cookies from the response
+            Map headers = conn.getHeaderFields();
+            processCookies(headers, request, response);
+        } catch (Exception ex) {
+            if (debug.messageEnabled()) {
+                debug.message("send exception : ", ex);
+            }
+        } 
+
+        return (origRequestData);
+    }
+
+    // parses the cookies from the response header and adds them in
+    // the HTTP response.
+	// TODO: This is a copy from AuthClientUtils, need to refactor into OpenAM common
+    private static void processCookies(Map headers,
+            HttpServletRequest request, HttpServletResponse response) {
+        if (debug.messageEnabled()) {
+            debug.message("processCookies : headers : " + headers);
+        }
+
+        if (headers == null || headers.isEmpty()) {
+            return;
+        }
+
+        for (Iterator hrs = headers.entrySet().iterator(); hrs.hasNext();) {
+            Map.Entry me = (Map.Entry)hrs.next();
+            String key = (String) me.getKey();
+            if (key != null && (key.equalsIgnoreCase("Set-cookie") ||
+                (key.equalsIgnoreCase("Cookie")))) {
+                List list = (List)me.getValue();
+
+                if (list == null || list.isEmpty()) {
+                    continue;
+                }
+
+                Cookie cookie = null;
+                String domain = null;
+                String path = null;
+                String cookieName = null;
+                String cookieValue = null;
+
+                for (Iterator it = list.iterator(); it.hasNext(); ) {
+                    String cookieStr = (String)it.next();
+
+                    if (debug.messageEnabled()) {
+                        debug.message("processCookies : cookie : " 
+                                          + cookieStr);
+                    }
+
+                    StringTokenizer stz = new StringTokenizer(cookieStr, ";");
+
+                    while (stz.hasMoreTokens()) {
+                        String nameValue = (String)stz.nextToken();
+                        int index = nameValue.indexOf("=");
+
+                        if (index == -1) {
+                            continue;
+                        }
+
+                        String nameofParam = nameValue.substring(0, index).trim();
+                        String nameOfValue = nameValue.substring(index + 1);
+
+                        /* decode the cookie if it is already URLEncoded,
+                         * we have to pass non URLEncoded cookie to 
+                         * createCookie method
+                         */
+                        if (isURLEncoded(nameOfValue)) {
+                            try {
+                                nameOfValue = URLDecoder.decode(nameOfValue, "UTF-8");
+                            } catch (java.io.UnsupportedEncodingException e) {
+                                // this would not happen for UTF-8
+                            }
+                        }
+
+                        if (nameofParam.equalsIgnoreCase("Domain")) {
+                            domain = nameOfValue;
+                        } else if (nameofParam.equalsIgnoreCase("Expires")) {
+                            // we don't care about the cookie expiry
+                            continue;
+                        } else if (nameofParam.equalsIgnoreCase("Path")) {
+                            path = nameOfValue;
+                        } else {
+                            cookieName = nameofParam;
+                            cookieValue = nameOfValue;
+                        }
+                    }
+
+                    cookie = createCookie(cookieName, cookieValue, domain, path);
+
+                    if("LOGOUT".equals(cookieValue)){
+                        cookie.setMaxAge(0);
+                    }
+
+                    response.addCookie(cookie);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if the provided <code>String</code> is URLEncoded. Our logic
+     * is simple. If the string has % or + character we treat as URL encoded
+     *
+	 * TODO : Copied from AuthClientUtils, refactor
+     * @param s the <code>String</code> we want to check
+     * @return <code>true</code> if the provided string is URLEncoded, 
+     *         <code>false</code> otherwise.
+     */
+    private static boolean isURLEncoded(String s) {
+        boolean urlEncoded = false;
+        if (s != null) {
+            if ((s.indexOf("%") != -1) || (s.indexOf("+") != -1)) {
+                urlEncoded = true;
+            }
+        }
+        return urlEncoded;
+    }
+
+    /**
+     * Creates a Cookie with the <code>cookieName</code>,
+     * <code>cookieValue</code> for the cookie domains specified.
+     *
+ 	 * TODO: Copied from AuthClientUtils Refactor
+     * @param cookieName is the name of the cookie
+     * @param cookieValue is the value fo the cookie
+     * @param cookieDomain Domain for which the cookie is to be set.
+     * @param path The path into which the cookie shall be set
+     * @return the cookie object.
+     */
+    public static Cookie createCookie(String cookieName,
+                               String cookieValue,
+                               String cookieDomain,
+                               String path) {
+        if (debug.messageEnabled()) {
+            debug.message("cookieName   : " + cookieName);
+            debug.message("cookieValue  : " + cookieValue);
+            debug.message("cookieDomain : " + cookieDomain);
+            debug.message("path : " + path);
+        }
+
+        Cookie cookie = null;
+
+        try {
+            cookie = CookieUtils.newCookie(cookieName, cookieValue,
+                        path, cookieDomain);
+        } catch (Exception ex) {
+            if (debug.messageEnabled()) {
+                debug.message("Error creating cookie. : " + ex.getMessage());
+            }
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("createCookie Cookie is set : " + cookie);
+        }
+
+        return cookie;
     }
 }
