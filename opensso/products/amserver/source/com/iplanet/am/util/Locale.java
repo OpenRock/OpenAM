@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.am.util;
 
 import com.iplanet.dpro.session.Session;
