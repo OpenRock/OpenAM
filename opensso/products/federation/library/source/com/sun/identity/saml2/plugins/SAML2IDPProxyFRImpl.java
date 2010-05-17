@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
+ * Copyright (c) 2010 ForgeRock AS. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -9,27 +9,23 @@
  * compliance with the License.
  *
  * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
+ * http://forgerock.org/license/CDDLv1.0.html
  * See the License for the specific language governing
  * permission and limitations under the License.
  *
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
+ * at http://forgerock.org/license/CDDLv1.0.html
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrigthed 2010 ForgeRock AS
- *
- * $Id: SAML2IDPProxyFRImpl.java,v 1.0 2010/03/23 20:00:01 vicake Exp $
  */
+
 
 package com.sun.identity.saml2.plugins;
 
-import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.CircleOfTrustDescriptor;
 import com.sun.identity.cot.COTException;
@@ -42,9 +38,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.ExtensionsType;
-import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
-// import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -72,11 +66,7 @@ import javax.servlet.http.HttpSession;
  */
 public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
 
-    // public static String ENABLE_IDP_FINDER_FOR_ALL_SPS = "com.forgerock.identity.saml2.enableidpfinderforallsps";
     public static String IDP_FINDER_ENABLED_IN_SP = "idpFinderEnabled";
-    // public static String IDP_FINDER_IMPLEMENTATION = "idpFinderImplementation";
-    // public static String DEFAULT_PROXY_IDP_FINDER = "proxyidpfinder.jsp";
-
 
     public static String SESSION_ATTR_NAME_IDP_LIST = "_IDPLIST_";
     public static String SESSION_ATTR_NAME_RELAYSTATE = "_RELAYSTATE_";
@@ -86,14 +76,14 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
     SPSSODescriptorElement spSSODescriptor = null;
     String relayState = "";
     String binding = "";
-    // String idpFinderImplementation = "";
 
-    /**
-     * Default Constructor.
+    /*
+     * Constructor.
      */
     public SAML2IDPProxyFRImpl() {
     }
-    public static String className = "GetIdPList.";
+
+    public static String className = "SAML2IDPProxyFRImpl.";
 
     /**
      * Returns a list of preferred IDP providerIDs.
@@ -202,7 +192,6 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                 // give the user the chance to select one interactively
                 if (proxyIDPs.size() > 1) {
                     String idpListSt = selectIDPBasedOnLOA(proxyIDPs, realm, authnRequest);
-                    // String idpListSt = listToString(proxyIDPs);
                     // Construct the IDPFinder URL to redirect to
                     String idpFinder = getRedirect(request, idpFinderJSP);
                     // Generate the requestID
@@ -252,7 +241,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                     return null;
                 }
             } else {
-                /* IDP Proxy with introduction cookie case*/
+                // IDP Proxy with introduction cookie
                 List cotList = (List) spConfigAttrsMap.get("cotlist");
                 String cotListStr = (String) cotList.iterator().next();
                 CircleOfTrustManager cotManager = new CircleOfTrustManager();
@@ -478,8 +467,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
         String methodName = "buildReturnURL";
         StringBuffer sb = new StringBuffer();
         String baseURL = request.getScheme() + "://" +
-                request.getHeader("host") + ":" +
-                request.getServerPort() +
+                request.getHeader("host") + 
                 request.getRequestURI();
         String qs = request.getQueryString();
         if (qs != null && !qs.isEmpty()) {
@@ -550,18 +538,9 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
 
         String methodName = "getRedirect";
 
-        String host = request.getHeader("host");
-        int pos = host.indexOf(":");
-        if (pos != -1) {
-            host = host.substring(0, pos);
-        }
-
-        debugMessage(methodName, ": host = " + host);
-
         // Get the base URL and construct the IdP Finder URL
         String baseURL = request.getScheme() + "://"
-                + host + ":"
-                + request.getServerPort()
+                + request.getHeader("host")
                 + request.getContextPath();
         String idpFinder = baseURL + "/" + idpFinderImplementation;
 

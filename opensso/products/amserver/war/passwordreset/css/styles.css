@@ -22,7 +22,9 @@
  * Copyright 2005 Sun Microsystems Inc. All Rights Reserved
  */
 
-
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 
 a:hover {  text-decoration: underline}.footerText {  font-family: Helvetica, Arial, Geneva, sans-serif; font-size: 9pt; color: #333333}.loginText {  font-family: Helvetica, Arial, Geneva, sans-serif}.mastheadLinks {  font-family: Helvetica, Arial, Geneva, sans-serif; font-size: 9pt; color: #4D59AB; text-decoration: none}.mastheadUsername {  font-family: Helvetica, Arial, Geneva, sans-serif; font-size: 10pt; color: #333333; font-weight: bold}input.buttonblue{  cursor: hand; font-family: verdana; background: #594fbf; color: #ffffff; font-weight: bold; font-size: 10pt; padding: 1px 1px; margin: 0px 0px; border: 0px}.doubleArrow {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: bold; color: #594FBF}.mastheadSeparators { font-family: Helvetica, Arial, Geneva, sans-serif; color: #A2A2A2; text-decoration: none; font-size: 12pt}
