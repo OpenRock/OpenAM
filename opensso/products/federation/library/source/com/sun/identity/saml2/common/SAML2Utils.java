@@ -4609,6 +4609,11 @@ public class SAML2Utils extends SAML2SDKUtils {
                         String nameofParam = nameValue.substring(0, index).trim();
                         String nameOfValue = nameValue.substring(index + 1);
 
+                        // we can ignore this cookie
+                        if (nameofParam.equalsIgnoreCase("JSESSIONID")) {
+                            continue;
+                        }
+
                         /* decode the cookie if it is already URLEncoded,
                          * we have to pass non URLEncoded cookie to 
                          * createCookie method
@@ -4623,7 +4628,9 @@ public class SAML2Utils extends SAML2SDKUtils {
 
                         if (nameofParam.equalsIgnoreCase("Domain")) {
                             domain = nameOfValue;
-                        } else if (nameofParam.equalsIgnoreCase("Expires")) {
+                        } else if (nameofParam.equalsIgnoreCase("Expires") ||
+                                   nameofParam.equalsIgnoreCase("Max-Age") ||
+                                   nameofParam.equalsIgnoreCase("Version")) {
                             // we don't care about the cookie expiry
                             continue;
                         } else if (nameofParam.equalsIgnoreCase("Path")) {
@@ -4636,7 +4643,11 @@ public class SAML2Utils extends SAML2SDKUtils {
 
                     cookie = createCookie(cookieName, cookieValue, domain, path);
 
-                    if("LOGOUT".equals(cookieValue)){
+                    if ("LOGOUT".equals(cookieValue)){
+                        cookie.setMaxAge(0);
+                    }
+
+                    if (cookieName.equals(sessionCookieName)) {
                         cookie.setMaxAge(0);
                     }
 
