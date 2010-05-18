@@ -41,7 +41,7 @@ import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.CircleOfTrustDescriptor;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.authentication.util.ISAuthConstants;
+
 import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.datastore.DataStoreProviderManager;
@@ -4503,7 +4503,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
 
             conn.setRequestProperty("Host", request.getHeader("host"));
-            conn.setRequestProperty(ISAuthConstants.ACCEPT_LANG_HEADER, request.getHeader(ISAuthConstants.ACCEPT_LANG_HEADER));
+            conn.setRequestProperty(SAMLConstants.ACCEPT_LANG_HEADER, request.getHeader(SAMLConstants.ACCEPT_LANG_HEADER));
 
 			// do the remote connection
 			conn.connect();

@@ -2450,8 +2450,10 @@ public class AuthClientUtils {
 
                         if (nameofParam.equalsIgnoreCase("Domain")) {
                             domain = nameOfValue;
-                        } else if (nameofParam.equalsIgnoreCase("Expires")) {
-                            // we don't care about the cookie expiry
+                        } else if (nameofParam.equalsIgnoreCase("Expires") ||
+                                   nameofParam.equalsIgnoreCase("Max-Age") ||
+                                   nameofParam.equalsIgnoreCase("Version")) {
+                            // we don't care about these cookie values
                             continue;
                         } else if (nameofParam.equalsIgnoreCase("Path")) {
                             path = nameOfValue;
@@ -2464,6 +2466,10 @@ public class AuthClientUtils {
                     cookie = createCookie(cookieName, cookieValue, domain, path);
 
                     if("LOGOUT".equals(cookieValue)){
+                        cookie.setMaxAge(0);
+                    }
+
+                    if (cookieName.equals(cookieName)) {
                         cookie.setMaxAge(0);
                     }
 
