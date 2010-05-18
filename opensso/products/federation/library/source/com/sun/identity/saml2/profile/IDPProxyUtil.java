@@ -22,10 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010 ForgeRock AS
- *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
+ */
+
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
  */
 
 package com.sun.identity.saml2.profile;
@@ -105,11 +107,6 @@ public class IDPProxyUtil {
         try {
              sm = new SAML2MetaManager();
              sessionProvider = SessionManager.getProvider();
-//             String proxyFinderClass = SystemConfigurationUtil.getProperty(
-//                 SAML2Constants.IDP_PROXY_FINDER_NAME,
-//                 SAML2Constants.DEFAULT_IDP_PROXY_FINDER);
-//             Class proxyClass = Class.forName(proxyFinderClass);
-//             proxyFinder = (SAML2IDPFinder)proxyClass.newInstance();
          } catch (Exception ex) {
              SAML2Utils.debug.error("IDPSSOFederate:Static Init Failed", ex);
          }

@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2010 ForgeRock AS
+-->
+
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 

@@ -22,12 +22,13 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010 ForgeRock AS
- * 
  * $Id: IDPCache.java,v 1.18 2009/05/14 17:23:45 exu Exp $
  *
  */
 
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.saml2.profile;
 

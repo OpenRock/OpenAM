@@ -25,6 +25,9 @@
    $Id: Home.jsp,v 1.19 2009/11/18 00:00:12 asyhuang Exp $
 
 --%>
+<%--
+   Portions Copyrighted [2010] [ForgeRock AS]
+--%>
 
 <%@ page info="Home" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>

@@ -22,10 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010 ForgeRock AS
- *
  * $Id: SAML2MetaUtils.java,v 1.9 2009/09/21 17:28:12 exu Exp $
  *
+ */
+
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
  */
 
 package com.sun.identity.saml2.meta;

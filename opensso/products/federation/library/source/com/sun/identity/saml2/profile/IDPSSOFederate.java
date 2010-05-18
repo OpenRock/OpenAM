@@ -22,10 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010 ForgeRock AS
- *
  * $Id: IDPSSOFederate.java,v 1.27 2009/10/14 23:59:09 exu Exp $
  *
+ */
+
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
  */
 
 package com.sun.identity.saml2.profile;

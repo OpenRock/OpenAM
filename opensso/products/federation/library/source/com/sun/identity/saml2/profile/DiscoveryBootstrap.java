@@ -22,8 +22,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010 ForgeRock AS
- *
  * $Id: DiscoveryBootstrap.java,v 1.4 2008/12/05 00:18:31 exu Exp $
  *
  */
@@ -71,8 +69,6 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.key.EncInfo;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.xml.XMLUtils;
 

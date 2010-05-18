@@ -22,10 +22,12 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   Portions Copyrighted 2010 ForgeRock AS
-
    $Id: binding.xjb,v 1.3 2008/06/25 05:48:42 qcheng Exp $
 
+-->
+
+<!--
+    Portions Copyrighted 2010 ForgeRock AS
 -->
 
 <jxb:bindings version="1.0"
