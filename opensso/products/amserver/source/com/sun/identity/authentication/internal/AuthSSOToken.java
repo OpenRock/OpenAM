@@ -26,10 +26,6 @@
  *
  */
 
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-
 package com.sun.identity.authentication.internal;
 
 import java.net.InetAddress;
@@ -187,30 +183,6 @@ public class AuthSSOToken implements SSOToken {
     public void addSSOTokenListener(SSOTokenListener listener)
             throws SSOException {
         callbackObjects.add(listener);
-    }
-
-    /**
-     * Not implemented in this SSOTokenImpl
-     *
-     * @return Always false
-     * @throws SSOException Method not supported
-     */
-    public boolean isTokenRestricted()
-    throws SSOException {
-        throw new SSOException("Method not supported");
-    }
-
-    /**
-     * Not implemented in this SSOTokenImpl
-     *
-     * @param requester Represents an amadmin SSOToken
-     * @param restrictedId The SSOTokenID string of the restricted token to be de-referenced
-     * @return The master token id that 'owns' the restricted token
-     * @throws SSOException Always, method not supported
-     */
-    public String dereferenceRestrictedTokenID(SSOToken requester, String restrictedId)
-    throws SSOException {
-        throw new SSOException("Method not supported");
     }
 
     protected boolean isValid() {

@@ -26,10 +26,6 @@
  *
  */
 
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-
 package com.iplanet.dpro.session.service;
 
 import java.io.DataInputStream;
@@ -44,31 +40,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.TokenRestrictionFactory;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.security.DecodeAction;
 
 /**
  * This servlet class is used as a helper to aid SessionService to perform
- * certain session-failover related operations.
+ * certain session-failover related operations:
  * <ol>
  * <li>Creating a new Http session
  * <li>Recovering an existing Http session in case of server failover
  * <li>Releasing an existing OpenSSO session if it is being
  * relocated to a different "owner" server
- * </ol>
- * 
- * This servlet is also used for certain restricted token functions
- * <ol>
- * <li>Creating a restricted token
- * <li>De-referencing a restriction token back to its master
- * </ol>
  * 
  * Name GetHttpSession is largely a misnomer, but it was kept to minimize
  * changes to other places of code/configuration This class does minimal amount
@@ -96,15 +82,11 @@ public final class GetHttpSession extends HttpServlet {
 
     public static final String GET_RESTRICTED_TOKEN_OP = "get_restricted_token";
 
-    public static final String DEREFERENCE_RESTRICTED_TOKEN_ID =
-                                                "dereference_restricted_token_id";
-
     public static final String DOMAIN = "domain";
 
-    public static final String PERCENT = "%";
+    private static final long MAX_TIMESTAMP_DIFF = 10 * 60 * 1000; // 10
+                                                                    // Minutes
 
-    private static final long MAX_TIMESTAMP_DIFF = 10 * 60 * 1000; // 10 minutes
-                                                                    
     private boolean validateRequest(HttpServletRequest servletRequest) {
         try {
             String encryptedCookie = CookieUtils.getCookieValueFromReq(
@@ -285,53 +267,6 @@ public final class GetHttpSession extends HttpServlet {
                         "GetHttpSession.get_restricted_token: " +
                         "exception occured while create token",
                                 ex);
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            } finally {
-                SessionService.closeStream(in);
-                SessionService.closeStream(out);
-            }
-        } else if (op.equals(DEREFERENCE_RESTRICTED_TOKEN_ID)) {
-            DataInputStream in = null;
-                        DataOutputStream out = null;
-
-            String cookieValue = CookieUtils.getCookieValueFromReq(
-                    request, CookieUtils.getAmCookieName());
-
-            if((cookieValue != null) && (cookieValue.indexOf(PERCENT) != -1)) {
-                cookieValue = URLEncDec.decode(cookieValue);
-            }
-
-            SessionID sid = new SessionID(cookieValue);
-
-            try {
-                in = new DataInputStream(request.getInputStream());
-
-                String restrictedID = in.readUTF();
-
-                try {
-                    String masterSID = SessionService.getSessionService().deferenceRestrictedID(Session.getSession(sid), restrictedID);
-
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    out = new DataOutputStream(response.getOutputStream());
-                    out.writeUTF(masterSID);
-                    out.flush();
-
-                    if (SessionService.sessionDebug.messageEnabled()) {
-                        SessionService.sessionDebug.message(
-                            "GetHttpSession.dereference_restricted_token_id: master sid=" + masterSID);
-                    }
-                } catch (SessionException se) {
-                    SessionService.sessionDebug.error(
-                            "GetHttpSession.dereference_restricted_token_id: unable to find master sid", se);
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    out = new DataOutputStream(response.getOutputStream());
-                    out.writeUTF("ERROR");
-                    out.flush();
-                }
-            } catch (Exception ex) {
-                SessionService.sessionDebug.error(
-                    "GetHttpSession.dereference_restricted_token_id: exception occured while finding master sid",
-                    ex);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } finally {
                 SessionService.closeStream(in);
