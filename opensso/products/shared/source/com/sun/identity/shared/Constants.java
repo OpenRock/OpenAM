@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.shared;
 
 /**
@@ -971,4 +975,9 @@ public interface Constants {
     public static final String KRB5_CREDENTIAL_TYPE =
         "com.sun.identity.authentication.module.WindowsDesktopSSO.credsType";
 
+    /**
+     * property to control whether remote auth includes request/response
+     */
+     public static final String REMOTEAUTH_INCLUDE_REQRES =
+             "openam.remoteauth.include.reqres";
 }
