@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.am.util;
 
 import com.iplanet.sso.SSOToken;
@@ -79,6 +83,7 @@ public class SystemProperties {
     private static Map attributeMap = new HashMap();
     private static boolean isSSOAdm = Boolean.valueOf(
         System.getProperty("ssoadm", "false")).booleanValue();
+    private final static String TRUE = "true";
     
     static {
         initAttributeMapping();
@@ -323,13 +328,25 @@ public class SystemProperties {
      * This method lets you query for a system property whose value is same as
      * <code>String</code> key.
      * 
-     * @param key Yhe key whose value one is looking for.
+     * @param key the key whose value one is looking for.
      * @param def the default value if the key does not exist.
      * @return the value if the key exists; otherwise returns default value.
      */
     public static String get(String key, String def) {
         String value = get(key);
         return ((value == null) ? def : value);
+    }
+
+    /**
+     * Returns the property value as a boolean
+     *
+     * @param key the key whose value one is looking for.
+     * @return the boolean value if the key exists; otherwise returns false
+     */
+    public static boolean getAsBoolean(String key) {
+        String value = get(key);
+
+        return (value.equalsIgnoreCase(TRUE) ? true : false);
     }
     
     /**

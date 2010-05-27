@@ -29,6 +29,7 @@
 
 package com.sun.identity.authentication.server;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +37,8 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOToken;
@@ -49,6 +52,9 @@ import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.share.AuthXMLUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.xml.XMLUtils;
+
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 
 /**
  * AuthXMLResponse constructs the response XML string to return
@@ -80,6 +86,8 @@ public class AuthXMLResponse {
     InternalSession oldSession = null;
     boolean validSessionNoUpgrade = false;
     AuthXMLRequest authXMLReq = null;
+    String remoteRequest = null;
+    String remoteResponse = null;
 
     /**
      * Creates <code>AuthXMLResponse</code> object
@@ -153,6 +161,44 @@ public class AuthXMLResponse {
      */
     public void setReqdCallbacks(Callback reqdCallbacks[]) {
         this.reqdCallbacks = reqdCallbacks;
+    }
+
+    /**
+     * Sets the remote request on the XML response
+     *
+     * @param remoteReq The Http Servlet Request to be set
+     */
+    public void setRemoteRequest(HttpServletRequest remoteReq) {
+        if (remoteReq != null) {
+            String encObj = null;
+
+            try {
+                encObj = AuthXMLUtils.serializeToString(remoteReq);
+            } catch (IOException ioe) {
+                debug.error("AuthXMLResponse::setRemoteRequest Unable to serailize http request", ioe);
+            }
+
+            remoteRequest = encObj;
+        }
+    }
+
+    /**
+     * Sets the remote response on the XML response
+     *
+     * @param remoteRes The Http Servlet Response to be set
+     */
+    public void setRemoteResponse(HttpServletResponse remoteRes) {
+        if (remoteRes != null) {
+            String encObj = null;
+
+            try {
+                encObj = AuthXMLUtils.serializeToString(remoteRes);
+            } catch (IOException ioe) {
+                debug.error("AuthXMLResponse::setRemoteResponse Unable to serailize http response", ioe);
+            }
+
+            remoteResponse = encObj;
+        }
     }
 
     /**
@@ -305,6 +351,7 @@ public class AuthXMLResponse {
             statusString.append(AuthXMLTags.ELEMENT_CLOSE);
         }
 
+        addRemoteRequestResponse(statusString);
         statusString.append(AuthXMLTags.LOGIN_STATUS_END);
  
         String statusXMLString = statusString.toString();
@@ -372,6 +419,7 @@ public class AuthXMLResponse {
                     xmlString.append(AuthXMLTags.GET_REQS_BEGIN);
                     xmlString.append(xmlCallback);
                     xmlString.append(AuthXMLTags.GET_REQS_END);
+                    addRemoteRequestResponse(xmlString);
                 } else { 
                     if ((loginStatus == AuthContext.Status.FAILED) || 
                         isException
@@ -534,5 +582,25 @@ public class AuthXMLResponse {
 
     public void setAuthXMLRequest(AuthXMLRequest authXMLReq) {
         this.authXMLReq = authXMLReq;
+    }
+
+    private void addRemoteRequestResponse(StringBuffer xmlString) {
+        if ((remoteRequest != null) && (remoteResponse != null)) {
+            xmlString.append(AuthXMLTags.REMOTE_REQUEST_RESPONSE_START);
+
+            if (remoteRequest != null) {
+                xmlString.append(AuthXMLTags.HTTP_SERVLET_REQUEST_START)
+                .append(remoteRequest)
+                .append(AuthXMLTags.HTTP_SERVLET_REQUEST_END);
+            }
+
+            if (remoteResponse != null) {
+                xmlString.append(AuthXMLTags.HTTP_SERVLET_RESPONSE_START)
+                .append(remoteResponse)
+                .append(AuthXMLTags.HTTP_SERVLET_RESPONSE_END);
+            }
+
+            xmlString.append(AuthXMLTags.REMOTE_REQUEST_RESPONSE_END);
+        }
     }
 }

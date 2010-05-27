@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.share;
 
@@ -39,8 +42,11 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.AccessController;
@@ -63,6 +69,8 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -297,6 +305,56 @@ public class AuthXMLUtils {
         }
         
         return (Callback[]) callbackList.toArray(answer);
+    }
+
+    /**
+     * Returns the remote HttpServletRequest object from the embedded serialized
+     * content in the XML document
+     *
+     * @param requestNode The request xml node
+     * @return The Http Servlet Request object
+     */
+    public static HttpServletRequest getRemoteRequest(Node requestNode) {
+        if (requestNode == null)
+            return null;
+
+        Object obj = null;
+
+        try {
+            obj = deserializeToObject(
+                    getValueOfChildNode(requestNode, AuthXMLTags.HTTP_SERVLET_REQUEST));
+        } catch (IOException ioe) {
+            debug.error("Unable to deserialize request object", ioe);
+        } catch (ClassNotFoundException cnfe) {
+            debug.error("Unable to load class", cnfe);
+        }
+
+        return (HttpServletRequest) obj;
+    }
+
+    /**
+     * Returns the remote HttpServletResponse object from the embedded serialized
+     * content in the XML document
+     *
+     * @param responseNode The response xml node
+     * @return The Http Servlet Response object
+     */
+    public static HttpServletResponse getRemoteResponse(Node responseNode) {
+        if (responseNode == null)
+            return null;
+
+        Object obj = null;
+
+        try {
+            obj = deserializeToObject(
+                    getValueOfChildNode(responseNode, AuthXMLTags.HTTP_SERVLET_RESPONSE));
+        } catch (IOException ioe) {
+            debug.error("Unable to deserialize response object", ioe);
+        } catch (ClassNotFoundException cnfe) {
+            debug.error("Unable to load class", cnfe);
+        }
+
+        return (HttpServletResponse) obj;
     }
     
     /**
@@ -1547,6 +1605,46 @@ public class AuthXMLUtils {
             debug.message("returning temp" + subjectObj);
         }
         return subjectObj;
+    }
+
+    /**
+     * Serialize an object to a string
+     *
+     * @param object The object to be serialized
+     * @return Base64 encoded string representation of the object
+     * @throws IOException If the object is not serializable
+     */
+    public static String serializeToString(Object object)
+    throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(object);
+        oos.close();
+
+        return Base64.encode(baos.toByteArray());
+    }
+
+    /**
+     * Deserialize a string back into the original object
+     *
+     * @param encObj The Base64 encoded string representation of the object
+     * @return The deserialized object
+     * @throws IOException If the object cannot be deserialized
+     * @throws ClassNotFoundException If the class representing the object
+     * cannot be found
+     */
+    public static Object deserializeToObject(String encObj)
+    throws IOException, ClassNotFoundException {
+        Object obj = null;
+
+        if (encObj != null && encObj.length() > 0) {
+            ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(encObj));
+            ObjectInputStream oos = new ObjectInputStream(bais);
+            obj = oos.readObject();
+            oos.close();
+        }
+
+        return obj;
     }
     
     static int getNameCallbackIndex(Callback[] callbacks,int startIndex) {

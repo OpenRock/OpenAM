@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.authentication.server;
 
 import com.iplanet.am.util.SystemProperties;
@@ -81,6 +85,8 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 
 /**
  * <code>AuthXMLHandler</code> class implements the <code>RequestHandler</code>.
@@ -395,10 +401,16 @@ public class AuthXMLHandler implements RequestHandler {
                         clientHost = servletRequest.getRemoteAddr();
                     }
                     loginState.setClient(clientHost);
+                    loginState.setHttpServletRequest(authXMLRequest.getClientRequest());
+                    loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
                     authContext.login();
-                    setServletRequest(servletRequest,authContext);
+                    //setServletRequest(servletRequest,authContext);
                     processRequirements(authContext,authResponse, params,
                         servletRequest);
+
+                    authResponse.setRemoteRequest(loginState.getHttpServletRequest());
+                    authResponse.setRemoteResponse(loginState.getHttpServletResponse());
+
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
                 } catch (Exception le) {
@@ -434,6 +446,8 @@ public class AuthXMLHandler implements RequestHandler {
                         clientHost = servletRequest.getRemoteAddr();
                     }
                     loginState.setClient(clientHost);
+                    loginState.setHttpServletRequest(authXMLRequest.getClientRequest());
+                    loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
                     String locale = authXMLRequest.getLocale();
                     if (locale != null && locale.length() > 0) {
                         if (debug.messageEnabled()) {
@@ -445,9 +459,11 @@ public class AuthXMLHandler implements RequestHandler {
                         authContext.login(indexType,indexName, false, 
                             envMap, null);
                     }
-                    setServletRequest(servletRequest,authContext);
+                    //setServletRequest(servletRequest,authContext);
                     processRequirements(authContext,authResponse, params,
                         servletRequest);
+                    authResponse.setRemoteRequest(loginState.getHttpServletRequest());
+                    authResponse.setRemoteResponse(loginState.getHttpServletResponse());
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
                 } catch (Exception le) {
@@ -462,7 +478,7 @@ public class AuthXMLHandler implements RequestHandler {
                 try {
                     Subject subject = authXMLRequest.getSubject();
                     authContext.login(subject);
-                    setServletRequest(servletRequest,authContext);
+                    //setServletRequest(servletRequest,authContext);
                     processRequirements(authContext,authResponse, params,
                         servletRequest);
                     postProcess(loginState, authResponse);
@@ -477,15 +493,19 @@ public class AuthXMLHandler implements RequestHandler {
                 break;
             case AuthXMLRequest.SubmitRequirements:
                 try {
-                    setServletRequest(servletRequest,authContext);
+                    //setServletRequest(servletRequest,authContext);
                     Callback[] submittedCallbacks =
                     authXMLRequest.getSubmittedCallbacks();
+                    loginState.setHttpServletRequest(authXMLRequest.getClientRequest());
+                    loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
                     authContext.submitRequirements(submittedCallbacks);
                     Callback[] reqdCallbacks = null;
                     if (authContext.hasMoreRequirements()) {
                         reqdCallbacks = authContext.getRequirements();
                         authResponse.setReqdCallbacks(reqdCallbacks);
                     }
+                    authResponse.setRemoteRequest(loginState.getHttpServletRequest());
+                    authResponse.setRemoteResponse(loginState.getHttpServletResponse());
                     postProcess(loginState, authResponse);
                     loginStatus = authContext.getStatus();
                     authResponse.setLoginStatus(loginStatus);

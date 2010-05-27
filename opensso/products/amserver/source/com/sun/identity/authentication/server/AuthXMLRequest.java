@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.server;
 
@@ -35,6 +37,7 @@ import java.security.Principal;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthException;
@@ -115,6 +118,8 @@ public class AuthXMLRequest {
     private List env = null;
     AuthContextLocal authContext = null;
     HttpServletRequest servletRequest = null;
+    HttpServletRequest clientRequest = null;
+    HttpServletResponse clientResponse = null;
     //String origAuthIdentifier=null;
 
     static com.sun.identity.shared.debug.Debug debug =
@@ -301,6 +306,42 @@ public class AuthXMLRequest {
      */
     public void setSubmittedCallbacks(Callback submittedCallbacks[]) {
         this.submittedCallbacks = submittedCallbacks;
+    }
+
+    /**
+     * Sets the client request
+     *
+     * @param request The client Http Servlet Request
+     */
+    public void setClientRequest(HttpServletRequest request) {
+       clientRequest = request;
+    }
+
+    /**
+     * Sets the client response
+     *
+     * @param response The client Http Servlet Response
+     */
+    public void setClientResponse(HttpServletResponse response) {
+       clientResponse = response;
+    }
+
+    /**
+     * Gets the client request
+     *
+     * @return The client Http Servlet Request
+     */
+    public HttpServletRequest getClientRequest() {
+       return clientRequest;
+    }
+
+    /**
+     * Gets the client response
+     *
+     * @return The client Http Servlet Response
+     */
+    public HttpServletResponse getClientResponse() {
+       return clientResponse;
     }
 
     /**

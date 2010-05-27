@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.server;
 
@@ -34,6 +36,7 @@ import java.io.ByteArrayInputStream;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -220,6 +223,13 @@ public class AuthXMLRequestParser {
                         LoginState loginState = authContext.getLoginState();
                         loginState.setRemoteLocale(localeAttr);
                     }
+
+                    HttpServletRequest clientRequest =
+                        AuthXMLUtils.getRemoteRequest(XMLUtils.getChildNode(requestNode,AuthXMLTags.REMOTE_REQUEST_RESPONSE));
+                    HttpServletResponse clientResponse =
+                        AuthXMLUtils.getRemoteResponse(XMLUtils.getChildNode(requestNode,AuthXMLTags.REMOTE_REQUEST_RESPONSE));
+                    authXMLRequest.setClientRequest(clientRequest);
+                    authXMLRequest.setClientResponse(clientResponse);
                 }
 
                 // get submit requirements node
@@ -238,6 +248,13 @@ public class AuthXMLRequestParser {
 		    String localeStr = authXMLRequest.getLocale();
                     LoginState loginState = authContext.getLoginState();
                     loginState.setRemoteLocale(localeStr);
+
+                    HttpServletRequest clientRequest =
+                        AuthXMLUtils.getRemoteRequest(XMLUtils.getChildNode(requestNode,AuthXMLTags.REMOTE_REQUEST_RESPONSE));
+                    HttpServletResponse clientResponse =
+                        AuthXMLUtils.getRemoteResponse(XMLUtils.getChildNode(requestNode,AuthXMLTags.REMOTE_REQUEST_RESPONSE));
+                    authXMLRequest.setClientRequest(clientRequest);
+                    authXMLRequest.setClientResponse(clientResponse);
                 }
 
                 // get  logout node

@@ -4268,7 +4268,7 @@ public class LoginState {
      * Sets servlet response.
      * @param servletResponse servletResponse object to be set
      */
-    protected void setHttpServletResponse(HttpServletResponse servletResponse) {
+    public void setHttpServletResponse(HttpServletResponse servletResponse) {
         this.servletResponse = servletResponse;
     }
     

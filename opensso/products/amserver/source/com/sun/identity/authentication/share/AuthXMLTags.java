@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.share;
 
@@ -165,6 +168,9 @@ public interface AuthXMLTags {
     public static final String REDIRECT_NAME_END = "</Name>";
     public static final String REDIRECT_VALUE_BEGIN = "<Value>";
     public static final String REDIRECT_VALUE_END = "</Value>";
+    public static final String REMOTE_REQUEST_RESPONSE = "RemoteRequestResponse";
+    public static final String HTTP_SERVLET_REQUEST = "HttpServletRequest";
+    public static final String HTTP_SERVLET_RESPONSE = "HttpServletResponse";
     
     /**
      * Predefined xml tags and statements.
@@ -298,4 +304,10 @@ public interface AuthXMLTags {
     public static final String ATTRIBUTE_COUNTRY="country";
     public static final String ATTRIBUTE_VARIANT="variant";
 
+    public static final String HTTP_SERVLET_REQUEST_START ="<HttpServletRequest>";
+    public static final String HTTP_SERVLET_REQUEST_END ="</HttpServletRequest>";
+    public static final String HTTP_SERVLET_RESPONSE_START ="<HttpServletResponse>";
+    public static final String HTTP_SERVLET_RESPONSE_END ="</HttpServletResponse>";
+    public static final String REMOTE_REQUEST_RESPONSE_START = "<RemoteRequestResponse>";
+    public static final String REMOTE_REQUEST_RESPONSE_END = "</RemoteRequestResponse>";
 }
