@@ -26,6 +26,10 @@
 #
 #
 
+#
+# Portions Copyrighted [2010] [ForgeRock AS]
+#
+
 /* The following keys are used to configure the Debug service.
  * Possible values for the key 'level' are: off | error | warning | message. 
  * The key 'directory' specifies the output directory where the debug files 
@@ -207,3 +211,15 @@ com.sun.identity.urlconnection.useCache=false
  */
 opensso.protocol.handler.pkgs=
 
+/*
+ * This setting controls whether the AuthContext includes the HttpServletRequest
+ * and HttpServletResponse objects as serialized Java objects in the remote auth
+ * XML communications with the server. If the OpenAM server is using custom auth
+ * modules that make use of the HttpServletRequest or Response objects; the module
+ * might look for a request parameter or need to set a cookie, then set this value
+ * to true.
+ *
+ * Enabling this functionality has a minimal performance impact due to the
+ * serialization overhead.
+ */
+openam.remoteauth.include.reqres=false
