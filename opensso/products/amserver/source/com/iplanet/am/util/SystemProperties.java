@@ -346,6 +346,9 @@ public class SystemProperties {
     public static boolean getAsBoolean(String key) {
         String value = get(key);
 
+        if (value == null)
+            return false;
+
         return (value.equalsIgnoreCase(TRUE) ? true : false);
     }
     
