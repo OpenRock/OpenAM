@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -595,7 +599,7 @@ class ServiceConfigImpl implements ServiceListener {
             // Check if the user has permissions
             Set principals = (Set) userPrincipals.get(cn);
             if ((principals == null) ||
-                !principals.contains(t.getPrincipal().getName())) {
+                !principals.contains(t.getTokenID().toString())) {
                 // Principal name not in cache, need to check perm
                 checkAndUpdatePermission(cn, answer.getDN(), t);
             }
@@ -612,7 +616,7 @@ class ServiceConfigImpl implements ServiceListener {
             sudoPrincipals = Collections.synchronizedSet(new HashSet(2));
             userPrincipals.put(cacheName, sudoPrincipals);
         }
-        sudoPrincipals.add(t.getPrincipal().getName());
+        sudoPrincipals.add(t.getTokenID().toString());
         return (answer);
     }
 
