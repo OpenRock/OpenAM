@@ -535,11 +535,20 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
             // Check URL is not the local server
             if (!url.toLowerCase().startsWith(serverURL)) {
                 synchronized (notificationURLs) {
-                    notificationURLs.put(id, new URL(url));
-                }
-                if (debug.messageEnabled()) {
-                    debug.message("SMSJAXRPCObjectImpl:register for "
-                            + "notification URL: " + url);
+                    URL nURL = new URL(url);
+                    if (!notificationURLs.containsValue(nURL)) {
+                        notificationURLs.put(id, new URL(url));
+                        
+                        if (debug.messageEnabled()) {
+                            debug.message("SMSJAXRPCObjectImpl:register for "
+                                + "notification URL: " + url);
+                        }
+                    } else {
+                        if (debug.messageEnabled()) {
+                            debug.message("SMSJAXRPCObjectImpl:register for " +
+                                "notification URL: " + url + " already present");
+                        }
+                    }
                 }
             } else {
                 // Cannot add this server for notifications
