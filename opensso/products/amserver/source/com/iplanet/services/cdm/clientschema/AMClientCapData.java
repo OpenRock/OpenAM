@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.services.cdm.clientschema;
 
 import com.iplanet.am.sdk.AMEntity;
@@ -485,9 +489,32 @@ public class AMClientCapData implements IDSEventListener {
                 Map attrsMap = amEntity.getAttributes();
                 props = parsePropertyNames(attrsMap);
             }
+        } catch (SSOException ssoe) {
+            debug.error(dbStr + "Could not get Client, session invalid: " + clientType, ssoe);
 
-        } catch (Exception e) {
-            debug.warning(dbStr + "Could not get Client: " + clientType, e);
+            // admin token has timed out, retry
+            adminToken = null;
+            String dbName = null;
+
+            if (isInternalInstance()) {
+                dbName = INTERNAL_DATA;
+            } else {
+                dbName = EXTERNAL_DATA;
+            }
+
+            try {
+                init(dbName); // call init after setting per-instance vars
+                AMEntity amEntity = amConnection.getEntity(dn);
+
+                if (amEntity.isExists()) {
+                    Map attrsMap = amEntity.getAttributes();
+                    props = parsePropertyNames (attrsMap);
+                }
+            } catch (Exception ex) {
+                debug.error(dbStr + "Could not get Client, even after retry: " + clientType, ex);
+            }
+        } catch (Exception ex) {
+            debug.warning(dbStr + "Could not get Client: " + clientType, ex);
         }
 
         return props;
