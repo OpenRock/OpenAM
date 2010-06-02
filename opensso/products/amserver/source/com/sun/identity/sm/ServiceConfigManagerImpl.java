@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.am.util.Cache;
@@ -604,14 +608,9 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
         // User has permissions,
         // Construct ServiceConfigManagerImpl and add to cache
         synchronized (configMgrImpls) {
-            // Check cache again, in case it was added by another thread
-            if ((answer = getFromCache(
-                cName, serviceName, version, token)) == null) {
-                answer = new ServiceConfigManagerImpl(
+            answer = new ServiceConfigManagerImpl(
                     token, serviceName, version);
-                // Add to cache
-                configMgrImpls.put(cName, answer);
-            }
+            configMgrImpls.put(cName, answer);
         }
         // Debug messages
         if (debug.messageEnabled()) {
