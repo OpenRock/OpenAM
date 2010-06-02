@@ -282,8 +282,13 @@ else
 	$(CC) -o $(CRYPT_EXE) crypt_util_program.o
 endif
 else
+ifeq ($(BUILD_TYPE), 32)
+	$(CC) -m32 -c crypt_util.c -o crypt_util_program.o
+	$(CC) -m32 -o $(CRYPT_EXE) crypt_util_program.o
+else
 	$(CC) -c crypt_util.c -o crypt_util_program.o
 	$(CC) -o $(CRYPT_EXE) crypt_util_program.o
+endif
 endif
 	$(CP) $(CRYPT_EXE) $(DEST_BIN_DIR)
 
