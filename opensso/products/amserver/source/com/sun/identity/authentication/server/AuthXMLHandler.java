@@ -42,6 +42,7 @@ import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 
@@ -314,19 +315,38 @@ public class AuthXMLHandler implements RequestHandler {
                 indexNameLoc.equals("Application"))) {
                 try {
                     String ssoTokenID = authXMLRequest.getAppSSOTokenID();
+
                     if (debug.messageEnabled()) {
                         debug.message("Session ID = : " + ssoTokenID);
                     }
+
                     SSOTokenManager manager = SSOTokenManager.getInstance();
                     SSOToken appSSOToken = manager.createSSOToken(ssoTokenID);
+
+                    // if the token isn't valid, let the client know so they
+                    // retry
                     if (!manager.isValidToken(appSSOToken)) {
-                        debug.message("App SSOToken is not valid");
-                        throw new AuthException(
-                            AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN, null);
+                        if (debug.messageEnabled()) {
+                            debug.message("App SSOToken is not valid");
+                        }
+
+                        setErrorCode(authResponse, new AuthException(
+                            AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN, null));
+                        return authResponse;
                     } else {
                         debug.message("App SSOToken is VALID");
-                    } 
-                }catch (Exception exp) {
+                    }
+                } catch (SSOException ssoe) {
+                    // token is unknown to OpenAM, let the client know so they
+                    // can retry
+                    if (debug.messageEnabled()) {
+                        debug.message("App SSOToken is not valid: " + ssoe.getMessage());
+                    }
+
+                    setErrorCode(authResponse, new AuthException(
+                        AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN, null));
+                    return authResponse;
+                } catch (Exception exp) {
                     debug.error("Got Exception", exp);
                     setErrorCode(authResponse, exp);
                     return authResponse;

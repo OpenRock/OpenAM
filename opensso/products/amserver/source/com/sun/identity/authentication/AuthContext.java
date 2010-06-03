@@ -44,6 +44,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.share.AuthXMLUtils;
@@ -156,6 +157,7 @@ public class AuthContext extends Object implements java.io.Serializable {
     private String ssoTokenID = null;
     private static SSOToken appSSOToken = null;
     com.sun.identity.authentication.server.AuthContextLocal acLocal = null;
+    private boolean retryRunLogin = true;
     
     /**
      * Variables for checking auth service is running local
@@ -722,25 +724,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         if (appSSOToken == null) {
             if (!((indexType == IndexType.MODULE_INSTANCE) && 
                 (indexName.equals("Application")))){
-                try {
-                    appSSOToken = (SSOToken) AccessController.doPrivileged(
-                        AdminTokenAction.getInstance());
-                } catch (AMSecurityPropertiesException propExp) {
-                    // Ignore the Exception and continue without App SSO Token.
-                    if (authDebug.messageEnabled()) {
-                        authDebug.message("AuthContext.runLogin: "
-                            + "Runtime Exception" + propExp.getMessage());
-                        authDebug.message("AuthContext.runLogin: Not "
-                            + "able to get appSSOToken, continuing without "
-                            + "appSSOToken");
-                    }
-                }
-                if (appSSOToken == null) {
-                    authDebug.message("Null App SSO Token");
-                }
-            }
-            if (authDebug.messageEnabled()) {
-                authDebug.message("Obtained App Token= "+appSSOToken);
+                appSSOToken = getAppSSOToken(false);
             }
         }
         
@@ -1013,9 +997,20 @@ public class AuthContext extends Object implements java.io.Serializable {
             // Check set the login status
             checkAndSetLoginStatus();
         } catch (AuthLoginException le) {
-            // Login has failed
-            loginStatus = Status.FAILED;
-            loginException = le;
+            if (le.getErrorCode().equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN) &&
+                    retryRunLogin) {
+                retryRunLogin = false;
+
+                if (authDebug.messageEnabled()) {
+                    authDebug.message("Run remote login failed due to expired app token, retying");
+                }
+
+                runRemoteLogin(indexType, indexName, params, pCookie, envMap, locale, req,  res);
+            } else {
+                // Login has failed
+                loginStatus = Status.FAILED;
+                loginException = le;
+            }
         }
     }
 
@@ -1755,7 +1750,7 @@ public class AuthContext extends Object implements java.io.Serializable {
     /**
      * Returns error code.
      *
-     * @return error code.
+     * @return error code with white space trimmed
      */
     public String getErrorCode() {
         if (localFlag) {
@@ -1764,11 +1759,13 @@ public class AuthContext extends Object implements java.io.Serializable {
             String errCode = "";
             Node exceptionNode = XMLUtils.getRootNode(receivedDocument,
             AuthXMLTags.EXCEPTION);
+
             if (exceptionNode != null) {
                 errCode = XMLUtils.getNodeAttributeValue(exceptionNode,
                 AuthXMLTags.ERROR_CODE);
             }
-            return errCode;
+
+            return errCode.trim();
         }
     }
     
@@ -1822,6 +1819,12 @@ public class AuthContext extends Object implements java.io.Serializable {
     private AuthLoginException checkException(){
         AuthLoginException exception = null;
         String error = getErrorCode();
+
+        // if the app token is invalid, refresh the token
+        if (error.equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN)) {
+             appSSOToken = getAppSSOToken(true);
+        }
+
         if (error != null && error.length() != 0){
             exception = new AuthLoginException("amAuth", error, null);
         } else {
@@ -2349,5 +2352,76 @@ public class AuthContext extends Object implements java.io.Serializable {
             }
         }
         localSessionChecked = true;
-    } 
+    }
+
+    /**
+     * Returns the application sso token. Can perform a check to ensure that
+     * the app token is still valid (requires a session refresh call to OpenAM)
+     *
+     * @param refresh true if we should check with OpenAM if the app token is valid
+     * @return a valid application's sso token.
+     */
+    private SSOToken getAppSSOToken(boolean refresh) {
+        SSOToken appToken = null;
+
+        try {
+            appToken = (SSOToken) AccessController.doPrivileged(
+                            AdminTokenAction.getInstance());
+        } catch (AMSecurityPropertiesException aspe) {
+            if (authDebug.messageEnabled()) {
+                authDebug.message("AuthContext::getAppSSOToken: " +
+                                  "unable to get app ssotoken " + aspe.getMessage());
+            }
+        }
+
+        if (refresh) {
+            // ensure the token is valid
+            try {
+                SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
+                ssoTokenManager.refreshSession(appToken);
+
+                if (!ssoTokenManager.isValidToken(appToken)) {
+                    if (authDebug.messageEnabled()) {
+                        authDebug.message("AuthContext.getAppSSOToken(): " +
+                                          "App SSOToken is invalid, retrying");
+                    }
+
+                    try {
+                        appToken = (SSOToken) AccessController.doPrivileged(
+                                                AdminTokenAction.getInstance());
+                    } catch (AMSecurityPropertiesException aspe) {
+                        if (authDebug.messageEnabled()) {
+                            authDebug.message("AuthContext::getAppSSOToken: " +
+                                              "unable to get app ssotoken " + aspe.getMessage());
+                        }
+                    }
+                }
+            } catch (SSOException ssoe) {
+                if (authDebug.messageEnabled()) {
+                    authDebug.message("AuthContext.getAppSSOToken(): " +
+                                      "unable to refresh app token: " + ssoe.getL10NMessage());
+                }
+
+                try {
+                    appToken = (SSOToken) AccessController.doPrivileged(
+                                            AdminTokenAction.getInstance());
+                } catch (AMSecurityPropertiesException aspe) {
+                    if (authDebug.errorEnabled()) {
+                        authDebug.error("AuthContext::getAppSSOToken: " +
+                                          "unable to get app ssotoken " + aspe.getMessage());
+                    }
+                }
+            }
+        }
+
+        if (authDebug.messageEnabled()) {
+            if (appToken == null) {
+                authDebug.message("Null App SSO Token");
+            } else {
+                authDebug.message("Obtained App Token= " + appToken.getTokenID().toString());
+            }
+        }
+
+        return appToken;
+    }
 }
