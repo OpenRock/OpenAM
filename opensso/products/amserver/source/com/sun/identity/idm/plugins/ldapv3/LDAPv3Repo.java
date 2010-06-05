@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -127,7 +128,7 @@ public class LDAPv3Repo extends IdRepo {
 
     private static SOAPClient mySoapClient = new SOAPClient("dummy");
 
-    private String primaryDS = null;
+    private List<String> ldapServers = new ArrayList();
 
     private String ldapServerName = null;
 
@@ -572,6 +573,7 @@ public class LDAPv3Repo extends IdRepo {
             String curr = (String) it.next();
             StringTokenizer tk = new StringTokenizer(curr, "|");
             String hostAndPort = tk.nextToken().trim();
+            ldapServers.add(hostAndPort);
             String hostServerID = "";
             if (tk.hasMoreTokens()) {
                 hostServerID = tk.nextToken();
@@ -612,11 +614,6 @@ public class LDAPv3Repo extends IdRepo {
         }
 
         ldapServerName = ldapServer;
-        primaryDS = ldapServer;
-        int index = ldapServer.indexOf(" ");
-        if (index > 0) {
-            primaryDS = ldapServer.substring(0, index);
-        }
 
         if (debug.messageEnabled()) {
             debug.message("getLDAPServerName:LDAPv3Config_LDAP_SERVER"
@@ -626,7 +623,8 @@ public class LDAPv3Repo extends IdRepo {
         }
 
         ldapHost = ldapServer;
-        index = ldapServer.indexOf(':');
+        int index = ldapServer.indexOf(':');
+
         if (index > -1) {
             ldapHost = ldapServer.substring(0, index);
             try {
@@ -686,97 +684,133 @@ public class LDAPv3Repo extends IdRepo {
         }
 
         LDAPConnection ldc = null;
-        try {
-            if (ssl != null && ssl.equalsIgnoreCase("true")) {
-                ldc = new LDAPConnection(new JSSESocketFactory(null));
-                sslMode = true;
-            } else {
-                ldc = new LDAPConnection();
-                sslMode = false;
-            }
-        } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("LDAPv3Repo: initConnectionPool "
-                        + "LDAPConnection failed", e);
-            }
-            connPool = null;
-        }
 
-        try {
-            ldc.setOption(LDAPv3.PROTOCOL_VERSION, new Integer(3));
-            ldc.setOption(LDAPv2.REFERRALS, Boolean.valueOf(referrals));
-            ldc.setOption(LDAPv2.TIMELIMIT, new Integer(timeLimit));
-            ldc.setOption(LDAPv2.SIZELIMIT, new Integer(defaultMaxResults));
-            setDefaultReferralCredentials(ldc);
-            LDAPSearchConstraints constraints = ldc.getSearchConstraints();
-            constraints.setMaxResults(defaultMaxResults);
-            constraints.setServerTimeLimit(timeLimit);
-            ldc.setSearchConstraints(constraints);
-            connOptions.put("searchconstraints", constraints);
-            if (cacheEnabled) {
-                ldapCache = new LDAPCache(cacheTTL, cacheSize);
-                ldc.setCache(ldapCache);
-                if (debug.messageEnabled()) {
-                    debug.message("LDAPv3Repo: cacheTTL=" + cacheTTL
-                        + "; cacheSize=" + cacheSize );
+        // loop through the configured ldap servers until we find one that works
+        for (String ldapServerHost : ldapServers) {
+            String origLdapHost = ldapServerHost;
+            int index = origLdapHost.indexOf(':');
+            int ldapServerPort = 389;
+
+            if (index > -1) {
+                ldapHost = origLdapHost.substring(0, index);
+
+                try {
+                    ldapServerPort = Integer.parseInt(origLdapHost.substring(index + 1));
+                } catch(NumberFormatException nfe) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("LDAPv3Repo:initConnectionPool : + origLdapHost" +
+                                      "incorrect port number, using default 389");
+                    }
                 }
             }
-        } catch (LDAPException lde) {
-            int resultCode = lde.getLDAPResultCode();
-            if (debug.messageEnabled()) {
-                debug.message("LDAPv3Repo: initConnectionPool setOption " +
-                        "failed: " + resultCode);
+
+            try {
+                if (ssl != null && ssl.equalsIgnoreCase("true")) {
+                    ldc = new LDAPConnection(new JSSESocketFactory(null));
+                    sslMode = true;
+                } else {
+                    ldc = new LDAPConnection();
+                    sslMode = false;
+                }
+            } catch (Exception ex) {
+                if (debug.messageEnabled()) {
+                    debug.message("LDAPv3Repo: initConnectionPool "
+                            + "LDAPConnection failed", ex);
+                }
+
+                connPool = null;
             }
-        }
 
-        try {
-            int tosec = timeLimit/1000;
-            if (tosec > 0) {
-                ldc.setConnectTimeout(timeLimit/1000);
-            } else  {
-                ldc.setConnectTimeout(3);
+            try {
+                ldc.setOption(LDAPv3.PROTOCOL_VERSION, new Integer(3));
+                ldc.setOption(LDAPv2.REFERRALS, Boolean.valueOf(referrals));
+                ldc.setOption(LDAPv2.TIMELIMIT, new Integer(timeLimit));
+                ldc.setOption(LDAPv2.SIZELIMIT, new Integer(defaultMaxResults));
+                setDefaultReferralCredentials(ldc);
+                LDAPSearchConstraints constraints = ldc.getSearchConstraints();
+                constraints.setMaxResults(defaultMaxResults);
+                constraints.setServerTimeLimit(timeLimit);
+                ldc.setSearchConstraints(constraints);
+                connOptions.put("searchconstraints", constraints);
+
+                if (cacheEnabled) {
+                    ldapCache = new LDAPCache(cacheTTL, cacheSize);
+                    ldc.setCache(ldapCache);
+                    if (debug.messageEnabled()) {
+                        debug.message("LDAPv3Repo: cacheTTL=" + cacheTTL
+                            + "; cacheSize=" + cacheSize );
+                    }
+                }
+            } catch (LDAPException lde) {
+                int resultCode = lde.getLDAPResultCode();
+
+                if (debug.messageEnabled()) {
+                    debug.message("LDAPv3Repo: initConnectionPool setOption " +
+                            "failed: " + resultCode);
+                }
             }
-            ldc.connect(primaryDS, ldapPort, authid, authpw);
 
-            connOptions.put("referrals", new Boolean(referrals));
+            try {
+                int tosec = timeLimit / 1000;
 
-            // Construct the pool by cloning the successful connection
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    connPool = new LDAPConnectionPool("LDAPv3Repo", minPoolSize,
-                        maxPoolSize, ldapServerName, ldapPort,
-                        ldc.getAuthenticationDN(), 
-                            ldc.getAuthenticationPassword(),
-                            ldc, connOptions);
-                    shutdownMan.addShutdownListener(
-                        new ShutdownListener() {
-                            public void shutdown() {
-                                hasShutdown = true;
-                                if (connPool != null) {
-                                    connPool.destroy();
+                if (tosec > 0) {
+                    ldc.setConnectTimeout(timeLimit / 1000);
+                } else  {
+                    ldc.setConnectTimeout(3);
+                }
+
+                ldc.connect(ldapServerHost, ldapServerPort, authid, authpw);
+                connOptions.put("referrals", new Boolean(referrals));
+
+                // Construct the pool by cloning the successful connection
+                ShutdownManager shutdownMan = ShutdownManager.getInstance();
+
+                if (shutdownMan.acquireValidLock()) {
+                    try {
+                        connPool = new LDAPConnectionPool("LDAPv3Repo", minPoolSize,
+                            maxPoolSize, ldapServerName, ldapPort,
+                            ldc.getAuthenticationDN(),
+                                ldc.getAuthenticationPassword(),
+                                ldc, connOptions);
+                        shutdownMan.addShutdownListener(
+                            new ShutdownListener() {
+                                public void shutdown() {
+                                    hasShutdown = true;
+                                    if (connPool != null) {
+                                        connPool.destroy();
+                                    }
                                 }
                             }
-                        }
-                    );
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+                        );
+                    } finally {
+                        shutdownMan.releaseLockAndNotify();
+                    }
+                }
+
+                // LDAP connection pool created successfully
+                break;
+            } catch (LDAPException lex) {
+                int resultCode = lex.getLDAPResultCode();
+                ldapConnError = Integer.toString(resultCode);
+                debug.error("LDAPv3Repo: initConnectionPool ConnectionPool failed: " +
+                            resultCode + "; to server ldapServerHost:" + ldapServerPort);
+                connPool = null;
+
+                try {
+                    ldc.disconnect();
+                } catch (LDAPException lex1) {
+                    debug.message("LDAPv3Repo: ldc.disconnect exception. "
+                        + lex1.getLDAPResultCode());
                 }
             }
-
-        } catch (LDAPException lde) {
-            int resultCode = lde.getLDAPResultCode();
-            ldapConnError = Integer.toString(resultCode);
-            debug.error("LDAPv3Repo: initConnectionPool ConnectionPool failed: "
-                + resultCode + "; ldapServerName:" + ldapServerName);
-            connPool = null;
-            try {
-                ldc.disconnect();
-            } catch (LDAPException lde1) {
-                debug.message("LDAPv3Repo: ldc.disconnect exception. "
-                    + lde1.getLDAPResultCode());
-            }
         }
+
+        // if we get here and connPool is still null, all servers failed
+        if (connPool == null) {
+            debug.error("LDAPv3Repo: initConnectionPool: all servers offline: " +
+                        ldapServerName + " connection pool create failed");
+        }
+
         if (debug.messageEnabled()) {
             debug.message("LDAPv3Repo: exit initConnectionPool ");
         }
