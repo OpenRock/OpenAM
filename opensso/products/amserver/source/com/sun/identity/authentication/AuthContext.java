@@ -1854,15 +1854,17 @@ public class AuthContext extends Object implements java.io.Serializable {
             String status = XMLUtils.getNodeAttributeValue(
             loginStatusNode, AuthXMLTags.STATUS);
             if (status != null) {
-                if (status.equals("success")) {
+                if (status.equals(Status.SUCCESS.toString())) {
                     loginStatus = Status.SUCCESS;
-                } else if (status.equals("failed")) {
+                } else if (status.equals(Status.FAILED.toString())) {
                     loginStatus = Status.FAILED;
                     loginException = checkException();
-                } else if (status.equals("completed")) {
+                } else if (status.equals(Status.COMPLETED.toString())) {
                     loginStatus = Status.COMPLETED;
-                } else if (status.equals("in_progress")) {
+                } else if (status.equals(Status.IN_PROGRESS.toString())) {
                     loginStatus = Status.IN_PROGRESS;
+                } else if (status.equals(Status.RESET.toString())) {
+                    loginStatus = Status.RESET;
                 }
             }
 

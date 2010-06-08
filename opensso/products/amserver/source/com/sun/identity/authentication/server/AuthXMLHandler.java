@@ -395,12 +395,9 @@ public class AuthXMLHandler implements RequestHandler {
                     processNewRequest(servletRequest, servletResponse,
                         authResponse, loginState, authContext);
                     postProcess(loginState, authResponse);
-                } catch (Exception ae) {
-                    debug.error("Error creating AuthContext ", ae);
-                    if (messageEnabled) {
-                        debug.message("Exception " , ae);
-                    }
-                    setErrorCode(authResponse, ae);
+                } catch (Exception ex) {
+                    debug.error("Error in NewAuthContext ", ex);
+                    setErrorCode(authResponse, ex);
                 }
                 break;
             case AuthXMLRequest.Login:
@@ -433,12 +430,10 @@ public class AuthXMLHandler implements RequestHandler {
 
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
-                } catch (Exception le) {
-                    debug.error("Error during login ", le);
-                    if (messageEnabled) {
-                        debug.message("Exception " , le);
-                    }
-                    setErrorCode(authResponse, le);
+                } catch (Exception ex) {
+                    debug.error("Error during login ", ex);
+                    setErrorCode(authResponse, ex);
+                    authResponse.setLoginStatus(authContext.getStatus());
                 }
                 break;
             case AuthXMLRequest.LoginIndex:
@@ -486,12 +481,9 @@ public class AuthXMLHandler implements RequestHandler {
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
-                } catch (Exception le) {
-                    debug.error("Login Exception ", le);
-                    if (messageEnabled) {
-                        debug.message("Exception " , le);
-                    }
-                    setErrorCode(authResponse, le);
+                } catch (Exception ex) {
+                    debug.error("Exception during LoginIndex", ex);
+                    setErrorCode(authResponse, ex);
                 }
                 break;
             case AuthXMLRequest.LoginSubject:
@@ -503,12 +495,9 @@ public class AuthXMLHandler implements RequestHandler {
                         servletRequest);
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
-                } catch (AuthLoginException le) {
-                    debug.error("Login Exception ", le);
-                    if (messageEnabled) {
-                        debug.message("Exception " , le);
-                    }
-                    setErrorCode(authResponse, le);
+                } catch (AuthLoginException ale) {
+                    debug.error("Exception during LoginSubject", ale);
+                    setErrorCode(authResponse, ale);
                 }
                 break;
             case AuthXMLRequest.SubmitRequirements:
@@ -533,12 +522,9 @@ public class AuthXMLHandler implements RequestHandler {
                         getOldSession();
                     authResponse.setOldSession(oldSession);
                     checkACException(authResponse, authContext);
-                } catch (Exception le) {
-                    debug.error("Error during login ", le);
-                    if (messageEnabled) {
-                        debug.message("Exception " , le);
-                    }
-                    setErrorCode(authResponse, le);
+                } catch (Exception ex) {
+                    debug.error("Error during submit requirements ", ex);
+                    setErrorCode(authResponse, ex);
                 }
                 break;
             case AuthXMLRequest.QueryInformation:
@@ -552,12 +538,9 @@ public class AuthXMLHandler implements RequestHandler {
                     authResponse.setAuthContext(authContext);
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
-                } catch (Exception ae) {
-                    debug.error("Error aborting ", ae);
-                    if (messageEnabled) {
-                        debug.message("Exception " , ae);
-                    }
-                    setErrorCode(authResponse, ae);
+                } catch (Exception ex) {
+                    debug.error("Error during Query Information", ex);
+                    setErrorCode(authResponse, ex);
                 }
                 break;
             case AuthXMLRequest.Logout:
@@ -686,12 +669,9 @@ public class AuthXMLHandler implements RequestHandler {
                     loginStatus = authContext.getStatus();
                     authResponse.setLoginStatus(loginStatus);
                     checkACException(authResponse, authContext);
-                } catch (AuthLoginException le) {
-                    debug.error("Error aborting ", le);
-                    if (messageEnabled) {
-                        debug.message("Exception " , le);
-                    }
-                    setErrorCode(authResponse, le);
+                } catch (AuthLoginException ale) {
+                    debug.error("Error aborting ", ale);
+                    setErrorCode(authResponse, ale);
                 }
                 break;
         }

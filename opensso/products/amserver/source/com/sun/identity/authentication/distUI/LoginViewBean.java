@@ -905,6 +905,28 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         + redirect_url);
                     }
                     session.invalidate();
+                } else if (ac.getStatus() == AuthContext.Status.RESET) {
+                    LoginFail = true;
+                    setErrorMessage(null);
+                    ResultVal = ErrorMessage;
+
+                    // AuthContext has been reset, send the client back to
+                    // the login URL
+                    if ((loginURL == null) ||
+                        (loginURL.length() == 0) ||
+                        (loginURL.equalsIgnoreCase("null")) ) {
+                        redirect_url = getLoginURL();
+                    } else {
+                        redirect_url = loginURL;
+                    }
+
+                    if (loginDebug.messageEnabled()) {
+                        loginDebug.message(
+                            "LoginFailedURL in getLoginDisplay : "
+                        + redirect_url);
+                    }
+
+                    session.invalidate();
                 } else {
                     redirect_url = gotoOnFailUrl;
                     if ((gotoOnFailUrl == null) ||
