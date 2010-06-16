@@ -135,11 +135,11 @@ AgentConfigurationRefCntPtr AgentProfileService::getAgentConfigInstance()
 am_status_t
 load_bootinfo_to_properties(Utils::boot_info_t *boot_ptr, am_properties_t properties)
 {
-    const char *thisfunc = "load_bootinfo_to_properties()";
+//    const char *thisfunc = "load_bootinfo_to_properties()";
     const char *function_name = "am_properties_get";
     am_status_t status = AM_SUCCESS;
     const char *parameter = "";
-    const char *encrypt_passwd = NULL;
+//    const char *encrypt_passwd = NULL;
     const char *namingURL = NULL;
     const char *agentName = NULL;
     const char *agentPasswd = NULL;
@@ -336,14 +336,14 @@ am_status_t AgentProfileService::fetchAndUpdateAgentConfigCacheInternal
     const char *thisfunc = "fetchAndUpdateAgentConfigCache()";
     am_properties_t properties;
     am_status_t status;
-    am_status_t authStatus = AM_FAILURE;
+//    am_status_t authStatus = AM_FAILURE;
     std::string userName(boot_info.agent_name);
     std::string passwd(boot_info.agent_passwd);
     std::string sharedAgentProfileName(boot_info.shared_agent_profile_name);
     std::string realmName(boot_info.realm_name);
     const char* agentConfigFile = boot_info.agent_config_file;
-    const Properties& propPtr =
-        *reinterpret_cast<Properties *>(boot_info.properties);
+//    const Properties& propPtr =
+//        *reinterpret_cast<Properties *>(boot_info.properties);
 
     if (getRepoType() == LOCAL_CONFIG) {
         am_properties_create(&properties);
@@ -474,9 +474,9 @@ am_status_t AgentProfileService::getAgentAttributes(
 {
     am_status_t status = AM_FAILURE;
     Http::Response response;
-    const char *parameter = NULL;
-    const char *repositoryLocation = NULL;
-    am_status_t getStatus; 
+//    const char *parameter = NULL;
+//    const char *repositoryLocation = NULL;
+//    am_status_t getStatus;
     std::string certName;
     std::string::size_type pos;
 

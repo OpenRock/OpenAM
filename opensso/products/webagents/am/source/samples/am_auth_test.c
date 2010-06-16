@@ -431,6 +431,10 @@ process_login_callback_requirements(am_auth_context_t *p_auth_ctx,
 		printf("     Message: %s\n",
 		callback->callback_info.text_output_callback.message);
 	    break;
+            case HTTPCallback:
+                printf("In HTTPCallback");
+                callback->callback_info.http_callback.authToken = "AUTHTOKEN";
+            break;
 	    default: 
 		printf("Warning: Unexpected callback type %d received.\n", 
 		callback->callback_type);

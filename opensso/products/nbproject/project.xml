@@ -85,6 +85,7 @@
             </folders>
             <ide-actions>
                 <action name="clean">
+                    <script>nbproject/nbjdk.xml</script>
                     <target>clean</target>
                 </action>
             </ide-actions>
@@ -151,11 +152,25 @@
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>
+        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+            <module name="org-netbeans-modules-editor-indent">
+                <node name="text">
+                    <node name="x-java">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
+                    </node>
+                </node>
+                <node name="CodeStyle">
+                    <node name="project"/>
+                    <property name="usedProfile" value="default"/>
+                </node>
+            </module>
+        </preferences>
         <web-data xmlns="http://www.netbeans.org/ns/freeform-project-web/2">
             <web-module>
                 <doc-root>.</doc-root>
                 <classpath/>
-                <context-path/>
                 <j2ee-spec-level>1.5</j2ee-spec-level>
                 <web-inf>.</web-inf>
             </web-module>

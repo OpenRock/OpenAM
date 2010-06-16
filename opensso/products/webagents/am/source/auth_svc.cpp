@@ -76,6 +76,8 @@ const char *TEMPLATE_NAME = "templateName";
 const char *CALLBACKS = "Callbacks";
 const char *LENGTH = "length";
 const char *CHOICE_CALLBACK = "ChoiceCallback";
+const char *HTTP_CALLBACK = "HttpCallback";
+const char *REDIRECT_CALLBACK = "RedirectCallback";
 const char *CONFIRMATION_CALLBACK = "ConfirmationCallback";
 const char *LANGUAGE_CALLBACK = "LanguageCallback";
 const char *NAME_CALLBACK = "NameCallback";
@@ -102,6 +104,39 @@ const char *OPTION_VALUE = "OptionValue";
 const char *OPTION_VALUES = "OptionValues";
 const char *DEFAULT_OPTION_VALUE = "DefaultOptionValue";
 const char *DEFAULT_VALUE = "DefaultValue";
+
+const char *HTTP_HEADER = "HttpHeader";
+const char *HTTP_NEGO = "Negotiation";
+const char *HTTP_CODE = "HttpErrorCode";
+const char *HTTP_TOKEN = "HttpToken";
+
+const char *REDIRECT_URL = "RedirectUrl";
+const char *REDIRECT_DATA = "RedirectData";
+const char *REDIRECT_STATUS = "Status";
+const char *REDIRECT_STATUS_PARAM = "RedirectStatusParam";
+const char *REDIRECT_BACK_URL_COOKIE = "RedirectBackUrlCookie";
+const char *REDIRECT_METHOD = "method";
+const char *REDIRECT_NAME = "Name";
+const char *REDIRECT_VALUE = "Value";
+
+
+const char *REDIRECT_CALLBACK_BEGIN = "<RedirectCallback";
+const char *REDIRECT_CALLBACK_END = "</RedirectCallback>";
+const char *REDIRECT_URL_BEGIN = "<RedirectUrl>";
+const char *REDIRECT_URL_END = "</RedirectUrl>";
+const char *REDIRECT_DATA_BEGIN = "<RedirectData>";
+const char *REDIRECT_DATA_END = "</RedirectData>";
+const char *REDIRECT_STATUS_BEGIN = "<Status>";
+const char *REDIRECT_STATUS_END = "</Status>";
+const char *REDIRECT_STATUS_PARAM_BEGIN = "<RedirectStatusParam>";
+const char *REDIRECT_STATUS_PARAM_END = "</RedirectStatusParam>";
+const char *REDIRECT_BACK_URL_COOKIE_BEGIN = "<RedirectBackUrlCookie>";
+const char *REDIRECT_BACK_URL_COOKIE_END = "</RedirectBackUrlCookie>";
+const char *REDIRECT_NAME_BEGIN = "<Name>";
+const char *REDIRECT_NAME_END = "</Name>";
+const char *REDIRECT_VALUE_BEGIN = "<Value>";
+const char *REDIRECT_VALUE_END = "</Value>";
+
 // VALUE is defined in utils.cpp
 // const char *VALUE = "Value";
 const char *QUOTE = "\"";
@@ -185,6 +220,25 @@ namespace {
 #define TEXT_OUTPUT_CALLBACK_PREFIX_DATA "<TextOutputCallback>"
 
 #define TEXT_OUTPUT_CALLBACK_SUFFIX_DATA "</TextOutputCallback>"
+
+
+#define HTTP_CALLBACK_PREFIX_DATA "<HttpCallback>"
+#define HTTP_CALLBACK_SUFFIX_DATA "</HttpCallback>"
+
+#define HTTP_HEADER_CALLBACK_PREFIX_DATA "<HttpHeader>"
+#define HTTP_HEADER_CALLBACK_SUFFIX_DATA "</HttpHeader>"
+
+#define HTTP_NEGO_CALLBACK_PREFIX_DATA "<Negotiation>"
+#define HTTP_NEGO_CALLBACK_SUFFIX_DATA "</Negotiation>"
+
+#define HTTP_CODE_CALLBACK_PREFIX_DATA "<HttpErrorCode>"
+#define HTTP_CODE_CALLBACK_SUFFIX_DATA "</HttpErrorCode>"
+
+#define HTTP_TOKEN_CALLBACK_PREFIX_DATA "<HttpToken>"
+#define HTTP_TOKEN_CALLBACK_SUFFIX_DATA "</HttpToken>"
+
+
+
 
 #define LOCALE_PREFIX_DATA "<Locale>"
 
@@ -366,7 +420,45 @@ const char textInputCallbackPrefix[] = {
 
 const char textInputCallbackSuffix[] = { 
     TEXT_INPUT_CALLBACK_SUFFIX_DATA 
-}; 
+};
+
+
+const char httpCallbackPrefix[] = {
+    HTTP_CALLBACK_PREFIX_DATA
+};
+const char httpCallbackSuffix[] = {
+    HTTP_CALLBACK_SUFFIX_DATA
+};
+
+const char httpHeaderCallbackPrefix[] = {
+    HTTP_HEADER_CALLBACK_PREFIX_DATA
+};
+const char httpHeaderCallbackSuffix[] = {
+    HTTP_HEADER_CALLBACK_SUFFIX_DATA
+};
+
+const char httpNegoCallbackPrefix[] = {
+    HTTP_NEGO_CALLBACK_PREFIX_DATA
+};
+const char httpNegoCallbackSuffix[] = {
+    HTTP_NEGO_CALLBACK_SUFFIX_DATA
+};
+
+const char httpCodeCallbackPrefix[] = {
+    HTTP_CODE_CALLBACK_PREFIX_DATA
+};
+const char httpCodeCallbackSuffix[] = {
+    HTTP_CODE_CALLBACK_SUFFIX_DATA
+};
+
+const char httpTokenCallbackPrefix[] = {
+    HTTP_TOKEN_CALLBACK_PREFIX_DATA
+};
+const char httpTokenCallbackSuffix[] = {
+    HTTP_TOKEN_CALLBACK_SUFFIX_DATA
+};
+
+
 
 const char localePrefix[] = {
     LOCALE_PREFIX_DATA
@@ -617,6 +709,7 @@ const AuthService::BodyChunk
 AuthService::textInputCallbackSuffixChunk(textInputCallbackSuffix,
 				    sizeof(textInputCallbackSuffix) - 1);
 
+
 const AuthService::BodyChunk
 AuthService::localePrefixChunk(localePrefix,
 				    sizeof(localePrefix) - 1);
@@ -745,6 +838,49 @@ AuthService::endElementChunk(endElement,
 const AuthService::BodyChunk
 AuthService::quoteEndElementChunk(quoteEndElement,
 				    sizeof(quoteEndElement) - 1);
+
+/* Now we add in the defines for the HTTP callback  */
+
+
+const AuthService::BodyChunk
+AuthService::httpCallbackPrefixChunk(httpCallbackPrefix,
+				    sizeof(httpCallbackPrefix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpCallbackSuffixChunk(httpCallbackSuffix,
+				    sizeof(httpCallbackSuffix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpHeaderPrefixChunk(httpHeaderCallbackPrefix,
+				    sizeof(httpHeaderCallbackPrefix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpHeaderSuffixChunk(httpHeaderCallbackSuffix,
+				    sizeof(httpHeaderCallbackSuffix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpNegoPrefixChunk(httpNegoCallbackPrefix,
+				    sizeof(httpNegoCallbackPrefix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpNegoSuffixChunk(httpNegoCallbackSuffix,
+				    sizeof(httpNegoCallbackSuffix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpErrorCodePrefixChunk(httpCodeCallbackPrefix,
+				    sizeof(httpCodeCallbackPrefix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpErrorCodeSuffixChunk(httpCodeCallbackSuffix,
+				    sizeof(httpCodeCallbackSuffix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpTokenPrefixChunk(httpTokenCallbackPrefix,
+				    sizeof(httpTokenCallbackPrefix) - 1);
+
+const AuthService::BodyChunk
+AuthService::httpTokenSuffixChunk(httpTokenCallbackSuffix,
+				    sizeof(httpTokenCallbackSuffix) - 1);
 
 
 /*
@@ -1373,6 +1509,30 @@ AuthService::processIndividualCallbacks(AuthContext &auth_ctx,
 	// add to the list of callbacks
 	auth_ctx.callbacks.push_back(callback);
 
+    } else if(callbackNode.isNamed(HTTP_CALLBACK)) {
+
+	// process HTTPCallback  OPENAM-45
+
+	am_auth_http_callback_t &http_cb =
+	    callback.callback_info.http_callback;
+	callback.callback_type = HTTPCallback;
+	processHTTPCallback(http_cb, callbackNode);
+
+	// add to the list of callbacks
+	auth_ctx.callbacks.push_back(callback);
+
+    } else if(callbackNode.isNamed(REDIRECT_CALLBACK)) {
+
+	// process RedirectCallback OPENAM-45
+
+	am_auth_redirect_callback_t &redirect_cb =
+	    callback.callback_info.redirect_callback;
+	callback.callback_type = RedirectCallback;
+	processRedirectCallback(redirect_cb, callbackNode);
+
+	// add to the list of callbacks
+	auth_ctx.callbacks.push_back(callback);
+
     } else if(callbackNode.isNamed(LANGUAGE_CALLBACK)) {
 
 	// process LanguageCallback
@@ -1692,6 +1852,146 @@ AuthService::processNameCallback(am_auth_name_callback_t &name_cb,
 
     return;
 } // processNameCallback
+
+/*
+ * processHTTPCallback
+ *             Process HTTP callback from server.
+ * Throws: InternalException upon error
+ */
+
+
+void
+AuthService::processHTTPCallback(am_auth_http_callback_t &http_cb,
+			const XMLElement &callbackNode)
+{
+
+    XMLElement headerNode;
+    if(callbackNode.getSubElement(HTTP_HEADER, headerNode)) {
+	std::string auth_header;
+	if(headerNode.getValue(auth_header) && auth_header.length() > 0) {
+	    http_cb.tokenHeader = (const char *) strdup(auth_header.c_str());
+	}
+    }
+
+    XMLElement negoNode;
+    if(callbackNode.getSubElement(HTTP_NEGO, negoNode)) {
+	std::string negotiation;
+	if(negoNode.getValue(negotiation) && negotiation.length() > 0)
+	{
+            size_t colon = negotiation.find ( ':' );
+            if(colon != std::string::npos) {
+                http_cb.negoHeader = (const char *) strdup(negotiation.substr(0,colon).c_str());
+                http_cb.negoValue  = (const char *) strdup(negotiation.substr(colon+1).c_str());
+
+            } else {
+                http_cb.negoHeader = (const char *) strdup(negotiation.c_str());
+                http_cb.negoValue  = (const char *) NULL;
+            }
+	}
+    }
+
+    XMLElement errorCodeNode;
+    if(callbackNode.getSubElement(HTTP_CODE, errorCodeNode)) {
+	std::string errorCode;
+	if(errorCodeNode.getValue(errorCode) && errorCode.length() > 0)
+	{
+	    http_cb.negoErrorCode = (const char *) strdup(errorCode.c_str());
+	}
+    }
+
+    XMLElement authTokenNode;
+    if(callbackNode.getSubElement(HTTP_CODE, authTokenNode)) {
+	std::string authToken;
+	if(authTokenNode.getValue(authToken) && authToken.length() > 0)
+	{
+	    http_cb.response = (const char *) strdup(authToken.c_str());
+	}
+    }
+
+    return;
+} // processHTTPCallback
+
+
+/*
+ * processRedirectCallback
+ *             Process redirect callback from server.
+ * Throws: InternalException upon error
+ **
+ * <RedirectCallBack method=XXX>
+ * <RedirectURL>
+ *     magicEncoded URL
+ * </RedirectURL>
+ * <RedirectData>
+ *    <RedirectName>
+ *         Name
+ *    </RedirectName>
+ *    <RedirectValue>
+ *         value
+ *    </RedirectValue>
+ * </RedirectData>
+ * <RedirectStatusParam>
+ *     RedirectStatus
+ * </RedirectStatusParam>
+ * <RedirectBackUrlCookie>
+ *     RedirectBackURL
+ * </RedirectBackUrlCookie>
+ * <Status>
+ *     status
+ * </Status>
+
+ */
+
+
+
+void
+AuthService::processRedirectCallback(am_auth_redirect_callback_t &redirect_cb,
+			const XMLElement &callbackNode)
+{
+
+    std::string redirectMethodStr;
+    redirect_cb.method = NULL;
+    if(callbackNode.getAttributeValue(REDIRECT_METHOD, redirectMethodStr)) {
+	redirect_cb.method = (const char *) strdup(redirectMethodStr.c_str());
+    } else {
+        redirect_cb.method = (const char *) strdup("get");
+    }
+
+    
+    XMLElement redirectURLNode;
+    if(callbackNode.getSubElement(REDIRECT_URL, redirectURLNode)) {
+	std::string redirectURL;
+	if(redirectURLNode.getValue(redirectURL) && redirectURL.length() > 0) {
+	    redirect_cb.redirectUrl = (const char *) strdup(redirectURL.c_str());
+	}
+    }
+
+    XMLElement redirectDataNode;
+    if(callbackNode.getSubElement(REDIRECT_DATA, redirectDataNode)) {
+        // Process all redirect data
+    }
+
+    XMLElement redirectStatusNode;
+    if(callbackNode.getSubElement(REDIRECT_STATUS, redirectStatusNode)) {
+	std::string redirectStatus;
+	if(redirectStatusNode.getValue(redirectStatus) && redirectStatus.length() > 0) {
+	    redirect_cb.statusParameter = (const char *) strdup(redirectStatus.c_str());
+	} else {
+	    redirect_cb.statusParameter = (const char *) strdup("AM_AUTH_SUCCESS_PARAM");
+        }
+    }
+
+    XMLElement redirectCookieNode;
+    if(callbackNode.getSubElement(REDIRECT_BACK_URL_COOKIE, redirectCookieNode)) {
+	std::string redirectCookie;
+	if(redirectCookieNode.getValue(redirectCookie) && redirectCookie.length() > 0) {
+	    redirect_cb.redirectBackUrlCookie = (const char *) strdup(redirectCookie.c_str());
+	} else {
+            redirect_cb.redirectBackUrlCookie = (const char *) strdup("AM_REDIRECT_BACK_SERVER_URL");
+        }
+    }
+
+    return;
+} // processRedirectCallback
 
 
 /*
@@ -2265,6 +2565,22 @@ AuthService::addCallbackRequirements(AuthContext &auth_ctx,
 		// nothing to do
 	    }
 	    break;
+	case HTTPCallback:
+	    // if HTTP callback
+	    {
+	    am_auth_http_callback_t &http_cb =
+		callback.callback_info.http_callback;
+	    addHttpCallbackRequirements(http_cb, bodyChunkList);
+	    }
+	    break;
+	case RedirectCallback:
+	    // if Redirect callback
+	    {
+	    am_auth_confirmation_callback_t &confirmation_cb =
+		callback.callback_info.confirmation_callback;
+	    addConfirmationCallbackRequirements(confirmation_cb, bodyChunkList);
+	    }
+	    break;
 	default:
 	    break;
 	}
@@ -2573,6 +2889,69 @@ AuthService::addTextInputCallbackRequirements(
 
     return;
 } // addTextInputCallbackRequirements
+
+
+/*
+ * addHTTPCallbackRequirements
+ *             Add name callback requirements received from client
+ *             to XML server response being generated.
+ */
+
+
+
+void
+AuthService::addHttpCallbackRequirements(am_auth_http_callback_t &http_cb,
+		BodyChunkList &bodyChunkList) {
+
+    std::string text(http_cb.authToken);
+
+    bodyChunkList.push_back(httpCallbackPrefixChunk);
+
+    // add Authorization Header
+    bodyChunkList.push_back(httpHeaderPrefixChunk);
+    bodyChunkList.push_back(BodyChunk(http_cb.tokenHeader, strlen(http_cb.tokenHeader)));
+    bodyChunkList.push_back(httpHeaderSuffixChunk);
+
+    // add Negotiation Header
+    bodyChunkList.push_back(httpNegoPrefixChunk);
+    bodyChunkList.push_back(BodyChunk(http_cb.negoHeader, strlen(http_cb.negoHeader)));
+    bodyChunkList.push_back(BodyChunk(":",1));
+    bodyChunkList.push_back(BodyChunk(http_cb.negoValue, strlen(http_cb.negoValue)));
+    bodyChunkList.push_back(httpNegoSuffixChunk);
+
+    // add Code Header
+    bodyChunkList.push_back(httpErrorCodePrefixChunk);
+    bodyChunkList.push_back(BodyChunk(http_cb.negoErrorCode, strlen(http_cb.negoErrorCode)));
+    bodyChunkList.push_back(httpErrorCodeSuffixChunk);
+
+
+    // Do entity Reference conversions
+    Utils::expandEntityRefs(text);
+
+    // add name value
+    bodyChunkList.push_back(httpTokenPrefixChunk);
+    bodyChunkList.push_back(BodyChunk(text));
+    bodyChunkList.push_back(httpTokenSuffixChunk);
+
+    bodyChunkList.push_back(httpCallbackSuffixChunk);
+
+    return;
+} // addNameCallbackRequirements
+
+
+/*
+ * addRedirectCallbackRequirements
+ *             Add Redirect callback requirements received from client
+ *             to XML server response being generated.
+ */
+void
+AuthService::addRedirectCallbackRequirements(am_auth_redirect_callback_t &redirect_cb,
+		BodyChunkList &bodyChunkList) {
+
+
+    return;
+} // addRedirectCallbackRequirements
+
 
 /*
  * create_auth_context_cac

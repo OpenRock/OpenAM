@@ -57,13 +57,13 @@ private:
     
 public:
     /* Throws NSPRException upon NSPR error */
-    AuditLog(LogService *logService,
-             AgentProfileService *agentProfileService,
+    AuditLog(LogService *logServiceParam,
+             AgentProfileService *agentProfileServiceParam,
              PRTime fetchInterval, 
              const char *messStr)
             : htcID(Log::addModule("Polling")),
-              logService(logService),
-              agentProfileService(agentProfileService),
+              logService(logServiceParam),
+              agentProfileService(agentProfileServiceParam),
               sleepTime(fetchInterval),
               lock(NULL), condVar(NULL), stayAlive(true),
               doneExit(false), message(messStr) {

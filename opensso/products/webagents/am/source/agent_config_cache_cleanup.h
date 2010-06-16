@@ -65,10 +65,10 @@ private:
     
 public:
     /* Throws NSPRException upon NSPR error */
-    AgentConfigCacheCleanup(AgentProfileService *agentProfileService,
+    AgentConfigCacheCleanup(AgentProfileService *agentProfileServiceParam,
                      PRTime cleanupInterval, const char *messStr)
             : htcID(Log::addModule("Polling")),
-              agentProfileService(agentProfileService),
+              agentProfileService(agentProfileServiceParam),
               sleepTime(cleanupInterval),
               lock(NULL), condVar(NULL), stayAlive(true),
               doneExit(false), message(messStr) {

@@ -101,11 +101,6 @@ am_status_t AgentConfiguration::populateAgentProperties()
     const char *function_name = "am_properties_create";
     const char *parameter = "";
     const char *agent_prefix_url = NULL;
-    char *dummy_url = NULL;
-    int tempurl_len = 0;
-    const char *encrypt_passwd = NULL;
-    char decrypt_passwd[100] = "";
-    int decrypt_status;
     const char *url_redirect_default = "goto";
     const char *user_id_default = "UserToken";
     const char *authLogType_default = LOG_TYPE_NONE;

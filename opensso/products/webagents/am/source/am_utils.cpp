@@ -44,7 +44,7 @@ am_http_cookie_encode(const char *cookie, char *buf, int len)
 	try {
 	    std::string encoded = Http::encode(std::string(cookie));
 	    const char *encoded_str = encoded.c_str();
-	    if (strlen(encoded_str) >= len)
+	    if ((int)strlen(encoded_str) >= len)
 		sts = AM_BUFFER_TOO_SMALL;
 	    else 
 		strcpy(buf, encoded_str);
@@ -71,7 +71,7 @@ am_http_cookie_decode(const char *cookie, char *buf, int len)
         try {
             std::string decoded = Http::decode(std::string(cookie));
             const char *decoded_str = decoded.c_str();
-            if (strlen(decoded_str) >= len)
+            if ((int)strlen(decoded_str) >= len)
                 sts = AM_BUFFER_TOO_SMALL;
             else 
                 strcpy(buf, decoded_str);

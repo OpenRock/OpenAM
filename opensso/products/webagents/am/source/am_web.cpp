@@ -223,7 +223,7 @@ void encode_url( const char *orig_url, char *dest_url)
     int i, ucnt;
     char p_enc = '%';
     char buffer[4];
-    for(i=0; i < strlen(orig_url); i++) {
+    for(i=0; i < (int)strlen(orig_url); i++) {
 	ucnt = orig_url[i];
 	if (( ucnt >  32) && ( ucnt < 127))  {
 	   strncat(dest_url, &orig_url[i], 1);
@@ -519,7 +519,7 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
                           const char *config_file, 
                           boolean_t initializeLog)
 {
-    const char *thisfunc = "load_bootstrap_properties()";
+//    const char *thisfunc = "load_bootstrap_properties()";
     am_status_t status, keyStatus;
     const char *function_name = "am_properties_create";
     const char *parameter = "";
@@ -709,7 +709,7 @@ am_agent_init(boolean_t* pAgentInitialized)
 {
     const char *thisfunc = "am_agent_init";
     am_status_t status = AM_SUCCESS;
-    const Properties *properties = NULL;
+//    const Properties *properties = NULL;
     //change the below member to boolean
     int agentAuthenticated = AM_FALSE;
     SSOToken ssoToken;
@@ -719,7 +719,7 @@ am_agent_init(boolean_t* pAgentInitialized)
     string passwd(boot_info.agent_passwd);
     const Properties& propPtr =
         *reinterpret_cast<Properties *>(boot_info.properties);
-    const char * agentConfigFile = boot_info.agent_config_file;
+//    const char * agentConfigFile = boot_info.agent_config_file;
           
     if (agentProfileService == NULL) {
         agentProfileService = new AgentProfileService(propPtr, boot_info);
@@ -814,9 +814,9 @@ am_web_init(const char *agent_bootstrap_file,
 {
     const char *thisfunc = "am_web_init";
     am_status_t status = AM_SUCCESS;
-    am_status_t authStatus = AM_FAILURE;
-    const Properties *properties = NULL;
-    am_properties_t tempprop ;
+//    am_status_t authStatus = AM_FAILURE;
+//    const Properties *properties = NULL;
+//    am_properties_t tempprop ;
 
     if (! initialized) {
 	// initialize log here so any error before properties file is
@@ -1590,7 +1590,7 @@ get_normalized_url(const char *url_str,
 {
     const char *thisfunc = "get_normalized_url()";
     am_status_t status = AM_SUCCESS;
-    am_bool_t isNotEnforced = AM_FALSE;
+//    am_bool_t isNotEnforced = AM_FALSE;
     std::string new_url_str;
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
@@ -1839,7 +1839,7 @@ am_web_is_access_allowed(const char *sso_token,
                         if (encodedUrl != NULL) {
                             bool url_spl_flag = false;
                             memset(encodedUrl, 0, encodedUrlSize);
-                            for(int i = 0; i < strlen(url); i++) {
+                            for(int i = 0; i < (int)strlen(url); i++) {
                                 if (( url[i] <  32) || ( url[i] > 127))  {
                                     url_spl_flag = true;
                                 }
@@ -2688,7 +2688,7 @@ am_web_get_url_to_redirect(am_status_t status,
                         retVal.append("=");
                         if((*agentConfigPtr)->cdsso_enable == AM_TRUE &&
                                        method != NULL) {
-                            string temp_url = goto_url;
+                            temp_url = goto_url;   // removed redeclaration
                             encoded_url =
                                PRIVATE_NAMESPACE_NAME::Http::encode(temp_url);
                         } else {
@@ -3201,8 +3201,8 @@ am_web_result_attr_map_set(
                    am_web_log_max_debug("%s: Iterating over %u values.",
                                         thisfunc, valueRef.size());
 
-                   for(std::size_t i = 0; i < valueRef.size(); ++i) {
-                      values.append(valueRef[i]);
+                   for(std::size_t i1 = 0; i1 < valueRef.size(); ++i1) {
+                      values.append(valueRef[i1]);
                       PUSH_BACK_CHAR(values, ',');
                    }
 
@@ -3318,8 +3318,8 @@ am_web_result_attr_map_set(
                                                    iter_cookie->second;
                     am_web_log_max_debug("%s: Iterating over %u values.",
                                                   thisfunc, valueRef.size());
-                    for(std::size_t i = 0; i < valueRef.size(); ++i) {
-                       values.append(valueRef[i]);
+                    for(std::size_t i2 = 0; i2 < valueRef.size(); ++i2) {
+                       values.append(valueRef[i2]);
                        PUSH_BACK_CHAR(values, ',');
                     }
 
@@ -3892,7 +3892,7 @@ static char* escapeQuotationMark(char*& ptr)
        int pos  = 0;
 #endif
 
-       while((pos = valueStr.find('"',pos)) != std::string::npos) {
+       while((pos = (int)valueStr.find('"',pos)) != std::string::npos) {
           valueStr.erase(pos,1);
           valueStr.insert(pos,"&quot;");
        }
@@ -4569,7 +4569,7 @@ remove_cookie(const char *cookie_name, char *cookie_header_val)
     char *last = NULL;
     char *tok = NULL;
     char *buf = NULL;
-    bool found = false;
+//    bool found = false;
     if (cookie_name == NULL) {
 	sts = AM_INVALID_ARGUMENT;
     }
@@ -5021,7 +5021,7 @@ set_cookie_in_request(Utils::cookie_info_t *cookie_info,
     // insert the cookie into the cookie string, replacing
     // any existing cookies of the same name.
     else {
-	char *buf = NULL;
+//	char *buf = NULL;
 	char *cookie_header_val = NULL;
 	char *new_cookie_header_val = NULL;
 

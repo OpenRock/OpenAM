@@ -118,6 +118,26 @@ AuthContext::cleanupCallbacks() {
 		    callback.callback_info.password_callback.prompt);
 	    }
 	    break;
+	case HTTPCallback:
+	    {
+		// clean prompt  Insert cleanup for HTTP
+		cleanupCharArray (
+		    callback.callback_info.http_callback.tokenHeader);
+		cleanupCharArray (
+		    callback.callback_info.http_callback.negoHeader);
+		cleanupCharArray (
+		    callback.callback_info.http_callback.negoValue);
+		cleanupCharArray (
+		    callback.callback_info.http_callback.negoErrorCode);
+
+	    }
+	    break;
+	case RedirectCallback:
+	    {
+		// clean prompt Insert cleanup for Redirect
+
+	    }
+	    break;
 	case TextInputCallback:
 	    {
 		// clean prompt

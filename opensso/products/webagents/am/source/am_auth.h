@@ -78,7 +78,9 @@ typedef enum am_auth_callback_type {
     NameCallback,
     PasswordCallback,
     TextInputCallback,
-    TextOutputCallback
+    TextOutputCallback,
+    HTTPCallback,           /* OpenAM-46 */
+    RedirectCallback
 } am_auth_callback_type_t;
 
 /*
@@ -106,6 +108,35 @@ typedef struct am_auth_confirmation_callback_info {
     const char *default_option;
     const char *response; /* selected index */
 } am_auth_confirmation_callback_t;
+
+/*
+ * HTTP callback structure. OPENAM-46
+ */
+
+
+typedef struct am_auth_http_callback_info {
+    const char *tokenHeader;
+    const char *authToken;
+    const char *negoHeader;
+    const char *negoValue;
+    const char *negoErrorCode;
+    const char *response; /* selected index */
+} am_auth_http_callback_t;
+
+/*
+ * Redirect callback structure.
+ */
+
+
+typedef struct am_auth_redirect_callback_info {
+    const char *redirectUrl;
+    const char *method;
+    const char *status;
+    const char *statusParameter;
+    const char *redirectBackUrlCookie;
+    const char **redirectData;
+
+} am_auth_redirect_callback_t;
 
 /*
  * Language callback structure.
@@ -166,6 +197,8 @@ typedef struct am_auth_callback {
 	am_auth_password_callback_t password_callback;
 	am_auth_text_input_callback_t text_input_callback;
 	am_auth_text_output_callback_t text_output_callback;
+	am_auth_http_callback_t	http_callback;
+	am_auth_redirect_callback_t	redirect_callback;
     } callback_info;
 } am_auth_callback_t;
 

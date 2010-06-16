@@ -227,7 +227,7 @@ public:
         this->iis6_replaypasswd_key = NULL;
         this->filter_priority = IIS_FILTER_PRIORITY;
         this->owa_enable = AM_FALSE;
-        this->owa_enable_change_protocol = NULL;        
+        this->owa_enable_change_protocol = AM_FALSE;     
         this->check_name_database = AM_FALSE;
         this->ltpa_enable = AM_FALSE;
         this->ltpa_config_name = LTPA_DEFAULT_CONFIG_NAME;

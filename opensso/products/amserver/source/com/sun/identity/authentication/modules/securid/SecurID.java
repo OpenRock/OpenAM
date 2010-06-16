@@ -28,7 +28,7 @@
 
 
 package com.sun.identity.authentication.modules.securid;
-
+/*
 import java.io.*;
 import java.util.*;
 
@@ -54,6 +54,31 @@ import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 
 import java.io.IOException;
+*/
+
+import java.util.*;
+
+import com.sun.identity.authentication.spi.AMLoginModule;
+
+import javax.security.auth.*;
+import javax.security.auth.callback.*;
+
+import com.sun.identity.authentication.spi.AuthLoginException;
+
+public class SecurID extends AMLoginModule {
+    public int process(Callback[] callbacks, int state) throws AuthLoginException {
+
+            return 0;
+        };
+
+    public java.security.Principal getPrincipal() {
+
+            return null;
+        };
+    public void init(Subject subject, Map sharedState, Map options) {
+    };
+
+}
 
 
 /*
@@ -62,7 +87,7 @@ import java.io.IOException;
  *    process(Callback[] callbacks, int state)
  *    getPrincipal()
  *    shutdown()
- */
+ *
 
 public class SecurID extends AMLoginModule {
 
@@ -110,7 +135,7 @@ public class SecurID extends AMLoginModule {
      *  another thing is that want to use the same config path througout
      *  the user's auth session, so get it here only.  however, the
      *  checking of the path has to be done in process().
-     */
+     *
     public void init(Subject subject, Map sharedState, Map options) {
         session = null;
         try {
@@ -205,7 +230,7 @@ public class SecurID extends AMLoginModule {
         /*
          *  state starts at 1, numbering corresponds to order of screens.
          *  return -1 if done, next screen# if another screen
-         */
+         *
 
         wtOrgName = getRequestOrg();
 
@@ -220,7 +245,7 @@ public class SecurID extends AMLoginModule {
          * verify that it exists once.  after that, can
          * get the AuthSessionFactory.getInstance every time,
          * as it will return the same one, given the same path.
-         */
+         *
         if (!configDone.containsKey(STR_SECURID_CONFIG_PATH)) {
             // verify path to sdconf.rec
             verifyConfigPath();
@@ -233,7 +258,7 @@ public class SecurID extends AMLoginModule {
          *  SecurID api states that it returns the same instance
          *  for the given path.  plus this way saves having to
          *  keep track of stuff...
-         */
+         *
         if (api == null) {
             debug.message("SecurID.process:getting Session instance");
             try {
@@ -326,7 +351,7 @@ public class SecurID extends AMLoginModule {
                      *    ACCESS_DENIED
                      *    NEW_PIN_REQUIRED
                      *    NEXT_CODE_REQUIRED
-                     */
+                     *
 
                     switch (authStatus) {
                         case AuthSession.ACCESS_OK:
@@ -362,7 +387,7 @@ public class SecurID extends AMLoginModule {
                                          * or having the user submit a
                                          * null pin will make things terminate
                                          * subsequently...
-                                         */
+                                         *
                                         debug.error(
                                             "SecurID.process:CCP:sys pin " +
                                             "not accepted!");
@@ -385,7 +410,7 @@ public class SecurID extends AMLoginModule {
                                     /*
                                      * weird that we'd get a null PIN
                                      * from the system...
-                                     */
+                                     *
                                      debug.message(
                                         "SecurID.process:CCP:newPin 0-length");
                                     newPin = "";
@@ -407,7 +432,7 @@ public class SecurID extends AMLoginModule {
                                 /*
                                  * then tell user the new PIN, and to do
                                  * next token
-                                 */
+                                 *
                                 setDynamicText(true,
                                     ISAuthConstants.LOGIN_NEW_PIN_NEXT_TOKEN,
                                     bundle.getString("SecurIDWaitPin") +
@@ -514,7 +539,7 @@ public class SecurID extends AMLoginModule {
                 /*
                  *  if no PIN provided, submit "" as the new PIN, and
                  *  let the ACE/Server handle it (by returning an error)
-                 */
+                 *
                 if (newPIN == null) {
                     newPIN = "";  // might not pass the ASCII test below
                 }
@@ -832,7 +857,7 @@ public class SecurID extends AMLoginModule {
                 /*
                  * next token mode : case 2
                  * After new PIN mode, we have lock the user again.
-                 */
+                 *
 
                 if (debug.messageEnabled()) {
                     debug.message("LOGIN_NEW_PIN_NEXT_TOKEN:username = " +
@@ -856,7 +881,7 @@ public class SecurID extends AMLoginModule {
                 /*
                  * if nothing provided, 
                  * send a null string, and let the ACE/Server handle it.
-                 */
+                 *
                 if (nextToken == null) {
                     nextToken = "";  // might not pass ASCII test below
                 }
@@ -1072,4 +1097,4 @@ public class SecurID extends AMLoginModule {
     public void shutdown() {
     }
 }
-
+*/

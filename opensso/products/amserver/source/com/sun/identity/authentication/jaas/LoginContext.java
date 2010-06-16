@@ -42,6 +42,8 @@ import javax.security.auth.Subject;
 import javax.security.auth.AuthPermission;
 import javax.security.auth.callback.*;
 
+import com.sun.identity.authentication.spi.*;
+
 /**
  * This class is pulled out from JDK1.4.
  * Removed <code>doPrivileged()</code> on <code>invoke()</code> method so that
@@ -68,6 +70,8 @@ public class LoginContext {
     private boolean configProvided = false;
     private ModuleInfo[] moduleStack;
     private static final Class[] PARAMS = { };
+
+    LoginException passwordError = null;    // OPENAM-46
 
     LoginException firstError = null;
     LoginException firstRequiredError = null;
@@ -277,6 +281,13 @@ public class LoginContext {
                     le = new LoginException(sw.toString());
                 }
 
+                // If we have a InvalidPasswordException save the exception,
+                // so we can rethrow it for account lockout OPENAM-46
+                if (le instanceof InvalidPasswordException) {
+                    if (passwordError == null)
+                        passwordError = le;
+                }
+
                 if (moduleStack[i].entry.getControlFlag() ==
                     AppConfigurationEntry.LoginModuleControlFlag.REQUISITE) {
 
@@ -288,6 +299,8 @@ public class LoginContext {
                         methodName.equals(LOGOUT_METHOD)) {
                         if (firstRequiredError == null)
                             firstRequiredError = le;
+                    } else if (passwordError != null) {
+                        throwException(passwordError, le);
                     } else {
                         throwException(firstRequiredError, le);
                     }
@@ -319,7 +332,12 @@ public class LoginContext {
         }
 
         // we went thru all the LoginModules.
-        if (firstRequiredError != null) {
+        // If there was a password error,  throw as exception so account lockout
+        // works as expected.  OPENAM-46
+        
+        if (passwordError != null) {
+            throwException(passwordError, null);
+        } else if (firstRequiredError != null) {
             // a REQUIRED module failed -- return the error
             throwException(firstRequiredError, null);
         } else if (success == false && firstError != null) {
@@ -335,6 +353,7 @@ public class LoginContext {
             return;
         }
     }
+
 
 
     /**
