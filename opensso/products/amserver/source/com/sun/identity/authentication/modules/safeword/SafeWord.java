@@ -6,7 +6,7 @@
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
- * compliance with the License. 
+ * compliance with the License.
  *
  * You can obtain a copy of the License at
  * https://opensso.dev.java.net/public/CDDLv1.0.html or
@@ -26,10 +26,7 @@
  *
  */
 
-
 package com.sun.identity.authentication.modules.safeword;
-
-
 
 import java.io.*;
 import java.util.*;
@@ -48,31 +45,6 @@ import javax.security.auth.spi.*;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
- 
-import java.util.*;
-
-import com.sun.identity.authentication.spi.AMLoginModule;
-
-import javax.security.auth.*;
-import javax.security.auth.callback.*;
-
-import com.sun.identity.authentication.spi.AuthLoginException;
-
-public class SafeWord extends AMLoginModule {
-    public int process(Callback[] callbacks, int state) throws AuthLoginException {
-
-            return 0;
-        };
-
-    public java.security.Principal getPrincipal() {
-
-            return null;
-        };
-    public void init(Subject subject, Map sharedState, Map options) {
-    };
-
-}
-
 
 import securecomputing.swec.SafeWordClient;
 import securecomputing.swec.Authentication;
@@ -173,7 +145,6 @@ public class SafeWord extends AMLoginModule {
      *                <code>Configuration</code> for this particular
      *                <code>LoginModule</code>
      */
-
     public void init(Subject subject, Map sharedState, Map options) {
         java.util.Locale locale = getLoginLocale();
         bundle = amCache.getResBundle(amAuthSafeWord, locale);
@@ -195,7 +166,6 @@ public class SafeWord extends AMLoginModule {
      * @return int order of next state. Return -1 if authentication
      *         is successful, return 0 if the LoginModule should be ignored
      */
-
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         try {
             if (state == PAGE_USERNAME) {
@@ -265,7 +235,6 @@ public class SafeWord extends AMLoginModule {
      *
      * @return <code>java.security.Principal</code>
      */
-
     public java.security.Principal getPrincipal() {
         if (userPrincipal != null) {
             return userPrincipal;
@@ -302,7 +271,6 @@ public class SafeWord extends AMLoginModule {
     /**
      * Gets SafeWord auth config parameters.
      */
-
     private void initAuthConfig() throws AuthLoginException {
         if(options != null) {
             serverSpec = Misc.getMapAttr(options,
@@ -365,7 +333,6 @@ public class SafeWord extends AMLoginModule {
     /**
      * Gets the user login name.
      */
-
     private String getUserName(Callback[] callbacks) throws AuthLoginException {
         
         // there are 1 Callback in this array of callbacks:
@@ -376,7 +343,6 @@ public class SafeWord extends AMLoginModule {
     /**
      * Instantiates SafeWordClient object.
      */
-
     private void initSafeWordClient() throws AuthLoginException {
         SwecConfig config = new SwecConfig();
         config.setDefaults();
@@ -418,7 +384,6 @@ public class SafeWord extends AMLoginModule {
      * Sends request message to SafeWord server and gets the
      * challenge ID from SafeWord server.
      */
-
     private boolean sendRequestForChallengeID() throws AuthLoginException {
         if (userTokenId == null || userTokenId.length() == 0) {
             closeClient();
@@ -541,7 +506,6 @@ public class SafeWord extends AMLoginModule {
     /**
      * Sets the text(challenge) in the callbacks belong to this state.
      */
-
     private void setDynamicText(int state) throws AuthLoginException {
         Callback[] callbacks = getCallback(state);
         String prompt = ((PasswordCallback)callbacks[0]).getPrompt();
@@ -559,7 +523,6 @@ public class SafeWord extends AMLoginModule {
     /**
      * Gets the password after prompting the challenge ID(if there is one).
      */
-
     private String getPassword(Callback[] callbacks) throws AuthLoginException {
         // there are 1 Callback in this array of callbacks:
         // callback[0] is for password(also display challenge text)
@@ -579,7 +542,6 @@ public class SafeWord extends AMLoginModule {
     /**
      * Authenticates to SafeWord server.
      */
-
     private void authenticate(String challengeResponse) throws AuthLoginException {
         if (challengeResponse == null || challengeResponse.length() == 0) {
             if (debug.messageEnabled()) {
@@ -732,5 +694,6 @@ public class SafeWord extends AMLoginModule {
             }
         }
     }
+    
 }
 
