@@ -25,6 +25,11 @@
  * $Id: auth_context.cpp,v 1.3 2008/06/25 08:14:31 qcheng Exp $
  *
  */ 
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #include "auth_context.h"
 #include "log.h"
 #include "am_sso.h"

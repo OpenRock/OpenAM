@@ -25,6 +25,11 @@
  * $Id: am_utils.cpp,v 1.3 2008/06/25 08:14:29 qcheng Exp $
  *
  */ 
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #include <stdexcept>
 #include <am_utils.h>
 #include "http.h"

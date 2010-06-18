@@ -29,6 +29,10 @@
  * object which contains all the bootstrap and configurable properties. 
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #include <prlock.h>
 #include <prnetdb.h>
 #include <prmem.h>

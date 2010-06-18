@@ -30,6 +30,10 @@
  * data.
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #ifndef __AGENT_CONFIG_FETCH_H__
 #define __AGENT_CONFIG_FETCH_H__
 

@@ -24,6 +24,11 @@
  *
  *
  */ 
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #include <stdio.h>
 #include <am_auth.h>
 #include <limits.h>

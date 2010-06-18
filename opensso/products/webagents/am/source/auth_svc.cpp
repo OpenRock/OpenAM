@@ -25,6 +25,11 @@
  * $Id: auth_svc.cpp,v 1.7 2009/12/10 00:01:43 robertis Exp $
  *
  */ 
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #include <iostream>
 #include <string.h>
 #include <prprf.h>

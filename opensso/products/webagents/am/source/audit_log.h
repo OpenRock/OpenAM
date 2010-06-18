@@ -25,6 +25,10 @@
  * data.
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #ifndef __AUDIT_LOG_H__
 #define __AUDIT_LOG_H__
 

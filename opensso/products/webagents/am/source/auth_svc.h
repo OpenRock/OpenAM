@@ -25,6 +25,11 @@
  * $Id: auth_svc.h,v 1.4 2008/06/25 08:14:31 qcheng Exp $
  *
  */ 
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #ifndef __AUTH_SVC_H__
 #define __AUTH_SVC_H__
 #include <string>

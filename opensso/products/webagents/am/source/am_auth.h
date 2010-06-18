@@ -25,6 +25,11 @@
  * $Id: am_auth.h,v 1.4 2009/12/09 23:58:58 robertis Exp $
  *
  */ 
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #ifndef __AM_AUTH_H__
 #define __AM_AUTH_H__
 

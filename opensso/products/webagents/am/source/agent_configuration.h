@@ -26,6 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
+
 #ifndef _AGENT_CONFIGURATION_H_
 #define _AGENT_CONFIGURATION_H_
 

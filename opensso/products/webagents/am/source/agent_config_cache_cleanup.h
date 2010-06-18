@@ -30,6 +30,10 @@
  * instances
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #ifndef __AGENT_CONFIG_CACHE_CLEANUP_H__
 #define __AGENT_CONFIG_CACHE_CLEANUP_H__
 

@@ -27,6 +27,10 @@
  */
 
 /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
+/*
 * This service does the following functions:
 * 1. Initial naming request to determine rest service url
 * 2. Agent authentication.
