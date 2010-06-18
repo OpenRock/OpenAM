@@ -28,6 +28,8 @@
 package com.sun.identity.config;
 
 import com.sun.identity.config.util.TemplatedPage;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
 import net.sf.click.control.ActionLink;
 
 public class Options extends TemplatedPage {
@@ -38,6 +40,7 @@ public class Options extends TemplatedPage {
 
     protected boolean passwordUpdateRequired = true;
     protected boolean upgrade = false;
+    protected boolean isOpenDS1x = false;
     
     private java.util.Locale configLocale = null;
     
@@ -51,6 +54,13 @@ public class Options extends TemplatedPage {
             Boolean.valueOf( passwordUpdateRequired ) );
         upgrade = !getConfigurator().isNewInstall();
         addModel( "upgrade", Boolean.valueOf( upgrade ) );
+
+        isOpenDS1x = EmbeddedOpenDS.isOpenDSVer1Installed();
+        addModel("isOpenDS1x", Boolean.valueOf(isOpenDS1x));
+
+        if (isOpenDS1x) {
+            addModel("odsdir", AMSetupServlet.getBaseDir());
+        }
     }
 
     public boolean upgrade() {

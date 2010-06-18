@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.setup;
 
 /**
@@ -376,6 +380,16 @@ public interface SetupConstants {
     String CONFIG_VAR_DIRECTORY_SERVER_PORT = "DIRECTORY_PORT";
 
     /**
+     * Configuration Variable for directory server admin port.
+     */
+    String CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT = "DIRECTORY_ADMIN_PORT";
+
+    /**
+     * Configuration Variable for directory server jmx port.
+     */
+    String CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT = "DIRECTORY_JMX_PORT";
+
+    /**
      * Configuration Variable for administrator password.
      */
     String CONFIG_VAR_ADMIN_PWD = "ADMIN_PWD";
@@ -555,8 +569,15 @@ public interface SetupConstants {
 
     /**
      * OpenDS Replication : remote OpenDS server port.
+     *
+     * @deprecated
      */
     String DS_EMB_REPL_PORT2 = "DS_EMB_REPL_PORT2";
+
+    /**
+     * OpenDS Replication : remote OpenDS server admin port.
+     */
+    String DS_EMB_REPL_ADMINPORT2 = "DS_EMB_REPL_ADMINPORT2";
     
     /**
      * Protocol of IDRepo entry to create for user data store.

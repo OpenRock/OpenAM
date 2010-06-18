@@ -432,7 +432,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                     continue;
                 }
                 String rdn = entry.getDN().getRDN().getAttributeValue(0)
-                    .getStringValue();
+                    .toString();
                 answer.add(rdn);
             }
             if (debug.messageEnabled()) {

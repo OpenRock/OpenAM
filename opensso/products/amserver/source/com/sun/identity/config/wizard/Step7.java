@@ -25,6 +25,10 @@
  * $Id: Step7.java,v 1.15 2009/10/27 05:31:45 hengming Exp $
  *
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
@@ -50,6 +54,7 @@ public class Step7 extends AjaxPage {
         add("configDirectory", tmp);
         
         if (isEmbedded) {
+            add("isEmbedded", "1");
             add("configStoreHost", "localhost");
         } else {
             tmp = getAttribute("configStoreHost", getHostName());
@@ -63,6 +68,10 @@ public class Step7 extends AjaxPage {
         add("rootSuffix", tmp);
         tmp = getAttribute("configStorePort", getAvailablePort(50389));
         add("configStorePort", tmp);
+        tmp = getAttribute("configStoreAdminPort", getAvailablePort(4444));
+        add("configStoreAdminPort", tmp);
+        tmp = getAttribute("configStoreJmxPort", getAvailablePort(1689));
+        add("configStoreJmxPort", tmp);
         tmp = getAttribute("configStoreLoginId", Wizard.defaultUserName);
         add("configStoreLoginId", tmp);
 

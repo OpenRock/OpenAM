@@ -30,7 +30,7 @@
 ### returns to a browser when it grants a session ID to a user.
 ###
 #############################################################################
-SERVER_URL=http://sample1.sun.com:58080
+SERVER_URL=http://server1.example.com:8080
 DEPLOYMENT_URI=/opensso
 BASE_DIR=/opensso
 locale=en_US
@@ -38,7 +38,7 @@ PLATFORM_LOCALE=en_US
 AM_ENC_KEY=
 ADMIN_PWD=11111111
 AMLDAPUSERPASSWD=00000000
-COOKIE_DOMAIN=.sun.com
+COOKIE_DOMAIN=.example.com
 
 
 ##############################################################################
@@ -60,6 +60,12 @@ COOKIE_DOMAIN=.sun.com
 ### DIRECTORY_PORT is the port on which the configuration data store is
 ### listening for connections.
 ###
+### DIRECTORY_ADMIN_PORT is the admin port on which the configuration data
+### store listens for administrative functions.
+###
+### DIRECTORY_JMX_PORT is the jmx port on which the configuration data
+### store listens for JMX connections.
+###
 ### ROOT_SUFFIX is the initial or root suffix of the configuration data store.
 ###
 ### DS_DIRMGRDN is the DN (distinguished name) of the directory manager,
@@ -71,8 +77,10 @@ COOKIE_DOMAIN=.sun.com
 #############################################################################
 DATA_STORE=embedded
 DIRECTORY_SSL=SIMPLE
-DIRECTORY_SERVER=sample1.sun.com
+DIRECTORY_SERVER=server1.example.com
 DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
 ROOT_SUFFIX=dc=opensso,dc=java,dc=net
 DS_DIRMGRDN=cn=Directory Manager
 DS_DIRMGRPASSWD=11111111
@@ -89,8 +97,10 @@ DS_DIRMGRPASSWD=11111111
 ###
 ### DS_EMB_REPL_HOST2 is the host name of the existing OpenSSO Server.
 ###
-### DS_EMB_REPL_PORT2 is listening port of the configuration data 
-### store of the existing OpenSSO Server.
+### DS_EMB_REPL_PORT2 is no longer used as of OpenAM Snapshot 9.5
+###
+### DS_EMB_REPL_ADMINPORT2 is the listening admin port of the configuration
+### data store of the existing OpenSSO Server.
 ###
 ### DS_EMB_REPL_REPLPORT2 is replication port of the configuration 
 ### data store of the existing OpenSSO Server
@@ -102,15 +112,15 @@ DS_DIRMGRPASSWD=11111111
 ### http://FQDN of existing OpenSSO Server:port of existing 
 ###    OpenSSO Server/<DEPLOYMENT_URI>
 ### eg.,
-### http://sample2.sun.com:58080/opensso
+### http://server2.example.com:8080/opensso
 ###
 ##############################################################################
 #DS_EMB_REPL_FLAG=embReplFlag
 #DS_EMB_REPL_REPLPORT1=58989
-#DS_EMB_REPL_HOST2=sample2.sun.com
-#DS_EMB_REPL_PORT2=50389
+#DS_EMB_REPL_HOST2=server2.example.com
+#DS_EMB_REPL_ADMINPORT2=4444
 #DS_EMB_REPL_REPLPORT2=50889
-#existingserverid=http://sample2.com:58080/opensso
+#existingserverid=http://server1.example.com:8080/opensso
 
 
 ##############################################################################
@@ -167,7 +177,7 @@ DS_DIRMGRPASSWD=11111111
 #USERSTORE_TYPE=LDAPv3ForSUNDS
 #USERSTORE_SSL=SIMPLE
 #USERSTORE_DOMAINNAME=amqa.test.com 
-#USERSTORE_HOST=sample1.sun.com
+#USERSTORE_HOST=server1.example.com
 #USERSTORE_PORT=389
 #USERSTORE_SUFFIX=dc=opensso,dc=java,dc=net
 #USERSTORE_MGRDN=cn=Directory Manager
@@ -182,4 +192,4 @@ DS_DIRMGRPASSWD=11111111
 ###
 ##############################################################################
 #LB_SITE_NAME=lb
-#LB_PRIMARY_URL=http://lb.sun.com:58080/opensso
+#LB_PRIMARY_URL=http://lb.example.com:80/opensso

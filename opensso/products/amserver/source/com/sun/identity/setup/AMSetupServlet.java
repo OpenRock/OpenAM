@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.AdminUtils;
@@ -1128,7 +1132,7 @@ public class AMSetupServlet extends HttpServlet {
         }
     }
     
-    private static String getBaseDir()
+    public static String getBaseDir()
         throws ConfiguratorException {
         String configDir = getPresetConfigDir();
         if ((configDir != null) && (configDir.length() > 0)) {
@@ -1560,7 +1564,7 @@ public class AMSetupServlet extends HttpServlet {
 
     /**
       * Obtains misc config data from a remote OpenSSO server :
-      *     opends port
+      *     opends admin port
       *     config basedn
       *     flag to indicate replication is already on or not
       *     opends replication port or opends sugested port
@@ -1777,7 +1781,17 @@ public class AMSetupServlet extends HttpServlet {
         dsConfig.loadSchemaFiles(schemaFiles);
 
         if (dataStore.equals(SetupConstants.SMS_EMBED_DATASTORE)) {
-            EmbeddedOpenDS.rebuildIndex(map);
+            int ret = EmbeddedOpenDS.rebuildIndex(map);
+
+            if (ret != 0) {
+                Object[] error = { Integer.toString(ret) };
+                SetupProgress.reportStart("emb.rebuildindex.failed", null);
+                SetupProgress.reportEnd("emb.rebuildindex.failedmsg", error);
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                    "AMSetupServlet.writeSchemaFiles: " +
+                    "Unable to rebuild indexes in OpenDS: " + ret);
+                throw new Exception("Unable to rebuild indexes in OpenDS: " + ret);
+            }
         }
 
         for(Iterator iter = absSchemaFiles.iterator(); iter.hasNext(); ) {

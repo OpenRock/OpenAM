@@ -30,6 +30,7 @@ package com.sun.identity.sm.ldap;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSDataEntry;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +41,8 @@ import java.util.Map;
 import java.util.Set;
 import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;
+import org.opends.server.protocols.ldap.LDAPAttribute;
+import org.opends.server.types.ByteString;
 import org.opends.server.types.SearchResultEntry;
 
 /**
@@ -100,28 +103,22 @@ public class EmbeddedSearchResultIterator implements Iterator {
         //not supported.
     }
 
-    static Map convertLDAPAttributeSetToMap(List attributes) {
+      static Map convertLDAPAttributeSetToMap(List attributes) {
         Map answer = null;
-
         if ((attributes != null) && (!attributes.isEmpty())) {
-            for (Iterator iter = attributes.iterator(); iter.hasNext();) {
-                Attribute attr = (Attribute) iter.next();
-                String attrName = attr.getName();
-
-                LinkedHashSet values = attr.getValues();
-                if ((values != null) && (!values.isEmpty())) {
-                    Set strValues = new HashSet();
-                    for(Iterator iter2 = values.iterator(); iter2.hasNext();) {
-                        AttributeValue value = (AttributeValue)iter2.next();
-
-                        strValues.add(value.getStringValue());
-                    }
-                    if (answer == null) {
-                        answer = new CaseInsensitiveHashMap(10);
-                    }
-                    answer.put(attrName, strValues);
-                }
-            }
+             for (Iterator iter = attributes.iterator(); iter.hasNext();) {
+                 Attribute attr = (Attribute) iter.next();
+               if (attr != null) {
+                 Set strValues = new HashSet();
+                 for(AttributeValue value : attr) {
+                         strValues.add(value.toString());
+                 }
+                 if (answer == null) {
+                     answer = new CaseInsensitiveHashMap(10);
+                  }
+                  answer.put(attr.getName(), strValues);
+                 }
+             }
         }
         return (answer);
     }

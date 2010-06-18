@@ -259,6 +259,12 @@
         AjaxUtils.load('wizardContainer', "$context/config/wizard/wizard.htm?" + getLocale(), renderWizard);
         /* #end
         */
+
+        #if ( $isOpenDS1x )
+            YAHOO.sun.identity.config.options.cannotContinue = new YAHOO.widget.Panel("cannotContinue", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
+            YAHOO.sun.identity.config.options.cannotContinue.render();
+            YAHOO.sun.identity.config.options.cannotContinue.show();
+        #end
     }        
         
     YAHOO.util.Event.onDOMReady(init);
@@ -412,3 +418,24 @@
     </div>
 #end
 
+#if ( $isOpenDS1x )
+<style type="text/css">
+	div.singlecolumn{
+		width:560px;
+		float:left;
+		padding:5px;
+		text-align:left;
+	}
+</style>
+<div id="cannotContinue" align="center" style="width:600px;visibility:hidden">
+    <div class="header">$page.getLocalizedString("cannot.continue.header")</div>
+    <div class="bd" style="background-color: white; height: 150px; text-align: left">
+	<h2>$page.getLocalizedString("cannot.continue.body")</h2>
+	<div class="singlecolumn">
+            <p>$page.getLocalizedString("cannot.continue.text1")</p>
+            <p>$page.getLocalizedString("cannot.continue.text2") $odsdir</p>
+            <p>$page.getLocalizedString("cannot.continue.text3")</p>
+        </div>
+    </div>
+</div>
+#end

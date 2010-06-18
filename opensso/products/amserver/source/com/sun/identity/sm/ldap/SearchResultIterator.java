@@ -111,8 +111,6 @@ public class SearchResultIterator implements Iterator {
             for (Enumeration enums = attrSet.getAttributes(); enums
                     .hasMoreElements();) {
                 LDAPAttribute attr = (LDAPAttribute) enums.nextElement();
-                String attrName = attr.getName();
-
                 if (attr != null) {
                     Set values = new HashSet();
                     String[] value = attr.getStringValueArray();
@@ -123,7 +121,7 @@ public class SearchResultIterator implements Iterator {
                     if (answer == null) {
                         answer = new CaseInsensitiveHashMap(10);
                     }
-                    answer.put(attrName, values);
+                    answer.put(attr.getName(), values);
                 }
             }
         }
