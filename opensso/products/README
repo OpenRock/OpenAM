@@ -27,6 +27,8 @@ your own identifying information:
 $Id: README,v 1.31 2009/11/23 21:37:02 huacui Exp $
 
 ------------------------------------------------------------------------------
+Portions Copyrighted [2010] [ForgeRock AS]
+------------------------------------------------------------------------------
 
 %% Contents:
 
@@ -111,6 +113,7 @@ The libraries needed for compiling OpenSSO sources are:
                          mq4_4-v2-SunOS_X86.zip,mq4_4-v2-SunOS.zip,
                          mq4_4-v2-WINNT.zip,imq.jar and jms.jar
    - Apache Commons Codec: commons-codec-1.3.jar
+   - OpenDS 2.3.x distribution ZIP file
 
 Once these libraries are available, they should be placed under the 
 "opensso/products/extlib" directory of your workspace. Any library placed 
@@ -257,6 +260,15 @@ libraries/native to opensso/products/extlib.
 2.12.1 Download 
        https://javaserverfaces.dev.java.net/files/documents/1866/138058/mojarra-1.2_13-binary.zip
 2.12.2 Unzip it and the jars are in lib directory.
+
+%% 2.13 Obtaining opends.zip
+2.13.1 Download the latest OpenDS 2.3.x from
+	http://www.opends.org/
+2.13.2 Change to the opensso/products/opends directory
+2.13.3 Unzip the OpenDS zip file
+2.13.4 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
+    	./create_opends_zip.sh OpenDS-2.3.0
+2.13.5 Copy the opends.zip into the products/extlib directory
 
 %% 3. Building the workspace
 
