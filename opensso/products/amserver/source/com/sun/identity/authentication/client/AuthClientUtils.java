@@ -118,7 +118,8 @@ public class AuthClientUtils {
     public static final String  DEFAULT_CLIENT_TYPE ="genericHTML";
     public static final String  COMPOSITE_ADVICE = "sunamcompositeadvice";
     private static final String  DEFAULT_CONTENT_TYPE="text/html";
-    private static final String  DEFAULT_FILE_PATH="html";
+    private static final String  DEFAULT_FILE_PATH = "html";
+    private static final String DEFAULT_COOKIE_SUPPORT = "true";
     private static final String  DSAME_VERSION="7.0";
     public static final String ERROR_MESSAGE = "Error_Message";
     public static final String ERROR_TEMPLATE = "Error_Template";
@@ -992,7 +993,6 @@ public class AuthClientUtils {
      * @return the requested property from clientData.
      */
     private static String getProperty(String clientType, String property) {
-
         if (clientDetector == null || !isClientDetectionEnabled()) {
             return null;
         }
@@ -1078,6 +1078,11 @@ public class AuthClientUtils {
      */
     public static String getCookieSupport(String clientType) {
         String cookieSup = getProperty(clientType,"cookieSupport");
+
+        if (cookieSup == null) {
+            return (DEFAULT_COOKIE_SUPPORT);
+        }
+
         return (cookieSup);
     }
 
