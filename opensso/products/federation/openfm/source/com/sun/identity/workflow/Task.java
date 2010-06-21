@@ -26,12 +26,17 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.workflow;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -62,6 +67,7 @@ public abstract class Task
 {
     private static Map resMap = new HashMap();
     static String REQ_OBJ = "_request_";
+    private static Debug debug = Debug.getInstance("workflow");
 
     protected String getString(Map params, String key) {
         Object values = params.get(key);
@@ -143,14 +149,17 @@ public abstract class Task
             }
             return content.toString();
         } catch (ProtocolException e) {
+            debug.error("unable to reach url: ", e);
             Object[] param = {url};
             throw new WorkflowException(MessageFormat.format(
                 getMessage("unable.to.reach.url", locale), param));
         } catch (MalformedURLException e) {
+            debug.error("malformed url: ", e);
             Object[] param = {url};
             throw new WorkflowException(MessageFormat.format(
                 getMessage("malformedurl", locale), param));
         } catch (IOException e) {
+            debug.error("unable to reach url: ", e);
             Object[] param = {url};
             throw new WorkflowException(MessageFormat.format(
                 getMessage("unable.to.reach.url", locale), param));
