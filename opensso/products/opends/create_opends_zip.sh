@@ -43,7 +43,7 @@ fi
 PWD=`pwd`
 cd "${@}"
 cp ../${LDIF_FILE} ${LDIF}
-+${SED} -i -e 's/ds-cfg-single-structural-objectclass-behavior: reject/ds-cfg-single-structural-objectclass-behavior: accept/' ${CONFIG}
-+${SED} -i -e '/dn: cn=SNMP/,/^$/d' ${CONFIG}
+${SED} -i -e 's/ds-cfg-single-structural-objectclass-behavior: reject/ds-cfg-single-structural-objectclass-behavior: accept/' ${CONFIG}
+${SED} -i -e '/dn: cn=SNMP/,/^$/d' ${CONFIG}
 ${ZIP} -r -i@../${LIST} ../${ZIP_FILE} .
 cd ${PWD}
