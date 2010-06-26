@@ -84,10 +84,10 @@ in this workspace use features not present in releases of Ant prior to 1.6.
 Thus, in order to build this workspace you must have Ant version 1.6.5 or above
 installed and available in your system path.
 
-The sources in this workspace should be compiled using JDK 5.0 with the source
-and target levels set to "1.4". In order to allow this, you must ensure that
-JDK 5.0 is present in your system path and the JAVA_HOME environment variable
-is setup correctly pointing to its location.
+The sources in this workspace should be compiled using JDK 6.0. In order to allow
+this, you must ensure that JDK 6.0 is present in your system path and the
+JAVA_HOME environment variable is setup correctly pointing to its location. The
+target JDK is set to 1.5.
 
 %% 2. Library dependencies
 
@@ -266,9 +266,11 @@ libraries/native to opensso/products/extlib.
 	http://www.opends.org/
 2.13.2 Change to the opensso/products/opends directory
 2.13.3 Unzip the OpenDS zip file
-2.13.4 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
+2.13.4 Copy the OpenDS.zip and je.jar files from the OpenDS-2.3.0/lib directory into
+        products/extlib
+2.13.5 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
     	./create_opends_zip.sh OpenDS-2.3.0
-2.13.5 Copy the opends.zip into the products/extlib directory
+2.13.6 Copy the opends.zip into the products/extlib directory
 
 %% 3. Building the workspace
 
