@@ -120,5 +120,6 @@ lib/_script-util.bat
 lib/_script-util.sh
 lib/_server-script.bat
 lib/_server-script.sh
+lib/setcp.bat
 locks/
 logs/
