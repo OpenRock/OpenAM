@@ -1440,4 +1440,11 @@ public class EmbeddedOpenDS {
 
         return openDSVer1x;
     }
+
+    /**
+     * Initialises OpenDS for client use, used by the CLI tools
+     */
+    public static void initializeForClientUse() {
+        EmbeddedUtils.initializeForClientUse();
+    }
 }
