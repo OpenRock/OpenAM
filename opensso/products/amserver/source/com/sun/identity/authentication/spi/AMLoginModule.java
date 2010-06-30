@@ -2341,6 +2341,27 @@ public abstract class AMLoginModule implements LoginModule {
         loginState.incrementFailCount(userName);
     }
 
+    /**
+     * Returns true if the named account is locked out, false otherwise.
+     *
+     * @throws AuthenticationException if the user name passed in is not valid
+     * or null, or for any other error condition.
+     * @supported.api
+     */
+    public boolean isAccountLocked(String userName)
+    throws AuthenticationException {
+        if (loginState == null) {
+            loginState = getLoginState();
+
+            if (loginState == null) {
+                throw new AuthenticationException(bundleName, "nullLoginState",
+                    null);
+            }
+        }
+
+        return loginState.isAccountLocked(userName);
+    }
+
     /* returns the normalized DN  */
     private String normalizeDN(String userDN) {
         String normalizedDN = userDN;

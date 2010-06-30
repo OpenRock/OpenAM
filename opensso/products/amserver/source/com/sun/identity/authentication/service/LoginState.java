@@ -4342,6 +4342,11 @@ public class LoginState {
             debug.error("LoginState::incrementFailCount called with null user id");
         }
     }
+
+    public boolean isAccountLocked(String username) {
+        AMAccountLockout amAccountLockout = new AMAccountLockout(this);
+        return amAccountLockout.isLockedOut(username);
+    }
     
     /**
      * Returns lockout warning message.
