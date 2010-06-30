@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import org.opends.server.util.EmbeddedUtils;
 
 public class Main implements SetupConstants{
     public static void main(String[] args) {
@@ -116,6 +117,7 @@ public class Main implements SetupConstants{
                     }
                 }
 
+                EmbeddedUtils.initializeForClientUse();
                 configProp = Bootstrap.load(configPath, false);
                 if (configProp == null) {
                     System.out.println(bundle.getString("message.error.dir"));
