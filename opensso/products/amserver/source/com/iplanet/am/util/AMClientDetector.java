@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.am.util;
 
 import com.iplanet.services.cdm.ClientDetectionInterface;
@@ -196,6 +200,7 @@ public class AMClientDetector {
                 clientManager = (ClientTypesManager) Class.forName(
                         ClientTypesManagerImpl).newInstance();
             } catch (Exception ex) {
+                debug.error("Unable to instantiate class ", ex);
                 clientManager = new DefaultClientTypesManager();
             }
         } else {
