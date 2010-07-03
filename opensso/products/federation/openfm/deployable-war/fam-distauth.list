@@ -36,6 +36,7 @@
 ./WEB-INF/classes/amClientDetection_zh.properties
 ./WEB-INF/classes/amClientDetection_zh_TW.properties
 ./WEB-INF/classes/debugfiles.properties
+./WEB-INF/classes/BasicClientTypesManager.properties
 ./WEB-INF/lib/jato.jar
 ./WEB-INF/auth.tld
 ./WEB-INF/jato.tld
