@@ -298,58 +298,60 @@ public class AuthXMLHandler implements RequestHandler {
             debug.message("Security Enabled = " + securityEnabled);
         }
 
-        if ((securityEnabled != null) && (securityEnabled.equals("true"))) {
-            security = true;
-            String indexNameLoc =  authXMLRequest.getIndexName();
-            AuthContext.IndexType indexTypeLoc =  authXMLRequest.getIndexType();
-            if (indexTypeLoc == null) {
-                indexTypeLoc = AuthUtils.getIndexType(authContext);
-                indexNameLoc =   AuthUtils.getIndexName(authContext);
-            }
-            if (debug.messageEnabled()) {
-                debug.message("Index Name Local : " + indexNameLoc);
-                debug.message("Index Type Local : " + indexTypeLoc);
-            }
-            if (((indexTypeLoc == null) || (indexNameLoc == null)) || 
-                !((indexTypeLoc == AuthContext.IndexType.MODULE_INSTANCE) && 
-                indexNameLoc.equals("Application"))) {
-                try {
-                    String ssoTokenID = authXMLRequest.getAppSSOTokenID();
+        if (requestType != 0) {
+            if ((securityEnabled != null) && (securityEnabled.equals("true"))) {
+                security = true;
+                String indexNameLoc =  authXMLRequest.getIndexName();
+                AuthContext.IndexType indexTypeLoc =  authXMLRequest.getIndexType();
+                if (indexTypeLoc == null) {
+                    indexTypeLoc = AuthUtils.getIndexType(authContext);
+                    indexNameLoc =   AuthUtils.getIndexName(authContext);
+                }
+                if (debug.messageEnabled()) {
+                    debug.message("Index Name Local : " + indexNameLoc);
+                    debug.message("Index Type Local : " + indexTypeLoc);
+                }
+                if (((indexTypeLoc == null) || (indexNameLoc == null)) ||
+                    !((indexTypeLoc == AuthContext.IndexType.MODULE_INSTANCE) &&
+                    indexNameLoc.equals("Application"))) {
+                    try {
+                        String ssoTokenID = authXMLRequest.getAppSSOTokenID();
 
-                    if (debug.messageEnabled()) {
-                        debug.message("Session ID = : " + ssoTokenID);
-                    }
-
-                    SSOTokenManager manager = SSOTokenManager.getInstance();
-                    SSOToken appSSOToken = manager.createSSOToken(ssoTokenID);
-
-                    // if the token isn't valid, let the client know so they
-                    // retry
-                    if (!manager.isValidToken(appSSOToken)) {
                         if (debug.messageEnabled()) {
-                            debug.message("App SSOToken is not valid");
+                            debug.message("Session ID = : " + ssoTokenID);
+                        }
+
+                        SSOTokenManager manager = SSOTokenManager.getInstance();
+                        SSOToken appSSOToken = manager.createSSOToken(ssoTokenID);
+
+                        // if the token isn't valid, let the client know so they
+                        // retry
+                        if (!manager.isValidToken(appSSOToken)) {
+                            if (debug.messageEnabled()) {
+                                debug.message("App SSOToken is not valid");
+                            }
+
+                            setErrorCode(authResponse, new AuthException(
+                                AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN, null));
+                            return authResponse;
+                        } else {
+                            debug.message("App SSOToken is VALID");
+                        }
+                    } catch (SSOException ssoe) {
+                        // token is unknown to OpenAM, let the client know so they
+                        // can retry
+                        if (debug.messageEnabled()) {
+                            debug.message("App SSOToken is not valid: " + ssoe.getMessage());
                         }
 
                         setErrorCode(authResponse, new AuthException(
                             AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN, null));
                         return authResponse;
-                    } else {
-                        debug.message("App SSOToken is VALID");
+                    } catch (Exception exp) {
+                        debug.error("Got Exception", exp);
+                        setErrorCode(authResponse, exp);
+                        return authResponse;
                     }
-                } catch (SSOException ssoe) {
-                    // token is unknown to OpenAM, let the client know so they
-                    // can retry
-                    if (debug.messageEnabled()) {
-                        debug.message("App SSOToken is not valid: " + ssoe.getMessage());
-                    }
-
-                    setErrorCode(authResponse, new AuthException(
-                        AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN, null));
-                    return authResponse;
-                } catch (Exception exp) {
-                    debug.error("Got Exception", exp);
-                    setErrorCode(authResponse, exp);
-                    return authResponse;
                 }
             }
         } else {
