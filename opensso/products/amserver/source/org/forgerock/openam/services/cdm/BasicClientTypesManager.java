@@ -260,7 +260,7 @@ public class BasicClientTypesManager implements ClientTypesManager {
         StringTokenizer st = new StringTokenizer(statGroupsNames, COMMA);
 
         while (st.hasMoreTokens()) {
-            populateClient((String) st.nextToken(), props);
+            populateClient(st.nextToken(), props);
         }
     }
 
@@ -284,7 +284,7 @@ public class BasicClientTypesManager implements ClientTypesManager {
 
         while (st.hasMoreTokens()) {
             attributeValues = new HashSet();
-            String entry = (String) st.nextToken();
+            String entry = st.nextToken();
             String attrName = entry.substring(0, entry.indexOf(EQUALS));
             String attrValue = entry.substring(entry.indexOf(EQUALS) + 1);
             attributeValues.add(attrValue);
