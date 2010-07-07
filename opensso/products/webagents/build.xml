@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted [2010] [ForgeRock AS]
+-->
+
 <project name="open-source-web-agents" default="usage">
                 
     <description>Open Web Single Sign-On Web Agents</description>
@@ -211,6 +215,20 @@
         <filter token="DATE" value="${nightly.date}" />
         <filter token="OS" value="${build.os}" />
         <filter token="BIT" value="${build.type.suffix}" />
+        <filter token="ARCH" value="${build.type.suffix}" />
+        <filter token="BUILD_DATE" value="${nightly.date}" />
+        <copy file="${webagents.basedir}/agents/source/apache/build_date.js.template"
+            tofile="${webagents.dist.dir}/apache_v20_${OS}${BIT}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
+            tofile="${webagents.dist.dir}/apache_v22_${OS}${BIT}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
+            tofile="${webagents.dist.dir}/iis_v6_${OS}${BIT}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
+            tofile="${webagents.dist.dir}/iis_v7_${OS}${BIT}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/proxy40/build_date.js.template"
+            tofile="${webagents.dist.dir}/proxy_v40_${OS}${BIT}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
+            tofile="${webagents.dist.dir}/sjsws_v70_${OS}${BIT}_build_date.js" filtering="true"/>
         <antcall target="prenightly" inheritRefs="true"/>
         <antcall target="all" inheritRefs="true"/>
         <copy file="${webagents.docs.dir}/nightly.html" 
