@@ -26,6 +26,8 @@
 #
 #
 
+# Portions Copyrighted [2010] [ForgeRock AS]
+
 USERX_ROOT = ../../..
 
 include $(USERX_ROOT)/arch/components.mk
@@ -65,9 +67,11 @@ CFLAGS += -DXP_UNIX
      endif
 INCLUDE_FLAGS += -I$(DEST_INC_DIR)  -I$(PROXY40_INC_DIR)
 LDFLAGS += $(LD_COMMON_ORIGIN_FLAG) $(LD_ORIGIN_FLAG) -L$(DEST_LIB_DIR)
-LDLIBS += $(LD_STATIC_FLAG) $(CXX_STD_LIBS) -lamsdk $(LD_SHARED_FLAG) -lc -lm
+LDLIBS += $(LD_STATIC_FLAG) -lamsdk $(LD_SHARED_FLAG) -lc -lm
 LDLIBS += -Bdynamic -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) -L$(NSS_LIB_DIR) -lc -lnspr4 -lplds4 -lplc4 -lnss3 -lssl3 -lxml2
-
+        ifeq ($(BUILD_TYPE), 32)
+        LDLIBS += -m32
+        endif
 
 all: depends export_libs 
 
