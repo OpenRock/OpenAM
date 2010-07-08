@@ -25,6 +25,10 @@
  * $Id: DefaultSummary.java,v 1.13 2009/01/05 23:17:09 veiming Exp $
  *
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.config;
 
 import com.sun.identity.config.util.AjaxPage;
@@ -72,6 +76,12 @@ public class DefaultSummary extends AjaxPage {
         request.addParameter(
             SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT, 
             "" + AMSetupServlet.getUnusedPort(getHostName(),50389, 1000));
+        request.addParameter(
+            SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT,
+            Integer.toString(AMSetupServlet.getUnusedPort(getHostName(), 4444, 1000)));
+        request.addParameter(
+            SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT,
+            Integer.toString(AMSetupServlet.getUnusedPort(getHostName(), 1689, 1000)));
         
         request.addParameter(
             SetupConstants.CONFIG_VAR_SERVER_HOST, getHostName());
