@@ -3979,6 +3979,7 @@ static char* escapeQuotationMark(char*& ptr)
 Utils::post_struct_t *
 split_post_data(const char * test_string)
 {
+    const char *thisfunc = "split_post_data()";
     char * str = NULL;
     char * ptr = NULL;
     std::size_t i = 0;
