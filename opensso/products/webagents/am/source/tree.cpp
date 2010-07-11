@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: tree.cpp,v 1.6 2008/08/29 17:35:40 subbae Exp $
+ * $Id: tree.cpp,v 1.7 2010/03/10 06:47:41 kiran_gonipati Exp $
  *
  */ 
 #include "tree.h"
@@ -229,6 +229,7 @@ Tree::remove(const ResourceName &elem, bool recursive) {
 	    }
 	}
     }
+    rootNode->removeAllChildren();
     return true;
 }
 

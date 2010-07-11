@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: iws_agent.c,v 1.25 2009/10/13 01:29:10 robertis Exp $
+ * $Id: iws_agent.c,v 1.26 2010/03/10 05:08:54 dknab Exp $
  *
  *
  */
@@ -80,30 +80,67 @@ const char getMethod[] = "GET";
 
 void init_at_request();
 
+am_status_t get_header_value(pblock *pb, const char *header_name,
+                             boolean_t isRequired, char **header_value,
+                             boolean_t needCopy, char **header_value_copy)
+{
+    const char *thisfunc = "get_header_value()";
+    am_status_t status = AM_SUCCESS;
+    // From NSAPI guide:
+    // The pointer returned is a pointer into the pblock. 
+    // Do not FREE it. If you want to modify it, do a STRDUP 
+    // and modify the copy.
+    *header_value = pblock_findval(header_name, pb);
+    if ((*header_value != NULL) && (strlen(*header_value) > 0 )) {
+        am_web_log_debug("%s: %s = %s", thisfunc, header_name, *header_value);
+    } else {
+        *header_value = NULL;
+        if (isRequired == B_TRUE) {
+            am_web_log_error("%s: Could not get a value for header %s.", 
+                             thisfunc, header_name);
+            status = AM_FAILURE;
+        } else {
+            am_web_log_debug("%s: %s =", thisfunc,
+                             header_name);
+        }
+    }
+    // In case the header needs to be modified later in the code,
+    // copy it in a variable that can be modified. This one must
+    // be freed.
+    if ((status == AM_SUCCESS) && (needCopy == B_TRUE) &&
+        (*header_value != NULL))
+    {
+        *header_value_copy = strdup(*header_value);
+        if (*header_value_copy == NULL) {
+            am_web_log_debug("%s: Not enough memory to make "
+                             "a copy of the %s header.",
+                             thisfunc, header_name);
+            status = AM_NO_MEMORY;
+        }
+    }
+    return status;
+}
+
 int send_data(const char *msg, Session *sn, Request *rq) {
     int len = msg != NULL?strlen(msg):0;
     int retVal = REQ_PROCEED;
 
     if(len > 0) {
-	char buf[50];
-	buf[0] = '\0';
-	sprintf(buf, "%d", len);
-	protocol_status(sn, rq, PROTOCOL_OK, NULL);
-	param_free(pblock_remove("content-type", rq->srvhdrs));
-	pblock_nvinsert("content-type", "text/html", rq->srvhdrs);
-
-	pblock_nvinsert("content-length", buf, rq->srvhdrs);
-
-	/* Send the headers to the client*/
-	protocol_start_response(sn, rq);
-
-	/* Write the output using net_write*/
-	if (IO_ERROR == net_write(sn->csd, (char *)msg, len)) {
-	    retVal = REQ_EXIT;
-    } else {
-        retVal = net_flush(sn->csd);
-    }
-
+        char buf[50];
+        buf[0] = '\0';
+        sprintf(buf, "%d", len);
+        protocol_status(sn, rq, PROTOCOL_OK, NULL);
+        param_free(pblock_remove("content-type", rq->srvhdrs));
+        pblock_nvinsert("content-type", "text/html", rq->srvhdrs);
+        pblock_nvinsert("content-length", buf, rq->srvhdrs);
+        // Send the headers to the client
+        protocol_start_response(sn, rq);
+        // Write the output using net_write
+        if (IO_ERROR == net_write(sn->csd, (char *)msg, len)) {
+            retVal = REQ_EXIT;
+        } else {
+            retVal = net_flush(sn->csd);
+        }
     }
     return retVal;
 }
@@ -288,59 +325,57 @@ static void register_post_data_orig(Session *sn, Request *rq,char *url,
   * invisible name value pairs
 */
 static int create_buffer_withpost(const char *key, am_web_postcache_data_t
-				  postentry, Session *sn, Request *rq,
+                                  postentry, Session *sn, Request *rq,
                                   void* agent_config)
 {
     const char *thisfunc = "create_buffer_withpost()";
+    am_status_t status = AM_SUCCESS;
     char *buffer_page = NULL;
     int nsapi_status;
     char msg_length[8];
-    const char *lbCookieHeader = NULL;
+    char *lbCookieHeader = NULL;
     am_status_t status_tmp = AM_SUCCESS;
+    buffer_page = am_web_create_post_page(key, postentry.value, 
+                                          postentry.url, agent_config);
 
-    buffer_page = am_web_create_post_page(key,postentry.value,postentry.url,
-                                           agent_config);
-
-    /* Use the protocol_status function to set the status of the
-     * response before calling protocol_start_response.
-     */
+    // Use the protocol_status function to set the status of the
+    // response before calling protocol_start_response.
     protocol_status(sn, rq, PROTOCOL_OK, NULL);
 
-    /* Although we would expect the ObjectType stage to
-     * set the content-type, set it here just to be
-     * completely sure that it gets set to text/html.
-     */
+    // Although we would expect the ObjectType stage to
+    // set the content-type, set it here just to be
+    // completely sure that it gets set to text/html.
     param_free(pblock_remove("content-type", rq->srvhdrs));
     pblock_nvinsert("content-type", "text/html", rq->srvhdrs);
-
     util_itoa(strlen(buffer_page), msg_length);
     pblock_nvinsert("content-length", msg_length, rq->srvhdrs);
 
-    // If using the lb cookie, it needs to be reset to NULL there.
-    status_tmp = am_web_get_postdata_preserve_lbcookie(
-                 &lbCookieHeader, B_TRUE, agent_config);
-    if (status_tmp == AM_SUCCESS) {
-        if (lbCookieHeader != NULL) {
+    // If using a LB cookie, it needs to be set to NULL there.
+    // If am_web_get_postdata_preserve_lbcookie() returns
+    // AM_INVALID_ARGUMENT, it means that the sticky session
+    // feature is disabled (ie no LB) or that the sticky
+    // session mode is URL.
+    status = am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, 
+                                                   B_TRUE, agent_config);
+    if (status == AM_NO_MEMORY) {
+        nsapi_status = REQ_EXIT;
+    } else {
+        if (status == AM_SUCCESS) {
             am_web_log_debug("%s: Setting LB cookie for post data "
-                              "preservation to  null", thisfunc);
+                             "preservation to null.", thisfunc);
             pblock_nvinsert("set-cookie", lbCookieHeader, rq->srvhdrs);
         }
         // Send the headers to the client
         protocol_start_response(sn, rq);
         // Repost the form
         if (net_write(sn->csd, buffer_page , strlen(buffer_page)) == IO_ERROR){
+            am_web_log_error("%s: Fail to send the form.", thisfunc);
             nsapi_status = REQ_EXIT;
         } else {
             nsapi_status = REQ_PROCEED;
         }
-    } else {
-        am_web_log_error("%s: am_web_get_postdata_preserve_lbcookie() failed",
-                          thisfunc);
-        nsapi_status = REQ_EXIT;
     }
-
     am_web_postcache_data_cleanup(&postentry);
-
     if(buffer_page != NULL){
         system_free(buffer_page);
     }
@@ -349,9 +384,7 @@ static int create_buffer_withpost(const char *key, am_web_postcache_data_t
         lbCookieHeader = NULL;
     }
     return nsapi_status;
-
 }
-
 
 /**
   * Function Name: append_post_data
@@ -363,55 +396,83 @@ static int create_buffer_withpost(const char *key, am_web_postcache_data_t
   * Output: As defined by a SAF
 */
 
-
 NSAPI_PUBLIC int append_post_data(pblock *param, Session *sn, Request *rq)
 {
-    const char *post_data_query   = NULL;
-    char *uri		    = NULL;
+    const char *thisfunc = "append_post_data()";
+    am_status_t status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
+    int requestResult = REQ_ABORTED;
+    const char *post_data_query = NULL;
+    char *uri = NULL;
     am_web_postcache_data_t get_data = {NULL, NULL};
-    const char *postdata_cache    = NULL;
-    const char *actionurl	    = NULL;
-
+    const char *postdata_cache = NULL;
+    const char *actionurl = NULL;
+    char *stickySessionValue = NULL;
+    char *stickySessionPos = NULL;
+    char *temp_uri = NULL;
     void* agent_config = NULL;
+    
     uri = pblock_findval("uri", rq->reqpb);
+    if(uri == NULL) {
+        status = AM_INVALID_ARGUMENT;
+    }
+
     agent_config = am_web_get_agent_configuration();
 
-
-    if (uri != NULL){
-	post_data_query = uri + strlen(POST_PRESERVE_URI);
+    // Check if magic URI is present in the URL
+    if(status == AM_SUCCESS) {
+        post_data_query = uri + strlen(POST_PRESERVE_URI);
+        // Check if a query paramter for the  sticky session has been
+        // added to the dummy URL. Remove it if it is the case.
+        status_tmp = am_web_get_postdata_preserve_URL_parameter
+                                   (&stickySessionValue, agent_config);
+        if (status_tmp == AM_SUCCESS) {
+            stickySessionPos = strstr(post_data_query, stickySessionValue);
+            if (stickySessionPos != NULL) {
+                size_t len = strlen(post_data_query) - 
+                             strlen(stickySessionPos)-1;
+                temp_uri = malloc(len+1);
+                memset(temp_uri,0,len+1);
+                strncpy(temp_uri, post_data_query, len);
+                post_data_query = temp_uri;
+            }
+        }
     }
-
-    // If magic uri present and there is a corresponding value in hashtable
-    if (post_data_query != NULL){
-
-	am_web_log_debug("POST Magic Query Value  : %s",post_data_query);
-
-	if (am_web_postcache_lookup(post_data_query,
-				    &get_data, agent_config) == B_TRUE) {
-
-	    // Now that the data is found, find the data and the URL to redirect
-	    postdata_cache = get_data.value;
-	    actionurl = get_data.url;
-
-	    am_web_log_debug("POST hashtable actionurl : %s",actionurl);
-
-	    // Create the buffer string that is to be written
-	    return create_buffer_withpost(post_data_query,
-					  get_data,sn, rq, agent_config);
-
-	} else {
-	    am_web_log_debug(" Found magic URI but entry not in POST"
-			    " Hash table :%s",post_data_query);
-	}
-
-	return(REQ_ABORTED);
-
-    }else {
-
-	am_web_log_error("Magic URL value not found in POST cache");
-	return(REQ_ABORTED);
+    // If magic uri present search for corresponding value in hashtable
+    if((status == AM_SUCCESS) && (post_data_query != NULL) &&
+       (strlen(post_data_query) > 0))
+    {
+        am_web_log_debug("%s: POST Magic Query Value: %s", 
+                         thisfunc, post_data_query);
+        if (am_web_postcache_lookup(post_data_query,
+                    &get_data, agent_config) == B_TRUE)
+        {
+            // Now that the data is found, find the data and the URL to redirect
+            postdata_cache = get_data.value;
+            actionurl = get_data.url;
+            am_web_log_debug("%s: POST hashtable actionurl : %s", 
+                             thisfunc, actionurl);
+            // Create the buffer string that is to be written
+            requestResult = create_buffer_withpost(post_data_query,
+                        get_data,sn, rq, agent_config);
+        } else {
+            am_web_log_debug("%s: Found magic URI but entry not in POST"
+                             " Hash table :%s", thisfunc, post_data_query);
+            requestResult = REQ_ABORTED;
+        }
+    } else {
+        am_web_log_error("%s: Magic URL value not found in POST cache", thisfunc);
+        requestResult = REQ_ABORTED;
     }
-}
+    if (temp_uri != NULL) {
+        free(temp_uri);
+        temp_uri = NULL;
+    }
+    if (stickySessionValue != NULL) {
+        am_web_free_memory(stickySessionValue);
+        stickySessionValue = NULL;
+    }
+    return requestResult;}
 
 /*
  * update the agent cache from the listener response.  Any response without a
@@ -727,57 +788,6 @@ static am_status_t set_cookie(const char *header, void **args)
     return ret;
 }
 
-
-char * get_post_assertion_data(Session *sn, Request *rq, char *url)
-{
-    int i = 0;
-    char *body = NULL;
-    int cl = 0;
-    char *cl_str = NULL;
-
-    /**
-    * content length and body
-    *
-    * note: memory allocated in here should be released by
-    * other function such as: "policy_unregister_post"
-    */
-
-    request_header("content-length", &cl_str, sn, rq);
-    if(cl_str == NULL)
-	    cl_str = pblock_findval("content-length", rq->headers);
-    if(cl_str == NULL)
-	    return body;
-    if(PR_sscanf(cl_str, "%ld", &cl) == 1) {
-        body =  (char *)malloc(cl + 1);
-	if(body != NULL){
-	    for (i = 0; i < cl; i++) {
-	        int ch = netbuf_getc(sn->inbuf);
-		if (ch==IO_ERROR || ch == IO_EOF) {
-		    break;
-	 	}
-		body[i] = ch;
-	    }
-
-	    body[i] = '\0';
-	}
-    } else {
-        am_web_log_error("Error reading POST content body");
-    }
-
-    am_web_log_max_debug("Read POST content body : %s", body);
-
-
-    /**
-    * need to reset content length before redirect,
-    * otherwise, web server will wait for serveral minutes
-    * for non existant data
-    */
-    param_free(pblock_remove("content-length", rq->headers));
-    pblock_nvinsert("content-length", "0", rq->headers);
-    return body;
-
-}
-
 char * get_post_data(Session *sn, Request *rq, char *url)
 {
     const char *thisfunc = "get_post_data()";int i = 0;
@@ -902,28 +912,94 @@ static void set_method(void ** args, char * orig_req){
     }
 }
 
-am_status_t get_request_url(Session *sn, 
-                           Request *rq, 
-                           void* agent_config,
-                           char **request_url,
-                           char **orig_request_url) {
-    am_status_t retVal = AM_SUCCESS;
-    const char *protocol = "HTTP";
-    const char *host_hdr = pblock_findval(HOST_HDR, rq->headers);
-    const char *query = pblock_findval(REQUEST_QUERY, rq->reqpb);
-    const char *uri = pblock_findval(REQUEST_URI, rq->reqpb);
+int process_request_with_post_data_preservation(Session *sn, Request *rq,
+                                    am_status_t request_status,
+                                    am_policy_result_t *policy_result,
+                                    char *requestURL,
+                                    void **args,
+                                    char **resp,
+                                    void* agent_config)
+{
+    const char *thisfunc = "process_request_with_post_data_preservation()";
+    am_status_t status = AM_SUCCESS;
+    int requestResult = REQ_PROCEED;
+    post_urls_t *post_urls;
+    char *response = NULL;
 
-    if (security_active) {
-        protocol = "HTTPS";
+    if (*resp != NULL) {
+        response = *resp;
     }
-    retVal = am_web_get_all_request_urls(host_hdr, protocol, server_hostname,
-                                    server_portnum, uri, query,
-                                    agent_config, request_url, orig_request_url);
-    if (retVal != AM_SUCCESS) {
-        am_web_log_error("get_request_url(): Failed with error: %s.",
-                         am_status_to_string(retVal));
+    // Create the magic URI, actionurl
+    status = am_web_create_post_preserve_urls(requestURL, &post_urls,
+                                              agent_config);
+    if (status != AM_SUCCESS) {
+        requestResult = REQ_ABORTED;
     }
-    return retVal;
+    // In CDSSO mode, for a POST request, the post data have
+    // already been saved in the response variable, so we need
+    // to get them here only if response is NULL.
+    if (status == AM_SUCCESS) {
+        if (response == NULL) {
+            response = get_post_data(sn, rq, requestURL);
+        }
+    }
+    if (status == AM_SUCCESS) {
+        if (response != NULL && strlen(response) > 0) {
+            if (AM_SUCCESS == register_post_data(sn, rq,
+                                post_urls->action_url,
+                                post_urls->post_time_key,
+                                response,
+                                agent_config))
+            {
+                char *lbCookieHeader = NULL;
+                // If using a LB in front of the agent and if the sticky 
+                // session mode is COOKIE, the lb cookie needs to be set there.
+                // If am_web_get_postdata_preserve_lbcookie()
+                // returns AM_INVALID_ARGUMENT, it means that the 
+                // sticky session feature is disabled (ie no LB) or
+                // that the sticky session mode is set to URL.
+                status = am_web_get_postdata_preserve_lbcookie(
+                          &lbCookieHeader, B_FALSE, agent_config);
+                if (status == AM_NO_MEMORY) {
+                    requestResult = REQ_ABORTED;
+                } else {
+                    if (status == AM_SUCCESS) {
+                        am_web_log_debug("%s: Setting LB cookie "
+                                         "for post data preservation (%s).",
+                                         thisfunc, lbCookieHeader);
+                        set_cookie(lbCookieHeader, args);
+                    }
+                    requestResult =  do_redirect(sn, rq, request_status,
+                                                 policy_result,
+                                                 post_urls->dummy_url,
+                                                 REQUEST_METHOD_POST,
+                                                 agent_config);
+                }
+                if (lbCookieHeader != NULL) {
+                    am_web_free_memory(lbCookieHeader);
+                    lbCookieHeader = NULL;
+                }
+            } else {
+                am_web_log_error("%s: register_post_data() "
+                     "failed.", thisfunc);
+                requestResult = REQ_ABORTED;
+            }
+        } else {
+            am_web_log_debug("%s: This is a POST request with no post data. "
+                             "Redirecting as a GET request.", thisfunc);
+            requestResult = do_redirect(sn, rq, request_status,
+                                      policy_result,
+                                      requestURL, 
+                                      REQUEST_METHOD_GET,
+                                      agent_config);
+        }
+    } 
+    if (post_urls != NULL) {
+        am_web_clean_post_urls(post_urls);
+        post_urls = NULL;
+    }
+
+    return requestResult;
 }
 
 /*
@@ -946,28 +1022,34 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     am_map_t env_parameter_map = NULL;
     am_policy_result_t result = AM_POLICY_RESULT_INITIALIZER;
     void *args[] = { (void *)rq };
-    char *method = NULL;
-    char *request_url = NULL;
-    char *orig_request_url = NULL;
+    char *request_url = NULL;    
     char *orig_req = NULL ;
-    char *path_info = NULL;
-    char * response = NULL;
+    char *response = NULL;
     char *clf_req =NULL;
-    const char *query = pblock_findval(REQUEST_QUERY, rq->reqpb);
-    const char *uri = pblock_findval(REQUEST_URI, rq->reqpb);
-    const char *protocol = pblock_findval(REQUEST_PROTOCOL, rq->reqpb); 
+    char *protocol_hdr = NULL;
+    char *uri_hdr = NULL;
+    char *pathInfo_hdr = NULL;
+    char *method_hdr = NULL;
+    char *method = NULL;
+    char *host_hdr = NULL;
+    char *query_hdr = NULL;
+    char *query = NULL;
+    char *protocol = "HTTP";
+    const char *clientIP_hdr_name = NULL;
+    char *clientIP_hdr = NULL;
+    char *clientIP = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    char *clientHostname_hdr = NULL;
+    char *clientHostname = NULL;
+    char *orig_request_url = NULL;
     void* agent_config = NULL;
-
+    am_status_t cdStatus = AM_FAILURE;
     char* logout_url = NULL;
-    am_status_t cdStatus = AM_FAILURE; 
-    char* cookie_name=NULL; 
-    int cookie_header_len;
-    char* cookie_header = NULL;
-    // check if agent is initialized.
-    // if not initialized, then call agent init function
+
+    // Check if agent is initialized.
+    // If not initialized, then call agent init function
     // This needs to be synchronized as only one time agent
     // initialization needs to be done.
-  
     if(agentInitialized != B_TRUE){
         //Start critical section
         crit_enter(initLock);
@@ -990,339 +1072,329 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
         crit_exit(initLock);
     }
 
-    if (am_web_is_max_debug_on()) {
-	/* Dump the entire set of request headers */
-	char *header_str = pblock_pblock2str(rq->reqpb, NULL);
-
-	am_web_log_max_debug("validate_session_policy() headers = %s",
-			    header_str);
-	system_free(header_str);
-    }
-
-    path_info = pblock_findval(PATH_INFO, rq->vars);
-    am_web_log_debug("%s: path_info=%s", "validate_session_policy()", path_info);
-    method = pblock_findval(REQUEST_METHOD, rq->reqpb);
-    
     agent_config = am_web_get_agent_configuration();
 
-    status = get_request_url(sn, 
-                             rq, 
-                             agent_config, 
-                             &request_url, 
-                             &orig_request_url);
-
-    /* Check notification URL. orig_request_url is getting passed. */
-    if (B_TRUE==am_web_is_notification(orig_request_url, agent_config)) {
-        notifResult = process_new_notification(param, sn, rq, agent_config);
-        am_web_free_memory(request_url);
-        am_web_free_memory(orig_request_url);
-        am_web_delete_agent_configuration(agent_config);
-        return notifResult;
+    // Dump the entire set of request headers 
+    if (am_web_is_max_debug_on()) {
+        char *header_str = pblock_pblock2str(rq->reqpb, NULL);
+        am_web_log_max_debug("%s: Headers = %s", thisfunc, header_str);
+        system_free(header_str);
     }
-
-    if (getISCookie(pblock_findval(COOKIE_HDR, rq->headers), &dpro_cookie, agent_config)
-        == REQ_ABORTED) {
-        am_web_free_memory(request_url);
-        am_web_free_memory(orig_request_url);
-        am_web_delete_agent_configuration(agent_config);
-        return REQ_ABORTED;
-    }
-
-    if (dpro_cookie != NULL)
-        am_web_log_debug("validate_session_policy(): Cookie Found: %s",
-                         dpro_cookie);
-    else
-        am_web_log_debug("validate_session_policy(): Cookie Not Found in "
-                         " request headers.");
-
-    if (dpro_cookie == NULL && (am_web_is_cdsso_enabled(agent_config) == B_TRUE)
-       && (am_web_is_url_enforced(request_url, path_info, 
-               pblock_findval(REQUEST_IP_ADDR, sn->client), agent_config) == B_TRUE)){
-        if (strcmp(method, REQUEST_METHOD_POST) == 0) {
-            response = get_post_assertion_data(sn, rq, request_url);
-            // Set the original request method to GET always
-            orig_req = (char *)malloc(strlen(getMethod)+1);
-            if (orig_req != NULL) {
-                strcpy(orig_req,getMethod);
-                status = am_web_check_cookie_in_post(args, &dpro_cookie,
-                                               &request_url,
-                                               &orig_req, method, response,
-                                               B_FALSE, set_cookie, 
-                                               set_method, agent_config);
-                if (status == AM_SUCCESS) {
-                    // Set back the original clf-request attribute
-                    int clf_reqSize = 0;
-                    if ((query != NULL) && (strlen(query) > 0)) {
-                        clf_reqSize = strlen(orig_req) + strlen(uri) +
-                                      strlen (query) + strlen(protocol) + 4;
-                    } else {
-                        clf_reqSize = strlen(orig_req) + strlen(uri) +
-                                      strlen(protocol) + 3;
-                    }
-                    clf_req = malloc(clf_reqSize);
-                    if (clf_req == NULL) {
-                        am_web_log_error("validate_session_policy() "
-                                      "Unable to allocate %i bytes for clf_req",
-                        clf_reqSize);
-                        status = AM_NO_MEMORY;
-                    } else {
-                        memset (clf_req,'\0',clf_reqSize);
-                        strcpy(clf_req, orig_req);
-                        strcat(clf_req, " ");
-                        strcat(clf_req, uri);
-                        if ((query != NULL) && (strlen(query) > 0)) {
-                            strcat(clf_req, "?");
-                            strcat(clf_req, query);
-                        }
-                        strcat(clf_req, " ");
-                        strcat(clf_req, protocol);
-                        am_web_log_debug("validate_session_policy(): "
-                                         "clf-request set to %s", clf_req);
-                    }
-                    pblock_nvinsert(REQUEST_CLF, clf_req, rq->reqpb);
-                }
-            } else {
-                am_web_log_error("validate_session_policy() : Unable to "
-                                 "allocate memory for orig_req");
-            }
-	} 
-    }
-
-    if (dpro_cookie != NULL) {
-	am_web_log_debug("validate_session_policy() cookie is %s", dpro_cookie);
-    } else {
-	am_web_log_debug("validate_session_policy() request has no cookie");
-    }
-
-    status = am_map_create(&env_parameter_map);
-    if (status != AM_SUCCESS) {
-        am_web_log_error("validate_session_policy() unable to create map, "
-                         "status = %s (%d)", am_status_to_string(status),
-                         status);
-    }
-
+    
+    // Get header values.
+    // Note: the variables ending by "_hdr" should not be modified or free
+    status  = get_header_value(rq->reqpb, REQUEST_PROTOCOL,
+                               B_TRUE, &protocol_hdr, B_FALSE, NULL);
     if (status == AM_SUCCESS) {
-        // Check if client ip header property is set
-        const char* client_ip_header_name = 
-            am_web_get_client_ip_header_name(agent_config);
-
-        // Check if client hostname header property is set
-        const char* client_hostname_header_name = 
-            am_web_get_client_hostname_header_name(agent_config);
-        char* ip_header = NULL;
-        char* hostname_header = NULL;
-        char* client_ip_from_ip_header = NULL;
-        char* client_hostname_from_hostname_header = NULL;
-
-        // If client ip header property is set, then try to
-        // retrieve header value.
-        if(client_ip_header_name != NULL && client_ip_header_name[0] != '\0') {
-            ip_header = pblock_findval(client_ip_header_name, rq->headers);
-
-            // Usually client ip header value is: client, proxy1, proxy2....
-            // Process client ip header value to get the correct value. 
-            am_web_get_client_ip(ip_header,
-                &client_ip_from_ip_header);
+        status = get_header_value(rq->reqpb, REQUEST_URI,
+                               B_TRUE, &uri_hdr, B_FALSE, NULL);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->vars, PATH_INFO,
+                               B_FALSE, &pathInfo_hdr, B_FALSE, NULL);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->reqpb, REQUEST_METHOD,
+                               B_TRUE, &method_hdr, B_TRUE, &method);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->headers, HOST_HDR,
+                               B_TRUE, &host_hdr, B_FALSE, NULL);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->reqpb, REQUEST_QUERY,
+                               B_FALSE, &query_hdr, B_TRUE, &query);
+    }
+    // Get the request URL
+    if (status == AM_SUCCESS) {
+        if (security_active) {
+            protocol = "HTTPS";
         }
-
-        // If client hostname header property is set, then try to
-        // retrieve header value.
-        if(client_hostname_header_name != NULL && client_hostname_header_name[0] != '\0') {
-            hostname_header = pblock_findval(client_hostname_header_name, rq->headers);
-
-           // Usually client hostname header value is: client, proxy1, proxy2....
-           // Process client hostname header value to get the correct value.
-            am_web_get_client_hostname(hostname_header, 
-                &client_hostname_from_hostname_header);
-        }
-
-        // If client IP value is present from above processing, then
-        // set it to env_param_map. Else use from request structure.
-        if(client_ip_from_ip_header != NULL && client_ip_from_ip_header[0] != '\0') {
-            am_web_set_host_ip_in_env_map(client_ip_from_ip_header,
-                                  client_hostname_from_hostname_header,
-                                  env_parameter_map,
-                                  agent_config);
-
-            status = am_web_is_access_allowed(dpro_cookie, 
-                         request_url,
-                         path_info, 
-                         method,
-                         client_ip_from_ip_header,
-                         env_parameter_map, 
-                         &result, 
-                         agent_config);
+        status = am_web_get_all_request_urls(host_hdr, protocol,
+                                             server_hostname,
+                                             server_portnum, uri_hdr, query,
+                                             agent_config, &request_url,
+                                             &orig_request_url);
+        if(status == AM_SUCCESS) {
+            am_web_log_debug("%s: Request_url: %s", thisfunc, request_url);
         } else {
-            status = am_web_is_access_allowed(dpro_cookie, 
-                         request_url,
-                         path_info, 
-                         method,
-                         pblock_findval(REQUEST_IP_ADDR, sn->client),
-                         env_parameter_map, 
-                         &result, 
-                         agent_config);
+            am_web_log_error("%s: Could not get the request URL. "
+                             "Failed with error: %s.",
+                             thisfunc, am_status_to_string(status));
         }
-        am_map_destroy(env_parameter_map);
-        am_web_free_memory(client_ip_from_ip_header);
-        am_web_free_memory(client_hostname_from_hostname_header);
+    }
+    // Check notification URL. orig_request_url is getting passed.
+    if (status == AM_SUCCESS) {
+        if (B_TRUE == am_web_is_notification(orig_request_url, agent_config)) {
+            notifResult = process_new_notification(param, sn, rq, agent_config);
+            if(query != NULL) {
+                free(query);
+                query = NULL;
+            }
+            if(method != NULL) {
+                free(method);
+                method = NULL;
+            }
+            am_web_free_memory(request_url);
+            am_web_free_memory(orig_request_url);
+            am_web_delete_agent_configuration(agent_config);
+            return notifResult;
+        }
+    }
+    // Check if the SSO token is in the cookie header
+    if (status == AM_SUCCESS) {
+        requestResult = getISCookie(pblock_findval(COOKIE_HDR, rq->headers),
+                                    &dpro_cookie, agent_config);
+        if (requestResult == REQ_ABORTED) {
+            status = AM_FAILURE;
+        } else if(dpro_cookie != NULL) {
+            am_web_log_debug("%s: SSO token found in cookie header.", thisfunc);
+        }
+    }
+    // Create the environment map
+    if( status == AM_SUCCESS) {
+        status = am_map_create(&env_parameter_map);
+        if( status != AM_SUCCESS) {
+            am_web_log_error("%s: Unable to create map, status = %s (%d)",
+                   thisfunc, am_status_to_string(status), status);
+        }
+    }
+    // If there is a proxy in front of the agent, the user can set in the
+    // properties file the name of the headers that the proxy uses to set
+    // the real client IP and host name. In that case the agent needs
+    // to use the value of these headers to process the request
+    //
+    // Get the client IP address header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            status = get_header_value(rq->headers, clientIP_hdr_name,
+                                    B_FALSE, &clientIP_hdr,
+                                    B_FALSE, NULL);
+        }
+    }
+    // Get the client host name header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientHostname_hdr_name = am_web_get_client_hostname_header_name
+                                  (agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            status = get_header_value(rq->headers, clientHostname_hdr_name,
+                                    B_FALSE, &clientHostname_hdr,
+                                    B_FALSE, NULL);
+        }
+    }
+    // If the client IP and host name headers contain more than one
+    // value, take the first value.
+    if (status == AM_SUCCESS) {
+        if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
+            status = am_web_get_client_ip_host(clientIP_hdr,
+                                               clientHostname_hdr,
+                                               &clientIP, &clientHostname);
+        }
+    }
+    // Set the IP address and host name in the environment map
+    if ((status == AM_SUCCESS) && (clientIP != NULL)) {
+        status = am_web_set_host_ip_in_env_map(clientIP, clientHostname,
+                                      env_parameter_map, agent_config);
+    }
+    // If the client IP was not obtained previously,
+    // get it from the REMOTE_ADDR header.
+    if ((status == AM_SUCCESS) && (clientIP == NULL)) {
+        status = get_header_value(sn->client, REQUEST_IP_ADDR,
+                               B_FALSE, &clientIP_hdr, B_TRUE, &clientIP);
+    }
+    // In CDSSO mode, check if the sso token is in the post data
+    if (status == AM_SUCCESS) {
+        if ((dpro_cookie == NULL) &&
+            (am_web_is_cdsso_enabled(agent_config) == B_TRUE) &&
+            (am_web_is_url_enforced(request_url, pathInfo_hdr, 
+                   clientIP, agent_config) == B_TRUE))
+        {
+            if (strcmp(method, REQUEST_METHOD_POST) == 0) {
+                //Set original method to GET
+                orig_req = strdup(REQUEST_METHOD_GET);
+                if (orig_req != NULL) {
+                    am_web_log_debug("%s: Request method set to GET.",
+                                     thisfunc);
+                    response = get_post_data(sn, rq, request_url);
+                    status = am_web_check_cookie_in_post(args, &dpro_cookie,
+                                                   &request_url,
+                                                   &orig_req, method, response,
+                                                   B_FALSE, set_cookie, 
+                                                   set_method, agent_config);
+                    // Set back the original clf-request attribute
+                    if (status == AM_SUCCESS) {
+                        int clf_reqSize = 0;
+                        if ((query != NULL) && (strlen(query) > 0)) {
+                            clf_reqSize = strlen(orig_req) + strlen(uri_hdr) +
+                                          strlen (query) + strlen(protocol) + 4;
+                        } else {
+                            clf_reqSize = strlen(orig_req) + strlen(uri_hdr) +
+                                          strlen(protocol) + 3;
+                        }
+                        clf_req = malloc(clf_reqSize);
+                        if (clf_req == NULL) {
+                            am_web_log_error("%s: Unable to allocate %i "
+                                             "bytes for clf_req", thisfunc,
+                                             clf_reqSize);
+                            status = AM_NO_MEMORY;
+                        } else {
+                            memset (clf_req,'\0',clf_reqSize);
+                            strcpy(clf_req, orig_req);
+                            strcat(clf_req, " ");
+                            strcat(clf_req, uri_hdr);
+                            if ((query != NULL) && (strlen(query) > 0)) {
+                                strcat(clf_req, "?");
+                                strcat(clf_req, query);
+                            }
+                            strcat(clf_req, " ");
+                            strcat(clf_req, protocol);
+                            am_web_log_debug("%s: clf-request set to %s", 
+                                             thisfunc, clf_req);
+                        }
+                        pblock_nvinsert(REQUEST_CLF, clf_req, rq->reqpb);
+                    } else {
+                        am_web_log_debug("%s: SSO token not found in "
+                                       "assertion. Redirecting to login page.",
+                                       thisfunc);
+                        status = AM_INVALID_SESSION;
+                    }
+                } else {
+                    am_web_log_error("%s: Not enough memory to ",
+                                "allocate orig_req.", thisfunc);
+                    status = AM_NO_MEMORY;
+                }
+            }
+        } 
     }
 
-    switch (status) {
-    case AM_SUCCESS:
-        ruser = result.remote_user;
-        if (ruser != NULL) {
-            pb_param *pbuser = pblock_remove(AUTH_USER_VAR, rq->vars);
-	    pb_param *pbauth = pblock_remove(AUTH_TYPE_VAR, rq->vars);
-            
-	    if (pbuser != NULL) {
-                param_free(pbuser);
-	    }
-	    pblock_nvinsert(AUTH_USER_VAR, ruser, rq->vars);
-
-            if (pbauth != NULL) {
-                param_free(pbauth);
-	    }
-	    pblock_nvinsert(AUTH_TYPE_VAR, AM_WEB_AUTH_TYPE_VALUE, rq->vars);
-
-            am_web_log_debug("validate_session_policy() access allowed to %s",
-                             ruser);
-	} else {
-	    am_web_log_debug("validate_session_policy() remote user not set,"
-	    " allowing access to the url as it is in not enforced list");
-	}
-
-        if (am_web_is_logout_url(request_url, agent_config) == B_TRUE) {
-            (void)am_web_logout_cookies_reset(reset_cookie, args, agent_config);
+    // Check if access is allowed.
+    if( status == AM_SUCCESS) {
+        if (dpro_cookie != NULL) {
+            am_web_log_debug("%s: SSO token = %s", thisfunc, dpro_cookie);
+        } else {
+            am_web_log_debug("%s: SSO token not found.", thisfunc);
         }
-
-	// set LDAP user attributes to http header
-	status = am_web_result_attr_map_set(&result, set_header,
+        status = am_web_is_access_allowed(dpro_cookie, request_url,
+                              pathInfo_hdr, method,
+                              clientIP, env_parameter_map, &result,
+                              agent_config);
+        am_web_log_debug("%s: Status after "
+                "am_web_is_access_allowed = %s (%d)",thisfunc,
+                am_status_to_string(status), status);
+        am_map_destroy(env_parameter_map);
+    }
+    
+    switch (status) {
+        case AM_SUCCESS:
+            // Set remote user and authentication type
+            ruser = result.remote_user;
+            if (ruser != NULL) {
+                pb_param *pbuser = pblock_remove(AUTH_USER_VAR, rq->vars);
+                pb_param *pbauth = pblock_remove(AUTH_TYPE_VAR, rq->vars);
+                if (pbuser != NULL) {
+                    param_free(pbuser);
+                }
+                pblock_nvinsert(AUTH_USER_VAR, ruser, rq->vars);
+                if (pbauth != NULL) {
+                    param_free(pbauth);
+                }
+                pblock_nvinsert(AUTH_TYPE_VAR, AM_WEB_AUTH_TYPE_VALUE, rq->vars);
+                am_web_log_debug("%s: Remote user set to %s", thisfunc, ruser);
+            } else {
+                am_web_log_debug("%s: Remote user not set, allowing access "
+                        "to the url as it is in not enforced list", thisfunc);
+            }
+            if (am_web_is_logout_url(request_url, agent_config) == B_TRUE) {
+                (void)am_web_logout_cookies_reset(reset_cookie, args,
+                                                  agent_config);
+            }
+            // set LDAP user attributes to http header
+            status = am_web_result_attr_map_set(&result, set_header,
                                                set_cookie_in_response,
                                                set_header_attr_as_cookie,
                                                get_cookie_sync, args, agent_config);
-	if (status != AM_SUCCESS) {
-	    am_web_log_error("am_web_result_attr_map_set failed, "
-                            "status = %s (%d)",
-                            am_status_to_string(status), status);
-	}
-
-	requestResult = REQ_PROCEED;
-	break;
-
-    case AM_ACCESS_DENIED:
-	am_web_log_debug("validate_session_policy() access denied to %s",
-			 result.remote_user ? result.remote_user :
-			 "unknown user");
-	requestResult = do_redirect(sn, rq, status, &result,
-				    request_url, method, agent_config);
-	break;
-
-    case AM_INVALID_SESSION:
-        //reset the cookie CDSSO. 
-        am_web_log_info("%s: Invalid session.",thisfunc);
-        if (am_web_is_cdsso_enabled(agent_config) == B_TRUE)
-        {
-            cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);        
-            if(cdStatus != AM_SUCCESS) {
-                am_web_log_error("validate_session_policy : CDSSO reset cookie failed");
+            if (status != AM_SUCCESS) {
+                am_web_log_error("%s: am_web_result_attr_map_set failed, "
+                                 "status = %s (%d)", thisfunc,
+                                 am_status_to_string(status), status);
             }
-        }
+            requestResult = REQ_PROCEED;
+            break;
 
-
-        am_web_do_cookies_reset(reset_cookie, args, agent_config);
-
-
-        if (strcmp(method, REQUEST_METHOD_POST) == 0 &&
-            B_TRUE==am_web_is_postpreserve_enabled(agent_config)) 
-        {
-                // Create the magic URI, actionurl
-                post_urls_t *post_urls;
-                post_urls = am_web_create_post_preserve_urls(request_url, 
-                                                         agent_config);
-                // In CDSSO mode, for a POST request, the post data have
-                // already been saved in the response variable, so we need
-                // to get them here only if response is NULL.
-                if (response == NULL) {
-                    response = get_post_data(sn, rq, request_url);
-                }
-                if (response != NULL && strlen(response) > 0) {
-                    if (AM_SUCCESS == register_post_data(sn, rq,
-                                         post_urls->action_url,
-                                         post_urls->post_time_key, response, agent_config))
-                    {
-                        const char *lbCookieHeader = NULL;
-                        // If using a LB in front of the agent, the LB cookie
-                        // needs to be set there. The boolean argument allows
-                        // to set the value of the cookie to the one defined in the
-                        // properties file (B_FALSE) or to NULL (B_TRUE).
-                        status_tmp = am_web_get_postdata_preserve_lbcookie(
-                                                   &lbCookieHeader, B_FALSE, agent_config);
-                        if (status_tmp == AM_SUCCESS) {
-                            if (lbCookieHeader != NULL) {
-                                am_web_log_debug("%s: Setting LB cookie for "
-                                             "post data preservation (%s)",
-                                             thisfunc, lbCookieHeader);
-                                set_cookie(lbCookieHeader, args);
-                            }
-                            requestResult =  do_redirect(sn, rq, status, &result,
-                                                 post_urls->dummy_url, method, agent_config);
-                        } else {
-                            am_web_log_error("%s: "
-                              "am_web_get_postdata_preserve_lbcookie() "
-                              "failed ", thisfunc);
-                            requestResult = REQ_ABORTED;
-                        }
-                        if (lbCookieHeader != NULL) {
-                            am_web_free_memory(lbCookieHeader);
-                            lbCookieHeader = NULL;
-                        }
-                    } else {
-                        requestResult = REQ_ABORTED;
-                    }
-                    // call cleanup routine
-                    am_web_clean_post_urls(post_urls);
-                } else {
-                    am_web_log_debug("%s: AM_INVALID_SESSION. This is a POST "
-                                     "request with no post data => redirecting "
-                                     " as a GET request.", thisfunc);
-                    requestResult = do_redirect(sn, rq, status, &result,
-                               request_url, REQUEST_METHOD_GET, agent_config);
-                }
+        case AM_ACCESS_DENIED:
+            am_web_log_debug("%s: Access denied to %s", thisfunc,
+                      result.remote_user ? result.remote_user :
+                      "unknown user");
+            if(am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                am_web_log_debug("Resetting cookie to avoid double assertion post");
+                am_web_do_cookies_reset(reset_cookie, args, agent_config);
+            }
+            // If the post data preservation feature is enabled
+            // save the post data in the cache for post requests.
+            // This needs to be done when the access has been denied 
+            // in case there is a composite advice.
+            if ((strcmp(method, REQUEST_METHOD_POST) == 0) &&
+                  (B_TRUE == am_web_is_postpreserve_enabled(agent_config)))
+            {
+                requestResult = process_request_with_post_data_preservation(
+                                    sn, rq, status, &result, request_url,
+                                    args, &response, agent_config);
             } else {
-                am_web_log_debug("%s: AM_INVALID_SESSION in GET", thisfunc);
                 requestResult = do_redirect(sn, rq, status, &result,
-                           request_url, method, agent_config);
+                                            request_url, method, agent_config);
             }
+            break;
 
-	break;
+        case AM_INVALID_SESSION:
+            am_web_log_info("%s: Invalid session.",thisfunc);
+            // Reset the cookie CDSSO. 
+            if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                cdStatus = am_web_do_cookie_domain_set(set_cookie, args, 
+                                                       EMPTY_STRING, 
+                                                       agent_config);
+                if(cdStatus != AM_SUCCESS) {
+                    am_web_log_error("%s : CDSSO reset cookie failed",
+                                     thisfunc);
+                }
+             }
+            am_web_do_cookies_reset(reset_cookie, args, agent_config);
+            if ((strcmp(method, REQUEST_METHOD_POST) == 0) &&
+                  (B_TRUE == am_web_is_postpreserve_enabled(agent_config)))
+            {
+                requestResult = process_request_with_post_data_preservation(
+                                    sn, rq, status, &result, request_url,
+                                    args, &response, agent_config);
+            } else {
+                requestResult = do_redirect(sn, rq, status, &result,
+                                            request_url, method, agent_config);
+            }
+            break;
 
-    case AM_INVALID_FQDN_ACCESS:
-        // Redirect to self with correct FQDN - no post preservation
-        requestResult = do_redirect(sn, rq, status, &result,
+        case AM_INVALID_FQDN_ACCESS:
+            // Redirect to self with correct FQDN - no post preservation
+            requestResult = do_redirect(sn, rq, status, &result,
                                     request_url, method, agent_config);
-        break;
+            break;
 
-    case AM_INVALID_ARGUMENT:
-    case AM_NO_MEMORY:
+        case AM_REDIRECT_LOGOUT:
+            status = am_web_get_logout_url(&logout_url, agent_config);
+            if(status == AM_SUCCESS) {
+                do_url_redirect(sn, rq, logout_url);
+            } else {
+                requestResult = REQ_ABORTED;
+                am_web_log_debug("%s: am_web_get_logout_url failed.",
+                                 thisfunc);
+            }
+            break;
 
-    case AM_REDIRECT_LOGOUT:
-        status = am_web_get_logout_url(&logout_url, agent_config);
-        if(status == AM_SUCCESS)
-        {
-            do_url_redirect(sn,rq,logout_url);
-        }
-        else
-        {
+        case AM_INVALID_ARGUMENT:
+        case AM_NO_MEMORY:
+        default:
+            am_web_log_error("%s: Status: %s (%d)", thisfunc,
+                   am_status_to_string(status), status);
             requestResult = REQ_ABORTED;
-            am_web_log_debug("validate_session_policy(): "
-				"am_web_get_logout_url failed. ");
-        }
-    break;
-    default:
-	am_web_log_error("validate_session_policy() status: %s (%d)",
-			am_status_to_string(status), status);
-	requestResult = REQ_ABORTED;
-	break;
+            break;
     }
 
     am_web_clear_attributes_map(&result);
@@ -1331,25 +1403,36 @@ validate_session_policy(pblock *param, Session *sn, Request *rq)
     am_web_free_memory(request_url);
     am_web_free_memory(orig_request_url);
     am_web_free_memory(logout_url);
-
     am_web_delete_agent_configuration(agent_config);
-
-    am_web_log_max_debug("validate_session_policy(): "
-			 "Completed handling request with status: %s.",
-			 am_status_to_string(status));
-
-    if (orig_req != NULL) {
+    if(response != NULL) {
+        free(response);
+        response = NULL;
+    }    
+    if(orig_req != NULL) {
         free(orig_req);
         orig_req = NULL;
     }
-    if (response != NULL) {
-        free(response);
-        response = NULL;
-    }
-    if (clf_req != NULL) {
+    if(clf_req != NULL) {
         free(clf_req);
         clf_req = NULL;
     }
+    if(query != NULL) {
+        free(query);
+        query = NULL;
+    }
+    if(method != NULL) {
+        free(method);
+        method = NULL;
+    }
+    if(clientIP != NULL) {
+        am_web_free_memory(clientIP);
+    }
+    if(clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+    }
+    
+    am_web_log_max_debug("%s: Completed handling request with status: %s.",
+                         thisfunc, am_status_to_string(status));
     return requestResult;
 }
 

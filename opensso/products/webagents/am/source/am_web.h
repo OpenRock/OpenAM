@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: am_web.h,v 1.31 2009/12/19 00:05:46 subbae Exp $
+ * $Id: am_web.h,v 1.32 2010/03/10 05:09:37 dknab Exp $
  *
  */
 
@@ -143,7 +143,9 @@ AM_BEGIN_EXTERN_C
 
 #define AM_WEB_POST_CACHE_ENTRY_LIFETIME AM_COMMON_PROPERTY_PREFIX "postcache.entry.lifetime"
 #define AM_WEB_POST_CACHE_DATA_PRESERVE AM_COMMON_PROPERTY_PREFIX "postdata.preserve.enable"
-#define AM_WEB_POST_CACHE_DATA_PRESERVE_LBCOOKIE AM_COMMON_PROPERTY_PREFIX "postdata.preserve.lbcookie"
+#define AM_WEB_POST_CACHE_DATA_PRESERVE_STICKY_SESSION_MODE AM_COMMON_PROPERTY_PREFIX "postdata.preserve.stickysession.mode"
+#define AM_WEB_POST_CACHE_DATA_PRESERVE_STICKY_SESSION_VALUE AM_COMMON_PROPERTY_PREFIX "postdata.preserve.stickysession.value"
+
 #define AM_WEB_URI_PREFIX AM_COMMON_PROPERTY_PREFIX "agenturi.prefix"
 
 #define AM_WEB_FQDN_MAP AM_COMMON_PROPERTY_PREFIX "fqdn.mapping"
@@ -950,8 +952,17 @@ AM_WEB_EXPORT boolean_t am_web_is_postpreserve_enabled(void* agent_config);
  * enabled
  */
 AM_WEB_EXPORT am_status_t
-am_web_get_postdata_preserve_lbcookie(const char **headerValue, 
+am_web_get_postdata_preserve_lbcookie(char **headerValue, 
                           boolean_t isValueNull, void* agent_config);
+
+/*
+ * Method to get the query parameter that should be added to the
+ * dummy url when using a LB in front of the agent with post 
+ * preservation enabled and sticky session mode set to URL.
+ */
+AM_WEB_EXPORT am_status_t 
+am_web_get_postdata_preserve_URL_parameter(char **queryParameter,
+                                           void* agent_config);
 
 /*
  * Method to insert POST data entry in the POST cache
@@ -1019,9 +1030,10 @@ AM_WEB_EXPORT void am_web_postcache_remove(const char *key,
  *        preservation.
  *
  */
-AM_WEB_EXPORT post_urls_t * am_web_create_post_preserve_urls(const
-					   char *request_url,
-                                           void* agent_config);
+AM_WEB_EXPORT am_status_t am_web_create_post_preserve_urls(
+                                  const char *request_url, 
+                                  post_urls_t **url_data,
+                                  void* agent_config);
 
 /*
  * Method to clean up datastructure containing dummy post url, action url and
@@ -1290,7 +1302,8 @@ AM_WEB_EXPORT const char *am_web_domino_ltpa_token_name(void* agent_config);
  * Method to determine if a url is enforced
  */
 AM_WEB_EXPORT boolean_t
-am_web_is_url_enforced(const char *url_str,const char *path_info,const char *client_ip, void* agent_config);
+am_web_is_url_enforced(const char *url_str,const char *path_info,
+                       const char *client_ip, void* agent_config);
 
 /*
  * Method to get the value of user id param
@@ -1299,10 +1312,12 @@ AM_WEB_EXPORT const char * am_web_get_user_id_param(void* agent_config);
 AM_WEB_EXPORT void am_web_clear_attributes_map(am_policy_result_t *result);
 
 AM_WEB_EXPORT boolean_t am_web_is_owa_enabled(void* agent_config);
-AM_WEB_EXPORT boolean_t am_web_is_owa_enabled_change_protocol(void* agent_config);
-AM_WEB_EXPORT const char * am_web_is_owa_enabled_session_timeout_url(void* agent_config);
-
-AM_WEB_EXPORT am_status_t am_web_get_logout_url(char** logout_url, void* agent_config);
+AM_WEB_EXPORT 
+    boolean_t am_web_is_owa_enabled_change_protocol(void* agent_config);
+AM_WEB_EXPORT 
+    const char * am_web_is_owa_enabled_session_timeout_url(void* agent_config);
+AM_WEB_EXPORT am_status_t am_web_get_logout_url(char** logout_url,
+                                                void* agent_config);
 
 /**
  * Returns client.ip.header property value
@@ -1316,27 +1331,22 @@ AM_WEB_EXPORT const char *
 AM_WEB_EXPORT const char *
     am_web_get_client_hostname_header_name(void* agent_config);
 
-/**
- * Returns client ip value from client ip header.
- * If the clientIP contains comma separated values,
- * then first value is taken into consideration.
+/*
+ * Returns client IP and hostname value from client IP and hostname headers.
+ * If the client IP header or client host name header contains comma 
+ * separated values, then first value is taken into consideration.
  */
-AM_WEB_EXPORT am_status_t am_web_get_client_ip(const char* clientIPHeader,
-                                               char** clientIP);
-
-/**
- * Returns client hostname value from client hostname header.
- * If the clientHostname contains comma separated values,
- * then first value is taken into consideration.
- */
-AM_WEB_EXPORT am_status_t am_web_get_client_hostname(const char* clientHostnameHeader,
-                                                     char** clientHostname);
+AM_WEB_EXPORT am_status_t
+    am_web_get_client_ip_host(const char *clientIPHeader,
+                              const char *clientHostHeader,
+                              char **clientIP,
+                              char **clientHost);
 
 /**
  * Sets client ip (and client hostname) in environment map
  * which then sent as part of policy request.
  */
-AM_WEB_EXPORT void
+AM_WEB_EXPORT am_status_t
     am_web_set_host_ip_in_env_map(const char *client_ip,
                               const char *client_hostname,
                               const am_map_t env_parameter_map,

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: web_agent.c,v 1.9 2009/08/05 22:00:44 subbae Exp $
+ * $Id: web_agent.c,v 1.10 2010/03/10 05:08:53 dknab Exp $
  *
  *
  */
@@ -73,7 +73,6 @@ static agent_props_t agent_props = {
 
 boolean_t agentInitialized = B_FALSE;
 static CRITICAL initLock;
-const char getMethod[] = "GET";
 
 void init_at_request();
 
@@ -102,6 +101,47 @@ int send_data(const char *msg, Session *sn, Request *rq) {
 
     }
     return retVal; 
+}
+
+am_status_t get_header_value(pblock *pb, const char *header_name,
+                             boolean_t isRequired, char **header_value,
+                             boolean_t needCopy, char **header_value_copy)
+{
+    const char *thisfunc = "get_header_value()";
+    am_status_t status = AM_SUCCESS;
+    // From NSAPI guide:
+    // The pointer returned is a pointer into the pblock. 
+    // Do not FREE it. If you want to modify it, do a STRDUP 
+    // and modify the copy.
+    *header_value = pblock_findval(header_name, pb);
+    if ((*header_value != NULL) && (strlen(*header_value) > 0 )) {
+        am_web_log_debug("%s: %s = %s", thisfunc, header_name, *header_value);
+    } else {
+        *header_value = NULL;
+        if (isRequired == B_TRUE) {
+            am_web_log_error("%s: Could not get a value for header %s.", 
+                             thisfunc, header_name);
+            status = AM_FAILURE;
+        } else {
+            am_web_log_debug("%s: %s =", thisfunc,
+                             header_name);
+        }
+    }
+    // In case the header needs to be modified later in the code,
+    // copy it in a variable that can be modified. This one must
+    // be freed.
+    if ((status == AM_SUCCESS) && (needCopy == B_TRUE) &&
+        (*header_value != NULL))
+    {
+        *header_value_copy = strdup(*header_value);
+        if (*header_value_copy == NULL) {
+            am_web_log_debug("%s: Not enough memory to make "
+                             "a copy of the %s header.",
+                             thisfunc, header_name);
+            status = AM_NO_MEMORY;
+        }
+    }
+    return status;
 }
 
 /*
@@ -421,7 +461,7 @@ static am_status_t set_header(const char *key, const char *values,
                               void **args) {
     Request *rq = (Request *)args[0];
     pb_param *hdr_pp = pblock_find("full-headers", rq->reqpb);
-    char *the_key = key;
+    const char *the_key = key;
 
     if (hdr_pp != NULL) {
 	if(values != NULL && *values != '\0') { //Added by bn152013 for 6739097
@@ -759,6 +799,7 @@ char *replace_host_port(const char *request_url, const char *agent_host,
  */
 NSAPI_PUBLIC int
 validate_session_policy(pblock *param, Session *sn, Request *rq) {
+    const char *thisfunc = "validate_session_policy()";
     char *dpro_cookie = NULL;
     am_status_t status = AM_SUCCESS;
     int  requestResult = REQ_ABORTED;
@@ -767,24 +808,28 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
     am_map_t env_parameter_map = NULL;
     am_policy_result_t result = AM_POLICY_RESULT_INITIALIZER;
     void *args[] = { (void *)rq };
-    char *method = NULL;
     char *request_url = NULL;
     char *orig_req = NULL ;
-    char *path_info = NULL;
-    char * response = NULL;
+    char *response = NULL;
     char *clf_req = NULL;
-    const char *query = pblock_findval(REQUEST_QUERY, rq->reqpb);
-    char *uri = pblock_findval(REQUEST_URI, rq->reqpb);
-    char *virt_host = NULL;
     char *server_protocol = NULL;
-    void* agent_config = NULL;
-//    boolean_t useSunwMethod = am_web_use_sunwmethod();
-    char* logout_url = NULL;
+    void *agent_config = NULL;
+    char *logout_url = NULL;
+    char *uri_hdr = NULL;
+    char *pathInfo_hdr = NULL;
+    char *method_hdr = NULL;
+    char *method = NULL;
+    char *virtHost_hdr = NULL;
+    char *query_hdr = NULL;
+    char *query = NULL;
+    char *protocol = "HTTP";
+    const char *clientIP_hdr_name = NULL;
+    char *clientIP_hdr = NULL;
+    char *clientIP = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    char *clientHostname_hdr = NULL;
+    char *clientHostname = NULL;
     am_status_t cdStatus = AM_FAILURE;
-    char* cookie_name= NULL;
-    int cookie_header_len;
-    char* cookie_header = NULL;
-    char* header_str = NULL;
 
     // check if agent is initialized.
     // if not initialized, then call agent init function
@@ -795,272 +840,255 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
         //Start critical section
         crit_enter(initLock);
         if(agentInitialized != B_TRUE){
-            am_web_log_debug("validate_session_policy : "
-                             "Will call init");
+            am_web_log_debug("%s: Will call init.", thisfunc);
             init_at_request(); 
-      	    if(agentInitialized != B_TRUE){
-      	           am_web_log_error("validate_session_policy : "
-                   " Agent is still not intialized");
+            if(agentInitialized != B_TRUE){
+                am_web_log_error("%s: Agent is still not intialized",
+                                 thisfunc);
                 //deny the access
                 requestResult =  do_deny(sn, rq, status);
-                return requestResult;
-      	    }  else {
-                am_web_log_debug("validate_session_policy : "
-                "Agent intialized");
+                status = AM_FAILURE;
+            } else {
+                am_web_log_debug("%s: Agent intialized");
             }
         }
         //end critical section
         crit_exit(initLock);
     }
-
-    if (am_web_is_max_debug_on()) {
+    if (status == AM_SUCCESS) {
+        // Get the agent configuration
+        agent_config = am_web_get_agent_configuration();
         // Dump the entire set of request headers
-        header_str = pblock_pblock2str(rq->reqpb, NULL);
-        am_web_log_max_debug("validate_session_policy() Headers: %s", 
-                              header_str);
-        system_free(header_str);
-    }
-
-    // Get request method, path info
-    method = pblock_findval(REQUEST_METHOD, rq->reqpb);
-    path_info = pblock_findval(PATH_INFO, rq->reqpb);
-
-    agent_config = am_web_get_agent_configuration();
-
-    // Construct request url
-    if (uri != NULL && *uri == '/') {
-        char *temp = NULL;
-        // Get the query
-        query = pblock_findval(REQUEST_QUERY, rq->reqpb);
-        if (query != NULL) {
-            temp = malloc(strlen(query) + 2);
-            if (temp == NULL) {
-                am_web_log_error("%s: Unable to allocate memory for temp.");
-                return REQ_ABORTED;
-            }
-            temp[0] = '?';
-            temp[1] = '\0';
-            strcat(temp, query);
+        if (am_web_is_max_debug_on()) {
+            char *header_str = pblock_pblock2str(rq->reqpb, NULL);
+            am_web_log_max_debug("%s: Headers: %s", thisfunc, header_str);
+            system_free(header_str);
         }
+    }
+    // Get header values
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->reqpb, REQUEST_URI,
+                               B_TRUE, &uri_hdr, B_FALSE, NULL);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->vars, PATH_INFO,
+                               B_FALSE, &pathInfo_hdr, B_FALSE, NULL);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->reqpb, REQUEST_METHOD,
+                               B_TRUE, &method_hdr, B_TRUE, &method);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->headers, "ampxy_host",
+                               B_TRUE, &virtHost_hdr, B_FALSE, NULL);
+    }
+    if (status == AM_SUCCESS) {
+        status = get_header_value(rq->reqpb, REQUEST_QUERY,
+                               B_FALSE, &query_hdr, B_TRUE, &query);
+    }
+    if (security_active) {
+        protocol = "HTTPS";
+    }
+    // Get the request URL
+    if (status == AM_SUCCESS) {
         if (am_web_is_proxy_override_host_port_set(agent_config) == AM_FALSE) {
-            // Get the virtual host
-            virt_host = pblock_findval("ampxy_host", rq->headers);
-            if(virt_host == NULL) {
-                am_web_log_error("validate_session_policy() vitual host is null");
-                return REQ_ABORTED;
+            status = am_web_get_request_url(virtHost_hdr, protocol,
+                                            NULL, 0, uri_hdr, query,
+                                            &request_url, agent_config);
+            if(status == AM_SUCCESS) {
+                am_web_log_debug("%s: Request_url: %s", thisfunc, request_url);
+            } else {
+                am_web_log_error("%s: Could not get the request URL. "
+                                 "Failed with error: %s.",
+                                 thisfunc, am_status_to_string(status));
             }
-            am_web_log_max_debug("validate_session_policy() ampxy_host = %s", virt_host);
-            server_protocol = to_lower(strtok(http_uri2url("/", ""), ":"));
-            request_url = (char *)malloc(strlen(server_protocol) + 3 +
-                             strlen(virt_host) + strlen(uri) + 1);
-            if (request_url == NULL) {
-                am_web_log_error("validate_session_policy() Unable to allocate memory for "
-                                   "request_url.");
-                return REQ_ABORTED;
-            }
-            sprintf(request_url,"%s://%s%s",server_protocol,virt_host,uri);
-            // Add the query
-            if (temp != NULL) {
-                int url_len = strlen(request_url);
-                request_url = (char *)realloc(request_url, url_len +
-                               strlen(temp) + 1);
-                if (request_url == NULL) {
-                    am_web_log_error("validate_session_policy() Unable to reallocate memory "
-                                     "for request_url.");
-                  return REQ_ABORTED;
+        }
+    }
+    if (status == AM_SUCCESS) {
+        if (am_web_is_proxy_override_host_port_set(agent_config) == AM_TRUE) {
+            const char *agent_host = am_web_get_agent_server_host(agent_config);
+            int agent_port = am_web_get_agent_server_port(agent_config);
+            if (agent_host != NULL) {
+                char *temp = NULL;
+                temp = replace_host_port(request_url, agent_host, agent_port,
+                                         agent_config);
+                if (temp != NULL) {
+                    free(request_url);
+                    request_url = temp;
                 }
-                strcat(request_url,temp);
-                am_web_log_max_debug("validate_session_policy() Query = %s", temp);
             }
-        } else {
-            request_url = http_uri2url(uri, temp ? temp : "");
+            am_web_log_debug("%s: Request_url after overriding "
+                             "host and port: %s",
+                             thisfunc, request_url);
         }
-        if (temp != NULL) {
-            free(temp);
-        }
-    } else {
-        request_url = strdup(uri);
-        if (request_url == NULL) {
-            am_web_log_error("validate_session_policy() Unable to allocate memory for "
-                               "request_url");
-            return REQ_ABORTED;
-        } 
     }
-    if (request_url == NULL) {
-        am_web_log_error("validate_session_policy() request_url is null.");
-        return REQ_ABORTED;
-    }
-    if (am_web_is_proxy_override_host_port_set(agent_config) == AM_TRUE) {
-        const char *agent_host = am_web_get_agent_server_host(agent_config);
-        int agent_port = am_web_get_agent_server_port(agent_config);
-        if (agent_host != NULL) {
-            char *temp = NULL;
-            temp = replace_host_port(request_url, agent_host, agent_port,
-                                     agent_config);
-            if (temp != NULL) {
-                free(request_url);
-                request_url=temp;
+    if (status == AM_SUCCESS) {
+        // Check for magic notification URL
+        if (B_TRUE == am_web_is_notification(request_url, agent_config)) {
+            am_web_free_memory(request_url);
+            am_web_delete_agent_configuration(agent_config);
+            if(query != NULL) {
+                free(query);
+                query = NULL;
             }
+            if(method != NULL) {
+                free(method);
+                method = NULL;
+            }
+            return REQ_PROCEED;
         }
-    }
-    am_web_log_debug("validate_session_policy() Request url =  %s", request_url);
-
-    // Check for magic notification URL
-    if (B_TRUE == am_web_is_notification(request_url, agent_config)) {
-        am_web_free_memory(request_url);
-        am_web_delete_agent_configuration(agent_config);
-        return REQ_PROCEED;
     }
     // Check if the SSO token is in the cookie header
-    if (getISCookie(pblock_findval(COOKIE_HDR, rq->headers), &dpro_cookie,
-                                   agent_config) == REQ_ABORTED) {
-        am_web_free_memory(request_url);
-        am_web_delete_agent_configuration(agent_config);
-        return REQ_ABORTED;
+    if (status == AM_SUCCESS) {
+        requestResult = getISCookie(pblock_findval(COOKIE_HDR, rq->headers),
+                                    &dpro_cookie, agent_config);
+        if (requestResult == REQ_ABORTED) {
+            status = AM_FAILURE;
+        } else if (dpro_cookie != NULL) {
+            am_web_log_debug("%s: SSO token found in cookie header.",
+                             thisfunc);
+        }
     }
-    if(dpro_cookie != NULL)
-        am_web_log_debug("validate_session_policy(): Cookie Found: %s",
-                          dpro_cookie); 
-    else
-        am_web_log_debug("validate_session_policy(): Cookie Not Found in "
-                         " request headers."); 
-
+    // Create the environment map
+    if( status == AM_SUCCESS) {
+        status = am_map_create(&env_parameter_map);
+        if( status != AM_SUCCESS) {
+            am_web_log_error("%s: Unable to create map, status = %s (%d)",
+                   thisfunc, am_status_to_string(status), status);
+        }
+    }    
+    // If there is a proxy in front of the agent, the user can set in the
+    // properties file the name of the headers that the proxy uses to set
+    // the real client IP and host name. In that case the agent needs
+    // to use the value of these headers to process the request
+    //
+    // Get the client IP address header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            status = get_header_value(rq->headers, clientIP_hdr_name,
+                                    B_FALSE, &clientIP_hdr,
+                                    B_FALSE, NULL);
+        }
+    }
+    // Get the client host name header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientHostname_hdr_name = 
+               am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            status = get_header_value(rq->headers, clientHostname_hdr_name,
+                                    B_FALSE, &clientHostname_hdr,
+                                    B_FALSE, NULL);
+        }
+    }
+    // If the client IP and host name headers contain more than one
+    // value, take the first value.
+    if (status == AM_SUCCESS) {
+        if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
+            status = am_web_get_client_ip_host(clientIP_hdr,
+                                               clientHostname_hdr,
+                                               &clientIP, &clientHostname);
+        }
+    }
+    // Set the IP address and host name in the environment map
+    if ((status == AM_SUCCESS) && (clientIP != NULL)) {
+        status = am_web_set_host_ip_in_env_map(clientIP, clientHostname,
+                                      env_parameter_map, agent_config);
+    }
+    // If the client IP was not obtained previously,
+    // get it from the REMOTE_ADDR header.
+    if ((status == AM_SUCCESS) && (clientIP == NULL)) {
+        status = get_header_value(sn->client, REQUEST_IP_ADDR,
+                               B_FALSE, &clientIP_hdr, B_TRUE, &clientIP);
+    }
     // In CDSSO mode, check if the sso token is in the post data
-    if (dpro_cookie == NULL &&
-        am_web_is_cdsso_enabled(agent_config) == B_TRUE ) {
-        if (strcmp(method, REQUEST_METHOD_POST) == 0 &&
-               (am_web_is_url_enforced(request_url, path_info, 
-               pblock_findval(REQUEST_IP_ADDR, 
-               sn->client),agent_config) == B_TRUE)) {
-               response = get_post_assertion_data(sn, rq, request_url);
-            // Set the original request method to GET always
-            orig_req = (char *)malloc(strlen(getMethod)+1);
-            if (orig_req != NULL) {
-                strcpy(orig_req,getMethod);
-                status = am_web_check_cookie_in_post(args, &dpro_cookie,
+    if( status == AM_SUCCESS) {
+        if((am_web_is_cdsso_enabled(agent_config) == B_TRUE) &&
+                   (strcmp(method, REQUEST_METHOD_POST) == 0))
+        {
+            if((dpro_cookie == NULL) && 
+               (am_web_is_url_enforced(request_url, pathInfo_hdr,
+                        clientIP, agent_config) == B_TRUE))
+            {
+                // Set original method to GET
+                orig_req = strdup(REQUEST_METHOD_GET);
+                if (orig_req != NULL) {
+                    am_web_log_debug("%s: Request method set to GET.",
+                                          thisfunc);
+                } else {
+                    am_web_log_error("%s: Not enough memory to ",
+                                "allocate orig_req.", thisfunc);
+                    status = AM_NO_MEMORY;
+                }
+                // Check if dpro_cookie is in post data
+                if( status == AM_SUCCESS) {
+                    response = get_post_assertion_data(sn, rq, request_url);
+                    status = am_web_check_cookie_in_post(args, &dpro_cookie,
                                                &request_url,
                                                &orig_req, method, response,
                                                B_FALSE, set_cookie, 
                                                set_method, agent_config);
+                    if( status == AM_SUCCESS) {
+                        am_web_log_debug("%s: SSO token found in "
+                                             "assertion.",thisfunc);
+                    } else {
+                        am_web_log_debug("%s: SSO token not found in "
+                                   "assertion. Redirecting to login page.",
+                                   thisfunc);
+                        status = AM_INVALID_SESSION;
+                    }
+                }
+                // Set back the original clf-request attribute
                 if (status == AM_SUCCESS) {
-                    // Set back the original clf-request attribute
                     int clf_reqSize = 0;
                     if ((query != NULL) && (strlen(query) > 0)) {
-                        clf_reqSize = strlen(orig_req) + strlen(uri) +
-                                      strlen (query) + strlen(server_protocol) + 4;
+                        clf_reqSize = strlen(orig_req) + strlen(uri_hdr) +
+                                      strlen (query) + strlen(protocol) + 4;
                     } else {
-                        clf_reqSize = strlen(orig_req) + strlen(uri) +
-                                      strlen(server_protocol) + 3;
+                        clf_reqSize = strlen(orig_req) + strlen(uri_hdr) +
+                                      strlen(protocol) + 3;
                     }
                     clf_req = malloc(clf_reqSize);
                     if (clf_req == NULL) {
-                        am_web_log_error("validate_session_policy() "
-                                      "Unable to allocate %i bytes for clf_req",
-                                      clf_reqSize);
+                        am_web_log_error("%s: Unable to allocate %i "
+                                         "bytes for clf_req",
+                                         thisfunc, clf_reqSize);
                         status = AM_NO_MEMORY;
                     } else {
                         memset (clf_req,'\0',clf_reqSize);
                         strcpy(clf_req, orig_req);
                         strcat(clf_req, " ");
-                        strcat(clf_req, uri);
+                        strcat(clf_req, uri_hdr);
                         if ((query != NULL) && (strlen(query) > 0)) {
                             strcat(clf_req, "?");
                             strcat(clf_req, query);
                         }
                         strcat(clf_req, " ");
-                        strcat(clf_req, server_protocol);
-                        am_web_log_debug("validate_session_policy(): "
-                        		 "clf-request set to %s", clf_req);
+                        strcat(clf_req, protocol);
+                        am_web_log_debug("%s: clf-request set to %s",
+                                          thisfunc, clf_req);
                     }
                     pblock_nvinsert(REQUEST_CLF, clf_req, rq->reqpb);
                 }
-            } else {
-                am_web_log_error("validate_session_policy() : Unable to "
-                                 "allocate memory for orig_req");
-            }
+            } 
         }
     }
-
-    if (dpro_cookie != NULL) {
-        am_web_log_debug("validate_session_policy() cookie is %s", dpro_cookie);
-    } else {
-        am_web_log_debug("validate_session_policy() request has no cookie");
-    }
-
-    status = am_map_create(&env_parameter_map);
-    if (status != AM_SUCCESS) {
-        am_web_log_error("validate_session_policy() unable to create map, "
-                         "status = %s (%d)", am_status_to_string(status),
-                         status);
-    }
-
-
     // Check if access is allowed.
-    if(status == AM_SUCCESS) {
-        // Check if client ip header property is set
-        const char* client_ip_header_name =
-            am_web_get_client_ip_header_name(agent_config);
-
-        // Check if client hostname header property is set
-        const char* client_hostname_header_name =
-            am_web_get_client_hostname_header_name(agent_config);
-        char* ip_header = NULL;
-        char* hostname_header = NULL;
-        char* client_ip_from_ip_header = NULL;
-        char* client_hostname_from_hostname_header = NULL;
-
-        // If client ip header property is set, then try to
-        // retrieve header value.
-        if(client_ip_header_name != NULL && client_ip_header_name[0] != '\0') {
-            ip_header = pblock_findval(client_ip_header_name, rq->headers);
-
-            // Usually client ip header value is: client, proxy1, proxy2....
-            // Process client ip header value to get the correct value.
-            am_web_get_client_ip(ip_header,
-                &client_ip_from_ip_header);
-        }
-
-        // If client hostname header property is set, then try to
-        // retrieve header value.
-        if(client_hostname_header_name != NULL && client_hostname_header_name[0] != '\0') {
-            hostname_header = pblock_findval(client_hostname_header_name, rq->headers);
-
-           // Usually client hostname header value is: client, proxy1, proxy2....
-           // Process client hostname header value to get the correct value.
-            am_web_get_client_hostname(hostname_header,
-                &client_hostname_from_hostname_header);
-        }
-
-        // If client IP value is present from above processing, then
-        // set it to env_param_map. Else use from request structure.
-        if(client_ip_from_ip_header != NULL && client_ip_from_ip_header[0] != '\0') {
-            am_web_set_host_ip_in_env_map(client_ip_from_ip_header,
-                                  client_hostname_from_hostname_header,
-                                  env_parameter_map,
-                                  agent_config);
-            status = am_web_is_access_allowed(dpro_cookie, 
-                     request_url,
-                     path_info, 
-                     method,
-                     client_ip_from_ip_header,
-                     env_parameter_map, 
-                     &result, 
-                     agent_config);
+    if( status == AM_SUCCESS) {
+        if (dpro_cookie != NULL) {
+            am_web_log_debug("%s: SSO token = %s", thisfunc, dpro_cookie);
         } else {
-            status = am_web_is_access_allowed(dpro_cookie, 
-                     request_url,
-                     path_info, 
-                     method,
-                     pblock_findval(REQUEST_IP_ADDR, sn->client),
-                     env_parameter_map, 
-                     &result, 
-                     agent_config);
+            am_web_log_debug("%s: SSO token not found.", thisfunc);
         }
+        status = am_web_is_access_allowed(dpro_cookie,
+                                          request_url,
+                                          pathInfo_hdr, method,
+                                          clientIP,
+                                          env_parameter_map,
+                                          &result,
+                                          agent_config);
         am_map_destroy(env_parameter_map);
-        am_web_free_memory(client_ip_from_ip_header);
-        am_web_free_memory(client_hostname_from_hostname_header);
     }
-
     switch(status) {
     case AM_SUCCESS:
         // Set remote user and authentication type
@@ -1076,11 +1104,11 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
                 param_free(pbauth);
             }
             pblock_nvinsert(AUTH_TYPE_VAR, AM_WEB_AUTH_TYPE_VALUE, rq->vars);
-            am_web_log_debug("validate_session_policy() access allowed to %s",
-                              ruser);
+            am_web_log_debug("%s: access allowed to %s", thisfunc, ruser);
         } else {
-            am_web_log_debug("validate_session_policy() Remote user not set,"
-                 " allowing access to the url as it is in not enforced list");
+            am_web_log_debug("%s: Remote user not set, "
+                             "allowing access to the url as it is in not "
+                             "enforced list", thisfunc);
         }
 
         if (am_web_is_logout_url(request_url,  agent_config) == B_TRUE) {
@@ -1092,17 +1120,17 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
                                            set_header_attr_as_cookie, 
                                            get_cookie_sync, args, agent_config);
         if (status != AM_SUCCESS) {
-            am_web_log_error("am_web_result_attr_map_set failed, "
-                        "status = %s (%d)",
+            am_web_log_error("%s: am_web_result_attr_map_set failed, "
+                        "status = %s (%d)", thisfunc,
                         am_status_to_string(status), status);
             requestResult = REQ_ABORTED;
         } else {
             requestResult = REQ_PROCEED;
         }
-    break;
+        break;
 
     case AM_ACCESS_DENIED:
-        am_web_log_debug("validate_session_policy()  Access denied to %s",
+        am_web_log_debug("%s: Access denied to %s", thisfunc,
                     result.remote_user ? result.remote_user :
                     "unknown user");
         requestResult = do_redirect(sn, rq, status, &result,
@@ -1110,29 +1138,25 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
         break;
 
     case AM_INVALID_SESSION:
-
-        if (am_web_is_cdsso_enabled(agent_config) == B_TRUE)
-        {
-            cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
+        if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+            cdStatus = am_web_do_cookie_domain_set(set_cookie, args,
+                                                   EMPTY_STRING,
+                                                   agent_config);
             if(cdStatus != AM_SUCCESS) {
-                am_web_log_error("validate_session_policy : CDSSO reset cookie failed");
+                am_web_log_error("%s: CDSSO reset cookie failed", thisfunc);
             }
         }
-
         am_web_do_cookies_reset(reset_cookie, args, agent_config);
         requestResult =  do_redirect(sn, rq, status, &result,
                                  request_url, method,
                                  agent_config);
-    break;
+        break;
 
     case AM_INVALID_FQDN_ACCESS:
         // Redirect to self with correct FQDN - no post preservation
         requestResult = do_redirect(sn, rq, status, &result,
                                 request_url, method, agent_config);
-    break;
-
-    case AM_INVALID_ARGUMENT:
-    case AM_NO_MEMORY:
+        break;
 
     case AM_REDIRECT_LOGOUT:
         status = am_web_get_logout_url(&logout_url, agent_config);
@@ -1146,27 +1170,23 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
             am_web_log_debug("validate_session_policy(): "
                              "am_web_get_logout_url failed. ");
         }
-    break;
+        break;
 
+    case AM_INVALID_ARGUMENT:
+    case AM_NO_MEMORY:
     default:
         am_web_log_error("validate_session_policy() Status: %s (%d)",
                           am_status_to_string(status), status);
         requestResult = REQ_ABORTED;
-    break;
+        break;
     }
-
+    // Cleaning
     am_web_clear_attributes_map(&result);
     am_policy_result_destroy(&result);
     am_web_free_memory(dpro_cookie);
     am_web_free_memory(request_url);
     am_web_free_memory(logout_url);
-
     am_web_delete_agent_configuration(agent_config);
-
-    am_web_log_max_debug("validate_session_policy() "
-                         " Completed handling request with status: %s.",
-                         am_status_to_string(status));
-
     if (orig_req != NULL) {
         free(orig_req);
         orig_req = NULL;
@@ -1179,6 +1199,22 @@ validate_session_policy(pblock *param, Session *sn, Request *rq) {
         free(clf_req);
         clf_req = NULL;
     }
+    if(query != NULL) {
+        free(query);
+        query = NULL;
+    }
+    if(method != NULL) {
+        free(method);
+        method = NULL;
+    }
+    if(clientIP != NULL) {
+        am_web_free_memory(clientIP);
+    }
+    if(clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+    }
+    am_web_log_max_debug("%s: Completed handling request with status: %s.",
+                         thisfunc, am_status_to_string(status));
 
     return requestResult;
 }

@@ -129,8 +129,7 @@ SUNW_1.0 {
 		am_web_clear_attributes_map;
 		am_web_get_client_ip_header_name;
 		am_web_get_client_hostname_header_name;
-		am_web_get_client_ip;
-		am_web_get_client_hostname;
+		am_web_get_client_ip_host;
 		am_web_set_host_ip_in_env_map;
 
 		am_auth_init;
@@ -217,10 +216,11 @@ SUNW_2.2 {
 		am_web_build_advice_response;
 		am_web_get_request_url;
 		am_web_get_all_request_urls;
-        am_web_get_agent_configuration;
-        am_web_delete_agent_configuration;
+		am_web_get_agent_configuration;
+		am_web_delete_agent_configuration;
 		am_web_is_url_enforced;
-        am_web_get_postdata_preserve_lbcookie;
+		am_web_get_postdata_preserve_lbcookie;
+		am_web_get_postdata_preserve_URL_parameter;
 
 
 	local:

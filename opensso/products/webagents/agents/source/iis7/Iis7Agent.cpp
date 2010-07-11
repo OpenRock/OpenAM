@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Iis7Agent.cpp,v 1.6 2009/08/18 22:50:03 robertis Exp $
+ * $Id: Iis7Agent.cpp,v 1.7 2010/03/10 05:08:52 dknab Exp $
  *
  *
  */
@@ -70,7 +70,7 @@ CRITICAL_SECTION initLock;
 BOOL isCdssoEnabled = FALSE;
 
 #define RESOURCE_INITIALIZER \
-    { NULL, 0, NULL, 0, AM_POLICY_RESULT_INITIALIZER }
+    { NULL, 0, AM_POLICY_RESULT_INITIALIZER }
 
 /*
  * This is the function invoked by RegisterModule
@@ -94,32 +94,34 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 {
     const char* thisfunc = "ProcessRequest";
     am_status_t status = AM_SUCCESS;
-    am_status_t cookieStatus = AM_SUCCESS;
-    am_status_t doDenyStatus = AM_SUCCESS;
-    REQUEST_NOTIFICATION_STATUS retStatus = RQ_NOTIFICATION_CONTINUE; 
+    REQUEST_NOTIFICATION_STATUS retStatus = RQ_NOTIFICATION_CONTINUE;
     string requestURL;
+    string origRequestURL;
     string pathInfo;
     PCSTR reqMethod = NULL;
     char* requestMethod = NULL;
     DWORD requestMethodSize = 0;
-    PCSTR requestClientIP = NULL;
-    DWORD requestClientIPSize = 0;
     CHAR* orig_req_method = NULL;
     CHAR* dpro_cookie = NULL;
-    BOOL isLocalAlloc = FALSE;
+    BOOL isLocalAlloc = FALSE;    
     BOOL redirectRequest = FALSE;
-    am_map_t env_parameter_map = NULL;
-    tOphResources OphResources = RESOURCE_INITIALIZER;
-    tOphResources* pOphResources = &OphResources;
     CHAR *set_cookies_list = NULL;
     CHAR *set_headers_list = NULL;
     CHAR *request_hdrs = NULL;
+    const char *clientIP_hdr_name = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    PCSTR clientIP_hdr = NULL;
+    PCSTR clientHostname_hdr = NULL;
+    char *clientIP = NULL;
+    BOOL isClientIPLocalAlloc = TRUE;
+    char *clientHostname = NULL;
     char* logout_url = NULL;
-    DWORD returnValue = 1;
     CHAR *tmpPecb = NULL;
+    am_map_t env_parameter_map = NULL;
+    tOphResources OphResources = RESOURCE_INITIALIZER;
+    tOphResources* pOphResources = &OphResources;
     void *args[] = {(void *) tmpPecb, (void *) &set_headers_list,
                     (void *) &set_cookies_list, (void *) &request_hdrs };
-
     void *agent_config=NULL;
     IHttpRequest* req = pHttpContext->GetRequest();
     IHttpResponse* res = pHttpContext->GetResponse();
@@ -132,14 +134,14 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         }
         LeaveCriticalSection(&initLock);
     }
-
+    // Initialize agent
     if(agentInitialized != B_TRUE){
         EnterCriticalSection(&initLock);
         if(agentInitialized != B_TRUE){
-            am_web_log_debug("ProcessRequest: Will call init");
+            am_web_log_debug("%s: Will call init", thisfunc);
             init_at_request(); 
             if(agentInitialized != B_TRUE){
-                am_web_log_error("ProcessRequest: Agent intialization failed.");
+                am_web_log_error("%s: Agent intialization failed.", thisfunc);
                 do_deny(pHttpContext);
                 retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
                 return retStatus;
@@ -149,23 +151,21 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         }
         LeaveCriticalSection(&initLock);
     }
-
     agent_config = am_web_get_agent_configuration();
-
     if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE)){
         isCdssoEnabled = TRUE;
     }
-
-
     req->SetHeader("Cache-Control","no-cache",(USHORT)strlen("no-cache"),TRUE);
     res->SetHeader("Cache-Control","no-store",(USHORT)strlen("no-store"),TRUE);
-
     res->DisableKernelCache(9);
 
-
-    status = get_request_url(pHttpContext,requestURL, pathInfo, pOphResources);
-
-    if ((status == AM_SUCCESS) && (B_TRUE == am_web_is_notification(requestURL.c_str(), agent_config)))
+    // Get the request url
+    status = get_request_url(pHttpContext, requestURL, origRequestURL,
+                             pathInfo, agent_config);
+    // Handle notification
+    if ((status == AM_SUCCESS) &&
+        (B_TRUE == am_web_is_notification(origRequestURL.c_str(), 
+                                          agent_config)))
     { 
         string data="";
         GetEntity(pHttpContext, data);
@@ -175,31 +175,38 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         am_web_delete_agent_configuration(agent_config);
         return retStatus;
     }
-
     // Get the request method
-    status = GetVariable(pHttpContext,"REQUEST_METHOD", &reqMethod, &requestMethodSize);
-
-    // Check for SSO Token in Http Cookie
-    if (status == AM_SUCCESS) 
-    {
-        if(requestMethodSize >0)
-        {
-            requestMethod = (char*)malloc(requestMethodSize+1);
-            memset(requestMethod, 0, requestMethodSize+1);
-            strncpy(requestMethod, (char*)reqMethod, requestMethodSize);
+    if (status == AM_SUCCESS) {
+        status = GetVariable(pHttpContext,"REQUEST_METHOD", &reqMethod,
+                 &requestMethodSize, TRUE);
+    }
+    if (status == AM_SUCCESS) {
+        if(requestMethodSize > 0) {
+            requestMethod = (char*)malloc(requestMethodSize + 1);
+            if (requestMethod != NULL) {
+                memset(requestMethod, 0, requestMethodSize+1);
+                strncpy(requestMethod, (char*)reqMethod, requestMethodSize);
+                am_web_log_debug("%s: requestMethod = %s", 
+                                 thisfunc, requestMethod);
+            } else {
+                am_web_log_error("%s: Not enough memory to ", 
+                                    "allocate orig_req_method.", thisfunc);
+                status = AM_NO_MEMORY;
+            }
         }
-        am_web_log_debug("%s: requestMethod = %s",thisfunc, requestMethod);
-        // Get the HTTP_COOKIE header
-        CHAR* cookieValue = NULL;    
-        int length = 0;
-        int i = 0;
-        cookieStatus = GetVariable(pHttpContext,"HTTP_COOKIE", 
-                &pOphResources->cookies, &pOphResources->cbCookies);
-
-        if ((cookieStatus == AM_SUCCESS)  &&  (pOphResources->cbCookies > 0)) 
-        {
+    }
+    // Get the HTTP_COOKIE header
+    if (status == AM_SUCCESS) {
+        status = GetVariable(pHttpContext,"HTTP_COOKIE", 
+                &pOphResources->cookies, &pOphResources->cbCookies, FALSE);
+    }
+    // Check for SSO Token in Http Cookie
+    if (status == AM_SUCCESS) {
+        if (pOphResources->cbCookies > 0) {
+            char *cookieValue = NULL;
+            int length = 0;
+            int i = 0;
             const char *cookieName = am_web_get_cookie_name(agent_config);
-
             // Look for the iPlanetDirectoryPro cookie
             if (cookieName != NULL) {
                 cookieValue = strstr((char *)(pOphResources->cookies), cookieName);
@@ -234,21 +241,68 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                             else {
                                 am_web_log_error("%s: Unable to allocate memory"
                                     " for cookie, size = %u", thisfunc, length);
-                                cookieStatus = AM_NO_MEMORY;
+                                status = AM_NO_MEMORY;
                             }
                         }
                     }
                 }
             }
         }
-
     }
-
-
-    //  Get the remote address.
+    // Create the environment map
     if (status == AM_SUCCESS) {
+        status = am_map_create(&env_parameter_map);
+    }
+    // If there is a proxy in front of the agent, the user can set in the
+    // properties file the name of the headers that the proxy uses to set
+    // the real client IP and host name. In that case the agent needs
+    // to use the value of these headers to process the request
+    //
+    // Get the client IP address header set by the proxy, if there is one
+    
+    if (status == AM_SUCCESS) {
+        clientIP_hdr_name = (PCSTR) am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            status = GetVariable(pHttpContext,clientIP_hdr_name, 
+                            &clientIP_hdr, NULL, FALSE);
+        }
+    }
+    // Get the client host name header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientHostname_hdr_name = 
+               (PCSTR) am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            status = GetVariable(pHttpContext,clientHostname_hdr_name, 
+                            &clientHostname_hdr, NULL, FALSE);
+
+        }
+    }
+    // If the client IP and host name headers contain more than one
+    // value, take the first value.
+    if (status == AM_SUCCESS) {
+        if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
+            status = am_web_get_client_ip_host((char *) clientIP_hdr,
+                                               (char *) clientHostname_hdr,
+                                               &clientIP, &clientHostname);
+        }
+    }
+    // Set the IP address and host name in the environment map
+    if ((status == AM_SUCCESS) && (clientIP != NULL)) {
+        isClientIPLocalAlloc = FALSE;
+        status = am_web_set_host_ip_in_env_map(clientIP, clientHostname,
+                                      env_parameter_map, agent_config);
+    }
+    // If the client IP was not obtained previously,
+    // get it from the REMOTE_ADDR header.
+    if ((status == AM_SUCCESS) && (clientIP == NULL)) {
+        PCSTR tmpClientIP = NULL;
+        DWORD tmpClientIPLength = 0;
         status = GetVariable(pHttpContext,"REMOTE_ADDR", 
-                            &requestClientIP, &requestClientIPSize);
+                            &tmpClientIP, &tmpClientIPLength, FALSE);
+        isClientIPLocalAlloc = TRUE;
+        clientIP = (char*)malloc(tmpClientIPLength + 1);
+        memset(clientIP, 0, tmpClientIPLength + 1);
+        strncpy(clientIP, (char*)tmpClientIP, tmpClientIPLength);
     }
 
     //  process post data in CDSSO
@@ -258,36 +312,31 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) && 
                 (strcmp(requestMethod, REQUEST_METHOD_POST) == 0)) 
         {
-            string reqClientIP= requestClientIP;
-
             if ((dpro_cookie == NULL) && 
                 (am_web_is_url_enforced(requestURL.c_str(), pathInfo.c_str(), 
-                reqClientIP.c_str(), agent_config) == B_TRUE)) 
+                 clientIP, agent_config) == B_TRUE)) 
             {
-
                 string response = "";
                 GetEntity(pHttpContext, response);
                 if (status == AM_SUCCESS) {
-                        //Set original method to GET
-                        orig_req_method = strdup(REQUEST_METHOD_GET);
-                        if (orig_req_method != NULL) {
-                            am_web_log_debug("%s: Request method set to GET.", 
-                                    thisfunc);
-                        } else {
-                            am_web_log_error("%s: Not enough memory to ", 
-                                    "allocate orig_req_method.", thisfunc);
-                            status = AM_NO_MEMORY;
-                        }
-                    pHttpContext->GetRequest()->SetHttpMethod(orig_req_method);
-
+                    //Set original method to GET
+                    orig_req_method = strdup(REQUEST_METHOD_GET);
+                    if (orig_req_method != NULL) {
+                        am_web_log_debug("%s: Request method set to GET.", 
+                                         thisfunc);
+                    } else {
+                        am_web_log_error("%s: Not enough memory to ", 
+                                       "allocate orig_req_method.", thisfunc);
+                        status = AM_NO_MEMORY;
+                    }
                     if (status == AM_SUCCESS) {
+                        pHttpContext->GetRequest()->SetHttpMethod(orig_req_method);
                         if(dpro_cookie != NULL) {
                             free(dpro_cookie);
                             dpro_cookie = NULL;
                         }
                         char* req_url= new char [requestURL.size()+1];
                         strcpy(req_url,requestURL.c_str());
-
                         status = am_web_check_cookie_in_post(args, &dpro_cookie, 
                                 &req_url, &orig_req_method, requestMethod,
                                 (char*)response.c_str(), B_FALSE, set_cookie, 
@@ -297,7 +346,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                             isLocalAlloc = FALSE;
                             am_web_log_debug("%s: SSO token found in "
                                              "assertion.",thisfunc);
-                                redirectRequest = TRUE;
+                            redirectRequest = TRUE;
                         } else {
                             am_web_log_debug("%s: SSO token not found in "
                                    "assertion. Redirecting to login page.",
@@ -313,93 +362,29 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
             }
         }
     }
-
-    //  Create env map
+    // Check if the user is authorized to access the resource.
     if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: requestClientIP = %s",
-                        thisfunc, requestClientIP);
-
-        status = am_map_create(&env_parameter_map);
-        am_web_log_debug("%s: status after "
-                        "am_map_create = %s (%d)",thisfunc,
-                        am_status_to_string(status),
-                        status);
-    }
-
-    if (status == AM_SUCCESS) {
-        char* client_ip_from_ip_header = NULL;
-        char* client_hostname_from_hostname_header = NULL;
-
-        const char* client_ip_header_name = am_web_get_client_ip_header_name(agent_config);
-        const char* client_hostname_header_name = am_web_get_client_hostname_header_name(agent_config);
-        
-        if(client_ip_header_name != NULL && client_ip_header_name[0] != '\0') {
-            PCSTR pszIpHeader;
-            USHORT ccIpHeader;
-            pszIpHeader = req->GetHeader(client_ip_header_name,&ccIpHeader);
-            pszIpHeader = (PCSTR) pHttpContext->AllocateRequestMemory( ccIpHeader + 1 );
-            if(pszIpHeader == NULL) {
-                am_web_log_debug("%s: pszIpHeader not allocated. ", thisfunc);
-            }
-            pszIpHeader = req->GetHeader(client_ip_header_name,&ccIpHeader);
-
-            am_web_get_client_ip(pszIpHeader, &client_ip_from_ip_header);
-        }
-
-        if(client_hostname_header_name != NULL && client_hostname_header_name[0] != '\0') {
-            PCSTR pszHostName;
-            USHORT cchostName;
-            pszHostName = req->GetHeader(client_hostname_header_name,&cchostName);
-            pszHostName = (PCSTR) pHttpContext->AllocateRequestMemory( cchostName + 1 );
-            if(pszHostName == NULL) {
-                am_web_log_debug("%s: pszHostName not allocated. ", thisfunc);
-            }
-            pszHostName = req->GetHeader(client_hostname_header_name,&cchostName);
-
-            am_web_get_client_hostname(pszHostName, 
-                &client_hostname_from_hostname_header);
-        }
-
-        // If client IP value is present from above processing, then
-        // set it to env_param_map. Else use from request structure.
-        if(client_ip_from_ip_header != NULL && client_ip_from_ip_header[0] != '\0') {
-
-            am_web_set_host_ip_in_env_map(client_ip_from_ip_header,
-                                  client_hostname_from_hostname_header,
-                                  env_parameter_map,
-                                  agent_config);
-
-            status = am_web_is_access_allowed(dpro_cookie, requestURL.c_str(),
+        status = am_web_is_access_allowed(dpro_cookie, requestURL.c_str(),
                                         pathInfo.c_str(), requestMethod,
-                                        client_ip_from_ip_header,
+                                        clientIP,
                                         env_parameter_map,
                                         &OphResources.result,
                                         agent_config);
-        } else {
-            status = am_web_is_access_allowed(dpro_cookie, requestURL.c_str(),
-                                        pathInfo.c_str(), requestMethod,
-                                        (char *)requestClientIP,
-                                        env_parameter_map,
-                                        &OphResources.result,
-                                        agent_config);
-        }
-
         am_web_log_debug("%s: status after "
                          "am_web_is_access_allowed = %s (%d)",thisfunc,
                          am_status_to_string(status), status);
         am_map_destroy(env_parameter_map);
-        am_web_free_memory(client_ip_from_ip_header);
-        am_web_free_memory(client_hostname_from_hostname_header);
     }
 
     //  Check for status and proceed accordingly
     switch(status) {
         case AM_SUCCESS:
-            if (am_web_is_logout_url(requestURL.c_str(),agent_config) == B_TRUE)
+            if (am_web_is_logout_url(requestURL.c_str(), agent_config) 
+                   == B_TRUE)
             {
-                (void)am_web_logout_cookies_reset(reset_cookie,args,agent_config);
+                (void)am_web_logout_cookies_reset(reset_cookie, args, 
+                                                  agent_config);
             }
-
             status = am_web_result_attr_map_set(&OphResources.result,
                                         set_header, set_cookie_in_response,
                                         set_header_attr_as_cookie,
@@ -407,41 +392,31 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
             if (status == AM_SUCCESS) {
                 if ((set_headers_list != NULL) || (set_cookies_list != NULL) 
                         || (redirectRequest == TRUE)) {
-
-
                     //the following function also invokes set_headers_in_context() 
                     //to set all the headers in the httpContext.
                     status = set_request_headers(pHttpContext, args);
                 }
             }
             if (status == AM_SUCCESS) {
-                if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) 
-                {
-
+                if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) {
                     //this call sets only cookies
                     set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
                 }
-
                 //now set remote user
-                if (pOphResources->result.remote_user != NULL) 
-                {
+                if (pOphResources->result.remote_user != NULL) {
                     const char * ruser = pOphResources->result.remote_user;
                     wchar_t *remoteUser = (wchar_t *)pHttpContext->
-                        AllocateRequestMemory((strlen(ruser)+1) * sizeof(wchar_t));
+                        AllocateRequestMemory((DWORD) (strlen(ruser)+1) 
+                                              * sizeof(wchar_t));
                     mbstowcs( remoteUser, ruser, strlen(ruser) + 1);
                     pHttpContext->SetServerVariable("REMOTE_USER", remoteUser);
-
                 }
-
-                if (redirectRequest == TRUE) 
-                {
+                if (redirectRequest == TRUE) {
                     am_web_log_debug("%s: Request redirected to orignal url "
                             "after return from CDC servlet",thisfunc);
                     retStatus = redirect_to_request_url(pHttpContext, 
                             requestURL.c_str(), request_hdrs);
-                } 
-                else 
-                {
+                } else {
                     retStatus = RQ_NOTIFICATION_CONTINUE;
                 }
                 if (set_cookies_list != NULL) {
@@ -454,7 +429,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         case AM_INVALID_SESSION:
             am_web_log_info("%s: Invalid session.",thisfunc);
             am_web_do_cookies_reset(reset_cookie, args, agent_config);
-            returnValue =do_redirect(pHttpContext, status, &OphResources.result,
+            status = do_redirect(pHttpContext, status, &OphResources.result,
                          requestURL.c_str(), requestMethod, args, agent_config);
             break;
 
@@ -462,28 +437,27 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
             am_web_log_info("%s: Access denied to %s",thisfunc,
                             OphResources.result.remote_user ?
                             OphResources.result.remote_user : "unknown user");
-            returnValue = do_redirect(pHttpContext, status, &OphResources.result,
+            status = do_redirect(pHttpContext, status, &OphResources.result,
                               requestURL.c_str(), requestMethod, 
                               args, agent_config);
             break;
 
         case AM_INVALID_FQDN_ACCESS:
             am_web_log_info("%s: Invalid FQDN access",thisfunc);
-            returnValue = do_redirect(pHttpContext, status, &OphResources.result,
+            status = do_redirect(pHttpContext, status, &OphResources.result,
                               requestURL.c_str(), requestMethod, 
                               args, agent_config);
             break;
 
         case AM_REDIRECT_LOGOUT:
             status = am_web_get_logout_url(&logout_url, agent_config);
-            if(status == AM_SUCCESS)
-            {
-
-
-                if (am_web_is_cdsso_enabled(agent_config) == B_TRUE)
-                {
-                    am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);        
-                    if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) 
+            if(status == AM_SUCCESS) {
+                if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                    am_status_t cdStatus = 
+                         am_web_do_cookie_domain_set(set_cookie, args, 
+                         EMPTY_STRING, agent_config);
+                    if (set_cookies_list != NULL &&
+                        strlen(set_cookies_list) > 0) 
                     {
                         set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
                     }
@@ -491,12 +465,8 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                     }
                 }
                 res->Redirect(logout_url, true, false);
-            }
-            else
-            {
-                am_web_log_debug("validate_session_policy(): "
-                    "am_web_get_logout_url failed. ");
-                am_web_delete_agent_configuration(agent_config);
+            } else {
+                am_web_log_debug("%s: am_web_get_logout_url failed. ");
                 retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
             }
             if (set_cookies_list != NULL) {
@@ -512,10 +482,8 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         default:
             am_web_log_error("%s: status: %s (%d)",thisfunc,
                               am_status_to_string(status), status);
-
             HRESULT hr = res->SetStatus(500,"Internal Server Error", 0, S_OK);
-            if (FAILED(hr))
-            {
+            if (FAILED(hr)) {
                 am_web_log_error("%s: Cannot set status to 500 .",thisfunc);
             }
             break;
@@ -543,6 +511,18 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
     if (orig_req_method != NULL) {
         free(orig_req_method);
         orig_req_method = NULL;
+    }
+    if(clientIP != NULL) {
+        if(isClientIPLocalAlloc) {
+            free(clientIP);
+        } else {
+            am_web_free_memory(clientIP);
+        }
+        clientIP = NULL;
+    }
+    if (clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+        clientHostname = NULL;
     }
 
     OphResourcesFree(pOphResources);
@@ -785,53 +765,31 @@ void TerminateAgent()
  *
  * */
 am_status_t get_request_url(IHttpContext* pHttpContext,
-                      string& requestURL, string& pathInfo,
-                      tOphResources* pOphResources)
+                            string& requestURLStr,
+                            string& origRequestURLStr,
+                            string& pathInfo,
+                            void* agent_config)
 {
     const char *thisfunc = "get_request_url()";
-
     PCSTR requestHostHeader = NULL;
-    DWORD requestHostHeaderSize	= 0;
-    BOOL gotRequestHost = FALSE;
-
-    const CHAR* requestProtocol = NULL;
+    const char* requestProtocol = NULL;
     PCSTR requestProtocolType  = NULL;
-    DWORD requestProtocolTypeSize = 0;
-    BOOL  gotRequestProtocol = FALSE;
-
     CHAR  defaultPort[TCP_PORT_ASCII_SIZE_MAX + 1] = "";
-    PCSTR  requestPort = NULL;
-    DWORD requestPortSize = 0;
-    BOOL  gotRequestPort = FALSE;
-
+    PCSTR requestPort = NULL;
     PCSTR queryString = NULL;
-    DWORD queryStringSize = 0;
-    BOOL  gotQueryString = FALSE;
-
     PCSTR baseUrl = NULL;
-    const char* colon_ptr = NULL;
-    DWORD baseUrlLength = 0;
-    BOOL  gotUrl = FALSE;
-    
-    PCSTR path_info = NULL;
-    DWORD pathInfoSize = 0;
-    BOOL gotPathInfo = FALSE;
-    CHAR* newPathInfo = NULL;
-    CHAR* tmpPath = NULL;
-
-    BOOL gotScriptName = FALSE;
+    PCSTR tmpPathInfo = NULL;
     PCSTR scriptName = NULL;
-    DWORD scriptNameSize = 0;
+    char *requestURL = NULL;
+    char *origRequestURL = NULL;
     
     am_status_t status = AM_SUCCESS;
 
     // Get the protocol type (HTTP / HTTPS)
     status = GetVariable(pHttpContext,"HTTPS", &requestProtocolType, 
-                                &requestProtocolTypeSize);
-
+                         NULL, TRUE);
     if (status == AM_SUCCESS) 
     {
-        am_web_log_debug("%s: requestProtocolType = %s", thisfunc, requestProtocolType);
         if(strncmp(requestProtocolType,"on", 2) == 0) {
             requestProtocol = httpsProtocol;
             strcpy(defaultPort, httpsPortDefault);
@@ -839,205 +797,157 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
             requestProtocol = httpProtocol;
             strcpy(defaultPort, httpPortDefault);
         }
-
         // Get the host name
         status = GetVariable(pHttpContext,"HEADER_Host", 
-                        &requestHostHeader, &requestHostHeaderSize);
-
+                             &requestHostHeader, NULL, TRUE);
     }
-
-    if ((status == AM_SUCCESS) && (requestHostHeader != NULL)) 
-    {
-        am_web_log_debug("%s: HEADER_Host = %s", thisfunc, requestHostHeader);
-        colon_ptr = strchr(requestHostHeader, ':');
+    // Get the port
+    if (status == AM_SUCCESS) {
+        const char* colon_ptr = strchr(requestHostHeader, ':');
         if (colon_ptr != NULL) {
             requestPort = (PCSTR)pHttpContext->
-                                AllocateRequestMemory((strlen(colon_ptr)) + 1 );
-            strncpy((char *)requestPort, colon_ptr + 1, strlen(colon_ptr)-1);
-        } 
-        else{
-            status=GetVariable(pHttpContext,"SERVER_PORT", &requestPort, 
-                                        &requestPortSize);
-        }
-    }
-
-
-    if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: SERVER_PORT = %s", thisfunc, requestPort);
-
-        pOphResources->cbUrl = strlen(requestProtocol)          +
-                               strlen(httpProtocolDelimiter)    +
-                               strlen(requestHostHeader)        +
-                               strlen(httpPortDelimiter)        +
-                               strlen(requestPort)              +
-                               URL_SIZE_MAX;
-        pOphResources->url = (CHAR *) malloc(pOphResources->cbUrl);
-        if (pOphResources->url == NULL) {
-            am_web_log_error("%s: Not enough memory pOphResources->cbUrl", thisfunc);
-            status = AM_NO_MEMORY;
-        }
-    }
-
-    if (status == AM_SUCCESS) {
-        strcpy(pOphResources->url, requestProtocol);
-        strcat(pOphResources->url, httpProtocolDelimiter);
-        strcat(pOphResources->url, requestHostHeader);
-
-        // Add the port number if it's not the default HTTP(S) port and
-        // there's no port delimiter in the Host: header indicating
-        // that the port is not present in the Host: header.
-        if (strstr(requestHostHeader, httpPortDelimiter) == NULL) {
-            if (strcmp(requestPort, defaultPort) != 0) {
-                strcat(pOphResources->url, httpPortDelimiter);
-                strcat(pOphResources->url, requestPort);
-            // following 2 "else if" were added based on
-            // instruction that port number has to be added for IIS
-            } else if (strcmp(requestProtocol, httpProtocol) == 0) {
-                strcat(pOphResources->url, httpPortDelimiter);
-                strcat(pOphResources->url, httpPortDefault);
-            } else if (strcmp(requestProtocol, httpsProtocol) == 0) {
-                strcat(pOphResources->url, httpPortDelimiter);
-                strcat(pOphResources->url, httpsPortDefault);
+                            AllocateRequestMemory((DWORD) (strlen(colon_ptr))
+                                                           + 1 );
+            if (requestPort != NULL) {
+                strncpy((char *)requestPort, colon_ptr + 1, 
+                        strlen(colon_ptr)-1);
+                am_web_log_debug("%s: port = %s", thisfunc, requestPort);
+            } else {
+                am_web_log_error("%s: Unable to allocate requestPort.",
+                                 thisfunc);
+                status = AM_NO_MEMORY;
             }
+        } else {
+            status = GetVariable(pHttpContext,"SERVER_PORT", &requestPort, 
+                                 NULL, TRUE);
         }
-
-        //Get the base url
-        status = GetVariable(pHttpContext,"URL", &baseUrl, &baseUrlLength);
-
     }
-
-    if (status == AM_SUCCESS) 
-    {
-        am_web_log_debug("%s: URL = %s", thisfunc, baseUrl);
-        // Get the path info .
-        status = GetVariable(pHttpContext,"PATH_INFO", &path_info, 
-                                        &pathInfoSize);
-    }
-
+    //Get the base url
     if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: PATH_INFO = %s", thisfunc, path_info);
-
-        // Get the script name
+        status = GetVariable(pHttpContext,"URL", &baseUrl, 
+                             NULL, TRUE);
+    }
+    // Get the path info
+    if (status == AM_SUCCESS) {
+        status = GetVariable(pHttpContext,"PATH_INFO", &tmpPathInfo, 
+                             NULL, FALSE);
+    }
+    // Get the script name
+    if (status == AM_SUCCESS) {
         status = GetVariable(pHttpContext,"SCRIPT_NAME", &scriptName, 
-                                                    &scriptNameSize);
+                             NULL, FALSE);
     }
-
+    //Remove the script name from path_info to get the real path info
     if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: SCRIPT_NAME = %s",thisfunc, scriptName);
-        
-        //Remove the script name from path_info to get the real path info
-        if (path_info != NULL && scriptName != NULL) {
-            tmpPath = (char*)path_info + strlen(scriptName);	             
-            if(tmpPath !=NULL && strlen(tmpPath) > 0){
-                newPathInfo = strdup(tmpPath);
-                if (newPathInfo != NULL) {
-                    pathInfo = newPathInfo;
-                    am_web_log_debug("%s: Reconstructed path info = %s", thisfunc, pathInfo );
-                } else {
-                   am_web_log_error("%s: Unable to allocate newPathInfo.", thisfunc);
-                   status = AM_NO_MEMORY;
-                }
-            }
-            else{
-                am_web_log_debug("%s: tmpPath is NULL.", thisfunc);
+        if ((tmpPathInfo != NULL) && (scriptName != NULL)) {
+            string pathInfoStr(tmpPathInfo);
+            size_t scriptPos = pathInfoStr.find(scriptName);
+            if (scriptPos != string::npos) {
+                pathInfo = pathInfoStr.substr(strlen(scriptName));
+                am_web_log_debug("%s: Reconstructed path info = %s",
+                                     thisfunc, pathInfo.c_str());
+            } else {
+                am_web_log_warning("%s: Script name %s not found in path info"
+                                   " (%s). Could not get the path info.",
+                                   thisfunc, scriptName, tmpPathInfo);
             }
         }
     }
-    
+    // Get the query string
     if (status == AM_SUCCESS) {
-        strcat(pOphResources->url, baseUrl);
-        // Add the path info to the base url
-        if ((newPathInfo != NULL) && (strlen(newPathInfo) > 0)) {
-            strcat(pOphResources->url, newPathInfo);
-        }
-
-        // Get the query string
         status = GetVariable(pHttpContext,"QUERY_STRING", &queryString, 
-                                &queryStringSize);
-        if(queryString != NULL)
-        {
-            if(strlen((char*)queryString) > 0)
-            {
-                strcat(pOphResources->url, "?");
-                strcat(pOphResources->url, queryString);
-                string qrystr= (char*)queryString;
+                             NULL, FALSE);
+    }
+    // Construct the URL
+    if (status == AM_SUCCESS) {
+        size_t portNumber = atoi(requestPort);
+        if (!pathInfo.empty()) {
+            string fullBaseUrl(baseUrl);
+            fullBaseUrl.append(pathInfo);
+            status = am_web_get_all_request_urls(requestHostHeader,
+                               requestProtocol,NULL, portNumber,
+                               fullBaseUrl.c_str(), queryString,
+                               agent_config, 
+                               &requestURL, &origRequestURL);
+        } else {
+            status = am_web_get_all_request_urls(requestHostHeader,
+                                requestProtocol, NULL, portNumber,
+                                baseUrl, queryString,
+                                agent_config,
+                                &requestURL, &origRequestURL);
+        }
+        if(status == AM_SUCCESS) {
+            if (requestURL != NULL) {
+                requestURLStr.assign(requestURL);
+                am_web_log_debug("%s: Constructed request url: %s",
+                                 thisfunc, requestURLStr.c_str());
+            }
+            if (origRequestURL != NULL) {
+                origRequestURLStr.assign(origRequestURL);
             }
         }
-        requestURL = pOphResources->url;
-        if (!requestURL.empty()) {
-           am_web_log_debug("%s: Constructed request url = %s", thisfunc, requestURL.c_str());
-        }
-
-        if(pOphResources->url){
-            free(pOphResources->url);
-            pOphResources->url = NULL;
-        }
     }
-
-    if(newPathInfo != NULL){
-        free(newPathInfo);
-        newPathInfo = NULL;
-    }
-
     return status;
 }
-
 
 /*
  * Retrives the server variables using GetServerVariable.
  *
  * */
 am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName, 
-                            PCSTR* pVarVal, DWORD* pVarValSize) 
+                        PCSTR* pVarVal, DWORD* pVarValSize,
+                        BOOL isRequired)
 {
-    const char* thisfunc = "GetVariable";
+    const char* thisfunc = "GetVariable()";
     am_status_t status = AM_SUCCESS;
+    DWORD VarValSize = 0;
 
-    if(S_OK == (pHttpContext->GetServerVariable(varName, pVarVal, pVarValSize)))
+    if (pVarValSize == NULL) {
+        pVarValSize = &VarValSize;
+    }
+    if(S_OK == (pHttpContext->GetServerVariable(varName, pVarVal, 
+                                                pVarValSize)))
     {
         *pVarVal = (PCSTR)pHttpContext->AllocateRequestMemory((*pVarValSize)+1);
-        if(pVarVal == NULL)
-        {
+        if(*pVarVal == NULL) {
             am_web_log_error("%s: Could not allocate memory", thisfunc);
             status = AM_NO_MEMORY;
-        }
-        else
-        {
-            if(S_OK != (pHttpContext->GetServerVariable(varName, pVarVal, pVarValSize)))
+        } else {
+            if(S_OK != (pHttpContext->GetServerVariable(varName, pVarVal,
+                                                        pVarValSize)))
             {
-                am_web_log_error("%s: Invalid Server Variable %s", thisfunc,pVarVal);
+                am_web_log_error("%s: %s is not a valid server variable.", 
+                                 thisfunc, pVarVal);
                 status = AM_FAILURE;
-            }
-            else
-            {
-                am_web_log_debug("%s: Server Variable received %s", thisfunc, *pVarVal);
-                if (pVarVal != NULL){
-                    status = AM_SUCCESS;
+            } else {
+                if (*pVarVal != NULL && strlen(*pVarVal) > 0) {
+                    am_web_log_debug("%s: %s = %s", thisfunc, 
+                                     varName, *pVarVal);
+                } else {
+                    am_web_log_debug("%s: %s = ", thisfunc, varName);
+                    if (*pVarVal != NULL && strlen(*pVarVal) == 0) {
+                        *pVarVal = NULL;
+                    }
                 }
             }
         }
+    } else {
+        if (isRequired) {
+            am_web_log_error("%s: Server variable %s is not found in "
+                             "HttpContext.", thisfunc, varName);
+            status = AM_FAILURE;
+        } else {
+            am_web_log_debug("%s: Server variable %s not found in HttpContext.",
+                             thisfunc, varName);
+        }
     }
-    else
-    {
-        am_web_log_debug("%s: GetServerVariable returned nothing as the SERVER VARIABLE is" 
-            " not present in the HttpContext.", thisfunc);
-        status = AM_FAILURE;
-    }
-
     return status;
-
 }
 
 void OphResourcesFree(tOphResources* pOphResources)
 {
-    if (pOphResources->url != NULL) {
-        free(pOphResources->url);
-        pOphResources->url       = NULL;
-        pOphResources->cbUrl        = 0;
-    } 
     //cookies are not freed because they are allocated
     //by httpContext.
-
     am_web_clear_attributes_map(&pOphResources->result);
     am_policy_result_destroy(&pOphResources->result);
     return;
@@ -1072,9 +982,10 @@ void GetEntity(IHttpContext* pHttpContext, string& data)
     }
 
     //set it back in the request
-    entityBody = pHttpContext->AllocateRequestMemory(data.length());
+    entityBody = pHttpContext->AllocateRequestMemory((DWORD) data.length());
     strcpy((char*)entityBody,data.c_str());
-    pHttpRequest->InsertEntityBody(entityBody,strlen((char*)entityBody));
+    pHttpRequest->InsertEntityBody(entityBody, 
+                  (DWORD) strlen((char*)entityBody));
 
 }
 
@@ -1467,8 +1378,10 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
 
             ConstructReqCookieValue(tmpCookieString, value);
 
-            pcHeader = (PCSTR)pHttpContext->AllocateRequestMemory(header.length()+1);
-            pcValue = (PCSTR)pHttpContext->AllocateRequestMemory(value.length()+1);
+            pcHeader = (PCSTR)pHttpContext->AllocateRequestMemory(
+                                            (DWORD) (header.length()) + 1);
+            pcValue = (PCSTR)pHttpContext->AllocateRequestMemory(
+                                           (DWORD) (value.length()) + 1);
             memset((void*)pcHeader,0,header.length() + 1);
             memset((void*)pcValue,0,value.length() + 1);
             strcpy((char*)pcHeader, header.c_str());
@@ -1509,7 +1422,8 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
 
         pszCookie = pHttpRequest->GetHeader("Cookie",&cchCookie);
         newCookie = (PCSTR) pHttpContext->
-                AllocateRequestMemory(cchCookie + tmpCookieString.length() + 1 );
+                AllocateRequestMemory(cchCookie + 
+                           (DWORD) (tmpCookieString.length()) + 1 );
         strcpy((char*)newCookie, (char*)pszCookie);
         strcat((char*)newCookie, tmpCookieString.c_str());
         strcat((char*)newCookie,"\0");
@@ -1544,7 +1458,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args)
     CHAR* request_hdrs = *ptr;
 
     //Get the original headers from the request
-	status = GetVariable(pHttpContext,"ALL_RAW", &httpHeaders, &httpHeadersSize);
+	status = GetVariable(pHttpContext,"ALL_RAW", &httpHeaders, &httpHeadersSize, TRUE);
 
 	httpHeadersC = (CHAR*) malloc(strlen(httpHeaders) + 1); 
 	strcpy(httpHeadersC, httpHeaders);
@@ -1581,7 +1495,6 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args)
             }
         }
     }
-
 
         //Remove empty values from set_headers_list 
         //also set these non empty headers in pHttpContext
@@ -1703,15 +1616,16 @@ REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
  * or 403, 500 responses.
  *
  * */
-static DWORD do_redirect(IHttpContext* pHttpContext,
-             am_status_t status,
-             am_policy_result_t *policy_result,
-             const char *original_url,
-             const char *method,
-             void** args,
-             void* agent_config)
+static am_status_t do_redirect(IHttpContext* pHttpContext,
+                               am_status_t policy_status,
+                               am_policy_result_t *policy_result,
+                               const char *original_url,
+                               const char *method,
+                               void** args,
+                               void* agent_config)
 {
     const char *thisfunc = "do_redirect()";
+    am_status_t status = AM_SUCCESS;
     size_t redirect_hdr_len = 0;
     char *redirect_url = NULL;
     DWORD redirect_url_len = 0;
@@ -1722,19 +1636,15 @@ static DWORD do_redirect(IHttpContext* pHttpContext,
              "Content-Type: text/html\r\n"
              "\r\n"
     };
-
-    DWORD returnValue = 0;
-    am_status_t ret = AM_SUCCESS;
     const am_map_t advice_map = policy_result->advice_map;
     HRESULT hr;
 
     IHttpResponse * pHttpResponse = pHttpContext->GetResponse();
     if(pHttpResponse == NULL) {
         am_web_log_error("%s: pHttpResponse is NULL.", thisfunc);
-        return returnValue;
+        return AM_FAILURE;
     }
-
-    ret = am_web_get_url_to_redirect(status, advice_map, original_url,
+    status = am_web_get_url_to_redirect(policy_status, advice_map, original_url,
                              method, AM_RESERVED,&redirect_url, agent_config);
 
     // Compute the length of the redirect response.  Using the size of
@@ -1742,42 +1652,38 @@ static DWORD do_redirect(IHttpContext* pHttpContext,
     // not a significant issue given the short life span of the allocation.
 
 
-    switch(status) {
+    switch(policy_status) {
         case AM_ACCESS_DENIED:
         case AM_INVALID_SESSION:
         case AM_INVALID_FQDN_ACCESS:
 
             //if advice string is present, send it as POST data, sending it as query string
             //is removed in Agents 3.0
-            if ((ret == AM_SUCCESS) && (redirect_url != NULL) && 
+            if ((status == AM_SUCCESS) && (redirect_url != NULL) && 
                     (policy_result->advice_string != NULL)) 
             {
                 char *advice_txt = NULL;
-                ret = am_web_build_advice_response(policy_result, redirect_url, 
+                status = am_web_build_advice_response(policy_result, redirect_url, 
                                                         &advice_txt);
                 am_web_log_debug("%s: policy status=%s, response[%s]", 
-                           thisfunc, am_status_to_string(status), advice_txt);
-
-                if(ret == AM_SUCCESS) 
-                {
+                           thisfunc, am_status_to_string(policy_status),
+                           advice_txt);
+                if(status == AM_SUCCESS) {
                     size_t data_length = (advice_txt != NULL)?strlen(advice_txt):0;
-                    if(data_length > 0) 
-                    {
+                    if(data_length > 0) {
                         char buff[256];
                         itoa(data_length,buff,10);
-
                         advice_headers_len = strlen(advice_headers_template) + 3;
                         advice_headers = (char *) malloc(advice_headers_len);
-
                         hr = pHttpResponse->SetStatus(200,"Status OK",0, S_OK);
                         hr = pHttpResponse->SetHeader("Content-Type","text/html",
-					      (USHORT)strlen("text/html"),TRUE);
+                                               (USHORT)strlen("text/html"),TRUE);
                         hr = pHttpResponse->SetHeader("Content-Length",buff, 
-						   (USHORT)strlen(buff),TRUE);
-                        if (FAILED(hr)){
+                                           (USHORT)strlen(buff),TRUE);
+                        if (FAILED(hr)) {
                             am_web_log_error("%s: SetHeader failed.", thisfunc);
+                            status = AM_FAILURE;
                         }
-
                         DWORD cbSent;
                         PCSTR pszBuffer = advice_txt;
                         HTTP_DATA_CHUNK dataChunk;
@@ -1787,58 +1693,44 @@ static DWORD do_redirect(IHttpContext* pHttpContext,
                         hr = pHttpResponse->WriteEntityChunks(&dataChunk,1,
                                                             FALSE,TRUE,&cbSent);
                     }
-
-                } 
-                else 
-                {
+                } else {
                     am_web_log_error("%s: Error while building " 
                                         "advice response body:%s",
-                                     thisfunc, am_status_to_string(ret));
+                                     thisfunc, am_status_to_string(status));
                 }
-
-            } 
-            else 
-            {
-
+            } else {
                 // redirection to OpenSSO Login page.
                 // because policy advice string is null.
-                if (ret == AM_SUCCESS && redirect_url != NULL) {
+                if (status == AM_SUCCESS && redirect_url != NULL) {
                     CHAR* set_cookies_list = *((CHAR**) args[2]);
                     am_web_log_debug("%s: policy status = %s, " 
                                     "redirection URL is %s", thisfunc, 
-                                    am_status_to_string(status), redirect_url);
-
-
+                                    am_status_to_string(policy_status), 
+                                    redirect_url);
                     if(set_cookies_list != NULL) {
                         set_headers_in_context(pHttpContext, set_cookies_list, 
                                                             FALSE);
                     }
                     pHttpResponse->Redirect(redirect_url, true, false);
-
                     if (FAILED(hr)) {
                         am_web_log_error("%s: SetHeader failed.", thisfunc);
+                        status = AM_FAILURE;
                     }
-
-                } 
-                //redirect url might be null or status is not success
-                //redirect to 403 Forbidden or 500 Internal Server error page.
-                else 
-                {
+                } else {
+                    //redirect url might be null or status is not success
+                    //redirect to 403 Forbidden or 500 Internal Server error page.
                     pHttpResponse->Clear();
                     PCSTR pszBuffer;
                     //if status is access denied, send 403.
                     //for every other error, send 500.
-                    if(status == AM_ACCESS_DENIED)
-                    {
+                    if(policy_status == AM_ACCESS_DENIED) {
                         pszBuffer = "403 Forbidden";
                         hr = pHttpResponse->SetStatus(403,"Forbidden",0, S_OK, NULL);
                         hr = pHttpResponse->SetHeader("Content-Length","13",
                                                 (USHORT)strlen("13"),TRUE);
                         hr = pHttpResponse->SetHeader("Content-Type","text/plain",
                                             (USHORT)strlen("text/plain"), TRUE);
-                    }
-                    else 
-                    {
+                    } else {
                         pszBuffer = "500 Internal Server Error";
                         hr = pHttpResponse->SetStatus(500,"Internal Server Error",
                                                                 0, S_OK);
@@ -1847,7 +1739,6 @@ static DWORD do_redirect(IHttpContext* pHttpContext,
                         hr = pHttpResponse->SetHeader("Content-Type","text/html",
                                             (USHORT)strlen("text/html"), TRUE);
                     }
-
                     HTTP_DATA_CHUNK dataChunk;
                     dataChunk.DataChunkType = HttpDataChunkFromMemory;
                     DWORD cbSent;
@@ -1855,16 +1746,14 @@ static DWORD do_redirect(IHttpContext* pHttpContext,
                     dataChunk.FromMemory.BufferLength = (USHORT) strlen(pszBuffer);
                     hr = pHttpResponse->WriteEntityChunks(&dataChunk,1,FALSE,
                                             TRUE,&cbSent);
-
                     if (FAILED(hr)) {
+                        am_web_log_error("%s: Error while calling "
+                                   "am_web_get_redirect_url(): status = %s",
+                                   thisfunc, am_status_to_string(status));
+                        status = AM_FAILURE;
                     }
-                    am_web_log_error("%s: Error while calling "
-                        "am_web_get_redirect_url(): status = %s",
-                        thisfunc, am_status_to_string(ret));
                 }
-
             }
-
             if (redirect_url) {
                 am_web_free_memory(redirect_url);
             }
@@ -1877,7 +1766,7 @@ static DWORD do_redirect(IHttpContext* pHttpContext,
             // All the default values are set to send 500 code.
             break;
     }
-    return returnValue;
+    return status;
 }
 
 

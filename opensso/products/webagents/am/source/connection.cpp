@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: connection.cpp,v 1.9 2008/11/10 22:56:37 madan_ranganath Exp $
+ * $Id: connection.cpp,v 1.10 2010/03/10 05:09:38 dknab Exp $
  *
  */
 #include <stdexcept>
@@ -212,7 +212,9 @@ PRFileDesc *Connection::createSocket(const PRNetAddr& address, bool useSSL,
     }
     
     PRFileDesc *sslSocket;
-    certdbpasswd = strdup(certDBPasswd.c_str());
+    if (certDBPasswd.size() > 0) {
+        certdbpasswd = strdup(certDBPasswd.c_str());
+     }
 
     if (static_cast<PRFileDesc *>(NULL) != rawSocket) {
 	if (useSSL) {
@@ -272,14 +274,13 @@ PRFileDesc *Connection::secureSocket(const std::string &certDBPasswd,
                 }
 
                 if (SECSuccess == secStatus) {
-                    char *nickName = NULL;
 		    if (certNickName.size() > 0) {
-                        nickName = (char *)certNickName.c_str();
+                        certnickname = strdup(certNickName.c_str());
                     }
                     sslMethodName = "SSL_GetClientAuthDataHook";
                     secStatus = SSL_GetClientAuthDataHook(sslSocket,
                                                    NSS_GetClientAuthData,
-                                                   static_cast<void *>(nickName));
+                                                   static_cast<void *>(certnickname));
                 }
 
                 if (SECSuccess == secStatus) {
@@ -316,7 +317,7 @@ Connection::Connection(const ServerInfo& server,
 		       const std::string &certDBPasswd,
 		       const std::string &certNickName,
 		       bool alwaysTrustServerCert) 
-    : socket(NULL)
+    : socket(NULL), certdbpasswd(NULL), certnickname(NULL)
 {
     char      buffer[PR_NETDB_BUF_SIZE];
     PRNetAddr address;
@@ -383,6 +384,10 @@ Connection::~Connection()
     if (NULL != certdbpasswd) {
         free(certdbpasswd);
         certdbpasswd = NULL;
+    }
+    if (NULL != certnickname) {
+        free(certnickname);
+        certnickname = NULL;
     }
 }
 

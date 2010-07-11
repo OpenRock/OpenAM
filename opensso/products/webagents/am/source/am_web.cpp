@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: am_web.cpp,v 1.57 2009/12/19 00:05:46 subbae Exp $
+ * $Id: am_web.cpp,v 1.58 2010/03/10 05:09:37 dknab Exp $
  *
  */
 
@@ -130,6 +130,7 @@ USING_PRIVATE_NAMESPACE
 // notification response body.
 #define NOTIFICATION_OK		       "OK\r\n"
 unsigned long policy_clock_skew = 0;
+int postDataPreserveKey = 0;
 #define PORT_MIN_VAL 0
 #define PORT_MAX_VAL 65536
 
@@ -223,7 +224,7 @@ void encode_url( const char *orig_url, char *dest_url)
     int i, ucnt;
     char p_enc = '%';
     char buffer[4];
-    for(i=0; i < (int)strlen(orig_url); i++) {
+    for(i=0; i < strlen(orig_url); i++) {
 	ucnt = orig_url[i];
 	if (( ucnt >  32) && ( ucnt < 127))  {
 	   strncat(dest_url, &orig_url[i], 1);
@@ -358,7 +359,7 @@ void mbyte_to_wchar(const char * orig_str,char *dest_str,int dest_len)
 	/* Perform iconv conversion */
 	Log::log(boot_info.log_module, Log::LOG_MAX_DEBUG,
 		 "i18n b4 convlen = %d  size = %d", len, size);
-#if defined(LINUX_64) || defined(LINUX)
+#if defined(LINUX_64)
 	int ret = iconv(encoder, &origstr, (size_t*)&len, &dest_str, (size_t*)&size);
 #else
 	int ret = iconv(encoder, &origstr, &len, &dest_str, &size);
@@ -1839,7 +1840,7 @@ am_web_is_access_allowed(const char *sso_token,
                         if (encodedUrl != NULL) {
                             bool url_spl_flag = false;
                             memset(encodedUrl, 0, encodedUrlSize);
-                            for(int i = 0; i < (int)strlen(url); i++) {
+                            for(int i = 0; i < strlen(url); i++) {
                                 if (( url[i] <  32) || ( url[i] > 127))  {
                                     url_spl_flag = true;
                                 }
@@ -2060,7 +2061,7 @@ am_web_is_notification(const char *request_url,
                                (*agentConfigPtr)->notification_url)) {
                     result = B_TRUE;
                 } else {
-                    am_web_log_max_debug("%s, %s is not notification url %s.",
+                    am_web_log_max_debug("%s: %s is not notification url %s.",
                                          thisfunc, request_url,
                                         (*agentConfigPtr)->notification_url);
                 }
@@ -2210,7 +2211,7 @@ am_web_get_request_url(const char *host_hdr, const char *protocol,
 	    }
 
 	    port = Utils::getNumber(hostHdr.substr(pos + 1));
-	    if(port > 0 && port < 65536) url.setPort(port);
+	    if(port > PORT_MIN_VAL && port < PORT_MAX_VAL) url.setPort(port);
 	}
     }
     overrideProtoHostPort(url, agent_config);
@@ -2892,8 +2893,7 @@ am_web_reset_ldap_attribute_cookies(
  */
 extern "C" AM_WEB_EXPORT am_status_t
 am_web_do_cookies_reset(am_status_t (*setFunc)(const char *, void **),
-                     void **args, 
-                      void* agent_config)
+                        void **args, void* agent_config)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
@@ -3833,52 +3833,120 @@ am_web_postcache_data_cleanup(am_web_postcache_data_t * const postentry_struct) 
   * This is a helper function and it will be shared with all agents
 */
 
-extern "C" AM_WEB_EXPORT post_urls_t *
-am_web_create_post_preserve_urls(const char *request_url,
+extern "C" AM_WEB_EXPORT am_status_t
+am_web_create_post_preserve_urls(const char *request_url, 
+                                 post_urls_t **url_data,
                                  void* agent_config)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
     const char *thisfunc = "am_web_create_post_preserve_urls()";
-    char *dummy_url	= NULL;
-    char *time_str	= NULL;
-    post_urls_t *url_data = (post_urls_t *)malloc (sizeof(post_urls_t));
+    am_status_t status = AM_SUCCESS;
+    char *time_str = NULL;
+    std::string key;
+    post_urls_t *url_data_tmp = (post_urls_t *)malloc (sizeof(post_urls_t));
+    const char *stickySessionValue = 
+            (*agentConfigPtr)->postdatapreserve_sticky_session_value;
 
-    if (request_url != NULL) {
-        time_str = (char *) malloc ( AM_WEB_MAX_POST_KEY_LENGTH );
-        prtime_to_string(time_str,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
-
-        if(time_str != NULL) {
-            // The root url is taken from the request url
-            URL urlObject(request_url);
-            std::string dummyURL;
-            urlObject.getRootURL(dummyURL);
-            dummyURL.append(DUMMY_REDIRECT).append(MAGIC_STR).append(time_str);
-            dummy_url = strdup(dummyURL.c_str());
-            if (dummy_url != NULL) {
-                am_web_log_info("%s: URI for POST redirection %s", 
-                                thisfunc, dummy_url);
-                url_data->dummy_url = dummy_url;
-                url_data->post_time_key = time_str;
-                url_data->action_url = (char *)strdup(request_url);
-                if (url_data->action_url == NULL) {
-                    am_web_log_error("%s: Not enough memory to allocate "
-                                     "url_data->action_url.", thisfunc);
-                }
-            } else {
-                am_web_log_error("%s: Not enough memory to allocate "
-                                 "dummy_url", thisfunc);
-            }
-        } else {
-            am_web_log_error("%s: time string is NULL", thisfunc);
-        }
-
-    } else {
+    if (request_url == NULL) {
         am_web_log_error("%s: request_url is NULL", thisfunc);
+        status = AM_INVALID_ARGUMENT;
     }
-
-    return url_data;
-
+    // Get the time stamp
+    if (status == AM_SUCCESS) {
+        time_str = (char *) malloc (AM_WEB_MAX_POST_KEY_LENGTH);
+        if (time_str != NULL) {
+            prtime_to_string(time_str,AM_WEB_MAX_POST_KEY_LENGTH, agent_config);
+        } else {
+            am_web_log_error("%s: Failed to allocate time_str.", thisfunc);
+            status = AM_NO_MEMORY;
+        }
+    }
+    // Build the key
+    if (status == AM_SUCCESS) {
+        std::string agentID, stickySessionValueStr;
+        size_t equalPos = 0;
+        char uniqueNumber[5];
+        key.assign(time_str);
+        // Add the agent id (if using a LB) to the key
+        if ((stickySessionValue != NULL) && (strlen(stickySessionValue) > 0))
+        {
+            stickySessionValueStr.assign(stickySessionValue);
+            equalPos=stickySessionValueStr.find('=');
+            if (equalPos != std::string::npos) {
+                agentID = stickySessionValueStr.substr(equalPos+1);
+                if (!agentID.empty()) {
+                    key.append(".").append(agentID);
+                }
+            }
+        }
+        // Add a number to the key to make sure it is unique.
+        // To prevent this number to get too big,
+        // reset it when it reaches 5000 (there should not be more
+        // than 5000 requests in the same millisecond)
+        postDataPreserveKey++;
+        if (postDataPreserveKey == 5000) {
+            postDataPreserveKey = 1;
+        }
+        sprintf(uniqueNumber, "%d", postDataPreserveKey);
+        key.append(".").append(uniqueNumber);
+        url_data_tmp->post_time_key = (char *)strdup(key.c_str());
+        if (url_data_tmp->post_time_key == NULL) {
+            am_web_log_error("%s: Failed to allocate url_data_tmp->post_time_key.",
+                             thisfunc);
+            status = AM_NO_MEMORY;
+        }
+        free(time_str);
+        time_str = NULL;
+    }
+    
+    // Build the dummy URL
+    if (status == AM_SUCCESS) {
+        std::string dummyURL;
+        char *stickySessionFromUrl = NULL;
+        URL urlObject(request_url);
+        urlObject.getRootURL(dummyURL);
+        dummyURL.append(DUMMY_REDIRECT).append(MAGIC_STR).append(key);
+        // Add the sticky session parameter if a LB is used with sticky
+        // session mode set to URL.
+        if (am_web_get_postdata_preserve_URL_parameter(
+                            &stickySessionFromUrl, agent_config)
+                            == AM_SUCCESS)
+        {
+            dummyURL.append("?").append(stickySessionFromUrl);
+        }
+        url_data_tmp->dummy_url = (char *)strdup(dummyURL.c_str());
+        if (url_data_tmp->dummy_url == NULL) {
+            am_web_log_error("%s: Failed to allocate url_data_tmp->dummy_url.",
+                             thisfunc);
+            status = AM_NO_MEMORY;
+        }
+        if (stickySessionFromUrl != NULL) {
+            free(stickySessionFromUrl);
+            stickySessionFromUrl = NULL;
+        }
+    }
+    // Set the action URL
+    if (status == AM_SUCCESS) {
+        url_data_tmp->action_url = (char *)strdup(request_url);
+        if (url_data_tmp->action_url == NULL) {
+            am_web_log_error("%s: Failed to allocate "
+                             "url_data_tmp->action_url.", thisfunc);
+            status = AM_NO_MEMORY;
+        }
+    }
+    if (status == AM_SUCCESS) {
+        *url_data = url_data_tmp;
+        am_web_log_info("%s: url_data->post_time_key: %s", 
+                        thisfunc, url_data_tmp->post_time_key);
+        am_web_log_info("%s: url_data->dummy_url: %s", 
+                        thisfunc, url_data_tmp->dummy_url);
+        am_web_log_info("%s: url_data->action_url: %s", 
+                        thisfunc, url_data_tmp->action_url);
+    } else {
+        am_web_log_error("%s: Failed to build url_data.", thisfunc);
+    }
+    return status;
 }
 
 static char* escapeQuotationMark(char*& ptr)
@@ -3892,7 +3960,7 @@ static char* escapeQuotationMark(char*& ptr)
        int pos  = 0;
 #endif
 
-       while((pos = (int)valueStr.find('"',pos)) != std::string::npos) {
+       while((pos = valueStr.find('"',pos)) != std::string::npos) {
           valueStr.erase(pos,1);
           valueStr.insert(pos,"&quot;");
        }
@@ -3916,58 +3984,55 @@ split_post_data(const char * test_string)
     std::size_t i = 0;
     unsigned int num_sectors = 0;
     Utils::post_struct_t *post_data =
-		    (Utils::post_struct_t *) malloc(sizeof(Utils::post_struct_t) * 1);
-
+        (Utils::post_struct_t *) malloc(sizeof(Utils::post_struct_t) * 1);
 
     //Create the tokens with name value pair separated with "&"
-
     char *postValue = strdup(test_string);
     ptr = strchr(postValue, '&');
     num_sectors = 1;
-
     while (ptr != NULL) {
-	num_sectors += 1;
-	ptr = strchr(ptr + 1, '&');
+        num_sectors += 1;
+        ptr = strchr(ptr + 1, '&');
     }
-
     if(post_data != NULL){
-	post_data->namevalue = (Utils::name_value_pair_t *)
-			       malloc (sizeof(Utils::name_value_pair_t) * num_sectors);
-	post_data->count = num_sectors;
-
-	// Parse the name value pair in a structure in one pass
-	if(post_data->namevalue != NULL) {
-	    ptr = postValue;
-	    for(i = 0; i < num_sectors-1; ++i){
-		post_data->namevalue[i].name = ptr;
-		ptr = strchr(ptr,'&');
-		*ptr = '\0';
-		ptr += 1;
-		post_data->namevalue[i].value =
-			strchr(post_data->namevalue[i].name, '=');
-		*(post_data->namevalue[i].value++) = '\0';
-
-		 post_data->namevalue[i].name = am_web_http_decode(post_data->namevalue[i].name,strlen(post_data->namevalue[i].name));
-                post_data->namevalue[i].value= am_web_http_decode(post_data->namevalue[i].value,strlen(post_data->namevalue[i].value));
-
+        post_data->namevalue = (Utils::name_value_pair_t *)
+                malloc (sizeof(Utils::name_value_pair_t) * num_sectors);
+        post_data->count = num_sectors;
+        // Parse the name value pair in a structure in one pass
+        if(post_data->namevalue != NULL) {
+            ptr = postValue;
+            for(i = 0; i < num_sectors-1; ++i){
+                post_data->namevalue[i].name = ptr;
+                ptr = strchr(ptr,'&');
+                *ptr = '\0';
+                ptr += 1;
+                post_data->namevalue[i].value =
+                       strchr(post_data->namevalue[i].name, '=');
+                *(post_data->namevalue[i].value++) = '\0';
+                post_data->namevalue[i].name = 
+                       am_web_http_decode(post_data->namevalue[i].name,
+                                          strlen(post_data->namevalue[i].name));
+                post_data->namevalue[i].value = 
+                        am_web_http_decode(post_data->namevalue[i].value,
+                                           strlen(post_data->namevalue[i].value));
                 escapeQuotationMark(post_data->namevalue[i].name);
                 escapeQuotationMark(post_data->namevalue[i].value);
-	    }
-
-	    post_data->namevalue[i].name = ptr;
-	    post_data->namevalue[i].value = strchr(post_data->namevalue[i].name,
-						    '=');
-	    *(post_data->namevalue[i].value++) = '\0';
-
-	     post_data->namevalue[i].name = am_web_http_decode(post_data->namevalue[i].name,strlen(post_data->namevalue[i].name));
-            post_data->namevalue[i].value= am_web_http_decode(post_data->namevalue[i].value,strlen(post_data->namevalue[i].value));
-
+            }
+            post_data->namevalue[i].name = ptr;
+            post_data->namevalue[i].value = 
+                      strchr(post_data->namevalue[i].name, '=');
+            *(post_data->namevalue[i].value++) = '\0';
+            post_data->namevalue[i].name = 
+                    am_web_http_decode(post_data->namevalue[i].name,
+                                       strlen(post_data->namevalue[i].name));
+            post_data->namevalue[i].value = 
+                    am_web_http_decode(post_data->namevalue[i].value,
+                                       strlen(post_data->namevalue[i].value));
             escapeQuotationMark(post_data->namevalue[i].name);
             escapeQuotationMark(post_data->namevalue[i].value);
-
-	}
-	post_data->buffer = str;
-	am_web_log_max_debug("post value = %s",post_data->buffer);
+        }
+        post_data->buffer = str;
+        am_web_log_max_debug("%s: post value = %s", thisfunc, post_data->buffer);
     }
     return post_data;
 }
@@ -3982,54 +4047,44 @@ am_web_create_post_page(const char *key,
                         const char *actionurl,
                         void* agent_config)
 {
+    const char *thisfunc = "am_web_create_post_page()";
     char *buffer_page = NULL;
     int num_sectors = 0;
     int i =0;
-#if defined(_AMD64_)
     size_t totalchars = 0;
-#else
-    int totalchars = 0;
-#endif
     Utils::post_struct_t *post_data = split_post_data(postdata);
-
     num_sectors = post_data->count;
 
     // Find the total length required to construct the name value fragment
     // of the page
     for(i = 0; i < num_sectors; ++i){
-	totalchars += strlen(post_data->namevalue[i].name);
-	totalchars += strlen(post_data->namevalue[i].value);
-	totalchars += strlen(sector_two) + strlen(sector_three)
-		      + strlen(sector_four);
+        totalchars += strlen(post_data->namevalue[i].name);
+        totalchars += strlen(post_data->namevalue[i].value);
+        totalchars += strlen(sector_two) + strlen(sector_three)
+                      + strlen(sector_four);
     }
-
     // Allocate the length of the buffer
     buffer_page = (char *)malloc(strlen(sector_one) + strlen(actionurl) +
-				 strlen(sector_two) +
-				 totalchars + strlen(sector_five) ) + 1;
+                  strlen(sector_two) +
+                  totalchars + strlen(sector_five) + 1);
     strcpy(buffer_page,sector_one);
     strcat(buffer_page,actionurl);
     strcat(buffer_page,sector_two);
-
     // Copy in the variable part, the name value pair..
     for(i = 0; i < num_sectors; i++){
-	strcat(buffer_page,sector_three);
-	strcat(buffer_page,post_data->namevalue[i].name);
-	strcat(buffer_page,sector_four);
-	strcat(buffer_page,post_data->namevalue[i].value);
-	strcat(buffer_page,sector_two);
+        strcat(buffer_page,sector_three);
+        strcat(buffer_page,post_data->namevalue[i].name);
+        strcat(buffer_page,sector_four);
+        strcat(buffer_page,post_data->namevalue[i].value);
+        strcat(buffer_page,sector_two);
     }
-
     strcat(buffer_page, sector_five);
-
     // Now remove the entry from the hashtable
     if(key != NULL){
-	am_web_postcache_remove(key, agent_config);
+        am_web_postcache_remove(key, agent_config);
     }
-
     Log::log(boot_info.log_module, Log::LOG_DEBUG,
-	     "HTML page for post %s :",buffer_page);
-
+             "%s: HTML page for post %s :", thisfunc, buffer_page);
     if(post_data->namevalue != NULL){
         free(post_data->namevalue);
     }
@@ -4041,7 +4096,6 @@ am_web_create_post_page(const char *key,
     }
 
     return buffer_page;
-
 }
 
 
@@ -5790,9 +5844,9 @@ process_request(am_web_request_params_t *req_params,
             orig_method = req_params->method;
 
         am_web_set_host_ip_in_env_map(req_params->client_ip,
-            req_params->client_hostname,
-            env_map,
-            agent_config);
+                                      req_params->client_hostname,
+                                      env_map,
+                                      agent_config);
 
         // now check if access allowed
         sts = am_web_is_access_allowed(
@@ -6373,7 +6427,13 @@ am_web_get_client_ip_header_name(void* agent_config)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
-    return (*agentConfigPtr)->clientIPHeader;
+    if (((*agentConfigPtr)->clientIPHeader != NULL) &&
+        (strlen((*agentConfigPtr)->clientIPHeader) == 0))
+    { 
+        return NULL;
+    } else {
+        return (*agentConfigPtr)->clientIPHeader;
+    }
 }
 
 /**
@@ -6384,142 +6444,153 @@ am_web_get_client_hostname_header_name(void* agent_config)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
-    return (*agentConfigPtr)->clientHostnameHeader;
+    if (((*agentConfigPtr)->clientHostnameHeader != NULL) &&
+        (strlen((*agentConfigPtr)->clientHostnameHeader) == 0))
+    {
+        return NULL;
+    } else {
+        return (*agentConfigPtr)->clientHostnameHeader;
+    }
 }
 
-/**
- * Returns client ip value from client ip header.
- * If the clientIP contains comma separated values,
- * then first value is taken into consideration.
- */
-extern "C" AM_WEB_EXPORT am_status_t
-am_web_get_client_ip(const char* clientIPHeader,
-                     char** clientIP)
+am_status_t getFirstValueOfList(const char *list, 
+                                char separator,
+                                char **firstValue)
 {
-    if (clientIPHeader != NULL && clientIPHeader[0] != '\0') {
-        am_web_log_debug("am_web_get_client_ip: "
-                "client IP header value = %s", clientIPHeader);
-
-        std::string tmpClientIPHeader(clientIPHeader);
-        size_t size = tmpClientIPHeader.size();
-        size_t multipleValues = 0, start = 0;
-        multipleValues = tmpClientIPHeader.find(',', start);
-        if (multipleValues == std::string::npos) {
-            *clientIP = strdup(tmpClientIPHeader.c_str());
-        } else {
-            *clientIP = strdup(tmpClientIPHeader.substr(start, multipleValues).c_str());
-        }
-        am_web_log_debug("am_web_get_client_ip: "
-            "processed client IP = %s", *clientIP);
-        return AM_SUCCESS;
-    } else {
-        return AM_INVALID_ARGUMENT;
+    const char *thisfunc = "getFirstValueOfList()";
+    am_status_t status = AM_SUCCESS;
+    
+    if ((list == NULL) || (strlen(list) == 0)) {
+        am_web_log_error("%s: The list is null or empty.", thisfunc);
+        status = AM_INVALID_ARGUMENT;
     }
-
+    if (status == AM_SUCCESS) {
+        std::string list_str(list);
+        size_t separatorPos = list_str.find(separator);
+        if (separatorPos == std::string::npos) {
+            *firstValue = strdup(list_str.c_str());
+        } else {
+            *firstValue = strdup(list_str.substr(0,separatorPos).c_str());
+        }
+        if (*firstValue == NULL) {
+            am_web_log_error("%s: Not enough memory to allocate firstValue.",
+                             thisfunc);
+            status = AM_NO_MEMORY;
+        }
+        if (strlen(*firstValue) == 0) {
+            *firstValue = NULL;
+        }
+    }
+    return status;
 }
 
-/**
- * Returns client hostname value from client hostname header.
- * If the clientHostname contains comma separated values,
- * then first value is taken into consideration.
+/*
+ * Returns client IP and hostname value from client IP and hostname headers.
+ * If the client IP header or client host name header contains comma 
+ * separated values, then first value is taken into consideration.
  */
 extern "C" AM_WEB_EXPORT am_status_t
-am_web_get_client_hostname(const char* clientHostnameHeader,
-                           char** clientHostname)
+am_web_get_client_ip_host(const char *clientIPHeader, 
+                          const char *clientHostHeader,
+                          char **clientIP,
+                          char **clientHost)
 {
-    if (clientHostnameHeader != NULL && 
-        clientHostnameHeader[0] != '\0') {
-        am_web_log_debug("am_web_get_client_hostname: "
-                "client hostname header value = %s", clientHostnameHeader);
+    const char *thisfunc = "am_web_get_client_ip_host()";
+    am_status_t status = AM_SUCCESS;
+    char *fullHostName = NULL;
 
-        std::string tmpClientHostnameHeader(clientHostnameHeader);
-        std::string tmpClientHostname;
-        size_t size = tmpClientHostnameHeader.size();
-        size_t multipleValues = 0, start = 0, colonSeparator = 0;
-        //check multiple hostname values present
-        multipleValues = tmpClientHostnameHeader.find(',', start);
-        if (multipleValues == std::string::npos) {
-            tmpClientHostname = tmpClientHostnameHeader;
-        } else {
-            tmpClientHostname = tmpClientHostnameHeader.substr(start, multipleValues);
-        }
-
-        am_web_log_debug("am_web_get_client_hostname: "
-                "tmp client hostname value = %s", tmpClientHostname.c_str());
-        //check hostname contains :port value
-        colonSeparator = tmpClientHostname.find(':', start);
-        if (colonSeparator == std::string::npos) {
-            *clientHostname = strdup(tmpClientHostname.c_str());;
-        } else {
-            *clientHostname = strdup(tmpClientHostname.substr(start, colonSeparator).c_str());
-        }
-        am_web_log_debug("am_web_get_client_hostname: "
-                "processed client hostname value = %s",
-                *clientHostname);
-
-        return AM_SUCCESS;
-    } else {
-        return AM_INVALID_ARGUMENT;
+     // If clientIPHeader contains a list of values, set clientIP
+     // to the first value of the list
+    if ((clientIPHeader != NULL) && (strlen(clientIPHeader) > 0)) {
+        status = getFirstValueOfList(clientIPHeader, ',', &(*clientIP));
     }
-
+    // If clientHostHeader contains a list of values, set the clientHost
+    // to the first value of the list
+    if (status == AM_SUCCESS) {
+        if ((clientHostHeader != NULL) &&
+            (strlen(clientHostHeader) > 0 )) 
+        {
+            status = getFirstValueOfList(clientHostHeader, ',',
+                                         &fullHostName);
+            // If fullHostName contains the port number, remove it
+            if ((status == AM_SUCCESS) && (fullHostName != NULL)) {
+                status = getFirstValueOfList(fullHostName, ':', &(*clientHost));
+            }
+        }
+    }
+    if (status == AM_SUCCESS) {
+        if (*clientIP != NULL) {
+            am_web_log_debug("%s: Processed client IP = %s",
+                             thisfunc, *clientIP);
+        } else {
+            am_web_log_debug("%s: Processed client IP is NULL.",
+                             thisfunc);
+        }
+        if (*clientHost != NULL) {
+            am_web_log_debug("%s: Processed client hostname = %s", 
+                             thisfunc, *clientHost);
+        } else {
+            am_web_log_debug("%s: Processed client hostname is NULL.", 
+                             thisfunc);
+        }
+    }
+    return status;
 }
 
 /**
  * Sets client ip (and client hostname) in environment map
  * which then sent as part of policy request.
  */
-extern "C" AM_WEB_EXPORT void 
+extern "C" AM_WEB_EXPORT am_status_t
 am_web_set_host_ip_in_env_map(const char *client_ip,
                               const char *client_hostname,
                               const am_map_t env_parameter_map,
                               void* agent_config)
 {
+    const char *thisfunc = "am_web_set_host_ip_in_env_map()";
+    am_status_t status = AM_SUCCESS;
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
-
-
+          (AgentConfigurationRefCntPtr*) agent_config;
     PRStatus prStatus;
     PRNetAddr address;
     PRHostEnt hostEntry;
     char buffer[PR_NETDB_BUF_SIZE];
 
-    Log::log(boot_info.log_module, Log::LOG_DEBUG,
-             "am_web_set_host_ip_in_env_map: map_insert: "
-             "client_ip=%s", client_ip);
-    am_map_insert(env_parameter_map, requestIp, client_ip, AM_TRUE);
-
-    //check if client_hostname value is available. Else
-    // try to get client host name based get.client.host.name property value.
-    if( client_hostname != NULL && client_hostname[0] != '\0') {
+    if(client_ip != NULL && strlen(client_ip) > 0) {
+        // Set the client IP in the environment map
         Log::log(boot_info.log_module, Log::LOG_DEBUG,
-             "am_web_set_host_ip_in_env_map: map_insert: "
-             "client_hostname=%s", client_hostname);
-        am_map_insert(env_parameter_map, 
-            requestDnsName,
-            client_hostname, 
-            AM_FALSE);
-
-    } else if ((*agentConfigPtr)->getClientHostname) {
-        prStatus = PR_StringToNetAddr(client_ip, &address);
-        if (PR_SUCCESS == prStatus) {
-            prStatus = PR_GetHostByAddr(
-                &address, buffer, sizeof(buffer), &hostEntry);
-
+             "%s: map_insert: client_ip=%s", thisfunc, client_ip);
+        am_map_insert(env_parameter_map, requestIp, client_ip, AM_TRUE);
+        if(client_hostname != NULL && strlen(client_hostname) > 0) {
+            // Set the hostname in the environment map if it is not null
+            Log::log(boot_info.log_module, Log::LOG_DEBUG,
+             "%s: map_insert: client_hostname=%s", thisfunc, client_hostname);
+            status = am_map_insert(env_parameter_map, 
+                                   requestDnsName,
+                                   client_hostname, 
+                                   AM_FALSE);
+        } else if ((*agentConfigPtr)->getClientHostname) {
+            prStatus = PR_StringToNetAddr(client_ip, &address);
             if (PR_SUCCESS == prStatus) {
-                // this function will log info about the client's hostnames
-                // so no need to do it here.
-                getFullQualifiedHostName(
-                    env_parameter_map, &address, &hostEntry);
+                // Try to get the hostname through DNS reverse lookup
+                prStatus = PR_GetHostByAddr(&address, buffer,
+                                            sizeof(buffer), &hostEntry);
+                if (PR_SUCCESS == prStatus) {
+                    // this function will log info about the client's hostnames
+                    // so no need to do it here.
+                    getFullQualifiedHostName(env_parameter_map, 
+                                             &address, &hostEntry);
+                }
+            } else {
+                Log::log(boot_info.log_module, Log::LOG_DEBUG,
+                         "%s: map_insert: could not get client's hostname for "
+                         "policy. Error %s.", thisfunc,
+                         PR_ErrorToString(PR_GetError(),
+                                          PR_LANGUAGE_I_DEFAULT));
             }
         }
-        else {
-            am_web_log_warning("am_web_set_host_ip_in_env_map: map_insert: "
-                "could not get client's hostname for policy. "
-                "Error %s.",
-                PR_ErrorToString(PR_GetError(), PR_LANGUAGE_I_DEFAULT));
-        }
     }
-
+    return status;
 }
 
 /*
@@ -6528,43 +6599,156 @@ am_web_set_host_ip_in_env_map(const char *client_ip,
  * enabled
  */
 extern "C" AM_WEB_EXPORT am_status_t
-am_web_get_postdata_preserve_lbcookie(const char **headerValue, 
-                                      boolean_t isValueNull, void* agent_config)
+am_web_get_postdata_preserve_lbcookie(char **headerValue, 
+                                      boolean_t isValueNull,
+                                      void* agent_config)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
     const char *thisfunc = "am_web_get_postdata_preserve_lbcookie()";
     am_status_t status = AM_SUCCESS;
-    size_t equalPos;
-    std::string cookieName, cookieValue, header;
-    std::string lbcookie((*agentConfigPtr)->postdatapreserve_lbcookie);
+    std::string header;
+    std::string stickySessionValueStr;
+    std::string cookieName, cookieValue;
+    size_t equalPos = 0;
+    const char *stickySessionMode = 
+            (*agentConfigPtr)->postdatapreserve_sticky_session_mode;
+    const char *stickySessionValue = 
+           (*agentConfigPtr)->postdatapreserve_sticky_session_value;
 
-    if (!lbcookie.empty()) {
-        equalPos=lbcookie.find('=');
-        if (equalPos != std::string::npos) {
-            cookieName = lbcookie.substr(0, equalPos);
-            if (isValueNull == B_FALSE) {
-                cookieValue = lbcookie.substr(equalPos+1);
-            } else {
-                cookieValue = "";
-            }
-            header = " ";
-            header.append(cookieName).append("=").
-                  append(cookieValue).append(";Path=/");
-            *headerValue = strdup(header.c_str());
-            if (*headerValue == NULL) {
-                am_web_log_error("%s: Not enough memory to allocate "
-                                 "headerValue");
-                status = AM_NO_MEMORY;
-            }
-        } else {
-            am_web_log_error("%s: The value of the postdata.preserve.lbcookie "
-                             "property (%s) has not a correct format.",
-                             thisfunc, lbcookie.c_str());
-            status = AM_FAILURE;
+    // If stickySessionMode or stickySessionValue is empty, 
+    // then there is no LB in front of the agent.
+    if ((stickySessionMode == NULL) || (strlen(stickySessionMode) == 0) ||
+        (stickySessionValue == NULL) || (strlen(stickySessionValue) == 0))
+    {
+        status = AM_INVALID_ARGUMENT;
+    } else if (strcmp(stickySessionMode, "COOKIE") != 0) {
+        // Deals only with the case where the sticky session mode is COOKIE.
+        status = AM_INVALID_ARGUMENT;
+        if (strcmp(stickySessionMode, "URL") != 0) {
+            am_web_log_warning("%s: %s is not a correct value for the property "
+                             "config.postdata.preserve.stickysession.value.",
+                             thisfunc, stickySessionMode);
         }
     }
+    // Check if the sticky session value has a correct format ("param=value")
+    if (status  == AM_SUCCESS) {
+        stickySessionValueStr.assign(stickySessionValue);
+        equalPos = stickySessionValueStr.find('=');
+        if (equalPos != std::string::npos) {
+            cookieName = stickySessionValueStr.substr(0, equalPos);
+            cookieValue = stickySessionValueStr.substr(equalPos+1);
+            if (cookieName.empty() || cookieValue.empty()) {
+                am_web_log_warning("%s: The property "
+                     "config.postdata.preserve.stickysession.value "
+                     "(%s) does not a have correct format.",
+                     thisfunc, stickySessionValueStr.c_str());
+                status = AM_INVALID_ARGUMENT;
+            }
+        } else {
+            am_web_log_warning("%s: The property "
+                     "config.postdata.preserve.stickysession.value "
+                     "(%s) does not have a correct format.",
+                     thisfunc, stickySessionValueStr.c_str());
+            status = AM_INVALID_ARGUMENT;
+        }
+    }
+    if (status  == AM_SUCCESS) {
+        if (isValueNull == B_TRUE) {
+            cookieValue = "";
+        }
+        header = " ";
+        header.append(cookieName).append("=").
+               append(cookieValue).append(";Path=/");
+        *headerValue = strdup(header.c_str());
+        if (*headerValue == NULL) {
+            am_web_log_error("%s: Not enough memory to allocate "
+                             "the headerValue variable.", thisfunc);
+             status = AM_NO_MEMORY;
+        }
+    }
+    if (status == AM_SUCCESS) {
+            am_web_log_debug("%s: Sticky session mode: %s", thisfunc, 
+                       stickySessionMode);
+            am_web_log_debug("%s: Sticky session value: %s", 
+                             thisfunc, *headerValue);
+    }
+    return status;
+}
+
+/*
+ * Method to get the query parameter that should be added to the
+ * dummy url when using a LB in front of the agent with post 
+ * preservation enabled and sticky session mode set to URL.
+ */
+extern "C" AM_WEB_EXPORT am_status_t
+am_web_get_postdata_preserve_URL_parameter(char **queryParameter,
+                                           void* agent_config)
+{
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+        (AgentConfigurationRefCntPtr*) agent_config;
+    const char *thisfunc = "am_web_get_postdata_preserve_URL_parameter()";
+    am_status_t status = AM_SUCCESS;
+    std::string stickySessionValueStr;
+    std::string cookieName, cookieValue;
+    size_t equalPos = 0;
+    const char *stickySessionMode = 
+            (*agentConfigPtr)->postdatapreserve_sticky_session_mode;
+    const char *stickySessionValue = 
+            (*agentConfigPtr)->postdatapreserve_sticky_session_value;
     
+    // If stickySessionMode or stickySessionValue is empty, 
+    // then there is no LB in front of the agent.
+    if ((stickySessionMode == NULL) || (strlen(stickySessionMode) == 0) ||
+        (stickySessionValue == NULL) || (strlen(stickySessionValue) == 0))
+    {
+        status = AM_INVALID_ARGUMENT;
+    } else if (strcmp(stickySessionMode, "URL") != 0) {
+        // Deals only with the case where the sticky session mode is URL.
+        status = AM_INVALID_ARGUMENT;
+        if (strcmp(stickySessionMode, "COOKIE") != 0) {
+            am_web_log_warning("%s: %s is not a correct value for the property "
+                             "config.postdata.preserve.stickysession.value.",
+                             thisfunc, stickySessionMode);
+        }
+    }
+    // Check if the sticky session value has a correct format ("param=value")
+    if (status  == AM_SUCCESS) {
+        stickySessionValueStr.assign(stickySessionValue);
+        equalPos = stickySessionValueStr.find('=');
+        if (equalPos != std::string::npos) {
+            cookieName = stickySessionValueStr.substr(0, equalPos);
+            cookieValue = stickySessionValueStr.substr(equalPos+1);
+            if (cookieName.empty() || cookieValue.empty()) {
+                am_web_log_warning("%s: The property "
+                     "config.postdata.preserve.stickysession.value "
+                     "(%s) does not a have correct format.",
+                     thisfunc, stickySessionValueStr.c_str());
+                status = AM_INVALID_ARGUMENT;
+            }
+        } else {
+            am_web_log_warning("%s: The property "
+                     "config.postdata.preserve.stickysession.value "
+                     "(%s) does not have a correct format.",
+                     thisfunc, stickySessionValueStr.c_str());
+            status = AM_INVALID_ARGUMENT;
+        }
+    }
+    if (status == AM_SUCCESS) {
+        *queryParameter = strdup(stickySessionValueStr.c_str());
+        if (*queryParameter == NULL) {
+            am_web_log_error("%s: Not enough memory to allocate "
+                             "the queryParameter variable.",
+                             thisfunc);
+            status = AM_NO_MEMORY;
+        }
+    }
+    if (status == AM_SUCCESS) {
+            am_web_log_debug("%s: Sticky session mode: %s", thisfunc, 
+                             stickySessionMode);
+            am_web_log_debug("%s: Sticky session value: %s", 
+                             thisfunc, *queryParameter);
+    }
     return status;
 }
 

@@ -351,82 +351,89 @@ render_result(void **args, am_web_result_t http_result, char *data)
 /**
  * gets request URL
  */
-static char *
-get_request_url(request_rec *r)
+static am_status_t
+get_request_url(request_rec *r, char **requestURL)
 {
     const char *thisfunc = "get_request_url()";
+    am_status_t status = AM_SUCCESS;
     const char *args = r->args;
     char *server_name = NULL;
-    char *retVal = NULL;
     unsigned int port_num = 0;
-    const char *host = (const char *)ap_table_get(r->headers_in, "Host");
+    const char *host = NULL;
     char *http_method = NULL;
     char port_num_str[40];
     char *args_sep_str = NULL;
 
-    // get host
-    if(host != NULL) {
-	size_t server_name_len = 0;
-	char *colon_ptr = strchr(host, ':');
-	am_web_log_max_debug("%s: Host: %s", thisfunc, host);
-	if(colon_ptr != NULL) {
-	    sscanf(colon_ptr + 1, "%u", &port_num);
-	    server_name_len = colon_ptr - host;
-	} else {
-	    server_name_len = strlen(host);
-	}
-	server_name = ap_pcalloc(r->pool, server_name_len + 1);
-	memcpy(server_name, host, server_name_len);
-	server_name[server_name_len] = '\0';
+    // Get the host name
+    if (host != NULL) {
+        size_t server_name_len = 0;
+        char *colon_ptr = strchr(host, ':');
+        am_web_log_max_debug("%s: Host: %s", thisfunc, host);
+        if (colon_ptr != NULL) {
+            sscanf(colon_ptr + 1, "%u", &port_num);
+            server_name_len = colon_ptr - host;
+        } else {
+            server_name_len = strlen(host);
+        }
+        server_name = apr_pcalloc(r->pool, server_name_len + 1);
+        memcpy(server_name, host, server_name_len);
+        server_name[server_name_len] = '\0';
     } else {
-	server_name = (char *)r->hostname;
+        server_name = (char *) r->hostname;
     }
 
     // In case of virtual servers with only a
     // IP address, use hostname defined in server_req
     // for the request hostname value
     if (server_name == NULL) {
-	server_name = (char *)r->server->server_hostname;
-	am_web_log_debug("%s: Host set to server hostname %s.", thisfunc, server_name);
+        server_name = (char *) r->server->server_hostname;
+        am_web_log_debug("%s: Host set to server hostname %s.",
+                         thisfunc, server_name);
     }
-
-    // get port
-    if(port_num == 0) {
-    	port_num = r->server->port;
+    if (server_name == NULL || strlen(server_name) == 0) {
+        am_web_log_error("%s: Could not get the hostname.", thisfunc);
+        status = AM_FAILURE;
+    } else {
+        am_web_log_debug("%s: hostname = %s", thisfunc, server_name);
     }
-    // Virtual servers set the port to 0 when listening on the default port.
-    // This creates problems, so set it back to default port
-    if(port_num == 0) {
-    	port_num = ap_default_port(r);
-    	am_web_log_debug("%s: Port is 0. Set to default port %u.",
-    	                  thisfunc, ap_default_port(r));
-    }    
-    am_web_log_max_debug("%s: Port is %u.", thisfunc, port_num);
+    if (status == AM_SUCCESS) {
+        // Get the port
+        if (port_num == 0) {
+            port_num = r->server->port;
+        }
+        // Virtual servers set the port to 0 when listening on the default port.
+        // This creates problems, so set it back to default port
+        if (port_num == 0) {
+            port_num = ap_default_port(r);
+            am_web_log_debug("%s: Port is 0. Set to default port %u.",
+                thisfunc, ap_default_port(r));
+        }
+    }
+    am_web_log_debug("%s: port = %u", thisfunc, port_num);
     sprintf(port_num_str, ":%u", port_num);
-
-    // get protocol
-    http_method = (char *)ap_http_method(r);
-
-    // get query args
+    // Get the protocol
+    http_method = (char *) ap_http_method(r);
+    // Get the query
     if (NULL == args || '\0' == args[0]) {
-	args_sep_str = "";
-	args = "";
+        args_sep_str = "";
+        args = "";
+    } else {
+        args_sep_str = "?";
     }
-    else {
-	args_sep_str = "?";
-    }
+    am_web_log_debug("%s: query = %s", thisfunc, args);
 
+    // Construct the url
     // <method>:<host><:port or nothing><uri><? or nothing><args or nothing>
-    retVal = ap_psprintf(r->pool, "%s://%s%s%s%s%s",
-	                 http_method,
-			 server_name,
-			 port_num_str,
-			 r->uri,
-			 args_sep_str,
-			 args);
+    *requestURL = apr_psprintf(r->pool, "%s://%s%s%s%s%s",
+                               http_method,
+                               server_name,
+                               port_num_str,
+                               r->uri,
+                               args_sep_str,
+                               args);
 
-    am_web_log_debug("%s: Returning request URL %s.", thisfunc, retVal);
-    return retVal;
+    am_web_log_debug("%s: Returning request URL = %s.", thisfunc, *requestURL);
+    return status;
 }
 
 /**
@@ -951,20 +958,20 @@ static int do_deny(request_rec *r, am_status_t status) {
 int dsame_check_access(request_rec *r)
 {
     const char *thisfunc = "dsame_check_access()";
-    char *url = get_request_url(r);
-    char *content;
-    am_status_t status = AM_FAILURE;
-    int  ret = OK;
-    const char *ruser = NULL;
-    int  requestResult = HTTP_FORBIDDEN;
-    am_map_t env_parameter_map = NULL;
-    void *args[] = { (void *)r, (void *)&ret };
-    void* agent_config = NULL;
-
-    am_web_req_method_t method = get_method_num(r); 
+    am_status_t status = AM_SUCCESS;
+    int ret = OK;
+    char *url = NULL;
+    void *args[] = {(void *) r, (void *) & ret};
+    const char *clientIP_hdr_name = NULL;
+    char *clientIP_hdr = NULL;
+    char *clientIP = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    char *clientHostname_hdr = NULL;
+    char *clientHostname = NULL;
+    am_web_req_method_t method;
     am_web_request_params_t req_params;
     am_web_request_func_t req_func;
-    am_status_t render_sts = AM_FAILURE;
+    void* agent_config = NULL;
 
     memset((void *)&req_params, 0, sizeof(req_params));
     memset((void *)&req_func, 0, sizeof(req_func));
@@ -973,93 +980,104 @@ int dsame_check_access(request_rec *r)
      * Initialize the agent during first request
      * Should not be repeated during subsequest requests.
      */
-
     if(agentInitialized != B_TRUE){
         apr_thread_mutex_lock(init_mutex);
         am_web_log_info("%s: Locked initialization section.", thisfunc);
         if(agentInitialized != B_TRUE){
             (void)init_at_request();
             if(agentInitialized != B_TRUE){
-                requestResult =  do_deny(r, status);
-                return requestResult;
-            }  else {
+                ret =  do_deny(r, status);
+                status = AM_FAILURE;
             }
         }
+    }
+    if (status == AM_SUCCESS) {
         apr_thread_mutex_unlock(init_mutex);
         am_web_log_info("%s: Unlocked initialization section.", thisfunc);
+        // Get the agent config
+        agent_config = am_web_get_agent_configuration();
+        // Check request
+        if (r == NULL) {
+            am_web_log_error("%s: Request to http server is NULL!", thisfunc);
+            status = AM_FAILURE;
+        }
     }
-
-    agent_config = am_web_get_agent_configuration();
-
+    // Check arguments
     if (r == NULL) {
-        am_web_log_error("%s: Request to http server is NULL!", thisfunc);
-        ret = HTTP_INTERNAL_SERVER_ERROR;
+        am_web_log_error("%s: Request to http server is NULL.", thisfunc);
+        status = AM_FAILURE;
     }
-    else if (url == NULL || *url == '\0' || method == AM_WEB_REQUEST_UNKNOWN ||
-         r->connection == NULL || r->connection->remote_ip == NULL ||
-         *(r->connection->remote_ip) == '\0') {
-        am_web_log_error("%s: Request to http server had invalid url, "
-                        "request method, or client IP.", thisfunc);
-        ret = HTTP_INTERNAL_SERVER_ERROR;
+    if (status == AM_SUCCESS) {
+        if (r->connection == NULL) {
+            am_web_log_error("%s: Request connection is NULL.", thisfunc);
+            status = AM_FAILURE;
+        }
     }
-    else {
-        // Check if client ip header property is set
-        const char* client_ip_header_name =
-            am_web_get_client_ip_header_name(agent_config);
-        // Check if client hostname header property is set
-        const char* client_hostname_header_name =
-            am_web_get_client_hostname_header_name(agent_config);
-        char* ip_header = NULL;
-        char* hostname_header = NULL;
-        char* client_ip_from_ip_header = NULL;
-        char* client_hostname_from_hostname_header = NULL;
-
-        // If client ip header property is set, then try to
-        // retrieve header value.
-        if(client_ip_header_name != NULL && client_ip_header_name[0] != '\0') {
-            ip_header = (char *)ap_table_get(r->headers_in, client_ip_header_name);
-
-            // Usually client ip header value is: client, proxy1, proxy2....
-            // Process client ip header value to get the correct value. 
-            am_web_get_client_ip(ip_header,
-                &client_ip_from_ip_header);
-        }
-
-        // If client hostname header property is set, then try to
-        // retrieve header value.
-        if(client_hostname_header_name != NULL 
-            && client_hostname_header_name[0] != '\0') {
-            hostname_header = (char *)ap_table_get(r->headers_in, 
-                client_hostname_header_name);
-
-            // Usually client hostname header value is: client, proxy1, proxy2....
-            // Process client hostname header value to get the correct value. 
-            am_web_get_client_hostname(hostname_header,
-                &client_hostname_from_hostname_header);
-        }
-
-        // If client IP value is present from above processing, then
-        // set it to req_param. Else set from request structure.
-        if(client_ip_from_ip_header != NULL && client_ip_from_ip_header[0] != '\0') {
-            req_params.client_ip = client_ip_from_ip_header;
-        } else {
-            req_params.client_ip = (char *)r->connection->remote_ip;
-        }
-
-        // If client hostname value is present from above processing, then
-        // set it to req_param. 
-        if(client_hostname_from_hostname_header != NULL && 
-            client_hostname_from_hostname_header[0] != '\0') {
-            req_params.client_hostname = client_hostname_from_hostname_header;
+    // Get the request URL
+    if (status == AM_SUCCESS) {
+        status = get_request_url(r, &url);
+    }
+    // Get the request method
+    if (status == AM_SUCCESS) {
+        method = get_method_num(r);
+        if (method == AM_WEB_REQUEST_UNKNOWN) {
+            am_web_log_error("%s: Request method is unknown.", thisfunc);
+            status = AM_FAILURE;
         } 
+    }
+     
+    // If there is a proxy in front of the agent, the user can set in the
+    // properties file the name of the headers that the proxy uses to set
+    // the real client IP and host name. In that case the agent needs
+    // to use the value of these headers to process the request
+    if (status == AM_SUCCESS) {
+        // Get the client IP address header set by the proxy, if there is one
+        clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            clientIP_hdr = (char *)apr_table_get(r->headers_in, 
+                                                 clientIP_hdr_name);
+        }
+        // Get the client host name header set by the proxy, if there is one
+        clientHostname_hdr_name = 
+                 am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            clientHostname_hdr = (char *)apr_table_get(r->headers_in, 
+                                                 clientHostname_hdr_name);
+        }
+        // If the client IP and host name headers contain more than one
+        // value, take the first value.
+        if ((clientIP_hdr != NULL && strlen(clientIP_hdr) > 0) ||
+            (clientHostname_hdr != NULL && strlen(clientHostname_hdr) > 0))
+        {
+            status = am_web_get_client_ip_host(clientIP_hdr,
+                                               clientHostname_hdr,
+                                               &clientIP, &clientHostname);
+        }
+    }
+    // Set the client ip in the request parameters structure
+    if (status == AM_SUCCESS) {
+        if (clientIP == NULL) {
+            req_params.client_ip = (char *)r->connection->remote_ip;
+        } else {
+            req_params.client_ip = clientIP;
+        }
+        if ((req_params.client_ip == NULL) ||
+            (strlen(req_params.client_ip) == 0))
+        {
+            am_web_log_error("%s: Could not get the remote IP.", thisfunc);
+            status = AM_FAILURE;
+        }
+    }
 
+    // Process the request
+    if (status == AM_SUCCESS) {
+        req_params.client_hostname = clientHostname;
         req_params.url = url;
         req_params.query = r->args;
         req_params.method = method;
         req_params.path_info = r->path_info;
         req_params.cookie_header_val =
-                    (char *)ap_table_get(r->headers_in, "Cookie");
-
+                (char *) apr_table_get(r->headers_in, "Cookie");
         req_func.get_post_data.func = content_read;
         req_func.get_post_data.args = args;
         // no free_post_data
@@ -1074,28 +1092,37 @@ int dsame_check_access(request_rec *r)
         req_func.render_result.func = render_result;
         req_func.render_result.args = args;
 
-        (void)am_web_process_request(&req_params, &req_func, &render_sts, agent_config);
-        if (render_sts != AM_SUCCESS) {
+        (void) am_web_process_request(&req_params, &req_func,
+                                      &status, agent_config);
+        if (status != AM_SUCCESS) {
             am_web_log_error("%s: Error encountered rendering result %d.",
-                                thisfunc, ret);
+                    thisfunc, ret);
+        }
+    }
+    // Cleaning
+    if(clientIP != NULL) {
+        am_web_free_memory(clientIP);
+    }
+    if(clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+    }
+    am_web_delete_agent_configuration(agent_config);
+    // Failure handling
+    if (status == AM_FAILURE) {
+        if (ret == OK) {
             ret = HTTP_INTERNAL_SERVER_ERROR;
         }
-        am_web_free_memory(client_ip_from_ip_header);
-        am_web_free_memory(client_hostname_from_hostname_header);
-
     }
-
-    am_web_delete_agent_configuration(agent_config);
-
     return ret;
 }
 
-static void shutdownNSS(void *data)
+static apr_status_t shutdownNSS(void *data)
 {    
     am_status_t status = am_shutdown_nss();
     if (status != AM_SUCCESS) {
        am_web_log_error("shutdownNSS(): Failed to shutdown NSS.");
-    } 
+    }
+    return OK;
 }
 
 #if defined(APACHE2)

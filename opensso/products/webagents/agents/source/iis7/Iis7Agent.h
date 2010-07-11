@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Iis7Agent.h,v 1.2 2009/06/03 00:25:32 robertis Exp $
+ * $Id: Iis7Agent.h,v 1.3 2010/03/10 05:08:52 dknab Exp $
  *
  *
  */
@@ -42,25 +42,11 @@ using namespace std;
 #define TCP_PORT_ASCII_SIZE_MAX 5
 #define URL_SIZE_MAX (20*1024)
 
-
-#if defined(_AMD64_)
 typedef struct OphResources {
-    PCSTR cookies;      
+    PCSTR cookies;
     DWORD cbCookies;
-    CHAR *url;         
-    DWORD64 cbUrl;
     am_policy_result_t result;
 } tOphResources;
-#else
-typedef struct OphResources {
-    PCSTR cookies;      
-    DWORD cbCookies;
-    CHAR *url;         
-    DWORD cbUrl;
-    am_policy_result_t result;
-} tOphResources;
-#endif
-
 
 typedef struct AgentConfig {
     BOOL bAgentInitSuccess; // For disabling IIS if init fails.
@@ -70,11 +56,12 @@ BOOL RegisterAgentModule();
 REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext, 
                                     IHttpEventProvider* pProvider);
 
-am_status_t get_request_url(IHttpContext* pHttpContext, string& requestURL, 
-                    string& pathInfo, tOphResources* pOphResources);
+am_status_t get_request_url(IHttpContext* pHttpContext, string& requestURL,
+                            string& origRequestURL, string& pathInfo,
+                            void* agent_config);
 
 am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName, 
-                        PCSTR* pVarVal, DWORD* pVarValSize); 
+                        PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired); 
 
 BOOL loadAgentPropertyFile(IHttpContext* pHttpContext);
 
@@ -103,7 +90,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args);
 REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext, 
                 const char *redirect_url, const char *set_cookies_list);
 
-static DWORD do_redirect(IHttpContext* pHttpContext, am_status_t status, 
+static am_status_t do_redirect(IHttpContext* pHttpContext, am_status_t status, 
         am_policy_result_t *policy_result, const char *original_url, 
         const char *method, void** args, void* agent_config);
 

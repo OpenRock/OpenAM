@@ -92,14 +92,12 @@ VOID WINAPI ExecUrlCompletion (
 // Returns TRUE for success, FALSE for an error.
 // pszPropertiesFileFullPath is malloc'd
 // in this iisaPropertiesFilePathGet(). MUST free it later...
-BOOL iisaPropertiesFilePathGet(CHAR** propertiesFileFullPath, char *instanceId);
+BOOL iisaPropertiesFilePathGet(CHAR** propertiesFileFullPath, 
+                               char *instanceId, BOOL isBootStrapFile);
 
 void logPrimitive(CHAR *message);
 
 char* string_case_insensitive_search(char *HTTPHeaders, char *KeY);
-
-am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB, char* header_name, 
-        char* header_value);
 
 tAgentConfig agentConfig;
 

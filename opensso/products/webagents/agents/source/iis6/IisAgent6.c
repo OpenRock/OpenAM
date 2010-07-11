@@ -83,6 +83,11 @@ CHAR httpBadRequest[]           = "400 Bad Request";
 CHAR httpForbidden[]            = "403 Forbidden";
 CHAR httpServerError[]          = "500 Internal Server Error";
 
+DWORD http200                   = 200;
+DWORD http302                   = 302;
+DWORD http500                   = 500;
+DWORD http404                   = 404;
+
 const CHAR httpProtocol[]       = "http";
 const CHAR httpVersion1_1[]     = "HTTP/1.1";
 const CHAR httpsProtocol[]      = "https";
@@ -120,13 +125,11 @@ CRITICAL_SECTION initLock;
 typedef struct OphResources {
     CHAR* cookies;      // cookies in the request
     DWORD cbCookies;
-    CHAR *url;          // Requested URL
-    size_t cbUrl;
     am_policy_result_t result;
 } tOphResources;
 
 #define RESOURCE_INITIALIZER \
-    { NULL, 0, NULL, 0, AM_POLICY_RESULT_INITIALIZER }
+    { NULL, 0, AM_POLICY_RESULT_INITIALIZER }
 
 
 BOOL WINAPI GetExtensionVersion(HSE_VERSION_INFO * pVer)
@@ -262,7 +265,7 @@ static am_status_t register_post_data(EXTENSION_CONTROL_BLOCK *pECB,
     post_data.value = response;
     post_data.url = url;
     am_web_log_debug("%s: Register POST data key :%s", thisfunc, key);
-    if (am_web_postcache_insert(key,&post_data,agent_config) == B_FALSE){
+    if (am_web_postcache_insert(key, &post_data, agent_config) == B_FALSE) {
         am_web_log_error("Register POST data insert into"
                          " hash table failed:%s",key);
         status = AM_FAILURE;
@@ -282,21 +285,46 @@ static am_status_t check_for_post_data(EXTENSION_CONTROL_BLOCK *pECB,
     const char *actionurl = NULL;
     const char *postdata_cache = NULL;
     am_status_t status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
     CHAR* buffer_page = NULL;
+    char *stickySessionValue = NULL;
+    char *stickySessionPos = NULL;
+    char *temp_uri = NULL;
     *page = NULL;
 
+    if(requestURL == NULL) {
+        status = AM_INVALID_ARGUMENT;
+    }
     // Check if magic URI is present in the URL
-    if(requestURL != NULL) {
+    if(status == AM_SUCCESS) {
         post_data_query = strstr(requestURL, POST_PRESERVE_URI);
         if (post_data_query != NULL) {
             post_data_query += strlen(POST_PRESERVE_URI);
-       }
+            // Check if a query parameter for the  sticky session has been
+            // added to the dummy URL. Remove it if it is the case.
+            status_tmp = am_web_get_postdata_preserve_URL_parameter
+                       (&stickySessionValue, agent_config);
+            if (status_tmp == AM_SUCCESS) {
+                stickySessionPos = strstr(post_data_query, stickySessionValue);
+                if (stickySessionPos != NULL) {
+                    size_t len = strlen(post_data_query) - 
+                                 strlen(stickySessionPos)-1;
+                    temp_uri = malloc(len+1);
+                    memset(temp_uri,0,len+1);
+                    strncpy(temp_uri, post_data_query, len);
+                    post_data_query = temp_uri;
+                }
+            }
+        }
     }
     // If magic uri present search for corresponding value in hashtable
-    if(post_data_query != NULL && strlen(post_data_query) > 0) {
+    if((status == AM_SUCCESS) && (post_data_query != NULL) &&
+       (strlen(post_data_query) > 0))
+    {
         am_web_log_debug("%s: POST Magic Query Value: %s", 
                          thisfunc, post_data_query);
-        if(am_web_postcache_lookup(post_data_query, &get_data, agent_config) == B_TRUE) {
+        if(am_web_postcache_lookup(post_data_query, &get_data,
+                                   agent_config) == B_TRUE) {
             postdata_cache = get_data.value;
             actionurl = get_data.url;
             am_web_log_debug("%s: POST hashtable actionurl: %s", 
@@ -318,6 +346,14 @@ static am_status_t check_for_post_data(EXTENSION_CONTROL_BLOCK *pECB,
                            " hash table",thisfunc, post_data_query);
             status = AM_FAILURE;
        }
+    }
+    if (temp_uri != NULL) {
+        free(temp_uri);
+        temp_uri = NULL;
+    }
+    if (stickySessionValue != NULL) {
+        am_web_free_memory(stickySessionValue);
+        stickySessionValue = NULL;
     }
     return status;
 }
@@ -350,6 +386,7 @@ DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB)
     const char *thisfunc = "send_error()";
     const char *data = INTERNAL_SERVER_ERROR_MSG;
     size_t data_len = sizeof(INTERNAL_SERVER_ERROR_MSG) - 1;
+    pECB->dwHttpStatusCode = http200;
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
                      (LPDWORD)&data_len, (DWORD) 0))==FALSE)
     {
@@ -408,10 +445,11 @@ DWORD send_post_data(EXTENSION_CONTROL_BLOCK *pECB, char *page,
         am_web_log_debug("%s: Post form:\n%s", thisfunc, page);
         sendHdr.pszStatus = httpOk;
         sendHdr.pszHeader = headers;
-        sendHdr.cchStatus = strlen(httpOk);
-        sendHdr.cchHeader = strlen(headers);
+        sendHdr.cchStatus = (DWORD) strlen(httpOk);
+        sendHdr.cchHeader = (DWORD) strlen(headers);
         sendHdr.fKeepConn = TRUE;
         //Send the headers
+        pECB->dwHttpStatusCode = http200;
         pECB->ServerSupportFunction(pECB->ConnID,
                            HSE_REQ_SEND_RESPONSE_HEADER_EX,
                            &sendHdr,
@@ -429,6 +467,95 @@ DWORD send_post_data(EXTENSION_CONTROL_BLOCK *pECB, char *page,
         headers = NULL;
     }
     return returnValue;
+}
+
+/*
+ * This function retrieves the value of a HTTP header.
+ * header_name is the name of the http header.
+ * The value is assigned in header_value.
+ * This value must be freed by the caller.
+ */
+am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB,
+                             const char *original_header_name,
+                             char **header_value,
+                             BOOL isRequired,
+                             BOOL addHTTPPrefix)
+{
+    const char *thisfunc = "get_header_value()";
+    am_status_t status = AM_SUCCESS;
+    DWORD header_size = 0;
+    BOOL got_header = FALSE;
+    char *header_name = NULL;
+
+    if (original_header_name == NULL) {
+        am_web_log_debug("%s: Header name is null.", thisfunc);
+        status = AM_INVALID_ARGUMENT;
+    }
+    // Add HTTP in front of the header name if requested
+    if (addHTTPPrefix == TRUE) {
+        header_name = malloc(strlen("HTTP_") + 
+                             strlen(original_header_name) + 1);
+        if (header_name != NULL) {
+            strcpy(header_name,"HTTP_");
+            strcat(header_name,original_header_name);
+            strcat(header_name,"\0");
+        } else {
+            am_web_log_error("%s: Not enough memory to allocate header_name",
+                             thisfunc);
+            status = AM_NO_MEMORY;
+        }
+    } else {
+        header_name = (char*) original_header_name;
+    }
+    // Get the header value
+    if (status == AM_SUCCESS) {
+        if (pECB->GetServerVariable(pECB->ConnID, header_name,
+                                    NULL, &header_size) == FALSE)
+        {
+            *header_value = malloc(header_size);
+            if (*header_value != NULL) {
+                got_header = pECB->GetServerVariable(pECB->ConnID, header_name,
+                                                     *header_value, &header_size);
+                if (got_header == TRUE) {
+                    // header_size includes the null-terminating byte
+                    // so the size needs to be > 1 to not be empty
+                    if ((*header_value != NULL) && (header_size > 1)) {
+                        am_web_log_debug("%s: %s = %s",
+                                         thisfunc, header_name, *header_value);
+                    } else {
+                        *header_value = NULL;
+                        if (isRequired == TRUE) {
+                            am_web_log_error("%s: Could not get a value for "
+                                             "header %s.", 
+                                             thisfunc, header_name);
+                            status = AM_FAILURE;
+                        } else {
+                            am_web_log_debug("%s: %s = ", thisfunc,
+                                             header_name);
+                        }
+                    }
+                } else {
+                    *header_value = NULL;
+                    if (isRequired == TRUE) {
+                        am_web_log_error("%s: Header %s not found.", thisfunc,
+                                         header_name);
+                        status = AM_FAILURE;
+                    } else {
+                        am_web_log_debug("%s: %s: not found.", thisfunc,
+                                         header_name);
+                    }
+                }
+            } else {
+                am_web_log_error("%s: Header value alloc failed ", thisfunc);
+                status = AM_NO_MEMORY;
+            }
+        }
+    }
+    if((addHTTPPrefix == TRUE) && (header_name != NULL)) {
+        free(header_name);
+        header_name = NULL;
+    }
+    return status;
 }
 
 // Set attributes as HTTP headers
@@ -702,18 +829,18 @@ DWORD process_original_url(EXTENSION_CONTROL_BLOCK *pECB,
                CHAR* requestURL,
                CHAR* orig_req_method,
                CHAR* request_hdrs,
-			   tOphResources* pOphResources,
+               tOphResources* pOphResources,
                void* agent_config)
 {
-    CHAR* authtype = NULL;
-
+    const char *thisfunc = "process_original_url()";
+    const char *authtype = NULL;
     HSE_EXEC_URL_INFO  *execUrlInfo  = NULL;
     execUrlInfo = (HSE_EXEC_URL_INFO *) malloc(sizeof(HSE_EXEC_URL_INFO));
 
     if (execUrlInfo == NULL) {
-        am_web_log_error("process_original_url(): Error %d occurred during "
+        am_web_log_error("%s: Error %d occurred during "
                          "creating HSE_EXEC_URL_INFO context. \r\n",
-                         GetLastError());
+                         thisfunc, GetLastError());
         return HSE_STATUS_ERROR;
     } else {
         memset(execUrlInfo, 0, sizeof(execUrlInfo));
@@ -722,17 +849,18 @@ DWORD process_original_url(EXTENSION_CONTROL_BLOCK *pECB,
             //CDSSO mode(restore orig method)
             execUrlInfo->pszMethod = orig_req_method;
             //Remove the entity-body sent by the CDC servlet
-            execUrlInfo->pEntity = "\0";
-            am_web_log_debug("process_original_url(): CDSSO Mode - "
-                             "method set back to original method (%s), "
-                             "CDC servlet content deleted",orig_req_method);
+            execUrlInfo->pEntity->cbAvailable = 0;
+            execUrlInfo->pEntity->lpbData = NULL;
+            am_web_log_debug("%s: CDSSO Mode - method set back to "
+                             "original method (%s), "
+                             "CDC servlet content deleted",
+                             thisfunc, orig_req_method);
         } else {
             execUrlInfo->pszMethod = NULL;       // Use original request method
             execUrlInfo->pEntity = NULL;         // Use original request entity
         }
         if (request_hdrs != NULL) {
-           am_web_log_debug("process_original_url(): request_hdrs = %s",
-                                                     request_hdrs);
+           am_web_log_debug("%s: request_hdrs = %s", thisfunc, request_hdrs);
            execUrlInfo->pszChildHeaders = request_hdrs; // Original and custom
                                                    // headers
         } else {
@@ -749,21 +877,18 @@ DWORD process_original_url(EXTENSION_CONTROL_BLOCK *pECB,
                                  (LPSTR)pOphResources->result.remote_user;
                authtype = am_web_get_authType(agent_config);
                if (authtype != NULL)
-                   execUrlInfo->pUserInfo->pszCustomAuthType = authtype;
+                   execUrlInfo->pUserInfo->pszCustomAuthType = (LPSTR) authtype;
                else
                    execUrlInfo->pUserInfo->pszCustomAuthType = "dsame";
-               am_web_log_debug("process_original_url(): Auth-Type set to %s",
+               am_web_log_debug("%s: Auth-Type set to %s", thisfunc,
                         execUrlInfo->pUserInfo->pszCustomAuthType);
            }
         }
     }
-
     //
     // Need to set the below flag to avoid recursion
     //
-
     execUrlInfo->dwExecUrlFlags = HSE_EXEC_URL_IGNORE_CURRENT_INTERCEPTOR;
-
     //
     // Associate the completion routine and the current URL with
     // this request.
@@ -775,9 +900,8 @@ DWORD process_original_url(EXTENSION_CONTROL_BLOCK *pECB,
                                       0,
                                       (LPDWORD)execUrlInfo) == FALSE )
     {
-        am_web_log_error("process_original_url(): Error %d occurred setting "
-             "I/O completion.\r\n", GetLastError());
-
+        am_web_log_error("%s: Error %d occurred setting "
+             "I/O completion.\r\n", thisfunc, GetLastError());
         if (execUrlInfo->pUserInfo != NULL) {
             free(execUrlInfo->pUserInfo);
             execUrlInfo->pUserInfo = NULL;
@@ -795,8 +919,8 @@ DWORD process_original_url(EXTENSION_CONTROL_BLOCK *pECB,
                                       NULL,
                                       NULL ) == FALSE )
     {
-        am_web_log_error("process_original_url(): Error %d occurred calling "
-                     "HSE_REQ_EXEC_URL.\r\n", GetLastError() );
+        am_web_log_error("%s: Error %d occurred calling "
+                     "HSE_REQ_EXEC_URL.\r\n", thisfunc, GetLastError() );
 
         if (execUrlInfo->pUserInfo != NULL) {
             free(execUrlInfo->pUserInfo);
@@ -816,7 +940,7 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
              am_policy_result_t *policy_result,
              const char *original_url,
              const char *method,
-			 void** args,
+             void** args,
              void* agent_config)
 {
     const char *thisfunc = "do_redirect()";
@@ -871,9 +995,10 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                             sprintf(advice_headers, advice_headers_template, data_length);
                             sendHdr.pszStatus = httpOk;
                             sendHdr.pszHeader = advice_headers;
-                            sendHdr.cchStatus = strlen(httpOk);
-                            sendHdr.cchHeader = strlen(advice_headers);
+                            sendHdr.cchStatus = (DWORD) strlen(httpOk);
+                            sendHdr.cchHeader = (DWORD) strlen(advice_headers);
                             sendHdr.fKeepConn = FALSE;
+                            pECB->dwHttpStatusCode = http200;
                             pECB->ServerSupportFunction(pECB->ConnID,
                                 HSE_REQ_SEND_RESPONSE_HEADER_EX,
                                 &sendHdr,
@@ -947,10 +1072,10 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                 if (redirect_status == httpRedirect) {
                     sendHdr.pszStatus = httpRedirect;
                     sendHdr.pszHeader = redirect_header;
-                    sendHdr.cchStatus = strlen(httpRedirect);
-                    sendHdr.cchHeader = strlen(redirect_header);
+                    sendHdr.cchStatus = (DWORD) strlen(httpRedirect);
+                    sendHdr.cchHeader = (DWORD) strlen(redirect_header);
                     sendHdr.fKeepConn = FALSE;
-
+                    pECB->dwHttpStatusCode = http302;
                     pECB->ServerSupportFunction(pECB->ConnID,
                                         HSE_REQ_SEND_RESPONSE_HEADER_EX,
                                         &sendHdr,
@@ -962,6 +1087,7 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                     if (redirect_status == httpServerError) {
                         data = INTERNAL_SERVER_ERROR_MSG;
                         data_len = sizeof(INTERNAL_SERVER_ERROR_MSG) - 1;
+                        pECB->dwHttpStatusCode = http500;
                     }
                     if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
                                 (LPDWORD)&data_len, (DWORD) 0))==FALSE) {
@@ -990,255 +1116,84 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
 
 am_status_t get_request_url(EXTENSION_CONTROL_BLOCK *pECB,
                       CHAR** requestURL, CHAR** pathInfo,
-                      tOphResources* pOphResources,
+                      CHAR** origRequestURL,
                       void* agent_config)
 {
     const char *thisfunc = "get_request_url()";
-
     CHAR *requestHostHeader = NULL;
-    DWORD requestHostHeaderSize	= 0;
-    BOOL gotRequestHost = FALSE;
-
     const CHAR* requestProtocol = NULL;
-    CHAR  *requestProtocolType  = NULL;
-    DWORD requestProtocolTypeSize = 0;
-    BOOL  gotRequestProtocol = FALSE;
-
-    CHAR  defaultPort[TCP_PORT_ASCII_SIZE_MAX + 1] = "";
-    CHAR  requestPort[TCP_PORT_ASCII_SIZE_MAX + 1] = "";
-    DWORD requestPortSize = sizeof requestPort;
-    BOOL  gotRequestPort = FALSE;
-    size_t portNumber = 0;
-
-    CHAR* queryString = NULL;
-    DWORD queryStringSize = 0;
-    BOOL  gotQueryString = FALSE;
-
-    CHAR* baseUrl = NULL;
-    CHAR* colon_ptr = NULL;
-    DWORD baseUrlLength = 0;
-    BOOL  gotUrl = FALSE;
-    CHAR* fullBaseUrl = NULL;
+    CHAR *requestProtocolType  = NULL;
+    CHAR defaultPort[TCP_PORT_ASCII_SIZE_MAX + 1] = "";
+    CHAR *requestPort = NULL;
+    size_t portNumber = 0; 
+    CHAR *queryString = NULL;
+    CHAR *baseUrl = NULL;
+    CHAR *fullBaseUrl = NULL;
     size_t fullBaseUrlLength = 0;
-    
-    CHAR* path_info = NULL;
-    DWORD pathInfoSize = 0;
-    BOOL gotPathInfo = FALSE;
-    CHAR* newPathInfo = NULL;
-    CHAR* tmpPath = NULL; 
-
-    BOOL gotScriptName = FALSE;
+    DWORD baseUrlLength = 0;
+    CHAR *path_info = NULL;
+    CHAR *newPathInfo = NULL;
+    CHAR *tmpPath = NULL;
     CHAR *scriptName = NULL;
-    DWORD scriptNameSize = 0;
-    
     am_status_t status = AM_SUCCESS;
 
     // Check whether the request is http or https
-    if ( pECB->GetServerVariable( pECB->ConnID, "HTTPS", NULL,
-                                  &requestProtocolTypeSize ) == FALSE ) {
-        if (requestProtocolTypeSize > 0) {
-            requestProtocolType = malloc(requestProtocolTypeSize);
-            if (requestProtocolType != NULL) {
-                gotRequestProtocol = pECB->GetServerVariable(pECB->ConnID,
-                                                 "HTTPS",
-                                                 requestProtocolType,
-                                                 &requestProtocolTypeSize);
-                if ((gotRequestProtocol == FALSE) ||
-                       (requestProtocolTypeSize <= 0)) {
-                    am_web_log_error("%s: Unable to get protocol"
-                                " type, gotRequestProtocol = %d, "
-                                "requestProtocolType = %s, "
-                                "requestProtocolTypeSize = %d",
-                                thisfunc, gotRequestProtocol, 
-                                requestProtocolType,
-                                requestProtocolTypeSize);
-                    status = AM_FAILURE;
-                }
-            } else {
-                am_web_log_error("%s: Not enough memory 0x%x"
-                    "bytes.", thisfunc, requestProtocolTypeSize);
-                status = AM_NO_MEMORY;
-            }
-        }
-    }
-
+    status = get_header_value(pECB, "HTTPS", &requestProtocolType,
+                              TRUE, FALSE);
     if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: requestProtocolType = %s",
-                        thisfunc, requestProtocolType);
         if(strncmp(requestProtocolType,"on", 2) == 0) {
             requestProtocol = httpsProtocol;
             strcpy(defaultPort, httpsPortDefault);
         } else if(strncmp(requestProtocolType,"off", 3) == 0) {
             requestProtocol = httpProtocol;
             strcpy(defaultPort, httpPortDefault);
-        }
-
-        // Get the host name
-        if ( pECB->GetServerVariable( pECB->ConnID, "HEADER_Host", NULL,
-                                      &requestHostHeaderSize ) == FALSE ) {
-            requestHostHeader = malloc(requestHostHeaderSize);
-            if (requestHostHeader != NULL) {
-                gotRequestHost = pECB->GetServerVariable(pECB->ConnID,
-                                                      "HEADER_Host",
-                                                      requestHostHeader,
-                                                      &requestHostHeaderSize);
-                if ((gotRequestHost == FALSE) || (requestHostHeaderSize <= 0)) {
-                    am_web_log_error("%s: Unable to get Host name "
-                                 "of request. errorHost = %d, "
-                                 "RequestHostHeaderSize = %d",
-                                 thisfunc, gotRequestHost, 
-                                 requestHostHeaderSize);
-                    status = AM_FAILURE;
-                }
-            } else {
-                am_web_log_error("%s: Not enough memory 0x%x bytes.", 
-                              thisfunc, requestHostHeaderSize);
-                status = AM_NO_MEMORY;
-            }
+        } else {
+            am_web_log_error("%s: Unable to get the protocol type.", thisfunc);
+            status = AM_FAILURE;
         }
     }
-
-    if ((status == AM_SUCCESS) && (requestHostHeader != NULL)) {
-        am_web_log_debug("%s: HEADER_Host = %s",
-                         thisfunc, requestHostHeader);
-        colon_ptr = strchr(requestHostHeader, ':');
+    if (status == AM_SUCCESS) {
+        am_web_log_debug("%s: requestProtocolType = %s",
+                        thisfunc, requestProtocolType);
+        // Get the host name
+        status = get_header_value(pECB, "HEADER_Host",
+                                  &requestHostHeader, TRUE, FALSE);
+    }
+    // Get the port number
+    if (status == AM_SUCCESS) {
+        CHAR *colon_ptr = strchr(requestHostHeader, ':');
+        // Check if the port number is included in the host name
         if (colon_ptr != NULL) {
-            strncpy(requestPort, colon_ptr + 1, strlen(colon_ptr)-1);
+            requestPort = malloc(TCP_PORT_ASCII_SIZE_MAX + 1);
+            if (requestPort != NULL) {
+                strncpy(requestPort, colon_ptr + 1, strlen(colon_ptr)-1);
+            } else {
+                am_web_log_error("%s: Not enough memory to allocate "
+                                 "requestPort.", thisfunc);
+                status = AM_NO_MEMORY;
+            }
         } else {
             // Get the port number from Server variable
-            gotRequestPort = pECB->GetServerVariable(pECB->ConnID,
-                                                    "SERVER_PORT",
-                                                    requestPort,
-                                                    &requestPortSize);
-            if ((gotRequestPort == FALSE) || (requestPortSize <= 0)) {
-                am_web_log_error("%s: Unable to get TCP port "
-                                "GetServerVariable(SERVER_PORT) = %d, "
-                                "requestPortSize = %d", thisfunc,
-                                gotRequestPort, requestPortSize);
-                status = AM_FAILURE;
-            }
+            status = get_header_value(pECB, "SERVER_PORT", 
+                                      &requestPort, TRUE, FALSE);
         }
     }
-
+    //Get the base url
     if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: SERVER_PORT = %s", thisfunc, requestPort);
-
-        pOphResources->cbUrl = strlen(requestProtocol)          +
-                               strlen(httpProtocolDelimiter)    +
-                               strlen(requestHostHeader)        +
-                               strlen(httpPortDelimiter)        +
-                               strlen(requestPort)              +
-                               URL_SIZE_MAX;
-        pOphResources->url = malloc(pOphResources->cbUrl);
-        if (pOphResources->url == NULL) {
-            am_web_log_error("%s: Not enough memory"
-                     "pOphResources->cbUrl", thisfunc);
-            status = AM_NO_MEMORY;
-        }
+        status = get_header_value(pECB, "URL", &baseUrl, TRUE, FALSE);
+        baseUrlLength = (DWORD) strlen(baseUrl);
     }
-
+    // Get the path info .
     if (status == AM_SUCCESS) {
-        strcpy(pOphResources->url, requestProtocol);
-        strcat(pOphResources->url, httpProtocolDelimiter);
-        strcat(pOphResources->url, requestHostHeader);
-
-        // Add the port number if it's not the default HTTP(S) port and
-        // there's no port delimiter in the Host: header indicating
-        // that the port is not present in the Host: header.
-        if (strstr(requestHostHeader, httpPortDelimiter) == NULL) {
-            if (strcmp(requestPort, defaultPort) != 0) {
-                strcat(pOphResources->url, httpPortDelimiter);
-                strcat(pOphResources->url, requestPort);
-            // following 2 "else if" were added based on
-            // instruction that port number has to be added for IIS
-            } else if (strcmp(requestProtocol, httpProtocol) == 0) {
-                strcat(pOphResources->url, httpPortDelimiter);
-                strcat(pOphResources->url, httpPortDefault);
-            } else if (strcmp(requestProtocol, httpsProtocol) == 0) {
-                strcat(pOphResources->url, httpPortDelimiter);
-                strcat(pOphResources->url, httpsPortDefault);
-            }
-        }
-
-        //Get the base url
-        if ( pECB->GetServerVariable( pECB->ConnID, "URL", NULL,
-                                      &baseUrlLength ) == FALSE ) {
-            if (baseUrlLength > 0) {
-                baseUrl = malloc(baseUrlLength);
-                if ( baseUrl != NULL ) {
-                    gotUrl = pECB->GetServerVariable(pECB->ConnID, "URL",
-                                          baseUrl, &baseUrlLength );
-                    if ((gotUrl == FALSE) || (baseUrlLength <= 0)) {
-                        am_web_log_error("%s: Unable to get base URL, "
-                                         "gotUrl = %d, baseUrlLength = %d",
-                                         thisfunc, gotUrl, baseUrlLength);
-                        status = AM_FAILURE;
-                    }
-                } else {
-                    am_web_log_error("%s: Not enough memory 0x%x"
-                             "bytes.", thisfunc, baseUrlLength);
-                    status = AM_NO_MEMORY;
-                }
-            }
-        }
+        status = get_header_value(pECB, "PATH_INFO", &path_info, FALSE, FALSE);
     }
-
+    // Get the script name
     if (status == AM_SUCCESS) {
-         am_web_log_debug("%s: URL = %s", thisfunc, baseUrl);
-        
-        // Get the path info .
-        if (pECB->GetServerVariable(pECB->ConnID, "PATH_INFO", NULL,
-                                     &pathInfoSize) == FALSE ) {
-            path_info = malloc(pathInfoSize);
-            if (path_info != NULL) {
-                gotPathInfo = pECB->GetServerVariable(pECB->ConnID,
-                                            "PATH_INFO",
-                                            path_info,
-                                            &pathInfoSize);
-                if ((gotPathInfo == FALSE) || (pathInfoSize <= 0)) {
-                    am_web_log_error("%s: Unable to get PATH_INFO,  "
-                              "gotPathInfo= %d, pathInfoSize = %d",
-                              thisfunc, gotPathInfo, pathInfoSize);
-                    status = AM_FAILURE;
-                }
-            } else {
-                am_web_log_error("%s: Unable to allocate memory for "
-                                 "path_info.", thisfunc);
-                status = AM_NO_MEMORY;
-            }
-        }
+        status = get_header_value(pECB, "SCRIPT_NAME", &scriptName,
+                                  FALSE, FALSE);
     }
-
+    //Remove the script name from path_info to get the real path info
     if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: PATH_INFO = %s", thisfunc, path_info);
-
-        // Get the script name
-        if (pECB->GetServerVariable(pECB->ConnID, "SCRIPT_NAME", NULL,
-                                     &scriptNameSize) == FALSE ) {
-            scriptName = malloc(scriptNameSize);
-            if (scriptName != NULL) {
-                gotScriptName = pECB->GetServerVariable(pECB->ConnID,
-                                                       "SCRIPT_NAME",
-                                                       scriptName,
-                                                       &scriptNameSize);
-                if ((gotScriptName == FALSE) || (scriptNameSize <= 0)) {
-                    am_web_log_error("%s: Unable to get SCRIPT_NAME, "
-                                    "gotScriptName= %d, scriptNameSize = %d",
-                                    thisfunc, gotScriptName, scriptNameSize);
-                    status = AM_FAILURE;
-                }
-            } else {
-                am_web_log_error("%s: Unable to allocate memory for "
-                                 "scriptName.", thisfunc);
-                status = AM_NO_MEMORY;
-            }
-        }
-    }
-
-    if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: SCRIPT_NAME = %s",thisfunc, scriptName);
-        
-        //Remove the script name from path_info to get the real path info
         if (path_info != NULL && scriptName != NULL) {
             tmpPath = path_info + strlen(scriptName);
             newPathInfo = strdup(tmpPath);
@@ -1253,39 +1208,14 @@ am_status_t get_request_url(EXTENSION_CONTROL_BLOCK *pECB,
             }
         }
     }
-    
+    // Get the query string
     if (status == AM_SUCCESS) {
-        strcat(pOphResources->url, baseUrl);
-        // Add the path info to the base url
-        if ((newPathInfo != NULL) && (strlen(newPathInfo) > 0)) {
-            strcat(pOphResources->url, newPathInfo);
-        }
-
-        // Get the query string
-        if ( pECB->GetServerVariable( pECB->ConnID, "QUERY_STRING", NULL,
-                                      &queryStringSize ) == FALSE ) {
-            queryString = malloc(queryStringSize+1);
-            if (queryString != NULL) {
-                gotQueryString = pECB->GetServerVariable(pECB->ConnID,
-                                                       "QUERY_STRING",
-                                                       queryString,
-                                                       &queryStringSize);
-                if (queryString != NULL && strlen(queryString) > 0) {
-                    am_web_log_debug("%s: QUERY_STRING = %s",
-                                     thisfunc, queryString);
-                    queryString[queryStringSize] = '\0';
-                    // Add the query string to the url
-                    strcat(pOphResources->url, "?");
-                    strcat(pOphResources->url, queryString);
-                }
-            } else {
-                am_web_log_error("%s: Not enough memory 0x%x"
-                        "bytes.", thisfunc, queryStringSize);
-                status = AM_NO_MEMORY;
-            }
-        }
+        status = get_header_value(pECB, "QUERY_STRING", &queryString,
+                                  FALSE, FALSE);
+    }
+    // Check if we have to add path info to the base url
+    if (status == AM_SUCCESS) {
         portNumber = atoi(requestPort);
-        // Check if we have to add path info to the base url
         if ((newPathInfo != NULL) && (strlen(newPathInfo) > 0)) {
             fullBaseUrlLength = baseUrlLength + strlen(newPathInfo);
             fullBaseUrl = (char *) malloc(fullBaseUrlLength + 1);
@@ -1293,27 +1223,29 @@ am_status_t get_request_url(EXTENSION_CONTROL_BLOCK *pECB,
                memset(fullBaseUrl, 0, sizeof(char) * (fullBaseUrlLength + 1));
                strcpy(fullBaseUrl, baseUrl);
                strcat(fullBaseUrl, newPathInfo); 
-               status = am_web_get_request_url(requestHostHeader, requestProtocol,
-                       NULL, portNumber, fullBaseUrl, queryString, requestURL,
-                       agent_config);
+               status = am_web_get_all_request_urls(requestHostHeader,
+                               requestProtocol,NULL, portNumber,
+                               fullBaseUrl, queryString, agent_config,
+                               requestURL, origRequestURL);
             } else {
                am_web_log_error("%s: Unable to allocate memory for "
                                 "fullBaseUrl.", thisfunc);
                status = AM_NO_MEMORY;
             }
         } else {
-            status = am_web_get_request_url(requestHostHeader, requestProtocol,
-                       NULL, portNumber, baseUrl, queryString, requestURL,
-                       agent_config);
+            status = am_web_get_all_request_urls(requestHostHeader,
+                                requestProtocol, NULL, portNumber, baseUrl,
+                                queryString, agent_config,
+                                requestURL, origRequestURL);
         }
         if(status == AM_SUCCESS) {
-            am_web_log_debug("%s: Constructed request url: %s", thisfunc, *requestURL);
+            am_web_log_debug("%s: Constructed request url: %s",
+                             thisfunc, *requestURL);
         } else {
             am_web_log_error("%s: Failed with error: %s.",
                         thisfunc, am_status_to_string(status)); 
         }
     }
-
     if (requestProtocolType != NULL) {
         free(requestProtocolType);
         requestProtocolType = NULL;
@@ -1321,6 +1253,10 @@ am_status_t get_request_url(EXTENSION_CONTROL_BLOCK *pECB,
     if (requestHostHeader != NULL) {
         free(requestHostHeader);
         requestHostHeader = NULL;
+    }
+    if (requestPort != NULL) {
+        free(requestPort);
+        requestPort = NULL;
     }
     if (baseUrl != NULL) {
         free(baseUrl);
@@ -1418,136 +1354,111 @@ am_status_t set_request_headers(EXTENSION_CONTROL_BLOCK *pECB,
         CHAR* request_hdrs = *ptr;
 
         if (addOriginalHeaders == TRUE) {
-        //Get the original headers from the request
-        if (pECB->GetServerVariable(pECB->ConnID, "ALL_RAW", NULL,
-                                      &httpHeadersSize) == FALSE ) {
-            httpHeaders = malloc(httpHeadersSize);
-            if (httpHeaders != NULL) {
-                gotHttpHeaders = pECB->GetServerVariable(pECB->ConnID,
-                                                          "ALL_RAW",
-                                                          httpHeaders,
-                                                          &httpHeadersSize);
-                if (httpHeaders == NULL) {
-                    am_web_log_error("%s: Unable to get http headers",thisfunc);
-                    status = AM_FAILURE;
-                } else {
-                    am_web_log_debug("%s: Original headers:\n%s",
-                                 thisfunc, httpHeaders);
-                }
-            } else {
-                am_web_log_error("%s: Not enough memory "
-                              "to allocate httpHeaders.", thisfunc);
-                status = AM_NO_MEMORY;
-            }
-        } else {
-             am_web_log_error("%s: Unable to get http "
-                            "headers size", thisfunc);
-             status = AM_FAILURE;
-        }
-        
+            //Get the original headers from the request
+            status = get_header_value(pECB, "ALL_RAW", &httpHeaders,
+                                      TRUE, FALSE);
         //Remove profile attributes from original request headers, if any,
         //to avoid tampering
-        if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
-            pkeyStart = set_headers_list;
-            iKeyStart=0;
-            for (i = 0; i < strlen(set_headers_list); ++i) {
-                if (set_headers_list[i] == ':') {
-                    keyLength = i + 1 - iKeyStart;
-                    key = malloc(keyLength + 1);
-                    if (key != NULL) {
-                        memset(key,0,keyLength + 1);
-                        strncpy (key,pkeyStart,keyLength);
-                        if (strlen(key) > 0) {
-                            status = remove_key_in_headers(key, &httpHeaders);
+            if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
+                pkeyStart = set_headers_list;
+                iKeyStart=0;
+                for (i = 0; i < strlen(set_headers_list); ++i) {
+                    if (set_headers_list[i] == ':') {
+                        keyLength = i + 1 - iKeyStart;
+                        key = malloc(keyLength + 1);
+                        if (key != NULL) {
+                            memset(key,0,keyLength + 1);
+                            strncpy (key,pkeyStart,keyLength);
+                            if (strlen(key) > 0) {
+                                status = remove_key_in_headers(key, &httpHeaders);
+                            }
+                            if((strchr(key, '-'))&&(strlen(key) > 0)) {
+                                while(temp = strchr(key, '-')) {
+                                    if(temp == NULL) {
+                                        break;
+                                    }
+                                    key[temp-key]='_';
+                                }
+                                status1 = remove_key_in_headers(key, &httpHeaders);
+                            }
+                            if((strchr(key, '_'))&&(strlen(key) > 0)) {
+                                while(temp = strchr(key, '_')) {
+                                    if(temp==NULL) {
+                                        break;
+                                    }
+                                    key[temp-key]='-';
+                                }
+                                status2 = remove_key_in_headers(key, &httpHeaders);
+                            }
+                            if(status == AM_NO_MEMORY || status1 == AM_NO_MEMORY ||
+                                status2 == AM_NO_MEMORY) {
+                                status = AM_NO_MEMORY;
+                            }
+                            free(key);
+                            key = NULL;
+                        } else {
+                            am_web_log_error("%s:Not enough memory "
+                                    "to allocate key variable", thisfunc);
+                            status = AM_NO_MEMORY;
+                            break;
                         }
-                        if((strchr(key, '-'))&&(strlen(key) > 0)) {
-                            while(temp = strchr(key, '-')) {
-                                if(temp == NULL) {
-                                    break;
-       			        }
-			        key[temp-key]='_';
-		            }
-			    status1 = remove_key_in_headers(key, &httpHeaders);
-                        }
-                        if((strchr(key, '_'))&&(strlen(key) > 0)) {
-			    while(temp = strchr(key, '_')) {
-  			        if(temp==NULL) {
-				    break;
-				}
-		                key[temp-key]='-';
-			    }
-			    status2 = remove_key_in_headers(key, &httpHeaders);
-		        }
-			if(status == AM_NO_MEMORY || status1 == AM_NO_MEMORY ||
-			    status2 == AM_NO_MEMORY) {
-			    status = AM_NO_MEMORY;
-			}
-
-                        free(key);
-                        key = NULL;
-                    } else {
-                        am_web_log_error("%s:Not enough memory "
-                                "to allocate key variable", thisfunc);
-                        status = AM_NO_MEMORY;
-                        break;
+                        pkeyStart = set_headers_list;
                     }
-                    pkeyStart = set_headers_list;
-                }
-                if ((set_headers_list[i] == '\r') &&
-                    (set_headers_list[i+1] == '\n')) {
-                    iKeyStart = i+2;
-                    pkeyStart = pkeyStart + i + 2;
+                    if ((set_headers_list[i] == '\r') &&
+                        (set_headers_list[i+1] == '\n')) {
+                        iKeyStart = i+2;
+                        pkeyStart = pkeyStart + i + 2;
+                    }
                 }
             }
-        }
-        //Remove empty values from set_headers_list 
-        if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
-            tmpAttributeList = malloc(strlen(set_headers_list)+1);
-            if (tmpAttributeList != NULL) {
-                memset(tmpAttributeList,0,strlen(set_headers_list)+1);
-                strcpy(tmpAttributeList,set_headers_list);
-                memset(set_headers_list,0,strlen(tmpAttributeList)+1);
-                iValueStart = 0;
-                iValueEnd = 0;
-                for (i = 0; i < strlen(tmpAttributeList); ++i) {
-                    if (tmpAttributeList[i] == ':') {
-                        iValueStart = i + 1;
-                    }
-                    if ((tmpAttributeList[i] == '\r') &&
-                         (tmpAttributeList[i+1] == '\n')) {
-                        iHdrStart = iValueEnd;
-                        iValueEnd = i;
-                        isEmptyValue = TRUE;
-                        if ((iValueStart > 0 ) && (iValueEnd > iValueStart)) {
-                            for (j=iValueStart ; j < iValueEnd ; j++) {
-                                if (tmpAttributeList[j] != ' ') {
-                                    isEmptyValue = FALSE;
-                                    break;
+            //Remove empty values from set_headers_list 
+            if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
+                tmpAttributeList = malloc(strlen(set_headers_list)+1);
+                if (tmpAttributeList != NULL) {
+                    memset(tmpAttributeList,0,strlen(set_headers_list)+1);
+                    strcpy(tmpAttributeList,set_headers_list);
+                    memset(set_headers_list,0,strlen(tmpAttributeList)+1);
+                    iValueStart = 0;
+                    iValueEnd = 0;
+                    for (i = 0; i < strlen(tmpAttributeList); ++i) {
+                        if (tmpAttributeList[i] == ':') {
+                            iValueStart = i + 1;
+                        }
+                        if ((tmpAttributeList[i] == '\r') &&
+                             (tmpAttributeList[i+1] == '\n')) {
+                            iHdrStart = iValueEnd;
+                            iValueEnd = i;
+                            isEmptyValue = TRUE;
+                            if ((iValueStart > 0 ) && (iValueEnd > iValueStart)) {
+                                for (j=iValueStart ; j < iValueEnd ; j++) {
+                                    if (tmpAttributeList[j] != ' ') {
+                                        isEmptyValue = FALSE;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (isEmptyValue == FALSE) {
-                            for (j=iHdrStart ; j<iValueEnd ; j++) {
-                                if ((tmpAttributeList[j] != '\r') &&
-                                        (tmpAttributeList[j] != '\n')) {
-                                    pTemp = tmpAttributeList + j;
-                                    strncat(set_headers_list, pTemp, 1);
+                            if (isEmptyValue == FALSE) {
+                                for (j=iHdrStart ; j<iValueEnd ; j++) {
+                                    if ((tmpAttributeList[j] != '\r') &&
+                                            (tmpAttributeList[j] != '\n')) {
+                                        pTemp = tmpAttributeList + j;
+                                        strncat(set_headers_list, pTemp, 1);
+                                    }
                                 }
+                                strcat(set_headers_list,pszCrlf);
                             }
-                            strcat(set_headers_list,pszCrlf);
                         }
                     }
+                } else {
+                       am_web_log_error("%s:Not enough memory to allocate "
+                                     "tmpAttributeList.", thisfunc);
+                       status = AM_NO_MEMORY;
                 }
-            } else {
-                   am_web_log_error("%s:Not enough memory to allocate "
-                                 "tmpAttributeList.", thisfunc);
-                   status = AM_NO_MEMORY;
+                if (tmpAttributeList != NULL) {
+                    free(tmpAttributeList);
+                    tmpAttributeList = NULL;
+                }
             }
-            if (tmpAttributeList != NULL) {
-                free(tmpAttributeList);
-                tmpAttributeList = NULL;
-            }
-        }
         }
 
         //Add custom headers and/or set_cookie header to original headers
@@ -1564,27 +1475,27 @@ am_status_t set_request_headers(EXTENSION_CONTROL_BLOCK *pECB,
                                strlen(set_cookies_list);
             }
             if (http_headers_length > 0) {
-            request_hdrs = (char *)malloc(http_headers_length + 1);
-            if (request_hdrs != NULL) {
-                memset(request_hdrs,0, http_headers_length + 1);
-                if (httpHeaders != NULL) {
-                    strcpy(request_hdrs, httpHeaders);
-                }
-                if (set_headers_list != NULL) {
-                    strcat(request_hdrs,set_headers_list);
-                }
-                if (set_cookies_list != NULL) {
-                    strcat(request_hdrs,set_cookies_list);
-                }
-                *ptr = request_hdrs;
+                request_hdrs = (char *)malloc(http_headers_length + 1);
+                if (request_hdrs != NULL) {
+                    memset(request_hdrs,0, http_headers_length + 1);
+                    if (httpHeaders != NULL) {
+                        strcpy(request_hdrs, httpHeaders);
+                    }
+                    if (set_headers_list != NULL) {
+                        strcat(request_hdrs,set_headers_list);
+                    }
+                    if (set_cookies_list != NULL) {
+                        strcat(request_hdrs,set_cookies_list);
+                    }
+                    *ptr = request_hdrs;
                     am_web_log_debug("%s: Final headers: %s",
                                      thisfunc, request_hdrs);
-            } else {
+                } else {
                     am_web_log_error("%s: Not enough memory to allocate "
                                    "request_hdrs", thisfunc);
-                status = AM_NO_MEMORY;
+                    status = AM_NO_MEMORY;
+                }
             }
-        }
         }
         if (httpHeaders != NULL) {
             free(httpHeaders);
@@ -1606,16 +1517,99 @@ void OphResourcesFree(tOphResources* pOphResources)
         pOphResources->cookies   = NULL;
         pOphResources->cbCookies    = 0;
     }
-
-    if (pOphResources->url != NULL) {
-        free(pOphResources->url);
-        pOphResources->url       = NULL;
-        pOphResources->cbUrl        = 0;
-    } 
-
     am_web_clear_attributes_map(&pOphResources->result);
     am_policy_result_destroy(&pOphResources->result);
     return;
+}
+
+DWORD process_request_with_post_data_preservation(EXTENSION_CONTROL_BLOCK *pECB,
+                                    am_status_t request_status,
+                                    am_policy_result_t *policy_result,
+                                    char *requestURL,
+                                    void **args,
+                                    char **resp,
+                                    void* agent_config)
+{
+    const char *thisfunc = "process_request_with_post_data_preservation()";
+    am_status_t status = AM_SUCCESS;
+    DWORD returnValue = HSE_STATUS_SUCCESS;
+    post_urls_t *post_urls = NULL;
+    char *response = NULL;
+
+    if (*resp != NULL) {
+        response = *resp;
+    }
+    status = am_web_create_post_preserve_urls(requestURL, &post_urls,
+                                              agent_config);
+    if (status != AM_SUCCESS) {
+        returnValue = send_error(pECB);
+    }
+    // In CDSSO mode, for a POST request, the post data have
+    // already been saved in the response variable, so we need
+    // to get them here only if response is NULL.
+    if (status == AM_SUCCESS) {
+        if (response == NULL) {
+            status = get_post_data(pECB, &response);
+            if (status != AM_SUCCESS) {
+                returnValue = send_error(pECB);
+            }
+        }
+    }
+    if (status == AM_SUCCESS) {
+        if (response != NULL && strlen(response) > 0) {
+            if (AM_SUCCESS == register_post_data(pECB,post_urls->action_url,
+                                       post_urls->post_time_key, response, 
+                                       agent_config)) 
+            {
+                char *lbCookieHeader = NULL;
+                // If using a LB in front of the agent and if the sticky 
+                // session mode is COOKIE, the lb cookie needs to be set there.
+                // If am_web_get_postdata_preserve_lbcookie()
+                // returns AM_INVALID_ARGUMENT, it means that the 
+                // sticky session feature is disabled (ie no LB) or
+                // that the sticky session mode is set to URL.
+                status = am_web_get_postdata_preserve_lbcookie(
+                          &lbCookieHeader, B_FALSE, agent_config);
+                if (status == AM_NO_MEMORY) {
+                    returnValue = send_error(pECB);
+                } else {
+                    if (status == AM_SUCCESS) {
+                        am_web_log_debug("%s: Setting LB cookie "
+                                         "for post data preservation.",
+                                         thisfunc);
+                        set_cookie(lbCookieHeader, args);
+                    }
+                    returnValue = do_redirect(pECB, request_status, 
+                                              policy_result,
+                                              post_urls->dummy_url, 
+                                              REQUEST_METHOD_POST, args,
+                                              agent_config);
+                }
+                if (lbCookieHeader != NULL) {
+                    am_web_free_memory(lbCookieHeader);
+                    lbCookieHeader = NULL;
+                }
+            } else {
+                am_web_log_error("%s: register_post_data() "
+                     "failed.", thisfunc);
+                returnValue = send_error(pECB);
+            }
+        } else {
+            am_web_log_debug("%s: This is a POST request with no post data. "
+                             "Redirecting as a GET request.", thisfunc);
+            returnValue = do_redirect(pECB, request_status,
+                                      policy_result,
+                                      requestURL, 
+                                      REQUEST_METHOD_GET, args,
+                                      agent_config);
+        }
+    } 
+    if (post_urls != NULL) {
+        am_web_clean_post_urls(post_urls);
+        post_urls = NULL;
+    }
+
+    return returnValue;
 }
 
 static DWORD redirect_to_request_url(EXTENSION_CONTROL_BLOCK *pECB,
@@ -1655,36 +1649,26 @@ static DWORD redirect_to_request_url(EXTENSION_CONTROL_BLOCK *pECB,
                         REDIRECT_COOKIE_TEMPLATE, redirect_url,
                         set_cookies_list);
             }
-
         }
     }
 
     // Send the request
     if (redirect_status == httpRedirect) {
         am_web_log_info("%s: redirect_header = %s", 
-	                             thisfunc, redirect_header);
+                             thisfunc, redirect_header);
         sendHdr.pszStatus = httpRedirect;
         sendHdr.pszHeader = redirect_header;
-        sendHdr.cchStatus = strlen(httpRedirect);
-        sendHdr.cchHeader = strlen(redirect_header);
+        sendHdr.cchStatus = (DWORD) strlen(httpRedirect);
+        sendHdr.cchHeader = (DWORD) strlen(redirect_header);
         sendHdr.fKeepConn = FALSE;
-	
+        pECB->dwHttpStatusCode = http302;
         pECB->ServerSupportFunction(pECB->ConnID,
                         HSE_REQ_SEND_RESPONSE_HEADER_EX,
                         &sendHdr,
                         NULL,
                         NULL);
     } else {
-        size_t data_len = sizeof(FORBIDDEN_MSG) - 1;
-        const char *data = FORBIDDEN_MSG;
-        data = INTERNAL_SERVER_ERROR_MSG;
-        data_len = sizeof(INTERNAL_SERVER_ERROR_MSG) - 1;
-        if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
-                       (LPDWORD)&data_len, (DWORD) 0))==FALSE) {
-            am_web_log_error("%s: WriteClient did not "
-                        "succeed. Attempted message = %s ", thisfunc, data);
-            returnValue = HSE_STATUS_ERROR;
-        }
+        returnValue = send_error(pECB);
     }
 
     if (redirect_header != NULL) {
@@ -1700,6 +1684,7 @@ DWORD send_ok(EXTENSION_CONTROL_BLOCK *pECB)
     const char *thisfunc = "send_ok()";
     const char *data = HTTP_RESPONSE_OK;
     size_t data_len = sizeof(HTTP_RESPONSE_OK) - 1;
+    pECB->dwHttpStatusCode = http200;
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
                      (LPDWORD)&data_len, (DWORD) 0))==FALSE)
     {
@@ -1709,10 +1694,24 @@ DWORD send_ok(EXTENSION_CONTROL_BLOCK *pECB)
     return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
 }
 
+DWORD getHttpStatusCode(EXTENSION_CONTROL_BLOCK *pECB) {
+    DWORD status = http200;
+    struct stat stat_buf;
+    int err_id = stat(pECB->lpszPathTranslated, &stat_buf);
+    if (err_id) {
+        am_web_log_debug("getHttpStatusCode(): File %s doesn't exist, "
+                         "setting HTTP status code to 404.",
+                         pECB->lpszPathTranslated);
+        status = http404;
+    }
+    return status;
+}
+
 DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 {
     const char *thisfunc = "HttpExtensionProc()";
     CHAR* requestURL = NULL;
+    CHAR* origRequestURL = NULL;
     CHAR* pathInfo = NULL;
     
     CHAR* dpro_cookie = NULL;
@@ -1722,51 +1721,32 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     CHAR *set_cookies_list = NULL;
     CHAR *set_headers_list = NULL;
     CHAR *request_hdrs = NULL;
-
+    CHAR *requestMethod = NULL;
     void *args[] = {(void *) pECB, (void *) &set_headers_list,
                     (void *) &set_cookies_list, (void *) &request_hdrs };
-
-    BOOL gotRequestMethod = FALSE;
-    CHAR *requestMethod = NULL;
-    DWORD requestMethodSize = 0;
-
-    BOOL gotRequestClientIP = FALSE;
-    CHAR *requestClientIP = NULL;
-    DWORD requestClientIPSize = 0;
-    
     am_map_t env_parameter_map = NULL;
-
     tOphResources OphResources = RESOURCE_INITIALIZER;
     tOphResources* pOphResources = &OphResources;
-
     CHAR* orig_req_method = NULL;
     CHAR* query = NULL;
     CHAR* response = NULL;
     BOOL fCookie = FALSE;
     DWORD cbCookiesLength = 0;
     CHAR* cookieValue = NULL;
-    CHAR* post_page = NULL;    
+    CHAR* post_page = NULL;
     int length = 0;
     int i = 0;
-    void *agent_config=NULL;
     BOOL isLocalAlloc = FALSE;
     BOOL redirectRequest = FALSE;
+    const char *clientIP_hdr_name = NULL;
+    char *clientIP_hdr = NULL;
+    char *clientIP = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    char *clientHostname_hdr = NULL;
+    char *clientHostname = NULL;
+    void *agent_config=NULL;
     char* logout_url = NULL;
     am_status_t cdStatus = AM_FAILURE; 
-    char* cookie_name=NULL; 
-    size_t cookie_header_len;
-    char* cookie_header = NULL;
-
-    char* ip_header = NULL;
-    char* hostname_header = NULL;
-    char* client_ip_from_ip_header = NULL;
-    char* client_hostname_from_hostname_header = NULL;
-    char* client_ip_header_name = NULL; 
-    char* client_hostname_header_name = NULL; 
-    DWORD client_ip_size=0;
-    DWORD client_host_size=0;
-    BOOL got_client_ip = FALSE;
-    BOOL got_client_host = FALSE;
 
     // Load Agent Propeties file only once
     if (readAgentConfigFile == FALSE) {
@@ -1781,45 +1761,42 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     agent_config = am_web_get_agent_configuration();
 
     // Get ther request url and the path info
-    status = get_request_url(pECB, &requestURL, &pathInfo, pOphResources, agent_config);
+    status = get_request_url(pECB, &requestURL, &pathInfo, 
+                             &origRequestURL, agent_config);
 
     // Check whether the url is a notification url
     if ((status == AM_SUCCESS) &&
-         (B_TRUE == am_web_is_notification(requestURL, agent_config))) {
+         (B_TRUE == am_web_is_notification(origRequestURL, agent_config))) {
           const char* data = NULL;
           if (pECB->cbTotalBytes > 0) {
              data =  pECB->lpbData;
              am_web_handle_notification(data, pECB->cbTotalBytes, agent_config);
              OphResourcesFree(pOphResources);
+             am_web_free_memory(requestURL);
+             am_web_free_memory(origRequestURL);
+             if (pathInfo != NULL) {
+                 free(pathInfo);
+                 pathInfo = NULL;
+             }
              send_ok(pECB);
              return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
           }
     }
-
+    // Set the correct HTTP status. By default the status is always 200,
+    // even if the file doesn't exist. Leave status to 200 for notification
+    // and dummy urls as those cases are handled by the agent.
+    if (status == AM_SUCCESS) {
+        char *dummyPtr = strstr(requestURL, POST_PRESERVE_URI);
+        if ((am_web_is_notification(origRequestURL, agent_config) != B_TRUE) &&
+            ( dummyPtr == NULL))
+        {
+            pECB->dwHttpStatusCode = getHttpStatusCode(pECB);
+        }
+    }
     // Get the request method
     if (status == AM_SUCCESS) {
-        if ( pECB->GetServerVariable( pECB->ConnID, "REQUEST_METHOD", NULL,
-                                      &requestMethodSize ) == FALSE ) {
-
-           requestMethod = malloc(requestMethodSize);
-           if (requestMethod != NULL) {
-              gotRequestMethod = pECB->GetServerVariable(pECB->ConnID,
-                                                         "REQUEST_METHOD",
-                                                         requestMethod,
-                                                         &requestMethodSize);
-              if ((gotRequestMethod == FALSE) || (requestMethodSize <= 0)) {
-                 am_web_log_error("%s: Unable to get request "
-                                   "method. GetHeader(method) = %d, "
-                                   "requestMethodSize = %d", thisfunc, gotRequestMethod,
-                                   requestMethodSize);
-                  status = AM_FAILURE;
-              }
-           } else {
-             am_web_log_error("%s:Not enough memory to allocate "
-                                 "requestMethod.",thisfunc);
-             status = AM_NO_MEMORY;
-           }
-        }
+        status = get_header_value(pECB, "REQUEST_METHOD", &requestMethod,
+                                  TRUE, FALSE);
     }
     
     //Check if the SSO token is in the HTTP_COOKIE header
@@ -1883,35 +1860,63 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
             }
         }
     }
-    
-    if (status == AM_SUCCESS) {
-        //Get the remote address
-        if (pECB->GetServerVariable(pECB->ConnID, "REMOTE_ADDR", NULL,
-                                     &requestClientIPSize ) == FALSE ) {
-            requestClientIP = malloc(requestClientIPSize);
-            if (requestClientIP != NULL) {
-                gotRequestClientIP = pECB->GetServerVariable(pECB->ConnID,
-                                                       "REMOTE_ADDR",
-                                                       requestClientIP,
-                                                       &requestClientIPSize);
-                am_web_log_debug("%s: requestClientIP = %s",
-                                 thisfunc, requestClientIP);
-            } else {
-                am_web_log_error("%s: Not enough memory 0x%x bytes.",
-                         thisfunc, requestClientIPSize);
-                status = AM_NO_MEMORY;
-            }
-        }
-    }
-
     // If post preserve data is enabled, check if there is post data
     // in the post data cache
     if (status == AM_SUCCESS) {
-        if (B_TRUE==am_web_is_postpreserve_enabled(agent_config)) {
-            status = check_for_post_data(pECB, requestURL, &post_page, agent_config);
+        if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+            status = check_for_post_data(pECB, requestURL, &post_page,
+                                         agent_config);
         }
     }
+    // Create the environment map
+    if (status == AM_SUCCESS) {
+        status = am_map_create(&env_parameter_map);
+    }
 
+    // If there is a proxy in front of the agent, the user can set in the
+    // properties file the name of the headers that the proxy uses to set
+    // the real client IP and host name. In that case the agent needs
+    // to use the value of these headers to process the request
+    //
+    // Get the client IP address header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            status = get_header_value(pECB, clientIP_hdr_name,
+                                      &clientIP_hdr,
+                                      FALSE, TRUE);
+        }
+    }
+    // Get the client host name header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientHostname_hdr_name = 
+               am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            status = get_header_value(pECB, clientHostname_hdr_name, 
+                                      &clientHostname_hdr, FALSE, TRUE);
+        }
+    }
+    // If the client IP and host name headers contain more than one
+    // value, take the first value.
+    if (status == AM_SUCCESS) {
+        if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
+            status = am_web_get_client_ip_host(clientIP_hdr,
+                                               clientHostname_hdr,
+                                               &clientIP, &clientHostname);
+        }
+    }
+    // Set the IP address and host name in the environment map
+    if ((status == AM_SUCCESS) && (clientIP_hdr != NULL)) {
+        status = am_web_set_host_ip_in_env_map(clientIP, clientHostname,
+                                      env_parameter_map, agent_config);
+    }
+    // If the client IP was not obtained previously,
+    // get it from the REMOTE_ADDR header.
+    if ((status == AM_SUCCESS) && (clientIP == NULL)) {
+        status = get_header_value(pECB, "REMOTE_ADDR", &clientIP,
+                                  FALSE, FALSE);
+    }
+    
     //In CDSSO mode, check if the sso token is in the post data
     if (status == AM_SUCCESS) {
         if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) &&
@@ -1920,7 +1925,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
             if (dpro_cookie == NULL &&
                  ((post_page != NULL) || 
                    am_web_is_url_enforced(requestURL, pathInfo, 
-                   requestClientIP, agent_config) == B_TRUE))
+                   clientIP, agent_config) == B_TRUE))
             {
                 status = get_post_data(pECB, &response);
                 if (status == AM_SUCCESS) {
@@ -1962,80 +1967,25 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
         }
     }
 
-    if (status == AM_SUCCESS) {
-        am_web_log_debug("%s: SSO token = %s", thisfunc, dpro_cookie);
-
-        status = am_map_create(&env_parameter_map);
-        am_web_log_debug("%s: status after "
-                        "am_map_create = %s (%d)",thisfunc,
-                        am_status_to_string(status),
-                        status);
-    }
-
     // Check if the user is authorized to access the resource.
-    // This check is not necessary for the "/dummypost/sunpostpreserve" url.
-    if ((status == AM_SUCCESS)) {
-        
-        client_ip_header_name = am_web_get_client_ip_header_name(agent_config);
-
-        client_hostname_header_name = 
-            am_web_get_client_hostname_header_name(agent_config);
-
-        // If client ip header property is set, then try to
-        // retrieve header value.
-        if(client_ip_header_name != NULL && client_ip_header_name[0] != '\0') {
-
-            get_header_value(pECB,client_ip_header_name, &ip_header);
-            am_web_log_debug("%s: Header value retrived : %s",thisfunc, ip_header);
-            am_web_get_client_ip(ip_header, &client_ip_from_ip_header);
-        }
-
-        // If client hostname header property is set, then try to retrieve header value.
-        if(client_hostname_header_name != NULL && client_hostname_header_name[0] != '\0') {
-            get_header_value(pECB,client_hostname_header_name, &hostname_header);
-            am_web_get_client_hostname(hostname_header, 
-                            &client_hostname_from_hostname_header);
-        }
-
-        // If client IP value is present from above processing, then
-        // set it to env_param_map. Else use from request structure.
-        if(client_ip_from_ip_header != NULL && client_ip_from_ip_header[0] != '\0') {
-            am_web_set_host_ip_in_env_map(client_ip_from_ip_header,
-                                  client_hostname_from_hostname_header,
-                                  env_parameter_map,
-                                  agent_config);
-
-            status = am_web_is_access_allowed(dpro_cookie, requestURL,
-                                        pathInfo, requestMethod,
-                                        client_ip_from_ip_header,
-                                        env_parameter_map,
-                                        &OphResources.result,
-                                        agent_config);
+    if (status == AM_SUCCESS) {
+        if (dpro_cookie != NULL) {
+            am_web_log_debug("%s: SSO token = %s", thisfunc, dpro_cookie);
         } else {
-            status = am_web_is_access_allowed(dpro_cookie, requestURL,
-                                        pathInfo, requestMethod,
-                                        (char *)requestClientIP,
-                                        env_parameter_map,
-                                        &OphResources.result,
-                                        agent_config);
+            am_web_log_debug("%s: SSO token not found.", thisfunc);
         }
-
-
-        am_web_log_debug("%s: status after "
-                         "am_web_is_access_allowed = %s (%d)",thisfunc,
-                         am_status_to_string(status), status);
+        status = am_web_is_access_allowed(dpro_cookie,
+                                          requestURL,
+                                          pathInfo,
+                                          requestMethod,
+                                          (char *)clientIP,
+                                          env_parameter_map,
+                                          &OphResources.result,
+                                          agent_config);
+        am_web_log_debug("%s: Status after "
+                "am_web_is_access_allowed = %s (%d)",thisfunc,
+                am_status_to_string(status), status);
         am_map_destroy(env_parameter_map);
-        am_web_free_memory(client_ip_from_ip_header);
-        am_web_free_memory(client_hostname_from_hostname_header);
-
-        if(ip_header !=NULL){
-            free(ip_header);
-            ip_header = NULL;
-        }
-        if(hostname_header != NULL){
-            free(hostname_header);
-            hostname_header = NULL;
-        }
     }
 
     switch(status) {
@@ -2063,29 +2013,30 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
             }
             if (status_tmp == AM_SUCCESS) {
                 if (post_page != NULL) {
-                    const char *lbCookieHeader = NULL;
-
-
+                    char *lbCookieHeader = NULL;
                     // If post_ page is not null it means that the request 
                     // contains the "/dummypost/sunpostpreserve" string and
-                    // that the data of the original request need to be posted
-                    // If using the lb cookie, it needs to be reset to NULL there
+                    // that the post data of the original request need to be
+                    // posted.
+                    // If using a LB cookie, it needs to be set to NULL there.
+                    // If am_web_get_postdata_preserve_lbcookie() returns
+                    // AM_INVALID_ARGUMENT, it means that the sticky session
+                    // feature is disabled (ie no LB) or that the sticky
+                    // session mode is URL.
                     status_tmp = am_web_get_postdata_preserve_lbcookie(
-                                  &lbCookieHeader, B_TRUE, agent_config);
-                    if (status_tmp == AM_SUCCESS) {
-                        if (lbCookieHeader != NULL) {
+                                            &lbCookieHeader, B_TRUE,
+                                            agent_config);
+                    if (status_tmp == AM_NO_MEMORY) {
+                        returnValue = send_error(pECB);
+                    } else {
+                        if (status_tmp == AM_SUCCESS) {
                             am_web_log_debug("%s: Setting LB cookie for "
-                                             "post data preservation to null",
+                                             "post data preservation to null.",
                                              thisfunc);
                             set_cookie(lbCookieHeader, args);
                         }
                         returnValue = send_post_data(pECB, post_page, 
                                                  set_cookies_list);
-                    } else {
-                        am_web_log_error("%s: "
-                              "am_web_get_postdata_preserve_lbcookie() "
-                              "failed ", thisfunc);
-                        returnValue = send_error(pECB);
                     }
                     if (lbCookieHeader != NULL) {
                         am_web_free_memory(lbCookieHeader);
@@ -2109,7 +2060,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                         cookieResponseHdr.pszStatus = NULL;
                         cookieResponseHdr.pszHeader = set_cookies_list;
                         cookieResponseHdr.cchStatus = 0;
-                        cookieResponseHdr.cchHeader = strlen(set_cookies_list);
+                        cookieResponseHdr.cchHeader = (DWORD) strlen(set_cookies_list);
                         cookieResponseHdr.fKeepConn = TRUE;
                         pECB->ServerSupportFunction(pECB->ConnID,
                                           HSE_REQ_SEND_RESPONSE_HEADER_EX,
@@ -2119,8 +2070,9 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                     }
                     returnValue = process_original_url(pECB, requestURL,
                                                        orig_req_method,
-                                                        request_hdrs, pOphResources, 
-                                                        agent_config);
+                                                       request_hdrs,
+                                                       pOphResources,
+                                                       agent_config);
                 }
             }
             if (set_cookies_list != NULL) {
@@ -2131,87 +2083,31 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 
         case AM_INVALID_SESSION:
             am_web_log_info("%s: Invalid session.",thisfunc);
-            //first clear the stale cdsso cookies if any, in the browser
+            // First clear the stale cdsso cookies if any, in the browser
             if (am_web_is_cdsso_enabled(agent_config) == B_TRUE)
             {
-                cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);        
+                cdStatus = am_web_do_cookie_domain_set(set_cookie, args, 
+                                                       EMPTY_STRING,
+                                                       agent_config);
                 if(cdStatus != AM_SUCCESS) {
-                    am_web_log_error("%s : CDSSO reset cookie failed. ", thisfunc);
+                    am_web_log_error("%s : CDSSO reset cookie failed. ",
+                                     thisfunc);
                 }
             }
-
             am_web_do_cookies_reset(set_cookie, args, agent_config);
             // If the post data preservation feature is enabled
             // save the post data in the cache for post requests.
             if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0 
-                && B_TRUE==am_web_is_postpreserve_enabled(agent_config))
+                && B_TRUE == am_web_is_postpreserve_enabled(agent_config))
             {
-                post_urls_t *post_urls = NULL;
-                post_urls = am_web_create_post_preserve_urls(requestURL, agent_config);
-                // In CDSSO mode, for a POST request, the post data have
-                // already been saved in the response variable, so we need
-                // to get them here only if response is NULL.
-                if (response == NULL) {
-                    status_tmp = get_post_data(pECB, &response);
-                }                
-                if (status_tmp == AM_SUCCESS) {
-                    const char *lbCookieHeader = NULL;
-                    if (response != NULL && strlen(response) > 0) {
-                        if (AM_SUCCESS == register_post_data(pECB,post_urls->action_url,
-                                          post_urls->post_time_key, response, agent_config)) 
-                        {                            
-                            // If using a LB in front of the agent, the LB cookie
-                            // needs to be set there. The boolean argument allows
-                            // to set the value of the cookie to the one defined in the
-                            // properties file (B_FALSE) or to NULL (B_TRUE).
-                            status_tmp = am_web_get_postdata_preserve_lbcookie(
-                                                   &lbCookieHeader, B_FALSE, agent_config);
-                            if (status_tmp == AM_SUCCESS) {
-                                if (lbCookieHeader != NULL) {
-                                    am_web_log_debug("%s: Setting LB cookie for post data "
-                                             "preservation", thisfunc);
-                                    set_cookie(lbCookieHeader, args);
-                                }
-                                returnValue = do_redirect(pECB, status, 
-                                                      &pOphResources->result,
-                                                      post_urls->dummy_url, 
-                                                      requestMethod, args, 
-                                                      agent_config);
-                            } else {
-                                am_web_log_error("%s: "
-                                   "am_web_get_postdata_preserve_lbcookie() "
-                                   "failed ", thisfunc);
-                                returnValue = send_error(pECB);
-                            }
-                            if (lbCookieHeader != NULL) {
-                                am_web_free_memory(lbCookieHeader);
-                                lbCookieHeader = NULL;
-                            }
-
-                        } else {
-                            returnValue = send_error(pECB);
-                        }
-                        if (post_urls != NULL) {
-                            am_web_clean_post_urls(post_urls);
-                            post_urls = NULL;
-                        }
-                    } else {
-                        am_web_log_debug("%s: AM_INVALID_SESSION. This is a POST "
-                                         "request with no post data => redirecting "
-                                         "as a GET request.", thisfunc);
-                        returnValue = do_redirect(pECB, status,
-                                              &OphResources.result,
-                                              requestURL, REQUEST_METHOD_GET, args,
-                                              agent_config);
-                    }
-                } else {
-                    returnValue = send_error(pECB);
-                }
+                returnValue = process_request_with_post_data_preservation
+                                  (pECB, status, &pOphResources->result,
+                                   requestURL, args, &response, agent_config);
             } else {
                 returnValue = do_redirect(pECB, status,
                                           &OphResources.result,
-                                          requestURL, requestMethod, args,
-                                          agent_config);
+                                          requestURL, requestMethod,
+                                          args, agent_config);
             }
             break;
 
@@ -2219,77 +2115,26 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
             am_web_log_info("%s: Access denied to %s",thisfunc,
                             OphResources.result.remote_user ?
                             OphResources.result.remote_user : "unknown user");
-            //returnValue = do_redirect(pECB, status, &OphResources.result, requestURL, requestMethod, args, agent_config);
-
-            if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0 
-                && B_TRUE==am_web_is_postpreserve_enabled(agent_config))
+            if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                am_web_log_debug("%s: Resetting cookie to avoid double "
+                                 "assertion post.", thisfunc);
+                am_web_do_cookies_reset(set_cookie, args, agent_config);
+            }
+            // If the post data preservation feature is enabled
+            // save the post data in the cache for post requests.
+            // This needs to be done when the access has been denied 
+            // in case there is a composite advice.
+            if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
+                && B_TRUE == am_web_is_postpreserve_enabled(agent_config))
             {
-                post_urls_t *post_urls = NULL;
-                post_urls = am_web_create_post_preserve_urls(requestURL, agent_config);
-                // In CDSSO mode, for a POST request, the post data have
-                // already been saved in the response variable, so we need
-                // to get them here only if response is NULL.
-                if (response == NULL) {
-                    status_tmp = get_post_data(pECB, &response);
-                }                
-                if (status_tmp == AM_SUCCESS) {
-                    const char *lbCookieHeader = NULL;
-                    if (response != NULL && strlen(response) > 0) {
-                        if (AM_SUCCESS == register_post_data(pECB,post_urls->action_url,
-                                          post_urls->post_time_key, response, agent_config)) 
-                        {                            
-                            // If using a LB in front of the agent, the LB cookie
-                            // needs to be set there. The boolean argument allows
-                            // to set the value of the cookie to the one defined in the
-                            // properties file (B_FALSE) or to NULL (B_TRUE).
-                            status_tmp = am_web_get_postdata_preserve_lbcookie(
-                                                   &lbCookieHeader, B_FALSE, agent_config);
-                            if (status_tmp == AM_SUCCESS) {
-                                if (lbCookieHeader != NULL) {
-                                    am_web_log_debug("%s: Setting LB cookie for post data "
-                                             "preservation", thisfunc);
-                                    set_cookie(lbCookieHeader, args);
-                                }
-                                returnValue = do_redirect(pECB, status, 
-                                                      &pOphResources->result,
-                                                      post_urls->dummy_url, 
-                                                      requestMethod, args, 
-                                                      agent_config);
-                            } else {
-                                am_web_log_error("%s: "
-                                   "am_web_get_postdata_preserve_lbcookie() "
-                                   "failed ", thisfunc);
-                                returnValue = send_error(pECB);
-                            }
-                            if (lbCookieHeader != NULL) {
-                                am_web_free_memory(lbCookieHeader);
-                                lbCookieHeader = NULL;
-                            }
-
-                        } else {
-                            returnValue = send_error(pECB);
-                        }
-                        if (post_urls != NULL) {
-                            am_web_clean_post_urls(post_urls);
-                            post_urls = NULL;
-                        }
-                    } else {
-                        am_web_log_debug("%s: AM_INVALID_SESSION. This is a POST "
-                                         "request with no post data => redirecting "
-                                         "as a GET request.", thisfunc);
-                        returnValue = do_redirect(pECB, status,
-                                              &OphResources.result,
-                                              requestURL, REQUEST_METHOD_GET, args,
-                                              agent_config);
-                    }
-                } else {
-                    returnValue = send_error(pECB);
-                }
+                returnValue = process_request_with_post_data_preservation
+                                  (pECB, status, &pOphResources->result,
+                                   requestURL, args, &response, agent_config);
             } else {
                 returnValue = do_redirect(pECB, status,
-                                          &OphResources.result,
-                                          requestURL, requestMethod, args,
-                                          agent_config);
+                                       &OphResources.result,
+                                       requestURL, requestMethod,
+                                       args, agent_config);
             }
             break;
 
@@ -2332,7 +2177,8 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
         dpro_cookie = NULL;
     }
     if (orig_req_method != NULL) {
-            free(orig_req_method);
+        free(orig_req_method);
+        orig_req_method = NULL;
     }
     if (pathInfo != NULL) {
         free(pathInfo);
@@ -2341,10 +2187,6 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     if (requestMethod != NULL) {
         free(requestMethod);
         requestMethod = NULL;
-    }
-    if (requestClientIP != NULL) {
-        free(requestClientIP);
-        requestClientIP = NULL;
     }
     if (response != NULL) {
         free(response);
@@ -2358,12 +2200,30 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
         free(post_page);
         post_page = NULL;
     }
-    
-    am_web_free_memory(logout_url);
-    am_web_free_memory(requestURL);
-
+    if (requestURL != NULL) {
+        am_web_free_memory(requestURL);
+    }
+    if (origRequestURL != NULL) {
+        am_web_free_memory(origRequestURL);
+    }
+    if(clientIP_hdr !=NULL){
+        free(clientIP_hdr);
+        clientIP_hdr = NULL;
+    }
+    if (clientIP != NULL) {
+        am_web_free_memory(clientIP);
+    }
+    if(clientHostname_hdr != NULL){
+        free(clientHostname_hdr);
+        clientHostname_hdr = NULL;
+    }
+    if (clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+    }
+    if (logout_url != NULL) {
+        am_web_free_memory(logout_url);
+    }
     OphResourcesFree(pOphResources);
-
     am_web_delete_agent_configuration(agent_config);
 
     return returnValue;
@@ -2375,7 +2235,7 @@ BOOL iisaPropertiesFilePathGet(CHAR** propertiesFileFullPath, char* instanceId,
 {
     // Max WINAPI path
     const DWORD dwPropertiesFileFullPathSize = MAX_PATH + 1;
-    const CHAR  szPropertiesFileName[512]    = "";
+    CHAR  szPropertiesFileName[512]          = "";
     CHAR agentApplicationSubKey[1000]        = "";
     const CHAR agentDirectoryKeyName[]       = "Path";
     DWORD dwPropertiesFileFullPathLen        = dwPropertiesFileFullPathSize;
@@ -2505,49 +2365,4 @@ char* string_case_insensitive_search(char *HTTPHeaders, char *KeY)
         }
     }
     return NULL;
-}
-
-/*
- * This function retrieves the value of a HTTP header. 
- * header_name is the name of the http header.
- * the value is assigned in header_value.
- * This value must be freed by the caller.
- * */
-am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB, char* header_name, 
-        char** header_value)
-{
-    const char *thisfunc = "get_header_value()";
-    DWORD header_size = 0;
-    BOOL got_header = FALSE;
-    am_status_t status = AM_SUCCESS; 
-    char* http_header = NULL;
-
-    http_header = malloc(strlen("HTTP_")+strlen(header_name)+1);
-    strcpy(http_header,"HTTP_");
-    strcat(http_header,header_name);
-    strcat(http_header,"\0");
-
-    am_web_log_debug("%s: Header to be retrived : %s",thisfunc, http_header);
-
-    if (pECB->GetServerVariable(pECB->ConnID, http_header, NULL, &header_size) == FALSE){
-       *header_value = malloc(header_size);
-       if (*header_value != NULL) {
-           got_header = pECB->GetServerVariable(pECB->ConnID, http_header,
-                               *header_value, &header_size);
-           if ((got_header == FALSE) || (header_size <= 0)) {
-                am_web_log_debug("%s: Invalid header received : %d",thisfunc,
-                         header_size);
-               status = AM_FAILURE;
-           }
-       } else {
-            am_web_log_debug("%s: Header value alloc failed ",thisfunc);
-            status = AM_NO_MEMORY;
-       }
-    }
-
-    if(http_header != NULL){
-        free(http_header);
-        http_header = NULL;
-    }
-    return status;
 }

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: agent_configuration.h,v 1.16 2009/12/19 00:05:46 subbae Exp $
+ * $Id: agent_configuration.h,v 1.17 2010/03/10 05:09:36 dknab Exp $
  *
  */
 
@@ -97,7 +97,8 @@ public:
     PostCache *postcache_handle;
     unsigned long postcacheentry_life;
     PRBool postdatapreserve_enable;
-    const char *postdatapreserve_lbcookie;
+    const char *postdatapreserve_sticky_session_mode;
+    const char *postdatapreserve_sticky_session_value;
     const char *url_redirect_param;
     const char *user_id_param;
     const char *authLogType_param;
@@ -198,7 +199,8 @@ public:
         this->postcacheentry_life = 0;
         this->postcache_handle = NULL;
         this->postdatapreserve_enable = AM_TRUE;
-        this->postdatapreserve_lbcookie= NULL;
+        this->postdatapreserve_sticky_session_mode = NULL;
+        this->postdatapreserve_sticky_session_value = NULL;
         this->url_redirect_param= NULL;
         this->user_id_param = NULL;
         this->authLogType_param = NULL;
@@ -232,7 +234,7 @@ public:
         this->iis6_replaypasswd_key = NULL;
         this->filter_priority = IIS_FILTER_PRIORITY;
         this->owa_enable = AM_FALSE;
-        this->owa_enable_change_protocol = AM_FALSE;     
+        this->owa_enable_change_protocol = NULL;        
         this->check_name_database = AM_FALSE;
         this->ltpa_enable = AM_FALSE;
         this->ltpa_config_name = LTPA_DEFAULT_CONFIG_NAME;

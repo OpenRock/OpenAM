@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: connection.h,v 1.4 2008/06/25 08:14:31 qcheng Exp $
+ * $Id: connection.h,v 1.5 2010/03/10 05:09:38 dknab Exp $
  *
  *
  * Abstract:
@@ -233,6 +233,7 @@ private:
     static bool initialized;
     PRFileDesc *socket;
     char *certdbpasswd;
+    char *certnickname;
 };
 
 END_PRIVATE_NAMESPACE

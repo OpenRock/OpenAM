@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: domino_agent.c,v 1.3 2009/11/20 21:34:55 leiming Exp $
+ * $Id: domino_agent.c,v 1.4 2010/03/10 05:08:11 dknab Exp $
  *
  *
  */ 
@@ -395,6 +395,30 @@ log_domino_error(const char *func, const char *dsapi_call, unsigned int errID)
     return map_domino_error(errID);
 }
 
+static am_status_t
+allocateVariableInDominoContext(FilterContext *context, char *buf,
+                           size_t len, char **var)
+{
+    const char *thisfunc = "allocateVariableInDominoContext()";
+    am_status_t sts = AM_SUCCESS;
+    unsigned int errID = 0;
+    if ((buf == NULL) || (len == 0)) {
+        am_web_log_warning("%s: Buffer is null or empty", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    }
+    if (sts == AM_SUCCESS) {
+        *var = (char *)context->AllocMem(context, len+1, 0, &errID);
+        if(*var == NULL) {
+            am_web_log_error("%s: memory alloc of %d bytes failed: %s.",
+                          thisfunc, len, domino_error_to_str(errID));
+            sts = map_domino_error(errID);
+        } else {
+            strcpy(*var, buf);
+        } 
+    }
+    return sts;
+}
+
 /**
  *  Gets a HTTP server variable, allocate memory from the domino context
  *  for the result, and copy result to the allocated memory.
@@ -407,19 +431,41 @@ log_domino_error(const char *func, const char *dsapi_call, unsigned int errID)
  *           other am_status_t values upon failure.
  */
 static am_status_t
-getServerVariable(FilterContext *context, const char *varName, char **value)
+getServerVariable(FilterContext *context, const char *originalVarName,
+                  char **varValue, boolean_t isRequired,
+                  boolean_t addHTTPPrefix)
 {
     const char *thisfunc = "getServerVariable()";
     am_status_t sts = AM_SUCCESS;
+    char* varName = NULL;
     char* buf = NULL;
     size_t buffer_size;
 
-    if(context == NULL || varName == NULL || value == NULL) {
+    if(context == NULL || originalVarName == NULL || varValue == NULL) {
         am_web_log_debug("%s: Invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
+    }
+    // Add HTTP in front of the header name if requested
+    if (addHTTPPrefix == TRUE) {
+        varName = malloc(strlen("HTTP_") + 
+                             strlen(originalVarName) + 1);
+        if (varName != NULL) {
+            strcpy(varName,"HTTP_");
+            strcat(varName,originalVarName);
+            strcat(varName,"\0");
+        } else {
+            am_web_log_error("%s: Not enough memory to allocate varName",
+                             thisfunc);
+            sts = AM_NO_MEMORY;
+        }
     } else {
+        varName = (char*) originalVarName;
+    }
+    // Store the value of the header in a buffer large enough to hold it
+    // (the exact size is not known)
+    if (sts == AM_SUCCESS) {
         unsigned int errID = 0;
-        *value = NULL;
+        *varValue = NULL;
         buffer_size = MAX_BUF_LEN;
 
         while (1) {
@@ -435,12 +481,16 @@ getServerVariable(FilterContext *context, const char *varName, char **value)
                 if(!context->GetServerVariable(context, (char *)varName,
                             (void *)buf, buffer_size-1, &errID)) {
                     if (errID == DSAPI_INVALID_ARGUMENT) {
-                        am_web_log_debug("%s: variable %s not found.",
-                                thisfunc, varName);
-                        sts = AM_NOT_FOUND;
+                        if (isRequired == B_TRUE) {
+                            am_web_log_error("%s: Could not get a value for "
+                                             "header %s.", 
+                                              thisfunc, *varName);
+                            sts = AM_FAILURE;
+                        }
                     } else {
                         sts = log_domino_error(thisfunc,
                          "context->GetServerVariable()", errID);
+                        sts = AM_FAILURE;
                     }
                     break;
                 } else {
@@ -450,38 +500,45 @@ getServerVariable(FilterContext *context, const char *varName, char **value)
                                     "is insufficient. Increasing to %i.",
                                     thisfunc, varName, buffer_size);
                     } else {
-                        am_web_log_info("%s: Max buffer size is %i, "
-                         "no buffer size increase required for %s (length=%i).",
-                         thisfunc, buffer_size-3, varName, strlen(buf));
+                        //am_web_log_info("%s: Max buffer size is %i, "
+                        // "no buffer size increase required for %s (length=%i).",
+                        // thisfunc, buffer_size-3, varName, strlen(buf));
                         break;
                     }
                 }
             }
-        } 
-
-        if (sts == AM_SUCCESS) {
-            size_t len;
-            if(strchr(buf, ' ') != NULL) {
-                len = strlen(buf) + EXT_BUF_LEN;
+        }
+        // Store the header in memory allocated from the domino context
+        if ((sts == AM_SUCCESS) && (buf != NULL)) {
+            if (strlen(buf) == 0) {
+                *varValue = NULL;
             } else {
-                len = strlen(buf) + 1;
+                size_t len = 0;
+                if(strchr(buf, ' ') != NULL) {
+                    len = strlen(buf) + EXT_BUF_LEN;
+                } else {
+                    len = strlen(buf) + 1;
+                }
+                sts = allocateVariableInDominoContext(context, buf,
+                                                      len, &(*varValue));
             }
-            *value = (char *)context->AllocMem(context, len, 0, &errID);
-            if(*value == NULL) {
-                am_web_log_error("%s: memory alloc of %d bytes failed: %s.",
-                      thisfunc, len, domino_error_to_str(errID));
-                sts = map_domino_error(errID);
+        }
+        if (sts == AM_SUCCESS) {
+            if (*varValue != NULL) {
+                am_web_log_debug("%s: %s = %s", thisfunc,
+                                  varName, *varValue);
             } else {
-                strcpy(*value, buf);
-                am_web_log_debug("%s: Value for %s is: %s",thisfunc,
-                        varName, *value);
-                sts = AM_SUCCESS;
+                am_web_log_debug("%s: %s =", thisfunc, varName);
             }
         }
         if (buf != NULL) {
             free(buf);
             buf = NULL;
         }
+    }
+    if((addHTTPPrefix == TRUE) && (varName != NULL)) {
+        free(varName);
+        varName = NULL;
     }
     return sts;
 }
@@ -675,8 +732,13 @@ get_request_url(FilterContext *context,
         // set method only on success.
         if (sts == AM_SUCCESS) {
             *request_method = method_to_am_web_num(fRequest.method);
-            am_web_log_debug("%s: return url [%s] method [%d]",
-                             thisfunc, *request_url, *request_method);
+            am_web_log_debug("%s: Request url = %s", thisfunc, *request_url);
+            am_web_log_debug("%s: Request method = %s", thisfunc,
+                              method_num_to_str(fRequest.method));
+
+        } else {        
+            am_web_log_error("%s: Could not get request URL. Error %s",
+                          thisfunc, am_status_to_string(sts));
         }
     }
     return sts;
@@ -733,7 +795,6 @@ add_header_in_response(void **args, const char *key, const char *value) {
     return sts;
 }
 
-
 static am_status_t
 get_post_data(void **args, char **data) {
     const char *thisfunc = "get_post_data()";
@@ -743,30 +804,27 @@ get_post_data(void **args, char **data) {
     size_t len = 0;
     am_status_t sts = AM_SUCCESS;
 
-    if ((sts = getServerVariable(
-		    context, HTTP_CONTENT_LENGTH, &cLen)) != AM_SUCCESS) {
-	am_web_log_error("%s: Could not get content length.", sts);
-    }
-    else if (sscanf(cLen, "%u", &len) != 1) {
-	am_web_log_error("%s: invalid content length string: %s",
-			 thisfunc, cLen);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else if (!context->GetRequestContents(context, data, &errID)) {
-	am_web_log_error("%s: Error getting request contents: %s.",
-			 thisfunc, domino_error_to_str(errID));
-	sts = map_domino_error(errID);
-    }
-    else if (*data == NULL || (*data)[0] == '\0') {
-	am_web_log_debug("%s: No contents recieved.", thisfunc);
-	*data = NULL;
-    }
-    else {
-	// content must be null terminated (for the rest of processing)
-	// Note: hopefully data long enough for the null terminating char ?
-	(*data)[len] = '\0';
-	am_web_log_max_debug("%s: Contents received:\n %s",
-				 thisfunc, *data);
+    sts = getServerVariable(context, HTTP_CONTENT_LENGTH, &cLen, 
+                                     B_TRUE, B_FALSE);
+    if (sts != AM_SUCCESS) {
+        am_web_log_error("%s: Could not get content length.", sts);
+    } else if (sscanf(cLen, "%u", &len) != 1) {
+        am_web_log_error("%s: invalid content length string: %s",
+                         thisfunc, cLen);
+        sts = AM_INVALID_ARGUMENT;
+    } else if (!context->GetRequestContents(context, data, &errID)) {
+        am_web_log_error("%s: Error getting request contents: %s.",
+                         thisfunc, domino_error_to_str(errID));
+        sts = map_domino_error(errID);
+    } else if (*data == NULL || (*data)[0] == '\0') {
+        am_web_log_debug("%s: No contents recieved.", thisfunc);
+        *data = NULL;
+    } else {
+        // content must be null terminated (for the rest of processing)
+        // Note: hopefully data long enough for the null terminating char ?
+        (*data)[len] = '\0';
+        am_web_log_max_debug("%s: Contents received:\n %s",
+                             thisfunc, *data);
     }
     return sts;
 }
@@ -1842,7 +1900,7 @@ get_path_info(FilterContext *context,
 {
     const char *thisfunc = "get_path_info()";
     am_status_t sts = AM_SUCCESS;
-    char *original_path_info;
+    char *original_path_info = NULL;
     char *constructed_path_info = NULL;
     char *pStart = NULL;
     char *pEnd = NULL;
@@ -1853,24 +1911,15 @@ get_path_info(FilterContext *context,
         am_web_log_error("%s: Invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     }
-    
     // Get the path_info server variable
-    // If it is null, no need to go further
     if (sts == AM_SUCCESS) {
-        sts = getServerVariable(context, HTTP_PATH_INFO, &original_path_info);
-        if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
-            am_web_log_error("%s: Unable to get the path_info server variable "
-                         "(status=%s)", thisfunc, am_status_to_string(sts));
-        } else if ((original_path_info != NULL) &&
-                   (strlen(original_path_info) == 0)) {
-            sts = AM_NOT_FOUND;
-        }
+        sts = getServerVariable(context, HTTP_PATH_INFO, 
+                                &original_path_info, B_FALSE, B_FALSE);
     }
-    
     // Extract the path info from the request url.
     // In Domino server the path info is everything between
     // the hostname and the query.
-    if (sts == AM_SUCCESS) {
+    if ((sts == AM_SUCCESS) && (original_path_info != NULL)) {
         pStart = strstr(request_url, DOUBLE_SLASH);
         if ((pStart != NULL) && (strlen(pStart) > strlen(DOUBLE_SLASH))) {
             pStart += strlen(DOUBLE_SLASH);
@@ -1910,15 +1959,21 @@ get_path_info(FilterContext *context,
             sts = AM_FAILURE;
         }
     }
-    // Log original_path_info if different from used path info
-    if (sts == AM_SUCCESS) {
+    // Allocate the path in the Domino context so it has not to 
+    // be free.
+    if ((sts == AM_SUCCESS) && (original_path_info != NULL)) {
+        sts = allocateVariableInDominoContext(context, constructed_path_info,
+                                              strlen(constructed_path_info),
+                                              &(*path_info));
         if (strcmp(original_path_info, constructed_path_info) != 0) {
             am_web_log_debug("%s: Path info changed to: %s",
                                   thisfunc, constructed_path_info);
         } 
-        *path_info = constructed_path_info;
     }
-
+    if (constructed_path_info != NULL) {
+        free(constructed_path_info);
+        constructed_path_info = NULL;
+    }
     return sts;
 }
 
@@ -1926,12 +1981,19 @@ static unsigned int
 filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     const char *thisfunc = "filterRawRequest()";
     unsigned int retVal = kFilterError;
-    am_status_t sts = AM_FAILURE;
+    am_status_t sts = AM_SUCCESS;
     private_context_t *priv_ctx = NULL;
     char *request_url = NULL;
     char *path_info = NULL;
-    char *client_ip = NULL;
+    char *requestIP = NULL;
     char *cookie_header_val = NULL;
+    const char *clientIP_hdr_name = NULL;
+    char *clientIP_hdr = NULL;
+    char *clientIP = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    char *clientHostname_hdr = NULL;
+    char *clientHostname = NULL;
+    void* agent_config = NULL;
     am_web_request_params_t params;
     am_web_req_method_t method;
     am_status_t render_sts = AM_FAILURE;
@@ -1939,108 +2001,133 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     am_web_request_func_t req_funcs;
     am_web_result_t result = AM_WEB_RESULT_ERROR;
     am_map_t request_headers_map = NULL;
-
-    void* agent_config = NULL;
+    
 
     memset(&params, 0, sizeof(params));
-
 
     // check if agent is initialized.
     // if not initialized, then call agent init function
     // TODO: This needs to be synchronized as only one time agent
     // initialization needs to be done.
     if(agentInitialized != B_TRUE){
-            am_web_log_debug("filterRawRequest : Will call init");
-            init_at_request();
-            if(agentInitialized != B_TRUE){
-                am_web_log_error("filterRawRequest : "
-                   " Agent is still not intialized");
-                //deny the access
-                (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-                return retVal;
-            }  else {
-                am_web_log_debug("filterRawRequest : Agent intialized");
-            }
+        am_web_log_debug("%s: Will call init", thisfunc);
+        init_at_request();
+        if(agentInitialized != B_TRUE){
+            am_web_log_error("%s: Agent is still not intialized", thisfunc);
+            //deny the access
+            sts = AM_FAILURE;
+        }  else {
+            am_web_log_debug("%s: Agent intialized", thisfunc);
+        }
     }
-
-    agent_config = am_web_get_agent_configuration();
-
-    // check arguments.
+    // Get agent configuration
+    if (sts == AM_SUCCESS) {
+        agent_config = am_web_get_agent_configuration();
+    }
+    // Check arguments
     if (context == NULL) {
-        am_web_log_error("%s: no context found.", thisfunc);
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+        am_web_log_error("%s: No context found.", thisfunc);
+        sts = AM_FAILURE;
+    }
+    // Check if there is an existing context
+    if (sts == AM_SUCCESS) {
+        if ((priv_ctx = (private_context_t *)context->privateContext) != NULL) {
+            am_web_log_error("%s: Unexpected private context found.", thisfunc);
+            // don't set any headers from the unexpected private context.
+            context->privateContext = NULL;
+            sts = AM_FAILURE;
+        }
+    }
+    // Create private context for passing info between HttpFilterProc calls.
+    if (sts == AM_SUCCESS) {
+         if ((context->privateContext = (void *)priv_ctx =
+                create_private_context(context)) == NULL)
+         {
+             am_web_log_error("%s: Failed to create request private context.",
+                              thisfunc);
+             sts = AM_FAILURE;
+         }
+    }
+    // Get the URL and method (method will be either GET or POST)
+    if (sts == AM_SUCCESS) {
+        sts = get_request_url(context, &request_url, &method);
+    }
+    // Get path info 
+    if (sts == AM_SUCCESS) {
+        sts = get_path_info(context, request_url, &path_info);
+    }
+    // Get cookie header val 
+    if (sts == AM_SUCCESS) {
+        sts = getServerVariable(context, HTTP_COOKIE, &cookie_header_val,
+                                B_FALSE, B_FALSE);
+    }
+    // If there is a proxy in front of the agent, the user can set 
+    // in AMAgent.properties the name of the headers that the proxy 
+    // is using to set the real client IP and host name. 
+    // The agent should then use the IP and host name obtained from 
+    // these headers to process the request
 
-    // create private context for passing info between HttpFilterProc calls.
-    } else if ((priv_ctx = (private_context_t *)
-               context->privateContext) != NULL) {
-        am_web_log_error("%s: unexpected private context found.", thisfunc);
-        // don't set any headers from the unexpected private context.
-        context->privateContext = NULL;
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    } else if ((context->privateContext = 
-                create_private_context(context)) == NULL) {
-        am_web_log_error("%s: Failed to create request private context.",
-                        thisfunc);
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    // Get required parameters for access check
-    // get Request URL and method (method will be either GET or POST)
-    } else if ((sts = get_request_url(context,
-                &request_url, &method)) != AM_SUCCESS) {
-        am_web_log_error("%s: Could not get request URL. Error %s",
-                          thisfunc, am_status_to_string(sts));
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    // get path info (may not exist - ok if null)
-    } else if ((sts = get_path_info(context, request_url, 
-                &path_info)) != AM_SUCCESS &&
-                sts != AM_NOT_FOUND) {
-        am_web_log_error("%s: get path info failed with: %s",
-                         thisfunc, am_status_to_string(sts));
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    // get client IP (must exist)
-    } else if ((sts = getServerVariable(context, HTTP_REMOTE_ADDR,
-                &client_ip)) != AM_SUCCESS) {
-        am_web_log_error("%s: get client IP failed with: %s",
-                          thisfunc, am_status_to_string(sts));
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    // get cookie header val (may not exist)
-    } else if ((sts = getServerVariable(context, HTTP_COOKIE,
-                &cookie_header_val)) != AM_SUCCESS &&
-        sts != AM_NOT_FOUND) {
-        am_web_log_error("%s: Error getting request header %s: %s",
-                         thisfunc, "cookie", am_status_to_string(sts));
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    // create headers map
-    } else if ((sts = am_map_create(&request_headers_map)) != AM_SUCCESS) {
-        am_web_log_error("%s: Error creating request headers map. %s",
-                         thisfunc, am_status_to_string(sts));
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-
-    } else {
+    // Get the client IP address header set by the proxy, if there is one
+    if (sts == AM_SUCCESS) {
+        clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            sts = getServerVariable(context, clientIP_hdr_name,
+                                   &clientIP_hdr, B_FALSE, B_TRUE);
+        }
+    }
+    // Get the client host name header set by the proxy, if there is one
+    if (sts == AM_SUCCESS) {
+        clientHostname_hdr_name = am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            sts = getServerVariable(context, clientHostname_hdr_name,
+                                   &clientHostname_hdr, B_FALSE, B_TRUE);
+        }
+    }
+    // If the client IP and host name headers contain more than one
+    // value, take the first value.
+    if (sts == AM_SUCCESS) {
+        if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
+            sts = am_web_get_client_ip_host(clientIP_hdr, clientHostname_hdr,
+                                            &clientIP, &clientHostname);
+        }
+    }
+    // Set the IP address that will be used for the evaluation
+    if (sts == AM_SUCCESS) {
+        if (clientIP != NULL) {
+            // The ip address should be allocated from the Domino context
+            // like it would have been using getServerVariable().
+            sts = allocateVariableInDominoContext(context, clientIP, 
+                                             strlen(clientIP), &requestIP);
+        } else {
+            sts = getServerVariable(context, HTTP_REMOTE_ADDR,
+                                &requestIP, B_TRUE, B_FALSE);
+        }
+    }
+    if (sts == AM_SUCCESS) {
+        am_web_log_debug("%s: IP address used for request evaluation: %s",
+                         thisfunc, requestIP);
+        sts = am_map_create(&request_headers_map);
+    }
+    if (sts == AM_SUCCESS) {
         void *args[3] = { context, rawRequest, request_headers_map };
+        // Get the query
         char *query = strchr(request_url, '?');
         if (query != NULL) {
             query++;
-        }
-
+            am_web_log_debug("%s: QUERY = %s", thisfunc, query);
+        }        
         // Set request info needed for processing access check.
         req_params.url = request_url;
         req_params.query = query;
         req_params.method = method;
+        req_params.client_ip = requestIP;
+        req_params.client_hostname = clientHostname;
         req_params.path_info = path_info;
-        req_params.client_ip = client_ip;
-        req_params.client_hostname = NULL;
         req_params.cookie_header_val = cookie_header_val;
-
         // Set functions for processing access check result.
         req_funcs.get_post_data.func = get_post_data;
         req_funcs.get_post_data.args = args;
-        /* no need to free post data */
+        // no need to free post data
         req_funcs.free_post_data.func = NULL;
         req_funcs.free_post_data.args = NULL;
         req_funcs.set_user.func = set_user;
@@ -2051,13 +2138,12 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
         req_funcs.render_result.args = args;
         req_funcs.set_header_in_request.func = set_header_in_request;
         req_funcs.set_header_in_request.args = args;
-        /* not currently used */
+        // not currently used
         req_funcs.add_header_in_response.func = add_header_in_response;
         req_funcs.add_header_in_response.args = args;
-
-        // now process request access check
-        result = am_web_process_request(&req_params, &req_funcs, &render_sts, 
-            agent_config);
+        // Process request access check
+        result = am_web_process_request(&req_params, &req_funcs, 
+                                        &render_sts, agent_config);
         if (render_sts != AM_SUCCESS) {
             retVal = kFilterError;
         } else {
@@ -2080,10 +2166,22 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
                     break;
             }
         }
-        if (request_headers_map != NULL) {
-            am_map_destroy(request_headers_map);
-        }
     }
+    // Cleaning
+    if (clientIP != NULL) {
+        am_web_free_memory(clientIP);
+    }
+    if (clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+    }
+    if (request_headers_map != NULL) {
+       am_map_destroy(request_headers_map);
+    }
+    // Handle error status
+    if (sts != AM_SUCCESS) {
+        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+    }
+
     return retVal;
 }
 

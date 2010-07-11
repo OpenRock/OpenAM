@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: agent_configuration.cpp,v 1.21 2009/12/19 00:05:46 subbae Exp $
+ * $Id: agent_configuration.cpp,v 1.22 2010/03/10 05:08:55 dknab Exp $
  *
  * Abstract:
  * AgentConfiguration: This class creates/delets the agent configuration 
@@ -466,15 +466,23 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 reinterpret_cast<int *>
                 (&this->postdatapreserve_enable));
     }
-    
-    /* Get lb cookie to use with post preservation.*/
+ 
+    /* Get the mode the LB uses to get the sticky session */
     if (AM_SUCCESS == status) {
-        parameter = AM_WEB_POST_CACHE_DATA_PRESERVE_LBCOOKIE;
+        parameter = AM_WEB_POST_CACHE_DATA_PRESERVE_STICKY_SESSION_MODE;
         status = am_properties_get_with_default(this->properties,
                                     parameter, "", 
-                                    &this->postdatapreserve_lbcookie);
+                                    &this->postdatapreserve_sticky_session_mode);
     }
-    
+
+    /* Get the value of the sticky session to use with post preservation.*/
+    if (AM_SUCCESS == status) {
+        parameter = AM_WEB_POST_CACHE_DATA_PRESERVE_STICKY_SESSION_VALUE;
+        status = am_properties_get_with_default(this->properties,
+                                    parameter, "", 
+                                    &this->postdatapreserve_sticky_session_value);
+    }
+
     /* Get the POST cache entry lifetime */
     if (AM_SUCCESS == status) {
         parameter = AM_WEB_POST_CACHE_ENTRY_LIFETIME;
