@@ -233,6 +233,10 @@ com/sun/identity/common/ChainedException.class
 com/sun/identity/common/ReaderWriterLock.class
 com/sun/identity/common/MapFactory.class
 com/sun/identity/common/LDAPConnectionPool.class
+com/sun/identity/common/LDAPConnectionPool$CleanupTask.class
+com/sun/identity/common/LDAPConnectionPool$ThreadLocalConnection$1.class
+com/sun/identity/common/LDAPConnectionPool$ThreadLocalConnection$2.class
+com/sun/identity/common/LDAPConnectionPool$ThreadLocalConnection.class
 com/sun/identity/common/SearchResults.class
 com/iplanet/services/cdm/ICDMConstants.class
 com/iplanet/services/cdm/G11NSettings.class
