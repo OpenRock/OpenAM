@@ -61,6 +61,7 @@ class ThreadPool {
     PRLock *lock;
     volatile bool exitNow;
     PRCondVar *condVar;
+    PRCondVar *threadStarted;
     std::vector<ThreadFunction*> workQueue;
     std::size_t maxThreads;
     std::vector<PRThread *> threads;

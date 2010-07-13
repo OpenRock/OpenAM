@@ -24,7 +24,7 @@
  *
  * $Id: thread_pool.cpp,v 1.4 2008/06/25 08:14:39 qcheng Exp $
  *
- */ 
+ */
 #include "thread_pool.h"
 
 USING_PRIVATE_NAMESPACE
@@ -39,6 +39,7 @@ ThreadPool::ThreadPool(std::size_t startThreads,
     lock = NULL;
     exitNow = false;
     condVar = NULL;
+    threadStarted = NULL;
     maxThreads = maxNumThreads;
     activeThreads = 0;
     workQueue.clear();
@@ -46,10 +47,10 @@ ThreadPool::ThreadPool(std::size_t startThreads,
     init(startThreads, maxNumThreads);
 }
 
-/* 
+/*
  * Throws:
  *	std::bad_alloc if out of memory.
- *	NSPRException upon NSPR error 
+ *	NSPRException upon NSPR error
  */
 void
 ThreadPool::init(std::size_t startThreads,
@@ -59,6 +60,7 @@ ThreadPool::init(std::size_t startThreads,
     activeThreads = 0;
     exitNow = false;
     condVar = NULL;
+    threadStarted = NULL;
 
     lock = PR_NewLock();
     if(lock == NULL) {
@@ -80,22 +82,37 @@ ThreadPool::init(std::size_t startThreads,
 	throw NSPRException("ThreadPool::ThreadPool", "PR_NewCondVar", error);
     }
 
+    threadStarted = PR_NewCondVar(lock);
+    if(threadStarted == NULL) {
+	PRErrorCode error = PR_GetError();
+	Log::log(logID, Log::LOG_ERROR,
+		 "ThreadPool::ThreadPool(size_t, size_t) : NSPRException : "
+		 "Error  during PR_NewCondVar() : Error Code = %s.",
+		 PR_ErrorToString(error, PR_LANGUAGE_I_DEFAULT));
+	throw NSPRException("ThreadPool::ThreadPool", "PR_NewCondVar", error);
+    }
+
     maxThreads = maxNumThreads;
     for(std::size_t i = 0; i < startThreads; i++) {
 	createNewThread();
     }
 }
 
-/* Throws 
+/* Throws
  *	std::bad_alloc if out of memory.
- *	NSPRException upon NSPR error 
+ *	NSPRException upon NSPR error
  *	InternalException upon other errors.
  */
 void
-ThreadPool::createNewThread() 
+ThreadPool::createNewThread()
 {
     std::size_t x = activeThreads;
     std::size_t cnt = 0;
+
+    if (activeThreads >= maxThreads)
+        return;
+
+    PR_Lock(lock);
 
     PRThread  *thread = PR_CreateThread(PR_SYSTEM_THREAD,
 					::spin,
@@ -116,10 +133,17 @@ ThreadPool::createNewThread()
     // a thread pool and immediately try distructing it, the
     // ~ThreadPool will take a lock and prevent from all the
     // worker threads from entering the wait-for-work state.
-    while(activeThreads == x) {
-	PR_Sleep(PR_TicksPerSecond());
-	++cnt;
-	if(cnt == MAX_THREAD_WAKEUP_TIME) {
+
+    // This WaitCondVar will allow the newly created thread to run...
+    // once the thread is run, It will mark the threadStarted, and
+    // WaitCondVar will return Already Locked
+    Log::log(ThreadPool::logID, Log::LOG_INFO,"::createNewThread Unlocking...");
+
+    PR_WaitCondVar(threadStarted,PR_TicksPerSecond() * MAX_THREAD_WAKEUP_TIME);
+
+    Log::log(ThreadPool::logID, Log::LOG_INFO,"::createNewThread Returning...");
+
+    if(activeThreads == x) {
 	    Log::log(logID, Log::LOG_ERROR,
 		     "ThreadPool::createNewThread(): Attempt to create "
 		     "thread failed.");
@@ -127,16 +151,16 @@ ThreadPool::createNewThread()
 				    "Thread not started.  The host process "
 				    "may not be multi-threaded.",
 				    AM_FAILURE);
-	}
     }
+    PR_Unlock(lock);
 
     return;
 }
 
-/* 
- * NOTE 
+/*
+ * NOTE
  * ====
- * The ThreadFunction in the input parameter is deleted after it has 
+ * The ThreadFunction in the input parameter is deleted after it has
  * finished executing.
  */
 bool
@@ -213,6 +237,8 @@ ThreadPool::~ThreadPool() {
 
     PR_DestroyCondVar(condVar);
     condVar = NULL;
+    PR_DestroyCondVar(threadStarted);
+    threadStarted = NULL;
 	PR_DestroyLock(lock);
     lock = NULL;
     Log::log(logID, Log::LOG_INFO,
@@ -237,11 +263,15 @@ void
 
     PR_Lock(ptr->lock);
     ptr->activeThreads++;
+    Log::log(ThreadPool::logID, Log::LOG_INFO,"Setting ThreadStarted");
+    PR_NotifyCondVar(ptr->threadStarted);   // Let the caller know we have started
+
     while(ptr->activeThreads <= ptr->maxThreads &&
 	  ptr->exitNow == false) {
 	if(ptr->workQueue.size() > 0) {
 	    ThreadFunction *func = *(ptr->workQueue.begin());
 	    ptr->workQueue.erase(ptr->workQueue.begin());
+            Log::log(ThreadPool::logID, Log::LOG_INFO,"::Spin Unlocking...");
 	    PR_Unlock(ptr->lock);
 	    try {
 		Log::log(ThreadPool::logID, Log::LOG_DEBUG,
@@ -261,8 +291,10 @@ void
 
 	    PR_Lock(ptr->lock);
 	} else {
-	    if(ptr->exitNow == false)
+	    if(ptr->exitNow == false) {
+                Log::log(ThreadPool::logID, Log::LOG_INFO,"::Spin Waiting...");
 		PR_WaitCondVar(ptr->condVar, PR_INTERVAL_NO_TIMEOUT);
+            };
 	    Log::log(ThreadPool::logID, Log::LOG_DEBUG,
 		     "spin() : Thread awakened: "
 		     "activeThreads = %u ; maxThreads = %u ; "
