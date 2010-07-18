@@ -50,6 +50,9 @@ boolean_t agentInitialized = B_FALSE;
 
 #define EMPTY_STRING        ""
 #define AGENT_DESCRIPTION   "Sun OpenSSO Policy Agent 3.0 for Microsoft IIS 7.0"
+#define	MAGIC_STR		"sunpostpreserve"
+#define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
+
 const CHAR agentDescription[]       = { AGENT_DESCRIPTION };
 const CHAR httpProtocol[]           = "http";
 const CHAR httpsProtocol[]          = "https";
@@ -85,6 +88,258 @@ BOOL RegisterAgentModule()
     return TRUE;
 }
 
+static am_status_t register_post_data(IHttpContext* pHttpContext,
+                         char *url, const char *key, char* response,
+                         void* agent_config)
+{
+    const char *thisfunc = "register_post_data()";
+    am_web_postcache_data_t post_data;
+    am_status_t status = AM_SUCCESS;
+
+    post_data.value = response;
+    post_data.url = url;
+    am_web_log_debug("%s: Register POST data key :%s", thisfunc, key);
+    if (am_web_postcache_insert(key, &post_data, agent_config) == B_FALSE) {
+        am_web_log_error("Register POST data insert into"
+                         " hash table failed:%s",key);
+        status = AM_FAILURE;
+    }
+
+    return status;
+}
+
+am_status_t process_request_with_post_data_preservation(IHttpContext* pHttpContext,
+                                    am_status_t request_status,
+                                    am_policy_result_t *policy_result,
+                                    char *requestURL,
+                                    void **args,
+                                    char *resp,
+                                    void* agent_config)
+{
+    const char *thisfunc = "process_request_with_post_data_preservation()";
+    am_status_t status = AM_SUCCESS;
+    DWORD returnValue = AM_FAILURE;
+    post_urls_t *post_urls = NULL;
+    string response = "";
+
+    if (resp != NULL) {
+        response = resp;
+    }
+    status = am_web_create_post_preserve_urls(requestURL, &post_urls,
+                                              agent_config);
+    if (status != AM_SUCCESS) {
+        returnValue = AM_FAILURE;
+    }
+    // In CDSSO mode, for a POST request, the post data have
+    // already been saved in the response variable, so we need
+    // to get them here only if response is NULL.
+    if ((status == AM_SUCCESS) && (response.size() == 0)) {
+        GetEntity(pHttpContext, response);
+    }
+    if ((status == AM_SUCCESS) && (response.size()) > 0) {
+            if (AM_SUCCESS == register_post_data(pHttpContext,post_urls->action_url,
+                                       post_urls->post_time_key, (char *)response.c_str(),
+                                       agent_config))
+            {
+                char *lbCookieHeader = NULL;
+                // If using a LB in front of the agent and if the sticky
+                // session mode is COOKIE, the lb cookie needs to be set there.
+                // If am_web_get_postdata_preserve_lbcookie()
+                // returns AM_INVALID_ARGUMENT, it means that the
+                // sticky session feature is disabled (ie no LB) or
+                // that the sticky session mode is set to URL.
+                status = am_web_get_postdata_preserve_lbcookie(
+                          &lbCookieHeader, B_FALSE, agent_config);
+                if (status == AM_NO_MEMORY) {
+                    returnValue = AM_FAILURE;
+                } else {
+                    if (status == AM_SUCCESS) {
+                        am_web_log_debug("%s: Setting LB cookie "
+                                         "for post data preservation.",
+                                         thisfunc);
+                        set_cookie(lbCookieHeader, args);
+                    }
+                    returnValue = do_redirect(pHttpContext, request_status,
+                                              policy_result,
+                                              post_urls->dummy_url,
+                                              REQUEST_METHOD_POST, args,
+                                              agent_config);
+                }
+                if (lbCookieHeader != NULL) {
+                    am_web_free_memory(lbCookieHeader);
+                    lbCookieHeader = NULL;
+                }
+            } else {
+                am_web_log_error("%s: register_post_data() "
+                     "failed.", thisfunc);
+                returnValue = AM_FAILURE;
+            }
+        } else {
+            am_web_log_debug("%s: This is a POST request with no post data. "
+                             "Redirecting as a GET request.", thisfunc);
+            returnValue = do_redirect(pHttpContext, request_status,
+                                      policy_result,
+                                      requestURL,
+                                      REQUEST_METHOD_GET, args,
+                                      agent_config);
+    }
+    if (post_urls != NULL) {
+        am_web_clean_post_urls(post_urls);
+        post_urls = NULL;
+    }
+
+    return (am_status_t)returnValue;
+}
+
+
+// Method to check and create post page
+static am_status_t check_for_post_data(IHttpContext* pHttpContext,
+                                       char *requestURL, char **page,
+                                       void *agent_config)
+{
+    const char *thisfunc = "check_for_post_data()";
+    const char *post_data_query = NULL;
+    am_web_postcache_data_t get_data = {NULL, NULL};
+    const char *actionurl = NULL;
+    const char *postdata_cache = NULL;
+    am_status_t status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
+    CHAR* buffer_page = NULL;
+    char *stickySessionValue = NULL;
+    char *stickySessionPos = NULL;
+    char *temp_uri = NULL;
+    *page = NULL;
+
+    if(requestURL == NULL) {
+        status = AM_INVALID_ARGUMENT;
+    }
+    // Check if magic URI is present in the URL
+    if(status == AM_SUCCESS) {
+        post_data_query = strstr(requestURL, POST_PRESERVE_URI);
+        if (post_data_query != NULL) {
+            post_data_query += strlen(POST_PRESERVE_URI);
+            // Check if a query parameter for the  sticky session has been
+            // added to the dummy URL. Remove it if it is the case.
+            status_tmp = am_web_get_postdata_preserve_URL_parameter
+                       (&stickySessionValue, agent_config);
+            if (status_tmp == AM_SUCCESS) {
+                stickySessionPos = strstr((char *)post_data_query, stickySessionValue);
+                if (stickySessionPos != NULL) {
+                    size_t len = strlen(post_data_query) -
+                                 strlen(stickySessionPos)-1;
+                    temp_uri = (char *)malloc(len+1);
+                    memset(temp_uri,0,len+1);
+                    strncpy(temp_uri, post_data_query, len);
+                    post_data_query = temp_uri;
+                }
+            }
+        }
+    }
+    // If magic uri present search for corresponding value in hashtable
+    if((status == AM_SUCCESS) && (post_data_query != NULL) &&
+       (strlen(post_data_query) > 0))
+    {
+        am_web_log_debug("%s: POST Magic Query Value: %s",
+                         thisfunc, post_data_query);
+        if(am_web_postcache_lookup(post_data_query, &get_data,
+                                   agent_config) == B_TRUE) {
+            postdata_cache = get_data.value;
+            actionurl = get_data.url;
+            am_web_log_debug("%s: POST hashtable actionurl: %s",
+                             thisfunc, actionurl);
+            // Create the post page
+            buffer_page = am_web_create_post_page(post_data_query,
+                                   postdata_cache,actionurl, agent_config);
+            *page = strdup(buffer_page);
+            if (*page == NULL) {
+                am_web_log_error("%s: Not enough memory to allocate page");
+                status = AM_NO_MEMORY;
+            }
+            am_web_postcache_data_cleanup(&get_data);
+            if (buffer_page != NULL) {
+                am_web_free_memory(buffer_page);
+            }
+        } else {
+            am_web_log_error("%s: Found magic URI (%s) but entry is not in POST"
+                           " hash table",thisfunc, post_data_query);
+            status = AM_FAILURE;
+       }
+    }
+    if (temp_uri != NULL) {
+        free(temp_uri);
+        temp_uri = NULL;
+    }
+    if (stickySessionValue != NULL) {
+        am_web_free_memory(stickySessionValue);
+        stickySessionValue = NULL;
+    }
+    return status;
+}
+
+// This function is called when the preserve post data feature is enabled
+// to send the original request with the original post data after the
+// iPlanetDirectoryPro value has been obtained from the CDC servlet
+REQUEST_NOTIFICATION_STATUS send_post_data(IHttpContext* pHttpContext, char *page,
+                     char *set_cookies_list)
+{
+    const char *thisfunc = "send_post_data()";
+    size_t page_len = 0;
+    HRESULT hr;
+    REQUEST_NOTIFICATION_STATUS retStatus = RQ_NOTIFICATION_CONTINUE;
+    USHORT content_len = 0;
+
+    IHttpResponse* res = pHttpContext->GetResponse();
+
+    page_len = strlen(page);
+
+    am_web_log_debug("%s: Cookies sent with post form:\n%s",
+                      thisfunc, set_cookies_list);
+    am_web_log_debug("%s: Post form:\n%s", thisfunc, page);
+
+    hr = res->SetStatus(200,"Status OK",0, S_OK);
+    hr = res->SetHeader("Content-Type","text/html",
+                                           (USHORT)strlen("text/html"),TRUE);
+    content_len = (USHORT)page_len;
+    if (set_cookies_list != NULL)
+        content_len += strlen(set_cookies_list);
+
+    char buff[256];
+    itoa(content_len,buff,10);
+    hr = res->SetHeader("Content-Length",buff,
+                                       (USHORT)strlen(buff),TRUE);
+
+    if (set_cookies_list != NULL) 
+        set_headers_in_context(pHttpContext, set_cookies_list, TRUE);
+
+    //Send the post page
+    void * pvBuffer = pHttpContext->AllocateRequestMemory(page_len);
+
+    if (pvBuffer == NULL) {
+        am_web_log_error("%s: AllocRequestMemory Failed.", thisfunc);
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+    }
+    DWORD cbSent;
+    HTTP_DATA_CHUNK dataChunk;
+    strcpy((char *)pvBuffer,page);
+    dataChunk.DataChunkType = HttpDataChunkFromMemory;
+    dataChunk.FromMemory.pBuffer = (PVOID) pvBuffer;
+    dataChunk.FromMemory.BufferLength = (USHORT) page_len;
+    hr = res->WriteEntityChunks(&dataChunk,1,FALSE,FALSE,&cbSent);
+
+    BOOL fCompletionExpected = false;
+    hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
+    return RQ_NOTIFICATION_FINISH_REQUEST;
+
+    if (FAILED(hr)) {
+        am_web_log_error("%s: WriteClient did not succeed: "
+                         "Attempted message = %s ", thisfunc, page);
+        return RQ_NOTIFICATION_FINISH_REQUEST;
+    }
+
+    return retStatus;
+}
+
+
 /*
  *This function gets invoked at every request by OnBeginRequest.
  *
@@ -94,6 +349,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 {
     const char* thisfunc = "ProcessRequest";
     am_status_t status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
     REQUEST_NOTIFICATION_STATUS retStatus = RQ_NOTIFICATION_CONTINUE;
     string requestURL;
     string origRequestURL;
@@ -105,6 +361,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
     CHAR* dpro_cookie = NULL;
     BOOL isLocalAlloc = FALSE;    
     BOOL redirectRequest = FALSE;
+    CHAR* post_page = NULL;
     CHAR *set_cookies_list = NULL;
     CHAR *set_headers_list = NULL;
     CHAR *request_hdrs = NULL;
@@ -123,8 +380,13 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
     void *args[] = {(void *) tmpPecb, (void *) &set_headers_list,
                     (void *) &set_cookies_list, (void *) &request_hdrs };
     void *agent_config=NULL;
+    string response = "";
+
+
     IHttpRequest* req = pHttpContext->GetRequest();
     IHttpResponse* res = pHttpContext->GetResponse();
+
+    am_web_log_error("ProcessRequest -- Starting");
 
     if (readAgentConfigFile == FALSE) {
         EnterCriticalSection(&initLock);
@@ -249,6 +511,14 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
             }
         }
     }
+
+    if (status == AM_SUCCESS) {
+        if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+            status = check_for_post_data(pHttpContext, (char *)requestURL.c_str(), &post_page,
+                                         agent_config);
+        }
+    }
+
     // Create the environment map
     if (status == AM_SUCCESS) {
         status = am_map_create(&env_parameter_map);
@@ -312,11 +582,11 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) && 
                 (strcmp(requestMethod, REQUEST_METHOD_POST) == 0)) 
         {
-            if ((dpro_cookie == NULL) && 
+            if ((dpro_cookie == NULL) &&
+                ((post_page != NULL) ||
                 (am_web_is_url_enforced(requestURL.c_str(), pathInfo.c_str(), 
-                 clientIP, agent_config) == B_TRUE)) 
+                 clientIP, agent_config) == B_TRUE)))
             {
-                string response = "";
                 GetEntity(pHttpContext, response);
                 if (status == AM_SUCCESS) {
                     //Set original method to GET
@@ -392,36 +662,72 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
             if (status == AM_SUCCESS) {
                 if ((set_headers_list != NULL) || (set_cookies_list != NULL) 
                         || (redirectRequest == TRUE)) {
+ // XXX
                     //the following function also invokes set_headers_in_context() 
                     //to set all the headers in the httpContext.
+                    am_web_log_debug("POSTDATA -- Setting Headers : redirectRequest = %b",
+                            redirectRequest);
+
                     status = set_request_headers(pHttpContext, args);
                 }
             }
             if (status == AM_SUCCESS) {
-                if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) {
-                    //this call sets only cookies
-                    set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
-                }
-                //now set remote user
-                if (pOphResources->result.remote_user != NULL) {
-                    const char * ruser = pOphResources->result.remote_user;
-                    wchar_t *remoteUser = (wchar_t *)pHttpContext->
-                        AllocateRequestMemory((DWORD) (strlen(ruser)+1) 
-                                              * sizeof(wchar_t));
-                    mbstowcs( remoteUser, ruser, strlen(ruser) + 1);
-                    pHttpContext->SetServerVariable("REMOTE_USER", remoteUser);
-                }
-                if (redirectRequest == TRUE) {
-                    am_web_log_debug("%s: Request redirected to orignal url "
-                            "after return from CDC servlet",thisfunc);
-                    retStatus = redirect_to_request_url(pHttpContext, 
-                            requestURL.c_str(), request_hdrs);
-                } else {
-                    retStatus = RQ_NOTIFICATION_CONTINUE;
-                }
-                if (set_cookies_list != NULL) {
-                    free(set_cookies_list);
-                    set_cookies_list = NULL;
+                 if (post_page != NULL) {
+                    char *lbCookieHeader = NULL;
+                    // If post_ page is not null it means that the request 
+                    // contains the "/dummypost/sunpostpreserve" string and
+                    // that the post data of the original request need to be
+                    // posted.
+                    // If using a LB cookie, it needs to be set to NULL there.
+                    // If am_web_get_postdata_preserve_lbcookie() returns
+                    // AM_INVALID_ARGUMENT, it means that the sticky session
+                    // feature is disabled (ie no LB) or that the sticky
+                    // session mode is URL.
+                    status_tmp = am_web_get_postdata_preserve_lbcookie(
+                                            &lbCookieHeader, B_TRUE,
+                                            agent_config);
+                    if (status_tmp == AM_NO_MEMORY) {
+                        retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                    } else {
+                        if (status_tmp == AM_SUCCESS) {
+                            am_web_log_debug("%s: Setting LB cookie for "
+                                             "post data preservation to null.",
+                                             thisfunc);
+                            set_cookie(lbCookieHeader, args);
+                        }
+                        retStatus = send_post_data(pHttpContext, post_page,
+                                                 set_cookies_list);
+                    }
+                    if (lbCookieHeader != NULL) {
+                        am_web_free_memory(lbCookieHeader);
+                        lbCookieHeader = NULL;
+                    }
+                } else { 
+                    if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) {
+                        //this call sets only cookies
+                        set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
+                    }
+                    //now set remote user
+                    if (pOphResources->result.remote_user != NULL) {
+                        const char * ruser = pOphResources->result.remote_user;
+                        wchar_t *remoteUser = (wchar_t *)pHttpContext->
+                            AllocateRequestMemory((DWORD) (strlen(ruser)+1)
+                                                  * sizeof(wchar_t));
+                        mbstowcs( remoteUser, ruser, strlen(ruser) + 1);
+                        pHttpContext->SetServerVariable("REMOTE_USER", remoteUser);
+                    }
+                    if (redirectRequest == TRUE) {
+                        am_web_log_debug("%s: Request redirected to orignal url "
+                                "after return from CDC servlet",thisfunc);
+                        retStatus = redirect_to_request_url(pHttpContext,
+                                requestURL.c_str(), request_hdrs);
+                    } else {
+                        retStatus = RQ_NOTIFICATION_CONTINUE;
+                    }
+                    if (set_cookies_list != NULL) {
+                        free(set_cookies_list);
+                        set_cookies_list = NULL;
+                    }
                 }
             }
             break;
@@ -429,17 +735,50 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         case AM_INVALID_SESSION:
             am_web_log_info("%s: Invalid session.",thisfunc);
             am_web_do_cookies_reset(reset_cookie, args, agent_config);
-            status = do_redirect(pHttpContext, status, &OphResources.result,
+
+            // If the post data preservation feature is enabled
+            // save the post data in the cache for post requests.
+            if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
+                && B_TRUE == am_web_is_postpreserve_enabled(agent_config))
+            {
+                status = process_request_with_post_data_preservation
+                                  (pHttpContext, status, &pOphResources->result,
+                                   (char *)requestURL.c_str(), args, (char *)response.c_str(), agent_config);
+             } else {
+                status = do_redirect(pHttpContext, status, &OphResources.result,
                          requestURL.c_str(), requestMethod, args, agent_config);
+            }
+            {
+                HRESULT hr;
+                // Buffer to store the byte count.
+                DWORD cbSent = 0;
+                // Buffer to store if asyncronous completion is pending.
+                BOOL fCompletionExpected = false;
+                hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
+
+            }
+
             break;
 
         case AM_ACCESS_DENIED:
             am_web_log_info("%s: Access denied to %s",thisfunc,
                             OphResources.result.remote_user ?
                             OphResources.result.remote_user : "unknown user");
+            // If the post data preservation feature is enabled
+            // save the post data in the cache for post requests.
+            // This needs to be done when the access has been denied
+            // in case there is a composite advice.
+            if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
+                && B_TRUE == am_web_is_postpreserve_enabled(agent_config))
+            {
+                status = process_request_with_post_data_preservation
+                                  (pHttpContext, status, &pOphResources->result,
+                                   (char *)requestURL.c_str(), args, (char *)response.c_str(), agent_config);
+            } else {
             status = do_redirect(pHttpContext, status, &OphResources.result,
                               requestURL.c_str(), requestMethod, 
                               args, agent_config);
+            }
             break;
 
         case AM_INVALID_FQDN_ACCESS:
@@ -527,6 +866,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 
     OphResourcesFree(pOphResources);
     am_web_delete_agent_configuration(agent_config);
+
     return retStatus;
 }
 
@@ -1598,6 +1938,8 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args)
     return status;
 }
 
+// Method to register POST data in agent cache
+
 /*
  * Invoked during CDSSO. It jsut returns RQ_NOTIFICATION_CONTINUE now to let the 
  * IIS handle the request. If more processing is required, it can be implemented
@@ -1711,6 +2053,7 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
                         set_headers_in_context(pHttpContext, set_cookies_list, 
                                                             FALSE);
                     }
+                    am_web_log_debug("Generated Redirect");
                     pHttpResponse->Redirect(redirect_url, true, false);
                     if (FAILED(hr)) {
                         am_web_log_error("%s: SetHeader failed.", thisfunc);
