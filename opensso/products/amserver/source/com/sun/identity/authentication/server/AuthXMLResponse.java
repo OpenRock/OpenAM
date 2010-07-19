@@ -312,7 +312,7 @@ public class AuthXMLResponse {
                             .append(AuthXMLTags.SUCCESS_URL)
                             .append(AuthXMLTags.EQUAL)
                             .append(AuthXMLTags.QUOTE)
-                            .append(successURL)
+                            .append(XMLUtils.escapeSpecialCharacters(successURL))
                             .append(AuthXMLTags.QUOTE);
             }
             
