@@ -26,6 +26,8 @@
 #
 #
 
+# Portions Copyrighted [2010] [ForgeRock AS]
+
 #------------------------------------------------------------------------------
 # J2EE Agents Bootstrap File
 #
@@ -135,3 +137,10 @@ com.sun.identity.agents.config.lock.enable = false
 #
 com.sun.identity.agents.config.profilename = @AGENT_PROFILE_NAME@
 
+#
+# OPENAM DEPLOYMENT URI
+#   This property controls the URI under which OpenAM has been deployed. If this
+#   parameter is not supplied then the default value is /opensso.
+# Hot-Swap Enabled: No
+#
+com.iplanet.am.services.deploymentDescriptor=@AM_SERVICES_DEPLOY_URI@
