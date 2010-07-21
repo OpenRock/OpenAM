@@ -32,6 +32,11 @@ public interface TestConstants {
     String TEST_PROPERTY_AMCONFIG = "AMConfig";
     
     /**
+     * Version number of OpenAM being used
+     */
+    String KEY_ATT_AM_VERSION = "openam_version";
+    
+    /**
      * Property name for logging level.
      */
     String KEY_ATT_LOG_LEVEL = "log_level";
@@ -177,6 +182,18 @@ public interface TestConstants {
      * Property key for <code>directory_port</code>.
      */
     String KEY_ATT_DIRECTORY_PORT = "directory_port";
+    
+    
+    /**
+     * Property key for <code>ds_adminport</code>.
+     */
+    String KEY_ATT_DS_ADMINPORT = "directory_admin_port";
+    
+    
+    /**
+     * Property key for <code>ds_jmxport</code>.
+     */
+    String KEY_ATT_DS_JMXPORT = "directory_jmx_port";
     
     /**
      * Property key for <code>config_root_suffix</code>.
