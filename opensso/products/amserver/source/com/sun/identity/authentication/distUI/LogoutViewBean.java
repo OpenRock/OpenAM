@@ -176,10 +176,10 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         // Invalidate HttpSession
         session.invalidate();
 
-        String LogoutJspPage = SystemProperties.get(DEFAULT_LOGOUT_PAGE);
+        String logoutJspPage = SystemProperties.get(DEFAULT_LOGOUT_PAGE);
 
-        if (LogoutJspPage!=null && LogoutJspPage.length()!=0) { //default logout page: set - redirecting to the custom logout page
-            jsp_page = appendLogoutCookie(getFileName(LogoutJspPage));
+        if (logoutJspPage!=null && logoutJspPage.length()!=0) { //default logout page: set - redirecting to the custom logout page
+            jsp_page = appendLogoutCookie(getFileName(logoutJspPage));
             if (!ssoTokenExists) {
                 if (!isGotoSet()) {
                     try {
@@ -213,11 +213,12 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     }
                 }
             }
-
-            if (!redirectToGoto(locale)) {
-                super.forwardTo(requestContext);
-            }
         }
+
+        if (!redirectToGoto(locale)) {
+            super.forwardTo(requestContext);
+        }
+        
     }
     
     private String getFileName(String fileName) {
