@@ -223,3 +223,9 @@ opensso.protocol.handler.pkgs=
  * serialization overhead.
  */
 openam.remoteauth.include.reqres=false
+
+/*
+ * This setting controls the default logout page to which a user is redirected
+ * if no goto url is specified to the LogoutViewBean.
+ */
+openam.authentication.distUI.defaultLogoutPage=Logout.jsp

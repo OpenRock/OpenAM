@@ -26,10 +26,13 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.distUI;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.RequestContext;
@@ -38,7 +41,6 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.jato.view.View;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 
@@ -119,9 +121,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             ISLocaleContext localeContext = new ISLocaleContext();
             localeContext.setLocale(request);
             locale = localeContext.getLocale();
-            SSOTokenManager manager = SSOTokenManager.getInstance();
             SessionID sessionID = AuthClientUtils.getSessionIDFromRequest(request);
             SSOToken ssoToken = AuthClientUtils.getExistingValidSSOToken(sessionID);
+
             if (ssoToken != null) {
                 ssoTokenExists = true;
                 loginURL = (String)ssoToken.getProperty
@@ -136,11 +138,13 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 }
             }
 
-            AuthContext ac = new AuthContext(ssoToken);
-            ac.login();
-            ac.logoutUsingTokenID();
-            //manager.destroyToken(ssoToken);
-            logoutDebug.message("logout successfully");
+            if (ssoTokenExists) {
+                AuthContext ac = new AuthContext(ssoToken);
+                ac.login();
+                ac.logoutUsingTokenID();
+                logoutDebug.message("logout successfully");
+            }
+
             rb =  rbCache.getResBundle(bundleName, locale);
             ResultVal = rb.getString("logout.successful");
            
@@ -171,31 +175,48 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         
         // Invalidate HttpSession
         session.invalidate();
-        
-        // get the Logout JSP page path
-        jsp_page = appendLogoutCookie(getFileName(LOGOUT_JSP));
-        
-        if (!ssoTokenExists) {
-            if (!isGotoSet()) {
-                try {
-                    if (logoutDebug.messageEnabled()) {
-                        logoutDebug.message("AuthContext is NULL");
-                        logoutDebug.message("Goto LOGINURL : "+ LOGINURL);
-                    }
-                    if (doSendRedirect(LOGINURL)) {
-                        response.sendRedirect(appendLogoutCookie(LOGINURL));
+
+        String LogoutJspPage = SystemProperties.get(DEFAULT_LOGOUT_PAGE);
+
+        if (LogoutJspPage!=null && LogoutJspPage.length()!=0) { //default logout page: set - redirecting to the custom logout page
+            jsp_page = appendLogoutCookie(getFileName(LogoutJspPage));
+            if (!ssoTokenExists) {
+                if (!isGotoSet()) {
+                    try {
+                        logoutDebug.message("super.forwardTo showing Logout page");
+                        super.forwardTo(requestContext);
                         return;
-                    } else {
-                        jsp_page = appendLogoutCookie(getFileName(LOGIN_JSP));
+                    } catch (Exception e) {
+                        ResultVal = getL10NMessage(e, locale);
                     }
-                } catch (Exception e) {
-                    ResultVal = getL10NMessage(e, locale);
                 }
             }
-        }
-        
-        if (!redirectToGoto(locale)) {
-            super.forwardTo(requestContext);
+        } else {
+            // get the Logout JSP page path
+            jsp_page = appendLogoutCookie(getFileName(LOGOUT_JSP));
+
+            if (!ssoTokenExists) {
+                if (!isGotoSet()) {
+                    try {
+                        if (logoutDebug.messageEnabled()) {
+                            logoutDebug.message("AuthContext is NULL");
+                            logoutDebug.message("Goto LOGINURL : "+ LOGINURL);
+                        }
+                        if (doSendRedirect(LOGINURL)) {
+                            response.sendRedirect(appendLogoutCookie(LOGINURL));
+                            return;
+                        } else {
+                            jsp_page = appendLogoutCookie(getFileName(LOGIN_JSP));
+                        }
+                    } catch (Exception e) {
+                        ResultVal = getL10NMessage(e, locale);
+                    }
+                }
+            }
+
+            if (!redirectToGoto(locale)) {
+                super.forwardTo(requestContext);
+            }
         }
     }
     
@@ -486,6 +507,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     private static final String LOGIN_JSP = "Login.jsp";
     private static final String bundleName = "amAuthUI";
     private boolean ssoTokenExists = false;
+    private final static String DEFAULT_LOGOUT_PAGE = "openam.authentication.distUI.defaultLogoutPage";
     
     static {
         LOGINURL = serviceUri + "/UI/Login";
