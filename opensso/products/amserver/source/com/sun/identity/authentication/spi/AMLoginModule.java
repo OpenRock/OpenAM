@@ -2359,7 +2359,13 @@ public abstract class AMLoginModule implements LoginModule {
             }
         }
 
-        return loginState.isAccountLocked(userName);
+        boolean accountLocked = loginState.isAccountLocked(userName);
+
+        if (ad.debug.messageEnabled()) {
+            ad.debug.message("isAccountLocked for user=" + userName + " :" + accountLocked);
+        }
+
+        return accountLocked;
     }
 
     /* returns the normalized DN  */
