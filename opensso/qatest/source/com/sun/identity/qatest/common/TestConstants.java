@@ -22,6 +22,10 @@
  * Copyright 2008 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.common;
 
 public interface TestConstants {

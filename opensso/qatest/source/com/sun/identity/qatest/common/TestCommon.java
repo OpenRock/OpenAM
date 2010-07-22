@@ -23,6 +23,11 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
+
 package com.sun.identity.qatest.common;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -626,29 +631,35 @@ public class TestCommon implements TestConstants {
                     .append(URLEncoder.encode(
                         (String)map.get(
                         TestConstants.KEY_ATT_AMADMIN_PASSWORD), "UTF-8"));
+
+            //OPENDS 2.3 PARAMETERS (OpenAM 9.5 and later)
+            boolean flag = true;
             try{
                 String strAMVersion = (String)map.get(
                                     TestConstants.KEY_ATT_AM_VERSION);
-                float floAMVersion = Float.parseFloat(strAMVersion);
-                if (floAMVersion >= 9.5){
-                    strBuff.append("&")
-                            .append(URLEncoder.encode("DIRECTORY_ADMIN_PORT", "UTF-8"))
-                            .append("=")
-                            .append(URLEncoder.encode(
-                                (String)map.get(
-                                TestConstants.KEY_ATT_DS_ADMINPORT), "UTF-8"))
-                            .append("&")
-                            .append(URLEncoder.encode("DIRECTORY_JMX_PORT", "UTF-8"))
-                            .append("=")
-                            .append(URLEncoder.encode(
-                                (String)map.get(
-                                TestConstants.KEY_ATT_DS_JMXPORT), "UTF-8"));
-                }   
+                float floAMVersionNum = Float.parseFloat(strAMVersion);
+                if (floAMVersionNum < 9.5) {
+                    flag = false;
+                }
             } catch (NumberFormatException ex) {
                 log(Level.FINE, "GetPostString", "Invalid version number");
             } catch (NullPointerException ex) {
                 log(Level.FINE, "GetPostString", "No version number");
             }
+            if (flag){
+                strBuff.append("&")
+                        .append(URLEncoder.encode("DIRECTORY_ADMIN_PORT", "UTF-8"))
+                        .append("=")
+                        .append(URLEncoder.encode(
+                            (String)map.get(
+                            TestConstants.KEY_ATT_DS_ADMINPORT), "UTF-8"))
+                        .append("&")
+                        .append(URLEncoder.encode("DIRECTORY_JMX_PORT", "UTF-8"))
+                        .append("=")
+                        .append(URLEncoder.encode(
+                            (String)map.get(
+                            TestConstants.KEY_ATT_DS_JMXPORT), "UTF-8"));
+            }   
         } else if (strConfigStore.equals("dirServer")) {
             strBuff.append(URLEncoder.encode("DIRECTORY_SERVER", "UTF-8"))
                     .append("=")
