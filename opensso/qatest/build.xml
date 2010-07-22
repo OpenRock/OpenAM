@@ -25,6 +25,9 @@
  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
 -->
 
+<!--
+ Portions Copyrighted [2010] [Forgerock AS]
+-->
 <project name="OpenSSO QA Test Framework" default="usage" basedir=".">
 
     <import file="./build.properties"/>
@@ -34,7 +37,7 @@
       <fail message="Please execute QATEST using ant 1.7.1 or above">
         <condition>
           <not>
-            <contains string="${ant.version}" substring="1.7.1"/>
+            <available classname="org.apache.tools.ant.input.SecureInputHandler"/>
           </not>
         </condition>
       </fail>
