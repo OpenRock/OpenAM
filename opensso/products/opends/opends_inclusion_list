@@ -101,8 +101,8 @@ config/schema/06-compat.ldif
 config/servicetag/
 config/servicetag/opends.uuids.properties
 config/upgrade/
-config/upgrade/config.ldif.6400
-config/upgrade/schema.ldif.6400
+config/upgrade/config.ldif.6500
+config/upgrade/schema.ldif.6500
 db/
 import-tmp/
 ldif/
