@@ -36,6 +36,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.util.HashMap;
@@ -97,12 +98,19 @@ public class BasicClientTypesManager implements ClientTypesManager {
      */
     public void initManager() {
         Properties clientProps = new Properties();
+        InputStream is = null;
 
         try {
-            InputStream is = this.getClass().getResourceAsStream(PROPS_FILE);
+            is = this.getClass().getResourceAsStream(PROPS_FILE);
             clientProps.load(is);
         } catch(Exception ex) {
-            debug.error(CLASS_NAME + "unable to load properties file" + PROPS_FILE, ex);
+            debug.error(CLASS_NAME + " unable to load properties file" + PROPS_FILE, ex);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ioe) {
+                debug.error(CLASS_NAME + " unable to close property file");
+            }
         }
 
         if (clientProps != null && !clientProps.isEmpty()) {
