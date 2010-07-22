@@ -2246,7 +2246,7 @@ public abstract class AMLoginModule implements LoginModule {
      * or  null, or for any other error condition.
      * @supported.api
      */
-     public int getFailCount(String userName) throws AuthenticationException {
+     public int getFailCount(AMIdentity amIdUser) throws AuthenticationException {
          AccountLockoutInfo acInfo = null;
          if (loginState == null) {
             loginState = getLoginState();
@@ -2269,6 +2269,7 @@ public abstract class AMLoginModule implements LoginModule {
             bundleName);
          isAccountLockout.setStoreInvalidAttemptsInDS(
          loginState.getLoginFailureLockoutStoreInDS());
+
          try {
              if (!isAccountLockout.isLockoutEnabled()) {
                   debug.message("Failure lockout mode disabled");
@@ -2278,11 +2279,10 @@ public abstract class AMLoginModule implements LoginModule {
                      debug.message("AMLogiModule.getFailCount()::"
                          +"lockout is enabled");
                  }
+
                  String userDN = null;
-                 AMIdentity amIdentity = null;
-                 AMIdentity amIdUser = ad.getIdentity(IdType.USER, userName, 
-                     loginState.getOrgDN());
                  userDN = normalizeDN(IdUtils.getDN(amIdUser));
+
                  if (acInfo == null) {
                      acInfo = isAccountLockout.getAcInfo(userDN,amIdUser);
                  }
@@ -2293,9 +2293,9 @@ public abstract class AMLoginModule implements LoginModule {
                  }
                  return failCount;
              }
-         } catch (Exception e) {
-             debug.error("AMLoginModule.getFailCount:Error : " + e.toString());
-             throw new AuthenticationException(e.getMessage());
+         } catch (Exception ex) {
+             debug.error("AMLoginModule.getFailCount:Error", ex);
+             throw new AuthenticationException(ex.getMessage());
          }
     }
 
