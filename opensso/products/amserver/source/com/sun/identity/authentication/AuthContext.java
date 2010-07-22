@@ -157,8 +157,7 @@ public class AuthContext extends Object implements java.io.Serializable {
     private String ssoTokenID = null;
     private static SSOToken appSSOToken = null;
     com.sun.identity.authentication.server.AuthContextLocal acLocal = null;
-    private final static int DEFAULT_RETRY_COUNT = 1;
-    private int retryRunLogin = DEFAULT_RETRY_COUNT;
+    private boolean retryRunLogin = true;
     
     /**
      * Variables for checking auth service is running local
@@ -764,8 +763,6 @@ public class AuthContext extends Object implements java.io.Serializable {
         // Run Login
         runRemoteLogin(indexType, indexName, params, pCookie, envMap, locale,
                 request, response);
-        // reset the retry count
-        retryRunLogin = DEFAULT_RETRY_COUNT;
         
         if (authDebug.messageEnabled()) {
             authDebug.message("useNewStyleRemoteAuthentication : " 
@@ -799,8 +796,6 @@ public class AuthContext extends Object implements java.io.Serializable {
             // Re-try login process with AuthIdentifier
             runRemoteLogin(indexType, indexName, params, pCookie, 
                 envMap, locale, request, response);
-            // reset the retry count
-            retryRunLogin = DEFAULT_RETRY_COUNT;
         } else if (!useNewStyleRemoteAuthentication) {
             useNewStyleRemoteAuthentication = true;
         }
@@ -1001,25 +996,21 @@ public class AuthContext extends Object implements java.io.Serializable {
 
             // Check set the login status
             checkAndSetLoginStatus();
-
-            // if the app token was refreshed, retry remote login
-            if (loginException != null &&
-                loginException.getErrorCode().equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN) &&
-                retryRunLogin > 0) {
-                retryRunLogin--;
+        } catch (AuthLoginException le) {
+            if (le.getErrorCode().equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN) &&
+                    retryRunLogin) {
+                retryRunLogin = false;
 
                 if (authDebug.messageEnabled()) {
                     authDebug.message("Run remote login failed due to expired app token, retying");
                 }
 
-                // reset as we are starting again
-                loginStatus = Status.IN_PROGRESS;
                 runRemoteLogin(indexType, indexName, params, pCookie, envMap, locale, req,  res);
+            } else {
+                // Login has failed
+                loginStatus = Status.FAILED;
+                loginException = le;
             }
-        } catch (AuthLoginException le) {
-            // Login has failed
-            loginStatus = Status.FAILED;
-            loginException = le;
         }
     }
 
@@ -1831,7 +1822,7 @@ public class AuthContext extends Object implements java.io.Serializable {
 
         // if the app token is invalid, refresh the token
         if (error.equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN)) {
-            appSSOToken = getAppSSOToken(true);
+             appSSOToken = getAppSSOToken(true);
         }
 
         if (error != null && error.length() != 0){

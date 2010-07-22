@@ -27,9 +27,6 @@
  $Id: defaultDelegationPoliciesForAmSDK.xml,v 1.3 2009/08/19 05:40:40 veiming Exp $
 -->
 
-<!--
-    Portions Copyrighted [2010] [ForgeRock AS]
--->
                                                                                 
 <!DOCTYPE Policies
     PUBLIC "-//iPlanet//OpenSSO 2005Q4 Admin CLI DTD//EN"    "jar://com/sun/identity/policy/policyAdmin.dtd">
@@ -62,19 +59,6 @@
     </Subjects>
 </Policy>
 
-<Policy name="@SM_ROOT_SUFFIX_HAT@^^AgentReadRealm" referralPolicy="false" active="true" >
-    <Rule name="delegation-rule1">
-        <ServiceName name="sunAMDelegationService" />
-        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/*" />
-        <AttributeValuePair>
-            <Attribute name="READ" />
-            <Value>allow</Value>
-        </AttributeValuePair>
-    </Rule>
-    <Subjects name="Subjects" description="">
-        <Subject name="AuthenticatedAgents" type="AuthenticatedAgents" includeType="inclusive">
-    </Subjects>
-</Policy>
 
 <Policy name="@SM_ROOT_SUFFIX_HAT@^^PolicyAdmin1"
     referralPolicy="false" active="true" >
