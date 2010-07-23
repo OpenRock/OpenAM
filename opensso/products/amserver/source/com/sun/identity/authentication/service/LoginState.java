@@ -2946,7 +2946,6 @@ public class LoginState {
                 String tmpDN = (isSessionUpgrade()) ? DNUtils.normalizeDNIgnoringCase(this.token) : DNUtils.normalizeDN(this.token);
                 if (tmpDN != null) {
                     this.userDN = tmpDN;
-                    this.token = DNUtils.DNtoName(this.token);
                 } else if (tmpDN == null && this.userDN == null) {
                     this.userDN = this.token;
                 }
