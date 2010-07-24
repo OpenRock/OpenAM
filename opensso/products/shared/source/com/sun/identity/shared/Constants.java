@@ -980,4 +980,19 @@ public interface Constants {
      */
      public static final String REMOTEAUTH_INCLUDE_REQRES =
              "openam.remoteauth.include.reqres";
+
+     /**
+      * property to control if the OpenAM session cookie should be made
+      * persistent
+      */
+     public static final String PERSIST_AM_COOKIE =
+             "openam.session.persist_am_cookie";
+
+     /**
+      * property to control if the OpenAM server will persist the OpenAM
+      * session cookie if the following parameter is in the incoming request
+      * <code>PersistAMCookie</code>.
+      */
+     public static final String ALLOW_PERSIST_AM_COOKIE =
+             "openam.session.allow_persist_am_cookie";
 }

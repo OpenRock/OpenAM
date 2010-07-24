@@ -2651,24 +2651,48 @@ public class AuthClientUtils {
     /**
      * Checks whether OpenSSO session cookie has to be made
      * persistent.
+     *
      * Only if value of <code>true</code> is providued for HTTP query
-     * parameter <code>Constants.PERSIST_AM_COOKIE</code>, AM session
-     * cookie would be made persistent
+     * parameter <code>Constants.PERSIST_AM_COOKIE</code> and this property is
+     * enabled or if persistent cookies are set globally.
+     *
+     * If either of these are true, AM session cookie will be made persistent
+     *
      * @param reqDataHash http request parameters and values
      * @return <code>true</code> if AM session cookie has to be made persistent,
      *        otherwise returns <code>false</code>
      */
      public static boolean persistAMCookie(Hashtable reqDataHash) {
-         boolean persistCookie = false;
-         String persistCookieString
-                 = (String)reqDataHash.get(Constants.PERSIST_AM_COOKIE);
-         if (persistCookieString != null) {
+        String globalPersistCookieString = SystemProperties.get(
+            com.sun.identity.shared.Constants.PERSIST_AM_COOKIE);
+        boolean globalPersist =
+            Boolean.valueOf(globalPersistCookieString).booleanValue();
+
+        if (globalPersist) {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("AuthUtils.persistAMCookie(): Set globally ");
+            }
+
+            return true;
+        }
+
+        boolean persistCookie = false;
+        String persistCookieString
+                = (String)reqDataHash.get(Constants.PERSIST_AM_COOKIE);
+        String allowRequestPersistString = SystemProperties.get(
+                com.sun.identity.shared.Constants.ALLOW_PERSIST_AM_COOKIE);
+        boolean allowRequestPersist =
+                Boolean.valueOf(allowRequestPersistString).booleanValue();
+
+         if (allowRequestPersist && (persistCookieString != null)) {
              persistCookie
                      = (Boolean.valueOf(persistCookieString)).booleanValue();
          }
+
          if (utilDebug.messageEnabled()) {
               utilDebug.message("AuthUtils.persistAMCookie(): " + persistCookie);
          }
+
          return persistCookie;
      }
     

@@ -229,3 +229,27 @@ openam.remoteauth.include.reqres=false
  * if no goto url is specified to the LogoutViewBean.
  */
 openam.authentication.distUI.defaultLogoutPage=Logout.jsp
+
+/*
+ * This setting turns on persistent OpenAM session cookies, traditionally the
+ * OpenAM session cookie (iPlanetDirectoryPro) has always been a session cookie.
+ * If the OpenAM session cookie is required by other applications then the cookie
+ * must be made persistent.
+ *
+ * SECURITY NOTE: This setting should only be set to true in very specific
+ * circumstances. If OpenAM is deployed alongside Enterprise/Desktop SSO
+ * customisations then this setting can be enabled. This will cause the browser
+ * to write the value of the OpenAM session cookie to disk enabling Enterprise/
+ * Desktop SSO. Writing the session cookie to disk will also allow other
+ * applications to read the cookie. This feature should only be enabled if you
+ * are aware and accept the security implications.
+ */
+openam.session.persist_am_cookie=false
+
+/*
+ * This property controls the length of time for which the OpenAM session cookie 
+ * will be persisted if persistent cookie mode is enabled.
+ *
+ * Units: Time in hours
+ */
+com.iplanet.am.cookie.timeToLive=24
