@@ -23,9 +23,19 @@
  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
 -->
 
+<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+
 <project>
     <dirname property="QATEST_HOME" file="build.xml"/>
     <echo message="QATEST_HOME=${QATEST_HOME}"/>
+
+    <path id="client.classpath">
+      <pathelement path="${classpath}"/>
+      <fileset dir="lib">
+        <include name="**/*.jar"/>
+      </fileset>
+      <pathelement location="classes"/>
+    </path>
 
     <property 
       name="configurator.server1.properties" 
@@ -128,7 +138,10 @@
         </if>
         <echo message="The Automation reports are at ${runtime.report.dir}"/>
         <java classname="com.sun.identity.qatest.report.GenerateReport">
-          <classpath refid="client.classpath" />
+            <classpath>
+                <pathelement path="${client.cp}"/>
+                <pathelement path="${built.classes.dir}"/>
+            </classpath>
           <arg value="${runtime.report.dir}" />
           <arg value="${test.output.file}" />
         </java>
@@ -547,13 +560,21 @@
             <contains string="${run_failed_testcase.set}" substring="false" casesensitive="No"/>
             <then>
                 <taskdef name="testng" classname="com.beust.testng.TestNGAntTask" classpathref="client.classpath"/>
-                <testng classpathref="client.classpath" outputdir="${base.report.dir}">
+                <testng classpathref="client.classpath" outputdir="${base.report.dir}" sourcedir="${built.classes.dir}">
+                    <classpath>
+                        <pathelement path="${client.cp}"/>
+                        <pathelement path="${built.classes.dir}"/>
+                    </classpath>
                     <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="${ModuleToExecute}-${EXECUTION_MODE}-generated.xml"/>
                 </testng>
             </then>
             <else>
                 <taskdef name="testng" classname="com.beust.testng.TestNGAntTask" classpathref="client.classpath"/>
                 <testng classpathref="client.classpath" outputdir="${base.report.dir}">
+                    <classpath>
+                        <pathelement path="${client.cp}"/>
+                        <pathelement path="${built.classes.dir}"/>
+                    </classpath>
                     <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="testng-failed.xml"/>
                 </testng>
             </else>
@@ -568,7 +589,10 @@
         </sort>
     </concat>
     <java classname="com.sun.identity.qatest.setup.CleanupProduct">
-        <classpath refid="client.classpath" />
+        <classpath>
+            <pathelement path="${client.cp}"/>
+            <pathelement path="${built.classes.dir}"/>
+        </classpath>
         <arg value="${SERVER_NAME1}" />
         <arg value="${SERVER_NAME2}" />
     </java>
