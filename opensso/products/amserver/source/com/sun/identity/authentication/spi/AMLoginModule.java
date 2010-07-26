@@ -2459,22 +2459,17 @@ public abstract class AMLoginModule implements LoginModule {
         int sessionCount = -1;
         int sessionQuota = -1;
         try {
-             // Get the universal ID
-             AMIdentity amIdUser = ad.getIdentity(IdType.USER, userName,
-                     loginState.getOrgDN());
-             String univId = IdUtils.getUniversalId(amIdUser);
-             sessionQuota = getSessionQuota(amIdUser);
+            // Get the universal ID
+            AMIdentity amIdUser = ad.getIdentity(IdType.USER, userName,
+                loginState.getOrgDN());
+            String univId = IdUtils.getUniversalId(amIdUser);
+            sessionQuota = getSessionQuota(amIdUser);
+            sessionCount = SessionCount.getAllSessionsByUUID(univId.toLowerCase()).size() + SessionCount.getAllSessionsByUUID(univId).size();
 
-             Map sessions  =
-                 SessionCount.getAllSessionsByUUID(univId);
-
-             if (sessions != null) {
-                sessionCount = sessions.size();
-                if (debug.messageEnabled()) {
-                        debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
-                             + univId + " - Session Quota Reached =  " + (sessionCount >= sessionQuota));
-                }
-             }
+            if (debug.messageEnabled()) {
+                    debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
+                         + univId + " - Session Quota Reached =  " + (sessionCount >= sessionQuota));
+            }
         } catch (Exception ex) {
              if (debug.messageEnabled()) {
                 debug.message("AMLoginModule.getSessionQuotaLevel::  "
