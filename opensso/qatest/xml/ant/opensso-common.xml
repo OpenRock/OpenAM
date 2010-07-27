@@ -313,6 +313,7 @@
         debug="on"
         failonerror="true">
             <src path="./source"/>
+            <exclude name="com/sun/identity/qatest/idsvcs/**"/>
             <classpath refid="client.classpath"/>
         </javac>
     </target>
@@ -1052,7 +1053,7 @@ This is to do away with skipping other agent related tests-->
             </then>
         </if>
     </target>
-    <target name="doc" depends="compile-doc">
+    <target name="doc">
         <javadoc destdir="./javadoc" windowtitle="qatest javadoc">
             <classpath refid="client.classpath"/>
             <packageset dir="./source">
