@@ -150,12 +150,14 @@ am_status_t Connection::initialize(const Properties& properties)
         if ((certDir.length() != 0) && (dbPrefix.length() != 0)) {
             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
 		 "CertDir and dbPrefix NOT Empty -- Calling NSS_Initialize");
+	    nssMethodName = "NSS_Initialize";
             secStatus = NSS_Initialize(certDir.c_str(), dbPrefix.c_str(),
 				   dbPrefix.c_str(), "secmod.db",
 				   NSS_INIT_READONLY|NSS_INIT_FORCEOPEN);
         } else {
             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
 		 "CertDir and dbPrefix EMPTY -- Calling NNS_NoDB_Init");
+	    nssMethodName = "NSS_NoDB_Init";
             secStatus = NSS_NoDB_Init(NULL);
         }
 
