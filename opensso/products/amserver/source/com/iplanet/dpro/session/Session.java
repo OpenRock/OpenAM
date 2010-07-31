@@ -1586,9 +1586,8 @@ public class Session extends GeneralTaskRunnable {
                             + "processSessionResponseException: Destorying AppToken");
                     }
                      if (appSSOToken != null) {
-                       SSOTokenManager tokenMgr = SSOTokenManager.getInstance();
                        try {
-                           tokenMgr.invalid(appSSOToken);
+                           AdminTokenAction.invalid(appSSOToken);
                        } catch ( Exception e ) {
                            // do nothing
                        }
