@@ -152,9 +152,20 @@ public class AdminTokenAction implements PrivilegedAction {
     }
 
     /**
-     * Resets cached SSOToken.
+     * Resets cached SSOToken. WITHOUT destroying.  Called when we know the 
+     * token is invalid
      */
-    public static void reset() {
+    public static void invalid(SSOToken token) {
+        if ((appSSOToken != null) && (token == appSSOToken))
+            appSSOToken = null;
+        if (debug.messageEnabled()) {
+            debug.message("AdminTokenAction:invalid called");
+        }
+   }
+
+    /**
+     * Resets cached SSOToken.
+     */    public static void reset() {
         if (appSSOToken != null) {
 	    if (tokenManager != null) {
                 try {
