@@ -1605,7 +1605,7 @@ public class Session extends GeneralTaskRunnable {
                    if (sessionDebug.messageEnabled()) {
                         sessionDebug.message("Session."
                             + "processSessionResponseException: creating New AppToken"
-                            + "TokenID = %s",newAppSSOToken");
+                            + "TokenID = " + newAppSSOToken);
                     }
                     createContext(newAppSSOToken);
                 }
