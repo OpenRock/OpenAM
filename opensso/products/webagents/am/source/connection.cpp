@@ -266,11 +266,11 @@ PRFileDesc *Connection::secureSocket(const std::string &certDBPasswd,
                 sslMethodName = "SSL_OptionSet";
                 {
                     bool state;
-                    secStatus = SSL_OptionGet(sslSocket,SSL_SECURITY, &state);
+                    secStatus = SSL_OptionGet(sslSocket,SSL_SECURITY, (PRBool*)&state);
                     printf"\nSSL Security = %b",state);
-                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL3, &state);
+                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL3, (PRBool*)&state);
                     printf"\nSSL SSL_ENABLE_SSL3 = %b",state);
-                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL2, &state);
+                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL2, (PRBool*)&state);
                     printf"\nSSL SSL_ENABLE_SSL2 = %b",state);
                 }
                 secStatus = SSL_OptionSet(sslSocket, SSL_SECURITY, PR_TRUE);
