@@ -721,13 +721,17 @@ am_agent_init(boolean_t* pAgentInitialized)
     const Properties& propPtr =
         *reinterpret_cast<Properties *>(boot_info.properties);
 //    const char * agentConfigFile = boot_info.agent_config_file;
-          
-    if (agentProfileService == NULL) {
-        agentProfileService = new AgentProfileService(propPtr, boot_info);
+    // call this to ensure NSS is initialised in the child process
+    status = Connection::initialize(propPtr);
     
-    }
-    if (agentProfileService != NULL) {
-        status = agentProfileService->agentLogin();
+    if (AM_SUCCESS == status) {
+        if (agentProfileService == NULL) {
+            agentProfileService = new AgentProfileService(propPtr, boot_info);
+
+        }
+        if (agentProfileService != NULL) {
+            status = agentProfileService->agentLogin();
+        }
     }
     
     if (AM_SUCCESS == status) {

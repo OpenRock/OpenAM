@@ -136,10 +136,6 @@ am_status_t Connection::initialize(const Properties& properties)
 	// We do not enable them here since null or no encryption is a 
 	// potential security risk.
 	//
-
-	Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		 "calling NSS_Initialize() with directory = \"%s\" and "
-		 "prefix = \"%s\"", certDir.c_str(), dbPrefix.c_str());
 	Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
 		 "Connection timeout when receiving data = %i milliseconds",timeout);
 	if (tcp_nodelay_is_enabled) {
@@ -147,16 +143,17 @@ am_status_t Connection::initialize(const Properties& properties)
 		   "Socket option TCP_NODELAY is enabled");
 	}
 
-        if ((certDir.length() != 0) && (dbPrefix.length() != 0)) {
+        if (certDir.length() != 0) {
             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		 "CertDir and dbPrefix NOT Empty -- Calling NSS_Initialize");
+		 "calling NSS_Initialize() with directory = \"%s\" and "
+		 "prefix = \"%s\"", certDir.c_str(), dbPrefix.c_str());
 	    nssMethodName = "NSS_Initialize";
             secStatus = NSS_Initialize(certDir.c_str(), dbPrefix.c_str(),
 				   dbPrefix.c_str(), "secmod.db",
 				   NSS_INIT_READONLY|NSS_INIT_FORCEOPEN);
         } else {
             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
-		 "CertDir and dbPrefix EMPTY -- Calling NNS_NoDB_Init");
+		 "CertDir and dbPrefix EMPTY -- Calling NSS_NoDB_Init");
 	    nssMethodName = "NSS_NoDB_Init";
             secStatus = NSS_NoDB_Init(NULL);
         }
