@@ -469,9 +469,8 @@ BaseService::doRequest(const ServiceInfo& service,
 		        PRErrorCode nspr_code = PR_GetError();
 		        Log::log(logModule, Log::LOG_ALWAYS,
 			     "BaseService::doRequest() NSPR failure while "
-			     "%s %s, error = %s", operation,
-			     (*iter).toString().c_str(), 
-			     PR_ErrorToName(nspr_code));
+			     "%s %s, error = %i", operation,
+			     (*iter).toString().c_str(),nspr_code);
 		    }
 		
 		    if (AM_SUCCESS == status) {
