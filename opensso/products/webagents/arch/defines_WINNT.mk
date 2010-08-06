@@ -162,5 +162,5 @@ MAKE_SHARED_LIB = $(LINK) $(LD_MAKE_SHARED_LIB_FLAG) -nologo -SUBSYSTEM:WINDOWS 
 endif
 
 ifdef	OS_IS_CYGWIN
-INCLUDE_MANIFEST = ${MT} -manifest $(MSCRT_DIR)\Microsoft.VC90.CRT.manifest -outputresource:$@;2
+INCLUDE_MANIFEST = ${MT} -manifest $(MSCRT_DIR)/Microsoft.VC90.CRT.manifest -outputresource:$@\;2
 endif
