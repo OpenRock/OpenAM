@@ -191,3 +191,13 @@ NSS_LIBS := $(NSS_DYNAMIC_LIBS)
 
 endif
 
+##########################################
+# MSCRT defines
+##########################################
+ifeq ($(OS_ARCH), WINNT)
+ifeq ($(BUILD_TYPE), 64)
+MSCRT_DIR := $(EXTERNAL_DIR)/mscrt_64/lib
+else
+MSCRT_DIR := $(EXTERNAL_DIR)/mscrt/lib
+endif
+endif

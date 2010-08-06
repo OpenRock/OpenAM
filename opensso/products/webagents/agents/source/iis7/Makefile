@@ -61,6 +61,7 @@ all: export_libs
 
 $(IIS7_LIB): $(EXPORTED_OBJS) Iis7Agent.def
 	$(MAKE_SHARED_LIB)
+	$(INCLUDE_MANIFEST)
 
 
 all: $(DEST_PACKAGE_SCRATCH_DIR) $(IIS7_LIB)
