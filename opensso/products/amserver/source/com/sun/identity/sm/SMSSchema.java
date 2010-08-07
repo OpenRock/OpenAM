@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.ums.IUMSConstants;
@@ -296,6 +300,21 @@ public class SMSSchema {
         // Since the plugin schema node is not found, throw an exception
         throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
                 IUMSConstants.SMS_SMSSchema_no_service_element, null));
+    }
+
+    /**
+     * Method returns the XML plugin schema for the given plugin name in a
+     * String format that can stored in a directory.
+     *
+     * @param pluginNode
+     *            plugin schema node
+     * @return service plugin schema in serialized String format
+     * @throws SMSException
+     */
+    public String getPluginSchema(Node pluginName) throws SMSException {
+        return (PLUGIN_PREFIX_1 + getServiceName() + PLUGIN_PREFIX_2
+                                + getServiceVersion() + PLUGIN_PREFIX_3
+                                + nodeToString(pluginName) + PLUGIN_SUFFIX);            
     }
 
     // ---------- static methods ----------------------

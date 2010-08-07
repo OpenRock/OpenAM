@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.am.util.Cache;
@@ -767,6 +771,16 @@ public class SMSEntry implements Cloneable {
                     "sms-INSUFFICIENT_ACCESS_RIGHTS"));
         }
         delete(ssoToken);
+    }
+
+    /**
+     * Delete the entry in the datastore. This will delete sub-entries also!
+     *
+     * TODO: There is no way to set read-only to false, we should see what we can
+     * about this.
+     */
+    public void forceDelete(SSOToken adminToken) throws SMSException, SSOException {
+        delete(adminToken);
     }
 
     /**

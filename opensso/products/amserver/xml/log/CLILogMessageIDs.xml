@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted [2010] [ForgeRock AS]
+-->
+
 <!DOCTYPE logmessages
     PUBLIC "OpenSSO Log Message DTD/EN"
     "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
@@ -7121,5 +7125,90 @@
             <item>Look under debug file for more information.</item>
         </actions>
     </logmessage>
-
+    <logmessage name="ATTEMPT_ADD_PLUGIN_SCHEMA" id="6043"
+        loglevel="LL_INFO"
+        description="Attempt to add Plug-in schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>name of interface</item>
+            <item>name of plugin</item>
+            <item>name of i18n key</item>
+            <item>name of i18n name</item>
+            <item>name of class</item>
+        </datainfo>
+        <triggers>
+            <item>Execute add Plug-in schema Commandline interface.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_ADD_PLUGIN_SCHEMA" id="6044"
+        loglevel="LL_INFO"
+        description="Added Plug-in schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>name of plugin</item>
+        </datainfo>
+        <triggers>
+            <item>Execute add Plug-in schema Commandline interface.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FAILED_ADD_PLUGIN_SCHEMA" id="6045"
+        loglevel="LL_INFO"
+        description="Failed to add Plug-in schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>name of plugin</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute add Plug-in schema Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ATTEMPT_REMOVE_PLUGIN_SCHEMA" id="6046"
+        loglevel="LL_INFO"
+        description="Attempt to remove Plug-in schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>name of interface</item>
+            <item>name of plugin</item>
+            <item>name of i18n key</item>
+            <item>name of i18n name</item>
+            <item>name of class</item>
+        </datainfo>
+        <triggers>
+            <item>Execute remove Plug-in schema Commandline interface.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_REMOVE_PLUGIN_SCHEMA" id="6047"
+        loglevel="LL_INFO"
+        description="Removed Plug-in schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>name of plugin</item>
+        </datainfo>
+        <triggers>
+            <item>Execute remove Plug-in schema Commandline interface.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FAILED_REMOVE_PLUGIN_SCHEMA" id="6048"
+        loglevel="LL_INFO"
+        description="Failed to remove Plug-in schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>name of plugin</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute remove Plug-in schema Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
 </logmessages>

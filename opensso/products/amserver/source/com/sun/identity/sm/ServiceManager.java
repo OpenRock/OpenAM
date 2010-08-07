@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -517,6 +521,89 @@ public class ServiceManager {
         }
 
         return valid;
+    }
+
+    /**
+     * Adds a new plugin schema to an existing service
+     *
+     * @param serviceName The name of the service
+     * @param interfaceName The name of the plugin interface
+     * @param pluginName The name of the plugin schema
+     * @param i18nKey The i18nkey of the plugin schema
+     * @param i18nName The i18nname of the plugin schema
+     * @param className The name of the plugin schema implementation class
+     * @throws SMSException if an error occurred while performing the operation
+     * @throws SSOException if the user's single sign on token is invalid or
+     *         expired.
+     */
+    public void addPluginSchema(Document pluginDoc)
+    throws SMSException, SSOException {
+        // Validate SSO Token
+        SMSEntry.validateToken(token);
+
+        Node serviceNode = XMLUtils.getRootNode(pluginDoc, SMSUtils.SERVICE);
+        String serviceName = XMLUtils.getNodeAttributeValue(serviceNode,
+                SMSUtils.NAME);
+        ServiceSchemaManager ssm = new ServiceSchemaManager(serviceName, token);
+        Document schemaDoc = ssm.getDocumentCopy();
+
+        Node pluginSchemaDoc = XMLUtils.getRootNode(pluginDoc, SMSUtils.PLUGIN_SCHEMA);
+
+        // Obtain the SMSSchema for Schema and PluginSchema
+        SMSSchema smsSchema = new SMSSchema(schemaDoc);
+        PluginSchema.createPluginSchema(token, pluginSchemaDoc, smsSchema);
+    }
+
+    /**
+     * Removes a plugin schema from a service
+     *
+     * @param serviceName The name of the service
+     * @param interfaceName The name of the plugin interface
+     * @param pluginName The name of the plugin schema
+     * @throws SMSException if an error occurred while performing the operation
+     * @throws SSOException if the user's single sign on token is invalid or
+     *         expired.
+     */
+    public void removePluginSchema(String serviceName,
+                               String interfaceName,
+                               String pluginName)
+    throws SMSException, SSOException {
+        ServiceSchemaManager ssm = new ServiceSchemaManager(serviceName, token);
+        String version = ssm.getVersion();
+
+        // Check if PluginSchema nodes exists
+        Set pluginSchemaNames = ssm.getPluginSchemaNames(interfaceName, null);
+
+        // if they match, delete
+        if (pluginSchemaNames.contains(pluginName)) {
+            StringBuilder sb = new StringBuilder(100);
+
+            // Construct the DN and get CachedSMSEntry
+            sb.append("ou=").append(pluginName).append(",").append("ou=").append(
+                interfaceName).append(",").append(
+                CreateServiceConfig.PLUGIN_CONFIG_NODE).append("ou=").append(
+                version).append(",").append("ou=").append(serviceName).append(
+                ",").append(SMSEntry.SERVICES_RDN).append(",");
+
+            CachedSMSEntry ce;
+
+            try {
+                ce = CachedSMSEntry.getInstance(token, sb.toString()
+                        + SMSEntry.baseDN);
+                SMSEntry smsEntry = ce.getClonedSMSEntry();
+                smsEntry.forceDelete(token);
+                ce.refresh(smsEntry);
+            } catch (SSOException ssoe) {
+                throw (new SMSException(ssoe, "sms-INVALID_SSO_TOKEN"));
+            }
+        } else {
+            throw new SMSException("Condition does not exist");
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("removePluginSchema: remove plugin " + pluginName +
+                    "from service " + serviceName);
+        }
     }
 
     /**

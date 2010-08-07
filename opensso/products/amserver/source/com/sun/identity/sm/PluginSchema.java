@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -343,7 +347,7 @@ public class PluginSchema {
         e.addAttribute(SMSEntry.ATTR_OBJECTCLASS, SMSEntry.OC_TOP);
         e.addAttribute(SMSEntry.ATTR_OBJECTCLASS, SMSEntry.OC_SERVICE);
         e.addAttribute(SMSEntry.ATTR_PLUGIN_SCHEMA, smsSchema
-                .getPluginSchema(name));
+                .getPluginSchema(node));
         e.save(token);
         ce.refresh(e);
     }
