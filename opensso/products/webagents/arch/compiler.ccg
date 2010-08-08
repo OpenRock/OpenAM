@@ -34,7 +34,7 @@
 # Generalized C/C++ interface for Microsoft C/C++
 #
 
-#
+# Portions Copyrighted [2010] [ForgeRock AS]
 
 # CL option prefixes: these are passed through to compiler
 
@@ -43,7 +43,7 @@
 Copts = { "-C", "-d", "-D", "-E", "-F", "-G", "-H", "-I", "-J", "-M",
 	  "-O", "-P", "-U", "-u", "-v", "-V", "-w", "-W", "-Y", "-Z" };
 
-coptions = { "-GX" };
+coptions = { "-EHsc" };
 ldoptions = { "-nologo" };
 debug = 0;
 map = 0;
