@@ -164,5 +164,4 @@ endif
 ifdef	OS_IS_CYGWIN
 INCLUDE_MANIFEST = ${MT} -manifest $(MSCRT_DIR)/Microsoft.VC90.CRT.manifest -outputresource:$@\;2
 INCLUDE_MANIFEST_LOCAL = ${MT} -manifest $@.manifest -outputresource:$@\;2
-INCLUDE_MANIFEST_EXE = ${MT} -manifest $(MSCRT_DIR)/Microsoft.VC90.CRT.manifest -outputresource:$@\;1
 endif
