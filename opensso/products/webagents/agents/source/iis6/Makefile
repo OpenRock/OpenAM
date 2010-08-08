@@ -57,6 +57,8 @@ all: export_libs
 
 $(IIS6_LIB): IisAgent6.o IisAgent6.def
 	$(MAKE_SHARED_LIB)
+	$(INCLUDE_MANIFEST)
+	$(INCLUDE_MANIFEST_LOCAL)
 
 #$(IIS6AUTH_LIB): Iis6auth.o Iis6auth.def
 #	$(MAKE_SHARED_LIB)

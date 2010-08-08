@@ -277,9 +277,11 @@ $(DEST_BIN_DIR)/$(CRYPT_EXE): $(DEST_BIN_DIR)
 ifeq ($(OS_ARCH), WINNT)
 ifdef   OS_IS_CYGWIN
 	$(CC) -DWINNT -Fe$(CRYPT_EXE) -Focrypt_util_program.o crypt_util.c
+	$(INCLUDE_MANIFEST_EXE)
 else
 	$(CC) -DWINNT -c crypt_util.c -o crypt_util_program.o
 	$(CC) -o $(CRYPT_EXE) crypt_util_program.o
+	$(INCLUDE_MANIFEST_EXE)
 endif
 else
 ifeq ($(BUILD_TYPE), 32)
