@@ -434,9 +434,13 @@ public abstract class AMLoginModule implements LoginModule {
     }
     
     /**
-     * Returns the authentication single sign on session.
+     * Returns an administration SSOToken for use the OpenAM APIs.
      *
-     * @return <code>SSOToken</code>for the authentication service.
+     * <I>NB:</I>This is not the SSOToken that represents the user, if you wish
+     * to set/get user session properties use the <code>setUserSessionProperty</code>
+     * and <code>getUserSessionProperty</code> method respectively.
+     *
+     * @return An administrative <code>SSOToken</code>.
      * @exception AuthLoginException if the authentication SSO session
      *         is null.
      * @supported.api
