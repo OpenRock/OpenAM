@@ -97,6 +97,7 @@ $(EXPORTED_LIBS): $(OBJS) $(LIB_MAPFILE)
 	echo "dest inc dir :" $(DEST_INC_DIR)
 	echo "proxy dir :" $(PROXY40_INC_DIR)
 	$(MAKE_SHARED_LIB)
+	$(INCLUDE_MANIFEST)
 endif
 
 clean: clean_objs clean_libs
