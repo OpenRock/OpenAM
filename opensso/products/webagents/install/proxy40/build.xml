@@ -158,14 +158,12 @@
         <mkdir dir="${container.web_agent.lib.dir}"/>
         <copy todir="${container.web_agent.lib.dir}">
             <fileset dir="${container.web_agent.bin.dir}">
-                <include name="opensso-installtools-launcher.jar"/>
-                <include name="opensso-installtools.jar"/>
+                <include name="*.jar"/>
             </fileset>
         </copy>
         <delete>
             <fileset dir="${container.web_agent.bin.dir}">
-                <include name="opensso-installtools-launcher.jar"/>
-                <include name="opensso-installtools.jar"/>
+                <include name="*.jar"/>
             </fileset>
         </delete>
         <!-- end fixme -->
