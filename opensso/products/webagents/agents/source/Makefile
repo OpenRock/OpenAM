@@ -72,7 +72,7 @@ ifeq ($(OS_ARCH), WINNT)
 ifeq ($(CYGWIN_ARCH), WOW64)
 SUBDIRS += iis7 iis6
 else
-SUBDIRS += $(BUILD_AGENT)
+SUBDIRS += iis7 iis6
 endif
 endif
 
