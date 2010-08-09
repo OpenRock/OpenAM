@@ -70,9 +70,9 @@ endif
 
 ifeq ($(OS_ARCH), WINNT)
 ifeq ($(CYGWIN_ARCH), WOW64)
-SUBDIRS += iis7 iis6
+SUBDIRS += iis7 iis6 apache apache22
 else
-SUBDIRS += iis7 iis6
+SUBDIRS += iis7 iis6 apache apache22 sjsws proxy40
 endif
 endif
 
