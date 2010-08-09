@@ -102,17 +102,6 @@
         <!-- Copy PROXY agent c library file -->
         <antcall target="copy-${build.os}-library"/>
 
-        <!-- FIXME: this is only here until we fix the manifests-->
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${container.web_agent.lib.dir}">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-
-        <!-- delete unncessary files/directories, since these are not used -->
-        <delete dir="${container.web_agent.lib.dir}"/>
-        <!-- end fixme -->
-
         <!-- Generate PROXY agent install archive -->
         <zip destfile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_agent_${agentversion}.zip">
              <fileset dir="${webagents.container.scratch.dir}" excludes="**/bin/**"/>
@@ -157,7 +146,23 @@
                     <include name="ampxy4.pdb"/>
             </fileset>
         </copy>
+        <!-- FIXME: this is only here until we fix the manifests-->
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${container.web_agent.lib.dir}">
+                    <include name="*."/>
+            </fileset>
+        </copy>
 
+        <!-- delete unncessary files/directories, since these are not used -->
+        <delete dir="${container.web_agent.lib.dir}"/>
+        <mkdir dir="${container.web_agent.lib.dir}"/>
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${container.web_agent.bin.dir}">
+                <include name="opensso-installtools-launcher.jar"/>
+                <include name="opensso-installtools.jar"/>
+            </fileset>
+        </copy>
+        <!-- end fixme -->
     </target>
 
 </project>

@@ -104,17 +104,6 @@
         <!-- Copy Apache agent c library-->
         <antcall target="copy-${build.os}-library"/>
 
-        <!-- FIXME: this is only here until we fix the manifests-->
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${container.web_agent.lib.dir}">
-                    <include name="**"/>
-            </fileset>
-        </copy>
-
-        <!-- delete unncessary files/directories, since these are not used -->
-        <delete dir="${container.web_agent.lib.dir}"/>
-        <!-- end fixme -->
-
 	<!-- Generate Apache agent install archive -->
 	<zip destfile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_agent_${agentversion}.zip">
              <fileset dir="${webagents.container.scratch.dir}" excludes="**/bin/**"/>
@@ -167,6 +156,23 @@
                     <include name="libamapc22.dll"/>
             </fileset>
         </copy>
+        <!-- FIXME: this is only here until we fix the manifests-->
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${container.web_agent.lib.dir}">
+                    <include name="*."/>
+            </fileset>
+        </copy>
+
+        <!-- delete unncessary files/directories, since these are not used -->
+        <delete dir="${container.web_agent.lib.dir}"/>
+        <mkdir dir="${container.web_agent.lib.dir}"/>
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${container.web_agent.bin.dir}">
+                <include name="opensso-installtools-launcher.jar"/>
+                <include name="opensso-installtools.jar"/>
+            </fileset>
+        </copy>
+        <!-- end fixme -->
     </target>
 
     <target name="copy-AIX-library">
