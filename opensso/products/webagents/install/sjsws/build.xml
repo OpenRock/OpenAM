@@ -156,12 +156,6 @@
 
         <!-- delete unncessary files/directories, since these are not used -->
         <delete dir="${container.web_agent.lib.dir}"/>
-        <delete>
-            <fileset dir="${container.web_agent.bin.dir}">
-                <include name="opensso-installtools-launcher.jar"/>
-                <include name="opensso-installtools.jar"/>
-            </fileset>
-        </delete>
         <mkdir dir="${container.web_agent.lib.dir}"/>
         <copy todir="${container.web_agent.lib.dir}">
             <fileset dir="${container.web_agent.bin.dir}">
@@ -169,6 +163,12 @@
                 <include name="opensso-installtools.jar"/>
             </fileset>
         </copy>
+            <delete>
+            <fileset dir="${container.web_agent.bin.dir}">
+                <include name="opensso-installtools-launcher.jar"/>
+                <include name="opensso-installtools.jar"/>
+            </fileset>
+        </delete>
         <!-- end fixme -->
 
     </target>
