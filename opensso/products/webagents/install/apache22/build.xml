@@ -159,7 +159,7 @@
         <!-- FIXME: this is only here until we fix the manifests-->
         <copy todir="${container.web_agent.bin.dir}">
             <fileset dir="${container.web_agent.lib.dir}">
-                    <include name="*."/>
+                    <include name="*"/>
             </fileset>
         </copy>
 
