@@ -106,6 +106,7 @@ ifeq ($(OS_ARCH),WINNT)
 	$(RM) $(EXPORTED_LIBS:.dll=.exp) $(EXPORTED_LIBS:.dll=.lib)
 	$(RM) *.pdb
 	$(RM) *.ilk
+	$(RM) *.manifest
 endif
 
 include $(USERX_ROOT)/arch/rules.mk

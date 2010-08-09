@@ -69,6 +69,7 @@ all: $(APACHE22_LIB)
 clean: clean_libs clean_objs
 	$(RM) $(APACHE22_LIB_NAME).o $(APACHE22_LIB_NAME).dll $(APACHE22_LIB_NAME).lib $(APACHE22_LIB_NAME).exp
 	$(RM) *.pdb
+	$(RM) *.manifest
 
 else
 APACHE22_LIB_NAME := libamapc22

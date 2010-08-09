@@ -68,6 +68,7 @@ all: $(APACHE25_LIB)
 clean: clean_libs clean_objs
 	$(RM) $(APACHE25_LIB_NAME).o $(APACHE25_LIB_NAME).dll $(APACHE25_LIB_NAME).lib $(APACHE25_LIB_NAME).exp
 	$(RM) *.pdb
+	$(RM) *.manifest
 
 else
 # else of WINNT condition

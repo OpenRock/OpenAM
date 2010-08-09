@@ -140,6 +140,7 @@ clean: clean_libs clean_objs
 ifeq ($(OS_ARCH),WINNT)
 	$(RM) $(EXPORTED_LIBS:.dll=.exp) $(EXPORTED_LIBS:.dll=.lib)
 	$(RM) *.pdb
+	$(RM) *.manifest
 endif
 
 include $(USERX_ROOT)/arch/rules.mk
