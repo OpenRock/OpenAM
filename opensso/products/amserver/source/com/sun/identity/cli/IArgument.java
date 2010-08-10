@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.cli;
 
 
@@ -202,6 +206,11 @@ public interface IArgument {
      * Site URL.
      */
     String SITE_URL = "siteurl";
+
+    /**
+     * Site ID.
+     */
+    String SITE_ID = "siteid";
     
     /**
      * Site secondary URLs.

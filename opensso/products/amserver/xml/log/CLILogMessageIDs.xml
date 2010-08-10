@@ -7211,4 +7211,31 @@
             <item>Look under debug file for more information.</item>
         </actions>
     </logmessage>
+    <logmessage name="SUCCEED_SET_SITE_ID" id="6049"
+        loglevel="LL_INFO"
+        description="Site ID is set.">
+        <datainfo>
+            <item>name of site</item>
+            <item>id of site</item>
+        </datainfo>
+        <triggers>
+            <item>Execute set site ID Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEED_SET_SITE_ID" id="6050"
+        loglevel="LL_INFO"
+        description="Unable to set site ID.">
+        <datainfo>
+            <item>name of site</item>
+            <item>site ID</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute set site ID Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
 </logmessages>

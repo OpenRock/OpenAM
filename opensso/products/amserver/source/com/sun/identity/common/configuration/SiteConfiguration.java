@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
@@ -537,6 +541,50 @@ public class SiteConfiguration extends ConfigurationBase {
     }
 
     /**
+     * Sets the ID of a site.
+     *
+     * @param ssoToken Single Sign-On Token which is used to access to the
+     *        service management datastore.
+     * @param siteName Name of the site.
+     * @param siteID The new id of the site.
+     * @throws SMSException if errors access in the service management
+     *         datastore.
+     * @throws SSOException if the <code>ssoToken</code> is not valid.
+     */
+    public static void setSiteID(
+        SSOToken ssoToken,
+        String siteName,
+        String siteID
+    ) throws SMSException, SSOException, ConfigurationException {
+        ServiceConfig rootNode = getRootSiteConfig(ssoToken);
+        ServiceConfig sc = rootNode.getSubConfig(siteName);
+        ServiceConfig accessPoint = sc.getSubConfig(SUBCONFIG_ACCESS_URL);
+
+        Map existing = accessPoint.getAttributes();
+        Set existingSet = (Set)existing.get(ATTR_PRIMARY_SITE_ID);
+
+        // check we are not already set to this value
+        if (existingSet.contains(siteID)) {
+            String[] params = {siteName, siteID};
+            throw new ConfigurationException("site.id.unchanged", params);
+        }
+
+        // check no other site is using it!
+        for (String siteURL : getAllSiteURLs(ssoToken)) {
+            if (siteID.equals(getSiteID(ssoToken, getSiteIdByURL(ssoToken,siteURL)))) {
+                String[] params = {siteID, siteURL};
+                throw new ConfigurationException("site.id.taken", params);
+            }
+        }
+
+        Map map = new HashMap(2);
+        Set set = new HashSet(2);
+        set.add(siteID);
+        map.put(ATTR_PRIMARY_SITE_ID, set);
+        accessPoint.setAttributes(map);
+    }
+
+    /**
      * Sets the secondary URLs of a site.
      *
      * @param ssoToken Single Sign-On Token which is used to access to the
@@ -834,7 +882,7 @@ public class SiteConfiguration extends ConfigurationBase {
         return sites.contains(siteName);
     }
     
-    private static Set getAllSiteURLs(SSOToken ssoToken)
+    private static Set<String> getAllSiteURLs(SSOToken ssoToken)
         throws SMSException, SSOException {
         Set urls = new HashSet();
         Set sites = getSites(ssoToken);

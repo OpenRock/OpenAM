@@ -2381,6 +2381,23 @@ public class AccessManager {
     private String remove_site_members;
 
     @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.serverconfig.SetSiteID",
+        description="Set the ID of a site.",
+        webSupport="true",
+        mandatoryOptions={
+            "sitename|s|s|Site name, e.g. mysite",
+            "siteid|i|s|Site's ID, e.g. 10"},
+        optionAliases={},
+        optionalOptions={},
+        macro="authentication",
+        resourceStrings={
+            "set-site-id-succeeded=Site ID was modified.",
+            "set-site-id-no-exists=Site did not exist."
+        }
+    )
+    private String set_site_id;
+
+    @SubCommandInfo(
         implClassName="com.sun.identity.cli.serverconfig.SetSitePrimaryURL",
         description="Set the primary URL of a site.",
         webSupport="true",
