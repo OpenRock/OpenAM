@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
@@ -508,7 +512,7 @@ public class AgentConfiguration {
             throw new ConfigurationException("agent.root.url.ends.with", null);
         }
 
-        String urlStr = strs[1];
+        String urlStr = strs[1].substring(key.length());
         URL url = null;
         try {
             url = new URL(urlStr);
