@@ -30,8 +30,10 @@ bat/status.bat
 bat/stop-ds.bat
 bat/verify-index.bat
 bin/
+bin/backup
 bin/base64
 bin/control-panel
+bin/ControlPanel.app
 bin/create-rc-script
 bin/dbtest
 bin/dsconfig
