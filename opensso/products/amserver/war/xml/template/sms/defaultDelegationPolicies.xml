@@ -149,6 +149,7 @@ End of comment for "notAttributes" AttributeValuePair -->
     </Conditions>
 </Policy>
 
+
 <!-- Delegation policy for shared agents to read the profile of other agents -->
 <Policy name="SharedAgentReadOnlyPermission" referralPolicy="false" active="true" >
     <Rule name="sharedagent-idrepo-read-rule">
@@ -167,6 +168,22 @@ End of comment for "notAttributes" AttributeValuePair -->
         <Condition name="condition" type="AuthenticatedSharedAgentsCondition">
         </Condition>
     </Conditions>
+</Policy>
+
+<!-- Delegation policy for agents to read the SMS Tree -->
+<Policy name="AgentRealmPermission" referralPolicy="false" active="true" >
+    <Rule name="agent-realm-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/sunAMRealmService/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="AuthenticatedAgents" type="AuthenticatedAgents" includeType="inclusive">
+        </Subject>
+    </Subjects>
 </Policy>
 
 <Policy name="@SM_ROOT_SUFFIX_HAT@^^AgentLogging" referralPolicy="false" active="true" >
