@@ -150,8 +150,11 @@
             </interaction>
         </instance-interactions>
         <common-tasks>
-            <task name="UPDATE_SET_CLASSPATH_SCRIPT">
-                <class name="UpdateServerClassPath" type="custom"/>
+            <task name="UPDATE_SET_ENV_SCRIPT">
+                <class name="UpdateServerEnvTask" type="custom"/>
+            </task>
+            <task name="COPY_AGENTS_FILES">
+                <class name="CopyAgentFilesTask" type="custom"/>
             </task>
         </common-tasks>
         <instance-tasks>
@@ -218,8 +221,11 @@
         <common-interactions/>
         <instance-interactions/>
         <common-tasks>
-            <task name="UNCONFIGURE_SERVER_CLASSPATH">
-                <class name="UnconfigureServerClassPathTask" type="custom"/>
+            <task name="UNCONFIGURE_SET_ENV_SCRIPT">
+                <class name="UnconfigureServerEnvTask" type="custom"/>
+            </task>
+            <task name="REMOVE_AGENTS_FILES">
+                <class name="RemoveAgentFilesTask" type="custom"/>
             </task>
         </common-tasks>
         <instance-tasks>
@@ -381,8 +387,11 @@
             </interaction>
         </instance-interactions>
         <common-tasks>
-            <task name="UPDATE_SET_CLASSPATH_SCRIPT">
-                <class name="UpdateServerClassPath" type="custom"/>
+            <task name="UPDATE_SET_ENV_SCRIPT">
+                <class name="UpdateServerEnvTask" type="custom"/>
+            </task>
+            <task name="COPY_AGENTS_FILES">
+                <class name="CopyAgentFilesTask" type="custom"/>
             </task>
         </common-tasks>
         <instance-tasks>
@@ -480,8 +489,11 @@
             </task>
         </common-tasks>
         <instance-tasks>
-            <task name="UPDATE_SET_CLASSPATH_SCRIPT">
-                <class name="UpdateServerClassPath" type="custom"/>
+            <task name="UPDATE_SET_ENV_SCRIPT">
+                <class name="UpdateServerEnvTask" type="custom"/>
+            </task>
+            <task name="COPY_AGENTS_FILES">
+                <class name="CopyAgentFilesTask" type="custom"/>
             </task>
             <task name="CREATE_LAYOUT">
                 <class name="CreateLayoutTask" type="system"/>

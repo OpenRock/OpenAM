@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.agents.arch;
 
 import java.io.BufferedInputStream;
@@ -55,9 +59,9 @@ import com.sun.identity.agents.util.ResourceReader;
 import com.sun.identity.common.DebugPropertiesObserver;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.install.tools.util.FileUtils;
 
 /**
  * <p>
@@ -443,26 +447,51 @@ public class AgentConfiguration implements
         properties.putAll(getProperties());
         return properties;
     }    
-    
+
+    /*
+     * This method will check for the JVM option:
+     *
+     * <code>openam.agents.bootstrap.dir</code>
+     *
+     * before falling back to trying to load the file from the CLASSPATH
+     */
     private static synchronized void setConfigurationFilePath() {
         if (!isInitialized()) {
+            String bootstrapDir = System.getProperty(CONFIG_JVM_OPTION_NAME);
+
+            // try to load the bootstrap from the JVM option
+            if (bootstrapDir != null) {
+                String configFile = bootstrapDir + System.getProperty("file.separator") +
+                        CONFIG_FILE_NAME;
+                String localConfigFile = bootstrapDir + System.getProperty("file.separator") +
+                        LOCAL_CONFIG_FILE_NAME;
+
+                if (isFileValid(configFile) && isFileValid(localConfigFile)) {
+                    setConfigFilePath(configFile);
+                    setLocalConfigFilePath(localConfigFile);
+
+                    return;
+                }
+            }
+
+            // fallback to loading the bootstrap file from the classpath
             String result = null;
             URL resUrl = ClassLoader.getSystemResource(CONFIG_FILE_NAME);
             if(resUrl == null) {
-                ClassLoader cl = 
+                ClassLoader cl =
                     Thread.currentThread().getContextClassLoader();
                 if(cl != null) {
                     resUrl = cl.getResource(CONFIG_FILE_NAME);
                 }
             }
-            
+
             if (resUrl == null) {
                 throw new RuntimeException(
                     "Failed to get configuration file:" + CONFIG_FILE_NAME);
             }
             result = resUrl.getPath();
             try {
-                if (System.getProperty("file.separator").equals("\\") && 
+                if (System.getProperty("file.separator").equals("\\") &&
                         result.startsWith("/")) {
                     result = resUrl.toURI().getPath().substring(1);
                 }
@@ -473,7 +502,7 @@ public class AgentConfiguration implements
             if (result == null) {
                 throw new RuntimeException(
                     "Failed to get configuration file:" + CONFIG_FILE_NAME);
-            }            
+            }
             setConfigFilePath(result);
             int index = result.lastIndexOf(CONFIG_FILE_NAME);
             if (index < 0) {
@@ -484,11 +513,28 @@ public class AgentConfiguration implements
             setLocalConfigFilePath(pathDir + LOCAL_CONFIG_FILE_NAME);
         }
     }
+
+    /*
+     * Is file valid @param filename
+     *
+     * @return boolean
+     */
+    private static boolean isFileValid(String filename) {
+
+        boolean result = false;
+        if ((filename != null) && (filename.length() > 0)) {
+            File file = new File(filename);
+            if (file.exists() && file.isFile() && file.canRead()) {
+                result = true;
+            }
+        }
+        return result;
+    }
     
     /**
      * Load from OpenSSOAgentBootstrap.properties for start up properties.
      * This method should only be called once at start up time
-     * since bootstrap properties are not hot swappable by editting the
+     * since bootstrap properties are not hot swappable by editing the
      * properties file without a restart.
      * If it is called more than once(already initialized, then it will just
      * return the bootstrap properties that were read and saved at start 

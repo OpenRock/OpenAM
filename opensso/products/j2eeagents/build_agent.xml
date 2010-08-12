@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+   Portions Copyrighted [2010] [ForgeRock AS]
+-->
+
 <project name="open-source-j2ee-agents" default="usage">
                 
     <description>Open Web Single Sign-On J2EE Agents</description>
@@ -102,6 +106,7 @@
             <fileset dir="${j2eeagents.basedir}/agentsdk/legal">
                 <include name="license.txt"/>
                 <include name="README.TXT"/>
+		<include name="LICENSE_apache_commons_io.txt" />
             </fileset>
         </copy>
         <copy todir="${container.j2ee_agent.bin.dir}">

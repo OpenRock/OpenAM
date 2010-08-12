@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.agents.arch;
 
 /**
@@ -36,8 +40,11 @@ public interface IAgentConfigurationConstants {
    /**
     * The configuration file name to be used by the Agent.
     */
-    public static final String CONFIG_FILE_NAME = "OpenSSOAgentBootstrap.properties";
+    public static final String CONFIG_FILE_NAME =
+                                        "OpenSSOAgentBootstrap.properties";
     public static final String LOCAL_CONFIG_FILE_NAME = 
-                                       "OpenSSOAgentConfiguration.properties";
+                                        "OpenSSOAgentConfiguration.properties";
+    public static final String CONFIG_JVM_OPTION_NAME =
+                                        "openam.agents.bootstrap.dir";
     
 }

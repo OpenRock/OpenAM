@@ -27,13 +27,15 @@ REM $Id: agentadmin.bat,v 1.4 2009/04/07 17:19:09 leiming Exp $
 REM
 REM
 
+REM Portions Copyrighted [2010] [ForgeRock AS]
+
 setlocal
 if "%AGENT_HOME%"=="" set AGENT_HOME=%~dp0..
 
 if not "%JAVA_HOME%"=="" set JAVA_VM=%JAVA_HOME%\bin\java.exe
 if "%JAVA_VM%"=="" set JAVA_VM=java.exe
 
-set AGENT_CLASSPATH=%AGENT_HOME%\lib\opensso-installtools-launcher.jar
+set AGENT_CLASSPATH=%AGENT_HOME%\lib\opensso-installtools-launcher.jar;%AGENT_HOME%\lib\commons-io-1.4.jar
 
 "%JAVA_VM%" -classpath "%AGENT_CLASSPATH%" com.sun.identity.install.tools.launch.AdminToolLauncher %*
 

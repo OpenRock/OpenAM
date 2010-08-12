@@ -96,6 +96,7 @@
                 <include name="openssoclientsdk.jar"/>
                 <include name="opensso-installtools-launcher.jar"/>
                 <include name="opensso-installtools.jar"/>
+		<include name="commons-io-1.4.jar"/>
             </fileset>
             <fileset dir="${j2eeagents.container.archive.dir}">
                 <include name="agent.jar"/>

@@ -25,6 +25,10 @@
  * $Id: IConstants.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.agents.tools.tomcat.v6;
 
 public interface IConstants {
@@ -121,6 +125,8 @@ public interface IConstants {
     public static final String STR_SET_CLASSPATH_FILE_WINDOWS =
     	"setclasspath.bat";
     public static final String STR_SET_CLASSPATH_FILE_UNIX = "setclasspath.sh";
+    public static final String STR_SET_ENV_FILE_WINDOWS = "setenv.bat";
+    public static final String STR_SET_ENV_FILE_UNIX = "setenv.sh";
     public static final String STR_SET_AGENT_CLASSPATH_FILE_WINDOWS =
     	"setAgentclasspath.bat";
     public static final String STR_SET_AGENT_CLASSPATH_FILE_UNIX =

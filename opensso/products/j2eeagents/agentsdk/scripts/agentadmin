@@ -28,6 +28,8 @@
 #
 #
 
+# Portions Copyrighted [2010] [ForgeRock AS]
+
 if [ -z "$AGENT_HOME" ]; then
     AGENT_HOME=`dirname $0`/..
 fi
@@ -47,6 +49,6 @@ else
     AGENT_OPTS=
 fi
 
-AGENT_CLASSPATH=${AGENT_HOME}/lib/opensso-installtools-launcher.jar
+AGENT_CLASSPATH=${AGENT_HOME}/lib/opensso-installtools-launcher.jar:${AGENT_HOME}/lib/commons-io-1.4.jar
 
 $JAVA_VM -classpath "$AGENT_CLASSPATH"  $AGENT_OPTS com.sun.identity.install.tools.launch.AdminToolLauncher $*
