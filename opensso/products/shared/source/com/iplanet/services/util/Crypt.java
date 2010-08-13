@@ -110,6 +110,8 @@ public class Crypt {
     }
 
     private static AMEncryption createInstance(String password) {
+        // FR 6385
+        Debug.getInstance("amSDK").message("FR6385 Crypt::createInstance password=" + password);
         AMEncryption instance;
         // Construct the encryptor class
         String encClass = SystemPropertiesManager.get(ENCRYPTOR_CLASS_PROPERTY,

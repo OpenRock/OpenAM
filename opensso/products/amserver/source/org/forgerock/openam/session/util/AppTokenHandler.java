@@ -25,8 +25,6 @@
 
 package org.forgerock.openam.session.util;
 
-import com.iplanet.sso.SSOToken;
-
 /**
  * Use to store an application token so that is can be evaluating later in the 
  * thread
@@ -42,7 +40,7 @@ public class AppTokenHandler {
      *
      * @param appToken The application token
      */
-    public static void set(SSOToken appToken) {
+    public static void set(Object appToken) {
         appTokenHolder.set(appToken);
     }
 
@@ -51,8 +49,8 @@ public class AppTokenHandler {
      *
      * @return The application token
      */
-    public static SSOToken getAndClear() {
-        SSOToken temp = (SSOToken) appTokenHolder.get();
+    public static Object getAndClear() {
+        Object temp = (Object) appTokenHolder.get();
         appTokenHolder.remove();
 
         return temp;

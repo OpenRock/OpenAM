@@ -43,16 +43,6 @@
                     <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
-                    <label>products</label>
-                    <type>doc_root</type>
-                    <location>.</location>
-                </source-folder>
-                <source-folder>
-                    <label>products</label>
-                    <type>web_inf</type>
-                    <location>.</location>
-                </source-folder>
-                <source-folder>
                     <label>amserver/source</label>
                     <type>java</type>
                     <location>amserver/source</location>
@@ -81,6 +71,16 @@
                     <type>java</type>
                     <location>federation/openfm/unittest/source</location>
                     <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>products</label>
+                    <type>doc_root</type>
+                    <location>.</location>
+                </source-folder>
+                <source-folder>
+                    <label>products</label>
+                    <type>web_inf</type>
+                    <location>.</location>
                 </source-folder>
             </folders>
             <ide-actions>
@@ -170,7 +170,7 @@
         <web-data xmlns="http://www.netbeans.org/ns/freeform-project-web/2">
             <web-module>
                 <doc-root>.</doc-root>
-                <classpath/>
+                <context-path/>
                 <j2ee-spec-level>1.5</j2ee-spec-level>
                 <web-inf>.</web-inf>
             </web-module>

@@ -30,8 +30,6 @@
  */
 package com.sun.identity.entitlement;
 
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.NetworkMonitor;
 import com.sun.identity.session.util.RestrictedTokenAction;
@@ -308,7 +306,7 @@ class PrivilegeEvaluator {
         // Submit additional privilges to be executed by worker threads
         Set<IPrivilege> privileges = null;
         boolean tasksSubmitted = false;
-        SSOToken appToken = AppTokenHandler.getAndClear();
+        Object appToken = AppTokenHandler.getAndClear();
 
         while (true) {
             start = PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.start();
