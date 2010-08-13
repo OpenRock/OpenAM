@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.install.tools.util;
 
 import java.io.BufferedInputStream;
@@ -37,6 +41,7 @@ import java.io.FileWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
@@ -52,6 +57,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 
 public class FileUtils {
 
@@ -1084,17 +1090,30 @@ public class FileUtils {
 
     /**
      * Appends the given set of lines to the specified file.
-     * 
+     *
      * @param filePath
      * @param linesToAppend
-     * @return
+     * @return true for success, false otherwise
      */
     public static boolean appendLinesToFile(String filePath,
             String[] linesToAppend) {
+        return appendLinesToFile(filePath, linesToAppend, false);
+    }
+
+    /**
+     * Appends the given set of lines to the specified file.
+     * 
+     * @param filePath
+     * @param linesToAppend
+     * @param create should the file be created if it does not exist
+     * @returntrue for success, false otherwise
+     */
+    public static boolean appendLinesToFile(String filePath,
+            String[] linesToAppend, boolean create) {
         boolean result = false;
         try {
             if (linesToAppend != null && linesToAppend.length > 0) {
-                LineNumberReader reader = getLineNumReader(filePath);
+                LineNumberReader reader = getLineNumReader(filePath, create);
                 StringWriter writer = new StringWriter();
 
                 String line = null;
@@ -1336,14 +1355,28 @@ public class FileUtils {
 
     /**
      * Method getLineNumReader
-     * 
-     * 
+     *
+     *
      * @param filePath
+     *
+     * @return
+     *
+     */
+    private static LineNumberReader getLineNumReader(String filePath) {
+        return getLineNumReader(filePath, false);
+    }
+
+    /**
+     * Method getLineNumReader
      * 
+     * 
+     * @param filePath the path to the file
+     * @param create should we create the file if it does not exist
+     *
      * @return
      * 
      */
-    private static LineNumberReader getLineNumReader(String filePath) {
+    private static LineNumberReader getLineNumReader(String filePath, boolean create) {
 
         LineNumberReader reader = null;
 
@@ -1351,6 +1384,10 @@ public class FileUtils {
             File srcFile = new File(filePath);
 
             if (srcFile.exists() && srcFile.isFile()) {
+                reader = new LineNumberReader(new FileReader(srcFile));
+                reader.setLineNumber(0);
+            } else if (!srcFile.exists() && create) {
+                FileUtils.writeLine(new FileWriter(srcFile), "");
                 reader = new LineNumberReader(new FileReader(srcFile));
                 reader.setLineNumber(0);
             }
