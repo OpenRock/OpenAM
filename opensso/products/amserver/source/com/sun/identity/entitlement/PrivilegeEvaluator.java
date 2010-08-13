@@ -24,10 +24,18 @@
  *
  * $Id: PrivilegeEvaluator.java,v 1.2 2009/10/07 06:36:40 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement;
 
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.NetworkMonitor;
+import com.sun.identity.session.util.RestrictedTokenAction;
+import com.sun.identity.session.util.RestrictedTokenContext;
 
 import com.sun.identity.shared.debug.IDebug;
 import java.security.Principal;
@@ -41,6 +49,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.security.auth.Subject;
+import org.forgerock.openam.session.util.AppTokenHandler;
 
 /**
  * This class evaluates entitlements of a subject for a given resource
@@ -299,6 +308,8 @@ class PrivilegeEvaluator {
         // Submit additional privilges to be executed by worker threads
         Set<IPrivilege> privileges = null;
         boolean tasksSubmitted = false;
+        SSOToken appToken = AppTokenHandler.getAndClear();
+
         while (true) {
             start = PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.start();
             if (!i.hasNext()) {
@@ -320,7 +331,7 @@ class PrivilegeEvaluator {
             if ((totalCount % tasksPerThread) == 0) {
                 start = PRIVILEGE_EVAL_MONITOR_SUBMIT.start();
                 threadPool.submit(new PrivilegeTask(this, privileges,
-                    isMultiThreaded));
+                    isMultiThreaded, appToken));
                 PRIVILEGE_EVAL_MONITOR_SUBMIT.end(start);
                 privileges.clear();
             }
@@ -328,11 +339,11 @@ class PrivilegeEvaluator {
         if ((privileges != null) && !privileges.isEmpty()) {
             start = PRIVILEGE_EVAL_MONITOR_SUBMIT.start();
             threadPool.submit(new PrivilegeTask(this, privileges,
-                isMultiThreaded));
+                isMultiThreaded, appToken));
             PRIVILEGE_EVAL_MONITOR_SUBMIT.end(start);
         }
         // IPrivilege privileges locally
-        (new PrivilegeTask(this, localPrivileges, tasksSubmitted)).run();
+        (new PrivilegeTask(this, localPrivileges, tasksSubmitted, appToken)).run();
 
         // Wait for submitted threads to complete evaluation
         start = PRIVILEGE_EVAL_MONITOR_WAIT.start();
@@ -404,24 +415,39 @@ class PrivilegeEvaluator {
         final PrivilegeEvaluator parent;
         private Set<IPrivilege> privileges;
         private boolean isThreaded;
+        private Object context;
 
         PrivilegeTask(PrivilegeEvaluator parent, Set<IPrivilege> privileges,
-            boolean isThreaded) {
+            boolean isThreaded, Object context) {
             this.parent = parent;
             this.privileges = new HashSet<IPrivilege>(privileges.size() *2);
             this.privileges.addAll(privileges);
             this.isThreaded = isThreaded;
+            this.context = context;
         }
 
         public void run() {
             try {
-                for (IPrivilege eval : privileges) {
-                    List<Entitlement> entitlements = eval.evaluate(
-                        parent.adminSubject,
-                        parent.realm, parent.subject,
-                        parent.applicationName, parent.resourceName,
-                        parent.actionNames, parent.envParameters,
-                        parent.recursive);
+                for (final IPrivilege eval : privileges) {
+                    List<Entitlement> entitlements = null;
+                    
+                    try {
+                        entitlements = (List<Entitlement>) RestrictedTokenContext.doUsing(context,
+                            new RestrictedTokenAction() {
+                                public Object run() throws Exception {
+                                    return eval.evaluate(
+                                            parent.adminSubject,
+                                            parent.realm, parent.subject,
+                                            parent.applicationName, parent.resourceName,
+                                            parent.actionNames, parent.envParameters,
+                                            parent.recursive);
+                                }
+                        });
+                    } catch (EntitlementException eex) {
+                        throw eex;
+                    } catch (Exception ex) {
+                        PrivilegeManager.debug.error("PrivilegeTask::run", ex);
+                    }
 
                     if (entitlements != null) {
                         if (isThreaded) {

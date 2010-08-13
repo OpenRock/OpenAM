@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.policy.remote;
 
 import com.sun.identity.shared.debug.Debug;
@@ -62,6 +66,7 @@ import java.util.Vector;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.session.util.AppTokenHandler;
 
 /**
  * The <code>PolicyRequestHandler</code> class handles the policy
@@ -268,6 +273,9 @@ public class PolicyRequestHandler implements RequestHandler {
             throw new PolicyEvaluationException(
                     PolicyResponse.APP_SSO_TOKEN_INVALID, requestId);
         }
+
+        // set the app token into the ThreadLocal
+        AppTokenHandler.set(appToken);
 
         if (req.getMethodID() == 
                 PolicyRequest.POLICY_REQUEST_ADD_POLICY_LISTENER) {
