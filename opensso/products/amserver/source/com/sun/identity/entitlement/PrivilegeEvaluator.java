@@ -32,8 +32,6 @@ package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.NetworkMonitor;
-import com.sun.identity.session.util.RestrictedTokenAction;
-import com.sun.identity.session.util.RestrictedTokenContext;
 
 import com.sun.identity.shared.debug.IDebug;
 import java.security.Principal;
@@ -427,25 +425,12 @@ class PrivilegeEvaluator {
         public void run() {
             try {
                 for (final IPrivilege eval : privileges) {
-                    List<Entitlement> entitlements = null;
-                    
-                    try {
-                        entitlements = (List<Entitlement>) RestrictedTokenContext.doUsing(context,
-                            new RestrictedTokenAction() {
-                                public Object run() throws Exception {
-                                    return eval.evaluate(
+                    List<Entitlement> entitlements = eval.evaluate(
                                             parent.adminSubject,
                                             parent.realm, parent.subject,
                                             parent.applicationName, parent.resourceName,
                                             parent.actionNames, parent.envParameters,
-                                            parent.recursive);
-                                }
-                        });
-                    } catch (EntitlementException eex) {
-                        throw eex;
-                    } catch (Exception ex) {
-                        PrivilegeManager.debug.error("PrivilegeTask::run", ex);
-                    }
+                                            parent.recursive, context);
 
                     if (entitlements != null) {
                         if (isThreaded) {

@@ -24,6 +24,10 @@
  *
  * $Id: Privilege.java,v 1.14 2010/01/08 22:20:47 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.JSONUtils;
@@ -259,7 +263,8 @@ public abstract class Privilege implements IPrivilege {
         String resourceName,
         Set<String> actionNames,
         Map<String, Set<String>> environment,
-        boolean recursive) throws EntitlementException;
+        boolean recursive,
+        Object context) throws EntitlementException;
 
     /**
      * Returns string representation of the object

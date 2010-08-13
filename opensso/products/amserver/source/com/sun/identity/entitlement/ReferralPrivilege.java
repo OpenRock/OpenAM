@@ -25,6 +25,10 @@
  * $Id: ReferralPrivilege.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -412,7 +416,8 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         String resourceName,
         Set<String> actionNames,
         Map<String, Set<String>> environment,
-        boolean recursive
+        boolean recursive,
+        Object context
     ) throws EntitlementException {
         List<Entitlement> results = null;
 

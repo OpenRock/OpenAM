@@ -25,6 +25,10 @@
  * $Id: IPrivilege.java,v 1.2 2009/11/19 01:02:03 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.List;
@@ -68,6 +72,7 @@ public interface IPrivilege {
      * @param environment Environment parameters.
      * @param recursive <code>true</code> to perform evaluation on sub resources
      *        from the given resource name.
+     * @param A security context
      * @return a list of entitlement for a given subject, resource name
      *         and environment.
      * @throws EntitlementException if the result cannot be determined.
@@ -80,5 +85,6 @@ public interface IPrivilege {
         String resourceName,
         Set<String> actionNames,
         Map<String, Set<String>> environment,
-        boolean recursive) throws EntitlementException;
+        boolean recursive,
+        Object context) throws EntitlementException;
 }

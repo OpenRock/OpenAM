@@ -25,6 +25,10 @@
  * $Id: OpenSSOPrivilege.java,v 1.5 2009/10/07 01:36:55 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.sun.identity.entitlement.Entitlement;
@@ -33,12 +37,15 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.PrivilegeType;
 import com.sun.identity.entitlement.util.NetworkMonitor;
+import com.sun.identity.session.util.RestrictedTokenAction;
+import com.sun.identity.session.util.RestrictedTokenContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.security.auth.Subject;
 import javax.security.auth.Subject;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +72,43 @@ public class OpenSSOPrivilege extends Privilege {
 
     @Override
     public List<Entitlement> evaluate(
+        final Subject adminSubject,
+        final String realm,
+        final Subject subject,
+        final String applicationName,
+        final String resourceName,
+        final Set<String> actionNames,
+        final Map<String, Set<String>> environment,
+        final boolean recursive,
+        final Object context
+    ) throws EntitlementException {
+        List<Entitlement> results = null;
+        
+        try {
+            results = (List<Entitlement>) RestrictedTokenContext.doUsing(context,
+                            new RestrictedTokenAction() {
+                                public Object run() throws Exception {
+                                    return internalEvaluate(
+                                                    adminSubject,
+                                                    realm,
+                                                    subject,
+                                                    applicationName,
+                                                    resourceName,
+                                                    actionNames,
+                                                    environment,
+                                                    recursive,
+                                                    context
+                                            );
+                                }
+                            });
+        } catch (Exception ex) {
+            // exception
+        }
+        
+        return results;
+    }
+
+    private List<Entitlement> internalEvaluate(
         Subject adminSubject,
         String realm,
         Subject subject,
@@ -72,7 +116,8 @@ public class OpenSSOPrivilege extends Privilege {
         String resourceName,
         Set<String> actionNames,
         Map<String, Set<String>> environment,
-        boolean recursive
+        boolean recursive,
+        Object context
     ) throws EntitlementException {
         long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :
             EVAL_SINGLE_LEVEL_MONITOR.start();
@@ -91,7 +136,7 @@ public class OpenSSOPrivilege extends Privilege {
             resourceName, environment) &&
             doesConditionMatch(realm, advices, subject, resourceName,
             environment)
-        ) {
+            ) {
             Entitlement origE = getEntitlement();
             Set<String> resources = origE.evaluate(adminSubject, realm,
                 subject, applicationName, resourceName, actionNames,
