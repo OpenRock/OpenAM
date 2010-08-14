@@ -26,10 +26,23 @@
 : $Id: ssoadm.bat,v 1.19 2010/01/28 00:49:05 bigfatrat Exp $
 :
 
-set TOOLS_HOME=@TOOLS_HOME@
+: Portions Copyrighted [2010] [ForgeRock AS]
 
 setlocal
 
-"@JAVA_HOME@/bin/java.exe" -Xms256m -Xmx512m -cp "@CONFIG_DIR@";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/resources";"%TOOLS_HOME%/lib/amadm_setup.jar";"%TOOLS_HOME%/lib/OpenDS.jar";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/lib/mail.jar";"%TOOLS_HOME%/lib/j2ee.jar";"%TOOLS_HOME%/lib/webservices-api.jar";"%TOOLS_HOME%/lib/webservices-rt.jar";"%TOOLS_HOME%/lib/webservices-tools.jar";"%TOOLS_HOME%/lib/xsdlib.jar";"%TOOLS_HOME%/lib/amserver.jar";"%TOOLS_HOME%/lib/opensso-sharedlib.jar";"%TOOLS_HOME%/lib/opensso.jar";"%TOOLS_HOME%/lib/openfedlib.jar";"%TOOLS_HOME%/lib/jdmkrt.jar";"%TOOLS_HOME%/lib/jdmktk.jar";"%TOOLS_HOME%/lib/json.jar" -D"sun.net.client.defaultConnectTimeout=3000" -D"ssoadm=true" -D"com.iplanet.am.serverMode=false" -D"com.sun.identity.sm.notification.enabled=false" -D"bootstrap.dir=@CONFIG_DIR@" -D"com.iplanet.services.debug.directory=@DEBUG_DIR@" -D"com.sun.identity.log.dir=@LOG_DIR@" -D"definitionFiles=com.sun.identity.cli.AccessManager,com.sun.identity.federation.cli.FederationManager" -D"commandName=ssoadm" -D"amconfig=AMConfig" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+" -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" -D"com.iplanet.am.sdk.package=com.iplanet.am.sdk.remote" -D"com.sun.identity.idm.remote.notification.enabled=false" com.sun.identity.cli.CommandManager %*
+IF NOT DEFINED JAVA_HOME (
+	set JAVA_HOME=@JAVA_HOME@
+)
+set TOOLS_HOME=@TOOLS_HOME@
+
+set ORIG_CLASSPATH=%CLASSPATH%
+set CLASSPATH="@CONFIG_DIR@";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/resources";"%TOOLS_HOME%/lib/amadm_setup.jar";"%TOOLS_HOME%/lib/OpenDS.jar";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/lib/mail.jar";"%TOOLS_HOME%/lib/j2ee.jar";"%TOOLS_HOME%/lib/webservices-api.jar";"%TOOLS_HOME%/lib/webservices-rt.jar";"%TOOLS_HOME%/lib/webservices-tools.jar";"%TOOLS_HOME%/lib/xsdlib.jar";"%TOOLS_HOME%/lib/amserver.jar";"%TOOLS_HOME%/lib/opensso-sharedlib.jar";"%TOOLS_HOME%/lib/opensso.jar";"%TOOLS_HOME%/lib/openfedlib.jar";"%TOOLS_HOME%/lib/jdmkrt.jar";"%TOOLS_HOME%/lib/jdmktk.jar";"%TOOLS_HOME%/lib/json.jar"
+
+IF DEFINED ORIG_CLASSPATH (
+	set CLASSPATH=%ORIG_CLASSPATH%;%CLASSPATH%
+)
+
+"%JAVA_HOME%/bin/java.exe" -Xms256m -Xmx512m -cp %CLASSPATH% -D"sun.net.client.defaultConnectTimeout=3000" -D"ssoadm=true" -D"com.iplanet.am.serverMode=false" -D"com.sun.identity.sm.notification.enabled=false" -D"bootstrap.dir=@CONFIG_DIR@" -D"com.iplanet.services.debug.directory=@DEBUG_DIR@" -D"com.sun.identity.log.dir=@LOG_DIR@" -D"definitionFiles=com.sun.identity.cli.AccessManager,com.sun.identity.federation.cli.FederationManager" -D"commandName=ssoadm" -D"amconfig=AMConfig" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+" -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" -D"com.iplanet.am.sdk.package=com.iplanet.am.sdk.remote" -D"com.sun.identity.idm.remote.notification.enabled=false" com.sun.identity.cli.CommandManager %*
 endlocal
 :END
+
