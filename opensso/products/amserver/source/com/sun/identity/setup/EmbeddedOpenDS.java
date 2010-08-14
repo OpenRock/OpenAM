@@ -1011,7 +1011,7 @@ public class EmbeddedOpenDS {
             "list-replication-server",
             "--provider-name", "Multimaster Synchronization",
             "--property", "replication-server",
-            "--property", "replication-port","--no-prompt"
+            "--property", "replication-port","--no-prompt", "--trustAll"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(args).replaceAll(passwd, "****");
@@ -1023,10 +1023,18 @@ public class EmbeddedOpenDS {
         DSConfig.main(args, false, bos, boe);
         String str = bos.toString();
         String stre = boe.toString();
-        if (stre.length() > 0) {
+        if (stre.length() > 0 &&
+                !stre.contains("Unable to continue since there are no Replication Server currently")) {
             debug.error("EmbeddedOpenDS:syncReplication: stderr is not empty:"
-                           +stre);
+                           + stre);   
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("EmbeddedOpenDS:syncReplication: stderr is not empty:"
+                           + stre);
+            }
+            return false;
         }
+
         BufferedReader brd = new BufferedReader(new StringReader(str));
         String line = null;
         try {
@@ -1057,6 +1065,7 @@ public class EmbeddedOpenDS {
             cmdlist.add("-w"); 
             cmdlist.add(passwd);
             cmdlist.add("--no-prompt");
+            cmdlist.add("--trustAll");
             cmdlist.add("set-replication-server-prop");
             cmdlist.add("--provider-name"); 
             cmdlist.add("Multimaster Synchronization");
@@ -1088,10 +1097,10 @@ public class EmbeddedOpenDS {
                          str);
                 }
                 if (stre.length() != 0) {
-                    debug.error("EmbeddedOpenDS:syncReplication:cmd stderr:"
-                                 +stre);
+                        debug.error("EmbeddedOpenDS:syncReplication:cmd stderr:"
+                                     +stre);
+                    }
                 }
-            } 
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
             return false;
@@ -1114,7 +1123,8 @@ public class EmbeddedOpenDS {
             "list-replication-domains",
             "--provider-name", "Multimaster Synchronization",
             "--property", "replication-server",
-            "--no-prompt"
+            "--no-prompt",
+            "--trustAll"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(args).replaceAll(passwd, "****");
@@ -1157,6 +1167,7 @@ public class EmbeddedOpenDS {
                     cmdlist.add("-w"); 
                     cmdlist.add(passwd);
                     cmdlist.add("--no-prompt");
+                    cmdlist.add("--trustAll");
                     cmdlist.add("set-replication-domain-prop");
                     cmdlist.add("--provider-name"); 
                     cmdlist.add("Multimaster Synchronization");

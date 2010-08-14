@@ -150,6 +150,7 @@ public class AMSetupServlet extends HttpServlet {
 
     final static String BOOTSTRAP_EXTRA = "bootstrap";    
     final static String BOOTSTRAP_FILE_LOC = "bootstrap.file";
+    final static String DS_ADMIN_PORT = "org.forgerock.embedded.dsadminport";
     final static String OPENDS_DIR = "/opends";
 
     private static String errorMessage = null;
@@ -488,7 +489,17 @@ public class AMSetupServlet extends HttpServlet {
                         AdminTokenAction.getInstance());
                     ServerConfiguration.setServerInstance(adminToken,
                         serverInstanceName, mapBootstrap);
-                    
+
+                    // store the ds admin port
+                    String dsAdminPort =
+                            (String)map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
+                    Map mapAdminPort = new HashMap(2);
+                    Set set2 = new HashSet(2);
+                    set2.add(dsAdminPort);
+                    mapAdminPort.put(DS_ADMIN_PORT, set2);
+                    ServerConfiguration.setServerInstance(adminToken,
+                        serverInstanceName, mapAdminPort);
+
                     // setup site configuration information
                     if ((siteMap != null) && !siteMap.isEmpty()) {
                         String site = (String)siteMap.get(
@@ -2502,6 +2513,8 @@ public class AMSetupServlet extends HttpServlet {
                 return true;
             }
 
+            String dsAdminPort = props.getProperty(DS_ADMIN_PORT);
+
             Iterator iter = serverSet.iterator();
             Set currServerSet = new HashSet();
             Set currServerDSSet = new HashSet();
@@ -2517,9 +2530,9 @@ public class AMSetupServlet extends HttpServlet {
             }
             ServerGroup sGroup = getSMSServerGroup(myName); 
             boolean stats = EmbeddedOpenDS.syncReplicatedServers(
-                  currServerSet, getSMSPort(sGroup), getSMSPassword(sGroup));
+                  currServerSet, dsAdminPort, getSMSPassword(sGroup));
             boolean statd = EmbeddedOpenDS.syncReplicatedDomains(
-                  currServerSet, getSMSPort(sGroup), getSMSPassword(sGroup));
+                  currServerSet, dsAdminPort, getSMSPassword(sGroup));
             boolean statl = EmbeddedOpenDS.syncReplicatedServerList(
                   currServerDSSet, getSMSPort(sGroup), getSMSPassword(sGroup));
             return stats || statd || statl;
