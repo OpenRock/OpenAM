@@ -27,8 +27,6 @@
 
 # Portions Copyrighted [2010] [ForgeRock AS]
 
-JAVA_HOME="@JAVA_HOME@"
-
 if [ -z "${JAVA_HOME}" ] ; then
         JAVA_HOME="@JAVA_HOME@"
 fi
