@@ -150,8 +150,8 @@ public class AMSetupServlet extends HttpServlet {
 
     final static String BOOTSTRAP_EXTRA = "bootstrap";    
     final static String BOOTSTRAP_FILE_LOC = "bootstrap.file";
-    final static String DS_ADMIN_PORT = "org.forgerock.embedded.dsadminport";
     final static String OPENDS_DIR = "/opends";
+    private static final String COLON = ":";
 
     private static String errorMessage = null;
     private static java.util.Locale configLocale;
@@ -496,7 +496,7 @@ public class AMSetupServlet extends HttpServlet {
                     Map mapAdminPort = new HashMap(2);
                     Set set2 = new HashSet(2);
                     set2.add(dsAdminPort);
-                    mapAdminPort.put(DS_ADMIN_PORT, set2);
+                    mapAdminPort.put(Constants.DS_ADMIN_PORT, set2);
                     ServerConfiguration.setServerInstance(adminToken,
                         serverInstanceName, mapAdminPort);
 
@@ -2474,15 +2474,16 @@ public class AMSetupServlet extends HttpServlet {
      * Synchronizes embedded replication state with current server list.
      * @returns boolean true is sync succeeds else false.
      */
-    private static boolean syncServerInfoWithRelication()
-    {
+    private static boolean syncServerInfoWithRelication() {
         // We need to execute syn only if we are in Embedded mode
  
         String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
         boolean isEmbeddedDS = (new File(baseDir + "/opends")).exists();
+
         if (!isEmbeddedDS) {
             return true;
         }
+
         try {
             if (getAdminSSOToken() == null) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
@@ -2500,12 +2501,12 @@ public class AMSetupServlet extends HttpServlet {
             Properties props = ServerConfiguration.getServerInstance
                                                  (adminToken, myName);
             String syncFlag = props.getProperty(
-                                    "com.sun.embedded.sync.servers");
+                                    Constants.EMBED_SYNC_SERVERS);
             if ("off".equals(syncFlag)) {
                 return true;
             }
             String myReplPort = props.getProperty(
-                                    "com.sun.embedded.replicationport");
+                                    Constants.EMBED_REPL_PORT);
             String myDSPort = null;
             // Get server list
             Set serverSet = ServerConfiguration.getServers(adminToken);
@@ -2513,28 +2514,30 @@ public class AMSetupServlet extends HttpServlet {
                 return true;
             }
 
-            String dsAdminPort = props.getProperty(DS_ADMIN_PORT);
+            String dsAdminPort = props.getProperty(Constants.DS_ADMIN_PORT);
 
-            Iterator iter = serverSet.iterator();
             Set currServerSet = new HashSet();
             Set currServerDSSet = new HashSet();
-            while (iter.hasNext()) {
-                String sname = (String) iter.next();
+            Set currServerDSAdminPortsSet = new HashSet();
+
+            for (String sname : (Set<String>) serverSet) {
                 Properties p = ServerConfiguration.getServerInstance(
                                    adminToken, sname);
-                String hname = p.getProperty("com.iplanet.am.server.host");
-                String rPort = p.getProperty("com.sun.embedded.replicationport");
-                currServerSet.add(hname+":"+rPort);
+                String hname = p.getProperty(Constants.AM_SERVER_HOST);
+                String rPort = p.getProperty(Constants.EMBED_REPL_PORT);
+                currServerSet.add(hname + ":" + rPort);
                 ServerGroup sg = getSMSServerGroup(sname); 
-                currServerDSSet.add(hname+":"+getSMSPort(sg));
+                currServerDSSet.add(hname + ":" + getSMSPort(sg));
+                currServerDSAdminPortsSet.add(hname + ":" + p.getProperty(Constants.DS_ADMIN_PORT));
             }
+
             ServerGroup sGroup = getSMSServerGroup(myName); 
             boolean stats = EmbeddedOpenDS.syncReplicatedServers(
                   currServerSet, dsAdminPort, getSMSPassword(sGroup));
             boolean statd = EmbeddedOpenDS.syncReplicatedDomains(
                   currServerSet, dsAdminPort, getSMSPassword(sGroup));
             boolean statl = EmbeddedOpenDS.syncReplicatedServerList(
-                  currServerDSSet, getSMSPort(sGroup), getSMSPassword(sGroup));
+                  currServerDSAdminPortsSet, getSMSPort(sGroup), getSMSPassword(sGroup));
             return stats || statd || statl;
         } catch (Exception ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(

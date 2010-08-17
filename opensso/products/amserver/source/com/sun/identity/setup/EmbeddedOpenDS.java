@@ -1026,13 +1026,13 @@ public class EmbeddedOpenDS {
         if (stre.length() > 0 &&
                 !stre.contains("Unable to continue since there are no Replication Server currently")) {
             debug.error("EmbeddedOpenDS:syncReplication: stderr is not empty:"
-                           + stre);   
+                           + stre);
+            return false;
         } else {
             if (debug.messageEnabled()) {
                 debug.message("EmbeddedOpenDS:syncReplication: stderr is not empty:"
                            + stre);
             }
-            return false;
         }
 
         BufferedReader brd = new BufferedReader(new StringReader(str));

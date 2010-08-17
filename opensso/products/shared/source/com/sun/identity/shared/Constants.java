@@ -995,4 +995,22 @@ public interface Constants {
       */
      public static final String ALLOW_PERSIST_AM_COOKIE =
              "openam.session.allow_persist_am_cookie";
+
+     /**
+      * Server configuration property for the OpenDS admin port
+      */
+     public static final String DS_ADMIN_PORT =
+             "org.forgerock.embedded.dsadminport";
+
+     /**
+      * OpenDS Replication Port
+      */
+     public static final String EMBED_REPL_PORT =
+             "com.sun.embedded.replicationport";
+
+     /**
+      * OpenDS Replication Port
+      */
+     public static final String EMBED_SYNC_SERVERS =
+             "com.sun.embedded.sync.servers";
 }
