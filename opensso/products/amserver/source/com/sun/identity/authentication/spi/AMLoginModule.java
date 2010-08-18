@@ -1535,7 +1535,8 @@ public abstract class AMLoginModule implements LoginModule {
     }
     
     /**
-     * Returns the property from the user session.
+     * Returns the property from the user session. If the session is being force
+     * upgraded then set on the old session otherwise set on the current session.
      *
      * @param name The property name.
      * @return The property value.
@@ -1545,8 +1546,15 @@ public abstract class AMLoginModule implements LoginModule {
      */
     public String getUserSessionProperty(String name)
             throws AuthLoginException {
-        InternalSession sess =
-        getLoginState("getUserSessionProperty()").getSession();
+        InternalSession sess = null;
+
+        if (getLoginState(null).isSessionUpgrade() &&
+                getLoginState(null).getForceFlag()) {
+            sess = getLoginState(null).getOldSession();
+        } else {
+            sess = getLoginState("getUserSessionProperty()").getSession();
+        }
+
         if (sess != null) {
             return sess.getProperty(name);
         } else {
@@ -1555,7 +1563,8 @@ public abstract class AMLoginModule implements LoginModule {
     }
     
     /**
-     * Sets a property in the user session.
+     * Sets a property in the user session. If the session is being force
+     * upgraded then set on the old session otherwise set on the current session.
      *
      * @param name The property name.
      * @param value The property value.
@@ -1565,8 +1574,15 @@ public abstract class AMLoginModule implements LoginModule {
      */
     public void setUserSessionProperty(String name, String value)
             throws AuthLoginException {
-        InternalSession sess =
-        getLoginState("setUserSessionProperty()").getSession();
+        InternalSession sess = null;
+
+        if (getLoginState(null).isSessionUpgrade() &&
+                getLoginState(null).getForceFlag()) {
+            sess = getLoginState(null).getOldSession();
+        } else {
+            sess = getLoginState("setUserSessionProperty()").getSession();
+        }
+
         if (sess != null) {
             sess.putProperty(name, value);
         } else {
