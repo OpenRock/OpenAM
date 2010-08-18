@@ -44,10 +44,10 @@ COOKIE_DOMAIN=.example.com
 ##############################################################################
 ###
 ### DATA_STORE is the type of configuration data store. Valid values are
-### 'embedded' - OpenSSO
+### 'embedded' - OpenAM embedded OpenDS server
 ### 'dirServer' - Sun Java System Directory Server
 ### If 'dirServer' is specified and the configuration data store contains
-### configuration of existing OpenSSO Servers, this OpenSSO Server will be
+### configuration of existing OpenAM Servers, this OpenAM Server will be
 ### added to the existing multi-server setup.
 ###
 ### DIRECTORY_SSL specifies if the configuration data store is using SSL.
@@ -61,10 +61,14 @@ COOKIE_DOMAIN=.example.com
 ### listening for connections.
 ###
 ### DIRECTORY_ADMIN_PORT is the admin port on which the configuration data
-### store listens for administrative functions.
+### store listens for administrative functions. This setting is only required
+### if you are using the embedded OpenDS, if you are using an external
+### configuration store you can ignore this property
 ###
 ### DIRECTORY_JMX_PORT is the jmx port on which the configuration data
-### store listens for JMX connections.
+### store listens for JMX connections. This setting is only required
+### if you are using the embedded OpenDS, if you are using an external
+### configuration store you can ignore this property
 ###
 ### ROOT_SUFFIX is the initial or root suffix of the configuration data store.
 ###

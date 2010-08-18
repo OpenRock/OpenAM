@@ -490,15 +490,20 @@ public class AMSetupServlet extends HttpServlet {
                     ServerConfiguration.setServerInstance(adminToken,
                         serverInstanceName, mapBootstrap);
 
-                    // store the ds admin port
-                    String dsAdminPort =
+                    // store the ds admin port if we are running in embedded mode
+                    String dataStore = (String) map.get(
+                        SetupConstants.CONFIG_VAR_DATA_STORE);
+
+                    if (dataStore.equals(SetupConstants.SMS_EMBED_DATASTORE)) {
+                        String dsAdminPort =
                             (String)map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
-                    Map mapAdminPort = new HashMap(2);
-                    Set set2 = new HashSet(2);
-                    set2.add(dsAdminPort);
-                    mapAdminPort.put(Constants.DS_ADMIN_PORT, set2);
-                    ServerConfiguration.setServerInstance(adminToken,
-                        serverInstanceName, mapAdminPort);
+                        Map mapAdminPort = new HashMap(2);
+                        Set set2 = new HashSet(2);
+                        set2.add(dsAdminPort);
+                        mapAdminPort.put(Constants.DS_ADMIN_PORT, set2);
+                        ServerConfiguration.setServerInstance(adminToken,
+                            serverInstanceName, mapAdminPort);
+                    }
 
                     // setup site configuration information
                     if ((siteMap != null) && !siteMap.isEmpty()) {
