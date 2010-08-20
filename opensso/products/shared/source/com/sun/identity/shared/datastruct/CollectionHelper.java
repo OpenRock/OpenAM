@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.shared.datastruct;
 
 import com.sun.identity.shared.debug.Debug;
@@ -156,6 +160,8 @@ public class CollectionHelper {
                         } else {
                             result = null;
                         }
+                    } else {
+                        result = null;
                     }
                 }
             }
