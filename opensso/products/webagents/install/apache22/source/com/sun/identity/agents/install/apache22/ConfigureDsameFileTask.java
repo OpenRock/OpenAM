@@ -136,7 +136,7 @@ public class ConfigureDsameFileTask
             // Tags get swapped with agent library and agent instance's config
             // file.
             Map tokens = new HashMap();
-            tokens.put("MODULE", ConfigUtil.getLibPath());
+            tokens.put("MODULE", ConfigUtil.getBinDirPath());
             tokens.put("AGENTBOOTSTRAP",
 	   	stateAccess.get(STR_CONFIG_FILE_PATH_TAG));
             tokens.put("AGENTCONFIG", 
