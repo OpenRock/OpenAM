@@ -34,6 +34,7 @@ import java.util.Random;
 import java.util.Vector;
 import javax.jms.BytesMessage;
 import javax.jms.DeliveryMode;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
@@ -51,6 +52,8 @@ import com.sun.identity.ha.FAMRecordUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.iplanet.services.naming.WebtopNaming;
+import com.sun.identity.common.ShutdownListener;
+import com.sun.identity.common.ShutdownManager;
 
 /**
  * This class <code>FAMRecordJMQPersister</code> implements 
@@ -112,9 +115,29 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
         ConnectionFactoryProvider provider = ConnectionFactoryProviderFactory
                 .getProvider();
         tFactory = provider.newTopicConnectionFactory();
-        tConn = tFactory.createTopicConnection();
         int flag = Session.DUPS_OK_ACKNOWLEDGE;
-        tSession = tConn.createTopicSession(false, flag);
+
+        ShutdownManager shutdownMan = ShutdownManager.getInstance();
+        if (shutdownMan.acquireValidLock()) {
+            tConn = tFactory.createTopicConnection();
+            tSession = tConn.createTopicSession(false, flag);
+            try {
+                shutdownMan.addShutdownListener(
+                    new ShutdownListener() {
+                        public void shutdown() {
+                            try {
+                                tSession.close();
+                                tConn.close();
+                            } catch (JMSException ex) {
+                                FAMRecordUtils.debug.error("Error closing JMS connection", ex);
+                            }
+                        }
+                    }
+                );
+            } finally {
+                shutdownMan.releaseLockAndNotify();
+            }
+        }
         reqTopic = tSession.createTopic(DBREQUEST);
         resTopic = tSession.createTopic(DBRESPONSE);
 
@@ -181,9 +204,29 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
                 .getProvider();
         tFactory = provider
         .newTopicConnectionFactory(serverList,true, true, userName, password);
-        tConn = tFactory.createTopicConnection();
         int flag = Session.DUPS_OK_ACKNOWLEDGE;
-        tSession = tConn.createTopicSession(false, flag);
+
+        ShutdownManager shutdownMan = ShutdownManager.getInstance();
+        if (shutdownMan.acquireValidLock()) {
+            tConn = tFactory.createTopicConnection();
+            tSession = tConn.createTopicSession(false, flag);
+            try {
+                shutdownMan.addShutdownListener(
+                    new ShutdownListener() {
+                        public void shutdown() {
+                            try {
+                                tSession.close();
+                                tConn.close();
+                            } catch (JMSException ex) {
+                                FAMRecordUtils.debug.error("Error closing JMS connection", ex);
+                            }
+                        }
+                    }
+                );
+            } finally {
+                shutdownMan.releaseLockAndNotify();
+            }
+        }
         reqTopic = tSession.createTopic(DBREQUEST);
         resTopic = tSession.createTopic(DBRESPONSE);
 
