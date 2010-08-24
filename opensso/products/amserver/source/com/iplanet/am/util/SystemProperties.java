@@ -81,8 +81,7 @@ public class SystemProperties {
     private static ReentrantReadWriteLock rwLock = new
         ReentrantReadWriteLock();
     private static Map attributeMap = new HashMap();
-    private static boolean isSSOAdm = Boolean.valueOf(
-        System.getProperty("ssoadm", "false")).booleanValue();
+    private static boolean sitemonitorDisabled = false;
     private final static String TRUE = "true";
     
     static {
@@ -227,6 +226,10 @@ public class SystemProperties {
                 // Should not happend, ignore the exception
             }
         }
+        sitemonitorDisabled = Boolean.valueOf(System.getProperty(
+               Constants.SITEMONITOR_DISABLED, getProp(
+               Constants.SITEMONITOR_DISABLED, "false"))).booleanValue();
+        System.out.println("siteMonitorDisabled=" + sitemonitorDisabled);
     }
 
     /**
@@ -262,7 +265,7 @@ public class SystemProperties {
             String answer = null;
 
             // look up values in SMS services only if in server mode.
-            if (isServerMode() || isSSOAdm) {
+            if (isServerMode() || sitemonitorDisabled) {
                 AttributeStruct ast = (AttributeStruct) attributeMap.get(key);
                 if (ast != null) {
                     answer = PropertiesFinder.getProperty(key, ast);

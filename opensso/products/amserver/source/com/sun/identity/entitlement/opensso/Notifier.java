@@ -25,6 +25,10 @@
  * $Id: Notifier.java,v 1.3 2010/01/07 00:19:11 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.am.util.SystemProperties;
@@ -36,6 +40,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.shared.Constants;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -62,8 +67,9 @@ public class Notifier implements Runnable {
     private String action;
     private Map<String, String> params;
     private static IThreadPool threadPool = new EntitlementThreadPool(4);
-    private static boolean ssoadm = Boolean.valueOf(
-        System.getProperty("ssoadm", "false")).booleanValue();
+    private static boolean sitemonitorDisabled = Boolean.valueOf(
+        System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
+        Constants.SITEMONITOR_DISABLED, "true"))).booleanValue();
 
     public static void submit(String action, Map<String, String> params) {
         threadPool.submit(new Notifier(action, params));
@@ -87,7 +93,7 @@ public class Notifier implements Runnable {
                     url = url.substring(0, idx);
                 }
 
-                if (ssoadm || !url.equals(currentServerInstance)) {
+                if (sitemonitorDisabled || !url.equals(currentServerInstance)) {
                     String strURL = url + NotificationServlet.CONTEXT_PATH +
                         "/" + action;
 

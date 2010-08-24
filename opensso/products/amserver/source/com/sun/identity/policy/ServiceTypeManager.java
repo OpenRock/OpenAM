@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 
 package com.sun.identity.policy;
@@ -45,6 +47,7 @@ import com.iplanet.services.ldap.*;
 import com.sun.identity.authentication.internal.*;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.Constants;
 
 /**
  * The class <code>ServiceTypeManager</code> provides methods
@@ -62,8 +65,9 @@ public class ServiceTypeManager {
     // static variables
     private static Random random = new Random();
 
-    private static boolean ssoadm = Boolean.valueOf(
-        System.getProperty("ssoadm", "false")).booleanValue();
+    private static boolean sitemonitorDisabled = Boolean.valueOf(
+            System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
+            Constants.SITEMONITOR_DISABLED, "false"))).booleanValue();
 
 
     /**
@@ -202,7 +206,7 @@ public class ServiceTypeManager {
      * configured in serverconfig.xml 
      */
     static SSOToken getSSOToken() throws SSOException{
-        if (!SystemProperties.isServerMode() && (token != null) && !ssoadm) {
+        if (!SystemProperties.isServerMode() && (token != null) && !sitemonitorDisabled) {
             return token;
         }
 

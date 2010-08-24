@@ -36,6 +36,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.shared.Constants;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -54,8 +55,9 @@ public class Notifier implements Runnable {
     private String action;
     private Map<String, String> params;
     private static IThreadPool threadPool = new EntitlementThreadPool(4);
-    private static boolean ssoadm = Boolean.valueOf(
-        System.getProperty("ssoadm", "false")).booleanValue();
+    private static boolean sitemonitorDisabled = Boolean.valueOf(
+       System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
+       Constants.SITEMONITOR_DISABLED, "false"))).booleanValue();
 
     public static void submit(String action, Map<String, String> params) {
         threadPool.submit(new Notifier(action, params));
@@ -79,7 +81,7 @@ public class Notifier implements Runnable {
                     url = url.substring(0, idx);
                 }
 
-                if (ssoadm || !url.equals(currentServerInstance)) {
+                if (sitemonitorDisabled || !url.equals(currentServerInstance)) {
                     String strURL = url + NotificationServlet.CONTEXT_PATH +
                         "/" + action;
 

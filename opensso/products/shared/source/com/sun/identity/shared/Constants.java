@@ -1013,4 +1013,10 @@ public interface Constants {
       */
      public static final String EMBED_SYNC_SERVERS =
              "com.sun.embedded.sync.servers";
+
+     /**
+      * Configuration property to enable the site monitor in the naming service
+      */
+     public static final String SITEMONITOR_DISABLED =
+             "openam.naming.sitemonitor.disabled";
 }

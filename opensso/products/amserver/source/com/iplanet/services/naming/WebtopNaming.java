@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.services.naming;
 
 import java.net.MalformedURLException;
@@ -134,7 +138,7 @@ public class WebtopNaming {
 
     private static boolean serverMode;
 
-    private static boolean ssoadm;
+    private static boolean sitemonitorDisabled;
 
     private static String amServerProtocol = null;
 
@@ -155,8 +159,9 @@ public class WebtopNaming {
         serverMode = Boolean.valueOf(
                 System.getProperty(Constants.SERVER_MODE, SystemProperties.get(
                         Constants.SERVER_MODE, "false"))).booleanValue();
-        ssoadm = Boolean.valueOf(
-                System.getProperty("ssoadm", "false")).booleanValue();
+        sitemonitorDisabled = Boolean.valueOf(
+                System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
+                Constants.SITEMONITOR_DISABLED,"false"))).booleanValue();
         
         if (!serverMode) {
             String v = SystemProperties.get(MAP_SITE_TO_SERVER);
@@ -265,7 +270,7 @@ public class WebtopNaming {
         try {
             // Initilaize the list of naming URLs
             getNamingServiceURL();
-            if (!serverMode && !ssoadm) {
+            if (!serverMode && !sitemonitorDisabled) {
                 startSiteMonitor(namingServiceURL);
             }
         } catch (Exception ex) {
@@ -662,7 +667,7 @@ public class WebtopNaming {
             String server = (uri != null) ?
                 protocol + ":" + "//" + host + ":" + port + uri : 
                 serverWithoutURI;
-            
+
             String serverID = null;
             if (serverIdTable != null) {
                 serverID = getValueFromTable(serverIdTable, server);
@@ -689,11 +694,18 @@ public class WebtopNaming {
 
             if (serverID == null) {
                 if (installTime.equals("false")) {
-                    debug.error("WebtopNaming.getServerId():serverId null " +
-                        "for server: " + server);
+                    if (!sitemonitorDisabled) {
+                        debug.error("WebtopNaming.getServerId():serverId null " +
+                            "for server: " + server);
+                    } else {
+                        debug.message("WebtopNaming.getServerId():serverId null " +
+                            "for server: " + server);
+                    }
                 }
-                throw new ServerEntryNotFoundException(
-                    NamingBundle.getString("noServerID"));
+                if (!sitemonitorDisabled) {
+                    throw new ServerEntryNotFoundException(
+                            NamingBundle.getString("noServerID"));
+                }
             }
             return serverID;
         } catch (Exception e) {
@@ -1388,7 +1400,7 @@ public class WebtopNaming {
          * start the monitoring agent, if not already started
          */
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        if (isServerMode() && !Agent.isRunning() && !ssoadm) {
+        if (isServerMode() && !Agent.isRunning() && !sitemonitorDisabled) {
             Date date1 = new Date();
             String startDate = sdf.format(date1);
 
