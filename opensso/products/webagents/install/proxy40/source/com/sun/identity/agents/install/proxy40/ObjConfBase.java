@@ -49,6 +49,7 @@ public class ObjConfBase implements
     
     protected boolean configureObjConf(IStateAccess stateAccess) {
         boolean status = false;
+        String agentBin = ConfigUtil.getBinDirPath() + FILE_SEP;
         String agentLib = ConfigUtil.getLibPath() + FILE_SEP ;
         String objFile = 
             (String)stateAccess.get(STR_KEY_PROXY40_OBJ_FILE);
@@ -59,7 +60,7 @@ public class ObjConfBase implements
                                 STR_INSTANCE_CONFIG_DIR_NAME ;
 
         if (OSChecker.isWindows()) {
-            agentLib = agentLib + "ampxy4.dll";
+            agentLib = agentBin + "ampxy4.dll";
         } else {
             agentLib = agentLib + "libampxy4.so";
         }

@@ -52,7 +52,8 @@ public class MagnusConfBase implements
         boolean status = false;
         String magnusFile = 
             (String)stateAccess.get(STR_KEY_SWS_MAGNUS_FILE);
-        String agentLib = ConfigUtil.getLibPath() + FILE_SEP ;
+        String agentBin = ConfigUtil.getBinDirPath() + FILE_SEP;
+        String agentLib = ConfigUtil.getLibPath() + FILE_SEP;
         String agentConfigDir = ConfigUtil.getHomePath() + 
                                 FILE_SEP +
                                 stateAccess.getInstanceName() +
@@ -60,7 +61,7 @@ public class MagnusConfBase implements
                                 STR_INSTANCE_CONFIG_DIR_NAME ;
 
         if (OSChecker.isWindows()) {
-            agentLib = agentLib + "ames6.dll";
+            agentLib = agentBin + "ames6.dll";
         } else {
             agentLib = agentLib + "libames6.so";
         }
