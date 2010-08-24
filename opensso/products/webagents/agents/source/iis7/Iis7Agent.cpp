@@ -309,7 +309,7 @@ REQUEST_NOTIFICATION_STATUS send_post_data(IHttpContext* pHttpContext, char *pag
                                        (USHORT)strlen(buff),TRUE);
 
     if (set_cookies_list != NULL) 
-        set_headers_in_context(pHttpContext, set_cookies_list, TRUE);
+        set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
 
     //Send the post page
     void * pvBuffer = pHttpContext->AllocateRequestMemory(page_len);
