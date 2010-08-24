@@ -136,7 +136,11 @@ public class ConfigureDsameFileTask
             // Tags get swapped with agent library and agent instance's config
             // file.
             Map tokens = new HashMap();
-            tokens.put("MODULE", ConfigUtil.getLibPath());
+            if (OSChecker.isWindows()) {
+                tokens.put("MODULE", ConfigUtil.getBinDirPath());
+            } else {
+                tokens.put("MODULE", ConfigUtil.getLibPath());
+            }
 
             // Bootstrap file tag swap
             tokens.put("AGENTBOOTSTRAP",
