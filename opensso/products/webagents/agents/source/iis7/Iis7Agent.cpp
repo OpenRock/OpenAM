@@ -1960,7 +1960,7 @@ REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
 
     IHttpResponse * pHttpResponse = pHttpContext->GetResponse();
     if(pHttpResponse == NULL) {
-        am_web_log_error("%s: pHttpResponse is NULL.", thisfunc);
+        am_web_log_error("redirect_to_request_url(): pHttpResponse is NULL.");
     }
 
     pHttpResponse->Redirect(redirect_url, true, false);
