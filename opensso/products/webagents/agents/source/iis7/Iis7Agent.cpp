@@ -1957,6 +1957,13 @@ REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
         set_headers_in_context(pHttpContext, set_cookies_list,FALSE);
     }
     am_web_log_debug("redirect_to_request_url: Generated Redirect");
+
+    IHttpResponse * pHttpResponse = pHttpContext->GetResponse();
+    if(pHttpResponse == NULL) {
+        am_web_log_error("%s: pHttpResponse is NULL.", thisfunc);
+        return AM_FAILURE;
+    }
+
     pHttpResponse->Redirect(redirect_url, true, false);
     return RQ_NOTIFICATION_FINISH_REQUEST;
 }
