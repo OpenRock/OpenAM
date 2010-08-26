@@ -1096,11 +1096,13 @@ public class AgentConfiguration {
                     if (name.equals(ATTR_NAME_FREE_FORM)) {
                         handleFreeFormAttrValues(values, result);
                     } else if (!asValidatorType.contains(name)) {
+                        int deviceKeyIndex = 0;
+                        
                         if (asListType.contains(name)) {
                             for (Iterator j = values.iterator(); j.hasNext();) {
                                 String val = (String) j.next();
                                 int idx = val.indexOf("]");
-                                int idx1 = -1;
+                                int idx1 = -1;                              
                                 
                                 if (idx != -1) {
                                     idx1 = val.indexOf("=", idx+1);
@@ -1113,6 +1115,17 @@ public class AgentConfiguration {
                                     String indice = val.substring(0, idx + 1);
                                     indice = indice.replaceAll("=", "\\\\=");
                                     result.put(name + indice, set);
+                                } else if (name.equals(DEVICE_KEY)) {
+                                    Set set = new HashSet(2);
+                                    set.add(val);
+                                    
+                                    StringBuilder nameWithIndex = new StringBuilder();
+                                    nameWithIndex.append(name);
+                                    nameWithIndex.append("[");
+                                    nameWithIndex.append(deviceKeyIndex++);
+                                    nameWithIndex.append("]");
+                                    
+                                    result.put(nameWithIndex.toString(), set);
                                 } else {
                                     Set set = new HashSet(2);
                                     set.add(val);

@@ -104,9 +104,7 @@ public class ShowAgent extends AuthenticatedCommand {
                 for (Iterator i = values.keySet().iterator(); i.hasNext();) {
                     String attrName = (String)i.next();
 
-                    if (passwords.contains(attrName)) {
-                        buff.append(attrName).append("=********\n");
-                    } else {
+                    if (!passwords.contains(attrName)) {
                         Set vals = (Set)values.get(attrName);
                         
                         if (vals != null) {
