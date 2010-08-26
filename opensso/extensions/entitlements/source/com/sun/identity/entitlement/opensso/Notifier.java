@@ -56,8 +56,7 @@ public class Notifier implements Runnable {
     private Map<String, String> params;
     private static IThreadPool threadPool = new EntitlementThreadPool(4);
     private static boolean sitemonitorDisabled = Boolean.valueOf(
-       System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
-       Constants.SITEMONITOR_DISABLED, "false"))).booleanValue();
+       SystemProperties.get(Constants.SITEMONITOR_DISABLED, "false")).booleanValue();
 
     public static void submit(String action, Map<String, String> params) {
         threadPool.submit(new Notifier(action, params));

@@ -159,9 +159,8 @@ public class WebtopNaming {
         serverMode = Boolean.valueOf(
                 System.getProperty(Constants.SERVER_MODE, SystemProperties.get(
                         Constants.SERVER_MODE, "false"))).booleanValue();
-        sitemonitorDisabled = Boolean.valueOf(
-                System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
-                Constants.SITEMONITOR_DISABLED,"false"))).booleanValue();
+        sitemonitorDisabled = Boolean.valueOf(SystemProperties.get(
+                Constants.SITEMONITOR_DISABLED,"false")).booleanValue();
         
         if (!serverMode) {
             String v = SystemProperties.get(MAP_SITE_TO_SERVER);

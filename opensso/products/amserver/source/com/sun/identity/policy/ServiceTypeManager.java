@@ -66,8 +66,7 @@ public class ServiceTypeManager {
     private static Random random = new Random();
 
     private static boolean sitemonitorDisabled = Boolean.valueOf(
-            System.getProperty(Constants.SITEMONITOR_DISABLED, SystemProperties.get(
-            Constants.SITEMONITOR_DISABLED, "false"))).booleanValue();
+        SystemProperties.get(Constants.SITEMONITOR_DISABLED, "false")).booleanValue();
 
 
     /**

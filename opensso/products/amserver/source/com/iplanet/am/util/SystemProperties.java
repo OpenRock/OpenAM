@@ -226,10 +226,8 @@ public class SystemProperties {
                 // Should not happend, ignore the exception
             }
         }
-        sitemonitorDisabled = Boolean.valueOf(System.getProperty(
-               Constants.SITEMONITOR_DISABLED, getProp(
-               Constants.SITEMONITOR_DISABLED, "false"))).booleanValue();
-        System.out.println("siteMonitorDisabled=" + sitemonitorDisabled);
+        sitemonitorDisabled = Boolean.valueOf(getProp(
+               Constants.SITEMONITOR_DISABLED, "false")).booleanValue();
     }
 
     /**
