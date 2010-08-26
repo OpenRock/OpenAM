@@ -559,6 +559,8 @@ public class LDAPv3Repo extends IdRepo {
                 .get(LDAPv3Config_LDAP_SERVER));
         String ldapServer = "";
         String endOfList = "";
+        List firstChoiceList = new ArrayList();
+        List secondChoiceList = new ArrayList();
         // put ldapServer from list into a string seperated by space for
         // failover purposes. LDAPConnection will automatcially handle failover.
         // hostname:portnumber | severID | siteID
@@ -573,7 +575,6 @@ public class LDAPv3Repo extends IdRepo {
             String curr = (String) it.next();
             StringTokenizer tk = new StringTokenizer(curr, "|");
             String hostAndPort = tk.nextToken().trim();
-            ldapServers.add(hostAndPort);
             String hostServerID = "";
             if (tk.hasMoreTokens()) {
                 hostServerID = tk.nextToken();
@@ -592,12 +593,14 @@ public class LDAPv3Repo extends IdRepo {
                 hostServerID = serverID;
             }
             if (siteID.equals(hostSiteID) && serverID.equals(hostServerID)) {
+                firstChoiceList.add(hostAndPort);
                 if (ldapServer.length() == 0) {
                     ldapServer = hostAndPort;
                 } else {
                     ldapServer = ldapServer + " " + hostAndPort;
                 }
             } else {
+                secondChoiceList.add(hostAndPort);
                 if (endOfList.length() == 0) {
                     endOfList = hostAndPort;
                 } else {
@@ -613,13 +616,22 @@ public class LDAPv3Repo extends IdRepo {
             }
         }
 
+        if (firstChoiceList.isEmpty()) {
+            firstChoiceList = secondChoiceList;
+        } else {
+            if (!secondChoiceList.isEmpty()) {
+                firstChoiceList.addAll(secondChoiceList);
+            }
+        }
+
         ldapServerName = ldapServer;
+        ldapServers = firstChoiceList;
 
         if (debug.messageEnabled()) {
             debug.message("getLDAPServerName:LDAPv3Config_LDAP_SERVER"
                     + "; ldapServer:" + ldapServer + "; endOfList:" + endOfList
                     + "; siteID:" + siteID + "; serverID:" + serverID
-                    + "; ldapServerSet:" + ldapServerSet);
+                    + "; ldapServers:" + ldapServers);
         }
 
         ldapHost = ldapServer;
