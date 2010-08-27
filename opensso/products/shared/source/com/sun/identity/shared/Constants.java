@@ -903,6 +903,11 @@ public interface Constants {
      * Configuration Variable for distauth bootstrap file base directory.
      */
     String CONFIG_VAR_DISTAUTH_BOOTSTRAP_BASE_DIR = "FAMDistAuth";
+
+    /**
+     * Configuration Variable for distauth bootstrap file name.
+     */
+    String CONFIG_VAR_DISTAUTH_BOOTSTRAP_FILENAME = "AMDistAuthConfig.properties";
     
     /**
      * property string for enabling SMS datastore notification

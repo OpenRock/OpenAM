@@ -28,6 +28,10 @@
 
 -->
 
+<!--
+  "Portions Copyrighted [2010] [ForgeRock AS]"
+-->
+
 <project name="openssozip" default="all" basedir=".">
     <description>Open SSO: opensso.zip Creation</description>
 
@@ -141,6 +145,7 @@
             <fileset dir="${amserver.base.dir}/built/distauth/classes">
                 <include name="com/sun/identity/distauth/setup/DistAuthConfiguratorFilter.class" />
                 <include name="com/sun/identity/distauth/setup/SetupDistAuthWAR.class" />
+                <include name="org/forgerock/openam/distauth/DistAuthConfiguratorHelper.class" />
             </fileset>
             <fileset dir="${amserver.base.dir}/distauth/configurator/resources">
                 <include name="AMDistAuthConfig.properties.template" />

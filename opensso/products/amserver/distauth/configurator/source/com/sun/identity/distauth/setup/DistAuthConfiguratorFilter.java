@@ -25,6 +25,11 @@
  * $Id: DistAuthConfiguratorFilter.java,v 1.4 2008/06/25 05:40:27 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.distauth.setup;
 
 import com.iplanet.am.util.SystemProperties;
@@ -44,6 +49,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Properties;
+import org.forgerock.openam.distauth.DistAuthConfiguratorHelper;
 
 /**
  * This filter brings user to a configuration page when DistAuth WAR
@@ -56,7 +62,6 @@ public final class DistAuthConfiguratorFilter implements Filter {
     // see if the configure.jsp page is executed
     public static boolean isConfigured = false;
     private static final String SETUP_URI = "/distAuthConfigurator.jsp";
-    private static String configFile = null;
     private boolean passThrough = false;
     private static String[] fList = { 
         ".htm", ".css", ".js", ".jpg", ".gif", ".png" 
@@ -115,15 +120,7 @@ public final class DistAuthConfiguratorFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         setFilterConfig(filterConfig);
         servletCtx = filterConfig.getServletContext();
-        configFile = System.getProperty("user.home") + File.separator
-                     + Constants.CONFIG_VAR_DISTAUTH_BOOTSTRAP_BASE_DIR 
-                     + File.separator
-                     + SetupDistAuthWAR.getNormalizedRealPath(servletCtx) + 
-                     "AMDistAuthConfig.properties";
-        File file = new File(configFile);
-        if (file.exists()) {
-            setAMDistAuthConfigProperties(configFile);
-        }
+        isConfigured = DistAuthConfiguratorHelper.initialiseDistAuth(servletCtx);
     }
     
     /**
@@ -149,38 +146,4 @@ public final class DistAuthConfiguratorFilter implements Filter {
         }
         return ok;     
     }    
-
-    /**
-     * Sets properties from AMDistAuthConfig.properties
-     * @param configFile path to the AMDistAuthConfig.properties file
-     * @throws ServletException when error occurs
-     */
-    private void setAMDistAuthConfigProperties(String configFile) 
-        throws ServletException {
-        FileInputStream fileStr = null;
-        try {
-            fileStr = new FileInputStream(configFile);
-            if (fileStr != null) {
-                Properties props = new Properties();
-                props.load(fileStr);
-                SystemProperties.initializeProperties(props);
-                isConfigured = true;
-            } else {
-                throw new ServletException("Unable to open: " + configFile);
-            }
-        } catch (FileNotFoundException fexp) {
-            fexp.printStackTrace();
-            throw new ServletException(fexp.getMessage());
-        } catch (IOException ioexp) {
-            ioexp.printStackTrace();
-            throw new ServletException(ioexp.getMessage());
-        } finally {
-            if (fileStr != null) {
-                try {
-                    fileStr.close();
-                } catch (IOException ioe) {
-                }
-            } 
-        }
-    }
 }
