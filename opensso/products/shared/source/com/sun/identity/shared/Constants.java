@@ -1024,4 +1024,29 @@ public interface Constants {
       */
      public static final String SITEMONITOR_DISABLED =
              "openam.naming.sitemonitor.disabled";
+
+     /**
+      * EQUALS sign
+      */
+     public static final String EQUALS = "=";
+
+     /**
+      * semi-colon sign
+      */
+     public static final String SEMI_COLON = ";";
+
+     /**
+      * colon sign
+      */
+     public static final String COLON = ":";
+
+     /**
+      * amp sign
+      */
+     public static final String AMP = "&";
+
+     /**
+      * at sign
+      */
+     public static final String AT = "@";
 }

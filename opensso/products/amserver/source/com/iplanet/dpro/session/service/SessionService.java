@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -158,6 +162,11 @@ public class SessionService {
         SystemProperties.get(
                 Constants.AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME,
                     "JSESSIONID");
+
+    private static boolean cookieEncoding =
+        (SystemProperties.get(Constants.AM_COOKIE_ENCODE) != null) &&
+        (SystemProperties.get(Constants.AM_COOKIE_ENCODE)
+            .equalsIgnoreCase("true"));
 
     private static final String sunAppServerLBRoutingCookieName = 
         SystemProperties.get(
@@ -3082,28 +3091,47 @@ public class SessionService {
         HttpURLConnection connection = null;
 
         try {
-
             connection = HttpURLConnectionManager.getConnection(url);
 
-            String securityCookie = (String) AccessController
-                    .doPrivileged(new EncodeAction(thisSessionServerURL + "@"
-                            + System.currentTimeMillis()));
+            StringBuilder securityCookieValue = new StringBuilder();
+            securityCookieValue.append(thisSessionServerURL);
+            securityCookieValue.append(Constants.AT);
+            securityCookieValue.append(System.currentTimeMillis());
 
-            String cookie = securityCookieName + "=" + securityCookie;
+            String securityCookie = (String) AccessController
+                    .doPrivileged(new EncodeAction(securityCookieValue.toString()));
+
+            StringBuilder cookie = new StringBuilder();
+            cookie.append(securityCookieName);
+            cookie.append(Constants.EQUALS);
+            cookie.append(cookieEncoding ? URLEncDec.encode(securityCookie) : securityCookie);
+
             if (extraCookies != null) {
-                cookie = cookie + ";" + extraCookies;
+                cookie.append(Constants.SEMI_COLON);
+                cookie.append(extraCookies);
             }
 
             if (sid != null) {
-                cookie = cookie + ";" + Session.getCookieName() + "=" + sid;
+                cookie.append(Constants.SEMI_COLON).append(Session.getCookieName());
+                cookie.append(Constants.EQUALS);
+                cookie.append(cookieEncoding ? URLEncDec.encode(sid.toString()) : sid.toString());
+
                 String httpId = sid.getTail();
+                
                 if (httpId != null) {
-                    cookie = cookie + ";" + getHttpSessionTrackingCookieName()
-                            + "=" + httpId;
+                    cookie.append(Constants.SEMI_COLON);
+                    cookie.append(getHttpSessionTrackingCookieName());
+                    cookie.append(Constants.EQUALS);
+                    cookie.append(cookieEncoding ? URLEncDec.encode(httpId) : httpId);
                 }
 
             }
-            connection.setRequestProperty("Cookie", cookie);
+
+            if (sessionDebug.messageEnabled()) {
+                sessionDebug.message("created cookie value: " + cookie.toString());
+            }
+
+            connection.setRequestProperty("Cookie", cookie.toString());
             connection.setRequestMethod("GET");
             connection.setDoInput(true);
 
