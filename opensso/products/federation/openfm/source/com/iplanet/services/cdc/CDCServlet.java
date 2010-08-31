@@ -136,6 +136,8 @@ public class CDCServlet extends HttpServlet {
             "X-DSAME-Assertion-Form";
     private static final String RESPONSE_HEADER_ALERT_VALUE =
             "true";
+    private static final String FORBIDDEN_STR_MATCH = "#403x";
+    private static final String SERVER_ERROR_STR_MATCH = "#500x";
     
     private static final List adviceParams = new ArrayList();
     private static HashSet invalidSet = new HashSet();
@@ -428,7 +430,7 @@ public class CDCServlet extends HttpServlet {
                 debug.error("CDCServlet.doGetPost", ssoe);
             } catch (Exception e) {
                 debug.error("CDCServlet.doGetPost", e);
-                showError(response, "#403x");
+                showError(response, FORBIDDEN_STR_MATCH);
             }
         }
     }
@@ -661,7 +663,7 @@ public class CDCServlet extends HttpServlet {
     }
     
     private void showError(HttpServletResponse response) {
-        showError(response, "ERROR: An application error has occured.");
+        showError(response, SERVER_ERROR_STR_MATCH);
     }
     
     private void showError(HttpServletResponse response, String msg) {

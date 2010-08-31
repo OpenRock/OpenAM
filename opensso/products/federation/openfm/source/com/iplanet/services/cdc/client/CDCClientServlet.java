@@ -107,6 +107,8 @@ extends HttpServlet {
             "X-DSAME-Assertion-Form";
     private static final String RESPONSE_HEADER_ALERT_VALUE =
             "true";
+    private static final String FORBIDDEN_STR_MATCH = "#403x";
+    private static final String SERVER_ERROR_STR_MATCH = "#500x";
     static Debug debug = Debug.getInstance(DEBUG_FILE_NAME);
 
     static {
@@ -244,14 +246,14 @@ extends HttpServlet {
                 if ((gotoParameter != null ) &&
                     (gotoParameter.toLowerCase().indexOf(invalidStr) != -1 ))
                 {
-                    showError(response, "GOTO parameter has invalid "
+                    showError(response, SERVER_ERROR_STR_MATCH + "GOTO parameter has invalid "
                         +"characters");
                     return;
                 }
                 if ((targetParameter != null ) &&
                    (targetParameter.toLowerCase().indexOf(invalidStr) != -1 ))
                 {
-                    showError(response, "TARGET parameter has invalid "
+                    showError(response, SERVER_ERROR_STR_MATCH + "TARGET parameter has invalid "
                         +"characters");
                     return;
                 }
@@ -545,8 +547,12 @@ extends HttpServlet {
                 }
 
                 if(finalURL == null || finalURL.equals("")) {
-                   showError(response,"GOTO or TARGET parameter is missing"
-                       +" in the request");
+                   if (debug.messageEnabled()) {
+                       debug.message("CDCClientServlet.redirectForAuthentication: "
+                           +"goto or target parameter is missing in the request.");
+                   }
+
+                   showError(response, SERVER_ERROR_STR_MATCH);
                    return;
                 }
 
@@ -635,9 +641,12 @@ extends HttpServlet {
      */
     private void showError(HttpServletResponse response, String msg) {
         ServletOutputStream out = null;
-        if (msg == null || msg.equals("")) {
-            msg = "ERROR: An application error has occured.";
+        if (msg == null || msg.equals("") || msg.contains(SERVER_ERROR_STR_MATCH)) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            
+            return;
         }
+
         try {
             out = response.getOutputStream();
             out.println(msg);
@@ -645,8 +654,7 @@ extends HttpServlet {
         } catch (IOException e) {
             debug.error("CDCClientServlet.showError::Could not show error "
                 +"message to the user " + e);
-        }
-        finally {
+        } finally {
             try {
                 out.close();
             } catch (IOException ignore) {}
@@ -698,15 +706,23 @@ extends HttpServlet {
             response.setHeader("Pragma", "no-cache");
             response.setHeader(RESPONSE_HEADER_ALERT, RESPONSE_HEADER_ALERT_VALUE);
 
-            final String forbStrMatch = "#403x";
-
-            if (authnResponse.contains(forbStrMatch)) {
+            if (authnResponse.contains(FORBIDDEN_STR_MATCH)) {
                 if (debug.messageEnabled()) {
                     debug.message("CDCClientServlet.sendAuthnResponse: " +
                                   "AuthnResponse showing 403 error page");
                 }
 
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            if (authnResponse.contains(SERVER_ERROR_STR_MATCH)) {
+                if (debug.messageEnabled()) {
+                    debug.error("CDCClientServlet.sendAuthnResponse: " +
+                                "ERROR: An application error has occured.");
+                }
+
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
