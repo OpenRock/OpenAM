@@ -697,6 +697,19 @@ extends HttpServlet {
             response.setContentType("text/html");
             response.setHeader("Pragma", "no-cache");
             response.setHeader(RESPONSE_HEADER_ALERT, RESPONSE_HEADER_ALERT_VALUE);
+
+            final String forbStrMatch = "#403x";
+
+            if (authnResponse.contains(forbStrMatch)) {
+                if (debug.messageEnabled()) {
+                    debug.message("CDCClientServlet.sendAuthnResponse: " +
+                                  "AuthnResponse showing 403 error page");
+                }
+
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
             PrintWriter out = response.getWriter();
             out.println(authnResponse);
             out.close();

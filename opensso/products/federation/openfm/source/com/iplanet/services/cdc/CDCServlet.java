@@ -428,7 +428,7 @@ public class CDCServlet extends HttpServlet {
                 debug.error("CDCServlet.doGetPost", ssoe);
             } catch (Exception e) {
                 debug.error("CDCServlet.doGetPost", e);
-                showError(response, "Access to resource is denied.");
+                showError(response, "#403x");
             }
         }
     }
