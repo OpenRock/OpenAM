@@ -26,6 +26,10 @@
   
 --%>
 
+<%--
+   Portions Copyrighted [2010] [ForgeRock AS]
+--%>
+
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
 <%@ page import="com.iplanet.sso.*" %>
 <%@ page import="com.sun.identity.cli.*" %>
@@ -62,7 +66,7 @@
 
 <pre>
 <%
-    String strDisabled = SystemProperties.get("ssoadm.disabled", "false");
+    String strDisabled = SystemProperties.get("ssoadm.disabled", "true");
     if (Boolean.parseBoolean(strDisabled)) {
         response.sendRedirect(SystemProperties.get(
             Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR));
