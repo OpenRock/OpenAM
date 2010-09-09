@@ -24,6 +24,11 @@
  *
  * $Id: ResourceAttribute.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.Map;
@@ -57,7 +62,7 @@ public interface ResourceAttribute {
     Set<String> getPropertyValues();
 
     /**
-     * Returns resoruce attributes aplicable to the request.
+     * Returns resource attributes applicable to the request.
      *
      * @param adminSubject Subject who is performing the evaluation.
      * @param realm Realm name.
@@ -73,13 +78,13 @@ public interface ResourceAttribute {
         String realm,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment)
+        Map<String, Object> environment)
         throws EntitlementException;
 
     /**
      * Sets OpenSSO policy response provider name of the object
      * @param pResponseProviderName response provider name as used in OpenSSO
-     *        policy, this is releavant only when StaticAttributes was created
+     *        policy, this is relevant only when StaticAttributes was created
      *        from OpenSSO policy Subject
      */
     void setPResponseProviderName(String pResponseProviderName);
@@ -87,7 +92,7 @@ public interface ResourceAttribute {
     /**
      * Returns OpenSSO policy response provider name of the object
      * @return response provider name as used in OpenSSO policy,
-     * this is releavant only when StaticAttributes was created from
+     * this is relevant only when StaticAttributes was created from
      * OpenSSO policy Subject
      */
     String getPResponseProviderName();

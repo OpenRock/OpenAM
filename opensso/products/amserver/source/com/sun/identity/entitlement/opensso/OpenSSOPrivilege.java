@@ -78,7 +78,7 @@ public class OpenSSOPrivilege extends Privilege {
         final String applicationName,
         final String resourceName,
         final Set<String> actionNames,
-        final Map<String, Set<String>> environment,
+        final Map<String, Object> environment,
         final boolean recursive,
         final Object context
     ) throws EntitlementException {
@@ -115,7 +115,7 @@ public class OpenSSOPrivilege extends Privilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Set<String>> environment,
+        Map<String, Object> environment,
         boolean recursive,
         Object context
     ) throws EntitlementException {

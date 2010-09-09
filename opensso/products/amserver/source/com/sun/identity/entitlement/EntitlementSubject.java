@@ -24,6 +24,11 @@
  *
  * $Id: EntitlementSubject.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.Map;
@@ -86,7 +91,7 @@ public interface EntitlementSubject {
         SubjectAttributesManager mgr,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment)
+        Map<String, Object> environment)
         throws EntitlementException;
 
     /**

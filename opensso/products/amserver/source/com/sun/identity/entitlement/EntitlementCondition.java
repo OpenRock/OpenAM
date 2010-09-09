@@ -24,6 +24,10 @@
  *
  * $Id: EntitlementCondition.java,v 1.2 2009/09/05 00:24:04 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement;
 
 import java.util.Map;
@@ -82,6 +86,6 @@ public interface EntitlementCondition {
         String realm,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment)
+        Map<String, Object> environment)
         throws EntitlementException;
 }

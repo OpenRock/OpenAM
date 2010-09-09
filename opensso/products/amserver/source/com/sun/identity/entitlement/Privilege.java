@@ -28,6 +28,7 @@
 /*
  * Portions Copyrighted [2010] [ForgeRock AS]
  */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.JSONUtils;
@@ -262,7 +263,7 @@ public abstract class Privilege implements IPrivilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Set<String>> environment,
+        Map<String, Object> environment,
         boolean recursive,
         Object context) throws EntitlementException;
 
@@ -579,7 +580,7 @@ public abstract class Privilege implements IPrivilege {
         Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment
+        Map<String, Object> environment
     ) throws EntitlementException {
         boolean result = true;
         if (getSubject() != null) {
@@ -615,7 +616,7 @@ public abstract class Privilege implements IPrivilege {
         Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment
+        Map<String, Object> environment
     ) throws EntitlementException {
         boolean result = true;
 
@@ -793,7 +794,7 @@ public abstract class Privilege implements IPrivilege {
 
     protected Map<String, Set<String>> getAttributes(Subject adminSubject, 
         String realm, Subject subject, String resourceName,
-        Map<String, Set<String>> environment
+        Map<String, Object> environment
     ) throws EntitlementException {
         Map<String, Set<String>> result = null;
 

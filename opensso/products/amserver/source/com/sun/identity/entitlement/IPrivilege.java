@@ -84,7 +84,7 @@ public interface IPrivilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Set<String>> environment,
+            Map<String, Object> environment,
         boolean recursive,
         Object context) throws EntitlementException;
 }

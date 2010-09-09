@@ -46,6 +46,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.security.auth.Subject;
 import org.forgerock.openam.session.util.AppTokenHandler;
+import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
 
 /**
  * This class evaluates entitlements of a subject for a given resource
@@ -57,7 +58,7 @@ class PrivilegeEvaluator {
     private Subject subject;
     private String applicationName;
     private String resourceName;
-    private Map<String, Set<String>> envParameters;
+    private Map<String, Object> envParameters;
     private ResourceSearchIndexes indexes;
     private List<List<Entitlement>> resultQ = new
         LinkedList<List<Entitlement>>();
@@ -68,6 +69,8 @@ class PrivilegeEvaluator {
     private EntitlementException eException;
     private final Lock lock = new ReentrantLock();
     private Condition hasResults = lock.newCondition();
+    private final static String PRIVILEGE_EVALUATION_CONTEXT =
+            "org.forgerock.openam.entitlement.context";
 
     // Static variables
     // TODO determine number of tasks per thread
@@ -136,7 +139,7 @@ class PrivilegeEvaluator {
         String applicationName,
         String resourceName,
         Set<String> actions,
-        Map<String, Set<String>> envParameters,
+        Map<String, Object> envParameters,
         boolean recursive
     ) throws EntitlementException {
         long start = PRIVILEGE_EVAL_MONITOR_INIT.start();
@@ -206,7 +209,7 @@ class PrivilegeEvaluator {
         Subject subject,
         String applicationName,
         Entitlement entitlement,
-        Map<String, Set<String>> envParameters
+        Map<String, Object> envParameters
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
             entitlement.getResourceName(), 
@@ -249,7 +252,7 @@ class PrivilegeEvaluator {
         Subject subject,
         String applicationName,
         String resourceName,
-        Map<String, Set<String>> envParameters,
+        Map<String, Object> envParameters,
         boolean recursive
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
@@ -304,6 +307,8 @@ class PrivilegeEvaluator {
         // Submit additional privilges to be executed by worker threads
         Set<IPrivilege> privileges = null;
         boolean tasksSubmitted = false;
+        envParameters.put(PRIVILEGE_EVALUATION_CONTEXT,
+                new PrivilegeEvaluatorContext(realm, resourceName, applicationName));
         Object appToken = AppTokenHandler.getAndClear();
 
         while (true) {

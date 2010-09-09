@@ -24,6 +24,11 @@
  *
  * $Id: Entitlement.java,v 1.7 2010/01/25 23:48:14 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -401,7 +406,7 @@ public class Entitlement {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Set<String>> environment,
+        Map<String, Object> environment,
         boolean recursive)
         throws EntitlementException {
         for (String a : actionNames) {
