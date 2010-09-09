@@ -207,7 +207,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
                                 HttpURLConnectionManager.getConnection(url);
                         huc.setDoInput(true);
                         huc.setRequestMethod("GET");
-                        String s = huc.getHeaderField(0);
+                        int responseCode = huc.getResponseCode();
                         
                         if (debug.messageEnabled()) {
                             Date t1 = Calendar.getInstance().getTime();
@@ -216,7 +216,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
                                 "Http connection took " + t + " ms");
                         }
                         
-                        if (s != null) {
+                        if (responseCode == 200) {
                             if (debug.messageEnabled()) {
                                 debug.message("URLChecker.check() : " +
                                     " setting status to " +
