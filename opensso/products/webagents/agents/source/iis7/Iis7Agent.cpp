@@ -719,6 +719,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                     if (redirectRequest == TRUE) {
                         am_web_log_debug("%s: Request redirected to orignal url "
                                 "after return from CDC servlet",thisfunc);
+                        
                         retStatus = redirect_to_request_url(pHttpContext,
                                 requestURL.c_str(), request_hdrs);
                     } else {
@@ -1950,18 +1951,18 @@ REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
                                   const char *redirect_url, 
                                   const char *set_cookies_list)
 {
-    am_web_log_debug("redirect_to_request_url:  " 
+    am_web_log_debug("redirect_to_request_url:  "
                      "redirection URL is %s", 
                      redirect_url);
-    if(set_cookies_list != NULL) {
-        set_headers_in_context(pHttpContext, set_cookies_list,FALSE);
-    }
+
     am_web_log_debug("redirect_to_request_url: Generated Redirect");
 
     IHttpResponse * pHttpResponse = pHttpContext->GetResponse();
     if(pHttpResponse == NULL) {
         am_web_log_error("redirect_to_request_url(): pHttpResponse is NULL.");
     }
+    /* Delete content-length since this is a redirect. */
+    pHttpResponse->DeleteHeader("Content-Length");
 
     pHttpResponse->Redirect(redirect_url, true, false);
     return RQ_NOTIFICATION_FINISH_REQUEST;
