@@ -440,7 +440,12 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 if ((newRequest) && 
                         (AuthClientUtils.isCookieSupported(request))) {
                     setServerCookies();
-                    setCookie();
+
+                    if (ac != null &&
+                            ac.getStatus() != AuthContext.Status.SUCCESS) {
+                        setCookie();
+                    }
+
                     setlbCookie();
                 }
             }
