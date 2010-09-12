@@ -58,7 +58,7 @@ class PrivilegeEvaluator {
     private Subject subject;
     private String applicationName;
     private String resourceName;
-    private Map<String, Object> envParameters;
+    private Map<String, Set<String>> envParameters;
     private ResourceSearchIndexes indexes;
     private List<List<Entitlement>> resultQ = new
         LinkedList<List<Entitlement>>();
@@ -139,7 +139,7 @@ class PrivilegeEvaluator {
         String applicationName,
         String resourceName,
         Set<String> actions,
-        Map<String, Object> envParameters,
+        Map<String, Set<String>> envParameters,
         boolean recursive
     ) throws EntitlementException {
         long start = PRIVILEGE_EVAL_MONITOR_INIT.start();
@@ -209,7 +209,7 @@ class PrivilegeEvaluator {
         Subject subject,
         String applicationName,
         Entitlement entitlement,
-        Map<String, Object> envParameters
+        Map<String, Set<String>> envParameters
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
             entitlement.getResourceName(), 
@@ -252,7 +252,7 @@ class PrivilegeEvaluator {
         Subject subject,
         String applicationName,
         String resourceName,
-        Map<String, Object> envParameters,
+        Map<String, Set<String>> envParameters,
         boolean recursive
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
@@ -307,8 +307,8 @@ class PrivilegeEvaluator {
         // Submit additional privilges to be executed by worker threads
         Set<IPrivilege> privileges = null;
         boolean tasksSubmitted = false;
-        envParameters.put(PRIVILEGE_EVALUATION_CONTEXT,
-                new PrivilegeEvaluatorContext(realm, resourceName, applicationName));
+        PrivilegeEvaluatorContext ctx =
+                new PrivilegeEvaluatorContext(realm, resourceName, applicationName);
         Object appToken = AppTokenHandler.getAndClear();
 
         while (true) {
@@ -332,7 +332,7 @@ class PrivilegeEvaluator {
             if ((totalCount % tasksPerThread) == 0) {
                 start = PRIVILEGE_EVAL_MONITOR_SUBMIT.start();
                 threadPool.submit(new PrivilegeTask(this, privileges,
-                    isMultiThreaded, appToken));
+                    isMultiThreaded, appToken, ctx));
                 PRIVILEGE_EVAL_MONITOR_SUBMIT.end(start);
                 privileges.clear();
             }
@@ -340,11 +340,11 @@ class PrivilegeEvaluator {
         if ((privileges != null) && !privileges.isEmpty()) {
             start = PRIVILEGE_EVAL_MONITOR_SUBMIT.start();
             threadPool.submit(new PrivilegeTask(this, privileges,
-                isMultiThreaded, appToken));
+                isMultiThreaded, appToken, ctx));
             PRIVILEGE_EVAL_MONITOR_SUBMIT.end(start);
         }
         // IPrivilege privileges locally
-        (new PrivilegeTask(this, localPrivileges, tasksSubmitted, appToken)).run();
+        (new PrivilegeTask(this, localPrivileges, tasksSubmitted, appToken, ctx)).run();
 
         // Wait for submitted threads to complete evaluation
         start = PRIVILEGE_EVAL_MONITOR_WAIT.start();
@@ -417,17 +417,21 @@ class PrivilegeEvaluator {
         private Set<IPrivilege> privileges;
         private boolean isThreaded;
         private Object context;
+        private PrivilegeEvaluatorContext ctx;
 
         PrivilegeTask(PrivilegeEvaluator parent, Set<IPrivilege> privileges,
-            boolean isThreaded, Object context) {
+            boolean isThreaded, Object context, PrivilegeEvaluatorContext ctx) {
             this.parent = parent;
             this.privileges = new HashSet<IPrivilege>(privileges.size() *2);
             this.privileges.addAll(privileges);
             this.isThreaded = isThreaded;
             this.context = context;
+            this.ctx = ctx;
         }
 
         public void run() {
+            PrivilegeEvaluatorContext.setCurrent(ctx);
+            
             try {
                 for (final IPrivilege eval : privileges) {
                     List<Entitlement> entitlements = eval.evaluate(

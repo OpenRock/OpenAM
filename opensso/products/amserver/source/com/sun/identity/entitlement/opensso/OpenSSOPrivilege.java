@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import javax.security.auth.Subject;
+import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -78,7 +78,7 @@ public class OpenSSOPrivilege extends Privilege {
         final String applicationName,
         final String resourceName,
         final Set<String> actionNames,
-        final Map<String, Object> environment,
+        final Map<String, Set<String>> environment,
         final boolean recursive,
         final Object context
     ) throws EntitlementException {
@@ -96,8 +96,7 @@ public class OpenSSOPrivilege extends Privilege {
                                                     resourceName,
                                                     actionNames,
                                                     environment,
-                                                    recursive,
-                                                    context
+                                                    recursive
                                             );
                                 }
                             });
@@ -115,9 +114,8 @@ public class OpenSSOPrivilege extends Privilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Object> environment,
-        boolean recursive,
-        Object context
+        Map<String, Set<String>> environment,
+        boolean recursive
     ) throws EntitlementException {
         long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :
             EVAL_SINGLE_LEVEL_MONITOR.start();

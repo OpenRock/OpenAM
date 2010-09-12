@@ -406,7 +406,7 @@ public class Entitlement {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Object> environment,
+        Map<String, Set<String>> environment,
         boolean recursive)
         throws EntitlementException {
         for (String a : actionNames) {

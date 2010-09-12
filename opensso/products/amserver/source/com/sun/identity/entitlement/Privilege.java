@@ -263,7 +263,7 @@ public abstract class Privilege implements IPrivilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-        Map<String, Object> environment,
+        Map<String, Set<String>> environment,
         boolean recursive,
         Object context) throws EntitlementException;
 
@@ -580,7 +580,7 @@ public abstract class Privilege implements IPrivilege {
         Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
-        Map<String, Object> environment
+        Map<String, Set<String>> environment
     ) throws EntitlementException {
         boolean result = true;
         if (getSubject() != null) {
@@ -616,7 +616,7 @@ public abstract class Privilege implements IPrivilege {
         Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
-        Map<String, Object> environment
+        Map<String, Set<String>> environment
     ) throws EntitlementException {
         boolean result = true;
 
@@ -794,7 +794,7 @@ public abstract class Privilege implements IPrivilege {
 
     protected Map<String, Set<String>> getAttributes(Subject adminSubject, 
         String realm, Subject subject, String resourceName,
-        Map<String, Object> environment
+        Map<String, Set<String>> environment
     ) throws EntitlementException {
         Map<String, Set<String>> result = null;
 

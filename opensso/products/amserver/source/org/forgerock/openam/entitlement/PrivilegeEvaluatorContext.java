@@ -41,6 +41,7 @@ public class PrivilegeEvaluatorContext implements Serializable {
     private String resourceName;
     private String applicationName;
     private Map<String, Object> attributes = new HashMap(2);
+    private static ThreadLocal <PrivilegeEvaluatorContext> currentCtx = new ThreadLocal();
 
     /**
      * Creates a new Privilege Evaluator Context
@@ -55,6 +56,24 @@ public class PrivilegeEvaluatorContext implements Serializable {
         this.realm = realm;
         this.resourceName = resourceName;
         this.applicationName = applicationName;
+    }
+
+   /**
+     * Returns the current context of the running thread
+     *
+     * @return object containing the current context
+     */
+    public static PrivilegeEvaluatorContext getCurrent() {
+        return currentCtx.get();
+    }
+
+    /**
+     * Set the current context of the running thread
+     *
+     * @return object containing the current context
+     */
+    public static void setCurrent(PrivilegeEvaluatorContext ctx) {
+        currentCtx.set(ctx);
     }
 
     /**

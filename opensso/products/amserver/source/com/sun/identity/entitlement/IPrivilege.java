@@ -25,10 +25,6 @@
  * $Id: IPrivilege.java,v 1.2 2009/11/19 01:02:03 veiming Exp $
  */
 
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-
 package com.sun.identity.entitlement;
 
 import java.util.List;
@@ -84,7 +80,7 @@ public interface IPrivilege {
         String applicationName,
         String resourceName,
         Set<String> actionNames,
-            Map<String, Object> environment,
+        Map<String, Set<String>> environment,
         boolean recursive,
         Object context) throws EntitlementException;
 }
