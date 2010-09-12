@@ -119,7 +119,7 @@ public class PrivilegeEvaluatorContext implements Serializable {
      * @param key The key of the attribute
      * @return The value
      */
-    public Object getAttributes(String key) {
+    public Object getAttribute(String key) {
         return attributes.get(key);
     }
 }
