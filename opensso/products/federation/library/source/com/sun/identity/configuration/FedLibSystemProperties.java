@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.configuration;
 
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -144,6 +148,17 @@ public class FedLibSystemProperties implements ISystemProperties {
     public Collection getServerList()
         throws Exception {
         return SystemConfigurationUtil.getServerList();
+    }
+
+    /**
+     * Returns service all url list.
+     *
+     * @return Server List.
+     * @throws Exception if server list cannot be returned.
+     */
+    public Collection getServiceAllURLs(String serviceName)
+        throws Exception {
+        return SystemConfigurationUtil.getServiceAllURLs(serviceName);
     }
     
     /**

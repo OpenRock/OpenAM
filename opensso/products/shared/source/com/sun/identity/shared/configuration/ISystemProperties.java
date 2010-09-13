@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.shared.configuration;
 
 import java.net.URL;
@@ -50,6 +54,15 @@ public interface ISystemProperties {
      * @throws Exception if server list cannot be returned.
      */
     Collection getServerList()
+        throws Exception;
+
+    /**
+     * Returns server all urls.
+     *
+     * @return Server List.
+     * @throws Exception if server list cannot be returned.
+     */
+    Collection getServiceAllURLs(String serviceName)
         throws Exception;
     
     /**

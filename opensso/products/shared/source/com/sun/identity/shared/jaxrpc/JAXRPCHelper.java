@@ -26,15 +26,17 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.shared.jaxrpc;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 /**
@@ -109,10 +111,10 @@ public class JAXRPCHelper {
                 }
             }
         } else {
-            Collection serverList = null;
+            Collection<URL> serverList = null;
             try {
                 serverList = SystemPropertiesManager.getSystemProperties().
-                    getServerList();
+                    getServiceAllURLs(JAXRPC_SERVICE);
             } catch (Exception e) {
                 // Unable to get platform server list
                 if (debug.warningEnabled()) {
@@ -123,14 +125,8 @@ public class JAXRPCHelper {
             }
 
             if (serverList != null) {
-                Iterator it = serverList.iterator();
-                while (it.hasNext()) {
+                for (URL weburl : serverList) {
                     try {
-                        URL url = new URL((String) it.next());
-                        URL weburl = SystemPropertiesManager
-                            .getSystemProperties().getServiceURL(
-                            JAXRPC_SERVICE, url.getProtocol(),
-                            url.getHost(), url.getPort(), url.getPath());
                         String surl = weburl.toString();
                         if (!surl.endsWith("/")) {
                             surl += "/";
@@ -138,8 +134,6 @@ public class JAXRPCHelper {
                         if (isServerValid(surl)) {
                             return (surl);
                         }
-                    } catch (MalformedURLException e) {
-                        debug.warning("JAXRPCHelper:getValidServerURL", e);
                     } catch (Exception e) {
                         debug.warning("JAXRPCHelper:getValidServerURL", e);
                     }

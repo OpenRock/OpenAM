@@ -26,11 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.configuration;
 
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.configuration.ISystemProperties;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -65,6 +70,19 @@ public class SystemProperties implements ISystemProperties {
         throws Exception {
         return WebtopNaming.getPlatformServerList(false);
     }
+
+
+    /**
+     * Returns server all urls.
+     *
+     * @return Server List.
+     * @throws Exception if server list cannot be returned.
+     */
+    public Collection getServiceAllURLs(String serviceName) 
+        throws Exception {
+        return new ArrayList(WebtopNaming.getServiceAllURLs(serviceName));
+    }
+
     
     /**
      * Returns the URL of the specified service on the specified host.
@@ -73,7 +91,7 @@ public class SystemProperties implements ISystemProperties {
      * @param protocol The service protocol.
      * @param hostname The service host name.
      * @param port The service listening port.
-     * @param uri The service depployment URI.
+     * @param uri The service deployment URI.
      * @return The URL of the specified service on the specified host.
      * @throws Exception if the URL could not be found.
      */

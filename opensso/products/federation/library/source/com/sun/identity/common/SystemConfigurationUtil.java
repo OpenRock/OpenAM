@@ -26,22 +26,22 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.common;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.Constants;
@@ -51,6 +51,7 @@ import com.sun.identity.plugin.configuration.ConfigurationException;
 import com.sun.identity.plugin.configuration.ConfigurationInstance;
 import com.sun.identity.plugin.configuration.ConfigurationListener;
 import com.sun.identity.plugin.configuration.ConfigurationManager;
+import java.util.Collection;
 
 /**
  * The <code>SystemConfigurationUtil</code> class provides methods to get
@@ -117,6 +118,16 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
             initPlatformNaming();
         }
         return serverList;
+    }
+
+    /**
+     * Returns all service urls.
+     * @return list of server names.
+     * @throws SystemConfigurationException if unable to get the server list.
+     */
+    public static Collection getServiceAllURLs(String serviceName)
+    throws SystemConfigurationException {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /**
