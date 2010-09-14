@@ -639,10 +639,11 @@ extends HttpServlet {
      *			the servlet sends to the client.
      * @param msg Message to be displayed.
      */
-    private void showError(HttpServletResponse response, String msg) {
+    private void showError(HttpServletResponse response, String msg)
+    throws IOException {
         ServletOutputStream out = null;
         if (msg == null || msg.equals("") || msg.contains(SERVER_ERROR_STR_MATCH)) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             
             return;
         }
@@ -712,7 +713,7 @@ extends HttpServlet {
                                   "AuthnResponse showing 403 error page");
                 }
 
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
 
@@ -722,7 +723,7 @@ extends HttpServlet {
                                 "ERROR: An application error has occured.");
                 }
 
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
