@@ -253,3 +253,18 @@ openam.session.persist_am_cookie=false
  * Units: Time in hours
  */
 com.iplanet.am.cookie.timeToLive=24
+
+/*
+ * The URL of the DAS to receive notifications.
+ */
+com.sun.identity.client.notification.url=@NOTIFICATION_URL@
+
+/*
+ * Enabled Cookie encoded (should be true when running in Tomcat)
+ */
+com.iplanet.am.cookie.c66Encode=false
+
+/*
+ * Invalid characters enforced by the CDCServlet
+ */
+com.iplanet.services.cdc.invalidGotoStrings=<,>,javascript:,javascript%3a,%3c,%3e
