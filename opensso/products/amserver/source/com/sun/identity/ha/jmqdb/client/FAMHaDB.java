@@ -25,6 +25,10 @@
  * $Id: FAMHaDB.java,v 1.6 2009/04/16 15:37:49 subashvarma Exp $
  *
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
  
 package com.sun.identity.ha.jmqdb.client;
 
@@ -256,6 +260,10 @@ public class FAMHaDB implements Runnable {
     }
        
     private void initJMQ () throws Exception {
+        if (tFactory != null) {
+            System.out.println(bundle.getString("reinitjmq"));
+            closeJMQ();
+        }
 
         ConnectionFactoryProvider provider = ConnectionFactoryProviderFactory
                 .getProvider();
@@ -288,6 +296,45 @@ public class FAMHaDB implements Runnable {
         isMasterNode = false;
         localStartTime = System.currentTimeMillis();
         isServerUp = true;
+    }
+
+    /**
+     * This method is used to clear out any existing connections before running
+     * the initJMQ method. Should only be called if the JMQ connection has
+     * already been initialised.
+     *
+     * @throws Exception
+     */
+    private void closeJMQ() {
+        try {
+            if (tNodePubSession != null) {
+                tNodePubSession.close();
+            }
+
+            if (resPub != null) {
+                resPub.close();
+            }
+
+            if (reqSub != null) {
+                resPub.close();
+            }
+
+            if (tNodeSubSession != null) {
+                tNodeSubSession.close();
+            }
+
+            if (tSession != null) {
+                tSession.close();
+            }
+
+            if (tConn != null) {
+                tConn.close();
+            }
+        } catch (Exception ex) {
+            if(verbose) {
+                System.out.println(bundle.getString("unabletoreinitjmq" + ex.getMessage()));
+            }
+        }
     }
     
     private void initialize(String args[]) throws Exception {
@@ -337,8 +384,8 @@ public class FAMHaDB implements Runnable {
         }
     }
 
-    public int process() throws Exception 
-    {
+    public int process()
+    throws Exception {
         BytesMessage message = (BytesMessage) reqSub.receive();
                 
         String id = message.getStringProperty(ID);
@@ -358,6 +405,11 @@ public class FAMHaDB implements Runnable {
                 readCount++;
             }
             String pKey = getLenString(message);
+
+            if (pKey == null) {
+                return 0;
+            }
+
             long random = message.readLong();
             
             if(verbose) {
@@ -407,6 +459,11 @@ public class FAMHaDB implements Runnable {
                 writeCount++;
             }
             String pKey = getLenString(message);
+
+            if (pKey == null) {
+                return 0;
+            }
+
             long expdate = message.readLong();
             byte[] secondKey = getLenBytes(message);
             byte[] auxdata = getLenBytes(message);
@@ -448,6 +505,11 @@ public class FAMHaDB implements Runnable {
                 deleteCount++;
             }
             String pKey = getLenString(message);
+
+            if (pKey == null) {
+                return 0;
+            }
+
             if(verbose) {
                 System.out.println(">>>>>>>>>>>>>> Delete by Primary Key : " + pKey);
             }
@@ -500,6 +562,11 @@ public class FAMHaDB implements Runnable {
         }
 
         String secondKey = getLenString(message);
+
+        if (secondKey == null) {
+            return;
+        }
+
         if(verbose) {
             System.out.println("SEC"+ secondKey);
         }
@@ -566,6 +633,11 @@ public class FAMHaDB implements Runnable {
         }
 
         String secondKey = getLenString(message);
+
+        if (secondKey == null) {
+            return;
+        }
+
         if(verbose) {
             System.out.println("SEC"+ secondKey);
         }
@@ -702,11 +774,25 @@ public class FAMHaDB implements Runnable {
     
     String getLenString(Message msg) throws Exception
     {
+        long pKeylen = 0;
+
+        try {
             BytesMessage message = (BytesMessage) msg;
-            long pKeylen = message.readLong();
+            // this should always be < 256 see FAMRecordJMQPersister
+            pKeylen = message.readLong();
+
+            if (pKeylen > 256) {
+                System.out.println("Message length is out of bounds: " + pKeylen);
+                return null;
+            }
+
             byte[] pKeybytes  = new byte[(int) pKeylen];
             message.readBytes(pKeybytes);
             return(new String(pKeybytes, "utf8"));
+        } catch (NegativeArraySizeException nae) {
+            System.out.println("Negative Array Size: " + pKeylen);
+            return null;
+        }
     }
     
     byte[] getLenBytes(Message msg) throws Exception

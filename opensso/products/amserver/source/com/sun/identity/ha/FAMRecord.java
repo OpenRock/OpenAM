@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.ha;
 
 import java.util.HashMap;
@@ -158,5 +162,22 @@ public class FAMRecord
     
     public HashMap getExtraByteAttributes() {
         return extraByteAttrs; 
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("Service: ").append(service).append("\n");
+        buffer.append("OP: ").append(operation).append("\n");
+        buffer.append("PK: ").append(primaryKey).append("\n");
+        buffer.append("SK: ").append(secondaryKey).append("\n");
+        buffer.append("Expr Date: ").append(expDate).append("\n");
+        buffer.append("State: ").append(state).append("\n");
+        buffer.append("Aux Data: ").append(auxdata).append("\n");
+        buffer.append("Data: ").append(new String(data)).append("\n");
+        buffer.append("Extra String Attrs: ").append(extraStringAttrs).append("\n");
+        buffer.append("Extra Byte Attrs: ").append(extraByteAttrs).append("\n");
+
+        return buffer.toString();
     }
 }
