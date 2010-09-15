@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.ha.jmqdb;
 
 import java.util.Hashtable;
@@ -460,5 +464,16 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
             return ret; 
        }  
        return null;   
+   }
+
+   public void close()
+   throws Exception {
+        try {
+            tSession.close();
+            tConn.close();
+        } catch (JMSException ex) {
+            FAMRecordUtils.debug.error("Error closing JMS connection", ex);
+            throw ex;
+        }
    }
 }

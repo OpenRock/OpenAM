@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.ha;
 
 /**
@@ -33,5 +37,7 @@ package com.sun.identity.ha;
  * return message, also reformats the message to FAMRecord.
  */
 public interface FAMRecordPersister {
-    public FAMRecord send(FAMRecord famRecord)throws Exception; 
+    public FAMRecord send(FAMRecord famRecord) throws Exception;
+
+    public void close() throws Exception;
 }
