@@ -2924,7 +2924,7 @@ public class AuthClientUtils {
      * @param request HttpServletRequest object
      * @return client IP address.
      */
-    private static String getClientIPAddress(HttpServletRequest request) {
+    public static String getClientIPAddress(HttpServletRequest request) {
         String result = null;
         String ipAddrHeader = getClientIPAddressHeader();
         if ((ipAddrHeader != null) && (ipAddrHeader.length() != 0)) {

@@ -1021,12 +1021,12 @@ public class LoginState {
                 cli = (String) requestHash.get("client");
             }
             if (messageEnabled) {
-                debug.message("getClient : servletRequest is : " + client);
+                debug.message("getClient : servletRequest is : " + servletRequest);
                 debug.message("getClient : cli is : " + cli);
             }
             if (cli == null || cli.length() == 0) {
                 if (servletRequest != null) {
-                    clientHost = servletRequest.getRemoteAddr();
+                    clientHost = AuthUtils.getClientIPAddress(servletRequest);
                 } else {
                     InetAddress localHost = InetAddress.getLocalHost();
                     clientHost = localHost.getHostAddress();
