@@ -26,20 +26,29 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.ha;
 
+import com.sun.identity.shared.debug.Debug;
+import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+
 /**
  * FAMPersisterFactory
  */
 public class FAMPersisterManager {
     private static FAMRecordPersister recordPesister = null; 
-    private static FAMPersisterManager instance=null; 
+    private static FAMPersisterManager instance = null;
     private static String famRecordPersisterImpl = null; 
     private static final String PERSISTER_KEY = 
         "com.sun.identity.ha.famrecordpersister"; 
     private static final String DEFAULT_PERSISTER_VALUE = 
-        "com.sun.identity.ha.jmqdb.FAMRecordJMQPersister"; 
+        "com.sun.identity.ha.jmqdb.FAMRecordJMQPersister";
+    private static Debug debug = SessionService.sessionDebug;
+
     static {
         try {
             famRecordPersisterImpl = SystemPropertiesManager.get(PERSISTER_KEY,
@@ -48,6 +57,7 @@ public class FAMPersisterManager {
             famRecordPersisterImpl = DEFAULT_PERSISTER_VALUE;
         }         
     }
+
     private FAMPersisterManager() throws Exception {
         recordPesister = (FAMRecordPersister) Class.forName(
             famRecordPersisterImpl).newInstance();        
@@ -66,6 +76,12 @@ public class FAMPersisterManager {
     }
 
     public synchronized static void clearInstance() {
+        try {
+            recordPesister.close();
+        } catch (Exception ex) {
+            debug.error("FAMPersisterManager::clearInstance unable to close instancee", ex);
+        }
+
         instance = null;
     }
 }
