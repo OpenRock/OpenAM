@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.configuration;
 
 import com.iplanet.services.naming.WebtopNaming;
@@ -74,6 +78,7 @@ public class FedSystemProperties extends FedLibSystemProperties {
      *
      * @param key Key to the properties.
      */
+    @Override
     public String get(String key) {
         String value = null;
         if (isServerMode()) {                    
@@ -111,6 +116,7 @@ public class FedSystemProperties extends FedLibSystemProperties {
      * @return Server List.
      * @throws Exception if server list cannot be returned.
      */
+    @Override
     public Collection getServerList()
         throws Exception {
         return WebtopNaming.getPlatformServerList(false);
@@ -127,6 +133,7 @@ public class FedSystemProperties extends FedLibSystemProperties {
      * @return The URL of the specified service on the specified host.
      * @throws Exception if the URL could not be found.
      */
+    @Override
     public URL getServiceURL(
         String serviceName, 
         String protocol,
@@ -136,5 +143,17 @@ public class FedSystemProperties extends FedLibSystemProperties {
     ) throws Exception {
         return WebtopNaming.getServiceURL(
             serviceName, protocol, hostname, "" + port, uri);
+    }
+
+    /**
+     * Returns service all url list.
+     *
+     * @return Server List.
+     * @throws Exception if server list cannot be returned.
+     */
+    @Override
+    public Collection getServiceAllURLs(String serviceName)
+        throws Exception {
+        return WebtopNaming.getServiceAllURLs(serviceName);
     }
 }

@@ -127,7 +127,46 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
      */
     public static Collection getServiceAllURLs(String serviceName)
     throws SystemConfigurationException {
-        throw new UnsupportedOperationException("Not implemented");
+        // TODO: Is this implementation still used?
+        if (!platformNamingInitialized) {
+            initPlatformNaming();
+        }
+
+        if (serviceName == null) {
+            throw new SystemConfigurationException("missingServiceName");
+        }
+
+        Collection allurls = null;
+        String name = "iplanet-am-naming-" + serviceName.toLowerCase() + "-url";
+
+        Set<String> values = null;
+        
+        try {
+            values = (Set<String>) namingConfig.getConfiguration(null, null).get(name);
+        } catch (ConfigurationException cex) {
+            getDebug().error("SystemConfigurationUtil.getServiceURL:", cex);
+        }
+        
+        if ((values) == null || values.isEmpty()) {
+            Object[] data = { serviceName };
+            throw new SystemConfigurationException("noServiceURL", data);
+        }
+
+        for (String url : values) {
+            if (url != null) {
+                try {
+                    allurls.add(new URL(url));
+                } catch (MalformedURLException muex) {
+                    Object[] data = { serviceName };
+                    throw new SystemConfigurationException("noServiceURL", data);
+                }
+            } else {
+                Object[] data = { serviceName };
+                throw new SystemConfigurationException("noServiceURL", data);
+            }
+        }
+
+        return allurls;
     }
 
     /**
