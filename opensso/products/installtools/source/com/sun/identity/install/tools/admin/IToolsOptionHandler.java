@@ -26,14 +26,17 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.admin;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface IToolsOptionHandler {
-    public boolean checkArguments(ArrayList arguments);
+    public boolean checkArguments(List arguments);
 
-    public void handleRequest(ArrayList arguments);
+    public void handleRequest(List arguments);
 
     public void displayHelp();
 }

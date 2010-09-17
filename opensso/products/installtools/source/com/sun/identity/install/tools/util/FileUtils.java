@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted [2010] [ForgeRock AS]
  */
-
 package com.sun.identity.install.tools.util;
 
 import java.io.BufferedInputStream;
@@ -41,7 +40,6 @@ import java.io.FileWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
@@ -57,7 +55,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 
 public class FileUtils {
 
@@ -1106,7 +1103,7 @@ public class FileUtils {
      * @param filePath
      * @param linesToAppend
      * @param create should the file be created if it does not exist
-     * @returntrue for success, false otherwise
+     * @return true for success, false otherwise
      */
     public static boolean appendLinesToFile(String filePath,
             String[] linesToAppend, boolean create) {
@@ -1396,6 +1393,36 @@ public class FileUtils {
         }
 
         return reader;
+    }
+
+    /**
+     * Returns the parent folder upper level count to the current path
+     * 
+     * @param path path to a file/folder
+     * @param level how much should we go upper in the path
+     * @return path to the parent upper the given level, for example: 
+     * (/a/b/c/d, 3) will result in /a
+     */
+    public static String getParentDirPath(String path, int level) {
+        String ret = path;
+        for (int i = 0 ; i < level; i++) {
+            if (path != null) {
+                ret = getParentDirPath(path);
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Returns the parent folder of the given file/folder
+     *
+     * @param path path to a file/folder
+     * @return path to the parent, it may be null, if there is no parent.
+     */
+    public static String getParentDirPath(String path) {
+        File dir = new File(path);
+        return dir.getParent();
     }
 
     private static final String FILE_SEP = 

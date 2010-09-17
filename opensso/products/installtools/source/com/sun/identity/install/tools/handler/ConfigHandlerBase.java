@@ -26,19 +26,21 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.handler;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
+import java.util.List;
 
 abstract public class ConfigHandlerBase {
 
-    protected boolean verifyArguments(ArrayList arguments) {
+    protected boolean verifyArguments(List arguments) {
         // Arguments to the -install option can be:
         // 1. <empty>
         // 2. -useResponses <responseFile>
@@ -129,7 +131,7 @@ abstract public class ConfigHandlerBase {
         return validationSuccess;
     }
 
-    protected String formatArgs(ArrayList arguments) {
+    protected String formatArgs(List arguments) {
         int count = arguments.size();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < count; i++) {

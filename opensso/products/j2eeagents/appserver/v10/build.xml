@@ -26,8 +26,10 @@
 
 -->
 
-<project name="open-source-j2ee-agents-appserver-v9" default="build">
-    <description>OpenSSO Policy Agent for Appserver 9</description>
+<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+
+<project name="open-source-j2ee-agents-appserver-v10" default="build">
+    <description>OpenSSO Policy Agent for Appserver 10</description>
 
     <fail message="*** jdk target is not set ***">
         <condition>
@@ -45,13 +47,13 @@
         </condition>
     </fail>
 
-    <property name="j2eeagents.appserver.v9.src.dir" location="${j2eeagents.basedir}/${containername}/v81/source"/>
+    <property name="j2eeagents.appserver.v10.src.dir" location="${j2eeagents.basedir}/${containername}/v81/source"/>
 
     <target name="build">
         <javac destdir="${j2eeagents.container.classes.dir}"
             source="${target.jdk.set}" target="${target.jdk.set}"
             debug="${build.debug}" debuglevel="${build.debuglevel}">
-            <src path="${j2eeagents.appserver.v9.src.dir}"/>
+            <src path="${j2eeagents.appserver.v10.src.dir}"/>
             <classpath refid="build.class.path"/>
         </javac>
 
@@ -99,6 +101,7 @@
                 <include name="openssoclientsdk.jar"/>
                 <include name="opensso-installtools-launcher.jar"/>
                 <include name="opensso-installtools.jar"/>
+                <include name="commons-io-1.4.jar"/>
             </fileset>
             <fileset dir="${j2eeagents.container.archive.dir}">
                 <include name="agent.jar"/>

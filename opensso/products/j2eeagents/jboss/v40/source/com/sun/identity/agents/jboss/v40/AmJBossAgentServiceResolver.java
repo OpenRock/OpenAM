@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.jboss.v40;
 
 import com.sun.identity.agents.filter.J2EEAuthenticationHandler;
@@ -46,7 +49,7 @@ public class AmJBossAgentServiceResolver extends ServiceResolver {
           
     public String getGlobalJ2EEAuthHandlerImpl() {
         boolean webauth = false; 
-        webauth = new Boolean(AmRealmManager.getSystemAccess().getManager().getConfiguration("jboss.webauth.available")).booleanValue();
+        webauth = AmRealmManager.getSystemAccess().getManager().getConfigurationBoolean("jboss.webauth.available");
             if (webauth == true){
                 return AmJBossJ2EEAuthHandler.class.getName();
             }            

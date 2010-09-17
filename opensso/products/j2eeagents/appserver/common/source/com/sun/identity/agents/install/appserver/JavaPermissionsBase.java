@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.install.appserver;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
@@ -35,6 +38,7 @@ import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.FileEditor;
 import com.sun.identity.install.tools.util.FileUtils;
 import com.sun.identity.install.tools.util.DeletePattern;
+import org.forgerock.openam.agents.install.appserver.VersionChecker;
 
 
 /**
@@ -49,7 +53,6 @@ public class JavaPermissionsBase implements InstallConstants, IConfigKeys {
         boolean status = false;        
         String serverPolicyFile = getServerPolicyFile(stateAccess); 
         try {
-            String libPath = getLibPath(stateAccess);
             FileUtils.appendDataToFile(serverPolicyFile, 
                     getPermissions(stateAccess));
             status = true;
@@ -82,14 +85,21 @@ public class JavaPermissionsBase implements InstallConstants, IConfigKeys {
     }
     
     protected String getLibPath(IStateAccess stateAccess) {
-        
-        String libPath  = ConfigUtil.getLibPath();
+
+        String libPath;
+        if (VersionChecker.isGlassFishv3(stateAccess)) {
+            libPath = FileUtils.getParentDirPath(
+                    stateAccess.get(IConfigKeys.STR_KEY_AS_INST_CONFIG_DIR).toString());
+            libPath += FILE_SEP + INSTANCE_LIB_DIR_NAME;
+        } else {
+            libPath = ConfigUtil.getLibPath();
+        }
         String remoteHomeDir = (String) stateAccess.get(
                 STR_REMOTE_AGENT_INSTALL_DIR_KEY);
-            // get the agent install directory on a remote instance
-	    if (remoteHomeDir != null && remoteHomeDir.trim().length() > 0) {
-	        libPath = remoteHomeDir + FILE_SEP + INSTANCE_LIB_DIR_NAME;
-            }
+        // get the agent install directory on a remote instance
+        if (remoteHomeDir != null && remoteHomeDir.trim().length() > 0) {
+            libPath = remoteHomeDir + FILE_SEP + INSTANCE_LIB_DIR_NAME;
+        }
         return libPath;
     }
     
@@ -98,20 +108,17 @@ public class JavaPermissionsBase implements InstallConstants, IConfigKeys {
     }
         
     private String getPermissions(IStateAccess stateAccess) {
-         StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(LINE_SEP);
-        sb.append("grant codeBase \"file:").append(getLibPath(stateAccess));
-        sb.append("/*\" {").append(LINE_SEP);
+        sb.append("grant codeBase \"file:");
+        sb.append(getLibPath(stateAccess));
+        sb.append("/agent.jar\" {").append(LINE_SEP);
         sb.append("       permission java.security.AllPermission;");
         sb.append(LINE_SEP);
         sb.append("};");
         _javaPermissions = sb.toString();
-        
+
         return _javaPermissions;
-    }
-    
-    private void setPermissions(String javaPermissions) {
-        _javaPermissions = javaPermissions;
     }
     
     public static final String STR_AS70_SERVER_POLICY_FILE_KEY = 

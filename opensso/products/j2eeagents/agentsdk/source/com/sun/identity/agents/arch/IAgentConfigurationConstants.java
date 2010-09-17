@@ -44,6 +44,10 @@ public interface IAgentConfigurationConstants {
                                         "OpenSSOAgentBootstrap.properties";
     public static final String LOCAL_CONFIG_FILE_NAME = 
                                         "OpenSSOAgentConfiguration.properties";
+    /**
+     * This JVM option tells, where the localized agent configurations are 
+     * available.
+     */
     public static final String CONFIG_JVM_OPTION_NAME =
                                         "openam.agents.bootstrap.dir";
     

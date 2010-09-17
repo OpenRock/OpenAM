@@ -26,23 +26,26 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.handler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.configurator.InstFinderStore;
 import com.sun.identity.install.tools.configurator.InstallException;
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
+import java.util.List;
 
 public class ListProductsHandler extends ProductInfoHandlerBase implements
         IToolsOptionHandler {
     
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         // There should be no arguments to this option. If there is any it
         // would an error.
         boolean validArgs = true;
@@ -64,7 +67,7 @@ public class ListProductsHandler extends ProductInfoHandlerBase implements
         Console.println();
     }
 
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
         try {
             ArrayList summaryKeys = getIFinderSummaryKeys();
             InstFinderStore iFinderStore = InstFinderStore.getInstance();

@@ -26,13 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.launch;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface IAdminTool {
 
-    public void run(ArrayList args);
+    public void run(List args);
 
     public static final String STR_DEBUG_OPTION = "--debug";
 

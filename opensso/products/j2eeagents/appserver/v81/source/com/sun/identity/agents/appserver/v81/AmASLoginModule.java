@@ -26,15 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.appserver.v81;
 
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.security.auth.login.LoginException;
-
 import com.sun.enterprise.security.auth.login.PasswordLoginModule;
-import com.sun.enterprise.security.auth.realm.Realm;
 import com.sun.identity.agents.arch.IModuleAccess;
 import com.sun.identity.agents.realm.AmRealmAuthenticationResult;
 import com.sun.identity.agents.realm.AmRealmManager;
@@ -63,7 +63,8 @@ public class AmASLoginModule extends PasswordLoginModule {
 
         AmASRealm agentRealm = getAgentRealm();
         String userName = getUserName();
-        String password = getPassword();
+        //Using protected variable from AppservPasswordLoginModule superclass
+        String password = _password;
 
         if( agentRealm == null) {
             throw new LoginException("AmAS81LoginModule requires AgentRealm.");
@@ -119,10 +120,6 @@ public class AmASLoginModule extends PasswordLoginModule {
 
     private String getUserName() {
         return _username;
-    }
-
-    private String getPassword() {
-        return _password;
     }
 
     private IAmRealm getRealmInstance() {

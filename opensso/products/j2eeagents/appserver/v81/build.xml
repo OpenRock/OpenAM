@@ -26,6 +26,8 @@
 
 -->
 
+<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+
 <project name="open-source-j2ee-agents-appserver-v81" default="build">
     <description>OpenSSO Policy Agent for Sun Appserver 8.1</description>
 
@@ -97,6 +99,7 @@
                 <include name="openssoclientsdk.jar"/>
                 <include name="opensso-installtools-launcher.jar"/>
                 <include name="opensso-installtools.jar"/>
+                <include name="commons-io-1.4.jar"/>
             </fileset>
             <fileset dir="${j2eeagents.container.archive.dir}">
                 <include name="agent.jar"/>

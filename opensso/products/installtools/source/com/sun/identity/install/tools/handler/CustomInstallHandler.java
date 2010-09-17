@@ -24,9 +24,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.handler;
-
-import java.util.ArrayList;
 
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.configurator.InstallAbortException;
@@ -37,6 +38,7 @@ import com.sun.identity.install.tools.configurator.InstallLogger;
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
+import java.util.List;
 
 public class CustomInstallHandler extends ConfigHandlerBase implements
         IToolsOptionHandler, InstallConstants {
@@ -44,11 +46,11 @@ public class CustomInstallHandler extends ConfigHandlerBase implements
         super();
     }
 
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         return verifyArguments(arguments);
     }
 
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
 
         try {
             // Create an InstallLogger

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.install.handler;
 
 import java.io.BufferedReader;
@@ -37,7 +40,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
-
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.install.tools.admin.ICommonToolsConstants;
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
@@ -46,14 +48,14 @@ import com.sun.identity.install.tools.util.ConfigUtil;
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
-import com.sun.identity.install.tools.admin.ToolsConfiguration;
+import java.util.List;
 
 /**
  * This class provides password encryption 
  */
 public class EncryptionHandler implements IToolsOptionHandler, ICommonToolsConstants {
 
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         boolean result = true;
         if (arguments.size() == 2) {
             String agentId = (String) arguments.get(0);
@@ -84,7 +86,7 @@ public class EncryptionHandler implements IToolsOptionHandler, ICommonToolsConst
         return result;
     }
 
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
         boolean result = false;
         String agentId = (String) arguments.get(0);
         String passwordFile = (String) arguments.get(1);

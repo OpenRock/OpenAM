@@ -26,12 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.tools.websphere;
 
-import java.util.ArrayList;
 import java.io.File;
 import java.util.Random;
-
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.configurator.InstallConstants;
 import com.sun.identity.install.tools.util.Console;
@@ -39,6 +40,7 @@ import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.xml.XMLDocument;
 import com.sun.identity.install.tools.util.xml.XMLElement;
+import java.util.List;
 
 /**
  * SetGroupHandler will set the OpenSSO Enterprise group name in admin-authz.xml file
@@ -53,11 +55,11 @@ public class SetGroupHandler extends GroupUpdateHandlerBase
         super();
     }
     
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         return super.checkArguments(arguments);
     }
     
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
         
         Debug.log("SetGroupHandler: handle request");
         String amGroupName = (String)arguments.get(1);
@@ -67,7 +69,7 @@ public class SetGroupHandler extends GroupUpdateHandlerBase
         try {
             XMLDocument adminauthFile = new XMLDocument(file);
             adminauthFile.setIndentDepth(2);
-            XMLElement authElem = findAuthElement(adminauthFile,arguments);
+            XMLElement authElem = findAuthElement(adminauthFile, arguments);
             
             if (authElem != null) {
                 // First see if the element with name=amGroupName is already

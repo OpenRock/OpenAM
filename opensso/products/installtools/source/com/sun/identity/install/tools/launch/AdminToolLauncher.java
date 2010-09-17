@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.launch;
 
 import java.io.File;
@@ -36,10 +39,11 @@ import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class AdminToolLauncher {
 
-    private static void launchAdminTool(ArrayList args) throws Exception {
+    private static void launchAdminTool(List args) throws Exception {
         String fullName = AdminToolLauncher.class.getName();
         int index = fullName.lastIndexOf('.');
         String shortClassName = fullName;

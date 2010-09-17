@@ -164,6 +164,9 @@
             <task name="CONFIGURE_DOMAIN_XML">                  
  	            <class name="ConfigureDomainXMLTask" type="custom"/>                                
             </task>                        
+            <task name="COPY_AGENTS_FILES">
+                <class name="CopyAgentFilesTask" type="custom"/>
+            </task>
 		</instance-tasks>
 	</install>
 	<custom-install>
@@ -415,6 +418,9 @@
             <task name="CONFIGURE_DOMAIN_XML">                  
  	            <class name="ConfigureDomainXMLTask" type="custom"/>                                
             </task>                        
+            <task name="COPY_AGENTS_FILES">
+                <class name="CopyAgentFilesTask" type="custom"/>
+            </task>
 		</instance-tasks>
 	</custom-install>
 	<uninstall>
@@ -431,6 +437,9 @@
 		<instance-tasks>
 			<task name="UNCONFIGURE_DOMAIN_XML">
 				<class name="UnconfigureDomainXMLTask" type="custom"/>				
+			</task>
+			<task name="REMOVE_AGENTS_FILES">
+				<class name="RemoveAgentFilesTask" type="custom"/>
 			</task>
 			<task name="DELETE_LAYOUT">
 				<class name="DeleteLayoutTask" type="system"/>
@@ -542,6 +551,9 @@
                 <task name="CONFIGURE_DOMAIN_XML">                  
                     <class name="ConfigureDomainXMLTask" type="custom"/>                                
                 </task> 
+		<task name="COPY_AGENTS_FILES">
+			<class name="CopyAgentFilesTask" type="custom"/>
+		</task>
             </instance-tasks>
         </migrate>
 </configure>

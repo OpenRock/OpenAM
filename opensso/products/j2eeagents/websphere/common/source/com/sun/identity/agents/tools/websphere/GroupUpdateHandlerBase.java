@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.tools.websphere;
 
 import java.util.ArrayList;
 import java.io.File;
-
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.configurator.InstallConstants;
 import com.sun.identity.install.tools.util.Console;
@@ -39,6 +41,7 @@ import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.xml.XMLDocument;
 import com.sun.identity.install.tools.util.xml.XMLElement;
 import com.sun.identity.install.tools.handler.ConfigHandlerBase;
+import java.util.List;
 
 /**
  * GroupUpdateHandlerBase is the base class for SetGroup and RemoveGroup
@@ -52,7 +55,7 @@ public abstract class GroupUpdateHandlerBase extends ConfigHandlerBase
         super();
     }
     
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         
         boolean result = true;
         String specifiedArgs = formatArgs(arguments);
@@ -100,7 +103,7 @@ public abstract class GroupUpdateHandlerBase extends ConfigHandlerBase
     }
     
     public XMLElement findAuthElement(XMLDocument adminauthFile,
-            ArrayList arguments) {
+            List arguments) {
         
         XMLElement returnElem = null;
         String wasRoleName = (String)arguments.get(0);

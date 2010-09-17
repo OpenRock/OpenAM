@@ -26,9 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.handler;
-
-import java.util.ArrayList;
 
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.configurator.InstallConstants;
@@ -38,6 +39,7 @@ import com.sun.identity.install.tools.configurator.MultipleUninstallDriver;
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
+import java.util.List;
 
 public class UninstallAllHandler extends ConfigHandlerBase implements
         IToolsOptionHandler, InstallConstants {
@@ -46,7 +48,7 @@ public class UninstallAllHandler extends ConfigHandlerBase implements
         super();
     }
 
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         // There should be no arguments to this option. If there is any it
         // would an error.
         boolean validArgs = true;
@@ -61,7 +63,7 @@ public class UninstallAllHandler extends ConfigHandlerBase implements
         return validArgs;
     }
 
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
         try {
             InstallLogger unInstallLog = new InstallLogger(STR_UNINSTALL);
             MultipleUninstallDriver driver = new MultipleUninstallDriver();

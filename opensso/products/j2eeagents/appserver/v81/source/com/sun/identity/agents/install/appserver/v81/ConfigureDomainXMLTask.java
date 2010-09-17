@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.install.appserver.v81;
 
 import java.io.File;
 import java.util.Map;
-
 import com.sun.identity.install.tools.configurator.IStateAccess;
 import com.sun.identity.install.tools.configurator.ITask;
 import com.sun.identity.install.tools.configurator.InstallException;
@@ -38,83 +40,22 @@ import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.xml.XMLDocument;
 import com.sun.identity.install.tools.util.xml.XMLElement;
-
+import org.forgerock.openam.agents.install.appserver.VersionChecker;
 
 /**
  * The class used by the installer to make changes in domain.xml file of
  * the Sun App Server
  */
 public class ConfigureDomainXMLTask extends DomainXMLBase implements ITask {
-    
-    public boolean execute(String name, IStateAccess stateAccess, 
-        Map properties) throws InstallException 
-    {
+
+    public boolean execute(String name, IStateAccess stateAccess,
+            Map properties) throws InstallException {
         boolean status = false;
         boolean skipTask = skipTask(stateAccess);
 
         if (skipTask) {
-           Debug.log("Skipping ConfigureDomainXMLTask.execute()");
-           status = true;
-        } else {
-            String serverXMLFile = getDomainXMLFile(stateAccess);
-            String serverInstanceName = getServerInstanceName(stateAccess); 
-            if (serverInstanceName == null) {
-                // use the default one
-                serverInstanceName = DEFAULT_INSTANCE_NAME;
-            }
-            if (serverXMLFile != null) {
-                try {
-                    File serverXML = new File(serverXMLFile);
-                    XMLDocument domainXMLDoc = new XMLDocument(serverXML);
-                    XMLElement instanceConfig = getInstanceConfig(
-                        domainXMLDoc, serverInstanceName); 
-                    if (instanceConfig != null) {
-                        status = addAgentJavaConfig(domainXMLDoc, instanceConfig, 
-                            stateAccess);
-                        status &= addAgentRealm(domainXMLDoc, instanceConfig, 
-                            stateAccess);
-                        domainXMLDoc.setIndentDepth(2);
-                        domainXMLDoc.store();
-                    }
-                } catch (Exception e) {
-                    Debug.log("ConfigureDomainXMLTask.execute() Error occurred " +
-                        "while updating serverXML file '" + serverXMLFile + "'.",e);                
-                }
-            } else {
-                Debug.log("ConfigureDomainXMLTask.execute() Error could get " +
-                    "server.xml file: " + serverXMLFile);
-            }
-        }
- 
-        return status;
-    }
-    
-    public LocalizedMessage getExecutionMessage(IStateAccess stateAccess,
-        Map properties) {
-        String serverXMLFile = getDomainXMLFile(stateAccess);
-        Object[] args = { serverXMLFile };
-        LocalizedMessage message = LocalizedMessage.get(
-            LOC_TSK_MSG_CONFIGURE_DOMAIN_XML_EXECUTE, STR_AS_GROUP, args);
-        return message;
-    }
-    
-    public LocalizedMessage getRollBackMessage(IStateAccess stateAccess,
-        Map properties) {
-        String serverXMLFile = getDomainXMLFile(stateAccess);
-        Object[] args = { serverXMLFile };
-        LocalizedMessage message = LocalizedMessage.get(
-            LOC_TSK_MSG_CONFIGURE_DOMAIN_XML_ROLLBACK, STR_AS_GROUP, args);
-        return message;
-    }
-    
-    public boolean rollBack(String name, IStateAccess stateAccess, 
-        Map properties) throws InstallException {
-        boolean status = false;
-        boolean skipTask = skipTask(stateAccess);
-
-        if (skipTask) {
-           Debug.log("Skipping ConfigureDomainXMLTask.rollback()");
-           status = true;
+            Debug.log("Skipping ConfigureDomainXMLTask.execute()");
+            status = true;
         } else {
             String serverXMLFile = getDomainXMLFile(stateAccess);
             String serverInstanceName = getServerInstanceName(stateAccess);
@@ -126,43 +67,104 @@ public class ConfigureDomainXMLTask extends DomainXMLBase implements ITask {
                 try {
                     File serverXML = new File(serverXMLFile);
                     XMLDocument domainXMLDoc = new XMLDocument(serverXML);
-                    XMLElement instanceConfig = getInstanceConfig(domainXMLDoc, 
-                        serverInstanceName); 
-                    if (instanceConfig != null) {                
-                        status = removeAgentClasspath(instanceConfig, stateAccess);
-                        status &= removeAgentRealm(domainXMLDoc, instanceConfig, 
-                            stateAccess);
-                        domainXMLDoc.setIndentDepth(8);
+                    XMLElement instanceConfig = getInstanceConfig(
+                            domainXMLDoc, serverInstanceName);
+                    if (instanceConfig != null) {
+                        status &= addAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
+                        status = addAgentJavaConfig(domainXMLDoc, instanceConfig,
+                                stateAccess);
+                        domainXMLDoc.setIndentDepth(2);
                         domainXMLDoc.store();
                     }
                 } catch (Exception e) {
-                    Debug.log("ConfigureDomainXMLTask.execute() Error occurred " +
-                        "while updating serverXML file '" + serverXMLFile + "'.",e);                
+                    status = false;
+                    Debug.log("ConfigureDomainXMLTask.execute() Error occurred "
+                            + "while updating serverXML file '" + serverXMLFile + "'.", e);
                 }
             } else {
-                Debug.log("ConfigureDomainXMLTask.rollBack() Error could get " +
-                    "server.xml file: " + serverXMLFile);
+                Debug.log("ConfigureDomainXMLTask.execute() Error could get "
+                        + "server.xml file: " + serverXMLFile);
             }
         }
 
         return status;
     }
-       
+
+    public LocalizedMessage getExecutionMessage(IStateAccess stateAccess,
+            Map properties) {
+        String serverXMLFile = getDomainXMLFile(stateAccess);
+        Object[] args = {serverXMLFile};
+        LocalizedMessage message = LocalizedMessage.get(
+                LOC_TSK_MSG_CONFIGURE_DOMAIN_XML_EXECUTE, STR_AS_GROUP, args);
+        return message;
+    }
+
+    public LocalizedMessage getRollBackMessage(IStateAccess stateAccess,
+            Map properties) {
+        String serverXMLFile = getDomainXMLFile(stateAccess);
+        Object[] args = {serverXMLFile};
+        LocalizedMessage message = LocalizedMessage.get(
+                LOC_TSK_MSG_CONFIGURE_DOMAIN_XML_ROLLBACK, STR_AS_GROUP, args);
+        return message;
+    }
+
+    public boolean rollBack(String name, IStateAccess stateAccess,
+            Map properties) throws InstallException {
+        boolean status = false;
+        boolean skipTask = skipTask(stateAccess);
+
+        if (skipTask) {
+            Debug.log("Skipping ConfigureDomainXMLTask.rollback()");
+            status = true;
+        } else {
+            String serverXMLFile = getDomainXMLFile(stateAccess);
+            String serverInstanceName = getServerInstanceName(stateAccess);
+            if (serverInstanceName == null) {
+                // use the default one
+                serverInstanceName = DEFAULT_INSTANCE_NAME;
+            }
+            if (serverXMLFile != null) {
+                try {
+                    File serverXML = new File(serverXMLFile);
+                    XMLDocument domainXMLDoc = new XMLDocument(serverXML);
+                    XMLElement instanceConfig = getInstanceConfig(domainXMLDoc,
+                            serverInstanceName);
+                    if (instanceConfig != null) {
+                        status &= removeAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
+                        if (!VersionChecker.isGlassFishv3(stateAccess)) {
+                            status = removeAgentClasspath(instanceConfig, stateAccess);
+                        }
+                        domainXMLDoc.setIndentDepth(8);
+                        domainXMLDoc.store();
+                    }
+                } catch (Exception e) {
+                    status = false;
+                    Debug.log("ConfigureDomainXMLTask.execute() Error occurred "
+                            + "while updating serverXML file '" + serverXMLFile + "'.", e);
+                }
+            } else {
+                Debug.log("ConfigureDomainXMLTask.rollBack() Error could get "
+                        + "server.xml file: " + serverXMLFile);
+            }
+        }
+
+        return status;
+    }
+
     private boolean skipTask(IStateAccess stateAccess) {
         boolean result = false;
         String isRemote = (String) stateAccess.get(STR_DAS_HOST_IS_REMOTE_KEY);
 
-        if ( isRemote != null) {
+        if (isRemote != null) {
             result = Boolean.valueOf(isRemote).booleanValue();
             Debug.log("ConfigureDomainXMLTask: skipTask = " + isRemote);
         }
 
         return result;
     }
- 
     public static final String DEFAULT_INSTANCE_NAME = "server";
     public static final String LOC_TSK_MSG_CONFIGURE_DOMAIN_XML_EXECUTE =
-        "TSK_MSG_CONFIGURE_DOMAIN_XML_EXECUTE";
+            "TSK_MSG_CONFIGURE_DOMAIN_XML_EXECUTE";
     public static final String LOC_TSK_MSG_CONFIGURE_DOMAIN_XML_ROLLBACK =
-        "TSK_MSG_CONFIGURE_DOMAIN_XML_ROLLBACK";
+            "TSK_MSG_CONFIGURE_DOMAIN_XML_ROLLBACK";
 }

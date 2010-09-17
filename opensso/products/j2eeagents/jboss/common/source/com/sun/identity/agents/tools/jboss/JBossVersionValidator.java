@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.tools.jboss;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
@@ -229,7 +232,7 @@ public class JBossVersionValidator extends ValidatorBase
         }
 
                
-        if (version32 || version40 || version50) {
+        if (version32 || version40 || version42 || version50) {
             validVersion = true;
         } else {
             Debug.log(
@@ -240,5 +243,4 @@ public class JBossVersionValidator extends ValidatorBase
 
         return validVersion;
     }
-
 }

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.admin;
 
 import java.io.File;
@@ -33,12 +36,12 @@ import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import com.sun.identity.install.tools.launch.IAdminTool;
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.ConfigUtil;
+import java.util.List;
 
 public class AdminTool implements IAdminTool {
 
@@ -67,7 +70,7 @@ public class AdminTool implements IAdminTool {
         return result;
     }
 
-    private boolean checkImplicitLicenseAcceptance(ArrayList args) {
+    private boolean checkImplicitLicenseAcceptance(List args) {
         boolean result = false;
         if (args.size() > 0) {
             Iterator it = args.iterator();
@@ -93,7 +96,7 @@ public class AdminTool implements IAdminTool {
         return result;
     }
 
-    public void run(ArrayList args) {
+    public void run(List args) {
         int returnCode = INT_CODE_SUCCESS;
         Debug.log("AdminTool is now starting up.");
         if (acquireLock()) {
@@ -165,7 +168,7 @@ public class AdminTool implements IAdminTool {
         }
     }
 
-    private int dispatch(ArrayList filteredArgs) {
+    private int dispatch(List filteredArgs) {
         int returnCode = INT_CODE_SUCCESS;
         String optionArg = (String) filteredArgs.remove(0);
         Debug.log("Trying to dispatch to option handler for: " + optionArg);

@@ -26,13 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import com.sun.identity.install.tools.configurator.ConfigurationLoader;
 import com.sun.identity.install.tools.configurator.I18NInfo;
 import com.sun.identity.install.tools.configurator.InstallException;
@@ -41,6 +43,7 @@ import com.sun.identity.install.tools.configurator.InteractionConstants;
 import com.sun.identity.install.tools.configurator.InteractionInfo;
 import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.LocalizedMessage;
+import java.util.List;
 
 public class ProductInfoHandlerBase {
 
@@ -106,7 +109,7 @@ public class ProductInfoHandlerBase {
         Console.println();
     }
 
-    public String formatArgs(ArrayList arguments) {
+    public String formatArgs(List arguments) {
         int count = arguments.size();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < count; i++) {

@@ -26,11 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.agents.tools.websphere;
 
-import java.util.ArrayList;
 import java.io.File;
-
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.configurator.InstallConstants;
 import com.sun.identity.install.tools.util.Console;
@@ -38,6 +39,7 @@ import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.xml.XMLDocument;
 import com.sun.identity.install.tools.util.xml.XMLElement;
+import java.util.List;
 
 /**
  * RemoveGroupHandler will remove the OpenSSO Enterprise group name in admin-authz.xml file
@@ -52,11 +54,11 @@ public class RemoveGroupHandler extends GroupUpdateHandlerBase
         super();
     }
     
-    public boolean checkArguments(ArrayList arguments) {
+    public boolean checkArguments(List arguments) {
         return super.checkArguments(arguments);
     }
     
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
         
         Debug.log("RemoveGroupHandler: handle request");
         String amGroupName = (String)arguments.get(1);

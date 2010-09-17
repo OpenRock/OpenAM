@@ -26,19 +26,19 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.install.tools.configurator;
 
 import com.sun.identity.install.tools.util.RESTUtils;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.net.URL;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -212,7 +212,7 @@ public class PasswordValidator extends ValidatorBase {
                             "Error from OpenSSO:" + response.toString());
                         returnMessage = LocalizedMessage.get(
                                 LOC_VA_WRN_IN_VAL_OTHER_AGENT_AUTH_FAILURE,
-                                new Object[] {responseCode});
+                                new Object[] {Integer.valueOf(responseCode)});
                         validRes = ValidationResultStatus.STATUS_WARNING;
                     }
                     
@@ -221,7 +221,7 @@ public class PasswordValidator extends ValidatorBase {
                             "Error from OpenSSO:" + response.toString());
                     returnMessage = LocalizedMessage.get(
                             LOC_VA_WRN_IN_VAL_AGENT_GENERIC_FAILURE,
-                            new Object[] {responseCode,});
+                            new Object[] {Integer.valueOf(responseCode)});
                     validRes = ValidationResultStatus.STATUS_WARNING;
                 }
                 
@@ -329,7 +329,7 @@ public class PasswordValidator extends ValidatorBase {
                             "Error from OpenSSO:" + response.toString());
                     returnMessage = LocalizedMessage.get(
                             LOC_VA_ERR_IN_VAL_OTHER_AGENT_AUTH_FAILURE,
-                            new Object[] {responseCode});
+                            new Object[] {Integer.valueOf(responseCode)});
                 }
                 
             } else {
@@ -337,7 +337,7 @@ public class PasswordValidator extends ValidatorBase {
                         "Error from OpenSSO:" + response.toString());
                 returnMessage = LocalizedMessage.get(
                         LOC_VA_ERR_IN_VAL_AGENT_GENERIC_FAILURE,
-                        new Object[] {responseCode,});
+                        new Object[] {Integer.valueOf(responseCode)});
             }
             
         } catch (UnknownHostException uhe) {
