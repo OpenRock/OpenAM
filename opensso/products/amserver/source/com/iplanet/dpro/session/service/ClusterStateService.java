@@ -26,12 +26,19 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.dpro.session.service;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
-import com.sun.identity.common.TaskRunnable;
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
@@ -79,6 +86,13 @@ public class ClusterStateService extends GeneralTaskRunnable {
     /** individual server wait default time out 10 milliseconds */
     public static final int DEFAULT_TIMEOUT = 1000;
 
+    private static String GET_REQUEST = "";
+    private final static String EMPTY_STRING = "";
+    private final static String SUCCESS_200 = "200";
+
+    private static String hcPath = SystemProperties.
+                                    get(Constants.URLCHECKER_TARGET_URL, null);
+
     private int timeout = DEFAULT_TIMEOUT; // in milliseconds
 
     /** default ServerInfo check time 10 milliseconds */
@@ -91,6 +105,19 @@ public class ClusterStateService extends GeneralTaskRunnable {
     
     // SessionService
     private SessionService ss = null;
+
+    static {
+        if (hcPath == null) {
+            String deployuri = SystemProperties.get
+                (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
+            hcPath = deployuri + "/namingservice";
+            if (!hcPath.startsWith("/")) {
+                hcPath += "/" + hcPath;
+            }
+
+            GET_REQUEST = "GET " + hcPath + " HTTP/1.0";
+        }
+    }
 
     /**
      * Constructs an instance for the cluster service
@@ -269,9 +296,24 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
         boolean result = false;
         Socket sock = new Socket();
+        PrintWriter out = null;
+        BufferedReader in = null;
+
         try {
             sock.connect(info.address, timeout);
-            result = true;
+            out = new PrintWriter(sock.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            out.println(GET_REQUEST);
+            out.println(EMPTY_STRING);
+            out.flush();
+
+            String response = in.readLine();
+
+            if (response.contains(SUCCESS_200)) {
+                result = true;
+            } else {
+                result = false;
+            }
         } catch (Exception e) {
             result = false;
         } finally {
