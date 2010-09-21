@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.idm.plugins.ldapv3;
 
 import java.util.Collection;
@@ -1344,10 +1348,12 @@ public class LDAPv3EventService implements Runnable {
         
         private long runPeriod;
         private Map requests;
+        private int numRetries;
         
         public RetryTask(Map requests) {
             this.runPeriod = (long) _retryInterval;
             this.requests = requests;
+            this.numRetries = _numRetries;
         }
         
         public void run() {
@@ -1370,7 +1376,8 @@ public class LDAPv3EventService implements Runnable {
                     // attempt
                 }
             }
-            if (requests.isEmpty()) {
+
+            if (--numRetries == 0) {
                 runPeriod = -1;
             }
         }

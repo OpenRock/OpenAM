@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.services.ldap.event;
 
 import java.security.AccessController;
@@ -1180,12 +1184,14 @@ public class EventService implements Runnable {
         private long runPeriod;
         private Map requests;
         private boolean clearCaches;
+        private int numRetries;
         
         public RetryTask(Map requests) {
             
             this.runPeriod = getPropertyIntValue(
                 EVENT_CONNECTION_RETRY_INTERVAL, EventService._retryInterval);
             this.requests = requests;
+            this.numRetries = _numRetries;
         }
         
         public void clearCache(boolean cc) {
@@ -1219,7 +1225,7 @@ public class EventService implements Runnable {
                     // attempt
                 }
             }
-            if (requests.isEmpty()) {
+            if (--numRetries == 0) {
                 runPeriod = -1;
             }
         }
