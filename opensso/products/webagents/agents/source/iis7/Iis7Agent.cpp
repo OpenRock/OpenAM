@@ -301,7 +301,7 @@ REQUEST_NOTIFICATION_STATUS send_post_data(IHttpContext* pHttpContext, char *pag
                                            (USHORT)strlen("text/html"),TRUE);
     content_len = (USHORT)page_len;
     if (set_cookies_list != NULL)
-        content_len += strlen(set_cookies_list);
+        content_len += 0;    // strlen(set_cookies_list);
 
     char buff[256];
     itoa(content_len,buff,10);
