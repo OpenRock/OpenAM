@@ -261,9 +261,6 @@ public class AuthXMLRequestParser {
                 Node logoutNode = XMLUtils.getChildNode(requestNode,"Logout");
                 if (logoutNode != null) {
                     authXMLRequest.setRequestType(AuthXMLRequest.Logout);
-                    AuthContextLocal authContext = 
-                        AuthUtils.getAuthContext(null,authIdentifier,true);
-                    authXMLRequest.setAuthContext(authContext);
                 }
 
                 // get abort node

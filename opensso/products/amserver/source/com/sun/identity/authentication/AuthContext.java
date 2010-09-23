@@ -1349,7 +1349,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             acLocal.logout();
             return;
         }
-        
+
         // Construct the XML
         try {
             StringBuffer xml = new StringBuffer(100);
@@ -1394,6 +1394,25 @@ public class AuthContext extends Object implements java.io.Serializable {
         if (localFlag) {
             return;
         }
+
+        if (ssoToken != null) {
+            try {
+                organizationName = ssoToken.getProperty(
+                    ISAuthConstants.ORGANIZATION);
+                ssoTokenID = ssoToken.getTokenID().toString();
+                authURL = Session.getSession(
+                    new SessionID(ssoTokenID)).getSessionServiceURL();
+            } catch (Exception e) {
+                throw new AuthLoginException(e);
+            }
+        }
+
+        if (authURL != null) {
+            authServiceURL = getAuthServiceURL(authURL.getProtocol(),
+                authURL.getHost(), Integer.toString(authURL.getPort()),
+                authURL.getPath());
+        }
+
 
         // Construct the XML
         try {

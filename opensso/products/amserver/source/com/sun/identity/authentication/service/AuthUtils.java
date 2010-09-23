@@ -972,7 +972,7 @@ public class AuthUtils extends AuthClientUtils {
     public static AuthContextLocal getAuthContext(String orgName,
     String sessionID, boolean isLogout, HttpServletRequest req)
     throws AuthException {
-        return getAuthContext(orgName, sessionID, false, req, null, null);
+        return getAuthContext(orgName, sessionID, isLogout, req, null, null);
     }
     
     /* create auth context for org  and sid, if sessionupgrade then
@@ -992,7 +992,7 @@ public class AuthUtils extends AuthClientUtils {
         String sessionID, boolean isLogout, HttpServletRequest req,
         String indexType, AuthXMLRequest xmlReq)
         throws AuthException {
-        return getAuthContext(orgName, sessionID, false, req,indexType,
+        return getAuthContext(orgName, sessionID, isLogout, req,indexType,
             xmlReq,false);
     }
 

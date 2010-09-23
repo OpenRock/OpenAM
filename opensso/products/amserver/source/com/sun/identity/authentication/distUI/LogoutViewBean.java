@@ -140,7 +140,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
             if (ssoTokenExists) {
                 AuthContext ac = new AuthContext(ssoToken);
-                ac.login();
                 ac.logoutUsingTokenID();
                 logoutDebug.message("logout successfully");
             }

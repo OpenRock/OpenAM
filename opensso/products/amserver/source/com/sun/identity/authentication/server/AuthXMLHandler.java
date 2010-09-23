@@ -550,7 +550,6 @@ public class AuthXMLHandler implements RequestHandler {
                 InternalSession intSess = null;
                 SSOToken token = null;
                 boolean logoutCalled = false;
-                setServletRequest(servletRequest,authContext);
                 if (sessionID != null && !sessionID.equals("0")) {
                     intSess = AuthD.getSession(sessionID);
                     try {
@@ -663,7 +662,6 @@ public class AuthXMLHandler implements RequestHandler {
                     }
                 }
                 authResponse.setLoginStatus(AuthContext.Status.COMPLETED);
-                checkACException(authResponse, authContext);
                 break;
             case AuthXMLRequest.Abort:
                 try {
