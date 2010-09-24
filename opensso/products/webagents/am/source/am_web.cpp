@@ -1608,22 +1608,21 @@ get_normalized_url(const char *url_str,
     if (status == AM_SUCCESS) {
         // Parse & canonicalize URL
         am_web_log_max_debug("%s: Original url: %s", thisfunc, url_str);
+        am_web_log_max_debug("%s: PathInfo: %s", thisfunc, path_info);
 
         try {
-            if(path_info != NULL && strlen(path_info) > 0) {
+            if AM_TRUE == (*agentConfigPtr)->ignore_path_info) {
+                am_web_log_max_debug("%s: Ignoring path info for "
+                                     "policy evaluation.", thisfunc);
                 pInfo=path_info;
                 URL urlObject(url_str, pInfo);
                 (void)overrideProtoHostPort(urlObject, agent_config);
-                am_web_log_max_debug("%s: Path info: %s", thisfunc, path_info);
-                if (AM_TRUE == (*agentConfigPtr)->ignore_path_info) {
-                    am_web_log_max_debug("%s: Ignoring path info for "
-                                         "policy evaluation.", thisfunc);
-                    urlObject.getBaseURL(normalizedURL);
-                    pInfo.erase();
-                } else {
-                    urlObject.getURLString(normalizedURL);
-                }
+                urlObject.getBaseURL(normalizedURL);
+                pInfo.erase();
+
             } else {
+                am_web_log_max_debug("%s: Using Full URI for "
+                                     "policy evaluation.", thisfunc);
                 URL urlObject(url_str);
                 (void)overrideProtoHostPort(urlObject, agent_config);
                 urlObject.getURLString(normalizedURL);
