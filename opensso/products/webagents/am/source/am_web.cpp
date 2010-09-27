@@ -1611,7 +1611,7 @@ get_normalized_url(const char *url_str,
         am_web_log_max_debug("%s: PathInfo: %s", thisfunc, path_info);
 
         try {
-            if AM_TRUE == (*agentConfigPtr)->ignore_path_info) {
+            if (AM_TRUE == (*agentConfigPtr)->ignore_path_info) {
                 am_web_log_max_debug("%s: Ignoring path info for "
                                      "policy evaluation.", thisfunc);
                 pInfo=path_info;
