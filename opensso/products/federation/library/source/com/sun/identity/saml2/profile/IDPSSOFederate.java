@@ -601,7 +601,7 @@ public class IDPSSOFederate {
                             try {
                                 Response res = SAML2Utils.getErrorResponse(authnReq,
                                         SAML2Constants.RESPONDER,
-                                        "urn:oasis:names:tc:SAML:2.0:status:NoPassive", null, idpEntityID);
+                                        SAML2Constants.NOPASSIVE, null, idpEntityID);
                                 StringBuffer returnedBinding = new StringBuffer();
                                 String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm,
                                         authnReq, request, returnedBinding);
@@ -753,7 +753,7 @@ public class IDPSSOFederate {
                                 try {
                                     Response res = SAML2Utils.getErrorResponse(authnReq,
                                             SAML2Constants.RESPONDER,
-                                            "urn:oasis:names:tc:SAML:2.0:status:NoPassive", null, idpEntityID);
+                                            SAML2Constants.NOPASSIVE, null, idpEntityID);
                                     StringBuffer returnedBinding = new StringBuffer();
                                     String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm,
                                             authnReq, request, returnedBinding);
