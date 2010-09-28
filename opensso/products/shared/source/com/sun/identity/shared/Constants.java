@@ -1049,4 +1049,9 @@ public interface Constants {
       * at sign
       */
      public static final String AT = "@";
+
+     /**
+      * empty string
+      */
+     public static final String EMPTY = "";
 }
