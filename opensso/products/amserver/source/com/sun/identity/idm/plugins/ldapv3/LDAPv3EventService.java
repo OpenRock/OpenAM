@@ -1345,7 +1345,7 @@ public class LDAPv3EventService implements Runnable {
     }
     
     class RetryTask extends GeneralTaskRunnable {
-        
+        private Debug debugger = Debug.getInstance("LDAPv3EventService");
         private long runPeriod;
         private Map requests;
         private int numRetries;
@@ -1371,6 +1371,7 @@ public class LDAPv3EventService implements Runnable {
                     }
                     iter.remove();
                 } catch (Exception e) {
+                    debugger.error("RetryTask", e);
                     // Ignore exception and retry as we are in the process of
                     // re-establishing the searches. Notify Listeners after the
                     // attempt
@@ -1378,6 +1379,7 @@ public class LDAPv3EventService implements Runnable {
             }
 
             if (--numRetries == 0) {
+                debugger.error("NumRetries " + numRetries);
                 runPeriod = -1;
             }
         }
