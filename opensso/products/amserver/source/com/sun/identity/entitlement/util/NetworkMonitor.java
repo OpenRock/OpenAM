@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 public class NetworkMonitor extends HttpServlet {
 
     // Static variables
-    private static boolean collectStats = true;
+    private static boolean collectStats = false;
     private static HashMap<String, NetworkMonitor> stats = new HashMap();
 
     // Instance variables
