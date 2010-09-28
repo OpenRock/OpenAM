@@ -593,9 +593,29 @@ public class IDPSSOFederate {
    
                     // redirect to the authentication service
                     try {
-                        redirectAuthentication(request, response, reqID,
-                            idpAuthnContextInfo, realm, idpEntityID, spEntityID,
-                            false);
+                        if (!Boolean.TRUE.equals(authnReq.isPassive())) {
+                            redirectAuthentication(request, response, reqID,
+                                    idpAuthnContextInfo, realm, idpEntityID, spEntityID,
+                                    false);
+                        } else {
+                            try {
+                                Response res = SAML2Utils.getErrorResponse(authnReq,
+                                        SAML2Constants.RESPONDER,
+                                        "urn:oasis:names:tc:SAML:2.0:status:NoPassive", null, idpEntityID);
+                                StringBuffer returnedBinding = new StringBuffer();
+                                String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm,
+                                        authnReq, request, returnedBinding);
+                                String acsBinding = returnedBinding.toString();
+                                IDPSSOUtil.sendResponse(request, response, acsBinding,
+                                        spEntityID, idpEntityID, idpMetaAlias, realm, null,
+                                        acsURL, res, session);
+                            } catch (SAML2Exception sme) {
+                                SAML2Utils.debug.error(classMethod, sme);
+                                sendError(request, response,
+                                        SAML2Constants.SERVER_FAULT,
+                                        "metaDataError", null, isFromECP);
+                            }
+                        }
                     } catch (IOException ioe) {
                         SAML2Utils.debug.error(classMethod +
                             "Unable to redirect to authentication.", ioe);
@@ -724,10 +744,30 @@ public class IDPSSOFederate {
                         // End of block for IDP Adapter invocation
 
                         try {
-                             redirectAuthentication(request, response, reqID,
-                                 idpAuthnContextInfo, realm, idpEntityID,
-                                 spEntityID, true);
-                             return;
+                            if (!Boolean.TRUE.equals(authnReq.isPassive())) {
+                                redirectAuthentication(request, response, reqID,
+                                        idpAuthnContextInfo, realm, idpEntityID,
+                                        spEntityID, true);
+                                return;
+                            } else {
+                                try {
+                                    Response res = SAML2Utils.getErrorResponse(authnReq,
+                                            SAML2Constants.RESPONDER,
+                                            "urn:oasis:names:tc:SAML:2.0:status:NoPassive", null, idpEntityID);
+                                    StringBuffer returnedBinding = new StringBuffer();
+                                    String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm,
+                                            authnReq, request, returnedBinding);
+                                    String acsBinding = returnedBinding.toString();
+                                    IDPSSOUtil.sendResponse(request, response, acsBinding,
+                                            spEntityID, idpEntityID, idpMetaAlias, realm, null,
+                                            acsURL, res, session);
+                                } catch (SAML2Exception sme) {
+                                    SAML2Utils.debug.error(classMethod, sme);
+                                    sendError(request, response,
+                                            SAML2Constants.SERVER_FAULT,
+                                            "metaDataError", null, isFromECP);
+                                }
+                            }
                         } catch (IOException ioe) {
                             SAML2Utils.debug.error(classMethod +
                                  "Unable to redirect to authentication.", ioe);

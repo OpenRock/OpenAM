@@ -199,6 +199,9 @@ public interface SAML2Constants {
 
     public String RESPONDER =
         "urn:oasis:names:tc:SAML:2.0:status:Responder";
+
+    public String NOPASSIVE =
+        "urn:oasis:names:tc:SAML:2.0:status:NoPassive";
     
     public String VERSION_MISMATCH =
         "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch";
