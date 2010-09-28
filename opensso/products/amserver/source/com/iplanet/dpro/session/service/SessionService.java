@@ -2354,8 +2354,12 @@ public class SessionService {
         } catch (IdRepoException idme) {
             sessionDebug.error("SessionService.hasTopLevelAdminRole:"+
                 "Cannot get the user identity or role.");
-        }        
-        sessionDebug.error("**** New:isTopLevelAdmin = "+isTopLevelAdmin);
+        }
+
+        if (sessionDebug.messageEnabled()) {
+            sessionDebug.message("**** New:isTopLevelAdmin = " + isTopLevelAdmin);
+        }
+
         return isTopLevelAdmin;
     }
 
