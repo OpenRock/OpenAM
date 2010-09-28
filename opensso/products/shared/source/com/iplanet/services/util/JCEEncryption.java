@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.services.util;
 
 import java.security.NoSuchAlgorithmException;
@@ -242,7 +246,7 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
                 if (share[0] != VERSION) {
                     Debug debug = Debug.getInstance("amSDK");
                     if (debug != null) {
-                        debug.error("JCEEncryption:: Unsported version: "
+                        debug.error("JCEEncryption:: Unsupported version: "
                                 + share[0]);
                     }
 
