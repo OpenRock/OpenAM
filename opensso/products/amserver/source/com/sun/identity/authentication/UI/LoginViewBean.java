@@ -1951,6 +1951,11 @@ public class LoginViewBean extends AuthViewBeanBase {
                 ErrorMessage = AuthUtils.getErrorMessage(errorCode);
             }
         }
+
+        // handle InternalSession timeout
+        if (errorCode.equals("110") && (loginURL.equals(Constants.EMPTY))) {
+            setDisplayFieldValue(LOGIN_URL, AuthUtils.constructLoginURL(request));
+        }
         
         if (loginDebug.messageEnabled()) {
             loginDebug.message("Error Message = " + ErrorMessage);
