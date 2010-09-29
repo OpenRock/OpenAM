@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.91 2009/12/01 02:09:58 veiming Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2010] [ForgeRock AS]"
+-->
 
 <project name="opensso" default="usage">
     <description>Open Web Single Sign-On</description>
@@ -112,16 +115,7 @@
             <fileset dir="${amserver.basedir}/xsd" includes="*.*" />
         </copy>
 
-        <java classname="com.sun.tools.internal.xjc.Driver"
-            classpath="${env.JAVA_HOME}/lib/tools.jar"
-            maxmemory="256m" failonerror="true" fork="true">
-            <arg line="-b ${amserver.built.xsd.dir}/xacml-core-v3.xjb -extension -d ${amserver.built.src.dir} ${amserver.built.xsd.dir}/xacml-core-v3-schema-cd-1.xsd"/>
-        </java>
-        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
-              destdir="${amserver.classes.dir}" source="1.5" target="1.5"
-              debug="${build.debug}" debuglevel="${build.debuglevel}" >
-            <src path="${amserver.built.src.dir}/com/sun/identity/entitlement/xacml3/core" />
-        </javac>
+	<antcall target="am-xacml" />
 
         <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
             destdir="${amserver.classes.dir}"
@@ -444,7 +438,7 @@
              inheritRefs="true" target="clean"/>
     </target>
 
-    <target name="am-mib">
+    <target name="am-mib" unless="amserver.mib.done">
         <mkdir dir="${amserver.built.dir}/mib" />
         <mkdir dir="${amserver.built.dir}/jdmk" />
         <unzip src="${extlib.dir}/jdmk51_02-allplatforms.zip"
@@ -460,6 +454,23 @@
             <arg line="-d ${amserver.built.dir}/mib -tp com.sun.identity.monitoring ${amserver.base.dir}/resources/mib/SUN-OPENSSO-SERVER.mib"/>
         </java>
 	<delete file="${amserver.built.dir}/mib/SUN_OPENSSO_SERVER_MIB.java" />
+        <property name="amserver.mib.done" value="true" />
+	<concat destfile="${tracker}" append="true">amserver.mib.done=true&#10;</concat>
+    </target>
+    
+    <target name="am-xacml" unless="amserver.xacml.done">
+        <java classname="com.sun.tools.internal.xjc.Driver"
+            classpath="${env.JAVA_HOME}/lib/tools.jar"
+            maxmemory="256m" failonerror="true" fork="true">
+            <arg line="-b ${amserver.built.xsd.dir}/xacml-core-v3.xjb -extension -d ${amserver.built.src.dir} ${amserver.built.xsd.dir}/xacml-core-v3-schema-cd-1.xsd"/>
+        </java>
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+              destdir="${amserver.classes.dir}" source="1.5" target="1.5"
+              debug="${build.debug}" debuglevel="${build.debuglevel}" >
+            <src path="${amserver.built.src.dir}/com/sun/identity/entitlement/xacml3/core" />
+        </javac>
+        <property name="amserver.xacml.done" value="true" />
+        <concat destfile="${tracker}" append="true">amserver.xacml.done=true&#10;</concat>
     </target>
 
     <target name="usage">
