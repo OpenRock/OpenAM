@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.authentication.modules.ldap;
 
@@ -407,7 +410,7 @@ public class LDAP extends AMLoginModule {
         try {
             
             if (currentState == ISAuthConstants.LOGIN_START) {
-                if (callbacks !=null && callbacks.length == 0) {
+                if (callbacks == null || callbacks.length == 0) {
                     userName = (String) sharedState.get(getUserKey());
                     userPassword = (String) sharedState.get(getPwdKey());
                     if (userName == null || userPassword == null) {
