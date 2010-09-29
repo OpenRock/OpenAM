@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.tools.bundles;
 
 import com.iplanet.am.util.SystemProperties;
@@ -121,13 +125,17 @@ public class Main implements SetupConstants{
                     System.out.println(bundle.getString("message.error.dir"));
                     System.exit(1);
                 }
-                boolean created = new File(debugPath).mkdirs();
+
+                File path = new File(debugPath);
+                boolean created = path.exists() || path.mkdirs();
                 if (!created) {
                     System.out.println(bundle.getString(
                         "message.error.debug.dir.not.writable"));
                     System.exit(1);                        
                 }
-                created = new File(logPath).mkdirs();
+
+                path = new File(logPath);
+                created = path.exists() || path.mkdirs();
                 if (!created) {
                     System.out.println(bundle.getString(
                         "message.error.log.dir.not.writable"));
