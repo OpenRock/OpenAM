@@ -42,12 +42,12 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.jato.view.View;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
 
@@ -510,7 +510,10 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     private final static String DEFAULT_LOGOUT_PAGE = "openam.authentication.distUI.defaultLogoutPage";
     
     static {
+        serviceUri = SystemProperties.get(
+             Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
         LOGINURL = serviceUri + "/UI/Login";
+        AuthClientUtils.setServiceURI(LOGINURL);
     }
 }
 
