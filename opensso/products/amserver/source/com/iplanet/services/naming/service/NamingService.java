@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.services.naming.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -116,6 +120,10 @@ public class NamingService implements RequestHandler, ServiceListener {
      * if a new platform server is added or gets deleted
      */
     static {
+        initialize();
+    }
+
+    public static void initialize() {
         namingDebug = Debug.getInstance("amNaming");
         platformProperties = SystemProperties.getAll();
         server_proto = platformProperties.getProperty(
@@ -157,7 +165,6 @@ public class NamingService implements RequestHandler, ServiceListener {
         } catch (Exception ne) {
             namingDebug.error("Naming Initialization failed.", ne);
         }
-
     }
 
     public NamingService() {

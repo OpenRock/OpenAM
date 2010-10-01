@@ -40,6 +40,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.naming.service.NamingService;
 import com.sun.identity.authentication.UI.LoginLogoutMapping;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.internal.server.SMSAuthModule;
@@ -1035,6 +1036,8 @@ public class AMSetupServlet extends HttpServlet {
         Crypt.reinitialize();
         initDSConfigMgr(strServerConfigXML);
         AdminUtils.initialize();
+        WebtopNaming.initialize();
+        NamingService.initialize();
         SMSAuthModule.initialize();
         SystemProperties.initializeProperties(prop, true, true);
         DebugPropertiesObserver.getInstance().notifyChanges();

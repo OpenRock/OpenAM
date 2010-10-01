@@ -156,6 +156,10 @@ public class WebtopNaming {
     private static Map mapSiteToServer = new HashMap();
 
     static {
+        initialize();
+    }
+
+    public static void initialize() {
         serverMode = Boolean.valueOf(
                 System.getProperty(Constants.SERVER_MODE, SystemProperties.get(
                         Constants.SERVER_MODE, "false"))).booleanValue();
