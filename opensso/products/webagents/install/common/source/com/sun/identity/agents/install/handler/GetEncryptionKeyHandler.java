@@ -26,9 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.agents.install.handler;
 
-import java.util.ArrayList;
 
 import com.sun.identity.install.tools.admin.IToolsOptionHandler;
 import com.sun.identity.install.tools.handler.ConfigHandlerBase;
@@ -36,6 +39,7 @@ import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.EncryptionKeyGenerator;
+import java.util.List;
 
 /**
  * The class generates a random encryption key 
@@ -47,7 +51,7 @@ public class GetEncryptionKeyHandler extends ConfigHandlerBase
         super();
     }
     
-    public boolean checkArguments(ArrayList arguments) {        
+    public boolean checkArguments(List arguments) {        
         // There should be no arguments to this option. If there is any it 
         // would an error.       
         boolean validArgs = true;
@@ -62,7 +66,7 @@ public class GetEncryptionKeyHandler extends ConfigHandlerBase
         return validArgs;
     }
        
-    public void handleRequest(ArrayList arguments) {
+    public void handleRequest(List arguments) {
         String encryptKey = EncryptionKeyGenerator.generateRandomString();
         Console.println();
         Console.println(
