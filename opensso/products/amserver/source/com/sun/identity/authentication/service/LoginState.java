@@ -4800,6 +4800,11 @@ public class LoginState {
                 messageId.append("_").append(error);
             }
             String[] data = (String[])dataList.toArray(new String[0]);
+            String contextId = null;
+            SSOToken localSSOToken = getSSOToken();
+            if (localSSOToken != null) {
+                contextId = localSSOToken.getProperty(Constants.AM_CTX_ID);
+            }
             
             Hashtable props = new Hashtable();
             if (client != null) {
@@ -4837,6 +4842,10 @@ public class LoginState {
             if (session != null) {
                 props.put(LogConstants.LOGIN_ID_SID, sid.toString());
             }
+            if (contextId != null) {
+                props.put(LogConstants.CONTEXT_ID, contextId);
+            }
+
             ad.logIt(data,ad.LOG_ERROR,messageId.toString(), props);
         } catch (Exception e) {
             debug.error("Error creating logFailed message" ,e );
