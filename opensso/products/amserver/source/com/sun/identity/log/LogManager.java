@@ -32,6 +32,7 @@ import java.io.File;
 import java.lang.SecurityException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.util.Hashtable;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.Enumeration;
@@ -72,6 +73,13 @@ public class LogManager extends java.util.logging.LogManager {
     public static String FORMATTER = "Formatter";
     
     public static boolean isMonitoringInit = false;
+
+    /*
+     * A list to maintain strong references to all loggers that are added,
+     * workaround for the file handle issue in OPENAM-184.
+     */
+    private static Hashtable loggersTable = new Hashtable();
+
 
     /**
      * Indicator for whether the first readConfiguration has happened
@@ -117,6 +125,11 @@ public class LogManager extends java.util.logging.LogManager {
             logger = new Logger(name, rbName);
         }
         boolean addSuccess = super.addLogger(logger);
+
+        // Workaround for OPENAM-184, maintains strong reference to the loggers until this class is collected
+        // The Hashtable will never be used to retrieve loggers, only to keep then  strongly referenced
+        loggersTable.put(name, logger);
+
         if(addSuccess){
             Enumeration loggerNames = getLoggerNames();
             int lcnt = 0;
