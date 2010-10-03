@@ -804,7 +804,7 @@ public class AMSetupServlet extends HttpServlet {
                 regService.registers(adminSSOToken, bUseExtUMDS);
                 processDataRequests("/WEB-INF/template/sms");
             }
-            
+
             // Set installTime to false, to avoid in-memory notification from
             // SMS in cases where not needed, and to denote that service  
             // registration got completed during configuration phase and it 
@@ -820,6 +820,10 @@ public class AMSetupServlet extends HttpServlet {
                 SetupConstants.CONFIG_VAR_DATA_STORE);
             boolean embedded = dataStore.equals(
                 SetupConstants.SMS_EMBED_DATASTORE);
+            // Ensure this service are initialized before continuing
+            WebtopNaming.initialize();
+            NamingService.initialize();
+
             if (embedded) {
                 try {
                     String serverID = WebtopNaming.getAMServerID();
@@ -1036,8 +1040,6 @@ public class AMSetupServlet extends HttpServlet {
         Crypt.reinitialize();
         initDSConfigMgr(strServerConfigXML);
         AdminUtils.initialize();
-        WebtopNaming.initialize();
-        NamingService.initialize();
         SMSAuthModule.initialize();
         SystemProperties.initializeProperties(prop, true, true);
         DebugPropertiesObserver.getInstance().notifyChanges();
