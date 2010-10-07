@@ -1423,9 +1423,18 @@ public class IDPSSOUtil {
             IDPAccountMapper idpAccountMapper = 
                 SAML2Utils.getIDPAccountMapper(realm, idpEntityID);
             nameID = idpAccountMapper.getNameID(session, idpEntityID,
-                spNameQualifier, realm, nameIDFormat); 
+                spNameQualifier, realm, nameIDFormat);
 
-            if (!isTransient && allowCreate) {
+            // If the IdP has received a request from a remote SP for which it has
+            // been configured not to persist the Federation if unspecified NameID
+            // Format has been set
+            boolean spDoNotWriteFedInfoInIdP = isSPDoNotWriteFedInfoInIdP(realm,
+                        remoteEntityID, metaManager) &&
+                        SAML2Constants.UNSPECIFIED.equals(nameIDFormat);
+            boolean writeFedInfo = !isTransient && !spDoNotWriteFedInfoInIdP;
+            SAML2Utils.debug.message(classMethod + " writeFedInfo = " + writeFedInfo);
+
+            if (writeFedInfo && allowCreate) {
                 // write federation info the into persistent datastore
                 if (SAML2Utils.isDualRole(idpEntityID,realm)){
                     nameIDInfo = new NameIDInfo(idpEntityID, remoteEntityID,
@@ -1436,7 +1445,7 @@ public class IDPSSOUtil {
                 }
                 AccountUtils.setAccountFederation(nameIDInfo, userName);
             }
-            if (!isTransient) {
+            if (writeFedInfo) {
                 isNewFederation.setValue(true);
             } else {
                 isNewFederation.setValue(false);
@@ -2922,5 +2931,85 @@ public class IDPSSOUtil {
         }
 
         return idpAdapter;
+    }
+
+    /**
+     * Returns  <code>true</code> or <code>false</code>
+     * depending if the flag  spDoNotWriteFederationInfo is set in the
+     * SP Extended metadata
+     *
+     * @param realm the realm name
+     * @param spEntityID the entity id of the Service Provider
+     * @param metaManager the SAML2MetaMAnager used to read the extendede metadata
+     * @return the <code>true/false</code>
+     * @exception SAML2Exception if the operation is not successful
+     */
+    private static Boolean isSPDoNotWriteFedInfoInIdP(
+                                 String realm, String spEntityID, SAML2MetaManager metaManager)
+        throws SAML2Exception {
+        String methodName = "isSPDoNotWriteFedInfoInIdp";
+
+        Boolean isSPDoNotWriteFedInfoEnabled = false;
+        SAML2Utils.debug.message("IDPSSOUtil." + methodName + "Entering");
+
+        try {
+            String SPDoNotWriteFedInfo = getAttributeValueFromSPSSOConfig(realm,
+                    spEntityID, metaManager,
+                    SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO);
+
+            if (SPDoNotWriteFedInfo != null && !SPDoNotWriteFedInfo.isEmpty()) {
+                SAML2Utils.debug.message("IDPSSOUtil." + methodName +
+                        ": SPDoNotWriteFedInfo is: " +  SPDoNotWriteFedInfo);
+                isSPDoNotWriteFedInfoEnabled = SPDoNotWriteFedInfo.equalsIgnoreCase("true");
+            } else {
+                SAML2Utils.debug.message("IDPSSOUtil." + methodName +
+                        ": SPDoNotWriteFedInfo is: not configured");
+                isSPDoNotWriteFedInfoEnabled = false;
+            }
+        } catch (Exception ex) {
+            SAML2Utils.debug.error("IDPSSOUtil." + methodName +
+                "Unable to get the spDoNotWriteFedInfo flag.", ex);
+            throw new SAML2Exception(ex);
+        }
+
+        return isSPDoNotWriteFedInfoEnabled ;
+    }
+
+    /**
+     * Retrieves attribute value for a given attribute name from
+     * <code>SPSSOConfig</code>.
+     * @param orgName realm or organization name the service provider resides in
+     * @param hostEntityId hosted service provider's Entity ID.
+     * @param sm <code>SAML2MetaManager</code> instance to perform meta
+     *                operations.
+     * @param attrName name of the attribute whose value ot be retrived.
+     * @return value of the attribute; or <code>null</code> if the attribute
+     *                if not configured, or an error occured in the process.
+     */
+    private static String getAttributeValueFromSPSSOConfig(String orgName,
+                                                        String hostEntityId,
+                                                        SAML2MetaManager sm,
+                                                        String attrName)
+    {
+        String result = null;
+        try {
+            SPSSOConfigElement config = sm.getSPSSOConfig(orgName,
+                                                        hostEntityId);
+            if (config == null) {
+                return null;
+            }
+            Map attrs = SAML2MetaUtils.getAttributes(config);
+            List value = (List) attrs.get(attrName);
+            if (value != null && value.size() != 0) {
+                result = ((String) value.iterator().next()).trim();
+            }
+        } catch (SAML2MetaException sme) {
+            if (SAML2Utils.debug.messageEnabled()) {
+                SAML2Utils.debug.message("IDPSSOUtil.getAttributeValueFromSPSSO"
+                        + " Config:", sme);
+            }
+            result = null;
+        }
+        return result;
     }
 }

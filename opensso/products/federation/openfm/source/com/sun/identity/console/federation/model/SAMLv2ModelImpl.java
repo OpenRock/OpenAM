@@ -96,8 +96,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     private static Map extendedAPMetaIdpMap = new HashMap(14);
     private static Map extendedSMetaIdpMap = new HashMap(2);
     private static Map extendedAdMetaIdpMap = new HashMap(9);
-    private static Map extendedMetaSpMap = new HashMap(64);
-    private static Map extendedACMetaSpMap = new HashMap(36);
+    private static Map extendedMetaSpMap = new HashMap(65);
+    private static Map extendedACMetaSpMap = new HashMap(37);
     private static Map extendedAPMetaSpMap = new HashMap(30);
     private static Map extendedSMetaSpMap = new HashMap(2);
     private static Map extendedAdMetaSpMap = new HashMap(20);
@@ -233,6 +233,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         //RelayState URL List
         extendedMetaSpMap.put(ATTR_RELAY_STATE_SP_URL_LIST,
                 Collections.EMPTY_SET);
+        
+        // Do Not Write Federation Info Feature
+        extendedMetaSpMap.put(ATTR_DO_NOT_WRITE_FEDERATION_INFO,
+                Collections.EMPTY_SET);
     }
     
     //extended Assertion Content metadata attributes for idp only    
@@ -320,7 +324,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedACMetaSpMap.put(SP_BASIC_AUTH_ON, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(SP_BASIC_AUTH_USER, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(SP_BASIC_AUTH_PWD, Collections.EMPTY_SET);
-        
+        extendedACMetaSpMap.put(ATTR_DO_NOT_WRITE_FEDERATION_INFO, Collections.EMPTY_SET);
     }
     
     //extended Assertion Processing metadata attributes for sp only    
@@ -340,6 +344,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
        extendedAPMetaSpMap.put(ATTR_SP_ADAPTER, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(ATTR_SP_ADAPTER_ENV, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(ARTI_MSG_ENCODE, Collections.EMPTY_SET);
+       // extendedAPMetaSpMap.put(ATTR_DO_NOT_WRITE_FEDERATION_INFO, Collections.EMPTY_SET);
     }
     
     //extended Services metadata attributes for sp only    

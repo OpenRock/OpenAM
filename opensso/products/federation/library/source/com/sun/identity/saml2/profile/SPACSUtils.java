@@ -1263,8 +1263,11 @@ public class SPACSUtils {
 
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(
             nameId.getFormat());
-        boolean writeFedInfo = ((!isTransient) && (!SAML2Utils.isFedInfoExists(
-            userName, hostEntityId, remoteHostId, nameId)));
+        boolean spDoNotWriteFedInfo = isSPDoNotWriteFedInfo(realm, hostEntityId, metaManager) &&
+                SAML2Constants.UNSPECIFIED.equals(nameId.getFormat());
+        boolean writeFedInfo = ( (!isTransient && !spDoNotWriteFedInfo) &&
+                (!SAML2Utils.isFedInfoExists(
+                    userName, hostEntityId, remoteHostId, nameId)));
             // TODO: check if this few lines are needed
             /*
                 DN dnObject = new DN(userName);
@@ -1731,7 +1734,7 @@ public class SPACSUtils {
     /** Sets Discovery bootstrap credentials in the SSOToken
      *
      *  @param sessionProvider session provider.
-     *  @param asserion assertion.
+     *  @param assertion assertion.
      *  @param session the valid session object.
      */
     private static void setDiscoBootstrapCredsInSSOToken(
@@ -2124,6 +2127,49 @@ public class SPACSUtils {
         }
         return createMapForFedlet(respInfo, realRedirectUrl, hostEntityId); 
     }
+
+     /**
+     * Returns  <code>true</code> or <code>false</code>
+     * depending if the flag  spDoNotWriteFederationInfo is set in the
+     * SP Extended metadata
+     *
+     * @param realm the realm name
+     * @param spEntityID the entity id of the Service Provider
+     * @param metaManager the SAML2MetaMAnager used to read the extendede metadata
+     * @return the <code>true/false</code>
+     * @exception SAML2Exception if the operation is not successful
+     */
+    private static Boolean isSPDoNotWriteFedInfo(
+                                 String realm, String spEntityID, SAML2MetaManager metaManager)
+        throws SAML2Exception {
+        String methodName = "isSPDoNotWriteFedInfo";
+
+        Boolean isSPDoNotWriteFedInfoEnabled = false;
+        SAML2SDKUtils.debug.message("SPACSUtils." + methodName + "Entering");
+
+        try {
+            String SPDoNotWriteFedInfo = getAttributeValueFromSPSSOConfig(realm,
+                    spEntityID, metaManager,
+                    SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO);
+
+            if (SPDoNotWriteFedInfo != null && !SPDoNotWriteFedInfo.isEmpty()) {
+                SAML2SDKUtils.debug.message("SPACSUtils." + methodName +
+                        ": SPDoNotWriteFedInfo is: " +  SPDoNotWriteFedInfo);
+                isSPDoNotWriteFedInfoEnabled = SPDoNotWriteFedInfo.equalsIgnoreCase("true");
+            } else {
+                SAML2SDKUtils.debug.message("SPACSUtils." + methodName +
+                        ": SPDoNotWriteFedInfo is: not configured");
+                isSPDoNotWriteFedInfoEnabled = false;
+            }
+        } catch (Exception ex) {
+            SAML2Utils.debug.error(methodName +
+                "Unable to get the SPDoNotWriteFedInfo flag.", ex);
+            throw new SAML2Exception(ex);
+        }
+
+        return isSPDoNotWriteFedInfoEnabled ;
+    }
+
 
     private static Map createMapForFedlet(
         ResponseInfo respInfo, String relayUrl, String hostedEntityId) {

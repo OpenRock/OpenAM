@@ -272,7 +272,10 @@ public interface SAMLv2Model
     // SAMLv2 Service Provider Adapter feature
      public static final String ATTR_SP_ADAPTER = "spAdapter";
      public static final String ATTR_SP_ADAPTER_ENV = "spAdapterEnv";
-     
+
+     // SAMLv2 Service Provider Do not Write Federation Info Feature
+     public static final String ATTR_DO_NOT_WRITE_FEDERATION_INFO = "spDoNotWriteFederationInfo";
+
      //SAML AUTHORITY
      public static final String ATTR_SEFVICE_DEFAULT_LOCATION = 
              "attrSerdefaultLocation";

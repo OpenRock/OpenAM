@@ -1570,4 +1570,12 @@ public interface SAML2Constants {
      * Map key used in SLO request redirect code
      */
     public static final String OUTPUT_DATA = "OUTPUT_DATA";
+
+    /**
+     * Flag to Indicate that we do not want to write the Federation info
+     * in the SP local User Data Store. This flag is set in the local SP
+     * extended metadata configuration
+     */
+    public static final String SP_DO_NOT_WRITE_FEDERATION_INFO =
+            "spDoNotWriteFederationInfo";
 } 
