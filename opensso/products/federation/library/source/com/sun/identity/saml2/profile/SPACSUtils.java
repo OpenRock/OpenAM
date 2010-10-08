@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
@@ -2063,20 +2067,16 @@ public class SPACSUtils {
                 request, response, orgName, hostEntityId, metaManager);
         
         Object newSession = null;
-        try {
-            newSession = SPACSUtils.processResponse(
+
+        // Throws a SAML2Exception if the response cannot be validated
+        // or contains a non-Success StatusCode, invoking the SPAdapter SPI
+        // for taking action on the failed validation.
+        // The resulting exception has its redirectionDone flag set if
+        // the SPAdapter issued a HTTP redirect.
+        newSession = SPACSUtils.processResponse(
                     request, response, metaAlias, null, respInfo,
                     orgName, hostEntityId, metaManager);
-        } catch (SAML2Exception se) {
-            SAML2SDKUtils.debug.message("SPACSUtils.processResponseForFedlet",
-                    se);
-            if (se.isRedirectionDone()) {
-                // response had been redirected already.
-                return createMapForFedlet(respInfo, null, hostEntityId);
-            }
-            throw new SAML2Exception(
-                    SAML2SDKUtils.bundle.getString("SSOFailed"));
-        }
+        
         SAML2SDKUtils.debug.message("SSO SUCCESS");
         String[] redirected = sessionProvider.getProperty(newSession,
                 SAML2Constants.RESPONSE_REDIRECTED);
