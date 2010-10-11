@@ -84,7 +84,7 @@ void log_version_info() {
 
     if(Version::getBuildRev() != NULL) {
         Log::log(Log::ALL_MODULES, Log::LOG_ALWAYS,
-            "Revision: %s", Version::getBuildRev());
+            "%s", Version::getBuildRev());
     }
     if(Version::getBuildDate() != NULL) {
         Log::log(Log::ALL_MODULES, Log::LOG_ALWAYS,
