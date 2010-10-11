@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 #include <string>
 
@@ -79,11 +82,15 @@ void log_version_info() {
     Log::log(Log::ALL_MODULES, Log::LOG_ALWAYS, "%s",
             versionStr.c_str());
 
+    if(Version::getBuildRev() != NULL) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ALWAYS,
+            "Revision: %s", Version::getBuildRev());
+    }
     if(Version::getBuildDate() != NULL) {
         Log::log(Log::ALL_MODULES, Log::LOG_ALWAYS,
             "Build Date: %s", Version::getBuildDate());
     }
-    if(Version::getBuildDate() != NULL) {
+    if(Version::getBuildMachine() != NULL) {
         Log::log(Log::ALL_MODULES, Log::LOG_ALWAYS,
             "Build Machine: %s", Version::getBuildMachine());
     }

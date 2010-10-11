@@ -29,6 +29,10 @@
  * Version object
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 #ifndef _VERSION_H_
 #define _VERSION_H_
 #include "internal_macros.h"
@@ -54,6 +58,7 @@ public:
             return NULL;
         }
     }
+    static const char* getBuildRev() {return "SVN_REVISION";}
     static const char* getBuildDate() {return "BUILD_DATE";}
     static const char* getBuildMachine() {return "BUILD_MACHINE";}
 };
