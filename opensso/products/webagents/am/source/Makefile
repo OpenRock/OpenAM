@@ -232,6 +232,7 @@ $(TEST_LIB): $(OBJS) $(TEST_LIB_MAP_FILE)
 version.h: version.template
 	sed -e 's%BUILD_DATE%$(BUILD_DATE)%g' \
 	    -e 's%BUILD_MACHINE%$(BUILD_MACHINE)%g' \
+	    -e 's%SVN_REVISION%$(SVN_REVISION)%g' \
 	    -e 's%AGENT_VER%$(AGENT_VER)%g' \
 	    -e 's%AGENT_ER_VER%$(AGENT_ER_VER)%g' \
 	    -e 's%AGENT_FVB_MARKER%$(AGENT_FVB_MARKER)%g' $< > $@
@@ -239,6 +240,7 @@ version.h: version.template
 $(USERX_ROOT)/.version: $(USERX_ROOT)/version.template
 	sed -e 's%BUILD_DATE%$(BUILD_DATE)%g' \
 	    -e 's%BUILD_MACHINE%$(BUILD_MACHINE)%g' \
+	    -e 's%SVN_REVISION%$(SVN_REVISION)%g' \
 	    -e 's%AGENT_VER%$(AGENT_VER)%g' \
 	    -e 's%AGENT_ER_TEXT%$(AGENT_ER_TEXT)%g' \
 	    -e 's%AGENT_FVB_TEXT%$(AGENT_FVB_TEXT)%g' $< > $@

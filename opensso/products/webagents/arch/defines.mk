@@ -26,6 +26,8 @@
 #
 #
 
+# Portions Copyrighted [2010] [ForgeRock AS]
+
 #
 # This makefile defines a number of standard symbols used in by the
 # makefiles that build the Agent Pack.
@@ -75,7 +77,9 @@ endif
 OS_ARCH := $(shell uname -s)
 OS_ARCH_VER := $(shell uname -r)
 BUILD_DATE := $(shell date)
-BUILD_MACHINE := $(shell uname -n)
+SVN_REVISION := $(shell svn info . | grep Revision:)
+#BUILD_MACHINE := $(shell uname -n)
+BUILD_MACHINE := constable.internal.forgerock.com
 MC_ARCH := $(shell uname -m)
 CYGWIN_ARCH := CYG32
 
