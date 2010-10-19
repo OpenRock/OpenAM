@@ -209,6 +209,7 @@ public class Bootstrap {
                 // after SMSEntry.initializedClass.
                 String debugLevel = (String)properties.get(
                     Constants.SERVICES_DEBUG_LEVEL);
+                if (debugLevel == null)  debugLevel = Debug.STR_ERROR;
                 properties.setProperty(Constants.SERVICES_DEBUG_LEVEL,
                     Debug.STR_ERROR);
                 SystemProperties.initializeProperties(
