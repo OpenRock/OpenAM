@@ -24,6 +24,11 @@
  *
  * $Id: EntitlementCombiner.java,v 1.4 2009/12/07 19:46:45 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -110,6 +115,7 @@ public abstract class EntitlementCombiner {
                 mergeActionValues(rootE, e);
                 mergeAdvices(rootE, e);
                 mergeAttributes(rootE, e);
+                mergeTimeToLiveValue(rootE, e);
             }
         } else {
             boolean isRegExComparator = (resourceComparator instanceof 
@@ -123,21 +129,24 @@ public abstract class EntitlementCombiner {
                         mergeActionValues(existing, e);
                         mergeAdvices(existing, e);
                         mergeAttributes(existing, e);
+                        mergeTimeToLiveValue(existing, e);
                         toAdd = false;
                     } else if (match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
                         mergeActionValues(existing, e);
                         mergeAdvices(existing, e);
                         mergeAttributes(existing, e);
-                    } else if (match.equals(ResourceMatch.SUPER_RESOURCE_MATCH)
-                    ) {
+                        mergeTimeToLiveValue(existing, e);
+                    } else if (match.equals(ResourceMatch.SUPER_RESOURCE_MATCH)) {
                         mergeActionValues(e, existing);
                         mergeAdvices(e, existing);
                         mergeAttributes(e, existing);
+                        mergeTimeToLiveValue(existing, e);
                     } else if (!isRegExComparator &&
                         match.equals(ResourceMatch.WILDCARD_MATCH)) {
                         mergeActionValues(e, existing);
                         mergeAdvices(e, existing);
                         mergeAttributes(e, existing);
+                        mergeTimeToLiveValue(existing, e);
                     }
                 }
 
@@ -146,6 +155,7 @@ public abstract class EntitlementCombiner {
                         e.getResourceName(), e.getActionValues());
                     tmp.setAttributes(e.getAttributes());
                     tmp.setAdvices(e.getAdvices());
+                    tmp.setTTL(e.getTTL());
                     results.add(tmp);
                 }
             }
@@ -273,6 +283,19 @@ public abstract class EntitlementCombiner {
             }
         }
         e1.setAttributes(result);
+    }
+
+    /**
+     * Merges time to live values. The lowest of the TTL values is set as the
+     * TTL.
+     *
+     * @param e1 Entitlement
+     * @param e2 Entitlement
+     */
+    protected void mergeTimeToLiveValue(Entitlement e1, Entitlement e2) {
+        if (e1.getTTL() > e2.getTTL()) {
+            e1.setTTL(e2.getTTL());
+        }
     }
 
     /**

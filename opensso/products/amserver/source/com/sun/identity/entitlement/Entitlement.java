@@ -80,6 +80,7 @@ public class Entitlement {
     private Map<String, Set<String>> advices;
     private Map<String, Set<String>> attributes;
     private Application application;
+    private long timeToLive = Long.MAX_VALUE;
 
     /**
      * Creates an entitlement object with default service name.
@@ -385,6 +386,24 @@ public class Entitlement {
      */
     public Map<String, Set<String>> getAttributes() {
         return attributes;
+    }
+
+    /**
+     * Sets this entitlements TTL
+     *
+     * @param ttl The TTL to set
+     */
+    public void setTTL(long ttl) {
+        this.timeToLive = ttl;
+    }
+
+    /**
+     * Returns the TTL
+     *
+     * @return The TTL in ms
+     */
+    public long getTTL() {
+        return this.timeToLive;
     }
 
     /**

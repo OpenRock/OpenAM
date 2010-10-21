@@ -31,6 +31,7 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -42,11 +43,11 @@ import com.sun.identity.session.util.RestrictedTokenContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -120,6 +121,7 @@ public class OpenSSOPrivilege extends Privilege {
         long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :
             EVAL_SINGLE_LEVEL_MONITOR.start();
         List<Entitlement> results = new ArrayList<Entitlement>();
+        Set<ConditionDecision> decisions = new HashSet();
 
         if (!isActive()) {
             Entitlement origE = getEntitlement();
@@ -133,7 +135,7 @@ public class OpenSSOPrivilege extends Privilege {
         if (doesSubjectMatch(adminSubject, realm, advices, subject,
             resourceName, environment) &&
             doesConditionMatch(realm, advices, subject, resourceName,
-            environment)
+            environment, decisions)
             ) {
             Entitlement origE = getEntitlement();
             Set<String> resources = origE.evaluate(adminSubject, realm,
@@ -151,6 +153,7 @@ public class OpenSSOPrivilege extends Privilege {
                 e.setAttributes(getAttributes(adminSubject, realm, subject,
                     resourceName, environment));
                 e.setAdvices(advices);
+                e.setTTL(getLowestDecisionTTL(decisions));
                 results.add(e);
             }
         } else {
@@ -158,6 +161,7 @@ public class OpenSSOPrivilege extends Privilege {
             Entitlement e = new Entitlement(origE.getApplicationName(),
                 origE.getResourceName(), Collections.EMPTY_SET);
             e.setAdvices(advices);
+            e.setTTL(getLowestDecisionTTL(decisions));
             results.add(e);
         }
 
@@ -204,5 +208,17 @@ public class OpenSSOPrivilege extends Privilege {
      */
     public String getPolicyName() {
         return this.policyName;
+    }
+
+    protected long getLowestDecisionTTL(Set<ConditionDecision> decisions) {
+        long minTTL = Long.MAX_VALUE;
+
+        for (ConditionDecision decision : decisions) {
+            if (minTTL > decision.getTimeToLive()) {
+                minTTL = decision.getTimeToLive();
+            }
+        }
+
+        return minTTL;
     }
 }

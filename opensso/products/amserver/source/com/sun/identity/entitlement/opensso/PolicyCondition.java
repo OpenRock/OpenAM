@@ -25,6 +25,10 @@
  * $Id: PolicyCondition.java,v 1.2 2010/01/08 22:12:49 farble1670 Exp $
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -44,10 +48,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 /**
  * This condition wraps all OpenSSO policy condition.
  */
+
 public class PolicyCondition extends  EntitlementConditionAdaptor {
     private String className;
     private String name;
@@ -176,7 +180,7 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
             SSOToken token = (subject != null) ? getSSOToken(subject) : null;
             com.sun.identity.policy.ConditionDecision dec =
                 cond.getConditionDecision(token, environment);
-            return new ConditionDecision(dec.isAllowed(), dec.getAdvices());
+            return new ConditionDecision(dec.isAllowed(), dec.getAdvices(), dec.getTimeToLive());
         } catch (SSOException ex) {
             throw new EntitlementException(510, ex);
         } catch (PolicyException ex) {

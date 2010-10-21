@@ -24,6 +24,11 @@
  *
  * $Id: ConditionDecision.java,v 1.3 2009/09/05 00:24:04 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.entitlement;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +42,7 @@ public class ConditionDecision {
     private Map<String, Set<String>> advices;
     public static final String TIME_TO_LIVE = "timeToLive";
     public static final String MAX_TIME = "maxTime";
+    private long timeToLive = Long.MAX_VALUE;
 
     /**
      * Constructs an instance of <code>ConditionDecision</code>
@@ -48,6 +54,21 @@ public class ConditionDecision {
         Map<String, Set<String>> advices) {
         this.satisfied = satisfied;
         this.advices = advices;
+    }
+
+    /**
+     * Constructs an instance of <code>ConditionDecision</code>
+     * @param satisfied boolean result of condition decision
+     * @param advices advice map of condition decision
+     * @param ttl The TTL of the decision
+     */
+    public ConditionDecision(
+        boolean satisfied,
+        Map<String, Set<String>> advices,
+        long ttl) {
+        this.satisfied = satisfied;
+        this.advices = advices;
+        this.timeToLive = ttl;
     }
 
     /**
@@ -86,5 +107,14 @@ public class ConditionDecision {
                 advices.putAll(otherAdvices);
             }
         }
+    }
+
+    /**
+     * Returns the TTL of this decision
+     *
+     * @return The TTL time in ms
+     */
+    public long getTimeToLive() {
+        return timeToLive;
     }
 }

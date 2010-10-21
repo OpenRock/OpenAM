@@ -616,7 +616,8 @@ public abstract class Privilege implements IPrivilege {
         Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment
+        Map<String, Set<String>> environment,
+        Set decisions
     ) throws EntitlementException {
         boolean result = true;
 
@@ -628,6 +629,7 @@ public abstract class Privilege implements IPrivilege {
                 resultAdvices.putAll(advices);
             }
             result = decision.isSatisfied();
+            decisions.add(decision);
         }
 
         if (PrivilegeManager.debug.messageEnabled()) {

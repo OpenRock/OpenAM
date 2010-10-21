@@ -1521,6 +1521,7 @@ public class PolicyEvaluator {
 
                 ActionDecision ad = new ActionDecision(actionName, set);
                 ad.setAdvices(entitlement.getAdvices());
+                ad.setTimeToLive(entitlement.getTTL());
                 pd.addActionDecision(ad, serviceType);
             }
         } else {
@@ -1551,10 +1552,12 @@ public class PolicyEvaluator {
                 }
                 ActionDecision ad = new ActionDecision(actionName, set);
                 ad.setAdvices(entitlement.getAdvices());
+                ad.setTimeToLive(entitlement.getTTL());
                 pd.addActionDecision(ad, serviceType);
             }
         }
 
+        pd.setTimeToLive(entitlement.getTTL());
         pd.setResponseAttributes(entitlement.getAttributes());
         return pd;
     }
