@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2010 ForgeRock AS
+ */
+
 package com.sun.identity.idsvcs.opensso;
 
 import com.iplanet.am.util.SystemProperties;
@@ -1847,6 +1851,7 @@ public class IdentityServicesImpl
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             SSOToken t = mgr.createSSOToken(token.getId());
             mgr.validateToken(t);
+            mgr.refreshSession(t);
         } catch (SSOException e) {
             // Token is not valid
             throw (new InvalidToken(e.getMessage()));
