@@ -30,6 +30,7 @@
 
 package com.sun.identity.policy.plugins;
 
+import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.ResourceMatch;
 import com.sun.identity.shared.debug.Debug;
@@ -91,6 +92,26 @@ public class HttpURLResourceName extends URLResourceName {
 
         if (debug.messageEnabled()) {
             debug.message("HttpURLResourceName.compare: "
+                          + "request resource=" + requestResource
+                          + "; policy resource=" + targetResource);
+        }
+
+        String requestResourceCanonicalized = null;
+        String targetResourceCanonicalized = null;
+
+        try {
+            requestResourceCanonicalized = canonicalize(requestResource);
+            targetResourceCanonicalized = canonicalize(targetResource);
+            requestResource = requestResourceCanonicalized;
+            targetResource = targetResourceCanonicalized;
+        } catch (PolicyException pe) {
+            debug.error("HttpURLResourceName.compare: " +
+                        "Unable to canonicalize URLs", pe);
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("HttpURLResourceName.compare: "
+                          + "after canonicalization: "
                           + "request resource=" + requestResource
                           + "; policy resource=" + targetResource);
         }
