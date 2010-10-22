@@ -209,7 +209,13 @@ public class Bootstrap {
                 // after SMSEntry.initializedClass.
                 String debugLevel = (String)properties.get(
                     Constants.SERVICES_DEBUG_LEVEL);
-                if (debugLevel == null)  debugLevel = Debug.STR_ERROR;
+
+                boolean debugSetAtDefault = false;
+
+                if (debugLevel == null) {
+                    debugSetAtDefault = true;
+                }
+
                 properties.setProperty(Constants.SERVICES_DEBUG_LEVEL,
                     Debug.STR_ERROR);
                 SystemProperties.initializeProperties(
@@ -222,10 +228,24 @@ public class Bootstrap {
                 Crypt.reinitialize();
                 BootstrapData.loadServerConfigXML(serverConfigXML);
                 SMSEntry.initializeClass();
-                properties.setProperty(Constants.SERVICES_DEBUG_LEVEL,
-                    debugLevel);
+
+                if (debugSetAtDefault) {
+                    properties.remove(Constants.SERVICES_DEBUG_LEVEL);
+                }
+
                 SystemProperties.initializeProperties(
                     properties, true, true);
+
+                String defaultDebugLevel =
+                        SystemProperties.getProperties().getProperty(Constants.SERVICES_DEBUG_LEVEL);
+
+                if (defaultDebugLevel == null) {
+                    properties.setProperty(Constants.SERVICES_DEBUG_LEVEL,
+                        Debug.STR_ERROR);
+                    SystemProperties.initializeProperties(
+                        properties, true, true);
+                }
+
                 AdminUtils.initialize();
                 SMSAuthModule.initialize();
                 debugPO.notifyChanges();
