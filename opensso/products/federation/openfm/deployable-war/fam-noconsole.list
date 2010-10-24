@@ -1335,6 +1335,7 @@
 ./WEB-INF/template/ldif/ad/ad_config_schema.ldif
 ./WEB-INF/template/ldif/ad/ad_user_schema.ldif
 ./WEB-INF/template/ldif/adam/adam_user_schema.ldif
+./WEB-INF/template/opends/opends.zip
 ./WEB-INF/template/ldif/opends/opends_config_schema.ldif
 ./WEB-INF/template/ldif/opends/opends_embinit.ldif
 ./WEB-INF/template/ldif/opends/opends_plugin.ldif
