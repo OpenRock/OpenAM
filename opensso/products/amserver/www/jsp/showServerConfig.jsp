@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2010 ForgeRock AS
+--%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <%@ page import="com.iplanet.sso.SSOException" %>
@@ -51,7 +55,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>OpenSSO</title>
+    <title>OpenAM</title>
     <link rel="stylesheet" type="text/css" href="com_sun_web_ui/css/css_ns6up.css" />
     <link rel="shortcut icon" href="com_sun_web_ui/images/favicon/favicon.ico" type="image/x-icon" />
 </head>
@@ -61,7 +65,7 @@
     <table class="MstTblBot" title="" border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
         <td class="MstTdTtl" width="99%">
-        <div class="MstDivTtl"><img name="AMConfig.configurator.ProdName" src="console/images/PrimaryProductName.png" alt="OpenSSO" border="0" /></div>
+        <div class="MstDivTtl"><img name="AMConfig.configurator.ProdName" src="console/images/PrimaryProductName.png" alt="OpenAM" border="0" /></div>
         </td>
         <td class="MstTdLogo" width="1%"><img name="AMConfig.configurator.BrandLogo" src="com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td>
         </tr>
@@ -89,7 +93,7 @@
                   <td>
               <%
                   Properties propDef = ServerConfiguration.getDefaults(ssoToken);
-                  out.println("<B>OpenSSO Version</B>");
+                  out.println("<B>OpenAM Version</B>");
               %>
                   </td>
                   <td>

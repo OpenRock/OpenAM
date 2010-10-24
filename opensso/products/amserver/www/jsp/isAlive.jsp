@@ -26,6 +26,10 @@
   
 --%>
 
+<%--
+   Portions Copyrighted 2010 ForgeRock AS
+--%>
+
 <%@ page language="java" 
     import="java.security.AccessController,
         com.sun.identity.security.AdminTokenAction,
@@ -37,7 +41,7 @@
 <html>
 
 <head>
-    <title>OpenSSO</title>
+    <title>OpenAM</title>
 </head>
 
 <body>

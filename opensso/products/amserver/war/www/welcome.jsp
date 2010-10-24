@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2010 ForgeRock AS
+--%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <%@ page import="com.sun.identity.setup.AMSetupServlet"%>
@@ -38,7 +42,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>OpenSSO</title>
+    <title>OpenAM</title>
     <link rel="stylesheet" type="text/css" href="com_sun_web_ui/css/css_ns6up.css" />
     <link rel="shortcut icon" href="com_sun_web_ui/images/favicon/favicon.ico" type="image/x-icon" />
 
@@ -161,7 +165,7 @@
           <td>&nbsp;</td>
           <td>
               <div class="logCpy"><span class="logTxtCpy">
-                  Copyright © 2008 Sun Microsystems, Inc.  All rights reserved.  Sun Microsystems, Inc. has intellectual property rights relating to technology embodied in the product that is described in this document. In particular, and without limitation, these intellectual property rights may include one or more of the U.S. patents listed at http://www.sun.com/patents and one or more additional patents or pending patent applications in the U.S. and in other countries.U.S. Government Rights - Commercial software.  Government users are subject to the Sun Microsystems, Inc. standard license agreement and applicable provisions of the FAR and its supplements.  Use is subject to license terms.  This distribution may include materials developed by third parties.Sun,  Sun Microsystems and  the Sun logo are trademarks or registered trademarks of Sun Microsystems, Inc. in the U.S. and other countries.<br>
+                  Copyright © 2010 ForgeRock AS, Philip Pedersens vei 1, 1366 Lysaker, Norway. All rights reserved. Licensed for use under the Common Development and Distribution License (CDDL), see http://www.forgerock.com/license/CDDLv1.0.html  for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.<br>
               </span></div>
           </td>
           <td>&nbsp;</td>
