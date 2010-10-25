@@ -272,17 +272,17 @@ public class CreateSAML2MetaDataViewBean
             hasRole |= addStringToMap(map,
                 MetaTemplateParameters.P_ATTR_AUTHORITY,
                 "tfattrauthority", realm);
-            addStringToMap(map, MetaTemplateParameters.P_ATTR_AUTHORITY_E_CERT,
-                "tfattrascertalias");
             addStringToMap(map, MetaTemplateParameters.P_ATTR_AUTHORITY_S_CERT,
+                "tfattrascertalias");
+            addStringToMap(map, MetaTemplateParameters.P_ATTR_AUTHORITY_E_CERT,
                 "tfattraecertalias");
 
             hasRole |= addStringToMap(map,
                 MetaTemplateParameters.P_AUTHN_AUTHORITY,
                 "tfauthnauthority", realm);
-            addStringToMap(map, MetaTemplateParameters.P_AUTHN_AUTHORITY_E_CERT,
-                "tfauthnascertalias");
             addStringToMap(map, MetaTemplateParameters.P_AUTHN_AUTHORITY_S_CERT,
+                "tfauthnascertalias");
+            addStringToMap(map, MetaTemplateParameters.P_AUTHN_AUTHORITY_E_CERT,
                 "tfauthnaecertalias");
 
             hasRole |= addStringToMap(map, MetaTemplateParameters.P_PEP,
