@@ -1596,7 +1596,7 @@ public class IDPSSOUtil {
                                    HttpServletRequest request, 
                                    StringBuffer rBinding) 
         throws SAML2Exception {
-       
+
         String acsURL = null;
         String acsBinding = null;
         
@@ -1640,9 +1640,14 @@ public class IDPSSOUtil {
             }
             acsBinding = returnedBinding.toString();
         } else {
-           if(acsBinding == null || acsBinding.length() == 0) {
-              acsBinding = getBindingForAcsUrl(spEntityID, realm, acsURL);
-           }
+            if (isACSurlValidInMetadataSP(acsURL, spEntityID, realm)) {
+                if (acsBinding == null || acsBinding.length() == 0) {
+                    acsBinding = getBindingForAcsUrl(spEntityID, realm, acsURL);
+                }
+            } else {
+                String[] args = {acsURL, spEntityID};
+                throw new SAML2Exception("libSAML2", "invalidAssertionConsumerServiceURL", args);
+            }
         }
         rBinding.append(acsBinding);
         return acsURL;
@@ -3011,5 +3016,63 @@ public class IDPSSOUtil {
             result = null;
         }
         return result;
+    }
+
+    /**
+     * Validates if the Assertion Consumer Service URL acsURL exists in the
+     * metadata of the Service Provider spEntityID
+     * @param acsURL the assertion consumer service <code>URL</code>
+     * @param spEntityID the entity id of the service provider
+     * @param realm the realm name of the identity provider
+     * @return true if the assertion consumer service URL was found 
+     *      false otherwise
+     */
+    private static boolean isACSurlValidInMetadataSP(String acsURL,
+            String spEntityID, String realm)
+     throws SAML2Exception {
+
+        boolean isValidACSurl = false;
+        String classMethod = "IDPSSOUtil.isACSurlValidInMetadataSP: ";
+
+        SPSSODescriptorElement spSSODescriptorElement = null;
+
+        if (metaManager == null) {
+            SAML2Utils.debug.error(classMethod + "Unable to get meta manager.");
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("errorMetaManager"));
+        }
+
+        try {
+            spSSODescriptorElement = metaManager.getSPSSODescriptor(
+                                            realm, spEntityID);
+            if (spSSODescriptorElement == null) {
+                SAML2Utils.debug.error(classMethod
+                    + "Unable to get SP SSO Descriptor from meta.");
+                throw new SAML2Exception(
+                    SAML2Utils.bundle.getString("metaDataError"));
+            }
+        } catch (SAML2MetaException sme) {
+            SAML2Utils.debug.error(classMethod
+                + "Unable to get SP SSO Descriptor from meta.");
+            throw new SAML2Exception(
+                    SAML2Utils.bundle.getString("metaDataError"));
+        }
+
+        List acsList = spSSODescriptorElement.getAssertionConsumerService();
+
+        AssertionConsumerServiceElement acs = null;
+
+        for (int i = 0; i < acsList.size(); i++) {
+            acs = (AssertionConsumerServiceElement)acsList.get(i);
+            String acsInMeta = acs.getLocation();
+            if (acsInMeta.equalsIgnoreCase(acsURL)) {
+                isValidACSurl = true;
+                SAML2Utils.debug.message(classMethod + " acsURL=" + acsURL +
+                        "Found in the metadata");
+                break;
+            }
+        }
+        
+        return isValidACSurl;
     }
 }
