@@ -900,10 +900,10 @@ int dsame_check_access(request_rec *r) {
                 status = AM_FAILURE;
             } 
         }
-    }    
-    if (status == AM_SUCCESS) {
         apr_thread_mutex_unlock(init_mutex);
         am_web_log_info("%s: Unlocked initialization section.", thisfunc);
+    }    
+    if (status == AM_SUCCESS) {
         // Get the agent config
         agent_config = am_web_get_agent_configuration();
         // Check request
