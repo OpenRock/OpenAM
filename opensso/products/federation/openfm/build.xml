@@ -259,6 +259,7 @@
             windowtitle="OpenSSO API" failonerror="true">
             <classpath refid="build.class.path"/>
             <packageset dir="${openfm.src.dir}">
+<!--
                 <include name="com/sun/identity/authentication/**"/>
                 <include name="com/sun/identity/configuration/**"/>
                 <include name="com/sun/identity/console/**"/>
@@ -272,6 +273,22 @@
                 <include name="com/sun/identity/wsfederation/**"/>
                 <include name="com/sun/identity/wss/**"/>
                 <include name="com/sun/identity/xacml/**"/>
+-->
+                <include name="com/iplanet/**"/>
+                <include name="com/sun/identity/**"/>
+            </packageset>
+	    <packageset dir="${library.src.dir}">
+                <include name="com/sun/liberty/**"/>
+                <include name="com/sun/identity/**"/>
+            </packageset>
+            <packageset dir="${shared.src.dir}">
+                <include name="com/iplanet/**"/>
+                <include name="com/sun/identity/**"/>
+            </packageset>
+            <packageset dir="${amserver.src.dir}">
+                <include name="com/iplanet/**"/>
+                <include name="com/sun/identity/**"/>
+                <include name="org/forgerock/openam/**"/>
             </packageset>
             <tag name="supported.all.api" description="" />
             <tag name="supported.api" description="" />

@@ -36,6 +36,8 @@
     <import file="installtools/installtools.xml" />
     <import file="j2eeagents/j2eeagents.xml" />
     <import file="upgrade/upgrade.xml" />
+
+    <property name="javac.includeAntRuntime" value="false"/>
     
     <echo message="OpenSSO Build Number: ${build.number.set}"/>
 

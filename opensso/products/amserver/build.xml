@@ -290,15 +290,15 @@
     </target>
 
     <target name="javadoc" depends="preparebuild">
-        <javadoc destdir="${amserver.built.apidocs.dir}" windowtitle="OpenSSO API"
+        <javadoc destdir="${amserver.built.apidocs.dir}" windowtitle="OpenAM API"
             maxmemory="512M" useexternalfile="yes">
             <classpath refid="build.class.path"/>
             <fileset dir="${amserver.src.dir}" defaultexcludes="yes"
                 includes="${amserver.javadoc-includes}"
-                excludes="${amserver.javadoc.excludes}" />
+                excludes="${amserver.javadoc-excludes}" />
             <tag name="supported.all.api" enabled="false" />
             <tag name="supported.api" enabled="false" />
-            <link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+            <link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
             <link href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/"/>
         </javadoc>
     </target>
@@ -310,12 +310,12 @@
             <classpath refid="build.class.path"/>
             <fileset dir="${amserver.src.dir}" defaultexcludes="yes"
                 includes="${amserver.public.javadoc-includes}"
-                excludes="${amserver.public.javadoc.excludes}" />
+                excludes="${amserver.public.javadoc-excludes}" />
             <doclet name="com.sun.identity.tools.javadocs.SupportedAPIDoclet"
                 path="${amserver.classes.dir}" />
             <tag name="supported.all.api" description="" />
             <tag name="supported.api" description="" />
-            <link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+            <link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
             <link href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/"/>
         </javadoc>
     </target>
