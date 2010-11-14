@@ -63,6 +63,8 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.install.tools.util.FileUtils;
 
+import org.forgerock.openam.util.Version;
+
 /**
  * <p>
  * Provides access to the configuration as set in the system.
@@ -136,9 +138,6 @@ public class AgentConfiguration implements
     private static final String ATTRIBUTE_SERVICE_NAME = "idsvcs-rest";
     private static final String AGENT_CONFIG_CENTRALIZED = "centralized";
     private static final String AGENT_CONFIG_LOCAL = "local";
-    /**name of the .version file for an agent **/
-    private static final String AGENT_VERSION_FILE_NAME = ".version";
-    
     
    /**
     * Returns a header name that contains the client IP address. If no header
@@ -1157,18 +1156,9 @@ public class AgentConfiguration implements
      * Logs the version information for the running agent.
      */
     private static void logAgentVersion() {
-        ResourceReader rr = new ResourceReader(getDebug());
-        String version = null;
-        try {
-            version = rr.getTextFromFile(AGENT_VERSION_FILE_NAME);
-        } catch (AgentException ae) {
-            version = null;
-        }
-        version = (version == null) ?  "Unknown Agent Version." : version; 
-        if (isLogMessageEnabled()) {
-            logMessage("AgentConfiguration.logAgentVersion: \n" + version);
-        }
+        logError(Version.getVersion());
     }
+    
     /**
      * Logs some of the system env information for the running agent.
      */
