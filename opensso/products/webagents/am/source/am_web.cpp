@@ -5354,7 +5354,7 @@ set_user_attributes(am_policy_result_t *result,
      // if no attributes in result, we're done.
      else if ((result->attr_profile_map == AM_MAP_NULL) &&
              (result->attr_session_map == AM_MAP_NULL) &&
-             (result->attr_response_map == AM_MAP_NULL)) {
+             (result->attr_response_map == AM_MAP_NULL) && 0 ) {
                am_web_log_info("%s: All attributes maps are null. Nothing to set ",
 			       thisfunc);
                sts = AM_SUCCESS;
@@ -5600,6 +5600,8 @@ process_access_success(char *url,
     //      to decide whether or not to allow null user.
     //   2) if notenforced_url_attributes_enable is set 
     //      to false, the remote user is not set to anything
+
+    am_web_log_error("%s: Starting", thisfunc);
     if (((*agentConfigPtr)->notenforced_url_attributes_enable == AM_FALSE) &&
             (policy_result.remote_user == NULL)) {
        am_web_log_debug("%s: notenforced.url.attributes.enable is "
