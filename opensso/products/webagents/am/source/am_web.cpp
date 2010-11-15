@@ -5406,11 +5406,13 @@ set_user_attributes(am_policy_result_t *result,
                if ((SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserProfileAttrsMode) ||
                    (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserSessionAttrsMode) ||
                    (SET_ATTRS_AS_HEADER == (*agentConfigPtr)->setUserResponseAttrsMode)) {
+                        am_web_log_warning("%s: Clearing header name %s.",
+                                              thisfunc, header_name);
                         set_sts = req_func->set_header_in_request.func(
                                          req_func->set_header_in_request.args,
                                          header_name, NULL);
                         if (set_sts != AM_SUCCESS) {
-                           am_web_log_warning("%s: Error %s encountered while "
+                           am_web_log_warning("%s: Error encountered while "
                                               "clearing header name %s.",
                                               thisfunc, header_name);
                         }
