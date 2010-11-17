@@ -77,10 +77,10 @@
 
     <target name="setTimeStamp">
      <tstamp>
-         <format property="date" pattern="MM_dd_yyyy" locale="en"/>
+         <format property="date" pattern="dd_MM_yyyy" locale="en"/>
       </tstamp>
      <tstamp>
-         <format property="current.timestamp" pattern="MM_dd_yyyy_hh_mm_aa"
+         <format property="current.timestamp" pattern="yyyy_MM_dd_HH_mm"
          locale="en"/>
       </tstamp>
     </target>

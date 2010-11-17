@@ -11,6 +11,7 @@ G<test name="PolicyMergeDecisionTestP10_E0 ">
             </run>
 	</groups>
 	<classes>
+            <class name="com.sun.identity.qatest.policy.ConfigUnconfig"/>
             <class name="com.sun.identity.qatest.policy.PolicyTests"/>
 	</classes>
     </test>
