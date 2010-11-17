@@ -22,6 +22,10 @@
  * Copyright 2008 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.session;
 
 import com.iplanet.sso.SSOToken;
@@ -96,7 +100,6 @@ public class GlobalRealmSessionConstraints extends TestCommon {
      */
     @Parameters({"inheritancelevel"})
     @BeforeClass(groups={"ldapv3", "ldapv3_sec", "s1ds", "s1ds_sec", "ad", 
-      
         "ad_sec", "amsdk", "amsdk_sec", "jdbc", "jdbc_sec"})
     public void setup(String inheritancelevel)
     throws Exception {
@@ -134,6 +137,7 @@ public class GlobalRealmSessionConstraints extends TestCommon {
             resultBehavior = (String) itr.next();     
             log(Level.FINE, "setup", "Resulting behavior if session quota " +
                     "exhausted is set to: " + resultBehavior);
+
             idmc.createDummyUser(admintoken, realm, "", testAdminUser);
             Map nullmap = new HashMap();
             if (!idmc.doesIdentityExists(adminGroup, IdType.GROUP, 
@@ -240,8 +244,9 @@ public class GlobalRealmSessionConstraints extends TestCommon {
             } 
         } catch(Exception e) {
             log(Level.SEVERE, "setup", e.getMessage());
-            cleanup();
             e.printStackTrace();
+            log(Level.FINE, "setup", "Setup failed, attempting cleanup");
+            cleanup();
             throw e;
         } 
         exiting("setup");

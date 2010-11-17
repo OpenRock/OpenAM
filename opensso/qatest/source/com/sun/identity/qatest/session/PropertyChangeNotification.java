@@ -22,6 +22,10 @@
  * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.session;
 
 import com.iplanet.sso.SSOException;
@@ -90,7 +94,7 @@ public class PropertyChangeNotification extends TestCommon implements
     throws Exception {
         entering("setup", null);
         try {
-            idmc.createDummyUser(adminToken, realm, "", strTestSPCN);
+            idmc.createID(strTestSPCN, "user", null, adminToken, realm);
             log(Level.FINE,"setup", "Created user " + strTestSPCN +
                     " identity");
             strURL = protocol + "://" + host + ":" + port + uri;
