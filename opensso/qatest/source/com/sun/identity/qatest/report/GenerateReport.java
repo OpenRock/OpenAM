@@ -21,6 +21,11 @@
  *
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.report;
 
 import com.sun.identity.qatest.common.TestCommon;
@@ -118,9 +123,9 @@ public class GenerateReport extends TestCommon {
                         bout.write(newline);
                         bout.write("<h2>");
                         bout.write(newline);
-                        bout.write(" <p align=\"center\"><img alt=\"\" ");
-                        bout.write("src=\"http://mahogany.red.iplanet.com:8080/" +
-                                "qatestnightly/sridhare/qalogo.JPG\"");
+                        bout.write(" <p align=\"center\"><img alt=\"\" "); 
+                        bout.write("src=\"http://www.forgerock.com/images/" +
+                                "boxes/half-top-box-openam.png\"");
                         bout.write(" style=\"width: 435px; height: 139px;\"><br>");
                         bout.write("</p><h2>");
                         bout.write(newline);
