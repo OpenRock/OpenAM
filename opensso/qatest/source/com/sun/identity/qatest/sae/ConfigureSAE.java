@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.sae;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -58,8 +62,8 @@ public class ConfigureSAE extends TestCommon {
      */
     private void getWebClient() throws Exception {
         try {
-            spWebClient = new WebClient(BrowserVersion.MOZILLA_1_0);
-            idpWebClient = new WebClient(BrowserVersion.MOZILLA_1_0);
+            spWebClient = new WebClient(BrowserVersion.FIREFOX_3);
+            idpWebClient = new WebClient(BrowserVersion.FIREFOX_3);
         } catch(Exception e) {
             log(Level.SEVERE, "getWebClient", e.getMessage());
             e.printStackTrace();

@@ -22,6 +22,10 @@
  * Copyright 2009 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.wss;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -423,7 +427,7 @@ public class StockQuoteSampleTest extends TestCommon {
                     stockPc.setForceUserAuthentication(false);
                     Thread.sleep(1000);
                     webClient = new WebClient();
-                    webClient.setCookiesEnabled(true);
+                    webClient.getCookieManager().setCookiesEnabled(true);
                     URL cmdUrl = new URL(strClientURL);
                     HtmlPage page = (HtmlPage) webClient.getPage(cmdUrl);
                     HtmlForm form = (HtmlForm) page.getFormByName("GetQuote");                    
@@ -431,7 +435,7 @@ public class StockQuoteSampleTest extends TestCommon {
                             getInputByName("symbol");
                     txtagentname.setValueAttribute("JAVA");
                     long startTime = System.currentTimeMillis();
-                    HtmlPage returnPage = (HtmlPage) form.submit();
+                    HtmlPage returnPage = (HtmlPage) form.getInputByName("Submit").click();
                     long endTime = System.currentTimeMillis();
                     long timetaken = endTime - startTime;
                     log(Level.FINEST, "evaluateStockQuoteClient",

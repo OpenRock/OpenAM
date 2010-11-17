@@ -21,6 +21,11 @@
  *
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.agents;
 
 import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
@@ -426,7 +431,7 @@ public class WebAgentHotSwapTests extends TestCommon {
                 strPropValue = rbg.getString(strPropValue);
             }
             hotswap.hotSwapProperty(strPropName, strPropValue);
-            webClient.setCookiesEnabled(true);
+            webClient.getCookieManager().setCookiesEnabled(true);
             page = consoleLogin(webClient, resource, "hsuser0",
                     "hsuser0");
             iIdx = -1;
@@ -486,7 +491,7 @@ public class WebAgentHotSwapTests extends TestCommon {
                     Url.toString());
             Reporter.log("Resource: " + Url.toString());
             Reporter.log("Expected Result: " + strEvalValue);
-            webClient.setCookiesEnabled(true);
+            webClient.getCookieManager().setCookiesEnabled(true);
             boolean isFound = false;
             long time = System.currentTimeMillis();
             HtmlPage page;

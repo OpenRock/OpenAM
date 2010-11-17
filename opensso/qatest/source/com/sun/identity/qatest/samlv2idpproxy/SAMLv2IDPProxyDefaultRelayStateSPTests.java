@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.samlv2idpproxy;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -310,7 +314,7 @@ public class SAMLv2IDPProxyDefaultRelayStateSPTests extends TestCommon {
     public void getWebClient()
     throws Exception {
         try {
-            webClient = new WebClient(BrowserVersion.MOZILLA_1_0);
+            webClient = new WebClient(BrowserVersion.FIREFOX_3);
         } catch (Exception e) {
             log(Level.SEVERE, "getWebClient", e.getMessage());
             e.printStackTrace();

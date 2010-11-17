@@ -21,6 +21,11 @@
  *
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.fedlet;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -247,7 +252,7 @@ public class FedletAttributeQueryTests extends TestCommon {
     public void getWebClient()
     throws Exception {
         try {
-            webClient = new WebClient(BrowserVersion.MOZILLA_1_0);
+            webClient = new WebClient(BrowserVersion.FIREFOX_3);
         } catch (Exception e) {
             log(Level.SEVERE, "getWebClient", e.getMessage());
             e.printStackTrace();
@@ -588,7 +593,7 @@ public class FedletAttributeQueryTests extends TestCommon {
             attribute2.setValueAttribute(attr2);
             HtmlInput attribute3 = form.getInputByName("attr3");
             attribute3.setValueAttribute(attr3);
-            page = (HtmlPage) form.submit();
+            page = (HtmlPage) form.getInputByName("Submit").click();
             log(Level.FINEST, "attributeQuery",
                     "Fedlet Attribute Query Response Page: " +
                     page.getWebResponse().getContentAsString());

@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.clientsamples;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -897,7 +901,7 @@ public class AMSamples extends TestCommon {
                     getInputByName("providerName");
             txtagentname.setValueAttribute("wsc");
             
-            HtmlPage returnPage = (HtmlPage) form.submit();
+            HtmlPage returnPage = (HtmlPage) form.getInputByName("Submit").click();
             log(Level.FINEST, "testSTSwscSAMLv2Token",
                     " Page after login\n" +
                     returnPage.getWebResponse().getContentAsString());
@@ -967,7 +971,7 @@ public class AMSamples extends TestCommon {
                     getInputByName("providerName");
             txtagentname.setValueAttribute("wsc");
             
-            HtmlPage returnPage = (HtmlPage) form.submit();
+            HtmlPage returnPage = (HtmlPage) form.getInputByName("Submit").click();
             log(Level.FINEST, "testSTSwscSAMLv1Token",
                     " Page after login\n" +
                     returnPage.getWebResponse().getContentAsString());

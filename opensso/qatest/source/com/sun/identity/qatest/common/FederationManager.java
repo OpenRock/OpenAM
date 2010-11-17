@@ -22,25 +22,30 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.common;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
-import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlButtonInput;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
 public class FederationManager extends TestCommon {
     private String amadmUrl;
     private String amUrl;
-    
+
 
     public FederationManager(String url) {
         super("FederationManager");
@@ -48,8 +53,8 @@ public class FederationManager extends TestCommon {
         if (!distAuthEnabled) {
             amadmUrl = url + "/ssoadm.jsp?cmd=";
         } else {
-            amadmUrl = url + "/UI/Login?goto=" + serverProtocol + "://" + 
-                    serverHost + ":" + serverPort + serverUri + 
+            amadmUrl = url + "/UI/Login?goto=" + serverProtocol + "://" +
+                    serverHost + ":" + serverPort + serverUri +
                     "/ssoadm.jsp?cmd=";
         }
     }
@@ -69,6 +74,7 @@ public class FederationManager extends TestCommon {
         if (val != 0) {
             log(Level.SEVERE, "getExitCode", "Non zero exit code:\n" +
                     content.substring(start, content.indexOf("</pre>", start)));
+            Thread.dumpStack();
         }
         return val;
     }
@@ -99,7 +105,10 @@ public class FederationManager extends TestCommon {
             txtbatchstatus.setValueAttribute(batchstatus);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -135,7 +144,10 @@ public class FederationManager extends TestCommon {
             txtbundlelocale.setValueAttribute(bundlelocale);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -164,7 +176,10 @@ public class FederationManager extends TestCommon {
             txtbundlelocale.setValueAttribute(bundlelocale);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -193,7 +208,10 @@ public class FederationManager extends TestCommon {
             txtbundlelocale.setValueAttribute(bundlelocale);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -215,7 +233,10 @@ public class FederationManager extends TestCommon {
             taxmlfile.setText(xmlfile);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -236,18 +257,22 @@ public class FederationManager extends TestCommon {
 
         if (servicename != null) {
             HtmlSelect slservicename= (HtmlSelect)form.getSelectByName("servicename");
-            String[] fakeOptions = new String[servicename.size()];
-            int cnt = 0;
-            for (Iterator i = servicename.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtservicename = (HtmlTextInput)form.getInputByName("servicenamelblb");
+            HtmlButtonInput btnservicename = form.getInputByValue("Add");
+            for (Object serviceNameInstance : servicename) {
+                slservicename.setSelectedAttribute((String)serviceNameInstance,true);
+                txtservicename.setValueAttribute((String)serviceNameInstance);
+                btnservicename.click();
             }
-            slservicename.fakeSelectedAttribute(fakeOptions);
         }
 
         HtmlCheckBoxInput cbdeletepolicyrule = (HtmlCheckBoxInput)form.getInputByName("deletepolicyrule");
         cbdeletepolicyrule.setChecked(deletepolicyrule);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -269,7 +294,10 @@ public class FederationManager extends TestCommon {
             taxmlfile.setText(xmlfile);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -312,7 +340,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -334,7 +365,10 @@ public class FederationManager extends TestCommon {
             txtentrydn.setValueAttribute(entrydn);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -356,7 +390,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -383,7 +420,10 @@ public class FederationManager extends TestCommon {
         HtmlCheckBoxInput cbrecursive = (HtmlCheckBoxInput)form.getInputByName("recursive");
         cbrecursive.setChecked(recursive);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -417,7 +457,10 @@ public class FederationManager extends TestCommon {
         HtmlCheckBoxInput cbrecursive = (HtmlCheckBoxInput)form.getInputByName("recursive");
         cbrecursive.setChecked(recursive);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -450,15 +493,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -485,7 +532,10 @@ public class FederationManager extends TestCommon {
         HtmlCheckBoxInput cbmandatory = (HtmlCheckBoxInput)form.getInputByName("mandatory");
         cbmandatory.setChecked(mandatory);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -507,7 +557,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -536,7 +589,10 @@ public class FederationManager extends TestCommon {
             txtservicename.setValueAttribute(servicename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -565,7 +621,10 @@ public class FederationManager extends TestCommon {
             txtservicename.setValueAttribute(servicename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -594,7 +653,10 @@ public class FederationManager extends TestCommon {
             txtservicename.setValueAttribute(servicename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -630,7 +692,10 @@ public class FederationManager extends TestCommon {
             txtattributename.setValueAttribute(attributename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -662,16 +727,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -703,16 +771,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -744,16 +815,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -791,15 +865,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -828,7 +906,10 @@ public class FederationManager extends TestCommon {
             taxmlfile.setText(xmlfile);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -854,15 +935,19 @@ public class FederationManager extends TestCommon {
 
         if (policynames != null) {
             HtmlSelect slpolicynames= (HtmlSelect)form.getSelectByName("policynames");
-            String[] fakeOptions = new String[policynames.size()];
-            int cnt = 0;
-            for (Iterator i = policynames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtpolicynames = (HtmlTextInput)form.getInputByName("policynameslblb");
+            HtmlButtonInput btnpolicynames = form.getInputByValue("Add");
+            for (Object policyName : policynames) {
+                slpolicynames.setSelectedAttribute((String)policyName,true);
+                txtpolicynames.setValueAttribute((String)policyName);
+                btnpolicynames.click();
             }
-            slpolicynames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -888,15 +973,15 @@ public class FederationManager extends TestCommon {
 
         if (policynames != null) {
             HtmlSelect slpolicynames= (HtmlSelect)form.getSelectByName("policynames");
-            String[] fakeOptions = new String[policynames.size()];
-            int cnt = 0;
-            for (Iterator i = policynames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object policyName : policynames) {
+                slpolicynames.setSelectedAttribute((String)policyName,true);
             }
-            slpolicynames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -931,12 +1016,9 @@ public class FederationManager extends TestCommon {
 
         if (attributenames != null) {
             HtmlSelect slattributenames= (HtmlSelect)form.getSelectByName("attributenames");
-            String[] fakeOptions = new String[attributenames.size()];
-            int cnt = 0;
-            for (Iterator i = attributenames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object attributeName : attributenames) {
+                slattributenames.setSelectedAttribute((String)attributeName,true);
             }
-            slattributenames.fakeSelectedAttribute(fakeOptions);
         }
 
         if (subschemaname != null) {
@@ -944,7 +1026,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -978,13 +1063,13 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
         if (subschemaname != null) {
@@ -992,7 +1077,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1032,15 +1120,15 @@ public class FederationManager extends TestCommon {
 
         if (attributenames != null) {
             HtmlSelect slattributenames= (HtmlSelect)form.getSelectByName("attributenames");
-            String[] fakeOptions = new String[attributenames.size()];
-            int cnt = 0;
-            for (Iterator i = attributenames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object attributeName : attributenames) {
+                slattributenames.setSelectedAttribute((String)attributeName,true);
             }
-            slattributenames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1079,16 +1167,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1140,15 +1231,15 @@ public class FederationManager extends TestCommon {
 
         if (choicevalues != null) {
             HtmlSelect slchoicevalues= (HtmlSelect)form.getSelectByName("choicevalues");
-            String[] fakeOptions = new String[choicevalues.size()];
-            int cnt = 0;
-            for (Iterator i = choicevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object choiceValue : choicevalues) {
+                slchoicevalues.setSelectedAttribute((String)choiceValue,true);
             }
-            slchoicevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1219,7 +1310,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1261,12 +1355,9 @@ public class FederationManager extends TestCommon {
 
         if (choicevalues != null) {
             HtmlSelect slchoicevalues= (HtmlSelect)form.getSelectByName("choicevalues");
-            String[] fakeOptions = new String[choicevalues.size()];
-            int cnt = 0;
-            for (Iterator i = choicevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object choiceValue : choicevalues) {
+                slchoicevalues.setSelectedAttribute((String)choiceValue,true);
             }
-            slchoicevalues.fakeSelectedAttribute(fakeOptions);
         }
 
         if (subschemaname != null) {
@@ -1274,7 +1365,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1324,7 +1418,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1374,7 +1471,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1424,7 +1524,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1474,7 +1577,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1524,7 +1630,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1574,7 +1683,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1616,12 +1728,13 @@ public class FederationManager extends TestCommon {
 
         if (defaultvalues != null) {
             HtmlSelect sldefaultvalues= (HtmlSelect)form.getSelectByName("defaultvalues");
-            String[] fakeOptions = new String[defaultvalues.size()];
-            int cnt = 0;
-            for (Iterator i = defaultvalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtdefaultvalues= (HtmlTextInput)form.getInputByName("defaultvalueslblb");
+            HtmlButtonInput btndefaultvalues = form.getInputByValue("Add");
+            for (Object defaultValue : defaultvalues) {
+                sldefaultvalues.setSelectedAttribute((String)defaultValue,true);
+                txtdefaultvalues.setValueAttribute((String)defaultValue);
+                btndefaultvalues.click();
             }
-            sldefaultvalues.fakeSelectedAttribute(fakeOptions);
         }
 
         if (subschemaname != null) {
@@ -1629,7 +1742,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1679,7 +1795,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1729,7 +1848,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1779,7 +1901,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1814,12 +1939,13 @@ public class FederationManager extends TestCommon {
 
         if (attributeschema != null) {
             HtmlSelect slattributeschema= (HtmlSelect)form.getSelectByName("attributeschema");
-            String[] fakeOptions = new String[attributeschema.size()];
-            int cnt = 0;
-            for (Iterator i = attributeschema.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributeschema = (HtmlTextInput)form.getInputByName("attributeschemalblb");
+            HtmlButtonInput btnattributeschema = form.getInputByValue("Add");
+            for (Object attributeSchemaInstance : attributeschema) {
+                slattributeschema.setSelectedAttribute((String)attributeSchemaInstance,true);
+                txtattributeschema.setValueAttribute((String)attributeSchemaInstance);
+                btnattributeschema.click();
             }
-            slattributeschema.fakeSelectedAttribute(fakeOptions);
         }
 
         if (subschemaname != null) {
@@ -1827,7 +1953,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1856,7 +1985,10 @@ public class FederationManager extends TestCommon {
             txti18nkey.setValueAttribute(i18nkey);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1885,7 +2017,10 @@ public class FederationManager extends TestCommon {
             txturl.setValueAttribute(url);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1914,7 +2049,10 @@ public class FederationManager extends TestCommon {
             txtrevisionnumber.setValueAttribute(revisionnumber);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1936,7 +2074,10 @@ public class FederationManager extends TestCommon {
             txtservicename.setValueAttribute(servicename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -1974,13 +2115,13 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
         if (realm != null) {
@@ -1998,7 +2139,10 @@ public class FederationManager extends TestCommon {
             txtpriority.setValueAttribute(priority);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2034,7 +2178,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2075,13 +2222,13 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
         if (realm != null) {
@@ -2089,7 +2236,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2132,7 +2282,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2167,12 +2320,9 @@ public class FederationManager extends TestCommon {
 
         if (subschemanames != null) {
             HtmlSelect slsubschemanames= (HtmlSelect)form.getSelectByName("subschemanames");
-            String[] fakeOptions = new String[subschemanames.size()];
-            int cnt = 0;
-            for (Iterator i = subschemanames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object insSubSchemaName : subschemanames) {
+                slsubschemanames.setSelectedAttribute((String)insSubSchemaName,true);
             }
-            slsubschemanames.fakeSelectedAttribute(fakeOptions);
         }
 
         if (subschemaname != null) {
@@ -2180,7 +2330,10 @@ public class FederationManager extends TestCommon {
             txtsubschemaname.setValueAttribute(subschemaname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2223,7 +2376,10 @@ public class FederationManager extends TestCommon {
             txtinheritance.setValueAttribute(inheritance);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2266,7 +2422,10 @@ public class FederationManager extends TestCommon {
             txti18nkey.setValueAttribute(i18nkey);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2309,7 +2468,10 @@ public class FederationManager extends TestCommon {
             txturl.setValueAttribute(url);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2349,15 +2511,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2385,12 +2551,13 @@ public class FederationManager extends TestCommon {
 
         if (idnames != null) {
             HtmlSelect slidnames= (HtmlSelect)form.getSelectByName("idnames");
-            String[] fakeOptions = new String[idnames.size()];
-            int cnt = 0;
-            for (Iterator i = idnames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtidnames = (HtmlTextInput)form.getInputByName("idnameslblb");
+            HtmlButtonInput btnidnames = form.getInputByValue("Add");
+            for (Object idName : idnames) {
+                slidnames.setSelectedAttribute((String)idName,true);
+                txtidnames.setValueAttribute((String)idName);
+                btnidnames.click();
             }
-            slidnames.fakeSelectedAttribute(fakeOptions);
         }
 
         if (idtype != null) {
@@ -2398,7 +2565,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2434,7 +2604,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2463,7 +2636,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2485,7 +2661,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2507,7 +2686,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2543,7 +2725,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2579,7 +2764,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2622,7 +2810,10 @@ public class FederationManager extends TestCommon {
             txtservicename.setValueAttribute(servicename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2662,15 +2853,15 @@ public class FederationManager extends TestCommon {
 
         if (attributenames != null) {
             HtmlSelect slattributenames= (HtmlSelect)form.getSelectByName("attributenames");
-            String[] fakeOptions = new String[attributenames.size()];
-            int cnt = 0;
-            for (Iterator i = attributenames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object attributeName : attributenames) {
+                slattributenames.setSelectedAttribute((String)attributeName,true);
             }
-            slattributenames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2713,7 +2904,10 @@ public class FederationManager extends TestCommon {
             txtmembershipidtype.setValueAttribute(membershipidtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2756,7 +2950,10 @@ public class FederationManager extends TestCommon {
             txtmembershipidtype.setValueAttribute(membershipidtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2806,7 +3003,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2856,7 +3056,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2902,16 +3105,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -2954,7 +3160,10 @@ public class FederationManager extends TestCommon {
             txtservicename.setValueAttribute(servicename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3000,16 +3209,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3048,16 +3260,19 @@ public class FederationManager extends TestCommon {
         }
 
         if (attributevalues != null) {
-            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3093,7 +3308,10 @@ public class FederationManager extends TestCommon {
             txtidtype.setValueAttribute(idtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3133,15 +3351,19 @@ public class FederationManager extends TestCommon {
 
         if (privileges != null) {
             HtmlSelect slprivileges= (HtmlSelect)form.getSelectByName("privileges");
-            String[] fakeOptions = new String[privileges.size()];
-            int cnt = 0;
-            for (Iterator i = privileges.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtprivileges = (HtmlTextInput)form.getInputByName("privilegeslblb");
+            HtmlButtonInput btnprivileges = form.getInputByValue("Add");
+            for (Object privilege : privileges) {
+                //slprivileges.setSelectedAttribute((String)privilege,true);
+                txtprivileges.setValueAttribute((String)privilege);
+                btnprivileges.click();
             }
-            slprivileges.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3181,15 +3403,15 @@ public class FederationManager extends TestCommon {
 
         if (privileges != null) {
             HtmlSelect slprivileges= (HtmlSelect)form.getSelectByName("privileges");
-            String[] fakeOptions = new String[privileges.size()];
-            int cnt = 0;
-            for (Iterator i = privileges.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object privilege : privileges) {
+                slprivileges.setSelectedAttribute((String)privilege,true);
             }
-            slprivileges.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3211,7 +3433,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3247,7 +3472,10 @@ public class FederationManager extends TestCommon {
             txtauthtype.setValueAttribute(authtype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3273,15 +3501,19 @@ public class FederationManager extends TestCommon {
 
         if (names != null) {
             HtmlSelect slnames= (HtmlSelect)form.getSelectByName("names");
-            String[] fakeOptions = new String[names.size()];
-            int cnt = 0;
-            for (Iterator i = names.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtnames = (HtmlTextInput)form.getInputByName("nameslblb");
+            HtmlButtonInput btnnames = form.getInputByValue("Add");
+            for (Object name : names) {
+                slnames.setSelectedAttribute((String)name,true);
+                txtnames.setValueAttribute((String)name);
+                btnnames.click();
             }
-            slnames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3314,15 +3546,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3351,7 +3587,10 @@ public class FederationManager extends TestCommon {
             txtname.setValueAttribute(name);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3373,7 +3612,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3402,7 +3644,10 @@ public class FederationManager extends TestCommon {
             txtname.setValueAttribute(name);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3428,15 +3673,19 @@ public class FederationManager extends TestCommon {
 
         if (names != null) {
             HtmlSelect slnames= (HtmlSelect)form.getSelectByName("names");
-            String[] fakeOptions = new String[names.size()];
-            int cnt = 0;
-            for (Iterator i = names.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtnames = (HtmlTextInput)form.getInputByName("nameslblb");
+            HtmlButtonInput btnnames = form.getInputByValue("Add");
+            for (Object name : names) {
+                slnames.setSelectedAttribute((String)name,true);
+                txtnames.setValueAttribute((String)name);
+                btnnames.click();
             }
-            slnames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3465,7 +3714,10 @@ public class FederationManager extends TestCommon {
             txtname.setValueAttribute(name);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3500,12 +3752,13 @@ public class FederationManager extends TestCommon {
 
         if (entries != null) {
             HtmlSelect slentries= (HtmlSelect)form.getSelectByName("entries");
-            String[] fakeOptions = new String[entries.size()];
-            int cnt = 0;
-            for (Iterator i = entries.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            /*String[] fakeOptions = new String[entries.size()];
+            int cnt = 0;*/
+            for (Object entry : entries) {
+                /*fakeOptions[cnt++] = (String)i.next();*/
+                slentries.setSelectedAttribute((String)entry,true);
             }
-            slentries.fakeSelectedAttribute(fakeOptions);
+            /*slentries.fakeSelectedAttribute(fakeOptions);*/
         }
 
         if (datafile != null) {
@@ -3513,7 +3766,10 @@ public class FederationManager extends TestCommon {
             tadatafile.setText(datafile);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3528,7 +3784,10 @@ public class FederationManager extends TestCommon {
         HtmlPage page = (HtmlPage)webClient.getPage(cmdUrl);
         HtmlForm form = (HtmlForm)page.getForms().get(0);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3550,7 +3809,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3590,15 +3852,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3624,15 +3890,19 @@ public class FederationManager extends TestCommon {
 
         if (names != null) {
             HtmlSelect slnames= (HtmlSelect)form.getSelectByName("names");
-            String[] fakeOptions = new String[names.size()];
-            int cnt = 0;
-            for (Iterator i = names.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtnames = (HtmlTextInput)form.getInputByName("nameslblb");
+            HtmlButtonInput btnnames = form.getInputByValue("Add");
+            for (Object name : names) {
+                slnames.setSelectedAttribute((String)name,true);
+                txtnames.setValueAttribute((String)name);
+                btnnames.click();
             }
-            slnames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3665,15 +3935,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3695,7 +3969,10 @@ public class FederationManager extends TestCommon {
             txtservername.setValueAttribute(servername);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3724,7 +4001,10 @@ public class FederationManager extends TestCommon {
             taxmlfile.setText(xmlfile);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3757,15 +4037,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3784,15 +4068,19 @@ public class FederationManager extends TestCommon {
 
         if (agentnames != null) {
             HtmlSelect slagentnames= (HtmlSelect)form.getSelectByName("agentnames");
-            String[] fakeOptions = new String[agentnames.size()];
-            int cnt = 0;
-            for (Iterator i = agentnames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtagentnames = (HtmlTextInput)form.getInputByName("agentnameslblb");
+            HtmlButtonInput btnagentnames = form.getInputByValue("Add");
+            for (Object agentName : agentnames) {
+                slagentnames.setSelectedAttribute((String)agentName,true);
+                txtagentnames.setValueAttribute((String)agentName);
+                btnagentnames.click();
             }
-            slagentnames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3823,15 +4111,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3857,15 +4149,19 @@ public class FederationManager extends TestCommon {
 
         if (attributenames != null) {
             HtmlSelect slattributenames= (HtmlSelect)form.getSelectByName("attributenames");
-            String[] fakeOptions = new String[attributenames.size()];
-            int cnt = 0;
-            for (Iterator i = attributenames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            /*String[] fakeOptions = new String[attributenames.size()];
+            int cnt = 0;*/
+            for (Object attributeName : attributenames) {
+                /*fakeOptions[cnt++] = (String)i.next();*/
+                slattributenames.setSelectedAttribute((String)attributeName,true);
             }
-            slattributenames.fakeSelectedAttribute(fakeOptions);
+            /*slattributenames.fakeSelectedAttribute(fakeOptions);*/
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3894,7 +4190,10 @@ public class FederationManager extends TestCommon {
             txtagenttype.setValueAttribute(agenttype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3921,7 +4220,10 @@ public class FederationManager extends TestCommon {
         HtmlCheckBoxInput cbinherit = (HtmlCheckBoxInput)form.getInputByName("inherit");
         cbinherit.setChecked(inherit);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3936,7 +4238,10 @@ public class FederationManager extends TestCommon {
         HtmlPage page = (HtmlPage)webClient.getPage(cmdUrl);
         HtmlForm form = (HtmlForm)page.getForms().get(0);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3958,7 +4263,10 @@ public class FederationManager extends TestCommon {
             txtagentgroupname.setValueAttribute(agentgroupname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -3991,15 +4299,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4018,15 +4330,19 @@ public class FederationManager extends TestCommon {
 
         if (agentgroupnames != null) {
             HtmlSelect slagentgroupnames= (HtmlSelect)form.getSelectByName("agentgroupnames");
-            String[] fakeOptions = new String[agentgroupnames.size()];
-            int cnt = 0;
-            for (Iterator i = agentgroupnames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            /*String[] fakeOptions = new String[agentgroupnames.size()];
+            int cnt = 0;*/
+            for (Object agentGroupName : agentgroupnames) {
+                /*fakeOptions[cnt++] = (String)i.next();*/
+                slagentgroupnames.setSelectedAttribute((String)agentGroupName,true);
             }
-            slagentgroupnames.fakeSelectedAttribute(fakeOptions);
+            /*slagentgroupnames.fakeSelectedAttribute(fakeOptions);*/
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4055,7 +4371,10 @@ public class FederationManager extends TestCommon {
             txtagenttype.setValueAttribute(agenttype);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4084,7 +4403,10 @@ public class FederationManager extends TestCommon {
             txtfilter.setValueAttribute(filter);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4106,7 +4428,10 @@ public class FederationManager extends TestCommon {
             txtagentname.setValueAttribute(agentname);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4132,15 +4457,19 @@ public class FederationManager extends TestCommon {
 
         if (agentnames != null) {
             HtmlSelect slagentnames= (HtmlSelect)form.getSelectByName("agentnames");
-            String[] fakeOptions = new String[agentnames.size()];
-            int cnt = 0;
-            for (Iterator i = agentnames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            /*String[] fakeOptions = new String[agentnames.size()];
+            int cnt = 0;*/
+            for (Object agentName : agentnames) {
+                /*fakeOptions[cnt++] = (String)i.next();*/
+                slagentnames.setSelectedAttribute((String)agentName,true);
             }
-            slagentnames.fakeSelectedAttribute(fakeOptions);
+            /*slagentnames.fakeSelectedAttribute(fakeOptions);*/
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4166,15 +4495,19 @@ public class FederationManager extends TestCommon {
 
         if (agentnames != null) {
             HtmlSelect slagentnames= (HtmlSelect)form.getSelectByName("agentnames");
-            String[] fakeOptions = new String[agentnames.size()];
-            int cnt = 0;
-            for (Iterator i = agentnames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            /*String[] fakeOptions = new String[agentnames.size()];
+            int cnt = 0;*/
+            for (Object agentName : agentnames) {
+                /*fakeOptions[cnt++] = (String)i.next();*/
+                slagentnames.setSelectedAttribute((String)agentName,true);
             }
-            slagentnames.fakeSelectedAttribute(fakeOptions);
+            /*slagentnames.fakeSelectedAttribute(fakeOptions);*/
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4205,15 +4538,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4240,7 +4577,10 @@ public class FederationManager extends TestCommon {
         HtmlCheckBoxInput cbwithdefaults = (HtmlCheckBoxInput)form.getInputByName("withdefaults");
         cbwithdefaults.setChecked(withdefaults);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4266,15 +4606,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4300,15 +4644,16 @@ public class FederationManager extends TestCommon {
 
         if (propertynames != null) {
             HtmlSelect slpropertynames= (HtmlSelect)form.getSelectByName("propertynames");
-            String[] fakeOptions = new String[propertynames.size()];
-            int cnt = 0;
-            for (Iterator i = propertynames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object propertyName : propertynames) {
+                /*fakeOptions[cnt++] = (String)i.next();*/
+                slpropertynames.setSelectedAttribute((String)propertyName,true);
             }
-            slpropertynames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4341,15 +4686,19 @@ public class FederationManager extends TestCommon {
 
         if (attributevalues != null) {
             HtmlSelect slattributevalues= (HtmlSelect)form.getSelectByName("attributevalues");
-            String[] fakeOptions = new String[attributevalues.size()];
-            int cnt = 0;
-            for (Iterator i = attributevalues.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            HtmlTextInput txtattributes = (HtmlTextInput)form.getInputByName("attributevalueslblb");
+            HtmlButtonInput btnattributes = form.getInputByValue("Add");
+            for (Object attributeValue : attributevalues) {
+                slattributevalues.setSelectedAttribute((String)attributeValue,true);
+                txtattributes.setValueAttribute((String)attributeValue);
+                btnattributes.click();
             }
-            slattributevalues.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4371,7 +4720,10 @@ public class FederationManager extends TestCommon {
             txtservername.setValueAttribute(servername);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4386,7 +4738,10 @@ public class FederationManager extends TestCommon {
         HtmlPage page = (HtmlPage)webClient.getPage(cmdUrl);
         HtmlForm form = (HtmlForm)page.getForms().get(0);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4419,15 +4774,15 @@ public class FederationManager extends TestCommon {
 
         if (secondaryurls != null) {
             HtmlSelect slsecondaryurls= (HtmlSelect)form.getSelectByName("secondaryurls");
-            String[] fakeOptions = new String[secondaryurls.size()];
-            int cnt = 0;
-            for (Iterator i = secondaryurls.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object secondaryUrl : secondaryurls) {
+                slsecondaryurls.setSelectedAttribute((String)secondaryUrl,true);
             }
-            slsecondaryurls.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4449,7 +4804,10 @@ public class FederationManager extends TestCommon {
             txtsitename.setValueAttribute(sitename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4464,7 +4822,10 @@ public class FederationManager extends TestCommon {
         HtmlPage page = (HtmlPage)webClient.getPage(cmdUrl);
         HtmlForm form = (HtmlForm)page.getForms().get(0);
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4486,7 +4847,10 @@ public class FederationManager extends TestCommon {
             txtsitename.setValueAttribute(sitename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4512,15 +4876,15 @@ public class FederationManager extends TestCommon {
 
         if (servernames != null) {
             HtmlSelect slservernames= (HtmlSelect)form.getSelectByName("servernames");
-            String[] fakeOptions = new String[servernames.size()];
-            int cnt = 0;
-            for (Iterator i = servernames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object serverName : servernames) {
+                slservernames.setSelectedAttribute((String)serverName,true);
             }
-            slservernames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4546,15 +4910,15 @@ public class FederationManager extends TestCommon {
 
         if (servernames != null) {
             HtmlSelect slservernames= (HtmlSelect)form.getSelectByName("servernames");
-            String[] fakeOptions = new String[servernames.size()];
-            int cnt = 0;
-            for (Iterator i = servernames.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object serverName : servernames) {
+                slservernames.setSelectedAttribute((String)serverName,true);
             }
-            slservernames.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4583,7 +4947,10 @@ public class FederationManager extends TestCommon {
             txtsiteurl.setValueAttribute(siteurl);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4605,7 +4972,10 @@ public class FederationManager extends TestCommon {
             txtsitename.setValueAttribute(sitename);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4631,15 +5001,15 @@ public class FederationManager extends TestCommon {
 
         if (secondaryurls != null) {
             HtmlSelect slsecondaryurls= (HtmlSelect)form.getSelectByName("secondaryurls");
-            String[] fakeOptions = new String[secondaryurls.size()];
-            int cnt = 0;
-            for (Iterator i = secondaryurls.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object secondaryUrl : secondaryurls) {
+                slsecondaryurls.setSelectedAttribute((String)secondaryUrl,true);
             }
-            slsecondaryurls.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4665,15 +5035,15 @@ public class FederationManager extends TestCommon {
 
         if (secondaryurls != null) {
             HtmlSelect slsecondaryurls= (HtmlSelect)form.getSelectByName("secondaryurls");
-            String[] fakeOptions = new String[secondaryurls.size()];
-            int cnt = 0;
-            for (Iterator i = secondaryurls.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object secondaryUrl : secondaryurls) {
+                slsecondaryurls.setSelectedAttribute((String)secondaryUrl,true);
             }
-            slsecondaryurls.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4699,15 +5069,15 @@ public class FederationManager extends TestCommon {
 
         if (secondaryurls != null) {
             HtmlSelect slsecondaryurls= (HtmlSelect)form.getSelectByName("secondaryurls");
-            String[] fakeOptions = new String[secondaryurls.size()];
-            int cnt = 0;
-            for (Iterator i = secondaryurls.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object secondaryUrl : secondaryurls) {
+                slsecondaryurls.setSelectedAttribute((String)secondaryUrl,true);
             }
-            slsecondaryurls.fakeSelectedAttribute(fakeOptions);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4736,7 +5106,10 @@ public class FederationManager extends TestCommon {
             txtcloneservername.setValueAttribute(cloneservername);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4758,7 +5131,10 @@ public class FederationManager extends TestCommon {
             txtservername.setValueAttribute(servername);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4787,7 +5163,10 @@ public class FederationManager extends TestCommon {
             taxmlfile.setText(xmlfile);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4809,7 +5188,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4831,7 +5213,10 @@ public class FederationManager extends TestCommon {
             txtauthmodule.setValueAttribute(authmodule);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -4853,7 +5238,10 @@ public class FederationManager extends TestCommon {
             txtauthmodule.setValueAttribute(authmodule);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5067,7 +5455,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5117,7 +5508,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5168,7 +5562,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5209,7 +5606,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5238,7 +5638,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5273,12 +5676,9 @@ public class FederationManager extends TestCommon {
 
         if (trustedproviders != null) {
             HtmlSelect sltrustedproviders= (HtmlSelect)form.getSelectByName("trustedproviders");
-            String[] fakeOptions = new String[trustedproviders.size()];
-            int cnt = 0;
-            for (Iterator i = trustedproviders.iterator(); i.hasNext(); ) {
-                fakeOptions[cnt++] = (String)i.next();
+            for (Object trustedProvider : trustedproviders) {
+                sltrustedproviders.setSelectedAttribute((String)trustedProvider,true);
             }
-            sltrustedproviders.fakeSelectedAttribute(fakeOptions);
         }
 
         if (prefix != null) {
@@ -5286,7 +5686,10 @@ public class FederationManager extends TestCommon {
             txtprefix.setValueAttribute(prefix);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5315,7 +5718,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5337,7 +5743,10 @@ public class FederationManager extends TestCommon {
             txtrealm.setValueAttribute(realm);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5373,7 +5782,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5416,7 +5828,10 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 
     /**
@@ -5459,6 +5874,9 @@ public class FederationManager extends TestCommon {
             txtspec.setValueAttribute(spec);
         }
 
-        return (HtmlPage)form.submit();
+        final HtmlSubmitInput button = form.getInputByValue("Submit");
+        final HtmlPage retValue = button.click();
+        webClient.closeAllWindows();
+        return retValue;
     }
 }

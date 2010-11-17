@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.agents;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -499,7 +503,7 @@ public class J2EEAgentHotSwapTests  extends TestCommon {
                    ".accessDeniedURIEvalValue");
             hotswap.hotSwapProperty(strPropName, strPropValue);
             Thread.sleep(3000);
-            webClient.setCookiesEnabled(true);
+            webClient.getCookieManager().setCookiesEnabled(true);
             page = consoleLogin(webClient, resource, "hsuser0",
                 "hsuser0");
             iIdx = -1;
@@ -573,7 +577,7 @@ public class J2EEAgentHotSwapTests  extends TestCommon {
             Set set = amid.getAttribute(strPropName);
             log(Level.FINE,"evalNotEnfURI", "List of not enf URI's " +
                     "from amid object is : " + set.toString());
-            webClient.setCookiesEnabled(true);
+            webClient.getCookieManager().setCookiesEnabled(true);
             boolean isFound = false;
             long time = System.currentTimeMillis();
             HtmlPage page;

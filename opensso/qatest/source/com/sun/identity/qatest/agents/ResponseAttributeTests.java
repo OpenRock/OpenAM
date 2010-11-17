@@ -22,6 +22,11 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
+
 package com.sun.identity.qatest.agents;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -119,7 +124,7 @@ public class ResponseAttributeTests extends TestCommon {
     throws Exception {
         entering("evaluateNewSingleValuedStaticResponseAttribute", null);
         webClient = new WebClient();
-        webClient.setCookiesEnabled(true);
+        webClient.getCookieManager().setCookiesEnabled(true);
         try {
             HtmlPage page = consoleLogin(webClient, resource, "rauser",
                     "rauser");

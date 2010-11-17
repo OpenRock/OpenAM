@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.samlv2;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -91,7 +95,7 @@ public class SAMLv2TransientUserTests extends TestCommon {
     private void getWebClient() 
     throws Exception {
         try {
-            webClient = new WebClient(BrowserVersion.MOZILLA_1_0);
+            webClient = new WebClient(BrowserVersion.FIREFOX_3);
         } catch(Exception e) {
             log(Level.SEVERE, "getWebClient", e.getMessage());
             e.printStackTrace();

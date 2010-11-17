@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.idwsf;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -76,7 +80,7 @@ public class IDWSFSmokeTest extends IDFFCommon {
     private WebClient getWebClient()
     throws Exception {
         try {
-            WebClient webClient = new WebClient(BrowserVersion.MOZILLA_1_0);
+            WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
             return webClient;
         } catch (Exception e) {
             log(Level.SEVERE, "getWebClient", e.getMessage());
@@ -231,10 +235,10 @@ public class IDWSFSmokeTest extends IDFFCommon {
             HtmlForm form = wscpage.getFormByName("discomodify");
             HtmlInput txtidpUserDN = (HtmlInput)form.getInputByName("idpUserDN");
             txtidpUserDN.setValueAttribute(uuidIDPuser);
-            wscpage = (HtmlPage)form.submit();
+            wscpage = (HtmlPage)form.getInputByName("Submit").click();
             Thread.sleep(3000);
             HtmlForm discomodifyform = wscpage.getFormByName("discomodify");
-            HtmlPage discomodifyPage = (HtmlPage)discomodifyform.submit();
+            HtmlPage discomodifyPage = (HtmlPage)discomodifyform.getInputByName("Submit").click();
             if (discomodifyPage.getWebResponse().getContentAsString().
                     contains("OK")) {
                 log(Level.FINE, "registerResourceOffering", "Register " +
@@ -270,10 +274,10 @@ public class IDWSFSmokeTest extends IDFFCommon {
             HtmlForm formdiscoquerycall =
                     wscindexpage.getFormByName("discoquerycall");
             Thread.sleep(3000);
-            HtmlPage discoquerypage = (HtmlPage)formdiscoquerycall.submit();
+            HtmlPage discoquerypage = (HtmlPage)formdiscoquerycall.getInputByName("Submit").click();
             HtmlForm formdiscoquery = discoquerypage.getFormByName(
                     "discoquery");
-            HtmlPage discoquerypage2 = (HtmlPage)formdiscoquery.submit();
+            HtmlPage discoquerypage2 = (HtmlPage)formdiscoquery.getInputByName("Submit").click();
         return discoquerypage2;
     }
 
@@ -290,7 +294,7 @@ public class IDWSFSmokeTest extends IDFFCommon {
         try {
             log(Level.FINE, "registerResourceOffering", "Running: PPModify");
             webClientTest = getWebClient();
-            webClientTest.setCookiesEnabled(true);
+            webClientTest.getCookieManager().setCookiesEnabled(true);
 
             strAttribute = configMap.get(TestConstants.KEY_ATTRIBUTE_NAME + "."
                     + testIndex);
@@ -321,7 +325,7 @@ public class IDWSFSmokeTest extends IDFFCommon {
             //Perform discovery modify
             HtmlForm ppmodifycallform = discoqueryPage.getFormByName(
                     "ppmodifycall");
-            HtmlPage ppmodify = (HtmlPage)ppmodifycallform.submit();
+            HtmlPage ppmodify = (HtmlPage)ppmodifycallform.getInputByName("Submit").click();
  
             Thread.sleep(3000);
             HtmlForm ppmodifyform = ppmodify.getFormByName("ppmodify");
@@ -336,7 +340,7 @@ public class IDWSFSmokeTest extends IDFFCommon {
             HtmlInput valueTxt = (HtmlInput)ppmodifyform.getInputByName(
                     "valueStr");
             valueTxt.setValueAttribute(strAttrValue);
-            HtmlPage ppmodifyPageReceived = (HtmlPage)ppmodifyform.submit();
+            HtmlPage ppmodifyPageReceived = (HtmlPage)ppmodifyform.getInputByName("Submit").click();
             if (ppmodifyPageReceived.getWebResponse().getContentAsString().
                     contains(TestConstants.KEY_PP_MODIFY_RESULT)) {
                 log(Level.FINE, "PPModify", "PP modify was " +
@@ -377,7 +381,7 @@ public class IDWSFSmokeTest extends IDFFCommon {
                     wscURL);
             Thread.sleep(3000);
             HtmlForm ppqueryform = discoqueryPage.getFormByName("ppquerycall");
-            HtmlPage ppquery = (HtmlPage)ppqueryform.submit();
+            HtmlPage ppquery = (HtmlPage)ppqueryform.getInputByName("Submit").click();
 
             Thread.sleep(3000);
             HtmlForm ppqueryform1 = ppquery.getFormByName("ppquery");
@@ -389,7 +393,7 @@ public class IDWSFSmokeTest extends IDFFCommon {
             } else {
                 queryStringTxt.setValueAttribute("/PP/" + strAttribute);
             }
-            HtmlPage ppqueryResultPage = (HtmlPage)ppqueryform1.submit();
+            HtmlPage ppqueryResultPage = (HtmlPage)ppqueryform1.getInputByName("Submit").click();
             if (ppqueryResultPage.getWebResponse().getContentAsString().
                     contains(strAttrValue)) {
                 log(Level.FINE, "PPQuery", "PP Query was successful");

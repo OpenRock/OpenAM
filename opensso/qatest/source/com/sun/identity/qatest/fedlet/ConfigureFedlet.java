@@ -21,6 +21,11 @@
  *
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.fedlet;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -163,7 +168,7 @@ public class ConfigureFedlet extends TestCommon {
      */
     private void getWebClient() throws Exception {
         try {            
-            idpWebClient = new WebClient(BrowserVersion.MOZILLA_1_0);
+            idpWebClient = new WebClient(BrowserVersion.FIREFOX_3);
         } catch(Exception e) {
             log(Level.SEVERE, "getWebClient", e.getMessage());
             e.printStackTrace();

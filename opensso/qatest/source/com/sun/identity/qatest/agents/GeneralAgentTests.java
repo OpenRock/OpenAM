@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.agents;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -265,7 +269,7 @@ public class GeneralAgentTests extends TestCommon {
     throws Exception {
         entering("evaluateCaseSensitive", null);
         webClient = new WebClient();
-        webClient.setCookiesEnabled(true);
+        webClient.getCookieManager().setCookiesEnabled(true);
         URL urlLoc = new URL(resourceCase);
         try {
             page = consoleLogin(webClient, resourceProtected,

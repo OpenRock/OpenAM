@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.idwsf;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -122,7 +126,7 @@ public class ConfigUnconfig extends TestCommon {
                     "idpDeploymenturi");
             txtidpDeploymenturi.setValueAttribute(rb_idff.getString(
                     TestConstants.KEY_IDP_DEPLOYMENT_URI));
-            HtmlPage returnedPage = (HtmlPage)form.submit("submit");
+            HtmlPage returnedPage = (HtmlPage)form.getInputByName("submit").click();
             if (returnedPage.getWebResponse().getContentAsString().contains(
                     configResult)) {
                 log(Level.FINE, "configureWSFSample", "WSC sample is " +

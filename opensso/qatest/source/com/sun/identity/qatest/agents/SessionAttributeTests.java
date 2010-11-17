@@ -21,6 +21,11 @@
  *
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.agents;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -140,7 +145,7 @@ public class SessionAttributeTests extends TestCommon {
         try {
             webClient.setThrowExceptionOnScriptError(false);
             webClient.setThrowExceptionOnFailingStatusCode(false);
-            webClient.setCookiesEnabled(true);
+            webClient.getCookieManager().setCookiesEnabled(true);
             HtmlPage page = consoleLogin(webClient, resource, "sauser",
                     "sauser");
             Reporter.log("Resource: " + url);
@@ -151,7 +156,7 @@ public class SessionAttributeTests extends TestCommon {
             Reporter.log("Expected Result (after updation): " +
                     "HTTP_SESSION_MYPROPERTY:val2");
             page = (HtmlPage) webClient.getPage(url);
-            webClient.setCookiesEnabled(true);
+            webClient.getCookieManager().setCookiesEnabled(true);
             WebResponse webResponse = page.getWebResponse();
             String test = webResponse.getContentAsString();
             log(Level.FINEST, "evaluateCustomSessionAttribute",

@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.sae;
 
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
@@ -54,6 +58,9 @@ import org.testng.Reporter;
  * transactions are initiated from the IDP.
  */
 public class SAESmokeTests extends TestCommon {
+
+    //TODO Find "getInputByName("Submit").click();" and replace with something
+    // which will work
     
     public WebClient webClient;
     private Map<String, String> configMap;
@@ -473,7 +480,7 @@ public class SAESmokeTests extends TestCommon {
             setSPAppData("symmetric");
             page = generateSSOSLOURL("symmetric");
             form = (HtmlForm)page.getForms().get(0);
-            page = (HtmlPage)form.submit((SubmittableElement)null);
+            page = (HtmlPage)form.getInputByName("Submit").click();
             assert (getHtmlPageStringIndex(page,
                     saeConfig.getString("mail_attribute")) != -1);
             assert (getHtmlPageStringIndex(page,
@@ -593,7 +600,7 @@ public class SAESmokeTests extends TestCommon {
             enableUserProfile("SP", spfm, "false");
             page = generateSSOSLOURL("symmetric");
             form = (HtmlForm)page.getForms().get(0);
-            page = (HtmlPage)form.submit((SubmittableElement)null);
+            page = (HtmlPage)form.getInputByName("Submit").click();
             form = page.getFormByName("Login");
             HtmlHiddenInput txt1 =
                     (HtmlHiddenInput)form.getInputByName("IDToken1");
@@ -601,7 +608,7 @@ public class SAESmokeTests extends TestCommon {
             HtmlHiddenInput txt2 =
                     (HtmlHiddenInput)form.getInputByName("IDToken2");
             txt2.setValueAttribute(saeConfig.getString("sp_userpw"));
-            page = (HtmlPage)form.submit((SubmittableElement)null);
+            page = (HtmlPage)form.getInputByName("Submit").click();
             assert (getHtmlPageStringIndex(page,
                     saeConfig.getString("mail_attribute")) != -1);
             assert (getHtmlPageStringIndex(page,
@@ -669,7 +676,7 @@ public class SAESmokeTests extends TestCommon {
             HtmlHiddenInput txt2 =
                     (HtmlHiddenInput)form.getInputByName("IDToken2");
             txt2.setValueAttribute(saeConfig.getString("sp_userpw"));
-            page = (HtmlPage)form.submit((SubmittableElement)null);
+            page = (HtmlPage)form.getInputByName("Submit").click();
             assert (getHtmlPageStringIndex(page,
                     saeConfig.getString("mail_attribute")) != -1);
             assert (getHtmlPageStringIndex(page,
@@ -732,7 +739,7 @@ public class SAESmokeTests extends TestCommon {
             setSPAppData("asymmetric");
             HtmlPage page = generateSSOSLOURL("asymmetric");
             HtmlForm form = (HtmlForm)page.getForms().get(0);
-            page = (HtmlPage)form.submit((SubmittableElement)null);            
+            page = (HtmlPage)form.getInputByName("Submit").click();
             assert (getHtmlPageStringIndex(page,
                     saeConfig.getString("mail_attribute")) != -1);
             assert (getHtmlPageStringIndex(page,
@@ -854,7 +861,7 @@ public class SAESmokeTests extends TestCommon {
             enableUserProfile("SP", spfm, "false");
             HtmlPage page = generateSSOSLOURL("asymmetric");
             HtmlForm form = (HtmlForm)page.getForms().get(0);
-            page = (HtmlPage)form.submit((SubmittableElement)null);            
+            page = (HtmlPage)form.getInputByName("Submit").click();
             form = page.getFormByName("Login");
             HtmlHiddenInput txt1 =
                     (HtmlHiddenInput)form.getInputByName("IDToken1");
@@ -862,7 +869,7 @@ public class SAESmokeTests extends TestCommon {
             HtmlHiddenInput txt2 =
                     (HtmlHiddenInput)form.getInputByName("IDToken2");
             txt2.setValueAttribute(saeConfig.getString("sp_userpw"));
-            page = (HtmlPage)form.submit((SubmittableElement)null);
+            page = (HtmlPage)form.getInputByName("Submit").click();
             assert (getHtmlPageStringIndex(page,
                     saeConfig.getString("mail_attribute")) != -1);
             assert (getHtmlPageStringIndex(page,
@@ -930,7 +937,7 @@ public class SAESmokeTests extends TestCommon {
             HtmlHiddenInput txt2 =
                     (HtmlHiddenInput)form.getInputByName("IDToken2");
             txt2.setValueAttribute(saeConfig.getString("sp_userpw"));
-            page = (HtmlPage)form.submit((SubmittableElement)null);
+            page = (HtmlPage)form.getInputByName("Submit").click();
             assert (getHtmlPageStringIndex(page,
                     saeConfig.getString("mail_attribute")) != -1);
             assert (getHtmlPageStringIndex(page,
@@ -1126,7 +1133,7 @@ public class SAESmokeTests extends TestCommon {
             ((HtmlTextInput)form.getInputByName("privkeypass")).
                     setValueAttribute(sp_storepass);
         }
-        result = (HtmlPage)form.submit((SubmittableElement)null);
+        result = (HtmlPage)form.getInputByName("Submit").click();
     }
 
     /**
@@ -1228,7 +1235,7 @@ public class SAESmokeTests extends TestCommon {
             ((HtmlTextInput)form.getInputByName("privkeypass")).
                     setValueAttribute(idp_storepass);
         }
-        result = (HtmlPage)form.submit((SubmittableElement)null);
+        result = (HtmlPage)form.getInputByName("Submit").click();
         log(Level.FINEST, "generateSSOSLOURL", "Generate URL Page:\n" +
                 result.asXml());
         List list = result.getAnchors();

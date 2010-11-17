@@ -30,6 +30,7 @@
 
 package com.sun.identity.qatest.common;
 
+import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlHiddenInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -450,11 +451,12 @@ public class TestCommon implements TestConstants {
         HtmlHiddenInput txt2 =
                 (HtmlHiddenInput)form.getInputByName("IDToken2");
         txt2.setValueAttribute(amadmPassword);
-        page = (HtmlPage)form.submit();
+        ScriptResult scriptResult = page.executeJavaScript("document.forms['Login'].submit();");
+        HtmlPage newPage = (HtmlPage)scriptResult.getNewPage();
         log(Level.FINEST, "consoleLogin", "AFTER CONSOLE LOGIN: " +
-                page.getTitleText());
+                newPage.getTitleText());
         exiting("consoleLogin");
-        return (page);
+        return (newPage);
     }
     
     /**
