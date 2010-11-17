@@ -20,6 +20,11 @@
  *$Id: AccountLockoutTest.java,v 1.9 2009/06/02 17:08:18 cmwesley Exp $*
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
+
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.authentication;
 
 import com.iplanet.sso.SSOToken;
@@ -195,7 +200,6 @@ public class AccountLockoutTest extends AuthenticationCommon {
             StringBuffer attrBuffer = new StringBuffer();
             if (!userExists) {
                 log(Level.FINE, "setup", "Creating the user " + lockUser);
-                testUserList.add(lockUser);
                 attrBuffer.append("sn=" + lockUser).
                             append(IDMConstants.IDM_KEY_SEPARATE_CHARACTER).
                             append("cn=" + lockUser).
@@ -217,7 +221,6 @@ public class AccountLockoutTest extends AuthenticationCommon {
                     idTypeList.add(IdType.USER);
                 }
                 log(Level.FINE, "setup", "Creating the user " + warnUser);
-                testUserList.add(warnUser);
                 attrBuffer = new StringBuffer("sn=" + warnUser).
                             append(IDMConstants.IDM_KEY_SEPARATE_CHARACTER).
                             append("cn=" + warnUser).

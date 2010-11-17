@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.authentication;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -110,8 +114,11 @@ public class AuthTest extends AuthenticationCommon {
                 "/UI/Logout";
 
         try {
+            //Checks for incompatible module/OS types (e.g. NT auth on UNIX)
+            // TODO Move to an if (!validModuleTest) {log issue; assert false;}
             isValidTest = isValidModuleTest(testModule);
             if (isValidTest) {
+                //Load config from resources/authentication/AuthTest.properties
                 rb = ResourceBundle.getBundle("authentication" + fileseparator +
                         "AuthTest");
 
@@ -127,15 +134,20 @@ public class AuthTest extends AuthenticationCommon {
                 modeValue = (String)rb.getString(testModule + ".modevalue." +
                         testMode);
 
+                //Log details using logger
                 log(Level.FINEST, "setup", "rolename: " + rolename);
                 log(Level.FINEST, "setup", "username: " + loginUser);
                 log(Level.FINEST, "setup", "userpassword: " + loginPassword);
 
+                //Output details with testng
                 Reporter.log("RoleName: " + rolename);
                 Reporter.log("UserName: " + loginUser);
                 Reporter.log("UserPassword: " + loginPassword);
 
+                //Log in using AMSDK and get SSOToken
                 idToken = getToken(adminUser, adminPassword, basedn);
+
+                //Create an instance of Service Management containing Token
                 smsc = new SMSCommon(idToken);
                 
                 userRealm = realm;
@@ -168,7 +180,8 @@ public class AuthTest extends AuthenticationCommon {
                     createAuthConfig(userRealm, serviceSubConfigName,
                             configInstances, configMap);
                 }
-            
+
+                //Build a string containing the attributes for Identity
                 StringBuffer attrBuffer = new StringBuffer("sn=" + loginUser).
                         append(IDMConstants.IDM_KEY_SEPARATE_CHARACTER).
                         append("cn=" + loginUser).
@@ -181,6 +194,8 @@ public class AuthTest extends AuthenticationCommon {
                         serviceSubConfigName);
 
                 log(Level.FINE, "setup", "Creating user " + loginUser + " ...");
+
+                //Create identity, and if it returns false, log and assert false
                 if (!idmc.createID(loginUser, "user", attrBuffer.toString(),
                         idToken, userRealm)) {
                     log(Level.SEVERE, "setup",
@@ -189,6 +204,7 @@ public class AuthTest extends AuthenticationCommon {
                     assert false;
                 }
 
+                // TODO 2nd if (testMode.equals("realm")) - check if necessary
                 if (testMode.equals("realm")) {
                     log(Level.FINE, "setup",
                             "Setting the authentication configuration of realm "
@@ -268,15 +284,20 @@ public class AuthTest extends AuthenticationCommon {
             String testMode,
             String instanceIndex)
     throws Exception {
+        //Log Parameters used in running method
         Object[] params = {testModule, testMode, instanceIndex};
         entering("testLoginPositive", params);
+
+        //Reset userToken
         SSOToken userToken = null;
 
+        //Log to System logging
         log(Level.FINEST, "testLoginPositive", "testModule = " + testModule);
         log(Level.FINEST, "testLoginPositive", "testMode = " + testMode);
         log(Level.FINEST, "testLoginPositive", "instanceIndex = " +
                 instanceIndex);
 
+        //Log to TestNG
         Reporter.log("Test Module: " + testModule);
         Reporter.log("Test Mode: " + testMode);
         Reporter.log("Instance Index: " + instanceIndex);
