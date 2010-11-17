@@ -22,9 +22,15 @@
  * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.common.webtest;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
@@ -34,6 +40,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.sun.identity.qatest.common.TestCommon;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -101,7 +108,7 @@ public class WebUtils extends TestCommon {
         HtmlPage page,
         DataEntry data,
         String formName
-    ) throws Exception {
+    ) throws IOException, ElementNotFoundException {
         try {
         HtmlForm form;
         if (formName.equals(NULL_FORMNAME)) {
@@ -132,25 +139,32 @@ public class WebUtils extends TestCommon {
         Map<String, String[]> dInputs = data.getFormDynamicInputValues();
         for (String key : dInputs.keySet()) {
             HtmlSelect htmlSelect = form.getSelectByName(key);
-            htmlSelect.fakeSelectedAttribute(dInputs.get(key));
+            for (String attribute : dInputs.get(key)) {
+                htmlSelect.setSelectedAttribute(attribute, true);
+            }
         }
 
         Page result = null;
         String btnName = data.getButtonName();
-        try {
-            if (btnName.trim().length() == 0) {
-                result = form.submit(); 
+        if (btnName.trim().length() == 0) {
+            result = form.getInputByName("Submit").click();
+        } else {
+            if (btnName.equals("IDButton")){
+                ScriptResult scriptResult = page.executeJavaScript("document.forms['Login'].submit();");
+                result = scriptResult.getNewPage();
             } else {
                 HtmlInput btn = form.getInputByName(btnName);
                 result = btn.click();
             }
-        } catch (com.gargoylesoftware.htmlunit.ScriptException e) {
-            //do nothing.
         }
 
         data.validate(result);
         return result;
-        } catch (Exception e) {
+        } catch (ElementNotFoundException e) {
+            log(Level.SEVERE, "submitForm", "Got Exception while working on " +
+                    "page : " + page.getWebResponse().getContentAsString());
+            throw e;
+        } catch (IOException e) {
             log(Level.SEVERE, "submitForm", "Got Exception while working on " +
                     "page : " + page.getWebResponse().getContentAsString());
             throw e;

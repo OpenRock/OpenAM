@@ -22,6 +22,10 @@
  * Copyright 2007 Sun Microsystems Inc. All Rights Reserved
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.qatest.common.authentication;
 
 import com.sun.identity.qatest.common.TestCommon;
@@ -98,7 +102,7 @@ public class CreateTestXML extends TestCommon {
             if (testNegative) {
                  tpass = tpass + "fail";
             }
-            out.write("<form name=\"Login\" IDButton=\"\">");
+            out.write("<form name=\"Login\" buttonName=\"IDButton\">");
             out.write(System.getProperty("line.separator"));
             out.write("<input name=\"IDToken1\" value=\"" + tuser + "\"/>");
             out.write(System.getProperty("line.separator"));
