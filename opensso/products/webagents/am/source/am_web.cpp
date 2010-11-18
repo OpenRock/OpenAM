@@ -5354,7 +5354,7 @@ set_user_attributes(am_policy_result_t *result,
      // if no attributes in result, we're done.
      else if ((result->attr_profile_map == AM_MAP_NULL) &&
              (result->attr_session_map == AM_MAP_NULL) &&
-             (result->attr_response_map == AM_MAP_NULL) && 0 ) {
+             (result->attr_response_map == AM_MAP_NULL)) {
                am_web_log_info("%s: All attributes maps are null. Nothing to set ",
 			       thisfunc);
                sts = AM_SUCCESS;
@@ -5468,7 +5468,7 @@ set_user_attributes(am_policy_result_t *result,
                   default:
 		       break;
              }
-	     if (!strcasecmp(mode, AM_POLICY_SET_ATTRS_AS_HEADER)) { 
+	     if (!strcasecmp(mode, AM_POLICY_SET_ATTRS_AS_HEADER) && (attrMap != AM_MAP_NULL)) {
                // set the new values.
                const KeyValueMap &headerAttrs =
 		                         *(reinterpret_cast<const KeyValueMap *>
@@ -5507,7 +5507,7 @@ set_user_attributes(am_policy_result_t *result,
             }
 
             // set attributes as cookies
-            if (!strcasecmp(mode, AM_POLICY_SET_ATTRS_AS_COOKIE)) {
+            if (!strcasecmp(mode, AM_POLICY_SET_ATTRS_AS_COOKIE)&& (attrMap != AM_MAP_NULL)) {
                 // set the new values.
                 const KeyValueMap &cookieAttrs =
                       *(reinterpret_cast<const KeyValueMap *>
