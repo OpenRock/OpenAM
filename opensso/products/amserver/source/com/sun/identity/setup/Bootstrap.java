@@ -231,6 +231,9 @@ public class Bootstrap {
 
                 if (debugSetAtDefault) {
                     properties.remove(Constants.SERVICES_DEBUG_LEVEL);
+                } else {
+                    properties.setProperty(Constants.SERVICES_DEBUG_LEVEL,
+                        debugLevel);
                 }
 
                 SystemProperties.initializeProperties(
@@ -239,9 +242,9 @@ public class Bootstrap {
                 String defaultDebugLevel =
                         SystemProperties.getProperties().getProperty(Constants.SERVICES_DEBUG_LEVEL);
 
-                if (defaultDebugLevel == null) {
+                if (debugSetAtDefault) {
                     properties.setProperty(Constants.SERVICES_DEBUG_LEVEL,
-                        Debug.STR_ERROR);
+                        defaultDebugLevel);
                     SystemProperties.initializeProperties(
                         properties, true, true);
                 }
