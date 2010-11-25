@@ -1054,4 +1054,10 @@ public interface Constants {
       * empty string
       */
      public static final String EMPTY = "";
+     
+     /**
+      * empty string
+      */
+     public static final String DELIMITER_PREF_LEFT =
+         "openam.entitlement.delimiter.precedence.left";
 }

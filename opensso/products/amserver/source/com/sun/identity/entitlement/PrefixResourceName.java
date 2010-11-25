@@ -29,6 +29,8 @@
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -70,6 +72,10 @@ public class PrefixResourceName implements ResourceName {
     private static String PROTO_DELIMITER = "://";
     private static int PROTO_DELIMITER_SIZE = PROTO_DELIMITER.length();
 
+    private final static String TRUE = "true";
+    private final static String FALSE = "false";
+    private final static String DUMMY_URI = "dummy.html";
+
     /**
      * empty no argument constructor.
      */
@@ -89,7 +95,7 @@ public class PrefixResourceName implements ResourceName {
      * which specifies the configuration paramater value.
      */
     public void initialize(Map configParams) {
-        this.delimiter = ";";
+        this.delimiter = "/";
         this.caseSensitive = false;
         this.wildcard = "*";
         this.oneLevelWildcard = "-*-";
@@ -160,6 +166,19 @@ public class PrefixResourceName implements ResourceName {
             requestResource = requestResource.toLowerCase();
             targetResource = targetResource.toLowerCase();
         }
+
+        String leftPrecedence =
+                SystemPropertiesManager.get(Constants.DELIMITER_PREF_LEFT, FALSE);
+
+        // end delimiter means we treat this resource as a directory
+        if (leftPrecedence.equalsIgnoreCase(TRUE)) {
+            if (requestResource.endsWith(delimiter)) {
+                requestResource = requestResource + DUMMY_URI;
+            } else if (requestResource.endsWith(delimiter + wildcard)) {
+                requestResource = requestResource.substring(0, requestResource.length() - 1) + DUMMY_URI;
+            }
+        }
+
       
         // get rid of ending delimiters if any from requestResource
         while (requestResource.endsWith(delimiter)) {
