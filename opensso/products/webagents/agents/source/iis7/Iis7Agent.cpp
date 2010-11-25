@@ -659,7 +659,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                                         set_header, set_cookie_in_response,
                                         set_header_attr_as_cookie,
                                         get_cookie_sync, args, agent_config);
-            if (status == AM_SUCCESS) {
+            if (NULL && status == AM_SUCCESS) {
                 if ((set_headers_list != NULL) || (set_cookies_list != NULL) 
                         || (redirectRequest == TRUE)) {
  // XXX

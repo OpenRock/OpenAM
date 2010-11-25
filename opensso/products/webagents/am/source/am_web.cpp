@@ -3139,6 +3139,7 @@ am_web_result_attr_map_set(
     }
     else {
         for (int i=0; i<3; i++) {
+            attrMap = NULL;         /* clear it,  since the switch does not*/
 	      switch (i) {
 		  case 0:
 		       if (result->attr_profile_map != NULL) {
