@@ -388,6 +388,16 @@ public class NamingService implements RequestHandler, ServiceListener {
                         SystemProperties.get(
                             Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR)
                         : WebtopNaming.getURI(url);
+                    
+                    if (uri.equals(Constants.EMPTY)) {
+                        uri = SystemProperties.get(
+                            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+
+                        if (namingDebug.messageEnabled()) {
+                            namingDebug.message("uri is blank; adding " + uri);
+                        }
+                    }
+
                     replacedTable = replaceTable(tempHash,
                                         url.getProtocol(),
                                         url.getHost(),

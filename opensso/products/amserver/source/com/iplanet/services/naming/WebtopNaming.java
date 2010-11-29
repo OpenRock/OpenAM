@@ -661,10 +661,14 @@ public class WebtopNaming {
             }
 
             String serverWithoutURI = protocol + ":" + "//" + host + ":" + port;
+            String serverWithURI = null;
             
             if ((uri != null) && (uri.length() > 0)) {
                 StringTokenizer tok = new StringTokenizer(uri, "/");
                 uri = "/" + tok.nextToken();
+            } else {
+                serverWithURI = protocol + ":" + "//" + host + ":" + port + amServerURI;
+                debug.message("WebtopNaming.getServerId(): serverWithURI: " + serverWithURI);
             }
             
             String server = (uri != null) ?
@@ -681,6 +685,13 @@ public class WebtopNaming {
                     serverID = getValueFromTable(serverIdTable, 
                         serverWithoutURI);
                 }
+
+                if (serverID == null) {
+                    // try with the URI, Agent 3.0 preferred naming URL
+                    // is missing the amServer URI
+                    serverID = getValueFromTable(serverIdTable,
+                        serverWithURI);
+                }
             }
             //update the naming table and as well as server id table
             //if it can not find it
@@ -692,6 +703,13 @@ public class WebtopNaming {
                     //Enterprise 8.0
                     serverID = getValueFromTable(serverIdTable, 
                         serverWithoutURI);
+                }
+
+                if (serverID == null) {
+                    // try with the URI, Agent 3.0 preferred naming URL
+                    // is missing the amServer URI
+                    serverID = getValueFromTable(serverIdTable,
+                        serverWithURI);
                 }
             }
 
