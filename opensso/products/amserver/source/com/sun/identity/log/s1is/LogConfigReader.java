@@ -26,12 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.log.s1is;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManager;
 import com.sun.identity.log.LogManagerUtil;
@@ -44,13 +47,14 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * <tt>LogConfigReader</TT> is used to load the configuration from the
@@ -74,6 +78,7 @@ public class LogConfigReader implements ServiceListener{
     private String localProtocol = null;
     private String localHost = null;
     private String localPort = null;
+    private boolean useOldLogFormat = false;
 
     /**
      * Local Log service identifier
@@ -103,6 +108,8 @@ public class LogConfigReader implements ServiceListener{
         localHost = SystemProperties.get("com.iplanet.am.server.host");
         localPort = SystemProperties.get(Constants.AM_SERVER_PORT);
         localLogServiceID = localProtocol + "://" + localHost + ":" + localPort;
+        useOldLogFormat =
+                SystemProperties.getAsBoolean(Constants.USE_OLD_LOG_FORMAT);
 
         SSOToken ssoToken;
         try {
@@ -151,12 +158,12 @@ public class LogConfigReader implements ServiceListener{
      * will then be loaded into the logmanager via properties API.
      */
     private String constructInputStream() {
-        StringBuffer sbuffer = new StringBuffer(2000);
+        StringBuilder sbuffer = new StringBuilder(2000);
         String key = null;
         String value = null;
         Set set;
         Iterator it;
-        String tempBuffer;
+        StringBuilder tempBuffer = new StringBuilder();
         boolean fileBackend = false;
         String basedir = null;
         String famuri = null;
@@ -237,17 +244,42 @@ public class LogConfigReader implements ServiceListener{
         // all Fields
         try {
             key = LogConstants.ALL_FIELDS;
-            tempBuffer = "time, Data, ";
+            tempBuffer.append("time, Data, ");
             set = (Set) logAttributes.get(key);
-            it = set.iterator();
-            tempBuffer += (String) it.next();
-            while(it.hasNext()) {
-                tempBuffer += ", " + (String) it.next();
+
+            if (!useOldLogFormat) {
+                it = set.iterator();
+            } else {
+                TreeSet orderedHeaders = new TreeSet(new LogHeaderComparator());
+                orderedHeaders.addAll(set);
+                it = orderedHeaders.descendingIterator();
             }
-            sbuffer.append(key).append("=")
+
+            String headerValue = (String) it.next();
+
+            if (headerValue.contains(Constants.COLON)) {
+                headerValue =
+                        headerValue.substring(headerValue.indexOf(Constants.COLON) + 1);
+            }
+
+            tempBuffer.append(headerValue);
+
+            while(it.hasNext()) {
+                headerValue = (String) it.next();
+
+                if (headerValue.contains(Constants.COLON)) {
+                    headerValue =
+                        headerValue.substring(headerValue.indexOf(Constants.COLON) + 1);
+                }
+
+                tempBuffer.append(", ").append(headerValue);
+            }
+
+            sbuffer.append(key).append(Constants.EQUALS)
                    .append(tempBuffer).append(LogConstants.CRLF);
-        }   catch (Exception e) {
-            debug.error("LogConfigReader: Could not read all field  ", e);
+
+        } catch (Exception ex) {
+            debug.error("LogConfigReader: Could not read all field  ", ex);
         }
         // Selected Log Fields
         try {
@@ -255,9 +287,10 @@ public class LogConfigReader implements ServiceListener{
             set = (Set) logAttributes.get(key);
             if ((set != null) && (set.size()!=0)) {
                 it = set.iterator();
-                tempBuffer = (String) it.next();
+                tempBuffer = new StringBuilder();
+                tempBuffer.append((String) it.next());
                 while(it.hasNext()) {
-                    tempBuffer += ", " + (String) it.next();
+                    tempBuffer.append(", ").append((String) it.next());
                 }
                 sbuffer.append(key).append("=")
                        .append(tempBuffer).append(LogConstants.CRLF);
@@ -829,11 +862,41 @@ public class LogConfigReader implements ServiceListener{
         return sbuffer.toString();
     }
 
+    class LogHeaderComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            String s1 = (String) o1;
+            String s2 = (String) o2;
+
+            if (s1.contains(Constants.COLON) && s2.contains(Constants.COLON)) {
+                int s1v = Integer.parseInt(s1.substring(0, s1.indexOf(Constants.COLON)));
+                int s2v = Integer.parseInt(s2.substring(0, s2.indexOf(Constants.COLON)));
+
+                if (s1v > s2v) {
+                    return -1;
+                } else if (s1v < s2v) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            } else if (s1.contains(Constants.COLON)) {
+                return 1;
+            } else if (s2.contains(Constants.COLON)) {
+                return -1;
+            }
+
+            return -1;
+        }
+
+        public boolean equals(Object obj) {
+            return obj instanceof LogHeaderComparator;
+        }
+    }
+
     private void getLoggingDirectory(
         boolean fileBackend,
         String basedir,
         String famuri,
-        StringBuffer sbuffer
+        StringBuilder sbuffer
     ) {
         String key = LogConstants.LOG_LOCATION;
 

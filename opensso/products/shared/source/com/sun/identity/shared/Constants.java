@@ -1060,4 +1060,7 @@ public interface Constants {
       */
      public static final String DELIMITER_PREF_LEFT =
          "openam.entitlement.delimiter.precedence.left";
+
+     public static final String USE_OLD_LOG_FORMAT =
+         "openam.logging.use.old.log.format";
 }
