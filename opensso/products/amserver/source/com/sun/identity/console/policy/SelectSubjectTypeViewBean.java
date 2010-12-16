@@ -52,8 +52,6 @@ public class SelectSubjectTypeViewBean
 
     /**
      * Creates a view to prompt user for subject type before subject creation.
-     *
-     * @param name Name of view
      */
     public SelectSubjectTypeViewBean() {
         super("SelectSubjectType", DEFAULT_DISPLAY_URL);

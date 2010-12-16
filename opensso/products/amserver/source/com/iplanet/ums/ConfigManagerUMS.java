@@ -670,7 +670,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *        <code>ConfigManager</code> to begin searching for DIT
      *        information (for structural entities).
      * @param templateName Template name.
-     * @param lookup.
+     * @param lookup
      * @return <code>AttrSet</code> value pertaining to the structural template
      *         in the DIT. Usage:
      *         <pre>
@@ -701,7 +701,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *        <code>ConfigManager</code> to begin searching for DIT information
      *        (for structural entities).
      * @param templateName Template name.
-     * @param lookup.
+     * @param lookup
      * @return <code>AttrSet</code> value pertaining to the structural template
      *         in the DIT.  Usage:
      *         <pre>
@@ -737,7 +737,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      * 
      * @param guid Organization DN.
      * @param className Name of <code>javaclass</code> Attribute to be matched.
-     * @param lookup.
+     * @param lookup
      * @return Attribute key-value pair of Creation templates.  Usage:
      *         <pre>
      *         AttrSet a = CM.getCreationTemplateForClass(

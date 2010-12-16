@@ -59,7 +59,7 @@ public class ApplicationPrivilege {
     /**
      * Sets entitlement subject.
      *
-     * @param eSubject Entitlement subject
+     * @param entitlementSubjects Entitlement subject
      * @throws EntitlementException if subject is null.
      */
     public void setSubject(Set<SubjectImplementation> entitlementSubjects)

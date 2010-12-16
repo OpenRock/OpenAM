@@ -117,7 +117,7 @@ public interface GroupModel
     /**
      * Returns group profile page XML.
      *
-     * @param viewbeanClasName Class responsible for generating the page
+     * @param viewbeanClassName Class responsible for generating the page
      * @param type Type of group object being displayed.
      * @return group profile XML string.
      */
@@ -142,7 +142,8 @@ public interface GroupModel
      * organization unit. A reload of the navigation frame will be performed
      * if the group is successfully created.
      *
-     * @param data - map which contains the group name and the optional and
+     * @param location where to create the given group
+     * @param values map which contains the group name and the optional and
      *               required attributes.
      * @return true if the group was created, false otherwise
      */

@@ -48,8 +48,6 @@ public class SelectConditionTypeViewBean
     /**
      * Creates a view to prompt user for condition type before condition
      * creation.
-     *
-     * @param name Name of view
      */
     public SelectConditionTypeViewBean() {
         super("SelectConditionType", DEFAULT_DISPLAY_URL);

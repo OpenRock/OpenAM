@@ -49,8 +49,6 @@ public class ReferralProxyViewBean
 
     /**
      * Creates a view to prompt user for referral type before referral creation.
-     *
-     * @param name Name of view
      */
     public ReferralProxyViewBean() {
         super("ReferralProxy");

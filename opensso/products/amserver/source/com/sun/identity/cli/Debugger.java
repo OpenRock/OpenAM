@@ -56,7 +56,7 @@ public class Debugger {
      *
      * @param mgr Command Manager Object.
      * @param msg debug message.
-     * @see Debug#message(String, Throwable)
+     * @see com.sun.identity.shared.debug.Debug#message(String, Throwable)
      */
     public static void message(CommandManager mgr, String msg) {
         dumpToOutput(mgr, msg, null);
@@ -94,7 +94,7 @@ public class Debugger {
      * @param t <code>Throwable</code>, on which <code>printStackTrace</code>
      *        will be invoked to print the stack trace. If <code>t</code> is
      *        null, it is ignored.
-     * @see Debug#error(String, Throwable)
+     * @see com.sun.identity.shared.debug.Debug#error(String, Throwable)
      */
     public static void message(CommandManager mgr, String msg, Throwable t) {
         dumpToOutput(mgr, msg, t);
@@ -122,7 +122,7 @@ public class Debugger {
      *        or to the debug file. If <code>msg</code> is null, it is
      *        ignored.
      *
-     * @see Debug#warning(String, Throwable)
+     * @see com.sun.identity.shared.debug.Debug#warning(String, Throwable)
      */
     public static void warning(CommandManager mgr, String msg) {
         dumpToOutput(mgr, msg, null);
@@ -178,7 +178,7 @@ public class Debugger {
      *             or to the debug file. If <code>msg</code> is null, it is
      *             ignored.
      *
-     * @see Debug#error(String, Throwable)
+     * @see com.sun.identity.shared.debug.Debug#error(String, Throwable)
      */
     public static void error(CommandManager mgr, String msg) {
         dumpToOutput(mgr, msg, null);

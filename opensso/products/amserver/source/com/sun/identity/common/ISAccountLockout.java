@@ -194,8 +194,10 @@ public class ISAccountLockout {
      * updates the accountInfo object with the user information and count of
      * failed authentication attempts.
      *
-     * @param  amIdentity , AMidentity object
-     * @param  user lockout information object
+     * @param  userDN DN of the user
+     * @param  userName name of the user
+     * @param  amIdentity AMidentity object
+     * @param  acInfo AccountLockoutInfo
      * @return updated user lockout information
      */
     public int invalidPasswd(String userDN, String userName,
@@ -617,8 +619,8 @@ public class ISAccountLockout {
      * Checks if user account has been unlocked.This method is only
      * for accounts which are physically locked.
      *
-     * @param amIdentity,  AMIdentity object
-     * @return boolean,true if account is locked else false
+     * @param amIdentity  AMIdentity object
+     * @return boolean <code>true</code> if account is locked else <code>false</code>
      */
     
     public boolean isAccountLocked(AMIdentity amIdentity) {

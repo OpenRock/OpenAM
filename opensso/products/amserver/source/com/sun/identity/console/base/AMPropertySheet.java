@@ -410,7 +410,7 @@ public class AMPropertySheet
      * Returns a map of attribute name to values.
      *
      * @param orig Map of attribute to original values.
-     * @param amModel <code>AMModel</code> object.
+     * @param model <code>AMModel</code> object.
      * @return a map of attribute name to values.
      * @throws ModelControlException if cannot get model of property sheet.
      * @throws AMConsoleException if password and confirm password values do
@@ -429,7 +429,7 @@ public class AMPropertySheet
      * @param orig Map of attribute to original values.
      * @param modified true to return map of attribute name to values that
      *        have values that is different from values in <code>orig</code>.
-     * @param amModel <code>AMModel</code> object.
+     * @param model <code>AMModel</code> object.
      * @return a map of attribute name to values.
      * @throws ModelControlException if cannot get model of property sheet.
      * @throws AMConsoleException if password and confirm password values do

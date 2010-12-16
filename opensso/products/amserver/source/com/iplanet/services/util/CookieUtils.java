@@ -141,9 +141,9 @@ public class CookieUtils {
     /**
      * Gets value of cookie that has mached name in servlet request
      * 
-     * @param HttpServletRequest
+     * @param req
      *            request
-     * @param cookie
+     * @param name
      *            name in servlet request
      * @return value of that name of cookie
      */
@@ -167,9 +167,9 @@ public class CookieUtils {
     /**
      * Gets cookie object that has mached name in servlet request
      * 
-     * @param HttpServletRequest
+     * @param req
      *            request
-     * @param cookie
+     * @param name
      *            name in servlet request
      * @return value of that name of cookie
      */
@@ -206,7 +206,7 @@ public class CookieUtils {
     /**
      * Gets Array of cookie in servlet request
      * 
-     * @param HttpServletRequest
+     * @param req
      *            request
      * 
      */

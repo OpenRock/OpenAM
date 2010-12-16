@@ -111,7 +111,7 @@ public class AMCommonNameGenerator
      * <code>{givenname} {initials} {sn}</code>.  This method replaces these
      * tokens with attributes values from <code>userInfoMap</code>.
      *
-     * @param universalId Universal Id of user.
+     * @param univId Universal Id of user.
      * @param model of the view bean.
      * @return common name for user.
      */
@@ -381,7 +381,7 @@ public class AMCommonNameGenerator
     /**
      * This method will be invoked when a service's schema has been changed.
      *
-     * @param seviceName name of the service
+     * @param serviceName name of the service
      * @param version version of the service
      */
     public void schemaChanged(String serviceName, String version) {
@@ -397,7 +397,7 @@ public class AMCommonNameGenerator
      * <code>serviceComponent</code> denotes the service's sub-component that
      * changed (e.g. <code>/NamedPolicy</code>, <code>/Templates</code>).
      *
-     * @param seviceName name of the service
+     * @param serviceName name of the service
      * @param version version of the service
      * @param groupName name of the configuration grouping
      * @param serviceComponent name of the service components that
@@ -422,7 +422,7 @@ public class AMCommonNameGenerator
      * configuration grouping name and service's sub-component that are
      * changed respectively.
      *
-     * @param seviceName name of the service
+     * @param serviceName name of the service
      * @param version version of the service
      * @param orgName organization name as DN
      * @param groupName name of the configuration grouping

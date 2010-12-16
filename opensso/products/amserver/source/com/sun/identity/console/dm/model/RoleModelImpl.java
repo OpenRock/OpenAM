@@ -124,8 +124,9 @@ public class RoleModelImpl extends DMModelBase
 
     /**
      * Removes users from the group.
-     *   
-     * @param setDNs set of distinguished names of users to be removed.
+     *
+     * @param location where to delete the given users
+     * @param names set of distinguished names of users to be removed.
      * @throws AMConsoleException if users cannot be removed.
      */  
     public void removeUsers(String location, Set names)
@@ -722,10 +723,10 @@ public class RoleModelImpl extends DMModelBase
 
     /**
      * Creates a role below the current organization or organization unit. 
-     *   
+     *
+     * @param location where to create the given role
      * @param data - map which contains the role name and the optional and
      *               required attributes.
-     * @return true if the role was created, false otherwise
      */  
     public void createRole(String location, Map data) 
         throws AMConsoleException
@@ -1111,7 +1112,7 @@ public class RoleModelImpl extends DMModelBase
     /**
      * Gets the localized string for the default permissions list
      *
-     * @param real value of the permission
+     * @param option value of the permission
      * @return localized string for permission
      */
     public String getOptionString(String option) {

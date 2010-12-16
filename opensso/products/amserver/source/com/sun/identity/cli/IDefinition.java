@@ -80,7 +80,7 @@ public interface IDefinition {
      * option such as user ID and password.
      *
      * @param opt Name of option.
-     * @returns <code>true</code> if the option is an authentication related
+     * @return <code>true</code> if the option is an authentication related
      *         option such as user ID and password.
      */
     boolean isAuthOption(String opt);

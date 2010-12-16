@@ -198,7 +198,7 @@ public class SearchModelImpl extends DMModelBase
      * Performs a search for groups which is either of scope
      * <code>AMConstants.SCOPE_SUB</code> or <code>AMConstants.SCOPE_ONE</code>
      *
-     * @param scope of search.
+     * @param location where to search
      * @param avMap map of attribute name to a set of values. These map
                     entries are search criteria.
      * @return The users matching the search criteria
@@ -557,8 +557,9 @@ public class SearchModelImpl extends DMModelBase
     /**
      * Searches for users with a default search scope of subtree
      *
-     * @param String logical operator
-     * @param Map attribute value pairs
+     * @param logicalOp logical operator
+     * @param avPairs attribute value pairs
+     * @param location where to search for users
      * @return a set of users which match the search criterias
      */
     public Set searchUsers(String logicalOp, Map avPairs, String location) {
@@ -570,9 +571,9 @@ public class SearchModelImpl extends DMModelBase
     /**
      * Searches for users
      *
-     * @param String logical operator
+     * @param logicalOp logical operator
      * @param scope of the search
-     * @param Map attribute value pairs
+     * @param avPairs attribute value pairs
      * @return a set of users which match the search criterias
      */
     public Set searchUsers(String logicalOp, String scope, Map avPairs) {

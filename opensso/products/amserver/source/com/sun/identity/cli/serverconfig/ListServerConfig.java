@@ -53,7 +53,7 @@ public class ListServerConfig extends ServerConfigBase {
      * Lists Server Configuration.
      *
      * @param rc Request Context.
-     * @throw CLIException if the request cannot serviced.
+     * @throws CLIException if the request cannot serviced.
      */
     @Override
     public void handleRequest(RequestContext rc) 

@@ -50,8 +50,6 @@ public class SelectResponseProviderTypeViewBean
     /**
      * Creates a view to prompt user for response provider type before response
      * provider creation.
-     *
-     * @param name Name of view
      */
     public SelectResponseProviderTypeViewBean() {
         super("SelectResponseProviderType", DEFAULT_DISPLAY_URL);

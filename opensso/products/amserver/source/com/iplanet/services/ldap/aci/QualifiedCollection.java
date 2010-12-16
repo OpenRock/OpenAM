@@ -125,8 +125,8 @@ public class QualifiedCollection {
     /**
      * Sets the exclusive flag
      * 
-     * @param the
-     *            value fo exclusive flag
+     * @param exclusive
+     *            value of exclusive flag
      * @supported.api
      */
     public void setExclusive(boolean exclusive) {

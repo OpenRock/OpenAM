@@ -112,7 +112,7 @@ public abstract class ApplicationPrivilegeManager {
      *
      * @param p Privilege.
      * @param action Privilege action.
-     * @return<code>true</code> if the subject has permission to a
+     * @return <code>true</code> if the subject has permission to a
      * privilege of a given action.
      */
     public abstract boolean hasPrivilege(Privilege p,
@@ -131,7 +131,7 @@ public abstract class ApplicationPrivilegeManager {
      *
      * @param p Referral Privilege.
      * @param action Privilege action.
-     * @return<code>true</code> if the subject has permission to a
+     * @return <code>true</code> if the subject has permission to a
      * referral privilege of a given action.
      */
     public abstract boolean hasPrivilege(ReferralPrivilege p,

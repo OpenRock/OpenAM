@@ -111,7 +111,7 @@ public interface UserModel
     /**
      * Returns set of groups that are available for assignment to a user.
      *
-     * @param name Name of user.
+     * @param userName Name of user.
      * @param assigned Collection of assigned groups.
      */
     public Set getAvailableGroups(String userName, Collection assigned);

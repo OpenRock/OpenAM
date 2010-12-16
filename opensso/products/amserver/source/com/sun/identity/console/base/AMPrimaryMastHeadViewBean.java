@@ -364,7 +364,7 @@ public abstract class AMPrimaryMastHeadViewBean
      * @param tabSetName Name of tab set.
      * @param nodeID Node ID.
      * @return view bean for a tab.
-     * @hrows AMConsoleException if view bean cannot be found.
+     * @throws AMConsoleException if view bean cannot be found.
      */
     protected AMViewBeanBase getTabNodeAssociatedViewBean(
         String tabSetName,

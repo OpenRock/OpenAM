@@ -320,7 +320,7 @@ public class AgentsModelImpl
      * @param name Name of agent.
      * @param type Type of agent.
      * @param password Password of agent.
-     * @param agent Agent URL.
+     * @param agentURL Agent URL.
      * @throws AMConsoleException if agent cannot be created.
      */
     public void createAgentLocal(
@@ -733,7 +733,7 @@ public class AgentsModelImpl
      * Returns attribute values of an agent group.
      *
      * @param realmName Realm where agent group resides.
-     * @param agentName agent group.
+     * @param groupName agent group.
      * @return attribute values of an agent group.
      * @throws AMConsoleException if object cannot located.
      */
@@ -841,7 +841,6 @@ public class AgentsModelImpl
     /**
      * Returns all the authentication chains in a realm.
      *
-     * @param realm Name of realm.
      * @return all the authentication chains in a realm.
      * @throws AMConsoleException if authentication chains cannot be returned.
      */
@@ -946,7 +945,7 @@ public class AgentsModelImpl
      * Returns display name of an agent/group.
      *
      * @param universalId Universal ID of the agent/agent group. 
-     * @returns display name of an agent/group.
+     * @return display name of an agent/group.
      * @throws AMConsoleException if object cannot located.
      */
     public String getDisplayName(String universalId) 
@@ -964,7 +963,7 @@ public class AgentsModelImpl
      * Returns <code>true</code> if the identity if an agent group.
      *
      * @param universalId Universal ID of the agent/agent group. 
-     * @returns <code>true</code> if the identity if an agent group.
+     * @return <code>true</code> if the identity if an agent group.
      */
     public boolean isAgentGroup(String universalId) {
         boolean isGroup = false;

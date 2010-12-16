@@ -56,8 +56,6 @@ public class DNSNameCondition extends EntitlementConditionAdaptor {
      * finace.yahoo.com
      * *.yahoo.com
      * </pre>
-     *
-     * @see #setProperties(Map)
      */
     public static final String DNS_NAME = "DnsName";
 

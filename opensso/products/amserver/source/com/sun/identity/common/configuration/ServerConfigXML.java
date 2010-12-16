@@ -173,7 +173,7 @@ public class ServerConfigXML implements Serializable {
         /**
          * Returns the XML representation of this object.
          *
-         * @param group Server Group Name.
+         * @param groupName Server Group Name.
          * @return the XML representation of this object.
          */
         public String toXML(String groupName) {
@@ -227,7 +227,7 @@ public class ServerConfigXML implements Serializable {
         /**
          * Constructs a Server object.
          *
-         * @node XML node for directory user blob.
+         * @param node XML node for directory user blob.
          */
         public ServerObject(Node node) {
             Element elm = (Element)node;
@@ -275,7 +275,7 @@ public class ServerConfigXML implements Serializable {
         /**
          * Constructs a directory User object.
          *
-         * @node XML node for directory user blob.
+         * @param node XML node for directory user blob.
          */
         public DirUserObject(Node node) {
             Element elm = (Element)node;

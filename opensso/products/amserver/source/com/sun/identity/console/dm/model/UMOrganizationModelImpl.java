@@ -88,7 +88,7 @@ public class UMOrganizationModelImpl
      * Returns assignable services of an organization.
      *
      * @param location Location DN of the organization.
-     * @returns assignable services of an organization.
+     * @return assignable services of an organization.
      */
     public Map getAssignableServiceNames(String location)
         throws AMConsoleException
@@ -181,8 +181,7 @@ public class UMOrganizationModelImpl
      * Removes the specified services from this organization.
      *
      * @param location name of current organization.
-     * @param set of services to remove from the organization.
-     * @return a set of organizations
+     * @param services of services to remove from the organization.
      */
     public void removeServices(String location, Set services) 
         throws AMConsoleException

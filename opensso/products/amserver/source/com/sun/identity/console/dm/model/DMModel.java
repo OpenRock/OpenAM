@@ -134,7 +134,6 @@ public interface DMModel
      *
      * @param location of entry.
      * @param services to remove.
-     * @return type of object.
      */
     void removeServices(String location, Set services) 
        throws AMConsoleException;

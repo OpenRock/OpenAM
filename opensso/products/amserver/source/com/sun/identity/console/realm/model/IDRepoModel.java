@@ -46,7 +46,7 @@ public interface IDRepoModel
      * Returns a set of ID Repository names.
      *
      * @param realmName Name of Realm.
-     * @returns a set of ID Repository names.
+     * @return a set of ID Repository names.
      * @throws AMConsoleException if there are errors getting these names.
      */
     Set getIDRepoNames(String realmName)

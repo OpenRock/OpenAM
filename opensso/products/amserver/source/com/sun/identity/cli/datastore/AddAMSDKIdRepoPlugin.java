@@ -115,7 +115,7 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
      * Services a Commandline Request.
      *
      * @param rc Request Context.
-     * @throw CLIException if the request cannot serviced.
+     * @throws CLIException if the request cannot serviced.
      */
     // @SuppressWarnings("empty-statement")
     public void handleRequest(RequestContext rc) 

@@ -52,7 +52,7 @@ public interface AuthConfigurationModel extends AMModel
      * Deletes the named authentication configuration object.
      *
      * @param realm name where configuration is locate.
-     * @param config name of entry.
+     * @param names names of entries.
      */
     public void deleteAuthConfiguration(String realm, Set names)
         throws AMConsoleException;
@@ -61,7 +61,7 @@ public interface AuthConfigurationModel extends AMModel
      * Gets the module name for the given module index in the current
      * authentication configuration attributes.
      *
-     * @param idx the index of the module to retrieve name from.
+     * @param moduleIndex the index of the module to retrieve name from.
      * @return the module name
      */
     public String getModuleName(int moduleIndex);
@@ -70,7 +70,7 @@ public interface AuthConfigurationModel extends AMModel
      * Gets the module flag for the given module index in the current
      * authentication configuration attributes
      *
-     * @param idx the index of the module to retrieve Flag from.
+     * @param moduleIndex the index of the module to retrieve Flag from.
      * @return the module flag
      */
     public String getModuleFlag(int moduleIndex);
@@ -79,7 +79,7 @@ public interface AuthConfigurationModel extends AMModel
      * Gets the module options string for the given module index in the
      * current authentication configuration attributes
      *
-     * @param idx the index of the module to retrieve Flag from.
+     * @param moduleIndex the index of the module to retrieve Flag from.
      * @return the module options string
      */
     public String getModuleOptions (int moduleIndex);
@@ -90,7 +90,7 @@ public interface AuthConfigurationModel extends AMModel
      * will be returned.
      *
      * @param realm name where configuration is locate.
-     * @param config name of entry.
+     * @param configuration name of entry.
      * @return value of postprocessing class
      */
     public String getPostProcessingClass(String realm, String configuration);
@@ -98,7 +98,7 @@ public interface AuthConfigurationModel extends AMModel
     /**
      * Returns the number of entries in the current configuration.
      *
-     * @retun number of entries
+     * @return number of entries
      */
     public int getNumberEntries();
 
@@ -125,7 +125,7 @@ public interface AuthConfigurationModel extends AMModel
      * List of the selected entries, then removing that List from the
      * original list of all the entries.
      *
-     * @param String[] array of index id's 
+     * @param entries array of index id's
      */
     public void removeAuthEntries(Integer[] entries);
 

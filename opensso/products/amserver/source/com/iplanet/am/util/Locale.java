@@ -47,7 +47,7 @@ import java.util.StringTokenizer;
  * functionality for applications and services to internationalize their
  * messages.
  * @supported.all.api
- * @deprected As of Opensso version 8.0
+ * @deprecated As of Opensso version 8.0
  *            {@link com.sun.identity.shared.locale.Locale}
  */
 public class Locale {

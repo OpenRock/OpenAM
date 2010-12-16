@@ -144,7 +144,7 @@ public class AuthToServiceHelper {
      *
      * @param filter Search Filter.
      * @param model Policy Model.
-     * @returns a set of realm names.
+     * @return a set of realm names.
      * @throws AMConsoleException if search operation failed.
      */
     public Set getRealmNames(String filter, PolicyModel model)

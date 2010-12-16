@@ -38,7 +38,7 @@ public interface CLICommand {
      * Services a Commandline Request.
      *
      * @param rc Request Context.
-     * @throw CLIException if the request cannot serviced.
+     * @throws CLIException if the request cannot serviced.
      */
     void handleRequest(RequestContext rc)
         throws CLIException;

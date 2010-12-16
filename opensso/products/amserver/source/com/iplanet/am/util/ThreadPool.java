@@ -104,7 +104,7 @@ public class ThreadPool {
     /**
      * Create thread for the pool.
      *
-     * @threadsToCreate number of threads of the pool after creation
+     * @param threadsToCreate number of threads of the pool after creation
      */
     protected void createThreads(int threadsToCreate) {
         if (threadsToCreate > poolSize) {

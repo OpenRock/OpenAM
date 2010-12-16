@@ -150,8 +150,8 @@ public class Client extends Observable implements ICDMConstants {
      * known client types. A valid user session is required when setting client
      * data.
      * 
-     * @param sess
-     *            The user's session
+     * @param token
+     *            The user's SSO token
      * @return Iterator of Client objects
      * @deprecated Use ClientsManager#getAllInstances()
      */

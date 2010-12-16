@@ -75,7 +75,7 @@ public class SMProfileModelImpl extends AMModelBase
     /**
      * Constructs a session management profile model implementation object.
      *
-     * @param req  HTTP Servlet request.
+     * @param request  HTTP Servlet request.
      * @param map of user information.
      */
     public SMProfileModelImpl(HttpServletRequest request, Map map) {

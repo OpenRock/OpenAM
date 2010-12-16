@@ -40,7 +40,7 @@ public interface IGenerateReport {
      * Report generation.
      *
      * @param path Path to the configuration directory.
-     * @throw DTException if the exception occurs.
+     * @throws DTException if the exception occurs.
      */
     void generateReport(String path) throws DTException;
 }

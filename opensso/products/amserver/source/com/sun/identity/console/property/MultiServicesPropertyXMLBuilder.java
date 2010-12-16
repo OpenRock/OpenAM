@@ -42,7 +42,6 @@ public class MultiServicesPropertyXMLBuilder
     /**
      * Returns a XML for displaying attribute in property sheet.
      *
-     * @param serviceName Name of service.
      * @param serviceSchema Service schemas.
      * @param model Model for getting localized string and user locale.
      * @throws SMSException if attribute schema cannot obtained.

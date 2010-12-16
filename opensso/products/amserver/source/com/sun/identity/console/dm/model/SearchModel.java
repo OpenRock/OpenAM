@@ -62,9 +62,9 @@ public interface SearchModel
     /**
      * Searches for users
      *
-     * @param String logical operator
-     * @param String scope level
-     * @param Map attribute value pairs
+     * @param logicalOp logical operator
+     * @param scope scope level
+     * @param avPairs attribute value pairs
      * @return a set of users which match the search criterias
      */
     public Set searchUsers(String logicalOp, String scope, Map avPairs);
@@ -72,8 +72,9 @@ public interface SearchModel
     /**
      * Searches for users with a default search scope of subtree
      *
-     * @param String logical operator
-     * @param Map attribute value pairs
+     * @param logicalOp logical operator
+     * @param avPairs attribute value pairs
+     * @param location where to search for users
      * @return a set of users which match the search criterias
      */
     public Set searchUsers(String logicalOp, Map avPairs, String location);
@@ -151,7 +152,7 @@ public interface SearchModel
      * Returns the value for the specified attribute.
      *
      * @param key attribute name.
-     * @retur values for the attribute.
+     * @return values for the attribute.
      */
     public Set getAttrValue(String key);
 

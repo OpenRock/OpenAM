@@ -481,7 +481,7 @@ public class AMAdminUtils {
      *
      * @param string String to work on.
      * @param orig Original character/s.
-     * @param substitute Substitution.
+     * @param substitution Substitution.
      * @return Manipulated string.
      */
     public static String replaceString(
@@ -503,7 +503,7 @@ public class AMAdminUtils {
      *
      * @param list List of string.
      * @param orig Original character/s.
-     * @param substitute Substitution.
+     * @param substitution Substitution.
      * @return Manipulated list.
      */
     public static List replaceString(

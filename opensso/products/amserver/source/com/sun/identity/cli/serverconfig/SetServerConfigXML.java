@@ -51,7 +51,7 @@ public class SetServerConfigXML extends ServerConfigBase {
      * Set Server Configuration XML.
      *
      * @param rc Request Context.
-     * @throw CLIException if the request cannot serviced.
+     * @throws CLIException if the request cannot serviced.
      */
     public void handleRequest(RequestContext rc) 
         throws CLIException {

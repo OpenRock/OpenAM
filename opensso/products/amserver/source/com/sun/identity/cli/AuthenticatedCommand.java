@@ -51,10 +51,10 @@ public abstract class AuthenticatedCommand extends CLICommandBase {
      * Authenticates the administrator. Dervived classes needs to
      * call this method from the dervived method,
      * <code>handleRequest(RequestContext rc)</code>.
+     * Override this method to get user name and passowrd.
      *
      * @param rc Request Context.
      * @throws CLIException if authentication fails.
-     * @Override this method to get user name and passowrd.
      */
     @Override
     public void handleRequest(RequestContext rc)

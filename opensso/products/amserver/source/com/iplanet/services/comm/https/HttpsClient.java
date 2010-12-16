@@ -192,7 +192,7 @@ public final class HttpsClient extends HttpClient
      * flavors, you may be giving up the protection you get through
      * SSL tunneling.
      *
-     * @param URL https URL with which a connection must be established
+     * @param url https URL with which a connection must be established
      */
     public HttpsClient (URL url) throws IOException {
         // HttpClient-level proxying is always disabled,

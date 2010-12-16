@@ -139,7 +139,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
     /**
      * Removes an exisiting attribute
      * 
-     * @param attr
+     * @param name
      *            attribute to be removed
      * @supported.api
      */

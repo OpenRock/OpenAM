@@ -217,7 +217,7 @@ public class PolicyModelImpl
      *
      * @param realmName Name of realm.
      * @param filter Filter string.
-     * @returns policy names that are under a realm.
+     * @return policy names that are under a realm.
      * @throws AMConsoleException if policy names cannot be returned.
      */
     public Set getPolicyNames(String realmName, String filter)

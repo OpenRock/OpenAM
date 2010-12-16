@@ -69,8 +69,6 @@ public class AgentAddViewBean
 
     /**
      * Creates a view to prompt user for ID Repo type before  creation.
-     *
-     * @param name Name of view
      */
     public AgentAddViewBean() {
         super("AgentAdd");

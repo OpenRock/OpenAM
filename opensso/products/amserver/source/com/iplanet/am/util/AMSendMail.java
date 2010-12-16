@@ -66,7 +66,6 @@ public class AMSendMail {
      * @param subject The e-mail subject
      * @param message The content contained in the e-mail
      * @param from The sending e-mail address
-     * @return none
      * @exception MessagingException if there is any error in sending e-mail
      */
     public void postMail(String recipients[], String subject, String message,
@@ -84,7 +83,6 @@ public class AMSendMail {
      * @param message The content contained in the e-mail
      * @param from The sending e-mail address 
      * @param charset The charset used in e-mail encoding
-     * @return none
      * @exception MessagingException if there is any error in sending e-mail
      */
 
@@ -138,9 +136,8 @@ public class AMSendMail {
      * @param host The host name to connect to send e-mail
      * @param port The host port to connect to send e-mail 
      * @param user The user name used to authenticate to the host
-     * @param pssword The user password used to authenticate to the host 
+     * @param password The user password used to authenticate to the host
      * @param ssl A boolean to indicate whether SSL is needed to connect to the host 
-     * @return none
      * @exception MessagingException if there is any error in sending e-mail
      */
 

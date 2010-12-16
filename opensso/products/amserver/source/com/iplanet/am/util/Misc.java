@@ -117,7 +117,7 @@ public class Misc {
      *             when fails to parse the defaultValue argument as a signed
      *             decimal integer for return
      * @deprecated As of OpenSSO version 8.0
-     * {@link com.sun.identity.shared.datastruct.CollectionHelper#getIntMapAttr(Map, String, String, debug)}
+     * {@link com.sun.identity.shared.datastruct.CollectionHelper#getIntMapAttr(Map, String, String, Debug)}
      */
     public static int getIntMapAttr(Map m, String name, String defaultValue,
             Debug debug) throws NumberFormatException {
@@ -147,7 +147,7 @@ public class Misc {
      *            Debug
      * @return int value
      * @deprecated As of OpenSSO version 8.0
-     * {@link com.sun.identity.shared.datastruct.CollectionHelper#getIntMapAttr(Map, String, int, debug)}
+     * {@link com.sun.identity.shared.datastruct.CollectionHelper#getIntMapAttr(Map, String, int, Debug)}
      */
     public static int getIntMapAttr(Map m, String name, int defaultValue,
             Debug debug) {

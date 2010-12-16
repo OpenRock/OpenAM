@@ -60,7 +60,6 @@ public class TokenCleanupRunnable extends GeneralTaskRunnable {
     /**
      * Constructor.
      * @param runPeriod The period for the clean up to run.
-     * @param map the <code>Map</code> to be cleaned up.
      */
     public TokenCleanupRunnable(long runPeriod) {
         this.runPeriod = runPeriod;

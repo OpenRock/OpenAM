@@ -154,7 +154,7 @@ public class AgentConfiguration {
      * @param realm Realm where group resides.
      * @param agentGroupName Name of agent group.
      * @param agentType Type of agent group.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @throws IdRepoException if there are Id Repository related errors.
      * @throws SSOException if the Single Sign On token is invalid or has
      *         expired.
@@ -181,7 +181,7 @@ public class AgentConfiguration {
      * @param realm Realm where group resides.
      * @param agentGroupName Name of agent group.
      * @param agentType Type of agent group.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @param serverURL Server URL.
      * @param agentURL Agent URL.
      * @throws IdRepoException if there are Id Repository related errors.
@@ -278,7 +278,7 @@ public class AgentConfiguration {
      * @param realm Realm where agent resides.
      * @param agentName Name of agent.
      * @param agentType Type of agent.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @param serverURL Server URL.
      * @param agentURL Agent URL.
      * @throws IdRepoException if there are Id Repository related errors.
@@ -334,7 +334,7 @@ public class AgentConfiguration {
      * @param realm Realm where agent resides.
      * @param agentName Name of agent.
      * @param agentType Type of agent.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @param agentURL Agent URL.
      * @throws IdRepoException if there are Id Repository related errors.
      * @throws SSOException if the Single Sign On token is invalid or has
@@ -369,7 +369,7 @@ public class AgentConfiguration {
      * @param realm Realm where agent resides.
      * @param agentName Name of agent.
      * @param agentType Type of agent.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @throws IdRepoException if there are Id Repository related errors.
      * @throws SSOException if the Single Sign On token is invalid or has
      *         expired.
@@ -646,7 +646,7 @@ public class AgentConfiguration {
      * @param ssoToken Single Sign On token that is to be used for creation.
      * @param realm Name of realm where agent resides.
      * @param agentName Name of agent.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @param bSet <code>true</code> to overwrite the values for the
      *        attribute.
      * @throws IdRepoException if there are Id Repository related errors.
@@ -739,8 +739,8 @@ public class AgentConfiguration {
      *
      * @param ssoToken Single Sign On token that is to be used for creation.
      * @param realm Realm where group resides.
-     * @param agentName Name group of agent.
-     * @param values Map of attribute name to its values.
+     * @param agentGroupName Name group of agent.
+     * @param attrValues Map of attribute name to its values.
      * @throws IdRepoException if there are Id Repository related errors.
      * @throws SSOException if the Single Sign On token is invalid or has
      *         expired.
@@ -765,7 +765,7 @@ public class AgentConfiguration {
      * @param ssoToken Single Sign On token that is to be used for creation.
      * @param realm Name of realm where agent resides.
      * @param agentGroupName Name of agent group.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @param bSet <code>true</code> to overwrite the values for the
      *        attribute.
      * @throws IdRepoException if there are Id Repository related errors.
@@ -1226,8 +1226,8 @@ public class AgentConfiguration {
      * Returns a set of attribute schema names whose schema match a given 
      * type.
      *
-     * @param amid Identity Object. Agent Type is to be gotten from it.
-     * @param type Type.
+     * @param agentType Agent type
+     * @param type AttributeSchema type
      * @return a set of attribute schema names whose schema match a given 
      * type.
      * @throws IdRepoException if there are Id Repository related errors.
@@ -1256,7 +1256,7 @@ public class AgentConfiguration {
     /**
      * Returns resource bundle name of agent service.
      * 
-     * @returnresource bundle name of agent service.
+     * @return resource bundle name of agent service.
      * @throws SMSException if Service Schema cannot be located.
      * @throws SSOException if admin single sign on token has expired.
      */
@@ -1615,7 +1615,7 @@ public class AgentConfiguration {
      *        operation.
      * @param realm Realm name where agent and group reside.
      * @param universalId Universal ID of Agent.
-     * @param group Name of Group object to be set.
+     * @param groupName Name of Group object to be set.
      * @return <code>true</code> if group is set.
      * @throws IdRepoException if group cannot be set.
      * @throws SSOException if the Single Sign On token is invalid or has
@@ -1639,7 +1639,7 @@ public class AgentConfiguration {
      *        operation.
      * @param realm Realm name where agent and group reside.
      * @param amid Agent object.
-     * @param group Name of Group object to be set.
+     * @param groupName Name of Group object to be set.
      * @return <code>true</code> if group is set.
      * @throws IdRepoException if group cannot be set.
      * @throws SSOException if the Single Sign On token is invalid or has

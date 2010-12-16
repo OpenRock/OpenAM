@@ -92,7 +92,7 @@ public interface UMOrganizationModel
      * Returns assignable services of an organization.
      *
      * @param location Location DN of the organization.
-     * @returns assignable services of an organization.
+     * @return assignable services of an organization.
      */
     public Map getAssignableServiceNames(String location)
         throws AMConsoleException;

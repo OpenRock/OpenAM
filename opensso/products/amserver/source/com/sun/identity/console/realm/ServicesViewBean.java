@@ -239,9 +239,9 @@ public class ServicesViewBean
     }
 
     /**
-     * Forwards request to edit ID Repo view bean.
+     * Forwards request to edit Service view bean.
      *
-     * @param event Request Invocation Event.
+     * @param serviceName name of the service to be edited
      */
     public void handleTblDataActionHrefRequest(String serviceName) {
         ServicesModel model = (ServicesModel)getModel();

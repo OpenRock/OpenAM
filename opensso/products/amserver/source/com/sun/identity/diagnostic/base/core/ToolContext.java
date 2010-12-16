@@ -175,7 +175,7 @@ public class ToolContext implements ToolConstants {
     /**
      * Returns the default service repository location i.e. TOOL_HOME/services
      *
-     * @returns the location of the default service repository.
+     * @return the location of the default service repository.
      */
     public String getDefaultServiceRepository() {
         return getApplicationHome() + File.separatorChar + 
@@ -185,7 +185,7 @@ public class ToolContext implements ToolConstants {
     /**
      * Returns the custom service repository location.
      *
-     * @returns the location of the default service repository.
+     * @return the location of the default service repository.
      */
     public List<String> getCustomServiceRepositories() {
         return serviceLocs;
@@ -194,7 +194,7 @@ public class ToolContext implements ToolConstants {
     /**
      * Returns the output writer for the tool
      *
-     * @returns the output writer based on the run mode 
+     * @return the output writer based on the run mode 
      */
     public IToolOutput getOutputWriter() {
         return tManager.getToolOutputManager().getOutputWriter();

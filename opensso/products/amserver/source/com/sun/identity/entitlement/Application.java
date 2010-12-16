@@ -275,7 +275,7 @@ public class Application implements Cloneable {
     /**
      * Sets supported subject class names.
      *
-     * @param conditions Supported subject class names.
+     * @param subjects Supported subject class names.
      */
     public void setSubjects(Set<String> subjects) {
         this.subjects = subjects;
@@ -606,7 +606,7 @@ public class Application implements Cloneable {
     /**
      * Set description.
      *
-     * @aparam description description.
+     * @param description description.
      */
     public void setDescription(String description) {
         this.description = description;
@@ -660,7 +660,7 @@ public class Application implements Cloneable {
     /**
      * Sets the user ID who last modified the policy.
      *
-     * @param createdBy user ID who last modified the policy.
+     * @param lastModifiedBy user ID who last modified the policy.
      */
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;

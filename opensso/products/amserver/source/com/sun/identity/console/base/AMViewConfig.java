@@ -213,7 +213,7 @@ public class AMViewConfig {
     /**
      * Returns the combined agent type.
      * 
-     * @param cName Combined Agent type referred name.
+     * @param type Combined Agent type referred name.
      * @return the combined agent type.
      */
     public String getCombineAgentType(String type) {
@@ -243,7 +243,7 @@ public class AMViewConfig {
     /**
      * Returns the combined agent types.
      * 
-     * @param cName Combined Agent type referred name.
+     * @param type Combined Agent type referred name.
      * @return the combined agent types.
      */
     public Set getCombineAgentTypes(String type) {
@@ -375,7 +375,7 @@ public class AMViewConfig {
      * </ul>
      *
      * @param parentID for the parent tab
-     * @param List of subtabs to add to the parent
+     * @param items list of subtabs to add to the parent
      */
 public void setTabViews(int parentID, List items) {
         AMTabEntry parent = null;

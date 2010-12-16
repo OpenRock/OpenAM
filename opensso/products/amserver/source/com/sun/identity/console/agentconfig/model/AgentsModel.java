@@ -83,7 +83,7 @@ public interface AgentsModel
      * @param name Name of agent.
      * @param type Type of agent.
      * @param password Password of agent.
-     * @param agent Agent URL.
+     * @param agentURL Agent URL.
      * @throws AMConsoleException if agent cannot be created.
      */
     void createAgentLocal(
@@ -224,7 +224,7 @@ public interface AgentsModel
      * Returns attribute values of an agent group.
      *
      * @param realmName Realm where agent group resides.
-     * @param agentName agent group.
+     * @param groupName agent group.
      * @return attribute values of an agent group.
      * @throws AMConsoleException if object cannot located.
      */
@@ -290,7 +290,7 @@ public interface AgentsModel
      * Returns display name of an agent/group.
      *
      * @param universalId Universal ID of the agent/agent group. 
-     * @returns display name of an agent/group.
+     * @return display name of an agent/group.
      * @throws AMConsoleException if object cannot located.
      */
     String getDisplayName(String universalId) throws AMConsoleException;
@@ -299,7 +299,7 @@ public interface AgentsModel
      * Returns <code>true</code> if the identity if an agent group.
      *
      * @param universalId Universal ID of the agent/agent group. 
-     * @returns <code>true</code> if the identity if an agent group.
+     * @return <code>true</code> if the identity if an agent group.
      */
     boolean isAgentGroup(String universalId);
 
@@ -333,8 +333,7 @@ public interface AgentsModel
     
     /**
      * Returns attribute values of agent's group.
-     *
-      @param realmName Realm where agent group resides
+     * @param realm Realm where agent group resides
      * @param agentId Universal Id of the agent.
      * @param attrNames Attribute Names of interests.
      * @return attribute values of agent's group.

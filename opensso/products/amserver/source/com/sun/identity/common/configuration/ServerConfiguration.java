@@ -866,7 +866,7 @@ public class ServerConfiguration extends ConfigurationBase {
      * @param ssoToken Single Sign-On Token which is used to access to the
      *        service management datastore.
      * @param instanceName Name of the server instance.
-     * @param sitename Site name.
+     * @param siteName Site name.
      * @throws SMSException if errors access in the service management
      *         datastore.
      * @throws SSOException if the <code>ssoToken</code> is not valid.

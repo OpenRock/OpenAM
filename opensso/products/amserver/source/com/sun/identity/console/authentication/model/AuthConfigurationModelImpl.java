@@ -195,7 +195,7 @@ public  class AuthConfigurationModelImpl extends AMModelBase
      * Deletes the named authentication configuration object.
      *  
      * @param realm name where configuration is locate.
-     * @param config name of entry.
+     * @param names names of entries.
      */
      public void deleteAuthConfiguration(String realm, Set names)
          throws AMConsoleException
@@ -352,7 +352,7 @@ public  class AuthConfigurationModelImpl extends AMModelBase
     /**
      * Returns the number of entries in the current configuration.
      * 
-     * @retun number of entries
+     * @return number of entries
      */
     public int getNumberEntries() {
         return (entryList != null) ? entryList.size() : 0;
@@ -396,7 +396,7 @@ public  class AuthConfigurationModelImpl extends AMModelBase
      * List of the selected entries, then removing that List from the 
      * original list of all the entries.
      *
-     * @param String[] array of index id's 
+     * @param entries array of index id's
      */
     public void removeAuthEntries(Integer[] entries) {
         List removeList = new ArrayList(entries.length * 2);

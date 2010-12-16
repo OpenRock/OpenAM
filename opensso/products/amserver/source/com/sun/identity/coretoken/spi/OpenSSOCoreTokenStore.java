@@ -94,8 +94,7 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
      * 
      * @param subject
      * @param attributes
-     * @param newTokenId
-     * @return
+     * @return the created token in JSON format
      * @throws CoreTokenException
      * @throws JSONException
      */
@@ -143,7 +142,7 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
      *
      * @param adminSubject
      * @param tokenId
-     * @return
+     * @return token value from SM with the given tokenId
      * @throws CoreTokenException
      */
     public String readToken(Subject adminSubject, String tokenId)
@@ -207,7 +206,7 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
      * 
      * @param subject
      * @param queryString
-     * @return
+     * @return JSON array of tokens matching the queryString
      * @throws CoreTokenException
      */
     public JSONArray searchTokens (Subject subject,

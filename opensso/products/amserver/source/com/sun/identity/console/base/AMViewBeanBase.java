@@ -634,7 +634,7 @@ public abstract class AMViewBeanBase
     /**
      * Set location DN
      *
-     * @param DN
+     * @param dn
      */
     public void setCurrentLocation(String dn) {
         if (dn != null) {

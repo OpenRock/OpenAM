@@ -741,7 +741,7 @@ public class SiteConfiguration extends ConfigurationBase {
      *
      * @param ssoToken Single Sign-On Token which is used to access to the
      *        service management datastore.
-     * @param siteId Identifier of the site.
+     * @param siteName Name of the site.
      * @param serverInstanceNames Set of server instance names.
      * @throws SMSException if errors access in the service management
      *         datastore.
@@ -769,7 +769,7 @@ public class SiteConfiguration extends ConfigurationBase {
      *
      * @param ssoToken Single Sign-On Token which is used to access to the
      *        service management datastore.
-     * @param siteId Identifier of the site.
+     * @param siteName Name of the site.
      * @param serverInstanceNames Set of server instance names.
      * @throws SMSException if errors access in the service management
      *         datastore.
@@ -836,7 +836,7 @@ public class SiteConfiguration extends ConfigurationBase {
      *
      * @param ssoToken Single Sign-On Token which is used to access to the
      *        service management datastore.
-     * @param siteId Identifier of the site.
+     * @param siteName Name of the site.
      * @return the server instance names that belong to a site.
      * @throws SMSException if errors access in the service management
      *         datastore.
@@ -899,7 +899,7 @@ public class SiteConfiguration extends ConfigurationBase {
      * 
      * @param ssoToken Single Sign-On Token which is used to access to the
      *        service management datastore.
-     * @param URL Lookup URL.
+     * @param url Lookup URL.
      * @return site name.
      * @throws SMSException if errors access in the service management
      *         datastore.

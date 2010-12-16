@@ -58,7 +58,7 @@ class HttpsURLConnection extends HttpURLConnection
     /**
      * Returns a connection to an HTTPS server.
      *
-     * @param URL identifies the HTTPS server to connect with.
+     * @param url identifies the HTTPS server to connect with.
      */
     protected HttpClient getNewClient (URL url)
     throws IOException {

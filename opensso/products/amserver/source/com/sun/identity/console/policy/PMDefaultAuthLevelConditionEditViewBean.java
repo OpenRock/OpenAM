@@ -61,7 +61,7 @@ public class PMDefaultAuthLevelConditionEditViewBean
     /**
      * Searches for realms and set up realm selectable list.
      *
-     * @param even Display Event.
+     * @param event Display Event.
      * @throws ModelControlException if <code>JATO</code> default model fails.
      */
     public void beginDisplay(DisplayEvent event)

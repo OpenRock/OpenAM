@@ -33,7 +33,7 @@ package com.sun.identity.console.base.model;
  * class is when a method needs to return a result plus an exception message
  *
  * @author    vs125812
- * @created   July 26, 2005
+ * July 26, 2005
  */
 public class QueryResults {
     private Object results;

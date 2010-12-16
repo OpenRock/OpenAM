@@ -389,7 +389,7 @@ public class GroupModelImpl extends DMModelBase
     /**
      * Returns value of the specified attribute for the given group.
      *
-     * @param given DN of the group.
+     * @param groupDN given DN of the group.
      * @param attribute name.
      * @return value of the of the attribute from the search results.
      */
@@ -786,7 +786,8 @@ public class GroupModelImpl extends DMModelBase
      * organization unit. A reload of the navigation frame will be performed
      * if the group is successfully created.
      *
-     * @param data - map which contains the group name and the optional and
+     * @param location where to create the given group
+     * @param dataIn map which contains the group name and the optional and
      *               required attributes.
      * @return true if the group was created, false otherwise
      */
@@ -1395,8 +1396,8 @@ public class GroupModelImpl extends DMModelBase
      * Returns <code>Set</code> of DN's (entries) which are the members of a 
      * group. The members can be a mixture of groups and user entries.
      *
-     * @param filter Filter used to limit the number of users returned.
-     * @param group name of group to get the members.
+     * @param pattern Pattern used to limit the number of users returned.
+     * @param groupDN DN of group to get the members.
      * @throws AMConsoleException
      */
     public Set getMembers(String pattern, String groupDN) 
@@ -1498,7 +1499,7 @@ public class GroupModelImpl extends DMModelBase
      * or users.
      *
      * @param location Name of the group.
-     * @param memberNames Set of names to remove from the group.
+     * @param setDNs Set of names to remove from the group.
      * @throws AMConsoleException if members cannot be removed.
      */
     public void removeMembers(String location, Set setDNs)

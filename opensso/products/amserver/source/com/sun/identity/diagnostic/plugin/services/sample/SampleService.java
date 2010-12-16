@@ -83,7 +83,7 @@ public class SampleService implements ToolService {
      *
      * @param sReq ServiceRequest object containing input params
      * @param sRes ServiceResponse object containg output results
-     * @throw Exception if the exception occurs.
+     * @throws Exception if the exception occurs.
      */
     public void processRequest(
         ServiceRequest sReq,

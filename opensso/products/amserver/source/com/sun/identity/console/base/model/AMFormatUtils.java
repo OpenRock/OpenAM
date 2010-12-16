@@ -58,7 +58,7 @@ public class AMFormatUtils
     /**
      * Sorts items in a set.
      *
-     * @param set to sort.
+     * @param collection to sort.
      * @param locale of user.
      * @return list of sorted items.
      */
@@ -229,7 +229,7 @@ public class AMFormatUtils
      *
      * @param model handle to AMModel interface.
      * @param universalId Universal Id of Entity object.
-     * @returns the display name of an <code>AMIdentity</code>.
+     * @return the display name of an <code>AMIdentity</code>.
      */
     public static String getIdentityDisplayName(
         AMModel model,
@@ -259,7 +259,7 @@ public class AMFormatUtils
      *
      * @param model handle to AMModel interface.
      * @param entity Entity object.
-     * @returns the display name of an <code>AMIdentity</code>.
+     * @return the display name of an <code>AMIdentity</code>.
      */
     public static String getIdentityDisplayName(
         AMModel model, 

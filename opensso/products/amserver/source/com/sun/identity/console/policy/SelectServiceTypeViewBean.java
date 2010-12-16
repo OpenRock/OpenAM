@@ -57,8 +57,6 @@ public class SelectServiceTypeViewBean
 
     /**
      * Creates a view to prompt user for policy type before policy creation.
-     *
-     * @param name Name of view
      */
     public SelectServiceTypeViewBean() {
         super("SelectServiceType", DEFAULT_DISPLAY_URL);

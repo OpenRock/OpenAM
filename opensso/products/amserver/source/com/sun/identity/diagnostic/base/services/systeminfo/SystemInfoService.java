@@ -61,7 +61,7 @@ public class SystemInfoService implements SystemInfoConstants, ToolService {
      * Initialize the service with the tool context. This is called once 
      * during service activation.
      *
-     * @param aContext ToolContext in which this service runs.
+     * @param tContext ToolContext in which this service runs.
      */
     public void init(ToolContext tContext) {
         sysInfoProvider = getSystemInfoProvider();
@@ -77,7 +77,7 @@ public class SystemInfoService implements SystemInfoConstants, ToolService {
      *
      * @param sReq ServiceRequest object containing input params
      * @param sRes ServiceResponse object containg output results
-     * @throw Exception if the exception occurs.
+     * @throws Exception if the exception occurs.
      */
     public void processRequest(ServiceRequest sReq, ServiceResponse sRes)
         throws Exception 

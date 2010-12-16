@@ -220,7 +220,7 @@ public interface AMModel
      * The authentication service sets a property in the users session
      * based on the properties in the core authentication service.
      *
-     * @returns true if the user profile should be ignored.
+     * @return true if the user profile should be ignored.
      */
     public boolean ignoreUserProfile();
 

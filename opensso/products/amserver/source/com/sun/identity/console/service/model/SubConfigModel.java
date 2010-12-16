@@ -68,7 +68,7 @@ public interface SubConfigModel
     /**
      * Returns a set of attribute names for a sub schema.
      *
-     * @param name Name of Schema.
+     * @param schemaName Name of Schema.
      * @return Set of attribute names for a sub schema.
      */
     Set getAttributeNames(String schemaName);
@@ -123,7 +123,7 @@ public interface SubConfigModel
      * Returns list of sub configuration objects.
      *
      * @return list of sub configuration objects.
-     * @see SMSubConfig
+     * @see com.sun.identity.console.base.model.SMSubConfig
      */
     List getSubConfigurations();
 

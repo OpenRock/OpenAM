@@ -62,7 +62,7 @@ import com.sun.identity.shared.debug.Debug;
  * </PRE>
  * @version iPlanet with JSS3.1
  * @see LDAPSocketFactory
- * @see LDAPConnection#LDAPConnection(com.sun.identity.shared.ldap.LDAPSocketFactory)
+ * @see com.sun.identity.shared.ldap.LDAPConnection#LDAPConnection(com.sun.identity.shared.ldap.LDAPSocketFactory)
  */
 
 public class JSSSocketFactory implements Serializable,

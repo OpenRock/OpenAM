@@ -63,7 +63,7 @@ public class LogWriter {
      * @param mgr Command Manager Object.
      * @param type Type of log message.
      * @param level Logging level of the message.
-     * @param message ID for message.
+     * @param msgid ID for message.
      * @param msgdata array of log message "data".
      * @param ssoToken Single Sign On Token of the user who committed the
      *        operation.

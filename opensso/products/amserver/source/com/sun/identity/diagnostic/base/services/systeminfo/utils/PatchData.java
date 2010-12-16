@@ -73,7 +73,7 @@ public class PatchData extends Object implements SystemInfoConstants,
     /**
      * Setter for property obsoletes.
      *
-     * @param zoneName New value of property obsoletes.
+     * @param obsoletes New value of property obsoletes.
      */
     public void setObsoletes(String obsoletes) {
         this.obsoletes = obsoletes;

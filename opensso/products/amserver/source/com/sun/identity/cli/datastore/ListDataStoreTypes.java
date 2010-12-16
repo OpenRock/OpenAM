@@ -55,7 +55,6 @@ public class ListDataStoreTypes extends AuthenticatedCommand {
      *
      * @param rc Request Context.
      * @throws CLIException if request cannot be processed.
-     * @Override
      */
     public void handleRequest(RequestContext rc)
         throws CLIException {

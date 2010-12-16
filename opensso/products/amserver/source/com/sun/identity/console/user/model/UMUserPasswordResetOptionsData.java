@@ -122,7 +122,7 @@ public class UMUserPasswordResetOptionsData
     /**
      * Set question.
      *
-     * @param question.
+     * @param question The password reset question
      */
     public void setQuestion(String question) {
         if (isPersonalQuestion()) {

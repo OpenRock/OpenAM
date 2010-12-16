@@ -203,7 +203,8 @@ public class PeopleContainerModelImpl extends DMModelBase
     /**
      * Deletes the People Containers that were selected
      *
-     * @param true if the People Containers delete operation is successful
+     * @param pcDNSet of people container DNs that should be deleted
+     * @return true if the People Containers delete operation is successful
      */
     public boolean deletePeopleContainers(Set pcDNSet) {
 	boolean delete = false;

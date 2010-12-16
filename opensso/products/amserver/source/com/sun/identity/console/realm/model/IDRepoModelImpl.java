@@ -79,7 +79,7 @@ public class IDRepoModelImpl
      * Returns a set of ID Repository names.
      *
      * @param realmName Name of Realm.
-     * @returns a set of ID Repository names.
+     * @return a set of ID Repository names.
      * @throws AMConsoleException if there are errors getting these names.
      */
     public Set getIDRepoNames(String realmName)
@@ -167,7 +167,7 @@ public class IDRepoModelImpl
      * Returns property sheet XML for ID Repo Profile.
      *
      * @param realmName Name of Realm.
-     * @param viewBeanClassName Class Name of View Bean.
+     * @param viewbeanClassName Class Name of View Bean.
      * @param type Type of ID Repo.
      * @param bCreate <code>true</code> for creation operation.
      * @return property sheet XML for ID Repo Profile.

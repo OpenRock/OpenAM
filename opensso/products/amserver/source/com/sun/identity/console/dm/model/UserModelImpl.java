@@ -401,8 +401,8 @@ public class UserModelImpl
     /**
      * Gets the services which are assigned to this user.
      *
-     * @param location name or current organization location
-     * @return a set of organizations
+     * @param userName name of a user
+     * @return a set of services
      */
     public Map getAssignedServices(String userName) {
         //TBD LOG GETTING USER ASSIGNED SERVICES
@@ -431,9 +431,8 @@ public class UserModelImpl
     /**
      * Removes the specified services from this user.
      *
-     * @param location name of current organization.
-     * @param set of services to remove from the organization.
-     * @return a set of organizations
+     * @param userName name of a user
+     * @param services set of services to remove from the user.
      */
     public void removeServices(String userName, Set services) 
         throws AMConsoleException
@@ -468,7 +467,7 @@ public class UserModelImpl
      * Gets a set of users.
      *
      * @param location name or current organization location
-     * @param filter wildcards
+     * @param pattern Pattern used to limit the number of users returned.
      * @return a set of organizations
      */
     public Set getUsers(String location, String pattern) {
@@ -561,10 +560,10 @@ public class UserModelImpl
      * key elements: user naming attribute; list of services to  assign to
      * the user; a set of required attribute values; and the people container
      * to create the user.
-     *   
-     * @param dataIn map which contains the user name and the optional
+     * 
+     * @param location where to create the given user
+     * @param data map which contains the user name and the optional
      * and required attributes.
-     * @return true if the user was created, false otherwise.
      */  
     public void createUser(String location, Map data) 
 	throws AMConsoleException 
@@ -1028,7 +1027,7 @@ public class UserModelImpl
     /**
      * Returns set of roles that are available for assignment to a user.
      *
-     * @param name Name of user.
+     * @param userName Name of user.
      * @param assigned Collection of assigned role.
      */
     public Set getAvailableRoles(String userName, Collection assigned) {
@@ -1059,7 +1058,7 @@ public class UserModelImpl
     /**
      * Returns set of groups that are available for assignment to a user.
      *
-     * @param name Name of user.
+     * @param userName Name of user.
      * @param assigned Collection of assigned groups.
      */
     public Set getAvailableGroups(String userName, Collection assigned) {
@@ -1094,7 +1093,7 @@ public class UserModelImpl
      * Updates the specified groups from the user entry.
      *
      * @param name of user entry.
-     * @param groupDNS set of group to be assigned to the user.
+     * @param groupDNs set of group to be assigned to the user.
      * @throws AMConsoleException if updating fails.
      */
     public void updateGroups(String name, Set groupDNs) 
@@ -1112,7 +1111,7 @@ public class UserModelImpl
      * Returns the static groups currently assigned to the user. This
      * will not return the dynamic groups.
      *
-     * @param name of the user entry.
+     * @param userName of the user entry.
      * @return Set of group dns.
      */
     public Set getAssignedGroups(String userName) {   
@@ -1154,7 +1153,7 @@ public class UserModelImpl
     /**
      * Removes the specified groups from the user entry.
      *
-     * @param roleDNs Set of group DNs to be removed.
+     * @param groupDNs Set of group DNs to be removed.
      */
     public void removeGroups(Set groupDNs) throws AMConsoleException {
 	if (user == null || groupDNs == null || groupDNs.isEmpty()) {

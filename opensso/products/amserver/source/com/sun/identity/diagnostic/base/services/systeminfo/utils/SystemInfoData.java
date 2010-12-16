@@ -273,7 +273,6 @@ public class SystemInfoData extends Object implements SystemInfoConstants,
      * Helper method to convert as string representation
      *
      * @param toolOutWriter the output writer for the tool
-     * @return string representation of this object
      */
     public void toString(IToolOutput toolOutWriter){
         String[] params = {SMALL_LINE, SMALL_LINE};

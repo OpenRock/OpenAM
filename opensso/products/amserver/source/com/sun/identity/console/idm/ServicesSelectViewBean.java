@@ -72,8 +72,6 @@ public class ServicesSelectViewBean
 
     /**
      * Creates a view to prompt user for services to be added to identity.
-     *
-     * @param name Name of view
      */
     public ServicesSelectViewBean() {
         super("ServicesSelect");

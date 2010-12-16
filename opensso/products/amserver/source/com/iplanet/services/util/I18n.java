@@ -349,8 +349,8 @@ public class I18n {
      * 
      * @param pattern
      *            pattern for which the message to be formatted
-     * @param j
-     *            Object to be formatted & substituted
+     * @param i
+     *            Integer to be formatted & substituted
      * @param l
      *            locale in a string format
      * @return Returns the formatted message

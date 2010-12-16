@@ -42,9 +42,8 @@ public interface Configurator {
     boolean isPasswordUpdateRequired();
 
     /**
-     * If <tt>true</tt>, the options.htm page will be cusotmized for a new installation, otherwise it will be
+     * @return If <tt>true</tt>, the options.htm page will be cusotmized for a new installation, otherwise it will be
      * customized for an upgrade.
-     * @return
      */
     boolean isNewInstall();
 
@@ -179,7 +178,7 @@ public interface Configurator {
     /**
      * Returns a Realm object corresponding to the realm name passed as parameter or null if doesn't exist a realm with the specified name.
      * @param name is the name of the realm we want to get from the back-end.
-     * @return
+     * @return a realm object corresponding to the passed name, or null if such not exists
      */
     Realm getRealm(String name);
 

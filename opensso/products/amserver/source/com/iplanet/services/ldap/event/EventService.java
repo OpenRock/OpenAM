@@ -719,8 +719,8 @@ public class EventService implements Runnable {
      * removes the listener from the list of Persistent Search listeners of the
      * asynchronous seach for the given search ID.
      * 
-     * @param requestID
-     *            The request ID returned by the addListener
+     * @param request
+     *            The request returned by the addListener
      * @supported.api
      */   
     protected void removeListener(Request request) {
@@ -782,7 +782,7 @@ public class EventService implements Runnable {
      * Reset all searches. Clear cache only if true is passed to argument
      * 
      * @param clearCaches
-     * @return
+     * @return <code>true</code> if the reset was successful, otherwise <code>false</code>
      */    
     public synchronized boolean resetAllSearches(boolean clearCaches) {
         if (_shutdownCalled) {

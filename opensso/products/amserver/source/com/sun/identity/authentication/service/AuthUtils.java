@@ -2027,9 +2027,9 @@ public class AuthUtils extends AuthClientUtils {
      * Returns valid goto parameter for this request.	 
      * Validate goto parameter set in the current request, then returns it	 
      * if valid	 
-     * @param request, the HttpServletRequest	 
+     * @param request the HttpServletRequest	 
      * @param authContext authentication context for this request.	 
-     * @return successURL, a String	 
+     * @return successURL a String	 
      */	 
     public static String getValidGotoURL(HttpServletRequest request,	 
             AuthContextLocal authContext) {	 
@@ -2041,9 +2041,9 @@ public class AuthUtils extends AuthClientUtils {
      * Returns valid goto parameter for this request.	 
      * Validate goto parameter set in the current request, then returns it	 
      * if valid	 
-     * @param request, the HttpServletRequest	 
-     * @param orgDN, organization DN	 
-     * @return successURL, a String	 
+     * @param request the HttpServletRequest	 
+     * @param orgDN organization DN	 
+     * @return successURL a String	 
      */	 
     public static String getValidGotoURL(HttpServletRequest request,	 
             String orgDN) {	 

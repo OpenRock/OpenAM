@@ -69,8 +69,6 @@ public class SubSchemaTypeSelectViewBean
 
     /**
      * Creates a view to prompt user for services to be added to realm.
-     *
-     * @param name Name of view
      */
     public SubSchemaTypeSelectViewBean() {
         super("SubSchemaTypeSelect");

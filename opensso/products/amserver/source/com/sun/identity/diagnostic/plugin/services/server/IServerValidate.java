@@ -40,7 +40,7 @@ public interface IServerValidate {
      * Server configuration validation.
      *
      * @param path Path to the configuration directory.
-     * @throw DTException if there is an exception.
+     * @throws DTException if there is an exception.
      */
     void validate(String path) throws DTException;
 }

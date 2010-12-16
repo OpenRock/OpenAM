@@ -212,7 +212,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
     /**
      * Add mulitple string values to the attribute
      * 
-     * @param value
+     * @param values
      *            string values to be added to the attribute
      * @supported.api
      */
@@ -275,7 +275,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
     /**
      * Add a list byte array values to the attribute
      * 
-     * @param list
+     * @param values
      *            of byte array values to be added to the attribute
      * @supported.api
      */

@@ -63,7 +63,7 @@ public interface MAPCreateDeviceModel extends MAPModel {
     /**
      * Create new device.
      *
-     * @param attrValues Attribute Values for the new device.
+     * @param values Attribute Values for the new device.
      * @throws AMConsoleException if device cannot be created.
      */
     void createDevice(Map values)

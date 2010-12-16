@@ -65,8 +65,6 @@ public class UserSelectServicesViewBean
 
     /**
      * Creates a view to prompt user for services to be added to realm.
-     *
-     * @param name Name of view
      */
     public UserSelectServicesViewBean() {
 	super("UserSelectServices");

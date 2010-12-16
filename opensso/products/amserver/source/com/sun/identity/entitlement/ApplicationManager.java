@@ -288,8 +288,6 @@ public final class ApplicationManager {
     /**
      * Returns application.
      *
-     * @param adminSubject Admin Subject who has the rights to access
-     *        configuration datastore.
      * @param realm Realm name.
      * @param name Name of Application.
      * @return application.

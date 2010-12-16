@@ -121,7 +121,7 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
     /**
      * Helper method to retrive the boot servers from the boot file
      *
-     * @param bootPath filename location of the boot file
+     * @param path filename location of the boot file
      * @return map of the boot directory servers
      */
     protected Map<String, Map> getBootServers(String path)
@@ -416,7 +416,7 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
     /**
      * Returns a LDAP connection to the directory host.
      *
-     * @param dsHostNanme name of the sever where DS is installed
+     * @param dsHostName name of the sever where DS is installed
      * @param dsPort port at which the directory server is listening
      * @param dsProtocol protocol used by directory server
      * @param dsManager admin user name for directory server

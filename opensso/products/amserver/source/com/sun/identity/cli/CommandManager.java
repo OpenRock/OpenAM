@@ -764,7 +764,7 @@ public class CommandManager {
     /**
      * Returns <code>true</code> if command manager is created from JSP.
      *
-     * @returns <code>true</code> if command manager is created from JSP.
+     * @return <code>true</code> if command manager is created from JSP.
      */
     public boolean webEnabled() {
         String url = getWebEnabledURL();

@@ -75,7 +75,7 @@ public abstract class ConsoleServletBase
     /**
      * Forwards request to login view bean if user has not logged in.
      *
-     * @param requestContent request context.
+     * @param requestContext request context.
      * @throws ServletException if redirection fails.
      */
     protected void onBeforeRequest(RequestContext requestContext)

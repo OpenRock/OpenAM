@@ -145,7 +145,7 @@ public class PageTrail
      * Discards items from a given index (exclusive) to the end.
      *
      * @param idx Index.
-     * @returns the Marker for <code>idx</code>.
+     * @return the Marker for <code>idx</code>.
      * @throws AMConsoleException if cannot be discard items in page trail.
      */
     public Marker backTo(int idx)

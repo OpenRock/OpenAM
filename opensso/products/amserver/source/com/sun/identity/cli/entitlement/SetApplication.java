@@ -48,7 +48,7 @@ public class SetApplication extends ApplicationImpl {
      * Services a Commandline Request.
      *
      * @param rc Request Context.
-     * @throw CLIException if the request cannot serviced.
+     * @throws CLIException if the request cannot serviced.
      */
     @Override
     public void handleRequest(RequestContext rc)

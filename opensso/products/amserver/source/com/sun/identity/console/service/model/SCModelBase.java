@@ -64,7 +64,6 @@ public  abstract class SCModelBase
      * Creates a service data model implementation object
      *
      * @param req The <code>HttpServletRequest</code> object.
-     * @param rbName The name of the resource bundle.
      * @param map of user information.
      */
     public SCModelBase(HttpServletRequest req, Map map) {

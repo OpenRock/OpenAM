@@ -873,7 +873,7 @@ public class EntitiesModelImpl
      * @param realmName Name of Realm.
      * @param idType Type of Entity.
      * @param containerIDType Type of Entity of Container.
-     * @returns true of members can be added to a type.
+     * @return true of members can be added to a type.
      */
     public boolean canAddMember(
         String realmName,

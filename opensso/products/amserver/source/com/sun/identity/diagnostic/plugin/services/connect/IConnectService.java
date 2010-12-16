@@ -41,7 +41,7 @@ public interface IConnectService {
      * Test connection.
      *
      * @param path Path to the configuration directory.
-     * @throw DTException if there is an exception.
+     * @throws DTException if there is an exception.
      */
     void testConnection(String path) throws DTException;
 }

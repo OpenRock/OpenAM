@@ -52,8 +52,6 @@ public class JSSThreadPool {
      * @param poolSize
      *            the thread pool size, indicates how many threads are created
      *            in the pool.
-     * @param threshold
-     *            the maximum size of the task queue in the thread pool.
      * @param daemon
      *            set the threads as daemon if true; otherwise if not.
      * @param debug
@@ -82,7 +80,7 @@ public class JSSThreadPool {
     /**
      * Create thread for the pool.
      *
-     * @threadsToCreate number of threads of the pool after creation
+     * @param threadsToCreate number of threads of the pool after creation
      */
     protected void createThreads(int threadsToCreate) {
         if (threadsToCreate > poolSize) {

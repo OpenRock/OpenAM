@@ -1069,7 +1069,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
      * 
      * @param token
      * @param props
-     * @return
+     * @return 0 if everything went fine
      * @throws AMClientCapException
      */
     public int modifyClientExternal(SSOToken token, Map props)
@@ -1111,7 +1111,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
      * 
      * @param token
      * @param clientType
-     * @return
+     * @return 0 if everything went fine
      * @throws AMClientCapException
      */
     public int removeClientExternal(SSOToken token, String clientType)
@@ -1127,7 +1127,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
     /**
      * Remove all references to this client
      * 
-     * @param clientData
+     * @param clientType The removable clientType
      */
     protected void removeFromMaps(String clientType) {
         Client client = (Client) clientTypeMap.get(clientType);

@@ -79,9 +79,9 @@ public interface RoleModel
     /**
      * Creates a role below the current organization or organization unit.
      *
-     * @param data The map which contains the role name and the optional and
+     * @param location where to create the given role
+     * @param values The map which contains the role name and the optional and
      *        required attributes.
-     * @return true if the role was created, false otherwise
      */
     public void createRole(String location, Map values)
         throws AMConsoleException;
@@ -110,7 +110,7 @@ public interface RoleModel
     /**
      * Gets the localized string for the default permissions list
      *
-     * @param real value of the permission
+     * @param option value of the permission
      * @return localized string for permission
      */
     public String getOptionString(String option);

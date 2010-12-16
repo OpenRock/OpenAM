@@ -69,8 +69,6 @@ public class SubConfigAddViewBean
 
     /**
      * Creates a view to prompt user for services to be added to realm.
-     *
-     * @param name Name of view
      */
     public SubConfigAddViewBean() {
         super("SubConfigAdd");

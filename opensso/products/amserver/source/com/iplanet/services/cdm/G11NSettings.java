@@ -136,8 +136,8 @@ public class G11NSettings implements ServiceListener, ICDMConstants,
 
     /**
      * @return list of charsets supported by a locale
-     * @param String
-     *            loc - locale such as en, en_US
+     * @param loc
+     *            locale such as en, en_US
      */
     public List getCharsetForLocale(String loc) {
         if (debug.messageEnabled()) {
@@ -215,10 +215,10 @@ public class G11NSettings implements ServiceListener, ICDMConstants,
 
     /**
      * @return string Charset to be used for the given locale
-     * @param String
-     *            clientType - Client type identified by CDM module
-     * @param Locale
-     *            loc - Locale such as en_US This method computes the
+     * @param clientType
+     *            Client type identified by CDM module
+     * @param loc
+     *            Locale such as en_US This method computes the
      *            characterset to be used for any given clientType It uses
      *            Ccpp-Accept-Charset of the ClientType and picks appropriate
      *            charset for any given locale. CcppAccept-Charset list may have

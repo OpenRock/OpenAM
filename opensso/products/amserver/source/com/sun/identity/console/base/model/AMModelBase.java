@@ -922,7 +922,7 @@ public class AMModelBase
      * <code>AMPasswordUtil.encrypt</code> will be called on each value in
      * the set to convert the current value to an encrypted value. 
      *
-     * @param Set containing string values 
+     * @param values containing string values
      * @return Set of encrypted data.
      */
     public Set encryptString(Set values) {
@@ -982,7 +982,7 @@ public class AMModelBase
      * The authentication service sets a property in the users session
      * based on the properties in the core authentication service.
      *
-     * @returns true if the user profile should be ignored.
+     * @return true if the user profile should be ignored.
      */
     public boolean ignoreUserProfile() {
         String profile = null;

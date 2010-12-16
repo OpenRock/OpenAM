@@ -67,9 +67,8 @@ public class TextCrypt {
      * This method reads the password from the file. If the read fails it prints
      * stacktrace of the exception.
      * 
-     * @param args
-     *            arguments for this method. The file from which the password is
-     *            read.
+     * @param passwordfile
+     *            The file from which the password is read.
      * 
      * @return Returns the password read from the file.
      */

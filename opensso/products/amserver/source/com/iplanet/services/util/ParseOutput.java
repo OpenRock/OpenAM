@@ -47,7 +47,7 @@ public interface ParseOutput {
      *            contains all the sub-nodes.
      * @param atts
      *            contains the attributes value of this node
-     * @param pcdata
+     * @param Pcdata
      *            contains text value of this node
      * @see ParseOutput
      */

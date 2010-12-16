@@ -62,8 +62,6 @@ public class PolicySelectTypeViewBean
 
     /**
      * Creates a view to prompt user for policy type before policy creation.
-     *
-     * @param name Name of view
      */
     public PolicySelectTypeViewBean() {
         super("PolicySelectType");

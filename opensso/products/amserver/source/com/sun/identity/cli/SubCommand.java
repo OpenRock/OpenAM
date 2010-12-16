@@ -149,7 +149,7 @@ public class SubCommand {
     /**
      * Creates a sub command object.
      *
-     * @param defintion Definition class.
+     * @param definition Definition class.
      * @param rb Resource Bundle.
      * @param name Name of the Sub Command.
      * @param mandatoryOptions Formated list of mandatory argument/options.
@@ -234,7 +234,7 @@ public class SubCommand {
     /**
      * Returns option aliases group.
      *
-     * @param name Full name of argument/option.
+     * @param fullName Full name of argument/option.
      * @return option aliases group.
      */
     public Set getOptionAliasesGroup(String fullName) {

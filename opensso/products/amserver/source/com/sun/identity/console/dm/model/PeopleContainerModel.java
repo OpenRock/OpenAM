@@ -50,7 +50,7 @@ public interface PeopleContainerModel
     /**
      * Deletes the specified people containers from the directory.
      *
-     * @param roles set of role DNs that should be deleted
+     * @param peopleContainers set of people container DNs that should be deleted
      * @return true of the delete operation is successful.
      */
     public boolean deletePeopleContainers(Set peopleContainers);

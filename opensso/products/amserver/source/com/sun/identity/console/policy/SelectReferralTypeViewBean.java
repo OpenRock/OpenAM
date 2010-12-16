@@ -47,8 +47,6 @@ public class SelectReferralTypeViewBean
 
     /**
      * Creates a view to prompt user for referral type before referral creation.
-     *
-     * @param name Name of view
      */
     public SelectReferralTypeViewBean() {
         super("SelectReferralType", DEFAULT_DISPLAY_URL);

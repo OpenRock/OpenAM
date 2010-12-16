@@ -153,7 +153,7 @@ public class AdministrationServiceListener implements AMConstants, ServiceListen
      *
      * @param orgDN
      *		  organization/realm name.
-     * @param invalidChars
+     * @param pluginName
      *		  user/password validation plugin name.
      */   
     public static void setOrgPluginNameInCache(String orgDN, String 
@@ -173,7 +173,7 @@ public class AdministrationServiceListener implements AMConstants, ServiceListen
     /**
      * Sets  global user/password validation plugin name in cache.
      *
-     * @param invalidChars
+     * @param pluginName
      *		  global user/password validation plugin name.
      */   
     public static void setGlobalPluginNameInCache(String pluginName) {
@@ -227,7 +227,7 @@ public class AdministrationServiceListener implements AMConstants, ServiceListen
      *		  name of the service.
      * @param version
      *		  version of the service.
-     * @param groupName
+     * @param goupName
      *		  name of the configuration grouping.
      * @param serviceComponent
      *		  name of the service components that changed.

@@ -220,7 +220,7 @@ public class DMModelBase
      * Sets the error message in the error message Set of the
      * model. This will be displayed by viewbean.
      *
-     * @param msg Error message as a String
+     * @param msgStr Error message as a String
      */    
     public void setErrorMessage(String msgStr) {
 	errorMessage = msgStr;
@@ -356,7 +356,7 @@ public class DMModelBase
     /**
      * Returns object's attribute names.
      *
-     * @param schemName name of schema.
+     * @param schemaName name of schema.
      * @param objectType object to search for.
      * @return a set of object's attribute names.
      */
@@ -401,7 +401,7 @@ public class DMModelBase
     /**
      * Sets the attributes to return in the search contol object.
      * 
-     * @param seachControl <code>AMSearchControl</code>.
+     * @param searchControl <code>AMSearchControl</code>.
      * @param returnAttributes a <code>String</code> containing the attributes 
      *     to return in the search results map.
      */
@@ -427,7 +427,7 @@ public class DMModelBase
      * @param orgDN organization DN.
      * @param schemaName name of schema.
      * @param objectType object type.
-     * @param seachControl <code>AMSearchControl</code>.
+     * @param searchControl <code>AMSearchControl</code>.
      * @param type navigation view type.
      */
     protected void setSearchControlAttributes(
@@ -462,7 +462,7 @@ public class DMModelBase
      * Returns the value of the Search Return Attribue found in
      * the administration service.
      *
-     * @param schemName name of schema.
+     * @param schemaName name of schema.
      * @param objectType object to search for.
      * @param type navigation view type.
      * @return the value of the return attribute in the administration
@@ -532,7 +532,7 @@ public class DMModelBase
     /**
      * Returns the value of an attribute for a given object and attribute name.
      *
-     * @param userDN DN of the user.
+     * @param objectDN DN of the user.
      * @param attrName attribute name.
      * @return the value of an attribute for a given role and attribute name.
      */
@@ -554,7 +554,7 @@ public class DMModelBase
     /**
      * Returns the last attribute name from the search results.
      *
-     * @param schemName name of schema.
+     * @param schemaName name of schema.
      * @param objectType object to search for.
      * @param type navigation view type.
      * @return the last name attribute from the search results.
@@ -617,7 +617,6 @@ public class DMModelBase
      * @param attrName name of attribute.
      * @param serviceName name of service.
      * @param dn current location DN.
-     * @param templateType type of template
      * @return attribute value for <code>attrName</code>
      */  
     protected Set getAttrValues(String attrName, String serviceName, String dn)
@@ -1384,8 +1383,7 @@ public class DMModelBase
      * Removes the specified services from this object.
      *
      * @param location name of current organization.
-     * @param set of services to remove from the organization.
-     * @return a set of organizations
+     * @param services of services to remove from the organization.
      */
     public void removeServices(String location, Set services) 
         throws AMConsoleException
@@ -1939,7 +1937,7 @@ public class DMModelBase
      * which contains the valid attribute names. If no valid names are found
      * the user naming attribute will be returned as a default.
      *
-     * @param string containing user attribute names.
+     * @param value containing user attribute names.
      * @return validated user attribute names.
      */
     protected String getValidUserAttributes(String value) {
@@ -2249,7 +2247,6 @@ public class DMModelBase
      * store connection.
      *
      * @param dn Distinguished Name of the object.
-     * @param sc Store connection.
      * @return <code>AMObject</code>
      * @throws AMException if AM SDK layer fails.
      * @throws SSOException if user's single sign on token is invalid.
@@ -2496,7 +2493,7 @@ public class DMModelBase
      *
      * This will be used by the Privileges tab and Entity Subject tab views.
      *
-     * @param name role name value being converted.
+     * @param roleName role name value being converted.
      * @return a string which can be displayed in the console.
      */
     public String getRoleDisplayName(String roleName) {
@@ -2680,11 +2677,6 @@ public class DMModelBase
      * is a user or not.
      *
      * @param dn the entry being displayed.
-     * @param organization location of the group, user, role where member 
-     *     is being displayed.
-     * @param userEntry flag indicating if this is a user or another 
-     *     type of entry. 
-     *
      * @return value of the attribute to display.
      */
     public String getUserDisplayValue(String dn) {

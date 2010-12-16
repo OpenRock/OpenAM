@@ -50,7 +50,7 @@ public interface SubSchemaModel
      * Returns list of sub configuration objects.
      *
      * @return list of sub configuration objects.
-     * @see SMSubConfig
+     * @see com.sun.identity.console.base.model.SMSubConfig
      */
     List getSubConfigurations();
 

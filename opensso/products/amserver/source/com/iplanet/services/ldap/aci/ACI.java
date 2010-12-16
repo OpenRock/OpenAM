@@ -308,7 +308,7 @@ public class ACI {
     /**
      * Sets the QualifiedCollection of targetAttributes that apply to the ACI
      * 
-     * @param targetAttribtes
+     * @param targetAttributes
      *            the QualifiedCollection of target attributes that apply to the
      *            ACI
      * @supported.api
@@ -502,7 +502,7 @@ public class ACI {
     /**
      * Sets the days of the week on which this ACI applies
      * 
-     * @param the
+     * @param daysOfWeek
      *            collection of days of week on which this ACI applies
      *           
      * @supported.api
