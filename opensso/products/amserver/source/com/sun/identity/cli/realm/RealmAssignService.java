@@ -26,8 +26,11 @@
  *
  */
 
-package com.sun.identity.cli.realm;
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
+package com.sun.identity.cli.realm;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -71,13 +74,12 @@ public class RealmAssignService extends AuthenticatedCommand {
         String datafile = getStringOptionValue(IArgument.DATA_FILE);
         List attrValues = rc.getOption(IArgument.ATTRIBUTE_VALUES);
 
-        if ((datafile == null) && (attrValues == null)) {
-            throw new CLIException(getResourceString("missing-attributevalues"),
-                ExitCodes.INCORRECT_OPTION, rc.getSubCommand().getName());
-        }
+        Map attributeValues = null;
 
-        Map attributeValues = AttributeValues.parse(
-            getCommandManager(), datafile, attrValues);
+        if ((datafile != null) || (attrValues != null)) {
+            attributeValues = AttributeValues.parse(
+                getCommandManager(), datafile, attrValues);
+        }
 
         IOutput outputWriter = getOutputWriter();
         String[] params = {realm, serviceName};
