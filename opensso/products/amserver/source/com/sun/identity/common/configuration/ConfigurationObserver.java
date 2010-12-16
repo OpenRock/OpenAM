@@ -146,6 +146,11 @@ public class ConfigurationObserver implements ServiceListener {
                     ||
                     serverName.equals(SystemProperties.getServerInstanceName())
                  ) {
+                    // always use the server instance name with initialising properties
+                    if (serverName.equals(ServerConfiguration.DEFAULT_SERVER_CONFIG)) {
+                        serverName = SystemProperties.getServerInstanceName();
+                    }
+
                     SSOToken adminToken = (SSOToken)
                         AccessController.doPrivileged(
                             AdminTokenAction.getInstance());
