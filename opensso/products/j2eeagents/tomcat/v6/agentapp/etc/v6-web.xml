@@ -66,6 +66,10 @@
         <jsp-file>/sunwCDSSORedirectURI.jsp</jsp-file>
     </servlet>
 
+	<listener>
+		<listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
+	</listener>
+    
     <servlet-mapping>
         <servlet-name>NotificationServlet</servlet-name>
         <url-pattern>/notification</url-pattern>
@@ -80,4 +84,5 @@
         <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
         <url-pattern>/sunwCDSSORedirectURI</url-pattern>
     </servlet-mapping>
+
 </web-app>
