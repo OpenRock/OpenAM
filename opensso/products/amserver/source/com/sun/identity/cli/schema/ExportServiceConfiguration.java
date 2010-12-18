@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.cli.schema;
 
 import com.iplanet.services.util.AMEncryption;
@@ -83,9 +86,9 @@ public class ExportServiceConfiguration extends AuthenticatedCommand {
             String resultXML = sm.toXML(encryptObj);
             resultXML += "<!-- " + Hash.hash(encryptSecret) + " -->";
             if (fout != null) {
-                fout.write(resultXML.getBytes("ISO-8859-1"));
+                fout.write(resultXML.getBytes("UTF-8"));
             } else {
-                System.out.write(resultXML.getBytes("ISO-8859-1"));
+                System.out.write(resultXML.getBytes("UTF-8"));
             }
 
             getOutputWriter().printlnMessage(getResourceString(
