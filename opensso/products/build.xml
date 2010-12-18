@@ -311,6 +311,8 @@
             target="clean" />
         <ant antfile="${upgrade.base.dir}/build.xml" inheritRefs="true"
             target="clean" />
+        <ant antfile="${wssagents.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
     </target>
 
     <target name="build-diff">
