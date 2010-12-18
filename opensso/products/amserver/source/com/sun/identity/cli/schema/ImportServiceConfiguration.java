@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 package com.sun.identity.cli.schema;
 
 import com.iplanet.am.util.SystemProperties;
@@ -387,20 +390,20 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
         String xml = CLIUtil.getFileContent(getCommandManager(), xmlFile);
         int start = xml.lastIndexOf("<!-- ");
         if (start == -1) {
-            throw new CLIException(
-                "import-service-configuration-unable-to-locate-hash-secret",
+            throw new CLIException(getResourceString(
+                "import-service-configuration-unable-to-locate-hash-secret"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         }
         int end = xml.indexOf(" -->", start);
         if (end == -1) {
-            throw new CLIException(
-                "import-service-configuration-unable-to-locate-hash-secret",
+            throw new CLIException(getResourceString(
+                "import-service-configuration-unable-to-locate-hash-secret"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         }
         String hashed = xml.substring(start+5, end);
         if (!Hash.hash(encryptSecret).equals(hashed)) {
-            throw new CLIException(
-                "import-service-configuration-secret-key",
+            throw new CLIException(getResourceString(
+                "import-service-configuration-secret-key"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         }
     }

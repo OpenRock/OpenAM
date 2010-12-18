@@ -1798,7 +1798,8 @@ public class AccessManager {
             "import-service-configuration-connected-to-ds=Connected to directory server.",
             "import-service-configuration-prompt-delete=Directory Service contains existing data. Do you want to delete it? [y|N]",
             "import-service-configuration-cannot-load-lidf=Could not locate LDIF, {0}.",
-            "import-service-configuration-unable-to-locate-hash-secret=Cannot locate hashed encryption key, please make sure that the last line of importing XML file have it."
+            "import-service-configuration-unable-to-locate-hash-secret=Cannot locate hashed encryption key, please make sure that the last line of importing XML file have it.",
+            "import-service-configuration-secret-key=The provided encryptsecret is invalid."
         }
     )
     private String import_svc_cfg;
