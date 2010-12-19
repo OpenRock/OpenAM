@@ -53,6 +53,12 @@
                     <location>.</location>
                 </source-folder>
                 <source-folder>
+                    <label>amserver/amtune/source</label>
+                    <type>java</type>
+                    <location>amserver/amtune/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
                     <label>amserver/source</label>
                     <type>java</type>
                     <location>amserver/source</location>
@@ -100,6 +106,10 @@
                         <location>.</location>
                     </source-folder>
                     <source-folder style="packages">
+                        <label>amserver/amtune/source</label>
+                        <location>amserver/amtune/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
                         <label>amserver/source</label>
                         <location>amserver/source</location>
                     </source-folder>
@@ -143,6 +153,7 @@
         </general-data>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
             <compilation-unit>
+                <package-root>amserver/amtune/source</package-root>
                 <package-root>amserver/source</package-root>
                 <package-root>federation/library/source</package-root>
                 <package-root>federation/openfm/source</package-root>

@@ -46,10 +46,6 @@
         value="${amserver.basedir}/scripts/bin"/>
     <property name="amadm.windows.scripts.log.dir"
         value="${amserver.basedir}/scripts/log"/>
-    <property name="amadm.windows.scripts.tune.dir"
-        value="${amserver.basedir}/scripts/tune"/>
-    <property name="amadm.unix.scripts.tune.dir"
-        value="${amserver.basedir}/scripts/tune"/> 
     <property name="amadm.tools.dir" value="${amserver.built.dir}/tools"/>
     <property name="amadm.res.dir" value="${amadm.tools.dir}/resources"/>
     <property name="amadm.classes.dir" value="${amadm.tools.dir}/classes"/>
@@ -57,18 +53,15 @@
     <property name="amadm.template.dir" value="${amadm.tools.dir}/template"/>
     <property name="amadm.windows.dir" value="${amadm.template.dir}/windows"/>
     <property name="amadm.windows.bin.dir" value="${amadm.windows.dir}/bin"/>
-    <property name="amadm.windows.bin.tune.dir" value="${amadm.windows.bin.dir}/amtune"/>
     <property name="amadm.unix.dir" value="${amadm.template.dir}/unix"/>
     <property name="amadm.unix.bin.dir" value="${amadm.unix.dir}/bin"/>
-    <property name="amadm.unix.bin.tune.dir" value="${amadm.unix.bin.dir}/amtune"/>
     <property name="amadm.classes.dir" value="${amadm.tools.dir}/classes"/>
-    <property name="amtune.tune.dir" value="${amserver.built.dir}/tune"/>
-    <property name="amtune.classes.dir" value="${amtune.tune.dir}/classes"/>
+    <property name="amtune.built.dir" value="${amtune.base.dir}/built" />
+    <property name="amtune.dist.dir" value="${amtune.built.dir}/dist" />
     <property name="amadm.package.dir"
         value="${amadm.classes.dir}/${amadm.package.path}"/>
     <property name="amadm.tools.scripts.dir"
         value="${amserver.script.dir}/tools"/>
-    <property name="amtune.package.dir" value="${amtune.classes.dir}/${amtune.package.path}"/>
     <property name="manifest.built.dir" value="${amserver.built.dir}/manifest"/>
     <property name="manifest.classes.dir" value="${manifest.built.dir}/classes"/>
     <property name="manifest.package.dir"
@@ -85,10 +78,8 @@
         <mkdir dir="${amadm.template.dir}"/>
         <mkdir dir="${amadm.windows.dir}"/>
         <mkdir dir="${amadm.windows.bin.dir}"/>
-        <mkdir dir="${amadm.windows.bin.tune.dir}"/>
         <mkdir dir="${amadm.unix.dir}"/>
         <mkdir dir="${amadm.unix.bin.dir}"/>
-        <mkdir dir="${amadm.unix.bin.tune.dir}"/>
         <mkdir dir="${amadm.classes.dir}"/>
         <mkdir dir="${amadm.package.dir}"/>
         <mkdir dir="${manifest.classes.dir}"/>
@@ -165,20 +156,6 @@
             </manifest>
         </jar>
     </target>
-    <target name="makeTuneJar" depends="prepareBuild">
-            <copy todir="${amtune.package.dir}"
-                overwrite="yes" encoding="UTF-8">
-                <fileset dir="${amserver.built.dir}/classes/${amtune.package.path}"
-                    includes="**/*"/>
-            </copy>
-            <jar destfile="${amadm.lib.dir}/amtune.jar"
-                basedir="${amtune.classes.dir}">
-                <manifest>
-                    <attribute name="Main-Class"
-                        value="com.sun.identity.tune.AMTune"/>
-                </manifest>
-            </jar>
-    </target>
     <target name="makePatchJar" depends="prepareBuild">
             <copy todir="${patch.package.dir}"
                 overwrite="yes" encoding="UTF-8">
@@ -206,8 +183,13 @@
                         value="com.sun.identity.tools.manifest.Manifest"/>
                 </manifest>
             </jar>
-    </target>        
-    <target name="copyNeededFiles" depends="makeJar, makeTuneJar, makeManifestJar,makePatchJar">
+    </target>
+
+    <target name="makeTune" depends="prepareBuild">
+        <ant antfile="${amtune.base.dir}/build.xml" target="package" />
+    </target>
+
+    <target name="copyNeededFiles" depends="makeJar,makeManifestJar,makePatchJar,makeTune">
         <copy todir="${amadm.lib.dir}"
             overwrite="yes" flatten="yes" encoding="UTF-8">
             <fileset dir="${extlib.dir}"
@@ -258,17 +240,8 @@
                 includes="${amadm.unix.amverifyarchive.file}"/>
             <mapper type="glob" from="*" to="*.template"/>
         </copy>
-        <copy todir="${amadm.unix.bin.tune.dir}"
-              overwrite="yes" flatten="yes" encoding="UTF-8">
-            <fileset dir="${amadm.unix.scripts.tune.dir}"
-                includes="amtune-env.properties, README, amtune-samplepasswordfile, ${amadm.unix.amtune.file}"/>
-            <mapper type="glob" from="*" to="*.template"/>
-        </copy>
-        <copy todir="${amadm.windows.bin.tune.dir}"
-              overwrite="yes" flatten="yes" encoding="UTF-8">
-            <fileset dir="${amadm.windows.scripts.tune.dir}"
-                includes="amtune-env.properties, README, amtune-samplepasswordfile, ${amadm.windows.amtune.bat.file}"/>
-            <mapper type="glob" from="*" to="*.template"/>
+        <copy todir="${amadm.tools.dir}">
+            <fileset dir="${amtune.dist.dir}" includes="**/*" />
         </copy>
         <antcall target="legacy-files" />
     </target>
