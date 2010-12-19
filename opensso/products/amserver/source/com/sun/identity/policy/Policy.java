@@ -2725,7 +2725,7 @@ public class Policy implements Cloneable {
     /**
      * Sets the user ID who last modified the policy.
      *
-     * @param createdBy user ID who last modified the policy.
+     * @param lastModifiedBy user ID who last modified the policy.
      */
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;

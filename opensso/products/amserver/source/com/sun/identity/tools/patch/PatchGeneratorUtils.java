@@ -91,7 +91,7 @@ public class PatchGeneratorUtils {
     /**
      * Load manifest information from a JarInputStream
      *
-     * @param warFile the file stream which contains the manifest information
+     * @param in the file stream which contains the manifest information
      * @param manifestPattern the pattern of the name of the manifest file
      * @param wildCard a character which is used as a wild card in the pattern
      * @return a properties object contains the manifest information

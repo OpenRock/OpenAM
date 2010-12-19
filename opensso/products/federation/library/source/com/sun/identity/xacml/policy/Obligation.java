@@ -78,7 +78,7 @@ public interface Obligation {
 
     /**
      * Sets the FullFillOn effect type of this obligation
-     * @param fullfillOn FullFillOn effect type of this obligation
+     * @param fulfillOn FullFillOn effect type of this obligation
      */
     public void setFulfillOn(String fulfillOn) 
             throws XACMLException;

@@ -197,7 +197,7 @@ public class NameIDMappingRequestImpl extends RequestAbstractImpl
      * Returns the value of the baseID property.
      *
      * @return the value of the baseID property
-     * @see #setbaseID(BaseID)
+     * @see #setBaseID(com.sun.identity.saml2.assertion.BaseID)
      */
     public BaseID getBaseID() {
         return baseID;

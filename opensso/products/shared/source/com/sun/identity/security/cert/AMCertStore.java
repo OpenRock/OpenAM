@@ -80,7 +80,7 @@ public class AMCertStore {
      * Class AMCertStore is special cased Certificate store for LDAP.
      * A AMCertStore instance has to have all the information for ldap.
      *
-     * @param   AMLDAPCertStoreParameters param
+     * @param param
      */
     public AMCertStore(AMLDAPCertStoreParameters param) {
             storeParam = param;
@@ -198,7 +198,7 @@ public class AMCertStore {
     /**
      * Return matched certificate from ldap certificate store 
      *
-     * @param X509Certificate cert
+     * @param cert
      */
     public X509Certificate getCertificate (X509Certificate cert) {
         X509Certificate c = getCertificate();
@@ -275,7 +275,7 @@ public class AMCertStore {
     /**
      * Return value of certificate Issuer DN 
      *
-     * @param X509Certificate certificate
+     * @param certificate
      */
     static public X500Name getIssuerDN(X509Certificate certificate) 
                                                     throws IOException {
@@ -296,7 +296,7 @@ public class AMCertStore {
     /**
      * Return value of certificate subject DN 
      *
-     * @param X509Certificate certificate
+     * @param certificate
      */
     static public X500Name getSubjectDN(X509Certificate certificate) 
                                                      throws IOException {
@@ -336,13 +336,13 @@ public class AMCertStore {
     /**
      * Return ldapParam object has all config params 
      *
-     * @param String serverHost 
-     * @param int serverPort 
-     * @param String principleUser 
-     * @param String principlePasswd 
-     * @param String startSearchLoc 
-     * @param String uriParamsCRL 
-     * @param boolean isSSL 
+     * @param serverHost 
+     * @param serverPort 
+     * @param principleUser 
+     * @param principlePasswd 
+     * @param startSearchLoc 
+     * @param uriParamsCRL 
+     * @param isSSL 
      */
     public static AMLDAPCertStoreParameters setLdapStoreParam(
                   String serverHost, int serverPort,
@@ -368,9 +368,9 @@ public class AMCertStore {
     /**
      * Return Issuer Certificate if the ldap entry has one
      *
-     * @param AMLDAPCertStoreParameters ldapParam 
-     * @param X509Certificate cert 
-     * @param String attrName 
+     * @param ldapParam 
+     * @param cert 
+     * @param attrName 
      */
     public static X509Certificate getIssuerCertificate (
         AMLDAPCertStoreParameters ldapParam, 
@@ -400,9 +400,9 @@ public class AMCertStore {
     /**
      * Return X509 Certificate if the ldap entry has the same one
      *
-     * @param AMLDAPCertStoreParameters ldapParam 
-     * @param X509Certificate cert 
-     * @param String attrName 
+     * @param ldapParam 
+     * @param cert 
+     * @param attrName 
      */
     public static X509Certificate getRegisteredCertificate (
             AMLDAPCertStoreParameters ldapParam, 
@@ -442,9 +442,9 @@ public class AMCertStore {
     /**
      * Return X509 Certificate if the ldap entry has one  
      *
-     * @param AMLDAPCertStoreParameters ldapParam 
-     * @param String attrName 
-     * @param String attrValue 
+     * @param ldapParam 
+     * @param attrName 
+     * @param attrValue 
      */
     public static  X509Certificate getCertificate (
         AMLDAPCertStoreParameters ldapParam, 
@@ -478,7 +478,7 @@ public class AMCertStore {
     /**
      * Return true if it is self signed ROOT CA  
      *
-     * @param X509Certificate cert 
+     * @param cert 
      */
     public static boolean isRootCA(X509Certificate cert) {
         X500Name subjectDN = null;

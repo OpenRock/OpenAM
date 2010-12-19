@@ -73,8 +73,7 @@ public abstract class JDAPFilter {
      * <starval> ::= NULL | <value> '*' <starval>
      * <final> ::= NULL | <value>
      * </pre>
-     * @param dn distinguished name of adding entry
-     * @param attrs list of attribute associated with entry
+     * @param filter
      * @return filter
      */
     public static JDAPFilter getFilter(String filter) {

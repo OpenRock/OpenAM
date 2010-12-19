@@ -40,8 +40,6 @@ public class VersionCheck implements SetupConstants {
     
     /**
      * Check whether the version AM is valid.
-     *
-     * @param bundle The ResourceBundle contains the prompt message.
      */
     public static int isValid() {
         try {

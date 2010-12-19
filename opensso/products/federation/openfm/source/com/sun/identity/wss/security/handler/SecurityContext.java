@@ -123,7 +123,7 @@ public class SecurityContext {
     
     /**
      * Sets the key type.
-     * @param the key type.
+     * @param keyType the key type.
      */
     public void setKeyType(String keyType) {
         this.keyType = keyType;

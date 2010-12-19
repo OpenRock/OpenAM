@@ -146,7 +146,7 @@ public class CookieUtils {
     /**
      * Returns value of cookie that has mached name in servlet request
      * 
-     * @param HttpServletRequest HTTP Servlet Request.
+     * @param req HTTP Servlet Request.
      * @param name Name in servlet request
      * @return value of that name of cookie
      */
@@ -167,7 +167,7 @@ public class CookieUtils {
     /**
      * Gets cookie object that has mached name in servlet request
      * 
-     * @param HttpServletRequest HTTP Servlet Request.
+     * @param req HTTP Servlet Request.
      * @param name Name in servlet request
      * @return value of that name of cookie
      */
@@ -203,7 +203,7 @@ public class CookieUtils {
     /**
      * Gets Array of cookie in servlet request.
      * 
-     * @param HttpServletRequest HTTP Servlet Request.
+     * @param req HTTP Servlet Request.
      */
     public static Cookie[] getCookieArrayFromReq(HttpServletRequest req) {
         Cookie cookies[] = req.getCookies();
@@ -354,8 +354,8 @@ public class CookieUtils {
     /**
      * Add cookie to HttpServletResponse as custom header
      * 
-     * @param HttpServletResponse object
-     * @param Cookie object
+     * @param response
+     * @param cookie 
      */
     public static void addCookieToResponse(HttpServletResponse response,
             Cookie cookie) {

@@ -108,7 +108,7 @@ public class AMPassword extends AMCallbackHandler implements  Cloneable,
      * @return A copy of the charArray, converted from Unicode to UTF8. It
      *         is the responsibility of the caller to clear the output byte
      *         array; *	<code>wipeBytes</code> is ideal for this purpose.
-     * @see Password#wipeBytes
+     * @see org.mozilla.jss.util.Password#wipeBytes
      */
     public static byte[] charToByte(char[] charArray) {
 	byte bytearray[] = null;

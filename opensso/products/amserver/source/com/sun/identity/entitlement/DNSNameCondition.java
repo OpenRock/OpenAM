@@ -70,7 +70,7 @@ public class DNSNameCondition extends EntitlementConditionAdaptor {
      * value for <code>REQUEST_DNS_NAME</code> is obtained
      * from the single sign on token of the user
      *
-     * @see #getConditionDecision(SSOToken, Map)
+     * @see com.sun.identity.policy.interfaces.Condition#getConditionDecision(com.iplanet.sso.SSOToken, java.util.Map)
      */
     public static final String REQUEST_DNS_NAME = "requestDnsName";
 

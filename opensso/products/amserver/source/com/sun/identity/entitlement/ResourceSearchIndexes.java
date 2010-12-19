@@ -43,7 +43,7 @@ public class ResourceSearchIndexes {
      *
      * @param hostIndexes Set of host indexes.
      * @param pathIndexes Set of path indexes.
-     * @param path
+     * @param parentPathIndexes 
      */
     public ResourceSearchIndexes(
         Set<String> hostIndexes,

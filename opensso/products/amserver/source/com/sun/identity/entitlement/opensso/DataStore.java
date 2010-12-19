@@ -147,7 +147,7 @@ public class DataStore {
      *
      * @param realm Realm name.
      * @param indexName Index name.
-     * @return
+     * @return the base search DN.
      */
     public static String getSearchBaseDN(String realm, String indexName) {
         if (indexName == null) {
@@ -664,7 +664,7 @@ public class DataStore {
     /**
      * Returns a set of privilege names that satifies a search filter.
      *
-     * @parma adminSubject Subject who has the rights to read datastore.
+     * @param adminSubject Subject who has the rights to read datastore.
      * @param realm Realm name
      * @param filter Search filter.
      * @param numOfEntries Number of max entries.
@@ -716,7 +716,7 @@ public class DataStore {
     /**
      * Returns a set of referral privilege names that satifies a search filter.
      *
-     * @parma adminSubject Subject who has the rights to read datastore.
+     * @param adminSubject Subject who has the rights to read datastore.
      * @param realm Realm name
      * @param filter Search filter.
      * @param numOfEntries Number of max entries.
@@ -915,7 +915,7 @@ public class DataStore {
      * Returns a set of referral privilege that satifies the resource and
      * subject indexes.
      *
-     * @param adminSubject Subject who has the rights to read datastore.
+     * @param adminToken Subject who has the rights to read datastore.
      * @param realm Realm name
      * @param iterator Buffered iterator to have the result fed to it.
      * @param indexes Resource search indexes.

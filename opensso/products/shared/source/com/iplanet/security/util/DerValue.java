@@ -273,7 +273,7 @@ public class DerValue {
      *            the buffer
      * @param offset
      *            start point of the single DER-encoded dataum
-     * @param length
+     * @param len
      *            how many bytes are in the encoded datum
      */
     public DerValue(byte[] buf, int offset, int len) throws IOException {

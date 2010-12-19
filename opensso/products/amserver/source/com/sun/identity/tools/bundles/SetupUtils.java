@@ -54,7 +54,6 @@ public class SetupUtils implements SetupConstants{
      * Loads properties from file.
      *
      * @param fileName The path to the properties file.
-     * @param outside The flat to indicate whether the file is in the package.
      * @return The Properties object of the specified propertoes file.
      */
     
@@ -203,8 +202,8 @@ public class SetupUtils implements SetupConstants{
      * @param toDir The directory of the destinated files located
      * @param fromFilePattern The pattern of the name of source files.
      * @param toFilePattern The pattern of the name of destinated files.
-     * @param (as return) fromFileList List of files from the source directory.
-     * @param (as return) toFileList List of files of the destinated directory.
+     * @param fromFilesList (as return) List of files from the source directory.
+     * @param toFilesList (as return) List of files of the destinated directory.
      */
     
     public static void getFiles(File fromDir, File toDir,

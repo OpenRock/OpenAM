@@ -589,7 +589,7 @@ public interface SignatureProvider {
 
     /**
      * Verify web services message signature using specified key
-     * @param doc the document to be validated
+     * @param document the document to be validated
      * @param key the secret key to be used for validating signature
      * @param certAlias the certificate alias used for validating the signature
      *        if the key is not available.

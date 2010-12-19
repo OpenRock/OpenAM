@@ -522,7 +522,7 @@ public class Rule extends Object implements Cloneable {
      * identical only if the service name, resource name,
      * action name and values match.
      *
-     * @param o object againt which this rule object
+     * @param obj object againt which this rule object
      * will be checked for equality
      *
      * @return <code>true</code> if the service type, resource, actions

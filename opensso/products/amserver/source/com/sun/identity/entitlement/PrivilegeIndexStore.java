@@ -123,7 +123,7 @@ public abstract class PrivilegeIndexStore {
     /**
      * Deletes a set of privileges from data store.
      *
-     * @param privileges Privileges to be deleted.
+     * @param privilege Privileges to be deleted.
      * @throws com.sun.identity.entitlement.EntitlementException if deletion
      * failed.
      */

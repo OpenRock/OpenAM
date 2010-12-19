@@ -67,7 +67,6 @@ public final class MonitorManager {
     /**
      * Returns an instance of the <code>FedMonAgent</code> object.
      *
-     * @param componentName name of the component .
      * @return instance of <code>Logger</code> object.
      * @exception LogException if there is an error.
      */

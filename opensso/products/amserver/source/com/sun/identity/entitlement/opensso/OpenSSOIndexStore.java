@@ -238,8 +238,8 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     /**
      * Deletes a set of privileges from data store.
      *
-     * @param privileges Privileges to be deleted.
-     * @throws com.sun.identity.entitlement.EntitlementException if deletion
+     * @param privilegeName Name of privilege to be deleted.
+     * @throws EntitlementException if deletion
      * failed.
      */
     public void delete(String privilegeName)
@@ -250,8 +250,8 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     /**
      * Deletes a referral privilege from data store.
      *
-     * @param privileges Privileges to be deleted.
-     * @throws com.sun.identity.entitlement.EntitlementException if deletion
+     * @param privilegeName Name of referral to be deleted.
+     * @throws EntitlementException if deletion
      * failed.
      */
     public void deleteReferral(String privilegeName)
@@ -262,8 +262,8 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     /**
      * Deletes a privilege from data store.
      *
-     * @param privilegeName name of privilege to be deleted.
-     * @throws com.sun.identity.entitlement.EntitlementException if deletion
+     * @param privileges Privileges to be deleted.
+     * @throws EntitlementException if deletion
      * failed.
      */
     public void delete(Set<IPrivilege> privileges)

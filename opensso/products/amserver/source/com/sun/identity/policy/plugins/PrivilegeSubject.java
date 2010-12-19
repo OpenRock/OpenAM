@@ -67,7 +67,7 @@ public class PrivilegeSubject implements Subject, Cloneable {
     /**
      * Return the syntax for displaying the property value.
      *
-     * @param property Property name.
+     * @param token SSO token
      * @return syntax for displaying the property value.
      */
     public Syntax getValueSyntax(SSOToken token) {

@@ -52,7 +52,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
     /**
      * Constructs NotCondition
      *
-     * @param eConditions wrapped <code>EntitlementCondition</code>(s)
+     * @param eCondition wrapped <code>EntitlementCondition</code>(s)
      */
     public NotCondition(EntitlementCondition eCondition) {
         this.eCondition = eCondition;
@@ -143,7 +143,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
     /**
      * Sets the nested <code>EntitlementCondition</code>(s).
      *
-     * @param eConditions the nested <code>EntitlementCondition</code>(s)
+     * @param eCondition the nested <code>EntitlementCondition</code>(s)
      */
     public void setECondition(EntitlementCondition eCondition) {
         this.eCondition = eCondition;

@@ -286,10 +286,6 @@ class InteractionConfig {
         return wmlStyleSheetLocation;
     }
     
-    /**
-     * Returns a String  
-     * @return  
-     */
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("InteractionConfig:wscSpecifiedInteractionChoice=" 

@@ -263,7 +263,8 @@ public abstract class EntitlementConfiguration {
     /**
      * Returns a set of application names for a given search criteria.
      *
-     * @param filter Set of search filter.
+     * @param adminSubject Admin Subject
+     * @param filters Set of search filter.
      * @return a set of application names for a given search criteria.
      * @throws EntitlementException if search failed.
      */

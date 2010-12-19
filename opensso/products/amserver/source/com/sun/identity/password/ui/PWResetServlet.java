@@ -116,7 +116,7 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
      * support gx_charset field for parameter encoding
      * which is BEA. Servlet 2.3 API setCharacterEncoding() is used
      * to set the character set value.
-     * @param requestContent - request context
+     * @param requestContext - request context
      * @throws ServletException 
      */
     protected void onBeforeRequest(RequestContext requestContext)

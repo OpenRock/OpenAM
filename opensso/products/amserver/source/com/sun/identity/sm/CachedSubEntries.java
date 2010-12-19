@@ -125,7 +125,7 @@ public class CachedSubEntries {
      * 
      * @param token
      * @param pattern
-     * @return
+     * @return subentries that match the pattern
      * @throws com.sun.identity.sm.SMSException
      * @throws com.iplanet.sso.SSOException
      */
@@ -146,7 +146,8 @@ public class CachedSubEntries {
      * @param token
      * @param pattern
      * @param serviceidPattern sub-schema name
-     * @return
+     * @return subentries that belong to given SubSchema name and satisfies
+     * the pattern
      * @throws com.sun.identity.sm.SMSException
      * @throws com.iplanet.sso.SSOException
      */
@@ -207,7 +208,7 @@ public class CachedSubEntries {
      * @param token
      * @param pattern
      * @param recursive
-     * @return
+     * @return realm names that matches the given pattern
      * @throws com.sun.identity.sm.SMSException
      * @throws com.iplanet.sso.SSOException
      */
@@ -232,7 +233,8 @@ public class CachedSubEntries {
      * @param serviceName
      * @param attrName
      * @param values
-     * @return
+     * @return realm names that match the attributevalues pair for the given
+     * service name
      * @throws com.sun.identity.sm.SMSException
      * @throws com.iplanet.sso.SSOException
      */

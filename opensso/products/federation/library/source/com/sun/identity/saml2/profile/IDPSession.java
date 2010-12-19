@@ -264,7 +264,7 @@ public class IDPSession {
     /**
      * Sets the IDP Meta Alias.
      *
-     * @param IDP Meta Alias
+     * @param metaAlias Meta Alias
      */
     public void setMetaAlias(String metaAlias) {
         this.metaAlias = metaAlias;

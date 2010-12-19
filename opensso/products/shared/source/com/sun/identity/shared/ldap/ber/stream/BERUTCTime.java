@@ -123,7 +123,6 @@ public class BERUTCTime extends BERElement {
     private byte[] byte_buf;
     /**
      * Writes BER to a stream.
-     * @return number of bytes written to stream.
      * @exception IOException failed to write
      */
     public void write(OutputStream stream) throws IOException {

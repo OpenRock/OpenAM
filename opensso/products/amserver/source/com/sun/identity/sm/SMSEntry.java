@@ -1062,7 +1062,7 @@ public class SMSEntry implements Cloneable {
      * @param sortResults <code>true</code> to have result sorted.
      * @param ascendingOrder <code>true</code> to have result sorted in
      *     ascending order.
-     * @param excludes List of DN to exclude.
+     * @param exclude List of DN to exclude.
      */
     public static Iterator search(SSOToken token, String dn, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,

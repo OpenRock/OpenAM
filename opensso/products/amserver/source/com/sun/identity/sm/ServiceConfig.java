@@ -156,8 +156,7 @@ public class ServiceConfig {
     /**
      * Sets the labeled uri to the service configuration.
      * 
-     * @param labeled uri
-     *            the labeled uri to be assigned to the configuration
+     * @param luri the labeled uri to be assigned to the configuration
      * @throws SMSException
      *             if there is an error occurred while performing the operation
      * @throws SSOException
@@ -913,7 +912,7 @@ public class ServiceConfig {
      * Returns the status of this Service Configuration Object.
      * Must be used by classes that cache ServiceConfig.
      * 
-     * @return
+     * @return <code>true</code> if this object is still valid.
      */
     public boolean isValid() {
         return (sc.isValid());

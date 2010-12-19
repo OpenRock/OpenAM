@@ -39,7 +39,6 @@ import com.iplanet.security.util.DerValue;
  * A AVAValueConverter that converts a IA5String attribute to a DerValue and
  * vice versa. An example an attribute that is a IA5String string is "E".
  * 
- * @see ASN1CharStrConverter
  * @see AVAValueConverter
  */
 public class IA5StringConverter implements AVAValueConverter {

@@ -231,7 +231,7 @@ public class RepositoryManager {
      * Sets the status for the specified service tag in the repository (and 
      * persists the change to the file).
      * @param serviceTag the service tag of interest
-     * @param the status to be assigned
+     * @param status the status to be assigned
      * @throws RegistrationException for errors writing the registration data
      * to the local repository
      */

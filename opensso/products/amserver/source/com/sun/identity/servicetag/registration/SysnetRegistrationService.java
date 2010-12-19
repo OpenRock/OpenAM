@@ -231,7 +231,7 @@ public class SysnetRegistrationService implements RegistrationService {
      *      country list of the specified locale. The second list is the country
      *      list in _en locale that the sysnet backend is expecting.  
      *       
-     *	@param	Locale	loccale  locale of the list to be displayed
+     *	@param	locale locale of the list to be displayed
      *
      *	@return	List<List>  country list. First elemnt is in the sepcified local,
      *                      second is _en locale that backend expects. 

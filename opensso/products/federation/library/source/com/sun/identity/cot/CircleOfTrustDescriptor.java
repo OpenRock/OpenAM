@@ -117,8 +117,10 @@ public class CircleOfTrustDescriptor {
      * @param realm The realm this circle of trust resides.
      * @param circleOfTrustStatus status of the CircleOfTrust.
      * @param circleOfTrustDescription description for the circleOfTrust.
-     * @param circleOfTrustReaderURL the reader url of the CircleOfTrust.
-     * @param circleOfTrustWriterURL the writer url of the circleOfTrust.
+     * @param circleOfTrustIDFFReaderURL the reader url of the CircleOfTrust.
+     * @param circleOfTrustIDFFWriterURL the writer url of the circleOfTrust.
+     * @param circleOfTrustSAML2ReaderURL the reader url of the CircleOfTrust.
+     * @param circleOfTrustSAML2WriterURL the writer url of the circleOfTrust.
      * @param circleOfTrustProvider the trusted providers of the CircleOfTrust.
      * @throws COTException if any input parameter is invalid.
      */

@@ -46,7 +46,7 @@ public class AMLDAPCertStoreParameters {
     static public final int ldap_version = 3;
 
     /**
-     * @param serverName
+     * @param server
      * @param port
      */
     public AMLDAPCertStoreParameters(String server, int port) {

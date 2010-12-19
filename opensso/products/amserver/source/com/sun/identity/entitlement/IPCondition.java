@@ -48,8 +48,8 @@ public class IPCondition extends EntitlementConditionAdaptor {
      * representation of IP of the client, in the form n.n.n.n where n is a
      * value between 0 and 255 inclusive.
      *
-     * @see #getConditionDecision(SSOToken, Map)
-     * @see #REQUEST_DNS_NAME
+     * @see com.sun.identity.policy.interfaces.Condition#getConditionDecision(com.iplanet.sso.SSOToken, java.util.Map)
+     * @see DNSNameCondition#REQUEST_DNS_NAME
      */
     public static final String REQUEST_IP = "requestIp";
 

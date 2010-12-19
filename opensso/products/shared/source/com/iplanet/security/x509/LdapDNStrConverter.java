@@ -124,7 +124,7 @@ public abstract class LdapDNStrConverter {
      * LdapV3DNStrConverter object using the default X500NameAttrMap and accepts
      * unknown OIDs.
      * 
-     * @see iplanet.security.LdapV3DNStrConverter
+     * @see LdapV3DNStrConverter
      * 
      * @return The global default LdapDNStrConverter instance.
      */

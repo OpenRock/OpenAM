@@ -193,7 +193,6 @@ public class AttributeQueryUtil {
      * @param attrProfile the attribute profile
      * @param binding the binding
      *
-     * @return the <code>Response</code> object
      * @exception SAML2Exception if the operation is not successful
      *
      * @supported.api
@@ -1304,8 +1303,6 @@ public class AttributeQueryUtil {
      * @param nameIDValue  NameID value 
      * @param attrsList The list of attributes whose values needs to be 
      *                  fetched from IDP
-     * @param encrypt  Boolean value to indicate whether the Fedlet will
-     *                 receive the encrypted data
      * @param attrQueryProfileAlias  Attribute Query Profile Alias
      * @param subjectDN  Attribute name which contains X.509 subject DN
      *

@@ -297,7 +297,7 @@ public abstract class ResourceBase {
      * Returns localized exception message.
      *
      * @param locale Locale of the message.
-     * @param statusCode statusCode of the message
+     * @param errorCode errorCode of the message
      * @return localized exception message.
      */
     protected String getLocalizedMessage(Locale locale, int errorCode) {

@@ -85,7 +85,7 @@ public class ResourceNameSplitter implements ISearchIndex {
     /**
      * Returns a list of sub parts of host of a resource name.
      *
-     * @param resName Resource name.
+     * @param url Resource name.
      * @return a list of sub parts of host of a resource name.
      */
     public static Set<String> splitHost(RelaxedURL url) {

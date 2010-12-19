@@ -70,7 +70,7 @@ public class RegisterServices {
      * Registers services.
      *
      * @param adminToken Administrator Single Sign On token.
-     * @Qparam bUseExtUMDS <code>true</code> to use external DS as
+     * @param bUseExtUMDS <code>true</code> to use external DS as
      *         user management datastore.
      * @throws IOException if file operation errors occur.
      * @throws SMSException if services cannot be registered.

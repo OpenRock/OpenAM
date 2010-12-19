@@ -51,7 +51,6 @@ public interface LDAPTraceWriter {
      * 
      * @param msg An incoming or outgoing LDAP message
      *
-     * @version 1.0
      * @see com.sun.identity.shared.ldap.LDAPConnection#setProperty(java.lang.String, java.lang.Object)
      */
     public void write (String msg);

@@ -403,7 +403,7 @@ public class Crypt {
      * sensitive methods which returns passwords, decrypts data, etc. This
      * method uses the stack trace to determine the calling class.
      * 
-     * @param obj
+     * @param className 
      *            fully qualified class name of Object calling this function
      */
     public static boolean isCallerValid(String className) {

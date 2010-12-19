@@ -243,7 +243,7 @@ public class X500Name implements Principal, GeneralNameInterface {
     /**
      * convenience method.
      * 
-     * @param rdns
+     * @param rdnVector 
      *            a vector of rdns.
      */
     public X500Name(Vector rdnVector) throws IOException {

@@ -87,7 +87,7 @@ public interface PWResetUserValidationModel extends PWResetModel {
      * Returns the localized string for attribute name in the user
      * service.
      *
-     * @param attrName attribute name
+     * @param userAttr attribute name
      * @return localized string for the attribute
      */
     String getLocalizedStrForAttr(String userAttr);
@@ -123,7 +123,7 @@ public interface PWResetUserValidationModel extends PWResetModel {
     /**
      * Sets the valid realm flag.
      *
-     * @param realm Realm name.
+     * @param orgDN Realm name.
      */
     void setValidRealm(String orgDN);
 

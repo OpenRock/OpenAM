@@ -351,7 +351,7 @@ implements HttpServletResponse, Serializable {
      * The default behavior of this method is to call setStatus(int sc, String sm)
      * on the wrapped response object. Not Serialized.
      * 
-     * @param The status code of the response
+     * @param sc The status code of the response
      */
      public void setStatus(int sc, String sm) {
          if (this._getHttpServletResponse() != null) 

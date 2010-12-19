@@ -50,7 +50,7 @@ public class SetSiteID extends ServerConfigBase {
      * Services a Commandline Request.
      *
      * @param rc Request Context.
-     * @throw CLIException if the request cannot serviced.
+     * @throws CLIException if the request cannot serviced.
      */
     public void handleRequest(RequestContext rc)
         throws CLIException {

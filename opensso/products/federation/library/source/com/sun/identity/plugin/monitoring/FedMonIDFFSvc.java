@@ -108,7 +108,7 @@ public interface FedMonIDFFSvc {
 
     /**
      * Set the ID-FF service's relay state indicator.
-     * @state the Relay
+     * @param state the Relay
      */
     public void setRelayState(long state);
 

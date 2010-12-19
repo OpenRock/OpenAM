@@ -263,7 +263,7 @@ public class CoreTokenResource extends ResourceBase {
      * 
      * @param headers HTTPHeaders object of the request.
      * @param request HTTPServletRequest object of the request.
-     * @return
+     * @return JSON array of tokens matching the queryString
      */
     @GET
     @Produces("application/json")

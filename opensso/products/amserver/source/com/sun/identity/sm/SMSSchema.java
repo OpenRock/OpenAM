@@ -306,8 +306,7 @@ public class SMSSchema {
      * Method returns the XML plugin schema for the given plugin name in a
      * String format that can stored in a directory.
      *
-     * @param pluginNode
-     *            plugin schema node
+     * @param pluginName plugin schema name
      * @return service plugin schema in serialized String format
      * @throws SMSException
      */

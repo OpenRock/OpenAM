@@ -233,7 +233,7 @@ public class AMViewConfig {
     /**
      * Returns <code>ture</code> if combined agent type.
      * 
-     * @param cName Combined Agent type referred name.
+     * @param type Combined Agent type referred name.
      * @return <code>ture</code> if combined agent type.
      */
     public boolean isCombineAgentType(String type) {

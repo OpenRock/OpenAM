@@ -123,7 +123,7 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
     /**
      * Returns the MIME type for the content response
      *
-     * @return
+     * @return MIME type of the content response
      * @since 2.4
      */
     public String getContentType() {
@@ -165,7 +165,7 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      * The default behavior of this method is to call setContentType(String type)
      * on the wrapped response object. Not Serialized.
      * 
-     * @param The new content type of the response.
+     * @param type The new content type of the response.
      */
     public void setContentType(String type) {
         if (response != null) 

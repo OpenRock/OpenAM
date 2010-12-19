@@ -113,7 +113,7 @@ public class AMCRLStore extends AMCertStore {
      * and all the access information for CRLDistributionPointExtension and
      * CRLIssuingDistributionPoint Extension
      *
-     * @param   AMLDAPCertStoreParameters param
+     * @param param
      */
     public AMCRLStore(AMLDAPCertStoreParameters param) {
 	super(param);
@@ -121,7 +121,7 @@ public class AMCRLStore extends AMCertStore {
 
     /**
      * Checks certificate and returns corresponding stored CRL in ldap store
-     * @param X509Certificate certificate
+     * @param certificate
      */
     public X509CRL getCRL(X509Certificate certificate) throws IOException  {
         LDAPEntry crlEntry = null;
@@ -203,7 +203,7 @@ public class AMCRLStore extends AMCertStore {
     /**
      * Checks certificate and returns corresponding stored CRL 
      * in cached CRL store
-     * @param X509Certificate certificate
+     * @param certificate
      */
     public X509CRL getCRLFromCache(X509Certificate certificate) 
                                           throws IOException  {
@@ -218,7 +218,7 @@ public class AMCRLStore extends AMCertStore {
 
     /**
      * Checks certificate and update CRL in cached CRL store
-     * @param X509Certificate certificate
+     * @param certificate
      */
     public void updateCRLCache(X509Certificate certificate, X509CRL crl) 
                                          throws IOException  {
@@ -688,9 +688,9 @@ public class AMCRLStore extends AMCertStore {
      * This dn entry has to have CRL in attribute certificaterevocationlist 
      * or certificaterevocationlist;binary.
      * 
-     * @param AMLDAPCertStoreParameters ldapParam 
-     * @param X509Certificate cert
-     * @param String attrName 
+     * @param ldapParam 
+     * @param cert
+     * @param attrName 
      */
     static public X509CRL getCRL(AMLDAPCertStoreParameters ldapParam, 
                                  X509Certificate cert, String attrName) {

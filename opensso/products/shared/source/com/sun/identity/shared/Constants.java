@@ -163,8 +163,8 @@ public interface Constants {
      * url safe char66 encoding
      *
      * @see com.iplanet.dpro.session.SessionID#c66EncodeCookie()
-     * @see com.iplanet.dpro.session.SessionID#c66EncodeSidString()
-     * @see com.iplanet.dpro.session.SessionID#c66DecodeCookieString()
+     * @see com.iplanet.dpro.session.SessionID#c66EncodeSidString(java.lang.String)
+     * @see com.iplanet.dpro.session.SessionID#c66DecodeCookieString(java.lang.String)
      */
     String C66_ENCODE_AM_COOKIE = "com.iplanet.am.cookie.c66Encode";
 

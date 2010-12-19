@@ -201,7 +201,7 @@ public class RemoteSession implements HttpSession, Serializable {
      *
      * @deprecated
      * @param name
-     * @return
+     * @return The value of the named attribute or null if not found or non-serializable
      */
     public Object getValue(String name) {
         return (session != null) ? session.getAttribute(name) :
@@ -278,7 +278,7 @@ public class RemoteSession implements HttpSession, Serializable {
     }
 
     /**
-     * @see removeAttribute
+     * @see #removeAttribute
      *
      * @deprecated
      * @param name The name of the value to remove

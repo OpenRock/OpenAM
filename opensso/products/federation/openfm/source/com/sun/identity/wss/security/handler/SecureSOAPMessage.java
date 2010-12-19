@@ -645,10 +645,6 @@ public class SecureSOAPMessage {
     /**
      * Signs the <code>SOAPMessage</code>  for the given security profile.
      *
-     * @param certAlias the certificate alias to be used for signing.
-     *        This cert alias is used for signing asymmetric keys.
-     * @param refType signing refence type.
-     * @param signingKey If signing key is present
      * @exception SecurityException if there is any failure in signing.
      */
      public void sign() 

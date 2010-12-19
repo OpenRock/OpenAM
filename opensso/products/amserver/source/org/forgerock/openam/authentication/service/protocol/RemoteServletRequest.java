@@ -210,7 +210,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
      * The default behavior of this method is to return getAttributeNames()
      * on the wrapped request object. Serialized.
      * 
-     * @ return Enumeration of attribute names
+     * @return Enumeration of attribute names
      */
     public Enumeration getAttributeNames() {
 	return (request != null) ? this.request.getAttributeNames() : 

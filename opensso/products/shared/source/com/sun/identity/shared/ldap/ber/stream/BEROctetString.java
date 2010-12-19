@@ -157,7 +157,6 @@ public class BEROctetString extends BERElement {
 
     /**
      * Writes BER to stream
-     * @return number of bytes written to stream.
      * @exception IOException failed to write
      */
     public void write(OutputStream stream) throws IOException {

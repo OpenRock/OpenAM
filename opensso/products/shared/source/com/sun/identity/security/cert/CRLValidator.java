@@ -172,7 +172,6 @@ public class CRLValidator {
     /**
      * Get certificate revocation list from cofigured ldap store
      * @param cert cert to be validated 
-     * @param chkCRLAttr ldap attribute name to get crl from ldap crlstore
      * @return crl if ldap store configured with crl
      */
     static public X509CRL getCRL(X509Certificate cert) {

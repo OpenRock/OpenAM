@@ -526,12 +526,7 @@ public class ServiceManager {
     /**
      * Adds a new plugin schema to an existing service
      *
-     * @param serviceName The name of the service
-     * @param interfaceName The name of the plugin interface
-     * @param pluginName The name of the plugin schema
-     * @param i18nKey The i18nkey of the plugin schema
-     * @param i18nName The i18nname of the plugin schema
-     * @param className The name of the plugin schema implementation class
+     * @param pluginDoc 
      * @throws SMSException if an error occurred while performing the operation
      * @throws SSOException if the user's single sign on token is invalid or
      *         expired.

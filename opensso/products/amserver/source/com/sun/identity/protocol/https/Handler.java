@@ -39,7 +39,6 @@ public class Handler extends sun.net.www.protocol.https.Handler {
     
     /**
      * Constructor
-     * @param none
      */
     public Handler () {
         super();
@@ -48,8 +47,8 @@ public class Handler extends sun.net.www.protocol.https.Handler {
 	
     /**
      * Constructor
-     * @param alias  certificate alias for client certificate used in the
-     *     https connection if client auth is required
+     * @param proxy
+     * @param port
      */
     public Handler (String proxy, int port) {
         super(proxy, port);

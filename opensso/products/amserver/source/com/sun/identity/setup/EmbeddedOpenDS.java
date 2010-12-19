@@ -437,8 +437,7 @@ public class EmbeddedOpenDS {
     /**
      * Runs the OpenDS setup command to create our instance
      *
-     * @param odsRoot File system directory where <code>OpenDS</code>
-     *                is installed.
+     * @param configFile path to config.ldif
      * @param map The map of configuration options
      * @throws Exception upon encountering errors.
      */
@@ -896,7 +895,10 @@ public class EmbeddedOpenDS {
 
     /**
      *  Get replication port 
-     *  @param map Map of properties collected by the configurator.
+     *  @param username
+     *  @param password
+     *  @param hostname
+     *  @param port
      *  @return port number if replication is setup, null if not or on error.
      */
     public static String getReplicationPort(

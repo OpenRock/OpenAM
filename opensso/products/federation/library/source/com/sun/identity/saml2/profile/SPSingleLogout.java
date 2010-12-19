@@ -943,7 +943,7 @@ public class SPSingleLogout {
      * @param spEntityID name of host entity ID.
      * @param realm name of host entity.
      * @param request HTTP servlet request.
-     * @param request HTTP servlet response.
+     * @param response HTTP servlet response.
      * @param isLBReq true if the request is for load balancing.
      * @param binding value of <code>SAML2Constants.HTTP_REDIRECT</code> or
      *        <code>SAML2Constants.SOAP</code>.

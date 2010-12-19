@@ -115,7 +115,6 @@ public class LogUtil {
      *          </ul>
      * @param msgid the message or a message identifier.
      * @param data string array of dynamic data to be replaced in the message.
-     * @param session the User's session object
      */
     public static void access(Level level, String msgid, String data[]) {
         access(level, msgid, data, null);
@@ -166,9 +165,8 @@ public class LogUtil {
      *          <li>FINER <br>
      *          <li>FINEST (lowest value) <br>
      *          </ul>
-     * @param messageId the message or a message identifier.
+     * @param msgid the message or a message identifier.
      * @param data string array of dynamic data to be replaced in the message.
-     * @param session the User's Session object.
      */
     public static void error(Level level, String msgid, String data[]) {
         error(level,msgid,data,null);
@@ -189,7 +187,7 @@ public class LogUtil {
      *          <li>FINER <br>
      *          <li>FINEST (lowest value) <br>
      *          </ul>
-     * @param messageId the message or a message identifier.
+     * @param msgid the message or a message identifier.
      * @param data string array of dynamic data to be replaced in the message.
      * @param session the User's Session object.
      */

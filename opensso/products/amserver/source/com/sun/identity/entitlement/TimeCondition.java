@@ -55,8 +55,8 @@ public class TimeCondition extends EntitlementConditionAdaptor {
      *  milliseconds since epoch. If no value is given for this, it is assumed
      *  to be the current system time
      *
-     *  @see #getConditionDecision(SSOToken, Map)
-     *  @see #ENFORCEMENT_TIME_ZONE
+     *  @see com.sun.identity.policy.interfaces.Condition#getConditionDecision(com.iplanet.sso.SSOToken, java.util.Map)
+     *  @see com.sun.identity.policy.plugins.SimpleTimeCondition#ENFORCEMENT_TIME_ZONE
      */
     public static final String REQUEST_TIME = "requestTime";
 
@@ -69,8 +69,8 @@ public class TimeCondition extends EntitlementConditionAdaptor {
      *  would be used only if the <code>ENFORCEMENT_TIME_ZONE</code> is not
      *  defined for the <code>SimpleTimeCondition</code>
      *
-     *  @see #getConditionDecision(SSOToken, Map)
-     *  @see #ENFORCEMENT_TIME_ZONE
+     *  @see com.sun.identity.policy.interfaces.Condition#getConditionDecision(com.iplanet.sso.SSOToken, java.util.Map)
+     *  @see com.sun.identity.policy.plugins.SimpleTimeCondition#ENFORCEMENT_TIME_ZONE
      *  @see java.util.TimeZone
      */
     public static final String REQUEST_TIME_ZONE = "requestTimeZone";
@@ -96,10 +96,11 @@ public class TimeCondition extends EntitlementConditionAdaptor {
 
     /**
      * Constructs IPCondition object:w
-     * @param domainNameMask domain name mask, for example *.example.com,
-     * only wild card allowed is *
-     * @param startIp starting ip of a range for example 121.122.123.124
-     * @param endIp ending ip of a range, for example 221.222.223.224
+     *
+     * @param startTime
+     * @param endTime
+     * @param startDay
+     * @param endDay
      */
     public TimeCondition(String startTime, String endTime,
             String startDay, String endDay) {
@@ -220,7 +221,7 @@ public class TimeCondition extends EntitlementConditionAdaptor {
     }
 
     /**
-     * @param startDay the startTime to set
+     * @param startTime the startTime to set
      */
     public void setStartTime(String startTime) {
         this.startTime = startTime;

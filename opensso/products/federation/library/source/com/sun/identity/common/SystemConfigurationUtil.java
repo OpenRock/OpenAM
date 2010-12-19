@@ -373,7 +373,7 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
      * Returns property value corresponding to the property name. If the
      * property is not found, the default value is returned. 
      * @param propertyName name of the property whose value to be returned. 
-     * @param default the default value.
+     * @param defaultValue the default value.
      * @return the value of the property, returns null if the property does
      *     not exist.
      */

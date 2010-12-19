@@ -113,7 +113,7 @@ public class PrivilegeUtils {
 
     /**
      * Maps a OpenSSO Policy to entitlement Privilege
-     * @param policy OpenSSO Policy object
+     * @param policyObject  OpenSSO Policy object
      * @return entitlement Privilege object
      * @throws com.sun.identity.policy.PolicyException if the mapping fails
      */

@@ -112,7 +112,7 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
     /**
      * Returns user attribute configured in password reset service.
      *
-     * @param realm Realm name.
+     * @param orgDN Realm name.
      * @return user attribute configured in password reset service.
      */
     public String getUserAttr(String orgDN) {
@@ -320,7 +320,7 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
      * This method will use the user DN stored in the model to
      * determine if the user's account is active or has expired.
      *
-     * @param orgDN organization DN
+     * @param realm organization DN
      * @return true if user is active and account is not expired.
      */
     public boolean isUserActive(String realm) {

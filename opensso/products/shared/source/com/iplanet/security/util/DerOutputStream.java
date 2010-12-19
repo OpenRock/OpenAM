@@ -327,8 +327,7 @@ public class DerOutputStream extends ByteArrayOutputStream implements
      * Marshals a DER bit string on the output stream. The bit strings need not
      * be byte-aligned.
      * 
-     * @param bits
-     *            the bit string, MSB first
+     * @param ba bitarray, MSB first
      */
     public void putUnalignedBitString(BitArray ba) throws IOException {
         byte[] bits = ba.toByteArray();
@@ -343,8 +342,7 @@ public class DerOutputStream extends ByteArrayOutputStream implements
      * Marshals a DER bit string on the output stream. All trailing 0 bits will
      * be stripped off in accordance with DER encoding.
      * 
-     * @param bits
-     *            the bit string, MSB first
+     * @param bitString the bit string, MSB first
      */
     public void putUnalignedBitString(byte[] bitString) throws IOException {
         putUnalignedBitString(toBitArray(bitString));
@@ -354,8 +352,7 @@ public class DerOutputStream extends ByteArrayOutputStream implements
      * Marshals a DER bit string on the output stream. All trailing 0 bits will
      * be stripped off in accordance with DER encoding.
      * 
-     * @param bits
-     *            the bit string as an array of booleans.
+     * @param bitString the bit string as an array of booleans.
      */
     public void putUnalignedBitString(boolean[] bitString) throws IOException {
         putUnalignedBitString(toBitArray(bitString));

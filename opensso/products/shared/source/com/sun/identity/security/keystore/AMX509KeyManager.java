@@ -40,8 +40,7 @@ public interface AMX509KeyManager extends X509KeyManager {
     /**
      * This constructor takes a JSSE default implementation and a
      * user-specified client certificate alias.
-     * @param defaultX509KeyManager a JSSE default implementation
-     * @param client certificate alias
+     * @param alias certificate alias
      */
     public void setAlias(String alias);
 

@@ -98,7 +98,7 @@ public class AMCertPath {
     /**
      * It does cert path validation together with CRL check and ocsp checking 
      * if they are properly configured.
-     * @param X509Certificate[] certs
+     * @param certs
      **/
     public boolean verify(X509Certificate[] certs, boolean crlEnabled,
                           boolean ocspEnabled) {

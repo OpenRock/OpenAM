@@ -140,7 +140,7 @@ public class Entitlement {
     /**
      * Creates an entitlement object.
      *
-     * @param resourceNames Resource namess.
+     * @param resourceName Resource namess.
      * @param actionValues Map of action name to set of values.
      */
     public Entitlement(
@@ -155,7 +155,7 @@ public class Entitlement {
      * Creates an entitlement object.
      *
      * @param applicationName applicationName
-     * @param resourceNames Resource namess.
+     * @param resourceName Resource namess.
      * @param actionValues Map of action name to set of values.
      */
     public Entitlement(
@@ -413,7 +413,7 @@ public class Entitlement {
      * @param realm Realm Name
      * @param subject Subject who is under evaluation.
      * @param applicationName application name.
-     * @param resourceNames Resource name.
+     * @param resourceName Resource name.
      * @param environment Environment parameters.
      * @return a set of resource names that match the given resource.
      * @throws EntitlementException if resource names cannot be returned.

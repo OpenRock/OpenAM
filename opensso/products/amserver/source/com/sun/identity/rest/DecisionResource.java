@@ -72,7 +72,6 @@ public class DecisionResource extends ResourceBase {
      * Returns entitlement decision of a given user.
      *
      * @param realm Realm name.
-     * @param subject Subject of interest.
      * @param action Action to be evaluated.
      * @param resource Resource to be evaluated.
      * @param application Application name.
@@ -123,8 +122,7 @@ public class DecisionResource extends ResourceBase {
      * Returns the entitlements of a given subject.
      *
      * @param realm Realm Name.
-     * @param subject Subject of interest.
-     * @param resource resources to be evaluated
+     * @param resources resources to be evaluated
      * @param application application name.
      * @param environment environment parameters.
      * @return entitlement of a given subject (in JSON string).
@@ -192,8 +190,6 @@ public class DecisionResource extends ResourceBase {
      * Returns the entitlement of a given subject.
      *
      * @param realm Realm Name.
-     * @param subject Subject of interest.
-     * @param action action to be evaluated.
      * @param resource resource to be evaluated
      * @param application application name.
      * @param environment environment parameters.
@@ -246,8 +242,6 @@ public class DecisionResource extends ResourceBase {
      * Returns the entitlements of a given subject.
      *
      * @param realm Realm Name.
-     * @param subject Subject of interest.
-     * @param action action to be evaluated.
      * @param resource resource to be evaluated
      * @param application application name.
      * @param environment environment parameters.

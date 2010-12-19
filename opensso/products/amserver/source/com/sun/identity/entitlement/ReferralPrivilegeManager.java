@@ -60,7 +60,7 @@ public final class ReferralPrivilegeManager {
     /**
      * Adds referral privilege.
      *
-     * @param privilege Referral privilege.
+     * @param referral Referral privilege.
      * @throws EntitlementException if privilege cannot be added.
      */
     public void add(ReferralPrivilege referral)
@@ -183,7 +183,7 @@ public final class ReferralPrivilegeManager {
     /**
      * Modifies a referral privilege.
      *
-     * @param privilege the referral privilege to be modified
+     * @param referral the referral privilege to be modified
      * @throws EntitlementException if privilege cannot be modified.
      */
     public void modify(ReferralPrivilege referral)

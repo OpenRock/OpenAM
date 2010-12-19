@@ -1511,8 +1511,8 @@ public class AMSetupServlet extends HttpServlet {
     /**
       * Returns a unused port on a given host.
       *    @param hostname (eg localhost)
-      *    @param start: starting port number to check (eg 389).
-      *    @param incr : port number increments to check (eg 1000).
+      *    @param start starting port number to check (eg 389).
+      *    @param incr port number increments to check (eg 1000).
       *    @return available port num if found. -1 of not found.
       */
     static public int getUnusedPort(String hostname, int start, int incr)
@@ -1530,7 +1530,7 @@ public class AMSetupServlet extends HttpServlet {
     /**
       * Checks whether the given host:port is currenly under use.
       *    @param hostname (eg localhost)
-      *    @param incr : port number.
+      *    @param port port number.
       *    @return  true if not in use, false if in use.
       */
     public static boolean canUseAsPort(String hostname, int port)
@@ -1593,7 +1593,7 @@ public class AMSetupServlet extends HttpServlet {
       * @param server URL string representing the remote OpenSSO
       *        server
       * @param userid - admin userid on remote server (only amdmin)
-      * @param password - admin password
+      * @param pwd - admin password
       * @return Map of confif params.
       * @throws <code>ConfiguratonException</code>
       *   errorCodes :

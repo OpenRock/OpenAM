@@ -891,8 +891,6 @@ public class IdentityServicesImpl
      * @param name The name of identity to retrieve.
      * @param attributes Attribute objects specifying criteria for the object
      * to retrieve.
-     * @param realm Optional name of realm to search.
-     * @param attributeNames Optional list of attributes to be returned.
      * @param admin Token identifying the administrator to be used to authorize
      * the request.
      * @return IdentityDetails of the subject.
@@ -1164,10 +1162,7 @@ public class IdentityServicesImpl
      *
      * @param admin Token identifying the administrator to be used to authorize
      * the request.
-     * @param name The name of identity to delete.
-     * @param identityType The identity type.
-     * @param universalId Optional universal ID of the identity.
-     * @param realm Optional name of realm to search.
+     * @param identity Identity Details of the Subject
      * @return boolean true if the identity object was deleted.
      * @throws NeedMoreCredentials when more credentials are required for
      * authorization.

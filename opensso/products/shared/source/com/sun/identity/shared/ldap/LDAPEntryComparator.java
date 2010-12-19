@@ -57,7 +57,6 @@ public interface LDAPEntryComparator {
      * argument.
      * <P>
      *
-     * @version 1.0
      * @see com.sun.identity.shared.ldap.LDAPCompareAttrNames
      * @see com.sun.identity.shared.ldap.LDAPSearchResults#sort
      */

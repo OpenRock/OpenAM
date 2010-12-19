@@ -180,12 +180,7 @@ public interface IdentityServices extends Remote {
      *
      * @param admin Token identifying the administrator to be used to authorize
      * the request.
-     * @param name The name of identity to retrieve.
-     * @param identityType The identity type.
-     * @param universalId Optional universal ID of the identity.
-     * @param realm Optional name of realm to search.
-     * @param attributeNames Optional array of attributes to be returned.
-     * @return IdentityDetails of the subject.
+     * @param identity IdentityDetails of the subject.
      * @throws NeedMoreCredentials when more credentials are required for
      * authorization.
      * @throws ObjectNotFound if no subject is found that matches the input criteria.
@@ -225,7 +220,6 @@ public interface IdentityServices extends Remote {
      * authentication and load balancing. Replaying all these cookies
      * during the request is highly recommended.
      *
-     * @param token Token being verified
      * @return <true> if token is valid
      * @throws InvalidToken if token is not a valid token
      * @throws TokenExpired if token has expired.

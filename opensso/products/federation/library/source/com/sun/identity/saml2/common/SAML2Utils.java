@@ -3566,7 +3566,7 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param ipaddr IP Address
      * @param userid User Id
      * @param org Organization
-     * @parma module Module Name
+     * @param module Module Name
      * @param props log record columns - used if tok is not available
      *        to specify log record columns such as ip address, realm, etc
      */

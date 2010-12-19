@@ -276,7 +276,7 @@ public class BasicClientTypesManager implements ClientTypesManager {
      * Simple utility method that parsed the properties file for the different
      * clients.
      *
-     * @param client The name of the client to populate
+     * @param clientName The name of the client to populate
      * @param props The incoming properties file
      * @throws InvalidPropertiesFormatException
      */

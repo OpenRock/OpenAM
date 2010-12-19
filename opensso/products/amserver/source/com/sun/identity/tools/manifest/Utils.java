@@ -97,7 +97,7 @@ public class Utils implements ManifestConstants {
      *
      * @param actualString The string to be checked.
      * @param patterns A list of patterns to check for.
-     * @param wildChar A character which is used as wild card in the pattern.
+     * @param wildCard A character which is used as wild card in the pattern.
      * @return Whether the string matches one of the patterns in the list.
      */
     
@@ -118,7 +118,7 @@ public class Utils implements ManifestConstants {
      *
      * @param actualString The string to be checked.
      * @param pattern A pattern to check for.
-     * @param wildChar A character which is used as wild card in the pattern.
+     * @param wildCard A character which is used as wild card in the pattern.
      * @return Whether the string matches one of the patterns in the list.
      */
     

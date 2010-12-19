@@ -32,7 +32,7 @@ import java.net.*;
  * Each protocol operation must implement this interface.
  *
  * @version 1.0
- * @see RFC1777
+ * @see <a href="http://www.faqs.org/rfcs/rfc1777.html">RFC1777</a>
  */
 public interface JDAPProtocolOp {
     /**

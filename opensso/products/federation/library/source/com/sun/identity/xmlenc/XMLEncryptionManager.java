@@ -103,7 +103,7 @@ public class XMLEncryptionManager {
      * @param doc the context XML Document.
      * @param element Element to be encrypted.
      * @param secretKeyAlg Encryption Key Algorithm.
-     * @param keyStrength Encryption Key Strength.
+     * @param keySize Encryption key size
      * @param certAlias KeyEncryption Key cert alias.
      * @return org.w3c.dom.Document XML Document replaced with encrypted data
      *         for a given XML element.
@@ -124,7 +124,7 @@ public class XMLEncryptionManager {
      * @param doc the context XML Document.
      * @param element Element to be encrypted.
      * @param secretKeyAlg Encryption Key Algorithm.
-     * @param keyStrength Encryption Key Strength.
+     * @param keySize Encryption key size
      * @param certAlias KeyEncryption Key cert alias.
      * @param providerID Unique provider ID. 
      * @return org.w3c.dom.Document XML Document replaced with encrypted data
@@ -148,7 +148,7 @@ public class XMLEncryptionManager {
      * @param doc the context XML Document.
      * @param element Element to be encrypted.
      * @param secretKeyAlg Encryption Key Algorithm.
-     * @param keyStrength Encryption Key Strength.
+     * @param keySize Encryption key size
      * @param certAlias KeyEncryption Key cert alias.
      * @param providerID Unique provider ID. 
      * @return org.w3c.dom.Document XML Document for EncryptedResourceID.
@@ -170,7 +170,7 @@ public class XMLEncryptionManager {
      * @param doc the context XML Document.
      * @param element Element to be encrypted.
      * @param secretKeyAlg Encryption Key Algorithm.
-     * @param keyStrength Encryption Key Strength.
+     * @param keySize Encryption key size
      * @param certAlias KeyEncryption Key cert alias.
      * @param kekStrength Key Encryption Key Strength.
      * @return org.w3c.dom.Document XML Document replaced with encrypted data

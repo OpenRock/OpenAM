@@ -118,7 +118,7 @@ public class EntitlementService extends EntitlementConfiguration {
     /**
      * Returns set of attribute values of a given attribute name,
      *
-     * @param attributeName attribute name.
+     * @param attrName attribute name.
      * @return set of attribute values of a given attribute name,
      */
     public Set<String> getConfiguration(String attrName) {
@@ -314,9 +314,8 @@ public class EntitlementService extends EntitlementConfiguration {
     /**
      * Returns a set of application names for a given search criteria.
      *
-     * @param filter Set of search filter.
-     * @param searchSizeLimit Search size limit.
-     * @param searchTimeLimit Search time limit in seconds.
+     * @param adminSubject Admin Subject
+     * @param filters Set of search filter.
      * @return a set of application names for a given search criteria.
      * @throws EntitlementException if search failed.
      */
@@ -549,8 +548,8 @@ public class EntitlementService extends EntitlementConfiguration {
     /**
      * Returns subject attribute names.
      *
-     * @param application Application name.
-     * @return subject attribute names.
+     * @param applicationName  Application name.
+     * @param names subject attribute names.
      * @throws EntitlementException if subject attribute names cannot be
      * returned.
      */
@@ -789,7 +788,7 @@ public class EntitlementService extends EntitlementConfiguration {
     /**
      * Stores the application to data store.
      *
-     * @param application Application object.
+     * @param appl Application object.
      * @throws EntitlementException if application cannot be stored.
      */
     public void storeApplication(Application appl)

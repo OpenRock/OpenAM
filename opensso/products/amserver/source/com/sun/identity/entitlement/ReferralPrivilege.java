@@ -142,7 +142,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
     /**
      * Sets the application name to resource name.
      *
-     * @param mapApplNameToResources map of application name to tesource names.
+     * @param map map of application name to tesource names.
      * @throws EntitlementException if map is empty.
      */
     public void setMapApplNameToResources(Map<String, Set<String>> map)
@@ -326,7 +326,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
     /**
      * Sets the user ID who last modified the policy.
      *
-     * @param createdBy user ID who last modified the policy.
+     * @param lastModifiedBy user ID who last modified the policy.
      */
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;

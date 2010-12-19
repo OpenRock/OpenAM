@@ -218,7 +218,7 @@ public class AMCallbackHandler implements CallbackHandler {
     
     /**
      * Set password for key store 
-     * @param passwd Value of string to be set 
+     * @param pw Value of string to be set 
      */
     public void setPassword(String pw) {
         password = pw.toCharArray();

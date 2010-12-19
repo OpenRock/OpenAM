@@ -68,7 +68,7 @@ public interface IPrivilege {
      * @param environment Environment parameters.
      * @param recursive <code>true</code> to perform evaluation on sub resources
      *        from the given resource name.
-     * @param A security context
+     * @param context A security context
      * @return a list of entitlement for a given subject, resource name
      *         and environment.
      * @throws EntitlementException if the result cannot be determined.

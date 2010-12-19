@@ -35,7 +35,7 @@ import java.net.*;
  * </pre>
  *
  * @version 1.0
- * @see RFC1777
+ * @see <a href="http://www.faqs.org/rfcs/rfc1777.html">RFC1777</a>
  */
 public class JDAPModifyResponse extends JDAPResult implements JDAPProtocolOp {
     /**

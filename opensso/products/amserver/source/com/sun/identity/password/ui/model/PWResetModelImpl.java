@@ -822,7 +822,7 @@ public class PWResetModelImpl
     /**
      * Sets the user locale.
      *
-     * @param value localeString.
+     * @param localeString localeString.
      */
     public void setUserLocale(String localeString) {
         localeContext.setUserLocale(localeString);

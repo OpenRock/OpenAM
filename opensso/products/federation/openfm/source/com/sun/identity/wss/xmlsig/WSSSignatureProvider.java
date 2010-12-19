@@ -128,7 +128,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
      * @param symmetricKey true if the supplied key is a symmetric key type.     
      * @param signingCert signer's Certificate. If present, this certificate
      *        will be added as part of signature <code>KeyInfo</code>.
-     * @param encryptCert the certificate if present will be used to encrypt
+     * @param encCert the certificate if present will be used to encrypt
      *        the symmetric key and replay it as part of <code>KeyInfo</code>
      * @param assertionID assertion ID for the SAML Security Token
      * @param algorithm XML signature algorithm

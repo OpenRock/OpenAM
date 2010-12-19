@@ -38,7 +38,7 @@ public interface TaskRunnable extends Runnable {
     /**
      * Adds an element to this TaskRunnable.
      *
-     * @param obj Element to be added to this TaskRunnable
+     * @param key Element to be added to this TaskRunnable
      * @return a boolean to indicate whether the add success
      */
     
@@ -47,7 +47,7 @@ public interface TaskRunnable extends Runnable {
     /**
      * Removes an element from this TaskRunnable.
      *
-     * @param obj Element to be removed from this TaskRunnable
+     * @param key Element to be removed from this TaskRunnable
      * @return A boolean to indicate whether the remove success
      */
     

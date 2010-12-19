@@ -62,8 +62,6 @@ import com.iplanet.security.util.ObjectIdentifier;
  * qualifier, country name, locality name, state or province name, organization
  * name, organization unit name, title, pkcs9 email. Not all the attributes are
  * supported. Please check the X500NameAttrMap for defined attributes.
- * 
- * @see SubjectDirectoryAttributesExtension
  */
 
 public final class Attribute implements DerEncoder {
@@ -128,7 +126,7 @@ public final class Attribute implements DerEncoder {
     /**
      * Construct an attribute from attribute type and attribute values
      * 
-     * @param oid
+     * @param attr 
      *            attribute type string
      *            CN,OU,O,C,L,TITLE,ST,STREET,UID,MAIL,E,DC
      * @param values
@@ -163,7 +161,7 @@ public final class Attribute implements DerEncoder {
      * Construct an attribute from a der encoded object. This der der encoded
      * value should represent the attribute object.
      * 
-     * @param value
+     * @param val
      *            the attribute object in der encode form.
      */
     public Attribute(DerValue val) throws IOException {

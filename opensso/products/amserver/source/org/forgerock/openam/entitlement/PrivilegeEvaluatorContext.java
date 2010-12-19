@@ -69,8 +69,6 @@ public class PrivilegeEvaluatorContext implements Serializable {
 
     /**
      * Set the current context of the running thread
-     *
-     * @return object containing the current context
      */
     public static void setCurrent(PrivilegeEvaluatorContext ctx) {
         currentCtx.set(ctx);

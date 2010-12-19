@@ -273,7 +273,7 @@ public interface PWResetModel {
     /**
      * Sets the user locale.
      *
-     * @param value localeString.
+     * @param localeString localeString.
      */
     void setUserLocale(String localeString);
 }
