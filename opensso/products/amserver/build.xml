@@ -298,8 +298,8 @@
                 excludes="${amserver.javadoc-excludes}" />
             <tag name="supported.all.api" enabled="false" />
             <tag name="supported.api" enabled="false" />
-            <link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
-            <link href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/"/>
+            <link href="http://download.oracle.com/javase/6/docs/api/"/>
+            <link href="http://download.oracle.com/javaee/1.3/api/"/>
         </javadoc>
     </target>
     
@@ -315,8 +315,8 @@
                 path="${amserver.classes.dir}" />
             <tag name="supported.all.api" description="" />
             <tag name="supported.api" description="" />
-            <link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
-            <link href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/"/>
+            <link href="http://download.oracle.com/javase/6/docs/api/"/>
+            <link href="http://download.oracle.com/javaee/1.3/api/"/>
         </javadoc>
     </target>
 
