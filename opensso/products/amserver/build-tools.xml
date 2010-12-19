@@ -27,6 +27,9 @@
    $Id: build-tools.xml,v 1.28 2010/01/11 17:34:32 veiming Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2010] [ForgeRock AS]"
+-->
 
 <project name="amadm" default="createZipFile" basedir=".">
     <description>OpenWebSingle Sign-On: Tools.zip Creation</description>

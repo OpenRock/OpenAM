@@ -26,6 +26,10 @@
     $Id: project.xml,v 1.8 2009/11/16 21:53:00 mallas Exp $
 
 -->
+<!--
+    "Portions Copyrighted [2010] [ForgeRock AS]"                                
+--> 
+
 <project xmlns="http://www.netbeans.org/ns/project/1">
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
