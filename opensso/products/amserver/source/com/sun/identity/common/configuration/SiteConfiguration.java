@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -135,7 +136,7 @@ public class SiteConfiguration extends ConfigurationBase {
         ServiceConfig rootNode,
         String name
     ) throws SMSException, SSOException {
-        Set info = new HashSet();
+        Set info = new LinkedHashSet();
         ServiceConfig sc = rootNode.getSubConfig(name);
         ServiceConfig accessPoint = sc.getSubConfig(SUBCONFIG_ACCESS_URL);
 

@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
@@ -49,6 +53,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.security.AccessController;
+import java.util.LinkedHashSet;
 
 /**
  * This is the base case for <code>ServerConfiguration</code> and
@@ -139,7 +144,7 @@ public abstract class ConfigurationBase {
             return Collections.EMPTY_SET;
         }
 
-        Set currentIds = new HashSet();
+        Set currentIds = new LinkedHashSet();
         ServiceConfig accessPoint = sc.getSubConfig(SUBCONFIG_ACCESS_URL);
 
         Map map = accessPoint.getAttributes();

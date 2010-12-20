@@ -918,6 +918,29 @@ public class WebtopNaming {
     }
 
     /**
+     * Returns the String representation of the separator delimited
+     * secondary site list.
+     *
+     * @param protocol procotol of the server instance
+     * @param host host of the server instance
+     * @param port port of the server instance
+     * @param uri uri of the server instance
+     *
+     * @return the secondary site list
+     * @throws ServerEntryNotFoundException if the Naming Service
+     *     can not find that server entry
+     */
+    public static String getSecondarySites(
+        String protocol,
+        String host,
+        String port,
+        String uri)
+    throws ServerEntryNotFoundException {
+        String serverid = getServerID(protocol, host, port, uri);
+        return getSecondarySites(serverid);
+    }
+
+    /**
      * Returns the String representation of the separator delimited 
      * secondary site list.
      *

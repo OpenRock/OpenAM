@@ -361,6 +361,8 @@ public class SessionService {
 
     private String sessionServerID;
 
+    private Set secondaryServerIDs;
+
     private static SessionService sessionService = null;
 
     public static String deploymentURI = SystemProperties
@@ -901,7 +903,12 @@ public class SessionService {
      */
     public boolean isLocalSite(SessionID sid) {
         String siteID = sid.getSessionServerID();
-        return sessionServerID.equals(siteID);
+
+        if (sessionServerID.equals(siteID) || secondaryServerIDs.contains(siteID)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -1672,7 +1679,23 @@ public class SessionService {
             if (isSiteEnabled) {
                 sessionServerID = WebtopNaming.getSiteID(sessionServerProtocol,
                         sessionServer, sessionServerPort, sessionServerURI);
+                String secondaryIDs =
+                    WebtopNaming.getSecondarySites(sessionServerProtocol,
+                        sessionServer, sessionServerPort, sessionServerURI);
+                secondaryServerIDs = new HashSet();
 
+                if (secondaryIDs != null) {
+                    if (secondaryIDs.contains("|")) {
+                        StringTokenizer st = new StringTokenizer(secondaryIDs, "|");
+
+                        while (st.hasMoreTokens()) {
+                            secondaryServerIDs.add(st.nextToken());
+                        }
+                    } else {
+                        secondaryServerIDs.add(secondaryIDs);
+                    }
+                }
+                
                 sessionServiceID = new URL(WebtopNaming.getServerFromID(
                     sessionServerID));
                 sessionServerProtocol = sessionServiceID.getProtocol();
