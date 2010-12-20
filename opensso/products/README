@@ -54,16 +54,15 @@ Portions Copyrighted [2010] [ForgeRock AS]
                oauth-signature-1.1.5-ea-SNAPSHOT.jar,
                oauth-server-1.1.5-ea-SNAPSHOT.jar,
                oauth-client-1.1.5-ea-SNAPSHOT.jar
-        %% 2.3 Obtaining db.jar
-        %% 2.4 Obtaining testng-5.9-jdk15.jar
-        %% 2.5 Obtaining fmsae.dll, fmsae64.dll and agent-csdk
-        %% 2.6 Obtaining Open Message Queue binaries, imq.jar and jms.jar
-        %% 2.7 Obtaining click.jar and click-extras.jar
-        %% 2.8 Obtaining ant-contrib-1.0b3.jar
-        %% 2.9 Obtaining commons-codec-1.3..jar
-        %% 2.10 Obtaining jsr311-api-1.1.jar
-        %% 2.11 Obtaining jstl.jar
-        %% 2.12 Obtaining jsf.jar, jsf-impl.jar
+        %% 2.3 Obtaining testng-5.9-jdk15.jar
+        %% 2.4 Obtaining fmsae.dll, fmsae64.dll and agent-csdk
+        %% 2.5 Obtaining Open Message Queue binaries, imq.jar and jms.jar
+        %% 2.6 Obtaining click.jar and click-extras.jar
+        %% 2.7 Obtaining ant-contrib-1.0b3.jar
+        %% 2.8 Obtaining commons-codec-1.3..jar
+        %% 2.9 Obtaining jsr311-api-1.1.jar
+        %% 2.10 Obtaining jstl.jar
+        %% 2.11 Obtaining jsf.jar, jsf-impl.jar
 
     %% 3. Building the workspace
         %% 3.1 build target
@@ -106,7 +105,6 @@ The libraries needed for compiling OpenSSO sources are:
      webservices-rt.jar, webservices-tools.jar, webservices-extra.jar,
      webservices-extra-api.jar, OpenDS.jar, je.jar,
      mfwk_instrum_tk-2.0.jar, xercesImpl.jar, jss4.jar
-   - SleepyCat Berkeley DB version 4.2.52: db.jar 
    - TestNG version 5.9 : testng-5.9-jdk15.jar
    - Secure Attribute Exchange API: fmsae.dll and fmsae64.dll
    - Open Message Queue: mq4_4-v2-AIX.zip,mq4_4-v2-Linux_X86.zip, 
@@ -154,41 +152,13 @@ http://download.java.net/general/opensso/extlib/latest/opensso-sun-extlib.zip
 
 Extract the zip, you can get all those shared library jars.
 
-%% 2.3 Obtaining db.jar
 
-The Sleepycat library db.jar is not distributed in the binary form. However,
-this can be built using the source distribution provided by Sleepycat 
-Software. Follow these steps to obtain the db.jar library:
-
-2.3.1 Open the web page: http://www.oracle.com/technology/software/products/berkeley-db/db/index.html 
-2.3.2 Under "4.x Releases", click "Berkeley DB 4.2.52 NC.tar.gz" link under 
-      4.2.52, this will download the source distribution of Berkeley DB.
-2.3.3 Extract the sources in a convenient location. 
-2.3.4 To build the entire distribution follow the instructions provided in
-      the docs/index.html by opening that file in a browser and clicking 
-      on the appropriate link under "Building Berkeley DB" section as 
-      applicable for your platform. The rest of the instructions in this 
-      section describe how this distribution can be built on a unix platform.
-2.3.5 Enter the directory db-4.2.52.NC/build_unix and issue the command:
-          ../dist/configure --enable-java
-      for this command to work, you will need a C compiler along with
-      development utilities like gmake, autoconf and libtool available on
-      your on your system.
-2.3.6 Once this command completes successfully, issue the following command
-      to compile the source distribution:
-          gmake
-      Note that you do not have to install the distribution for obtaining
-      the desired library.
-
-Once this process is complete, the db.jar library can be obtained from 
-under the db-4.2.52.NC/build_unix directory.
-
-%% 2.4 Obtaining testng-5.9-jdk15.jar
+%% 2.3 Obtaining testng-5.9-jdk15.jar
 
 Download testng-5.9.zip from http://testng.org/testng-5.9.zip; unzip it and 
 testng-5.9-jdk15.jar in the base directory.
 
-%% 2.5 Obtaining fmsae.dll, fmsae64.dll and agent-cdsk
+%% 2.4 Obtaining fmsae.dll, fmsae64.dll and agent-cdsk
 
 Download opensso.zip from 
 http://download.java.net/general/opensso/nightly/latest/opensso/opensso.zip
@@ -197,10 +167,10 @@ libraries/native/dll and copy it into the opensso/products/extlib directory
 in your workspace. Copy the agent-csdk subdirectory, and contents from 
 libraries/native to opensso/products/extlib.
 
-%% 2.6 Obtaining Open Message Queue binaries, imq.jar and jms.jar
+%% 2.5 Obtaining Open Message Queue binaries, imq.jar and jms.jar
 
-2.6.1 Open the web page: https://mq.dev.java.net/downloads.html
-2.6.2 Depending on your choice of platform, you may choose to download any
+2.5.1 Open the web page: https://mq.dev.java.net/downloads.html
+2.5.2 Depending on your choice of platform, you may choose to download any
       one of the available distribution types available under Open MQ 4.4 
       Binary Downloads.
        |----mq4_4-v2-Linux_X86.zip
@@ -218,59 +188,59 @@ libraries/native to opensso/products/extlib.
        |----mq4_4-v2-AIX.zip
        |    (Open Message Queue binaries for AIX)
   
-2.6.3 Extract the downloaded file as necessary to get the 
+2.5.3 Extract the downloaded file as necessary to get the 
       imq.jar and jms.jar under /imq/lib directory
 
-%% 2.7 Obtaining click.jar and click-extras.jar
-2.7.1 Visit http://click.sourceforge.net/, click on the Download hyperlink
+%% 2.6 Obtaining click.jar and click-extras.jar
+2.6.1 Visit http://click.sourceforge.net/, click on the Download hyperlink
       (under the Click tree) on the left panel
       You will be brought to sourceforge.net with the list of click binaries.
-2.7.2 Download click-1.4.2.zip
-2.7.3 Unzip this zip file in a temporary directory
-2.7.4 copy <temporary directory>/click.1.4.2/dist/click-1.4.2.jar to
+2.6.2 Download click-1.4.2.zip
+2.6.3 Unzip this zip file in a temporary directory
+2.6.4 copy <temporary directory>/click.1.4.2/dist/click-1.4.2.jar to
       <your workspace>/opensso/products/extlib/click.jar
-2.7.5 copy <temporary directory>/click.1.4.2/dist/click-extras-1.4.2.jar to
+2.6.5 copy <temporary directory>/click.1.4.2/dist/click-extras-1.4.2.jar to
       <your workspace>/opensso/products/extlib/click-extras.jar
 
-%% 2.8 Obtaining ant-contrib-1.0b3.jar
-2.8.1 Visit http://sourceforge.net/project/showfiles.php?group_id=36177
-2.8.2 Under "Latest File Releases" , click on the link "Download".
+%% 2.7 Obtaining ant-contrib-1.0b3.jar
+2.7.1 Visit http://sourceforge.net/project/showfiles.php?group_id=36177
+2.7.2 Under "Latest File Releases" , click on the link "Download".
       You wil be brought to a page with list of ant-contrib binaries.
-2.8.3 Download ant-contrib-1.0b3-bin.zip 
-2.8.4 Unzip this zip file in a temporary directory.
-2.8.5 copy <temporary directory>/ant-contrib/ant-contrib-1.0b3.jar to
+2.7.3 Download ant-contrib-1.0b3-bin.zip 
+2.7.4 Unzip this zip file in a temporary directory.
+2.7.5 copy <temporary directory>/ant-contrib/ant-contrib-1.0b3.jar to
       <your workspace>/opensso/products/extlib/ant-contrib-1.0b3.jar
 
-%% 2.9 Obtaining commons-codec-1.3..jar
-2.9.1 Visit http://commons.apache.org/downloads/download_codec.cgi
-2.9.2 Download one of the Binary selections (e.g., 1.3.tar.gz)
-2.9.3 Uncompress (and un-tar, in the case of 1.3.tar.gz) the file in
+%% 2.8 Obtaining commons-codec-1.3..jar
+2.8.1 Visit http://commons.apache.org/downloads/download_codec.cgi
+2.8.2 Download one of the Binary selections (e.g., 1.3.tar.gz)
+2.8.3 Uncompress (and un-tar, in the case of 1.3.tar.gz) the file in
        a temporary directory.
-2.9.4 Find the commons-codec-1.3.jar file and copy it to
+2.8.4 Find the commons-codec-1.3.jar file and copy it to
        <your workspace>/opensso/products/extlib/commons-codec-1.3.jar
 
-%% 2.10 Obtaining jsr311-api-1.1.jar
-2.10.1 Download from
+%% 2.9 Obtaining jsr311-api-1.1.jar
+2.9.1 Download from
        http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar
 
-%% 2.11 Obtaining jstl.jar
-2.11.1 Download from
+%% 2.10 Obtaining jstl.jar
+2.10.1 Download from
        http://mirrors.ibiblio.org/pub/mirrors/maven2/jstl/jstl/1.1.2/jstl-1.1.2.jar
-%% 2.12 Obtaining jsf.jar, jsf-impl.jar
-2.12.1 Download 
+%% 2.11 Obtaining jsf.jar, jsf-impl.jar
+2.11.1 Download 
        https://javaserverfaces.dev.java.net/files/documents/1866/138058/mojarra-1.2_13-binary.zip
-2.12.2 Unzip it and the jars are in lib directory.
+2.11.2 Unzip it and the jars are in lib directory.
 
-%% 2.13 Obtaining opends.zip
-2.13.1 Download the latest OpenDS 2.3.x from
+%% 2.12 Obtaining opends.zip
+2.12.1 Download the latest OpenDS 2.3.x from
 	http://www.opends.org/
-2.13.2 Change to the opensso/products/opends directory
-2.13.3 Unzip the OpenDS zip file
-2.13.4 Copy the OpenDS.zip and je.jar files from the OpenDS-2.3.0/lib directory into
+2.12.2 Change to the opensso/products/opends directory
+2.12.3 Unzip the OpenDS zip file
+2.12.4 Copy the OpenDS.zip and je.jar files from the OpenDS-2.3.0/lib directory into
         products/extlib
-2.13.5 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
+2.12.5 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
     	./create_opends_zip.sh OpenDS-2.3.0
-2.13.6 Copy the opends.zip into the products/extlib directory
+2.12.6 Copy the opends.zip into the products/extlib directory
 
 %% 3. Building the workspace
 

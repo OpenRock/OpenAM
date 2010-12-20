@@ -49,7 +49,6 @@
         <war destfile="${amserver.dist.dir}/opensso-amserver.war" webxml="${amserver.www.jsfconsole.dir}/WEB-INF/web.xml">
             <lib dir="${extlib.dir}">
                 <exclude name="j2ee.jar"/>
-                <exclude name="db.jar"/>
                 <exclude name="console.jar"/>
             </lib>
             <lib dir="${jsflockhart.dir}/lib" />
