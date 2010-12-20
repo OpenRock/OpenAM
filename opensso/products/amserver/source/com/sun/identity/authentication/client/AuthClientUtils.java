@@ -157,6 +157,12 @@ public class AuthClientUtils {
     private static String authCookieName=
         SystemProperties.get(Constants.AM_AUTH_COOKIE_NAME,
         ISAuthConstants.AUTH_COOKIE_NAME);
+    /* Constants.AM_DIST_AUTH_COOKIE_NAME is the Auth Cookie which
+     * gets set during the authentication process.
+     */
+    private static String distAuthCookieName=
+        SystemProperties.get(com.sun.identity.shared.Constants.AM_DIST_AUTH_COOKIE_NAME,
+        ISAuthConstants.DIST_AUTH_COOKIE_NAME);
     private static String loadBalanceCookieName = null;
     private static String persistentCookieName=
         SystemProperties.get(Constants.AM_PCOOKIE_NAME);
@@ -1196,6 +1202,14 @@ public class AuthClientUtils {
      */
     public static String getAuthCookieName() {
         return (authCookieName);
+    }
+
+    /**Returns the Dist Auth Cookie Name.
+     *
+     * @return authCookieName, a String, the dist auth cookie name.
+     */
+    public static String getDistAuthCookieName() {
+        return (distAuthCookieName);
     }
 
     public static String getCookieName() {

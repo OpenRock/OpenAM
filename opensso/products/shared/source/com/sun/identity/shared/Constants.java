@@ -983,84 +983,90 @@ public interface Constants {
     /**
      * property to control whether remote auth includes request/response
      */
-     public static final String REMOTEAUTH_INCLUDE_REQRES =
-             "openam.remoteauth.include.reqres";
+    public static final String REMOTEAUTH_INCLUDE_REQRES =
+        "openam.remoteauth.include.reqres";
 
-     /**
-      * property to control if the OpenAM session cookie should be made
-      * persistent
-      */
-     public static final String PERSIST_AM_COOKIE =
-             "openam.session.persist_am_cookie";
+    /**
+     * property to control if the OpenAM session cookie should be made
+     * persistent
+     */
+    public static final String PERSIST_AM_COOKIE =
+        "openam.session.persist_am_cookie";
 
-     /**
-      * property to control if the OpenAM server will persist the OpenAM
-      * session cookie if the following parameter is in the incoming request
-      * <code>PersistAMCookie</code>.
-      */
-     public static final String ALLOW_PERSIST_AM_COOKIE =
-             "openam.session.allow_persist_am_cookie";
+    /**
+     * property to control if the OpenAM server will persist the OpenAM
+     * session cookie if the following parameter is in the incoming request
+     * <code>PersistAMCookie</code>.
+     */
+    public static final String ALLOW_PERSIST_AM_COOKIE =
+        "openam.session.allow_persist_am_cookie";
 
-     /**
-      * Server configuration property for the OpenDS admin port
-      */
-     public static final String DS_ADMIN_PORT =
-             "org.forgerock.embedded.dsadminport";
+    /**
+     * Server configuration property for the OpenDS admin port
+     */
+    public static final String DS_ADMIN_PORT =
+        "org.forgerock.embedded.dsadminport";
 
-     /**
-      * OpenDS Replication Port
-      */
-     public static final String EMBED_REPL_PORT =
-             "com.sun.embedded.replicationport";
+    /**
+     * OpenDS Replication Port
+     */
+    public static final String EMBED_REPL_PORT =
+        "com.sun.embedded.replicationport";
 
-     /**
-      * OpenDS Replication Port
-      */
-     public static final String EMBED_SYNC_SERVERS =
-             "com.sun.embedded.sync.servers";
+    /**
+     * OpenDS Replication Port
+     */
+    public static final String EMBED_SYNC_SERVERS =
+        "com.sun.embedded.sync.servers";
 
-     /**
-      * Configuration property to enable the site monitor in the naming service
-      */
-     public static final String SITEMONITOR_DISABLED =
-             "openam.naming.sitemonitor.disabled";
+    /**
+     * Configuration property to enable the site monitor in the naming service
+     */
+    public static final String SITEMONITOR_DISABLED =
+        "openam.naming.sitemonitor.disabled";
 
-     /**
-      * EQUALS sign
-      */
-     public static final String EQUALS = "=";
+    /**
+     * EQUALS sign
+     */
+    public static final String EQUALS = "=";
 
-     /**
-      * semi-colon sign
-      */
-     public static final String SEMI_COLON = ";";
+    /**
+     * semi-colon sign
+     */
+    public static final String SEMI_COLON = ";";
 
-     /**
-      * colon sign
-      */
-     public static final String COLON = ":";
+    /**
+     * colon sign
+     */
+    public static final String COLON = ":";
 
-     /**
-      * amp sign
-      */
-     public static final String AMP = "&";
+    /**
+     * amp sign
+     */
+    public static final String AMP = "&";
 
-     /**
-      * at sign
-      */
-     public static final String AT = "@";
+    /**
+     * at sign
+     */
+    public static final String AT = "@";
 
-     /**
-      * empty string
-      */
-     public static final String EMPTY = "";
+    /**
+     * empty string
+     */
+    public static final String EMPTY = "";
      
-     /**
-      * empty string
-      */
-     public static final String DELIMITER_PREF_LEFT =
-         "openam.entitlement.delimiter.precedence.left";
+    /**
+     * empty string
+     */
+    public static final String DELIMITER_PREF_LEFT =
+        "openam.entitlement.delimiter.precedence.left";
 
-     public static final String USE_OLD_LOG_FORMAT =
-         "openam.logging.use.old.log.format";
+    public static final String USE_OLD_LOG_FORMAT =
+        "openam.logging.use.old.log.format";
+
+    /**
+     * Property for dist auth cookie name.
+     */
+    public static final String AM_DIST_AUTH_COOKIE_NAME =
+        "openam.auth.distAuthCookieName";
 }

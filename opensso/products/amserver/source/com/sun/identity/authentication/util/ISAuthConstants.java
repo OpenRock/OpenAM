@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.authentication.util;
 
 /**
@@ -601,6 +605,9 @@ public interface ISAuthConstants {
 
     /** Auth Cookie Name */
     public static final String AUTH_COOKIE_NAME = "AMAuthCookie";
+
+    /** Dist Auth Cookie Name */
+    public static final String DIST_AUTH_COOKIE_NAME = "AMDistAuthCookie";
 
     public static final String SERVER_SUBSCHEMA = "serverconfig";
 
