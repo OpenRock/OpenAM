@@ -1086,6 +1086,23 @@ public class PolicyUtils {
      *         manager is no longer valid.
      */
     public static void createPolicies(PolicyManager pm, InputStream xmlPolicies)
+            throws PolicyException, SSOException {
+        // Overload common method
+        createOrReplacePolicies(pm, xmlPolicies, false);
+    }
+
+    /**
+     * Creates or replaces policy objects given an input stream of policy XML 
+     * which confines to <code>com/sun/identity/policy/policyAdmin.dtd</code>.
+     *
+     * @param pm Policy manager.
+     * @param xmlPolicies Policy XML input stream.
+     * @param replace True if the policies should be replaced, otherwise create.
+     * @throws PolicyException if policies cannot be updated.
+     * @throws SSOException if Single Sign On token used to update policy
+     *         manager is no longer valid.
+     */
+    public static void createOrReplacePolicies(PolicyManager pm, InputStream xmlPolicies, boolean replace)
         throws PolicyException, SSOException {
         try {
             DocumentBuilderFactory factory =
@@ -1103,7 +1120,11 @@ public class PolicyUtils {
                 Node node = childElements.item(i);
                 if ((node != null) && (node.getNodeType() == Node.ELEMENT_NODE)
                 ) {
-                    pm.addPolicy(new Policy(pm, node));
+                    if (replace) {
+                        pm.replacePolicy(new Policy(pm, node));
+                    } else {
+                        pm.addPolicy(new Policy(pm, node));
+                    }
                 }
             }
         } catch (IOException e) {

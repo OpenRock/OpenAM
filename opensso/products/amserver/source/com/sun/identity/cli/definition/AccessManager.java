@@ -523,6 +523,21 @@ public class AccessManager {
     private String delete_policies;
 
     @SubCommandInfo(
+        implClassName="com.sun.identity.cli.realm.RealmUpdatePolicy",
+        description="Update policies in a realm.",
+        webSupport="true",
+        mandatoryOptions={
+            "realm|e|s|Name of realm.",
+            "xmlfile|X|s|Name of file that contains policy XML definition."},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={},
+        resourceStrings={
+            "update-policy-in-realm-name-not-found=The policy provided did not exist in the policy store with the same name. If this is a new policy then run create-policies.",
+            "update-policy-in-realm-succeed=Policies were updated under realm, {0}."})
+    private String update_policies;
+
+    @SubCommandInfo(
         implClassName="com.sun.identity.cli.realm.RealmGetPolicy",
         description="List policy definitions in a realm.",
         webSupport="true",
