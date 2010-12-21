@@ -473,7 +473,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     clearCookieAndDestroySession();
                 }
                 try {
-                    if (ssoToken != null) {
+                    if (ssoToken != null &&
+                            SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {
                         loginDebug.message(
                             "Destroy existing/old valid session");
                         manager.destroyToken(ssoToken);

@@ -268,3 +268,10 @@ com.iplanet.am.cookie.c66Encode=false
  * Invalid characters enforced by the CDCServlet
  */
 com.iplanet.services.cdc.invalidGotoStrings=<,>,javascript:,javascript%3a,%3c,%3e
+
+/*
+ * Enable this setting if you want the original session _not_ to be destroyed
+ * during session upgrade. Useful if you have concurrent access to OpenAM 
+ * during the session upgrade process.
+ */
+openam.auth.destroy_session_after_upgrade=false
