@@ -1055,7 +1055,7 @@ public class SessionService {
                 if (!matchAll) {
                     // For application sessions, the client ID
                     // will not be in the DN format but just uid.
-                    String clientID = (sess.isAppSession()) ? 
+                    String clientID = (!sess.isAppSession()) ? 
                         DNUtils.DNtoName(sess.getClientID()) :
                         sess.getClientID();
 
