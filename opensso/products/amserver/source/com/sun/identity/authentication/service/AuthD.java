@@ -1389,13 +1389,16 @@ public class AuthD  {
     
     
     /**
-     * Returns the <code>AMIdentity</code> object.
+     * Returns the <code>AMIdentity</code> object for the given parameters.
+     * If there is no such identity, or there is more then one matching identity,
+     * then an AuthException will be thrown.
      *
      * @param idType Identity Type.
      * @param idName Identity Name.
      * @param orgName organization name.
      * @return <code>AMIdentity</code> object.
-     * @throws AuthException
+     * @throws AuthException if there was no result, or if there was more results
+     * then one.
      */
     public AMIdentity getIdentity(IdType idType,String idName,String orgName)
             throws AuthException {

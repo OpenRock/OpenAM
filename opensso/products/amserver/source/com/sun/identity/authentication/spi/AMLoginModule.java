@@ -2488,29 +2488,23 @@ public abstract class AMLoginModule implements LoginModule {
         try {
             // Get the universal ID
             AMIdentity amIdUser = ad.getIdentity(IdType.USER, userName,
-                loginState.getOrgDN());
+                    loginState.getOrgDN());
 
-            if (amIdUser != null) {
-                String univId = IdUtils.getUniversalId(amIdUser);
+            String univId = IdUtils.getUniversalId(amIdUser);
 
-                if (univId != null) {
-                    sessionQuota = getSessionQuota(amIdUser);
-                    sessionCount = 
-                            SessionCount.getAllSessionsByUUID(univId.toLowerCase()).size() +
-                                SessionCount.getAllSessionsByUUID(univId).size();
+            if (univId != null) {
+                sessionQuota = getSessionQuota(amIdUser);
+                sessionCount =
+                        SessionCount.getAllSessionsByUUID(univId.toLowerCase()).size()
+                        + SessionCount.getAllSessionsByUUID(univId).size();
 
-                    if (debug.messageEnabled()) {
-                            debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
-                                 + univId + " - Session Quota Reached =  " + (sessionCount >= sessionQuota));
-                    }
-                } else {
-                    debug.error("AMLoginModule.isSessionQuotaReached :: " + 
-                            "univId is null , amIdUser is " + amIdUser);
-                    return false;
+                if (debug.messageEnabled()) {
+                    debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
+                            + univId + " - Session Quota Reached =  " + (sessionCount >= sessionQuota));
                 }
             } else {
-                debug.error("AMLoginModule.isSessionQuotaReached :: " +
-                            "amIdUser is null, username is " + userName);
+                debug.error("AMLoginModule.isSessionQuotaReached :: "
+                        + "univId is null , amIdUser is " + amIdUser);
                 return false;
             }
         } catch (Exception ex) {
