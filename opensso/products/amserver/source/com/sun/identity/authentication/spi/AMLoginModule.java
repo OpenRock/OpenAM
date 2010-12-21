@@ -85,6 +85,7 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.common.ISAccountLockout;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.AccountLockoutInfo;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -2478,23 +2479,43 @@ public abstract class AMLoginModule implements LoginModule {
     public boolean isSessionQuotaReached(String userName) {
         int sessionCount = -1;
         int sessionQuota = -1;
+
+        if (userName == null || userName.equals(Constants.EMPTY)) {
+            debug.error("AMLoginModule.isSessionQuotaReached :: called with null username");
+            return false;
+        }
+
         try {
             // Get the universal ID
             AMIdentity amIdUser = ad.getIdentity(IdType.USER, userName,
                 loginState.getOrgDN());
-            String univId = IdUtils.getUniversalId(amIdUser);
-            sessionQuota = getSessionQuota(amIdUser);
-            sessionCount = SessionCount.getAllSessionsByUUID(univId.toLowerCase()).size() + SessionCount.getAllSessionsByUUID(univId).size();
 
-            if (debug.messageEnabled()) {
-                    debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
-                         + univId + " - Session Quota Reached =  " + (sessionCount >= sessionQuota));
+            if (amIdUser != null) {
+                String univId = IdUtils.getUniversalId(amIdUser);
+
+                if (univId != null) {
+                    sessionQuota = getSessionQuota(amIdUser);
+                    sessionCount = 
+                            SessionCount.getAllSessionsByUUID(univId.toLowerCase()).size() +
+                                SessionCount.getAllSessionsByUUID(univId).size();
+
+                    if (debug.messageEnabled()) {
+                            debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
+                                 + univId + " - Session Quota Reached =  " + (sessionCount >= sessionQuota));
+                    }
+                } else {
+                    debug.error("AMLoginModule.isSessionQuotaReached :: " + 
+                            "univId is null , amIdUser is " + amIdUser);
+                    return false;
+                }
+            } else {
+                debug.error("AMLoginModule.isSessionQuotaReached :: " +
+                            "amIdUser is null, username is " + userName);
+                return false;
             }
         } catch (Exception ex) {
-             if (debug.messageEnabled()) {
-                debug.message("AMLoginModule.getSessionQuotaLevel::  "
+            debug.error("AMLoginModule.getSessionQuotaLevel::  "
                     + "Exception : ", ex);
-             }
         }
 
         return (sessionCount >= sessionQuota);
@@ -2502,6 +2523,12 @@ public abstract class AMLoginModule implements LoginModule {
 
     private int getSessionQuota(AMIdentity iden) {
         int quota = SessionConstraint.getDefaultSessionQuota();
+        
+        if (iden == null) {
+            debug.error("AMLoginModule.getSessionQuota :: AMIdentity is null, returning default quota");
+            return quota;
+        }
+
         try {
              Map serviceAttrs =
                 iden.getServiceAttributesAscending("iPlanetAMSessionService");
@@ -2512,13 +2539,12 @@ public abstract class AMLoginModule implements LoginModule {
                 String attr = (String) attrs.next();
                 quota = (Integer.valueOf(attr)).intValue();
              }
-        } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("Failed to get the session quota via the "+
-                            "IDRepo interfaces, => Use the default " +
-                            "value from the dynamic schema instead.", e);
-            }
+        } catch (Exception ex) {
+            debug.error("Failed to get the session quota via the "+
+                        "IDRepo interfaces, => Use the default " +
+                        "value from the dynamic schema instead.", ex);
         }
+
         return quota;
    }
 }
