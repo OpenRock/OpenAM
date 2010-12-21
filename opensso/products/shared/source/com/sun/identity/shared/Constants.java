@@ -1070,6 +1070,6 @@ public interface Constants {
     public static final String AM_DIST_AUTH_COOKIE_NAME =
         "openam.auth.distAuthCookieName";
 
-    public static final String DESTROY_SESSION_AFTER_UPGRADE =
-        "openam.auth.destroy_session_after_upgrade";
+    public static final String KEEP_SESSION_AFTER_UPGRADE =
+        "openam.auth.keep_session_after_upgrade";
 }

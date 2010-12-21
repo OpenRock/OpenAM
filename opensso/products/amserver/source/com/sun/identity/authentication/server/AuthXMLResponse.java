@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.sso.SSOException;
@@ -51,10 +52,9 @@ import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.share.AuthXMLUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.xml.XMLUtils;
 
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 
 /**
  * AuthXMLResponse constructs the response XML string to return
@@ -439,11 +439,14 @@ public class AuthXMLResponse {
                                     .getID());
                                 authContext.getLoginState().setForceAuth(false);
                             } else {
-                                if (debug.messageEnabled()) {
-                                    debug.message("AuthXMLResponse.toXMLString : "
-                                        +"destroying old session");
+                                if (!SystemProperties.getAsBoolean(Constants.KEEP_SESSION_AFTER_UPGRADE)) {
+                                    if (debug.messageEnabled()) {
+                                        debug.message("AuthXMLResponse.toXMLString : "
+                                            +"destroying old session");
+                                    }
+
+                                    authD.destroySession(oldSession.getID());
                                 }
-                                authD.destroySession(oldSession.getID());
                             }
                         }
                         xmlString.append(createLoginStatusString());
