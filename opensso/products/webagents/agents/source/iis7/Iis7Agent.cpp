@@ -406,6 +406,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                 am_web_log_error("%s: Agent intialization failed.", thisfunc);
                 do_deny(pHttpContext);
                 retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                LeaveCriticalSection(&initLock);
                 return retStatus;
             }  else {
                 am_web_log_debug("ProcessRequest: Agent intialized");
@@ -582,8 +583,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
         if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) && 
                 (strcmp(requestMethod, REQUEST_METHOD_POST) == 0)) 
         {
-            if ((dpro_cookie == NULL) &&
-                ((post_page != NULL) ||
+            if (((post_page != NULL) ||
                 (am_web_is_url_enforced(requestURL.c_str(), pathInfo.c_str(), 
                  clientIP, agent_config) == B_TRUE)))
             {
