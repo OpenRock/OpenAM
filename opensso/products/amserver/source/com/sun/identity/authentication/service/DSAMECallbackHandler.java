@@ -169,11 +169,11 @@ public class DSAMECallbackHandler implements CallbackHandler {
         } else {
             int indx1 = 0;
             int indx2 = 0;
-            while (cb1[indx1] instanceof PagePropertiesCallback) {
+            while (indx1 < len1 && cb1[indx1] instanceof PagePropertiesCallback) {
                 indx1 ++;
             }
 
-            while (cb2[indx2] instanceof PagePropertiesCallback) {
+            while (indx2 < len2 && cb2[indx2] instanceof PagePropertiesCallback) {
                 indx2 ++;
             }
 
