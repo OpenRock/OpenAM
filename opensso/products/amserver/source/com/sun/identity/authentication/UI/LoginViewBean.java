@@ -2270,6 +2270,10 @@ public class LoginViewBean extends AuthViewBeanBase {
      * @return Realm name for current context
      */
     public String getRealmName() {
+        if (ac == null) {
+            return null;
+        }
+
         LoginState ls = ac.getLoginState();
         if (ls != null) {
             return ls.getOrgName();
@@ -2282,6 +2286,10 @@ public class LoginViewBean extends AuthViewBeanBase {
      * @return Applicable service for current context, or null if service based authentication is not being used.
      */
     public String getAuthChainName() {
+        if (ac == null) {
+            return null;
+        }
+
         LoginState ls = ac.getLoginState();
         if (ls != null && ls.getIndexType() == AuthContext.IndexType.SERVICE) {
             return ls.getIndexName();
