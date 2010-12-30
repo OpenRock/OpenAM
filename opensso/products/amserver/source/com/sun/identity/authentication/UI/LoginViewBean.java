@@ -53,6 +53,7 @@ import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.LoginState;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
@@ -2263,7 +2264,31 @@ public class LoginViewBean extends AuthViewBeanBase {
     public int getCookieTimeToLive() {
         return ac.getLoginState().getCookieTimeToLive();
     }
-  
+
+    /**
+     * Returns the name of the current realm
+     * @return Realm name for current context
+     */
+    public String getRealmName() {
+        LoginState ls = ac.getLoginState();
+        if (ls != null) {
+            return ls.getOrgName();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the service (authentication chain name)
+     * @return Applicable service for current context, or null if service based authentication is not being used.
+     */
+    public String getAuthChainName() {
+        LoginState ls = ac.getLoginState();
+        if (ls != null && ls.getIndexType() == AuthContext.IndexType.SERVICE) {
+            return ls.getIndexName();
+        }
+        return null;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////
     // Class variables
