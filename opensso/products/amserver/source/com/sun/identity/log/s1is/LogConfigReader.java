@@ -863,6 +863,18 @@ public class LogConfigReader implements ServiceListener{
     }
 
     class LogHeaderComparator implements Comparator {
+        /**
+         * Compares two strings from the Log headers. Names should either be
+         * in the form ##:HeaderName or HeaderName, where ## is a two digit 
+         * number. Instances with ##: preceding will go first, in ascending
+         * order according to the two digit number. If two of the same number
+         * appear they will be ordered according to the order of in which they
+         * were compared.
+         *
+         * @param o1 First object in comparison
+         * @param o2 Second object in comparison
+         * @return Returns positive if prefix for o2 is gt o1, otherwise negative
+         */
         public int compare(Object o1, Object o2) {
             String s1 = (String) o1;
             String s2 = (String) o2;
@@ -871,12 +883,10 @@ public class LogConfigReader implements ServiceListener{
                 int s1v = Integer.parseInt(s1.substring(0, s1.indexOf(Constants.COLON)));
                 int s2v = Integer.parseInt(s2.substring(0, s2.indexOf(Constants.COLON)));
 
-                if (s1v > s2v) {
-                    return -1;
-                } else if (s1v < s2v) {
+                if (s1v < s2v) {
                     return 1;
                 } else {
-                    return 0;
+                    return -1;
                 }
             } else if (s1.contains(Constants.COLON)) {
                 return 1;
