@@ -195,6 +195,8 @@
         <echo message=" clean               : deletes all the generated files"/>
         <echo message=" appserver_v10       : builds the Sun Appserver 10 agent"/>
         <echo message=" clean_appserver_v10 : deletes the generated files for appserver_v10 agent"/>
+        <echo message=" jetty_v61           : builds the Jetty v6.1 agent"/>
+        <echo message=" clean_jetty_v61     : deletes the generated files for jetty_v61 agent"/>
         <echo message=" jsr196_jsr115       : builds the JSR196/JSR115 based Glassfish v2.1 Agent"/>
         <echo message=" clean_jsr196_jsr115 : deletes the generated files for jsr196_jsr115 agent"/>
         <echo message=" weblogic_v10        : builds the BEA WebLogic 10.0 agent"/>
