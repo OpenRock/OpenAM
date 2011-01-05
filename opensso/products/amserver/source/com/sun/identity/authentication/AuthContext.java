@@ -1793,7 +1793,11 @@ public class AuthContext extends Object implements java.io.Serializable {
                 AuthXMLTags.ERROR_CODE);
             }
 
-            return errCode.trim();
+            if (errCode != null) {
+                return errCode.trim();
+            } else {
+                return errCode;
+            }
         }
     }
     
