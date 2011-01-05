@@ -1853,7 +1853,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         String error = getErrorCode();
 
         // if the app token is invalid, refresh the token
-        if (error.equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN)) {
+        if (error != null && error.equals(AMAuthErrorCode.REMOTE_AUTH_INVALID_SSO_TOKEN)) {
             appSSOToken = getAppSSOToken(true);
         }
 
