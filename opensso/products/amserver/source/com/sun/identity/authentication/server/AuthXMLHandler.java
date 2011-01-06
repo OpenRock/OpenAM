@@ -783,10 +783,14 @@ public class AuthXMLHandler implements RequestHandler {
         }  
         boolean allCallbacksAreSet = true;
         String param;
+        debug.message("FR: before hasMoreRequirements");
         while (authContext.hasMoreRequirements()) {
             Callback[] reqdCallbacks = authContext.getRequirements();
+            debug.message("FR: getRequirements: " + reqdCallbacks);
+            debug.message("FR: getRequirements length: " + reqdCallbacks.length);
             for (int i = 0 ; i < reqdCallbacks.length ; i++) {
                 if (reqdCallbacks[i] instanceof X509CertificateCallback) {
+                    debug.message("FR: 1");
                     X509CertificateCallback certCallback =
                     (X509CertificateCallback) reqdCallbacks[i];
                     LoginState loginState = 
@@ -801,7 +805,8 @@ public class AuthXMLHandler implements RequestHandler {
                             allCallbacksAreSet = false;
                         }
                     }                    
-                } else { 
+                } else {
+                    debug.message("FR: 2");
                     param = null;
                     if (reqdCallbacks[i] instanceof NameCallback) {
                         param = getNextParam(paramsSet);
@@ -816,6 +821,7 @@ public class AuthXMLHandler implements RequestHandler {
                             break;
                         }
                     } else if (reqdCallbacks[i] instanceof PasswordCallback) {
+                        debug.message("FR: 3");
                         param = getNextParam(paramsSet);
                         if (param != null) {
                             PasswordCallback pc =
@@ -829,6 +835,7 @@ public class AuthXMLHandler implements RequestHandler {
                             break;
                         }
                     } else {
+                        debug.message("FR: 4: params is " + params);
                         if (params == null) {
                             allCallbacksAreSet = false;
                         } 
@@ -841,6 +848,7 @@ public class AuthXMLHandler implements RequestHandler {
                 if (messageEnabled) {
                     debug.message("submit callbacks with passed in params");
                 }
+                debug.message("FR: submitRequirements");
                 authContext.submitRequirements(reqdCallbacks);
             } else {
                 authResponse.setReqdCallbacks(reqdCallbacks);
