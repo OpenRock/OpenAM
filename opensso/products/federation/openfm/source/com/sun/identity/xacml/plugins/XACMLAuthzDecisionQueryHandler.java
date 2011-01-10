@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 
 package com.sun.identity.xacml.plugins;
 
@@ -86,8 +89,6 @@ import java.util.Map;
 import java.util.Set;
 
 import java.util.logging.Level;
-
-import org.testng.annotations.Test;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.17 2009/07/09 17:04:17 veiming Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2011] [ForgeRock AS]"
+-->
 
 <project name="openfm" default="all">
     <description>Open Federation - test</description>
@@ -72,7 +75,7 @@
             file="${amserver.base.dir}/resources/config/bootstrapConfig.properties" />
 
         <copy todir="${test.package.dir}/lib">
-            <fileset dir="${extlib.dir}" includes="jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, j2ee.jar, mail.jar, relaxngDatatype.jar, webservices-api.jar, webservices-rt.jar, webservices-tools.jar, webservices-extra-api.jar, webservices-extra.jar, testng-5.1-jdk15.jar, xsdlib.jar"/>
+            <fileset dir="${extlib.dir}" includes="jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, j2ee.jar, mail.jar, relaxngDatatype.jar, webservices-api.jar, webservices-rt.jar, webservices-tools.jar, webservices-extra-api.jar, webservices-extra.jar, testng-5.9-jdk15.jar, xsdlib.jar"/>
             <fileset dir="${library.extlib.dir}" />
             <fileset dir="${openfm.extlib.dir}" />
         </copy>

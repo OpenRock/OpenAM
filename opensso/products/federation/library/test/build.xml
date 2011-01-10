@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.10 2009/08/19 05:40:42 veiming Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2011] [ForgeRock AS]"
+-->
 
 <project name="openfedlib" default="all">
                 
@@ -85,7 +88,7 @@
 
         <copy todir="${test.package.dir}/lib">
             <fileset dir="${extlib.dir}" includes="jaxb-api.jar, jaxb-impl.jar,
-jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, j2ee.jar, mail.jar, relaxngDatatype.jar, saaj-api.jar, saaj-impl.jar, testng-5.1-jdk15.jar, webservices-rt.jar, xsdlib.jar"/>
+jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, j2ee.jar, mail.jar, relaxngDatatype.jar, saaj-api.jar, saaj-impl.jar, testng-5.9-jdk15.jar, webservices-rt.jar, xsdlib.jar"/>
             <fileset dir="${library.extlib.dir}" />
         </copy>
 
