@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.56 2009/11/21 00:36:40 huacui Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+-->
 
 <project name="top" default="usage">
                 
@@ -37,9 +40,7 @@
     <import file="j2eeagents/j2eeagents.xml" />
     <import file="upgrade/upgrade.xml" />
 
-    <property name="javac.includeAntRuntime" value="false"/>
-    
-    <echo message="OpenSSO Build Number: ${build.number.set}"/>
+    <echo message="OpenAM Build Number: ${build.number.set}"/>
 
     <fail message="*** jdk target is not set ***">
         <condition>

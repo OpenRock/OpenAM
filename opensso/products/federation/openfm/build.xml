@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.65 2009/08/27 19:52:00 farble1670 Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+-->
 
 <project name="Open Federation" default="usage">
                 
@@ -256,7 +259,7 @@
     
     <target name="doc" depends="preparebuild">
         <javadoc maxmemory="1024m" destdir="${openfm.built.apidocs.dir}" 
-            windowtitle="OpenSSO API" failonerror="true">
+            windowtitle="OpenAM API" failonerror="true">
             <classpath refid="build.class.path"/>
             <packageset dir="${openfm.src.dir}">
 <!--
@@ -299,7 +302,7 @@
 
     <target name="publicdoc" depends="preparebuild">
         <javadoc maxmemory="1024m" destdir="${openfm.built.publicapidocs.dir}"
-                 windowtitle="OpenSSO Public API" failonerror="true">
+                 windowtitle="OpenAM Public API" failonerror="true">
             <classpath refid="build.class.path"/>
             <packageset dir="${amserver.src.dir}">
                 <include name="com/iplanet/am/sdk/**"/>
@@ -326,7 +329,7 @@
                 <include name="com/sun/identity/wss/sts/**"/>
             </packageset>
             <doclet name="com.sun.identity.tools.javadocs.SupportedAPIDoclet"
-                    path="${library.classes.dir}" />
+                    path="${sharedlib.classes.dir}" />
             <tag name="supported.all.api" description="" />
             <tag name="supported.api" description="" />
             <link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>

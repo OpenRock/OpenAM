@@ -25,6 +25,9 @@
    $Id: build.xml,v 1.9 2009/08/19 05:41:17 veiming Exp $
 
 -->
+<!--
+   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+-->
 
 <project name="opensso shared library" default="all">
     <description>Open Web Single Sign-On Shared library</description>
@@ -40,6 +43,7 @@
     <path id="build.class.path">
         <pathelement location="${sharedlib.classes.dir}"/>
         <fileset dir="${extlib.dir}" includes="**/*.jar" />
+        <fileset dir="${java.home}/../lib" includes="tools.jar" />
     </path>
 
     <target name="all" depends="build">

@@ -25,11 +25,13 @@
  * $Id: SupportedAPIDoclet.java,v 1.2 2008/06/25 05:48:04 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ */
 
 package com.sun.identity.tools.javadocs;
 
 import com.sun.javadoc.Doc;
-import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
@@ -43,10 +45,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
  
-public class SupportedAPIDoclet {
-    private static String SUPPORTED_ALL_API = "supported.all.api";
-    private static String SUPPORTED_API = "supported.api";
+public class SupportedAPIDoclet extends Standard {
 
+    private static final String SUPPORTED_ALL_API = "supported.all.api";
+    private static final String SUPPORTED_API = "supported.api";
     private static Set includeAll = new HashSet();
 
     public static void main(String[] args) {
@@ -54,27 +56,21 @@ public class SupportedAPIDoclet {
         Main.execute(name, name, args);
     }
  
-    public static boolean validOptions(
-        String[][] options,
-        DocErrorReporter reporter
-    ) throws java.io.IOException {
-        return Standard.validOptions(options, reporter);
-    }
-     
-    public static int optionLength(String option) {
-        return Standard.optionLength(option);
-    }
-         
-    public static boolean start(RootDoc root)
-        throws java.io.IOException {
-        return Standard.start((RootDoc)process(root, RootDoc.class));
+    public static boolean start(RootDoc root) {
+        return Standard.start((RootDoc) process(root, RootDoc.class));
     }
  
+    /**
+     * Goes through the parameter array, and checks for supported.all.api
+     * tags. If the given doc entry has the tag, then we store the name
+     * of the class/interface.
+     *
+     * @param array array of objects deriving from a Doc entry
+     */
     private static void setIncludeAll(Object[] array) {
-        for (int i = 0; i < array.length; i++) {
-            Object entry = array[i];
+        for (Object entry : array) {
             if (entry instanceof Doc) {
-                Doc doc = (Doc)entry;
+                Doc doc = (Doc) entry;
                 if (doc.isClass() || doc.isInterface()) {
                     if (doc.tags(SUPPORTED_ALL_API).length > 0) {
                         includeAll.add(entry.toString());
@@ -84,20 +80,33 @@ public class SupportedAPIDoclet {
         }
     }
 
+    /**
+     * Returns <code>true</code> if the class for the given Doc 
+     * is part of the public JavaDoc.
+     * 
+     * @param doc A JavaDoc item for a class/constructor/method/
+     * field
+     * @return <code>true</code> if this class is part of the 
+     * public JavaDoc
+     */
     private static boolean toIncludeMe(Doc doc) {
+        //does this doc item have at least one of the supported tags?
         boolean includeMe = (doc.tags(SUPPORTED_ALL_API).length > 0) ||
             (doc.tags(SUPPORTED_API).length > 0);
 
         if (!includeMe) {
             String name = doc.toString();
+            //Is it a method or constructor? If so, let's remove the ending () 
             int idx = name.indexOf('(');
-            String className = (idx != -1) ?
-                name.substring(0, name.indexOf('(')) : name;
+            String className = (idx != -1) ? name.substring(0, idx) : name;
 
+            //If this is not a constructor, remove the name of the method or variable
             if (!doc.isConstructor()) {
                 className = className.substring(0, className.lastIndexOf('.'));
             }
 
+            //If we used supported.all.api to include this class, then we don't want 
+            //to exclude this item
             includeMe = includeAll.contains(className);
         }
 
@@ -109,32 +118,31 @@ public class SupportedAPIDoclet {
 
         if (obj != null) {
             Class cls = obj.getClass();
-            if (cls.getName().startsWith("com.sun.")) {
+            if (cls.getName().startsWith("com.sun.tools.")) {
                 retObj = Proxy.newProxyInstance(cls.getClassLoader(),
                     cls.getInterfaces(), new StandardHandler(obj));
             } else if (obj instanceof Object[]) {
                 Class componentType = expect.getComponentType();
-                Object[] array = (Object[])obj;
+                Object[] array = (Object[]) obj;
                 setIncludeAll(array);
                 List list = new ArrayList(array.length);
 
-                for (int i = 0; i < array.length; i++) {
-                    Object entry = array[i];
-                    if ((entry instanceof Doc) && !toIncludeMe((Doc)entry)) {
+                for (Object entry : array) {
+                    //Only continue recursion for "interesting" items
+                    if ((entry instanceof Doc) && !toIncludeMe((Doc) entry)) {
                         continue;
                     }
                     list.add(process(entry, componentType));
                 }
                 retObj = list.toArray(
-                    (Object[])Array.newInstance(componentType, list.size()));
+                    (Object[]) Array.newInstance(componentType, list.size()));
             }
         }
-        
+
         return retObj;
     }
 
-    private static class StandardHandler
-        implements InvocationHandler {
+    private static class StandardHandler implements InvocationHandler {
         private Object target;
                                                                                 
         public StandardHandler(Object target) {
@@ -162,9 +170,8 @@ public class SupportedAPIDoclet {
                                                                                 
         private Object unwrap(Object proxy) {
             return (proxy instanceof Proxy) ?
-                ((StandardHandler)Proxy.getInvocationHandler(proxy)).target :
+                ((StandardHandler) Proxy.getInvocationHandler(proxy)).target :
                 proxy;
         }
     }
 }
-

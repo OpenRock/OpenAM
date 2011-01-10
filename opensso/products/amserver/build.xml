@@ -26,7 +26,7 @@
 
 -->
 <!--
-   "Portions Copyrighted [2010] [ForgeRock AS]"
+   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
 -->
 
 <project name="opensso" default="usage">
@@ -305,14 +305,14 @@
     
     <target name="publicjavadoc" depends="preparebuild">
         <javadoc destdir="${amserver.built.publicapidocs.dir}"
-                 windowtitle="Public OpenSSO API"
+                 windowtitle="Public OpenAM API"
                  maxmemory="512M" useexternalfile="yes">
             <classpath refid="build.class.path"/>
             <fileset dir="${amserver.src.dir}" defaultexcludes="yes"
                 includes="${amserver.public.javadoc-includes}"
                 excludes="${amserver.public.javadoc-excludes}" />
             <doclet name="com.sun.identity.tools.javadocs.SupportedAPIDoclet"
-                path="${amserver.classes.dir}" />
+                path="${sharedlib.classes.dir}" />
             <tag name="supported.all.api" description="" />
             <tag name="supported.api" description="" />
             <link href="http://download.oracle.com/javase/6/docs/api/"/>

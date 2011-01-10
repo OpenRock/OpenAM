@@ -3,7 +3,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-   Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+   Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
 
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -66,7 +66,6 @@
         <javac memoryInitialSize="128m" memoryMaximumSize="256m" fork="true"
              destdir="${amtune.classes.dir}"
              source="1.5" target="1.5"
-             includeantruntime="false"
              debug="${build.debug}" debuglevel="${build.debuglevel}">
              <src path="${amtune.src.dir}" />
              <classpath refid="build.class.path" />
