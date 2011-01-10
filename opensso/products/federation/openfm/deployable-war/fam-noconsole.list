@@ -1264,7 +1264,6 @@
 ./WEB-INF/lib/acmecrypt.jar
 ./WEB-INF/lib/activation.jar
 ./WEB-INF/lib/amserver.jar
-./WEB-INF/lib/ant-contrib-1.0b3.jar
 ./WEB-INF/lib/asm-3.1.jar
 ./WEB-INF/lib/authapi.jar
 ./WEB-INF/lib/cc.jar
@@ -1320,7 +1319,6 @@
 ./WEB-INF/lib/rome-1.0.jar
 ./WEB-INF/lib/scn_stprs_util.jar
 ./WEB-INF/lib/swec.jar
-./WEB-INF/lib/testng-5.9-jdk15.jar
 ./WEB-INF/lib/unittest.jar
 ./WEB-INF/lib/webservices-api.jar
 ./WEB-INF/lib/webservices-extra-api.jar

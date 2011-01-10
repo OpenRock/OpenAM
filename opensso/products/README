@@ -50,7 +50,7 @@ Portions Copyrighted [2010] [ForgeRock AS]
                backport-util-concurrent-2.2.jar, commons-beanutils-1.6.jar,
                icefaces.jar, icefaces-comps.jar, commons-logging-1.1.1.jar,
                commons-digester-1.8.jar, icefaces-facelets.jar,
-               el-api-1.0.jar, jersey-bundle-1.1.1-ea-SNAPSHOT.jar,
+               jersey-bundle-1.1.1-ea-SNAPSHOT.jar,
                oauth-signature-1.1.5-ea-SNAPSHOT.jar,
                oauth-server-1.1.5-ea-SNAPSHOT.jar,
                oauth-client-1.1.5-ea-SNAPSHOT.jar
