@@ -39,11 +39,34 @@
         </condition>
     </fail>
 
+    <condition property="isMacOS">
+        <os family="mac" />
+    </condition>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${extlib.dir}/ant-contrib-1.0b3.jar" />
+        </classpath>
+    </taskdef>
+
+    <if>
+        <isset property="isMacOS" />
+        <then>
+            <property name="tools.path" value="${java.home}/../../../../../Frameworks/JavaVM.framework/Classes" />
+            <property name="tools.filename" value="classes.jar" />
+        </then>
+        <else>
+            <property name="tools.path" value="${java.home}/../lib" />
+            <property name="tools.filename" value="tools.jar" />
+        </else>
+    </if>
+	<echo message="${isMacOS} path: ${tools.path}/${tools.filename}" />
+
     <!-- build class path -->
     <path id="build.class.path">
         <pathelement location="${sharedlib.classes.dir}"/>
         <fileset dir="${extlib.dir}" includes="**/*.jar" />
-        <fileset dir="${java.home}/../lib" includes="tools.jar" />
+        <fileset dir="${tools.path}" includes="${tools.filename}" />
     </path>
 
     <target name="all" depends="build">
