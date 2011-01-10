@@ -679,8 +679,11 @@ public class AuthXMLHandler implements RequestHandler {
         
         if (messageEnabled) {
             debug.message("loginStatus: " + loginStatus);
-            debug.message("error Code: " + authContext.getErrorCode());
-            debug.message("error Template: " + authContext.getErrorTemplate());
+
+            if (authContext != null) {
+                debug.message("error Code: " + authContext.getErrorCode());
+                debug.message("error Template: " + authContext.getErrorTemplate());
+            }
         }
         
         if (loginStatus == AuthContext.Status.FAILED) {
