@@ -242,7 +242,7 @@ public class AuthXMLHandler implements RequestHandler {
         try {
             AuthXMLRequest sreq = AuthXMLRequest.parseXML(content, servletReq);
             sreq.setHttpServletRequest(servletReq);
-            authResponse = processAuthXMLRequest(sreq, servletReq, servletRes);
+            authResponse = processAuthXMLRequest(content, sreq, servletReq, servletRes);
         } catch (AuthException e) {
             debug.error("Got Auth Exception", e);
             authResponse = new AuthXMLResponse(AuthXMLRequest.NewAuthContext);
@@ -260,6 +260,7 @@ public class AuthXMLHandler implements RequestHandler {
      * Process the XMLRequest
      */
     private AuthXMLResponse processAuthXMLRequest(
+        String xml,
         AuthXMLRequest authXMLRequest,
         HttpServletRequest servletRequest,
         HttpServletResponse servletResponse) {
@@ -424,7 +425,7 @@ public class AuthXMLHandler implements RequestHandler {
                     loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
                     authContext.login();
                     //setServletRequest(servletRequest,authContext);
-                    processRequirements(authContext,authResponse, params,
+                    processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
 
                     authResponse.setRemoteRequest(loginState.getHttpServletRequest());
@@ -477,7 +478,7 @@ public class AuthXMLHandler implements RequestHandler {
                             envMap, null);
                     }
                     //setServletRequest(servletRequest,authContext);
-                    processRequirements(authContext,authResponse, params,
+                    processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
                     authResponse.setRemoteRequest(loginState.getHttpServletRequest());
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
@@ -493,7 +494,7 @@ public class AuthXMLHandler implements RequestHandler {
                     Subject subject = authXMLRequest.getSubject();
                     authContext.login(subject);
                     //setServletRequest(servletRequest,authContext);
-                    processRequirements(authContext,authResponse, params,
+                    processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
@@ -771,6 +772,7 @@ public class AuthXMLHandler implements RequestHandler {
      * process callbacks
      */
     private void processRequirements(
+        String xml,
         AuthContextLocal authContext, 
         AuthXMLResponse authResponse,
         String params,
@@ -783,12 +785,22 @@ public class AuthXMLHandler implements RequestHandler {
         }  
         boolean allCallbacksAreSet = true;
         String param;
-        debug.message("FR: before hasMoreRequirements");
+        debug.message("FR: before hasMoreRequirements: params " + params);
+        int loopCount = 0;
         while (authContext.hasMoreRequirements()) {
+            debug.message("loop count: " + loopCount++);
+
+            if (loopCount > 5) {
+                debug.message("loop count is 5");
+                Thread.dumpStack();
+                debug.message("xml request was " + xml);
+            }
+
             Callback[] reqdCallbacks = authContext.getRequirements();
             debug.message("FR: getRequirements: " + reqdCallbacks);
             debug.message("FR: getRequirements length: " + reqdCallbacks.length);
             for (int i = 0 ; i < reqdCallbacks.length ; i++) {
+                debug.message("FR: selected callback is " + reqdCallbacks[i]);
                 if (reqdCallbacks[i] instanceof X509CertificateCallback) {
                     debug.message("FR: 1");
                     X509CertificateCallback certCallback =
@@ -809,14 +821,17 @@ public class AuthXMLHandler implements RequestHandler {
                     debug.message("FR: 2");
                     param = null;
                     if (reqdCallbacks[i] instanceof NameCallback) {
+                        debug.message("FR: callback is NameCallback");
                         param = getNextParam(paramsSet);
                         if (param != null) {
+                            debug.message("FR2: param is " + param);
                             NameCallback nc = (NameCallback)reqdCallbacks[i];
                             nc.setName(param);
                             if (messageEnabled) {
                                 debug.message("Name callback set to " + param);
                             }
                         } else {
+                            debug.message("FR2: all callbacks are set false ");
                             allCallbacksAreSet = false;
                             break;
                         }
@@ -824,6 +839,7 @@ public class AuthXMLHandler implements RequestHandler {
                         debug.message("FR: 3");
                         param = getNextParam(paramsSet);
                         if (param != null) {
+                            debug.message("FR3: param is " + param);
                             PasswordCallback pc =
                                 (PasswordCallback)reqdCallbacks[i];
                             pc.setPassword(param.toCharArray());
@@ -831,6 +847,7 @@ public class AuthXMLHandler implements RequestHandler {
                                 debug.message("Password callback is set");
                             }
                         } else {
+                            debug.message("FR3: all callbacks are set false ");
                             allCallbacksAreSet = false;
                             break;
                         }
