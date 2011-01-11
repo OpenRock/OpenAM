@@ -28,6 +28,8 @@
 
 -->
 
+<!-- Portions Copyrighted 2011 ForgeRock AS -->
+
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -2550,6 +2552,28 @@
                         </BooleanValues>
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.xss.code.elements"
+                        type="list"
+                        syntax="string"
+                        uitype="unorderedlist"
+                        validator="ListValueValidator"
+                        i18nKey="a258">
+                        <DefaultValues>
+                            <Value>[0]=</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.xss.redirect.uri"
+                        type="list"
+                        syntax="string"
+                        uitype="maplist"
+                        validator="MapValueValidator"
+                        i18nKey="a259">
+                        <DefaultValues>
+                            <Value>[]=</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

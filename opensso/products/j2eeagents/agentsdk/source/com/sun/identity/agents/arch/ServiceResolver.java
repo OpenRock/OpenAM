@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.agents.arch;
 
 import java.util.ArrayList;
@@ -84,6 +88,7 @@ import com.sun.identity.agents.policy.AmWebPolicyAppSSOProvider;
 import com.sun.identity.agents.policy.AmWebPolicyModule;
 import com.sun.identity.agents.realm.AmRealm;
 import com.sun.identity.agents.realm.AmRealmModule;
+import org.forgerock.openam.agents.filter.XSSDetectionTaskHandler;
 
 /**
  * The <code>ServiceResolver</code> provides the necessary means to access
@@ -215,7 +220,10 @@ public abstract class ServiceResolver {
     public boolean getRealmMembershipCacheFlag() {
         return false;
     }
-    
+
+    public String getXSSDetectionTaskHandlerImpl() {
+        return XSSDetectionTaskHandler.class.getName();
+    }
     public String getNotificationTaskHandlerImpl() {
         return NotificationTaskHandler.class.getName();
     }
@@ -254,7 +262,9 @@ public abstract class ServiceResolver {
     
     public ArrayList getFirstCustomInboundTaskHandlerImpls(AmFilterMode mode,
             boolean cdssoEnabled) {
-        return new ArrayList();
+        ArrayList result = new ArrayList();
+        result.add(getXSSDetectionTaskHandlerImpl());
+        return result;
     }
     
     public ArrayList getLastCustomInboundTaskHandlerImpls(AmFilterMode mode,
@@ -450,6 +460,10 @@ public abstract class ServiceResolver {
     public ArrayList getFirstCustomResultHandlerImpls(
             AmFilterMode mode, boolean cdssoEnabled) {
         return new ArrayList();
+    }
+
+    private String getXSSDetectionTaskHanlderImpl() {
+        return XSSDetectionTaskHandler.class.getName();
     }
     
     public ArrayList getLastCustomResultHandlerImpls(
