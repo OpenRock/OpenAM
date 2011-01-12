@@ -668,7 +668,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                     //the following function also invokes set_headers_in_context() 
                     //to set all the headers in the httpContext.
                     am_web_log_debug("POSTDATA -- Setting Headers :  \n");
-                    if (redirectrequest) am_web_log_debug("         --    Redirect :  TRUE ");
+                    if (redirectRequest) am_web_log_debug("         --    Redirect :  TRUE ");
                     am_web_log_debug("         --    Headers :  %s ",set_headers_list);
                     am_web_log_debug("         --    Cookies :  %s ",set_cookies_list);
 
