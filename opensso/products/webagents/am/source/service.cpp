@@ -95,7 +95,7 @@ std::string normalize_Response_Attr(std::string value)
 
         std::string newVal(start,end);
 
-        values.insert(pair<std::string,int>(newVal,0);
+        values.insert(std::pair<std::string,int>(newVal,0));
 
         if (str_it == value.end()) break;
 
@@ -103,7 +103,7 @@ std::string normalize_Response_Attr(std::string value)
 
 
     for ( map_it=values.begin() ; map_it != values.end(); map_it++ ) {
-        if (str_count++ ) result.append('|');
+        if (str_count++ ) result.append("|");
         result.append(map_it->first);
     }
        
