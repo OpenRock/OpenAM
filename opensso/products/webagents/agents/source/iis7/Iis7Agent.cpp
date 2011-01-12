@@ -1708,8 +1708,8 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
     PCSTR pcHeader, pcValue;
     string tmpCookieString="";
 
-    if (isRequest)  am_web_log_debug("%s: inRequest: TRUE",thisfunc)
-        else        am_web_log_debug("%s: inRequest: FALSE",thisfunc)
+    if (isRequest)  am_web_log_debug("%s: inRequest: TRUE",thisfunc);
+        else        am_web_log_debug("%s: inRequest: FALSE",thisfunc);
 
     IHttpRequest* pHttpRequest = pHttpContext->GetRequest();
     IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
