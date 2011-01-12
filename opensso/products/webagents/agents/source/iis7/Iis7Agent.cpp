@@ -483,6 +483,8 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                 }
                 if (cookieValue != NULL) {
                     cookieValue = strchr(cookieValue ,'=');
+                }
+                if (cookieValue != NULL) {
                     cookieValue = &cookieValue[1]; // 1 vs 0 skips over '='
                     // find the end of the cookie
                     length = 0;
@@ -665,8 +667,10 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
  // XXX
                     //the following function also invokes set_headers_in_context() 
                     //to set all the headers in the httpContext.
-                    am_web_log_debug("POSTDATA -- Setting Headers : redirectRequest = %b",
-                            redirectRequest);
+                    am_web_log_debug("POSTDATA -- Setting Headers :  \n");
+                    if (redirectrequest) am_web_log_debug("         --    Redirect :  TRUE ");
+                    am_web_log_debug("         --    Headers :  %s ",set_headers_list);
+                    am_web_log_debug("         --    Cookies :  %s ",set_cookies_list);
 
                     status = set_request_headers(pHttpContext, args);
                 }
@@ -1695,6 +1699,7 @@ void ConstructReqCookieValue(string& completeString,string value)
 am_status_t set_headers_in_context(IHttpContext *pHttpContext, 
                                 string headersList, BOOL isRequest)
 {
+    const char *thisfunc = "set_headers_in_context()";
     am_status_t status = AM_SUCCESS;
     string st = headersList;
     size_t cl =0, cr=0;
@@ -1702,6 +1707,9 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
     string header="", value="";
     PCSTR pcHeader, pcValue;
     string tmpCookieString="";
+
+    if (isRequest)  am_web_log_debug("%s: inRequest: TRUE",thisfunc)
+        else        am_web_log_debug("%s: inRequest: FALSE",thisfunc)
 
     IHttpRequest* pHttpRequest = pHttpContext->GetRequest();
     IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
@@ -1727,7 +1735,10 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
             memset((void*)pcValue,0,value.length() + 1);
             strcpy((char*)pcHeader, header.c_str());
             strcpy((char*)pcValue, value.c_str());
-            if(isRequest)
+
+            am_web_log_debug("%s: Setting Head: %s = %s",thisfunc,pcHeader,pcValue);
+
+                    if(isRequest)
             {
                 pHttpContext->GetRequest()->SetHeader(pcHeader,pcValue,
                                                (USHORT)strlen(pcValue),TRUE);
@@ -1918,7 +1929,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args)
                     strcat(request_hdrs,set_cookies_list);
                 }
                 *ptr = request_hdrs;
-                am_web_log_debug("set_request_headers(): Final headers: %s",
+                am_web_log_debug("set_request_headers(): Final headers: %s \n",
                                                       request_hdrs);
             } else {
                 am_web_log_error("set_request_headers():Not enough memory "
