@@ -86,7 +86,8 @@ std::string normalize_Response_Attr(std::string value)
         while ((str_it < value.end()) &&( *str_it != '|'))
             str_it++;
 
-        values.insert(std::string(start,str_it),0);
+        std::string newstring(start,str_it);
+        values.insert(newstring,0);
 
         if (str_it == value.end()) break;
 
