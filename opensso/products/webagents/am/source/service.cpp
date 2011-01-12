@@ -75,7 +75,7 @@ std::string normalize_Response_Attr(std::string value)
     std::map<std::string,int> values;
 
     string::iterator str_it = value.begin();
-    map<std::string,int>::iterator map_it;
+    std::map<std::string,int>::iterator map_it;
     std::string result;
     int str_count=0;
 
