@@ -95,7 +95,7 @@ std::string normalize_Response_Attr(std::string value)
 
         std::string newVal(start,end);
 
-        values.insert(std::string(start,end),0);
+        values.insert(pair<std::string,int>(newVal,0);
 
         if (str_it == value.end()) break;
 
