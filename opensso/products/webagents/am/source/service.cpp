@@ -74,20 +74,28 @@ std::string normalize_Response_Attr(std::string value)
 {
     std::map<std::string,int> values;
 
-    string::iterator str_it = value.begin();
+    std::string::iterator str_it = value.begin();
     std::map<std::string,int>::iterator map_it;
     std::string result;
     int str_count=0;
 
     while(1)
     {
-        string::iterator start = str_it;
+        std::string::iterator start = str_it;
+        std::string::iterator end;
 
         while ((str_it < value.end()) &&( *str_it != '|'))
             str_it++;
+        
+        end = str_it;
+        if (*str_it == '|') {
+            end = str_it-1;
+            str_it++;
+        };
 
-        std::string newstring(start,str_it);
-        values.insert(newstring,0);
+        std::string newVal(start,end);
+
+        values.insert(std::string(start,end),0);
 
         if (str_it == value.end()) break;
 
