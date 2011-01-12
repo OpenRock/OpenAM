@@ -25,6 +25,9 @@
  * $Id: AmFilterManager.java,v 1.2 2008/06/25 05:51:43 qcheng Exp $
  *
  */
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.agents.filter;
 
@@ -38,6 +41,7 @@ import com.sun.identity.agents.arch.ISystemAccess;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.ServiceFactory;
+import com.sun.identity.agents.common.IPDPCache;
 
 /**
  * The class manages agent filter component 
@@ -53,6 +57,7 @@ implements IFilterConfigurationConstants
         );
 
         setAmSSOCache(ServiceFactory.getAmSSOCache(this));
+        setPDPCache(ServiceFactory.getPDPCache(this));
     }
     
     private IAmFilter getAmFilter(AmFilterMode mode) throws AgentException {
@@ -76,9 +81,17 @@ implements IFilterConfigurationConstants
     private IAmSSOCache getAmSSOCacheProvider() {
         return _ssoCache;
     }
+
+    private IPDPCache getPDPCacheProvider() {
+        return _pdpCache;
+    }
     
     private void setAmSSOCache(IAmSSOCache cache) {
         _ssoCache = cache;
+    }
+
+    private void setPDPCache(IPDPCache cache) {
+        _pdpCache = cache;
     }
     
     private HashMap getFilterMap() {
@@ -87,6 +100,7 @@ implements IFilterConfigurationConstants
     
     private HashMap _filters = new HashMap();
     private IAmSSOCache _ssoCache;
+    private IPDPCache _pdpCache;
     
     //------------- static service API methods    ----------//
     
@@ -100,6 +114,10 @@ implements IFilterConfigurationConstants
     
     public static IAmSSOCache getAmSSOCache() {
         return getAmFilterManager().getAmSSOCacheProvider();
+    }
+
+    public static IPDPCache getPDPCache() {
+        return getAmFilterManager().getPDPCacheProvider();
     }
     
     public static IAmFilter getAmFilterInstanceModeConfigured() 

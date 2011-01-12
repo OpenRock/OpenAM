@@ -25,6 +25,9 @@
  * $Id: SSOTaskHandler.java,v 1.4 2008/06/25 05:51:48 qcheng Exp $
  *
  */
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.agents.filter;
 
@@ -95,13 +98,33 @@ implements ISSOTaskHandler {
             }
             
             if (result == null) {
-                if(isLogMessageEnabled()) {
-                    logMessage("SSOTaskHandler: SSO Validation failed for "
-                               + tokenValidator.getSSOTokenValue(
-                                       ctx.getHttpServletRequest()));
+                //implementation of CR openam-307
+                try {
+                    String pdpTaskHandlerImplClass =
+                            AgentConfiguration.getServiceResolver().
+                            getInitialPDPTaskHandlerImpl();
+                    InitialPDPTaskHandler pdpHandler = (InitialPDPTaskHandler)
+                            ServiceFactory.getServiceInstance(getManager(),
+                            pdpTaskHandlerImplClass);
+                    pdpHandler.initialize(ssoContext, ctx.getFilterMode());
+                    if (pdpHandler.isActive()) {
+                        result = pdpHandler.process(ctx);
+                    }
+                } catch (Exception ex) {
+                    logError("SSOTaskHandler: Error while " +
+                             " delegating to PDPTaskHandler.", ex);
+                    result = null;
                 }
-                doCookiesReset(ctx);
-                result = doSSOLogin(ctx);
+                //end of implementation of CR openam-307
+                if (result == null) {
+                    if(isLogMessageEnabled()) {
+                        logMessage("SSOTaskHandler: SSO Validation failed for "
+                                   + tokenValidator.getSSOTokenValue(
+                                           ctx.getHttpServletRequest()));
+                    }
+                    doCookiesReset(ctx);
+                    result = doSSOLogin(ctx);
+                }
             }
         } else {
             if (ssoContext.isSSOCacheEnabled()) {

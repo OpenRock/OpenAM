@@ -25,9 +25,14 @@
  * $Id: ServiceFactory.java,v 1.4 2008/06/25 05:51:37 qcheng Exp $
  *
  */
+ /*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
 
 package com.sun.identity.agents.arch;
 
+import com.sun.identity.agents.common.IPDPCache;
+import com.sun.identity.agents.common.IPDPCacheEntry;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -188,7 +193,35 @@ public class ServiceFactory {
         }
         return result;
     }
-    
+
+    public static IPDPCache getPDPCache(Manager manager)
+                    throws AgentException {
+        IPDPCache result = null;
+        String className = getResolver().getPDPCacheImpl();
+        try {
+            result = (IPDPCache) getServiceInstance(manager, className);
+            result.initialize();
+        } catch (Exception ex) {
+            throw new AgentException("Unable to load IPDPCache: "
+                    + className, ex);
+        }
+        return result;
+    }
+
+    public static IPDPCacheEntry getPDPCacheEntry(Manager manager)
+                    throws AgentException {
+        IPDPCacheEntry result = null;
+        String className = getResolver().getPDPCacheEntryImpl();
+        try {
+            result = (IPDPCacheEntry) getServiceInstance(manager, className);
+            result.initialize();
+        } catch (Exception ex) {
+            throw new AgentException("Unable to load IPDPCacheEntry: "
+                    + className, ex);
+        }
+        return result;
+    }
+
     public static ISSOContext getSSOContext(Manager manager, 
             AmFilterMode filterMode) throws AgentException 
     {
