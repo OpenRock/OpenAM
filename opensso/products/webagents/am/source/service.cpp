@@ -77,6 +77,7 @@ std::string normalize_Response_Attr(std::string value)
     string::iterator str_it = value.begin();
     map<std::string,int>::iterator map_it;
     std::string result;
+    int str_count=0;
 
     while(1)
     {
@@ -93,7 +94,8 @@ std::string normalize_Response_Attr(std::string value)
 
 
     for ( map_it=values.begin() ; map_it != values.end(); map_it++ ) {
-        result.append(it->first);
+        if (str_count++ ) result.append('|');
+        result.append(map_it->first);
     }
        
     return result;
