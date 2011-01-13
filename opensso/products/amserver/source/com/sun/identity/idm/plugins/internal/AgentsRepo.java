@@ -461,7 +461,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 if (debug.warningEnabled()) {
                     debug.warning("AgentsRepo.getAttributes(): Unable to "+
                         "read/get agent attributes IdRepoException: " +
-                        idpe.getMessage());
+                        idpe.getMessage(), idpe);
                 }
                 Object args[] = { NAME };
                 throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "200", 
@@ -479,7 +479,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         throws IdRepoException, SSOException {
 
         if (debug.messageEnabled()) {
-            debug.message("AgentsRepo.getAgentAttrs() called: " + agentName);
+            debug.message("AgentsRepo.getAgentAttrs() called: svcConfig=" + svcConfig +
+                    "; agentName=" + agentName + "; type=" + type);
         }
         Map answer = new HashMap(2);
         try {
