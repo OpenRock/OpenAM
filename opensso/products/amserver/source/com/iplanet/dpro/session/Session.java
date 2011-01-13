@@ -812,6 +812,42 @@ public class Session extends GeneralTaskRunnable {
     }
 
     /**
+     * Given a restricted token, returns the SSOTokenID of the master token
+     * can only be used if the requester is an app token
+     *
+     * @param requester Must be an app token
+     * @param restrictedId The SSOTokenID of the restricted token
+     * @return The SSOTokenID string of the master token
+     * @throws SSOException If the master token cannot be dereferenced
+     */
+    public String dereferenceRestrictedTokenID(Session s, String restrictedId)
+    throws SessionException {
+        String masterSID = null;
+
+        try {
+            masterSID = sessionService.deferenceRestrictedID(s, restrictedId);
+        }
+        catch (Exception e) {
+            sessionDebug.error("unable to find master token for  " + restrictedId, e);
+            throw new SessionException(e);
+        }
+
+        return masterSID;
+    }
+
+    /**
+     * Returns true if the SSOTokenID associated with this SSOToken is a
+     * restricted token, false otherwise.
+     *
+     * @return true if the token is restricted
+     * @throws SSOException If we are unable to determine if the session is
+     *              restricted
+     */
+    public boolean isRestricted() throws SessionException {
+        return (this.getRestriction() != null ? true : false);
+    }
+
+    /**
      * Gets the property stored in this session.
      * 
      * @param name The property name.

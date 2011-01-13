@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
+
 package com.sun.identity.authentication.internal;
 
 import java.net.InetAddress;
@@ -208,6 +212,15 @@ public class AuthSSOToken implements SSOToken {
         } catch (LoginException le) {
             // do nothing
         }
+    }
+
+    public boolean isTokenRestricted() throws SSOException {
+        throw new UnsupportedOperationException("This method is not supported");
+    }
+
+    public String dereferenceRestrictedTokenID(SSOToken requester, String restrictedId)
+    throws SSOException {
+        throw new UnsupportedOperationException("This method is not supported");
     }
 
     protected class AuthSSOTokenID implements SSOTokenID {

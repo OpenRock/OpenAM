@@ -26,8 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
+
 package com.iplanet.dpro.session.service;
 
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -46,6 +52,7 @@ import com.iplanet.dpro.session.TokenRestrictionFactory;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.security.DecodeAction;
+import com.sun.identity.shared.encode.URLEncDec;
 
 /**
  * This servlet class is used as a helper to aid SessionService to perform
@@ -81,6 +88,9 @@ public final class GetHttpSession extends HttpServlet {
     public static final String RELEASE_OP = "release";
 
     public static final String GET_RESTRICTED_TOKEN_OP = "get_restricted_token";
+
+    public static final String DEREFERENCE_RESTRICTED_TOKEN_ID =
+                                              "dereference_restricted_token_id";
 
     public static final String DOMAIN = "domain";
 
@@ -267,6 +277,52 @@ public final class GetHttpSession extends HttpServlet {
                         "GetHttpSession.get_restricted_token: " +
                         "exception occured while create token",
                                 ex);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } finally {
+                SessionService.closeStream(in);
+                SessionService.closeStream(out);
+            }
+        } else if (op.equals(DEREFERENCE_RESTRICTED_TOKEN_ID)) {
+            DataInputStream in = null;
+            DataOutputStream out = null;
+
+            String cookieValue = CookieUtils.getCookieValueFromReq(
+                    request, CookieUtils.getAmCookieName());
+            if((cookieValue != null) && (cookieValue.indexOf("%") != -1)) {
+                cookieValue = URLEncDec.decode(cookieValue);
+            }
+
+            SessionID sid = new SessionID(cookieValue);
+
+            try {
+                in = new DataInputStream(request.getInputStream());
+
+                String restrictedID = in.readUTF();
+
+                try {
+                    String masterSID = SessionService.getSessionService().deferenceRestrictedID(Session.getSession(sid), restrictedID);
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out = new DataOutputStream(response.getOutputStream());
+                    out.writeUTF(masterSID);
+                    out.flush();
+
+                    if (SessionService.sessionDebug.messageEnabled()) {
+                        SessionService.sessionDebug.message(
+                            "GetHttpSession.dereference_restricted_token_id: master sid=" + masterSID);
+                    }
+                } catch (SessionException se) {
+                    SessionService.sessionDebug.message(
+                            "GetHttpSession.dereference_restricted_token_id: unable to find master sid", se);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out = new DataOutputStream(response.getOutputStream());
+                    out.writeUTF("ERROR");
+                    out.flush();
+                }
+            } catch (Exception ex) {
+                SessionService.sessionDebug.error(
+                    "GetHttpSession.dereference_restricted_token_id: exception occured while finding master sid",
+                    ex);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } finally {
                 SessionService.closeStream(in);

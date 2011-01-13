@@ -1452,6 +1452,99 @@ public class SessionService {
     }
 
     /**
+     * Given a restricted token, returns the SSOTokenID of the master token
+     * can only be used if the requester is an app token
+     *
+     * @param requester Must be an app token
+     * @param restrictedId The SSOTokenID of the restricted token
+     * @return The SSOTokenID string of the master token
+     * @throws SSOException If the master token cannot be dereferenced
+     */
+    public String deferenceRestrictedID(Session s, String restrictedID)
+    throws SessionException {
+        SessionID rid = new SessionID(restrictedID);
+
+        // we need to accomodate session failover situation
+        if (SessionService.getUseInternalRequestRouting()) {
+            //first try
+            String hostServerID = getCurrentHostServer(rid);
+
+            if(!isLocalServer(hostServerID)) {
+                if (!sessionService.checkServerUp(hostServerID)) {
+                    hostServerID = getCurrentHostServer(rid);
+                }
+
+                if(!isLocalServer(hostServerID)) {
+                    String masterID = deferenceRestrictedIDRemotely(
+                            s, Session.getSessionServiceURL(hostServerID), rid);
+
+                    if (masterID == null) {
+                        //TODO consider one retry attempt
+                        throw new SessionException("unable to get master id remotely " + rid);
+                    } else {
+                        return masterID;
+                    }
+                }
+            }
+        }
+
+        return resolveRestrictedToken(rid, false).getID().toString();
+    }
+
+    // sjf bug 6797573
+    public String deferenceRestrictedIDRemotely(Session s, URL hostServerID, SessionID sessionID) {
+        DataInputStream in = null;
+        DataOutputStream out = null;
+
+        try {
+            String query =
+                    "?" + GetHttpSession.OP + "=" + GetHttpSession.DEREFERENCE_RESTRICTED_TOKEN_ID;
+
+            URL url = new URL(hostServerID.getProtocol(),
+                                              hostServerID.getHost(),
+                                              hostServerID.getPort(),
+                                              deploymentURI + "/GetHttpSession" + query);
+
+            HttpURLConnection conn = invokeRemote(url,s.getID(),null);
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty ("Content-Type", "application/octet-stream");
+
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            DataOutputStream ds = new DataOutputStream(bs);
+
+            ds.writeUTF(sessionID.toString());
+            ds.flush(); ds.close();
+
+            byte[] getRemotePropertyString = bs.toByteArray();
+
+            conn.setRequestProperty ("Content-Length",
+                    Integer.toString(getRemotePropertyString.length));
+
+            out = new DataOutputStream(conn.getOutputStream());
+
+            out.write(getRemotePropertyString);
+            out.close(); out = null;
+
+            in = new DataInputStream(conn.getInputStream());
+
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return null;
+            }
+
+            return in.readUTF();
+
+        } catch (Exception ex) {
+            sessionDebug.error("Failed to dereference the master token remotely", ex);
+        } finally {
+            closeStream(in);
+            closeStream(out);
+        }
+
+        return null;
+    }
+
+    /**
      * Locate InternalSession by session id
      * 
      * @exception SessionException

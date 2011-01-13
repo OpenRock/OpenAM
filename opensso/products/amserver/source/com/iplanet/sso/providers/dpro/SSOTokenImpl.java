@@ -26,9 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
+
 package com.iplanet.sso.providers.dpro;
 
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionListener;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -568,5 +573,49 @@ class SSOTokenImpl implements SSOToken {
      */
     Session getSession() {
         return SSOSession;
+    }
+
+    /**
+     * Returns true if the SSOTokenID associated with this SSOToken is a
+     * restricted token, false otherwise.
+     *
+     * @return true if the token is restricted
+     * @throws SSOException If we are unable to determine if the session is
+     *              restricted
+     */
+    public boolean isTokenRestricted()
+    throws SSOException {
+        boolean restricted = false;
+
+        try {
+            restricted = SSOSession.isRestricted();
+        } catch (SessionException se) {
+            throw new SSOException(se);
+        }
+
+        return restricted;
+    }
+
+    /**
+     * Given a restricted token, returns the SSOTokenID of the master token
+     * can only be used if the requester is an app token
+     *
+     * @param requester Must be an app token
+     * @param restrictedId The SSOTokenID of the restricted token
+     * @return The SSOTokenID string of the master token
+     * @throws SSOException If the master token cannot be dereferenced
+     */
+    public String  dereferenceRestrictedTokenID(SSOToken requester, String restrictedId)
+    throws SSOException {
+        String masterSID = null;
+
+        try {
+            masterSID = SSOSession.dereferenceRestrictedTokenID(((SSOTokenImpl)requester).getSession(), restrictedId);
+        } catch (Exception e) {
+            SSOProviderImpl.debug.error("Can't dereference master token for id :  " + restrictedId, e);
+            throw new SSOException(e);
+        }
+
+        return masterSID;
     }
 }
