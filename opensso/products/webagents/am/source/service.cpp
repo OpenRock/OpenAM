@@ -82,22 +82,14 @@ std::string normalize_Response_Attr(std::string value)
     while(1)
     {
         std::string::iterator start = str_it;
-        std::string::iterator end;
 
         while ((str_it < value.end()) &&( *str_it != '|'))
             str_it++;
         
-        end = str_it;
-        if (*str_it == '|') {
-            end = str_it-1;
-            str_it++;
-        };
-
-        std::string newVal(start,end);
-
-        values.insert(std::pair<std::string,int>(newVal,0));
+        values.insert(std::pair<std::string,int>(std::string(start,str_it),0));
 
         if (str_it == value.end()) break;
+        str_it++;     // move over the '|'
 
     }
 
