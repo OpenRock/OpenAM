@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.session.util;
 
 import java.io.ByteArrayInputStream;
@@ -129,5 +133,13 @@ public class RestrictedTokenContext {
         } else {
             throw new IllegalArgumentException("Bad context value:" + data);
         }
+    }
+
+    /**
+     * Clears the current context from this Thread Local
+     *
+     */
+    public static void clear() {
+        currentContext.remove();
     }
 }

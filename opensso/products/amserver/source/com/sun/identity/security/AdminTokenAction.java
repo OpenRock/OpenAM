@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.sun.identity.security;
 
 import java.security.PrivilegedAction;
@@ -155,9 +159,9 @@ public class AdminTokenAction implements PrivilegedAction {
      * Resets cached SSOToken. WITHOUT destroying.  Called when we know the 
      * token is invalid
      */
-    public static void invalid(SSOToken token) {
-        if ((appSSOToken != null) && (token == appSSOToken))
-            appSSOToken = null;
+    public static void invalid() {
+        appSSOToken = null;
+
         if (debug.messageEnabled()) {
             debug.message("AdminTokenAction:invalid called");
         }
@@ -165,15 +169,16 @@ public class AdminTokenAction implements PrivilegedAction {
 
     /**
      * Resets cached SSOToken.
-     */    public static void reset() {
+     */
+    public static void reset() {
         if (appSSOToken != null) {
 	    if (tokenManager != null) {
                 try {
                     tokenManager.destroyToken(appSSOToken);
-                } catch (SSOException e) {
+                } catch (SSOException ssoe) {
                     debug.error(
                         "AdminTokenAction.reset: cannot destroy appSSOToken.",
-                        e);
+                        ssoe);
                 }
             }
             

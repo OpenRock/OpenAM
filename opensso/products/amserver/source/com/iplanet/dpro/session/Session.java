@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2010] [ForgeRock AS]
+ */
+
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
@@ -1529,7 +1533,7 @@ public class Session extends GeneralTaskRunnable {
                      AdminTokenAction.getInstance());
              createContext(appSSOToken);
          }
-        try {
+         try {
             if (context != null) {
                 sreq.setRequester(RestrictedTokenContext.marshal(context));
             }
@@ -1555,8 +1559,9 @@ public class Session extends GeneralTaskRunnable {
      * @param sres SessionResponse object holding the exception
      */
 
-    private void processSessionResponseException (SessionResponse sres, 
-        SSOToken appSSOToken) throws SessionException {
+    private void processSessionResponseException(SessionResponse sres, 
+            SSOToken appSSOToken)
+    throws SessionException {
         try {
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("Session."
@@ -1580,18 +1585,15 @@ public class Session extends GeneralTaskRunnable {
                         + "processSessionResponseException: AppTokenInvalid = TRUE");
                 }
 
-                if (!isServerMode()&& !(this.sessionID.getComingFromAuth())) {
+                if (!isServerMode()) {
                     if (sessionDebug.messageEnabled()) {
                         sessionDebug.message("Session."
                             + "processSessionResponseException: Destorying AppToken");
                     }
-                     if (appSSOToken != null) {
-                       try {
-                           AdminTokenAction.invalid(appSSOToken);
-                       } catch ( Exception e ) {
-                           // do nothing
-                       }
-                    }
+                       
+                    AdminTokenAction.invalid();
+                    RestrictedTokenContext.clear();
+                    
                     if (sessionDebug.warningEnabled()) {
                         sessionDebug.warning("Session."
                             +"processSessionResponseException"
@@ -1602,7 +1604,8 @@ public class Session extends GeneralTaskRunnable {
                     SSOToken newAppSSOToken = (SSOToken) 
                         AccessController.doPrivileged(
                             AdminTokenAction.getInstance());
-                   if (sessionDebug.messageEnabled()) {
+
+                    if (sessionDebug.messageEnabled()) {
                         sessionDebug.message("Session."
                             + "processSessionResponseException: creating New AppToken"
                             + "TokenID = " + newAppSSOToken);
@@ -1612,8 +1615,8 @@ public class Session extends GeneralTaskRunnable {
             } else {
                 throw new SessionException(sres.getException());
             }
-        } catch (Exception e) {
-            throw new SessionException(e);
+        } catch (Exception ex) {
+            throw new SessionException(ex);
         }
     }
 
