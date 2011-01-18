@@ -81,6 +81,8 @@ public class PolicyViewBean
     private static final String TBL_DATA_NAME = "tblDataName";
     private static final String TBL_COL_RESOURCES = "tblColResources";
     private static final String TBL_DATA_RESOURCES = "tblDataResources";
+    private static final String TBL_COL_ACTIVE = "tblColActive";
+    private static final String TBL_DATA_ACTIVE = "tblDataActive";
 
     private static final String TBL_DATA_ACTION_HREF = "tblDataActionHref";
 
@@ -185,6 +187,8 @@ public class PolicyViewBean
         tblModel.setActionValue(TBL_COL_NAME, "table.policy.column.name");
         tblModel.setActionValue(TBL_COL_RESOURCES,
             "table.policy.column.resources");
+        tblModel.setActionValue(TBL_COL_ACTIVE,
+            "table.policy.column.active");
     }
 
     private void getPolicyNames() {
@@ -237,9 +241,13 @@ public class PolicyViewBean
                     AMAdminConstants.CURRENT_REALM);
                 Set resourceNames =
                     model.getProtectedResourceNames(realm, name);
+                boolean isActive = model.isPolicyActive(realm, name);
                 if (resourceNames.isEmpty()) {
                     tblModel.setValue(TBL_DATA_RESOURCES,
                         model.getLocalizedString(
+                        "policy.resources.empty.message"));
+                    tblModel.setValue(TBL_DATA_ACTIVE,
+                            model.getLocalizedString(
                         "policy.resources.empty.message"));
                 } else {
                     StringBuffer sbResources = new StringBuffer();
@@ -255,6 +263,11 @@ public class PolicyViewBean
                     }
                     tblModel.setValue(TBL_DATA_RESOURCES,
                         sbResources.toString());
+                    tblModel.setValue(TBL_DATA_ACTIVE,
+                        (isActive) ? model.getLocalizedString(
+                        "policy.resources.active.true") :
+                            model.getLocalizedString(
+                        "policy.resources.active.false"));
                 }
             }
             szCache.setValue((ArrayList)list);

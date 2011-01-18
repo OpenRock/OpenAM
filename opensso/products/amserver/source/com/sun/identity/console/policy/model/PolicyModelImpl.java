@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
+
 package com.sun.identity.console.policy.model;
 
 import com.iplanet.jato.view.html.OptionList;
@@ -1865,6 +1869,15 @@ public class PolicyModelImpl
         }
 
         return names;
+    }
+
+    public boolean isPolicyActive(String realmName, String policyName)
+    throws AMConsoleException {
+        String policyID = cachePolicy(realmName, policyName);
+        CachedPolicy cachedPolicy = getCachedPolicy(policyID);
+        Policy policy = cachedPolicy.getPolicy();
+
+        return policy.isActive();
     }
     
     public Set getProtectedResourceNames(String realmName, String policyName)

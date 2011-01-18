@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
+
 package com.sun.identity.console.policy.model;
 
 import com.iplanet.jato.view.html.OptionList;
@@ -543,6 +547,16 @@ public interface PolicyModel
     Set getAuthenticationInstances(String realmName)
         throws AMConsoleException;
     
+    /**
+     * Returns true if the policy is active, false otherwise.
+     *
+     * @param realmName Realm name.
+     * @param policyName Policy name.
+     * @return true if the policy is active, false otherwise.
+     */
+    boolean isPolicyActive(String realmName, String policyName)
+        throws AMConsoleException;
+
     /**
      * Returns names of resources protected by the policy.
      *

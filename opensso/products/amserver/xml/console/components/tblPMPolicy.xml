@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+   Portions Copyrighted [2011] [ForgeRock AS]
+-->
+
 <!DOCTYPE table SYSTEM "table.dtd" >
 
 <table>
@@ -49,6 +53,12 @@
     </column>
     <column name="tblColResources" rowheader="true">
         <cc name="tblDataResources"
+            tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="escape" value="false"/>
+        </cc>
+    </column>
+    <column name="tblColActive" rowheader="true">
+        <cc name="tblDataActive"
             tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
             <attribute name="escape" value="false"/>
         </cc>
