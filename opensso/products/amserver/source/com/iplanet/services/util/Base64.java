@@ -99,7 +99,7 @@ public final class Base64 {
 
     protected static boolean isWhiteSpace(char octect) {
         return (octect == 0x20 || octect == 0xd || octect == 0xa 
-                || octect == 0x9);
+                || octect == 0x9 || octect == 0x0);
     }
 
     protected static boolean isPad(char octect) {
