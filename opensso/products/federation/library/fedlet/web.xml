@@ -33,10 +33,6 @@
     <display-name>Fedlet Sample Application</display-name>
     <distributable/>
 
-    <welcome-file-list>
-         <welcome-file>index.jsp</welcome-file>
-         <welcome-file>index.html</welcome-file>
-     </welcome-file-list>
     <!-- Add one servlet entry like this per module -->
     <servlet>
         <servlet-name>fedletapplication</servlet-name>
@@ -88,4 +84,9 @@
         <servlet-name>fedletSloRedirect</servlet-name>
         <url-pattern>/fedletSloRedirect</url-pattern>
     </servlet-mapping>
+
+    <welcome-file-list>
+         <welcome-file>index.jsp</welcome-file>
+         <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 </web-app>
