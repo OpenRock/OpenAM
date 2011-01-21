@@ -804,12 +804,33 @@ public class IDPSSOUtil {
         } else {
             idpSession = (IDPSession)IDPCache.idpSessionsByIndices.
                                               get(sessionIndex);
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message(classMethod +
-                    "This is an existing IDP session with sessionIndex="
-                    + sessionIndex + ", and sessionID=" +
-                    sessionProvider.getSessionID(idpSession.getSession()));
-            }       
+            if ((idpSession == null) &&
+                    (SAML2Utils.isSAML2FailOverEnabled())) {
+                // Read from DataBase
+                IDPSessionCopy idpSessionCopy = (IDPSessionCopy)
+                    SAML2Repository.getInstance().retrieve(sessionIndex);
+                // Copy back to IDPSession
+                if (idpSessionCopy != null) {
+                    idpSession = new IDPSession(idpSessionCopy);
+                } else {
+                    SAML2Utils.debug.error("IDPSessionCopy is null");
+                    throw new SAML2Exception(
+                        SAML2Utils.bundle.getString("IDPSessionIsNULL"));
+                }
+            } else if ((idpSession == null) &&
+                    (!SAML2Utils.isSAML2FailOverEnabled())) {
+                SAML2Utils.debug.error("IDPSession is null; SAML2 failover" +
+                        "is disabled");
+                throw new SAML2Exception(
+                   SAML2Utils.bundle.getString("IDPSessionIsNULL"));
+            } else {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod +
+                        "This is an existing IDP session with sessionIndex="
+                        + sessionIndex + ", and sessionID=" +
+                        sessionProvider.getSessionID(idpSession.getSession()));
+                }
+            }
         }
     
         statementList.add(authnStatement);
