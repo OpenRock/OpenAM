@@ -26,6 +26,9 @@
  *
  */
 
+ /*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.plugins;
 
@@ -91,22 +94,40 @@ public class DefaultIDPAuthnContextMapper
         String classMethod = 
             "DefaultIDPAuthnContextMapper.getIDPAuthnContextInfo: ";
 
+        // Get the ClassRef to AuthnType and Value Map
         Map classRefSchemesMap = null;
         if (IDPCache.classRefSchemesHash != null) {
             classRefSchemesMap = (Map) IDPCache.classRefSchemesHash.get(
                 idpEntityID + "|" + realm);
         }
-        if (classRefSchemesMap == null || classRefSchemesMap.isEmpty()) {
+
+        // Get the ClassRef to AuthN Level Map
+        Map classRefLevelMap = null;
+        if (IDPCache.classRefLevelHash != null) {
+           classRefLevelMap = (Map) IDPCache.classRefLevelHash.get(
+                   idpEntityID + "|" + realm);
+        }
+
+        // If one of the Maps above was empty populate them
+        if (classRefSchemesMap == null || classRefSchemesMap.isEmpty() ||
+                classRefLevelMap == null || classRefLevelMap.isEmpty()) {
             updateAuthnContextMapping(realm, idpEntityID);
             classRefSchemesMap = (Map) IDPCache.classRefSchemesHash.get(
                 idpEntityID + "|" + realm);
             if (classRefSchemesMap == null) {
                 classRefSchemesMap = new LinkedHashMap();
             }
+            classRefLevelMap = (Map) IDPCache.classRefLevelHash.get(
+                   idpEntityID + "|" + realm);
+            if (classRefLevelMap == null) {
+                classRefLevelMap = new LinkedHashMap();
+            }
         }
-
+        
+        // Look now for the Authn Class Ref that fulfills the request
         String classRef = null;
         Set authTypeAndValues = null;
+        Integer authnLevel = null;
         RequestedAuthnContext requestedAuthnContext = null;
         if (authnRequest != null) {
             requestedAuthnContext = authnRequest.getRequestedAuthnContext();
@@ -134,7 +155,7 @@ public class DefaultIDPAuthnContextMapper
                         authTypeAndValues =
                             (Set)classRefSchemesMap.get(tmpClassRef);
                         classRef = tmpClassRef;
-
+                        authnLevel = (Integer)classRefLevelMap.get(tmpClassRef);
                         break;
                     }
                 }
@@ -150,7 +171,7 @@ public class DefaultIDPAuthnContextMapper
             authTypeAndValues = (Set) classRefSchemesMap.get(DEFAULT);
             classRef = (String) IDPCache.defaultClassRefHash.get(
                 idpEntityID + "|" + realm);
-
+            authnLevel = 0;
             if (classRef == null) {
                 classRef = SAML2Constants.CLASSREF_PASSWORD_PROTECTED_TRANSPORT;
             }
@@ -161,11 +182,12 @@ public class DefaultIDPAuthnContextMapper
             AssertionFactory.getInstance().createAuthnContext();
         authnContext.setAuthnContextClassRef(classRef);
         IDPAuthnContextInfo info = new IDPAuthnContextInfo(
-            authnContext, authTypeAndValues); 
+            authnContext, authTypeAndValues, authnLevel);
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(classMethod +
                 "\nreturned AuthnContextClassRef=" + classRef + 
-                "\nauthTypeAndValues=" + authTypeAndValues);
+                "\nauthTypeAndValues=" + authTypeAndValues +
+                "\nauthnLevel=" + authnLevel);
         }
         return info;
     } 
@@ -349,5 +371,4 @@ public class DefaultIDPAuthnContextMapper
             IDPCache.defaultClassRefHash.put(key, defaultClassRef);
         }
     }
-
 }

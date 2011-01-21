@@ -27,7 +27,7 @@
  */
 
  /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -494,21 +494,6 @@ public class IDPSSOFederate {
                     }
                     return;
                 }
-                // need to check if the forceAuth is true. if so, do auth 
-                if ((Boolean.TRUE.equals(authnReq.isForceAuthn())) &&
-                    (!Boolean.TRUE.equals(authnReq.isPassive())))
-                {
-                    if (session != null) {
-                        try {
-                            SessionManager.getProvider().invalidateSession(
-                                session, request, response);
-                        } catch (SessionException ssoe) {
-                            SAML2Utils.debug.error(classMethod +
-                                "Unable to invalidate the sso session.");
-                        }
-                        session = null;
-                    }
-                }
 
                 // get the relay state query parameter from the request
                 relayState = request.getParameter(SAML2Constants.RELAY_STATE);
@@ -641,17 +626,26 @@ public class IDPSSOFederate {
                     IDPSession oldIDPSession = null;
                     String sessionIndex = IDPSSOUtil.getSessionIndex(session);
                     boolean sessionUpgrade = isSessionUpgrade(
-                        idpAuthnContextInfo.getAuthnContext(), sessionIndex);
+                        idpAuthnContextInfo, session);        
 
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message(classMethod +
-                            "Session Upgrade is :" + sessionUpgrade);
+                            "IDP Session Upgrade is :" + sessionUpgrade);
                     }
-                    if (sessionUpgrade) {
-                        // Save the original IDP Session
-                        oldIDPSession = (IDPSession) 
-                            IDPCache.idpSessionsByIndices.get(sessionIndex); 
-                        IDPCache.oldIDPSessionCache.put(reqID,oldIDPSession);
+
+                    if (sessionUpgrade ||
+                            ((Boolean.TRUE.equals(authnReq.isForceAuthn())) &&
+                            (!Boolean.TRUE.equals(authnReq.isPassive()))) ) {
+
+                        // If there was no previous SAML2 session, there will be no
+                        // sessionIndex
+                        if (sessionIndex != null && sessionIndex.length() != 0) {
+                            // Save the original IDP Session
+                            oldIDPSession = (IDPSession) IDPCache.
+                                    idpSessionsByIndices.get(sessionIndex);
+                            IDPCache.oldIDPSessionCache.put(reqID, oldIDPSession);
+                        }
+
                         // Save the new requestId and AuthnRequest
                         IDPCache.authnRequestCache.put(reqID, 
                             new CacheObject(authnReq));
@@ -660,7 +654,6 @@ public class IDPSSOFederate {
                             new CacheObject(matchingAuthnContext));
                         // save if the request was an Session Upgrade case.
                         IDPCache.isSessionUpgradeCache.add(reqID);
-                        // redirect to the authentication service
 
                         // save the relay state in the IDPCache so that it can
                         // be retrieved later when the user successfully
@@ -1241,10 +1234,12 @@ public class IDPSSOFederate {
         }
         return;
     }
-    
-       /**
-     * Iterates through the RequestedAuthnContext from Service Provider and
-     * check if user has already authenticated with the same AuthnContext.
+
+    /**
+     * Iterates through the RequestedAuthnContext from the Service Provider and
+     * check if user has already authenticated with a sufficient authentication
+     * level.
+     *
      * If RequestAuthnContext is not found in the authenticated AuthnContext
      * then session upgrade will be done .
      *
@@ -1252,33 +1247,44 @@ public class IDPSSOFederate {
      * @param sessionIndex the Session Index of the active session.
      * @return true if the requester requires to reauthenticate
      */
-    private static boolean isSessionUpgrade(AuthnContext authnContext,
-        String sessionIndex) {
+    private static boolean isSessionUpgrade(
+            IDPAuthnContextInfo idpAuthnContextInfo, Object session) {
+
         String classMethod = "IDPSSOFederate.isSessionUpgrade: ";
 
-        if (sessionIndex == null) {
-            return false;
-        }
+        if (session != null) {
+            // Get the Authentication Context required
+            String authnClasRef = idpAuthnContextInfo.getAuthnContext().
+                    getAuthnContextClassRef();
+            // Get the AuthN level associated with the Authentication Context
+            int authnLevel = idpAuthnContextInfo.getAuthnLevel();
 
-        Set oldAuthnContexts =
-           (Set)IDPCache.authnContextCache.get(sessionIndex);
+            SAML2Utils.debug.message(classMethod + "Requested AuthnContext: " +
+                    "authnClasRef=" + authnClasRef + " authnLevel=" + authnLevel);
 
-        if ((oldAuthnContexts == null) || (oldAuthnContexts.isEmpty())) {
-            return false;
-        }
+            int sessionAuthnLevel = 0;
 
-        String newAuthnContextClassRef = authnContext.getAuthnContextClassRef(); 
-        
-        for(Iterator iter = oldAuthnContexts.iterator(); iter.hasNext(); ) {
-            AuthnContext oldAuthnContext = (AuthnContext)iter.next();
-            if (newAuthnContextClassRef.equals(
-                oldAuthnContext.getAuthnContextClassRef())) {
+            try {
+                sessionAuthnLevel = Integer.parseInt(
+                        SessionManager.getProvider().getProperty(
+                        session, SAML2Constants.AUTH_LEVEL)[0]);
+                SAML2Utils.debug.message(classMethod +
+                        "Current session Authentication Level: " +
+                        sessionAuthnLevel);
+            } catch (SessionException sex) {
+                SAML2Utils.debug.error(classMethod +
+                        " Couldn't get the session Auth Level", sex);
+            }
 
+
+            if (authnLevel > sessionAuthnLevel) {
+                return true;
+            } else {
                 return false;
             }
+        } else {
+            return true;
         }
-
-        return true;
     }
 
     /**

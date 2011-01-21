@@ -26,6 +26,9 @@
  *
  */
 
+ /*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.plugins;
 
@@ -44,6 +47,7 @@ import java.util.Set;
 public class IDPAuthnContextInfo {
     AuthnContext authnContext;
     Set authnTypeAndValues;
+    Integer authnLevel;
    
    /** 
     * The constructor. 
@@ -51,11 +55,14 @@ public class IDPAuthnContextInfo {
     * @param authnContext The <code>AuthnContext</code> that is returned
     *  to the requester.
     * @param authnTypeAndValues The set of authentication mechanism
+    * @param authnLevel The Authentication Level associated to the Authentication
+    *  context
     */ 
     public IDPAuthnContextInfo(AuthnContext authnContext,
-                            Set authnTypeAndValues) {
+                            Set authnTypeAndValues, Integer authnLevel) {
         this.authnContext = authnContext;
         this.authnTypeAndValues = authnTypeAndValues;
+        this.authnLevel = authnLevel;
     }
 
    /** 
@@ -74,6 +81,15 @@ public class IDPAuthnContextInfo {
     */ 
     public Set getAuthnTypeAndValues() {
         return authnTypeAndValues;
+    }
+
+    /**
+    * Returns the Authentication Level
+    *
+    * @return the Authentication level
+    */
+    public Integer getAuthnLevel() {
+        return authnLevel;
     }
 }
 
