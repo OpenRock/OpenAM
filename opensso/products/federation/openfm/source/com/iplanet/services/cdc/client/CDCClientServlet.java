@@ -96,7 +96,6 @@ extends HttpServlet {
     private static final char	EQUAL_TO = '=';
     private static final char   SEMI_COLON = ';';
     private static final char   SPACE = ' ';
-    private static final char   DOUBLE_QUOTE = '"';
     private static final String GOTO_PARAMETER = "goto";
     private static final String TARGET_PARAMETER = "TARGET";
     private static final String CDCURI	= "/cdcservlet";
@@ -414,7 +413,7 @@ extends HttpServlet {
         Cookie cookies[] = CookieUtils.getCookieArrayFromReq(request);
         // above call would return pure sid in iPlanetDirectoryPro cookie
         // independent of container encoding
-        StringBuffer cookieStr = null;
+        StringBuilder cookieStr = null;
         String strCookies = null;
         if (cookies != null) {
             for (int nCookie = 0; nCookie < cookies.length; nCookie++) {
@@ -427,12 +426,11 @@ extends HttpServlet {
                         +"Cookie val= "+ cookieVal);  
                 }
                 if (cookieStr == null) {
-                    cookieStr = new StringBuffer();
+                    cookieStr = new StringBuilder();
                 } else {
                     cookieStr.append(SEMI_COLON).append(SPACE);
                 }
-                cookieStr.append(cookieName).append(EQUAL_TO).append(DOUBLE_QUOTE);
-                cookieStr.append(cookieVal).append(DOUBLE_QUOTE);
+                cookieStr.append(cookieName).append(EQUAL_TO).append(cookieVal);
             }
         }
         if (cookieStr != null) {
