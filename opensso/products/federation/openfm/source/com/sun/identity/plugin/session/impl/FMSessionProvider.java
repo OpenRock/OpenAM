@@ -26,6 +26,10 @@
  *
  */
 
+ /*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
+
 package com.sun.identity.plugin.session.impl;
 
 import javax.servlet.http.HttpServletRequest;
@@ -404,8 +408,20 @@ public class FMSessionProvider implements SessionProvider {
                 request);
             SSOTokenManager.getInstance().refreshSession(session);
             return session;
-        } catch (Throwable e) {
-            throw new SessionException(e);
+        } catch (SSOException e) {
+            String sessionId = CookieUtils.getCookieValueFromReq(request, cookieName);
+            debug.warning("FMSessionProvider.getSession: SessionId obtained from cookie"
+                    + cookieName + " SesssionId=" + sessionId);
+            try {
+                SSOToken token = SSOTokenManager.getInstance().createSSOToken(
+                        sessionId);
+                SSOTokenManager.getInstance().refreshSession(token);
+                return token;
+            } catch (Throwable ex) {
+                debug.error("FMSessionProvider.getSession: Could not get the session" +
+                        " from the HTTP request", ex);
+                throw new SessionException(ex);
+            }
         }
     }
     
