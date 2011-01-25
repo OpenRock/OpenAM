@@ -576,7 +576,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                                 setCookie();
                                 clearCookie(AuthUtils.getAuthCookieName());
                             }
-                            if (oldSession != null) {
+                            if (!SystemProperties.getAsBoolean(Constants.KEEP_SESSION_AFTER_UPGRADE) &&
+                                    oldSession != null) {
                                 loginDebug.message(
                                     "Destroy existing/old valid session");
                                 AuthD authD = AuthD.getAuth();
