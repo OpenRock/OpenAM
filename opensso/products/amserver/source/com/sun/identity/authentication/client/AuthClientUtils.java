@@ -2488,10 +2488,6 @@ public class AuthClientUtils {
                         cookie.setMaxAge(0);
                     }
 
-                    if (cookieName.equals(cookieName)) {
-                        cookie.setMaxAge(0);
-                    }
-
                     response.addCookie(cookie);
                 }
             }
