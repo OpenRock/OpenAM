@@ -24,7 +24,9 @@
  *
  * $Id: WarCreator.java,v 1.2 2009/08/18 16:08:55 kevinserwin Exp $
  */
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.deployablewar;
 
 import java.io.BufferedReader;
@@ -34,9 +36,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -51,7 +53,7 @@ import java.util.jar.JarOutputStream;
  */
 public class WarCreator {
     private static ResourceBundle rb;
-    private static Set supportedTypes = new HashSet();
+    private static final Set<String> supportedTypes = new HashSet<String>();
 
     static {
         supportedTypes.add("console");
@@ -66,7 +68,7 @@ public class WarCreator {
         rb = ResourceBundle.getBundle("deployablewar", getLocale(locale));
 
         // print usage and quit.
-        if (hasOption(args, "-?", "--help")) {
+        if (args.length == 0 || hasOption(args, "-?", "--help")) {
             System.out.println();
             System.out.println(rb.getString("usage"));
             System.exit(0);
@@ -80,6 +82,21 @@ public class WarCreator {
         if ((staging == null) || (type == null) || (warfile == null)) {
             System.err.println();
             System.err.println(rb.getString("usage"));
+            System.exit(1);
+        }
+
+        File stagingDir = new File(staging);
+        File webinfDir = new File(staging + File.separator + "WEB-INF");
+        if (!stagingDir.exists() || !stagingDir.canRead() || !webinfDir.exists()) {
+            System.err.println();
+            System.err.println(rb.getString("invalid.staging.dir"));
+            System.exit(1);
+        }
+
+        File typeDir = new File(type);
+        if (!typeDir.exists() || !typeDir.canRead()) {
+            System.err.println();
+            System.err.println(rb.getString("missing.typedir"));
             System.exit(1);
         }
 
@@ -98,8 +115,8 @@ public class WarCreator {
         String shortName,
         String longName
     ) {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(shortName) || args[i].equals(longName)) {
+        for (String arg : args) {
+            if (arg.equals(shortName) || arg.equals(longName)) {
                 return true;
             }
         }
@@ -111,9 +128,9 @@ public class WarCreator {
         String shortName,
         String longName
     ) {
-        for (int i = 0; i < (args.length -1); i++) {
+        for (int i = 0; i < (args.length - 1); i++) {
             if (args[i].equals(shortName) || args[i].equals(longName)) {
-                return (args[i+1].startsWith("-")) ? null : args[i+1];
+                return (args[i + 1].startsWith("-")) ? null : args[i + 1];
             }
         }
         return null;
@@ -126,9 +143,8 @@ public class WarCreator {
             byte[] buf = new byte[1024];
 
             // get the contents from mother opensso.war
-            List fileList = getFileList("fam-" + type + ".list");
-            for (Iterator i = fileList.iterator(); i.hasNext(); ) {
-                String f = (String)i.next();
+            List<String> fileList = getFileList("fam-" + type + ".list");
+            for (String f : fileList) {
                 File test = new File(staging + "/" + f);
                 if (test.exists()) {
                     FileInputStream in = new FileInputStream(staging + "/" + f);
@@ -140,14 +156,15 @@ public class WarCreator {
                     }
                     out.closeEntry();
                     in.close();
+                } else {
+                    System.err.println(MessageFormat.format(rb.getString("missing.file"), test));
                 }
             }
 
             // get the contents for individual specialized WAR
             fileList = getTargetedList(type, type);
-            for (Iterator i = fileList.iterator(); i.hasNext(); ) {
-                String f = (String)i.next();
-                f= f.replaceAll("\\"+System.getProperty("file.separator"), "/");
+            for (String f : fileList) {
+                f = f.replaceAll("\\" + System.getProperty("file.separator"), "/");
                 out.putNextEntry(new JarEntry(f));
                 FileInputStream in = new FileInputStream(type + "/" + f);
 
@@ -170,27 +187,26 @@ public class WarCreator {
         }
     }
 
-    private static List getTargetedList(String type, String base)
+    private static List<String> getTargetedList(String type, String base)
         throws IOException {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         File dir = new File(type);
         File[] files = dir.listFiles();
 
-        for (int i = 0; i < files.length; i++) {
-            File f = files[i];
+        for (File f : files) {
             if (f.isDirectory()) {
                 list.addAll(getTargetedList(type + "/" + f.getName(), base));
             } else {
-                list.add(f.getPath().substring(base.length()+1));
+                list.add(f.getPath().substring(base.length() + 1));
             }
         }
 
         return list;
     }
 
-    private static List getFileList(String listName)
+    private static List<String> getFileList(String listName)
         throws IOException {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         FileReader frdr = null;
 
         try {

@@ -26,6 +26,9 @@
 
 -->
 
+Portions Copyrighted [2011] [ForgeRock AS]
+
+
 OpenSSO - Deployable WAR 
 
 This directory contains the OpenSSO deployable WAR file
@@ -72,7 +75,8 @@ Steps to create a specialized WAR file:
 
 2. Creates the specialized WAR file using createwar.sh or createwar.bat. 
    (Please remember that createwar.sh and createwar.bat needs to be executed in
-    its current directory)
+    its current directory to be able to find the type-specific additional 
+    files)
    For example, to create Console WAR:
    % ./createwar.sh -s /tmp/staging -t console -w /tmp/console.war
 
