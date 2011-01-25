@@ -788,24 +788,12 @@ public class AuthXMLHandler implements RequestHandler {
         }  
         boolean allCallbacksAreSet = true;
         String param;
-        debug.message("FR: before hasMoreRequirements: params " + params);
-        int loopCount = 0;
+
         while (authContext.hasMoreRequirements()) {
-            debug.message("loop count: " + loopCount++);
-
-            if (loopCount > 5) {
-                debug.message("loop count is 5");
-                Thread.dumpStack();
-                debug.message("xml request was " + xml);
-            }
-
             Callback[] reqdCallbacks = authContext.getRequirements();
-            debug.message("FR: getRequirements: " + reqdCallbacks);
-            debug.message("FR: getRequirements length: " + reqdCallbacks.length);
+
             for (int i = 0 ; i < reqdCallbacks.length ; i++) {
-                debug.message("FR: selected callback is " + reqdCallbacks[i]);
                 if (reqdCallbacks[i] instanceof X509CertificateCallback) {
-                    debug.message("FR: 1");
                     X509CertificateCallback certCallback =
                     (X509CertificateCallback) reqdCallbacks[i];
                     LoginState loginState = 
@@ -821,28 +809,26 @@ public class AuthXMLHandler implements RequestHandler {
                         }
                     }                    
                 } else {
-                    debug.message("FR: 2");
                     param = null;
+
                     if (reqdCallbacks[i] instanceof NameCallback) {
-                        debug.message("FR: callback is NameCallback");
                         param = getNextParam(paramsSet);
+
                         if (param != null) {
-                            debug.message("FR2: param is " + param);
                             NameCallback nc = (NameCallback)reqdCallbacks[i];
                             nc.setName(param);
+
                             if (messageEnabled) {
                                 debug.message("Name callback set to " + param);
                             }
                         } else {
-                            debug.message("FR2: all callbacks are set false ");
                             allCallbacksAreSet = false;
                             break;
                         }
                     } else if (reqdCallbacks[i] instanceof PasswordCallback) {
-                        debug.message("FR: 3");
                         param = getNextParam(paramsSet);
+
                         if (param != null) {
-                            debug.message("FR3: param is " + param);
                             PasswordCallback pc =
                                 (PasswordCallback)reqdCallbacks[i];
                             pc.setPassword(param.toCharArray());
@@ -850,12 +836,10 @@ public class AuthXMLHandler implements RequestHandler {
                                 debug.message("Password callback is set");
                             }
                         } else {
-                            debug.message("FR3: all callbacks are set false ");
                             allCallbacksAreSet = false;
                             break;
                         }
                     } else {
-                        debug.message("FR: 4: params is " + params);
                         if (params == null) {
                             allCallbacksAreSet = false;
                         } 
@@ -864,11 +848,14 @@ public class AuthXMLHandler implements RequestHandler {
                 }    
             }
 
+            if (getNextParam(paramsSet) != null) {
+                allCallbacksAreSet = false;
+            }
+
             if (allCallbacksAreSet) {
                 if (messageEnabled) {
                     debug.message("submit callbacks with passed in params");
                 }
-                debug.message("FR: submitRequirements");
                 authContext.submitRequirements(reqdCallbacks);
             } else {
                 authResponse.setReqdCallbacks(reqdCallbacks);
