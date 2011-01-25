@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.idm.plugins.ldapv3;
@@ -405,7 +405,7 @@ public class LDAPv3EventService implements Runnable {
     }
     
     protected boolean retryManager(boolean clearCaches) {
-            long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
         // reset _retryCount to 0 after 12 hours
         if ((now - _lastResetTime) > 43200000) {
             _retryCount = 1;
@@ -606,10 +606,20 @@ public class LDAPv3EventService implements Runnable {
                                 "LDAPv3EventService.run() LDAPException " +
                                 "received:" + " randomID=" + randomID, ex);
                         }
-                        if (_retryErrorCodes.contains("" + resultCode)) {
-                            resetErrorSearches(true);
-                        } else { // Some other network error
+
+                        // Catch special error codition in
+                       // LDAPSearchListener.getResponse
+                        String msg = ex.getLDAPErrorMessage();
+                        if ((resultCode == LDAPException.OTHER) &&
+                            (msg != null) && msg.equals("Invalid response")) {
+                            // We should not try to resetError and retry
                             processNetworkError(ex);
+                        } else {
+                            if (_retryErrorCodes.contains("" + resultCode)) {
+                                resetErrorSearches(true);
+                            } else { // Some other network error
+                                processNetworkError(ex);
+                            }
                         }
                     }
                 }      
