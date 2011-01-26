@@ -439,7 +439,7 @@ public class AuthXMLResponse {
                                     .getID());
                                 authContext.getLoginState().setForceAuth(false);
                             } else {
-                                if (!SystemProperties.getAsBoolean(Constants.KEEP_SESSION_AFTER_UPGRADE)) {
+                                if (SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {
                                     if (debug.messageEnabled()) {
                                         debug.message("AuthXMLResponse.toXMLString : "
                                             +"destroying old session");
