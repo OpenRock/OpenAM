@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.authentication.UI;
@@ -576,7 +576,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                                 setCookie();
                                 clearCookie(AuthUtils.getAuthCookieName());
                             }
-                            if (!SystemProperties.getAsBoolean(Constants.KEEP_SESSION_AFTER_UPGRADE) &&
+                            if (SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE) &&
                                     oldSession != null) {
                                 loginDebug.message(
                                     "Destroy existing/old valid session");
