@@ -957,6 +957,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 loginDebug.message("getLoginDisplay::getLoginDisplay=" + remoteRequestResponseProcessed);
             }
         } catch(Exception e){
+            loginDebug.error("getLoginDisplay caught exception: ", e);
             setErrorMessage(e);
             throw new L10NMessageImpl(bundleName, "loginDisplay.get",
             new Object[]{e.getMessage()});
@@ -1854,7 +1855,12 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         loginDebug.message("BACK re-submit with valid session");
         boolean gotOrigCredentials = false;
         try {
-            loginURL = ssoToken.getProperty("loginURL");
+            String tmpLoginURL = ssoToken.getProperty("loginURL");
+
+            if (tmpLoginURL != null) {
+                loginURL = tmpLoginURL;
+            }
+
             orgName = ssoToken.getProperty("Organization");
             indexType = AuthClientUtils.getIndexType(ssoToken.getProperty("IndexType"));
             indexName = AuthClientUtils.getIndexName(ssoToken,indexType);
@@ -1863,6 +1869,10 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             loginDebug.message("Error in canGetOrigCredentials");
         }
         if (loginDebug.messageEnabled()) {
+            loginDebug.message("canGetOrigCredentials : loginURL = "
+            + loginURL);
+            loginDebug.message("canGetOrigCredentials : orgName = "
+            + orgName);
             loginDebug.message("canGetOrigCredentials : IndexType = "
             + indexType);
             loginDebug.message("canGetOrigCredentials : IndexName = "
