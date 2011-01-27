@@ -26,17 +26,27 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
+
 package com.sun.identity.tools.bundles;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.setup.Bootstrap;
 import com.sun.identity.setup.ConfiguratorException;
+import com.sun.identity.shared.debug.Debug;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class VersionCheck implements SetupConstants {
     private static ResourceBundle bundle = ResourceBundle.getBundle(
         System.getProperty(SETUP_PROPERTIES_FILE, DEFAULT_PROPERTIES_FILE));
+    private final static String MISMATCH_MSG_TO_DEBUGLOG =
+            "openam.mismatch.message.to.debuglog";
+    private final static String IGNORE_VERSION_CHECK =
+            "openam.ignore.version.check";
+    private final static Debug debug = Debug.getInstance("amCLI");
     
     /**
      * Check whether the version AM is valid.
@@ -60,26 +70,43 @@ public class VersionCheck implements SetupConstants {
         String amExpectedVersion = System.getProperty(AM_VERSION_EXPECTED);
         String configVersion = SystemProperties.get(System.getProperty(
             AM_VERSION_CURRENT)).trim();
-        
+       
         if (!versionCompatible(System.getProperty(JAVA_VERSION_CURRENT),
             javaExpectedVersion)) {
             System.out.println(bundle.getString("message.error.version.jvm") +
                 " " + javaExpectedVersion + " .");
             return 1;
         }
-        
+
+        Boolean writeToDebugLog = Boolean.valueOf(
+                SystemProperties.get(MISMATCH_MSG_TO_DEBUGLOG, "true"))
+                && Boolean.valueOf(
+                      SystemProperties.get(IGNORE_VERSION_CHECK, "true"));
+
         // checking case like this, server version is 
         // OpenSSO Express Build 6a(2008-December-9 02:22) but
         // ssoadm version is (2008-December-10 01:19)
         if (configVersion.length() != amExpectedVersion.length()) {
-            System.out.println(bundle.getString("message.error.version.am") +
-                " " + amExpectedVersion + " .");
+            if (writeToDebugLog) {
+                debug.warning("VersionCheck.isVersionValid: "
+                        + bundle.getString("message.error.version.am")
+                        + " " + amExpectedVersion + " .");
+            } else {
+                System.out.println(bundle.getString("message.error.version.am")
+                        + " " + amExpectedVersion + " .");
+            }
             return 1;
         }
         
         if (!versionCompatible(configVersion, amExpectedVersion)) {
-            System.out.println(bundle.getString("message.error.version.am") +
-                " " + amExpectedVersion + " .");
+            if (writeToDebugLog) {
+                debug.warning("VersionCheck.isVersionValid: "
+                        + bundle.getString("message.error.version.am")
+                        + " " + amExpectedVersion + " .");
+            } else {
+                System.out.println(bundle.getString("message.error.version.am")
+                        + " " + amExpectedVersion + " .");
+            }
             return 1;
         }
         return 0;

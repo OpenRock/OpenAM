@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
+
 package com.sun.identity.cli;
 
 
@@ -67,6 +71,8 @@ import java.util.Vector;
 public class CommandManager {
     private final static String IMPORT_SVC_CMD = "import-svc-cfg";
     private final static String RESOURCE_BUNDLE_NAME = "cliBase";
+    private final static String IGNORE_VERSION_CHECK =
+            "openam.ignore.version.check";
     public static ResourceBundle resourceBundle;
     private static Debug debugger;        
     private ResourceBundle rbMessages;
@@ -132,9 +138,17 @@ public class CommandManager {
                 System.exit(1);
             }
 
+            Boolean ignoreVersion = Boolean.valueOf(
+                    SystemProperties.get(IGNORE_VERSION_CHECK, "true"));
             if (bBootstrapped && !noVersionCheck(argv)) {
                 if (VersionCheck.isVersionValid() == 1) {
-                    System.exit(1);
+                    if (!ignoreVersion) {
+                        System.exit(1);
+                    } else {
+                        Debug.getInstance("amCLI").warning("CommandManager(): "
+                           + "The versions of the OpenAM and the ssoadm did not"
+                           + " match, however the version check was ignored");
+                    }
                 }
             }
         }
