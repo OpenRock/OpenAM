@@ -2554,6 +2554,7 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                   <!--
                     <AttributeSchema
                         name="com.sun.identity.agents.config.xss.code.elements"
                         type="list"
@@ -2576,6 +2577,7 @@
                             <Value>[]=</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    -->
                 </SubSchema>
                 
                 <SubSchema name="WSCAgent" inheritance="multiple">
