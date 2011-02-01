@@ -30,7 +30,6 @@ import com.sun.identity.agents.filter.AmFilterResultStatus;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 public class XSSDetector {
 
     private static final String ENCODING = "UTF-8";
+    private static final String PROPERTIES_DELIMITER = ",";
     private static final String XSS_REDIRECT_URI_PROP = "xss.redirect.uri";
     private static final String XSS_ELEMENTS_PROP = "xss.code.elements";
     private static final String XSS_DEFAULT_REDIRECT_URI = "/agentapp/XSSCodeDetected.html";
@@ -67,12 +67,12 @@ public class XSSDetector {
         List<String> XSSElements = getXSSCodeElements(manager);
         if (XSSElements.isEmpty()) {
             return null;
-            //return new AmFilterResult(AmFilterResultStatus.STATUS_CONTINUE);
         } else {
             String XSSredirectURI = getXSSRedirectURI(manager, application);
+            String inputString = input.toLowerCase();
             for (String XSSElement : XSSElements) {
                 try {
-                    if ((input.indexOf(XSSElement) != -1) || (input.indexOf((URLEncoder.encode(XSSElement, ENCODING)))) != -1) {
+                    if ((inputString.indexOf(XSSElement) != -1) || (inputString.indexOf((URLEncoder.encode(XSSElement, ENCODING)))) != -1) {
                         logMessage(manager, "XSSDetector.handle: Found XSS code <" + XSSElement + ">");
                         return new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT, XSSredirectURI);
                     }
@@ -84,7 +84,6 @@ public class XSSDetector {
             }
         }
         return null;
-        //return new AmFilterResult(AmFilterResultStatus.STATUS_CONTINUE);
     }
 
     /**
@@ -107,59 +106,103 @@ public class XSSDetector {
 
         List<String> XSSElements = getXSSCodeElements(manager);
         if (XSSElements.isEmpty()) {
-            //return new AmFilterResult(AmFilterResultStatus.STATUS_CONTINUE);
             return null;
         } else {
             String XSSredirectURI = getXSSRedirectURI(manager, application);
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            if ((null == parameterMap) || (parameterMap.isEmpty())) {
-                return null;
-                //return new AmFilterResult(AmFilterResultStatus.STATUS_CONTINUE);
-            } else {
-                for (Entry<String, String[]> parameter : parameterMap.entrySet()) {
+
+            try {
+                //first check resuest URI
+                String requestURI = request.getRequestURI().toLowerCase();
+                if (null != requestURI) {
                     for (String XSSElement : XSSElements) {
-                        XSSElement = XSSElement.trim();
-                        String key = parameter.getKey();
-                        try {
-                            if ((key.indexOf(XSSElement) != -1) || (key.indexOf(URLEncoder.encode(XSSElement, ENCODING)) != -1)) {
+                        if ((requestURI.indexOf(XSSElement) != -1) || (requestURI.indexOf(URLEncoder.encode(XSSElement, ENCODING).toLowerCase()) != -1)) {
+                            return new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT, XSSredirectURI);
+                        }
+                    }
+                }
+
+                // then check request parameters
+                Map<String, String[]> parameterMap = request.getParameterMap();
+                if ((null == parameterMap) || (parameterMap.isEmpty())) {
+                    return null;
+                } else {
+                    for (Entry<String, String[]> parameter : parameterMap.entrySet()) {
+                        for (String XSSElement : XSSElements) {
+                            String key = parameter.getKey().toLowerCase();
+                            if ((key.indexOf(XSSElement) != -1) || (key.indexOf(URLEncoder.encode(XSSElement, ENCODING).toLowerCase()) != -1)) {
                                 logMessage(manager, "XSSDetector.handle: Found XSS code <" + XSSElement + "> in request parameter");
                                 return new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT, XSSredirectURI);
                             }
                             String[] parameterValues = parameter.getValue();
                             if ((null != parameterValues) && (parameterValues.length != 0)) {
                                 for (String value : parameterValues) {
-                                    if ((value.indexOf(XSSElement) != -1) || (value.indexOf(URLEncoder.encode(XSSElement, ENCODING)) != -1)) {
+                                    value = value.toLowerCase();
+                                    if ((value.indexOf(XSSElement) != -1) || (value.indexOf(URLEncoder.encode(XSSElement, ENCODING).toLowerCase()) != -1)) {
                                         logMessage(manager, "XSSDetector.handle: Found XSS code <" + XSSElement + "> in request parameter value");
                                         return new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT, XSSredirectURI);
                                     }
                                 }
                             }
-                        } catch (UnsupportedEncodingException ex) {
-                            logError(manager, "XSSDetector.handle: URLEncoding failed");
-                            logMessage(manager, "XSSDetector.handle: URLEncoding failed", ex);
-                            return new AmFilterResult(AmFilterResultStatus.STATUS_SERVER_ERROR);
                         }
                     }
                 }
+            } catch (UnsupportedEncodingException ex) {
+                logError(manager, "XSSDetector.handle: URLEncoding failed");
+                logMessage(manager, "XSSDetector.handle: URLEncoding failed", ex);
+                return new AmFilterResult(AmFilterResultStatus.STATUS_SERVER_ERROR);
             }
         }
         return null;
-        //return new AmFilterResult(AmFilterResultStatus.STATUS_CONTINUE);
     }
 
     private static String getXSSRedirectURI(Manager manager, String applicationName) {
         String config = manager.getApplicationConfigurationString(XSS_REDIRECT_URI_PROP, applicationName);
         if ((null == config) || (config.trim().length() == 0)) {
-            config = manager.getConfiguration(XSS_REDIRECT_URI_PROP, XSS_DEFAULT_REDIRECT_URI);
+            config = manager.getConfiguration(XSS_REDIRECT_URI_PROP);
+            //config = manager.getConfiguration(XSS_REDIRECT_URI_PROP,XSS_DEFAULT_REDIRECT_URI);
         }
-        return config;
+        /*
+         * TODO remove workaround if update issue is fixed
+         * Workaround for OpenAM update issue begin
+         * read freeform properties
+         */
+        if ((null == config) || (config.trim().length() == 0)) {
+            // first try to get the applicatioin specific value
+            StringBuilder keyBuilder = new StringBuilder(XSS_REDIRECT_URI_PROP);
+            keyBuilder.append("[").append(applicationName).append("]");
+            config = manager.getSystemConfiguration(keyBuilder.toString());
+
+            if ((null == config) || (config.trim().length() == 0)) {
+                // then get the global or default value
+                config = manager.getSystemConfiguration(XSS_REDIRECT_URI_PROP,XSS_DEFAULT_REDIRECT_URI);
+            }
+        }
+        // Workaround end
+        return config.trim();
     }
 
+    /*
+     * get configuration elements to be treated as XSSCode
+     * @param manager
+     * @return a list of trimmed,lowercased Strings
+     */
     private static List<String> getXSSCodeElements(Manager manager) {
-        List<String> result = new ArrayList();
-        String[] config = manager.getConfigurationStrings(XSS_ELEMENTS_PROP);
-        if ((config != null) && (config.length != 0)) {
-            result = Arrays.asList(config);
+        List<String> result = new ArrayList<String>();
+        String[] configElements = manager.getConfigurationStrings(XSS_ELEMENTS_PROP);
+        /*
+         * TODO remove workaround if update issue is fixed
+         * Workaround for OpenAM update issue begin
+         * read freeform properties
+         */
+        if ((configElements == null) || (configElements.length == 0)) {
+            String freeFormProps = manager.getSystemConfiguration(XSS_ELEMENTS_PROP);
+            if (freeFormProps != null) {
+                configElements = freeFormProps.split(PROPERTIES_DELIMITER);
+            }
+        }
+        // Workaround end
+        for (String configElem : configElements) {
+            result.add(configElem.trim().toLowerCase());
         }
         return result;
     }
