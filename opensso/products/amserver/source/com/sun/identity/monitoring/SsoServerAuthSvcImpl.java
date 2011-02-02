@@ -26,10 +26,18 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.monitoring;
 
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
+import java.util.Deque;
+import java.util.concurrent.LinkedBlockingDeque;
 import javax.management.MBeanServer;
 
 /**
@@ -38,6 +46,19 @@ import javax.management.MBeanServer;
 public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
     private static Debug debug = null;
     private static String myMibName;
+    
+    /*
+     * This is the interval over which the authehticate rate will be averaged
+     * in seconds
+     */
+    private long interval;
+    private long frequency;
+    private long lastCheckpoint = System.currentTimeMillis();
+    private static long DEFAULT_INTERVAL = 3600;
+    private static int MINIMUM_FREQUENCY = 250;
+    private static int AVERAGE_RECORD_COUNT = 1000;
+    private Deque<Long> historicSuccessRecords;
+    private Deque<Long> historicFailureRecords;
 
     /**
      * Constructors
@@ -65,6 +86,75 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         AuthenticationSuccessRate = new Long(0);
         AuthenticationFailureCount = new Long(0);
         AuthenticationSuccessCount = new Long(0);
+
+        String intervalValue =
+            SystemProperties.get(Constants.AUTH_RATE_MONITORING_INTERVAL);
+
+        try {
+            interval = Long.parseLong(intervalValue);
+        } catch (NumberFormatException nfe) {
+            debug.error("SsoServerAuthSvcImpl::init interval value is not " +
+                    " a number " + intervalValue + " set to default of " +
+                    DEFAULT_INTERVAL);
+            interval = DEFAULT_INTERVAL;
+        }
+
+        if (((interval * 1000) / AVERAGE_RECORD_COUNT) < MINIMUM_FREQUENCY) {
+            frequency = MINIMUM_FREQUENCY;
+        } else {
+            frequency = (interval * 1000) / AVERAGE_RECORD_COUNT;
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("Monitoring interval set to " + interval + "ms.");
+        }
+
+        historicSuccessRecords = new LinkedBlockingDeque(AVERAGE_RECORD_COUNT);
+        historicFailureRecords = new LinkedBlockingDeque(AVERAGE_RECORD_COUNT);
+    }
+
+    protected void updateSsoServerAuthenticationFailureRate() {
+        long li = AuthenticationFailureCount.longValue();
+
+        if (lastCheckpoint + frequency > System.currentTimeMillis()) {
+            if (!historicFailureRecords.offerLast(li)) {
+                historicFailureRecords.removeFirst();
+                historicFailureRecords.offerLast(li);
+            }
+
+            lastCheckpoint = System.currentTimeMillis();
+        }
+
+        Long historicCount = historicFailureRecords.peekFirst();
+        long average = li / interval;
+
+        if (historicCount != null) {
+             average = (li - historicCount.longValue()) / interval;
+        }
+
+        AuthenticationFailureCount = Long.valueOf(average);
+    }
+
+    protected void updateSsoServerAuthenticationSuccessRate() {
+        long li = AuthenticationSuccessCount.longValue();
+
+        if (lastCheckpoint + frequency < System.currentTimeMillis()) {
+            if (!historicSuccessRecords.offerLast(li)) {
+                historicSuccessRecords.removeFirst();
+                historicSuccessRecords.offerLast(li);
+            }
+
+            lastCheckpoint = System.currentTimeMillis();
+        }
+
+        Long historicCount = historicSuccessRecords.peekFirst();
+        long average = li / interval;
+
+        if (historicCount != null) {
+             average = (li - historicCount.longValue()) / interval;
+        }
+
+        AuthenticationSuccessRate = Long.valueOf(average);
     }
 
     /*
@@ -82,6 +172,8 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         long li = AuthenticationFailureCount.longValue();
         li++;
         AuthenticationFailureCount = Long.valueOf(li);
+
+        updateSsoServerAuthenticationFailureRate();
     }
 
     public void incSsoServerAuthenticationSuccessCount() {
@@ -91,6 +183,8 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         long li = AuthenticationSuccessCount.longValue();
         li++;
         AuthenticationSuccessCount = Long.valueOf(li);
+
+        updateSsoServerAuthenticationSuccessRate();
     }
 
     /**
