@@ -26,8 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.iplanet.dpro.session.service;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -35,6 +40,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.util.Iterator;
@@ -84,6 +90,11 @@ public class SessionConstraint {
 
     private static QuotaExhaustionAction quotaExhaustionActionDestroy = null;
 
+    private static QuotaExhaustionAction quotaExhaustionActionDestoryAll = null;
+
+    private static boolean destroyAllButOne =
+            SystemProperties.getAsBoolean(Constants.DESTROY_ALL_SESSIONS);
+
     /*
      * Get the session service
      */
@@ -102,17 +113,40 @@ public class SessionConstraint {
         // supported scenarios.
         quotaExhaustionActionDeny = new DenyAccessAction();
         quotaExhaustionActionDestroy = new DestroyNextExpiringSessionAction();
+        quotaExhaustionActionDestoryAll = new DestroyAllExistingSessionsAction();
     }
 
     static SessionService getSS() {
         return SessionCount.getSS();
     }
 
-    private static QuotaExhaustionAction getQuotaExhaustionAction(){
-        if (SessionService.getConstraintResultingBehavior() == DENY_ACCESS) {
-            return quotaExhaustionActionDeny;
-        } else {
+    private static QuotaExhaustionAction getQuotaExhaustionAction() {
+        if ((SessionService.getConstraintResultingBehavior() == DESTROY_OLD_SESSION) &&
+            !(destroyAllButOne)) {
+            if (debug.messageEnabled()) {
+		    debug.message("SessionConstraint." +
+                        "getQuotaExhaustionAction: " +
+                        "Using quotaExhaustionActionDestroy");
+            }
+
             return quotaExhaustionActionDestroy;
+        } else if ((SessionService.getConstraintResultingBehavior() == DESTROY_OLD_SESSION) &&
+            (destroyAllButOne)) {
+            if (debug.messageEnabled()) {
+		    debug.message("SessionConstraint." +
+                        "getQuotaExhaustionAction: " +
+                        "Using quotaExhaustionActionDestoryAll");
+            }
+
+            return quotaExhaustionActionDestoryAll;
+        } else {
+            if (debug.messageEnabled()) {
+		    debug.message("SessionConstraint." +
+                        "getQuotaExhaustionAction: " +
+                        "Using quotaExhaustionActionDeny");
+            }
+
+            return quotaExhaustionActionDeny;
         }
     }
 
@@ -236,6 +270,37 @@ public class SessionConstraint {
                     // deny the session activation request
                     // in this case
                     return true;
+                }
+            }
+            SessionCount.incrementSessionCount(is);
+            return false;
+        }
+    }
+
+    private static class DestroyAllExistingSessionsAction implements
+            QuotaExhaustionAction {
+
+        public boolean action(InternalSession is, Map sessions) {
+            Set<String> sids = sessions.keySet();
+            debug.message("there are " + sids.size() + " sessions");
+            synchronized (sessions) {
+                for (String sid : sids) {
+                    SessionID sessID = new SessionID(sid);
+
+                    try {
+                        Session s = Session.getSession(sessID);
+                        s.destroySession(s);
+                        debug.message("Destroy sid " + sessID);
+                    } catch (SessionException se) {
+                        if (debug.messageEnabled()) {
+                            debug.message("Failed to destroy the next "
+                                    + "expiring session.", se);
+                        }
+                        
+                        // deny the session activation request
+                        // in this case
+                        return true;
+                    }
                 }
             }
             SessionCount.incrementSessionCount(is);
