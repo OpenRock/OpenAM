@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 package com.sun.identity.authentication.distUI;
 
@@ -148,6 +150,7 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                     String redirect_url = null;
                     String clientType = null;
                     String output_data = null;
+                    String contentType = null;
                     if (origRequestData != null && !origRequestData.isEmpty()) {
                         redirect_url =
                             (String)origRequestData.get("AM_REDIRECT_URL");
@@ -155,6 +158,8 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                             (String)origRequestData.get("OUTPUT_DATA");
                         clientType =
                             (String)origRequestData.get("AM_CLIENT_TYPE");
+                        contentType =
+                            (String)origRequestData.get("CONTENT_TYPE");
                     } else {
                         Set domainsList = AuthClientUtils.getCookieDomains();
 
@@ -179,6 +184,14 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                     }
                     if ((output_data != null) && (!output_data.equals(""))) {
                         debug.message("Printing the forwarded response");
+                        if (contentType != null) {
+                            debug.message("Content type is " + contentType);
+                            response.setContentType(contentType);
+                        } else {
+                            debug.message("Content type is default; " + DEFAULT_CONTENT_TYPE);
+                            response.setContentType(DEFAULT_CONTENT_TYPE);
+                        }
+
                         java.io.PrintWriter outP = response.getWriter();
                         outP.println(output_data);
                     }
@@ -250,7 +263,9 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
     private static final String REDIRECT_JSP = "Redirect.jsp";
     
     // the debug file
-    private static Debug debug = Debug.getInstance("amLoginServlet");    
+    private static Debug debug = Debug.getInstance("amLoginServlet");
+
+    private static final String DEFAULT_CONTENT_TYPE = "text/html";
     
     ////////////////////////////////////////////////////////////////////////////
     // Instance variables

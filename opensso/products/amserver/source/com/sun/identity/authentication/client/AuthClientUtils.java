@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.authentication.client;
@@ -2359,6 +2359,10 @@ public class AuthClientUtils {
             String redirect_url = conn.getHeaderField("Location");
             if (redirect_url != null) {
                 origRequestData.put("AM_REDIRECT_URL", redirect_url);
+            }
+            String content_type = conn.getHeaderField("Content-Type");
+            if (content_type != null) {
+                origRequestData.put("CONTENT_TYPE", content_type);
             }
 
             // retrieves cookies from the response
