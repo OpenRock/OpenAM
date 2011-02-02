@@ -119,7 +119,7 @@ public class XSSDetectionTaskHandler extends AmFilterTaskHandler implements IXSS
         }
 
         if (isCDSSOEnabled()) {
-            if (request.getRequestURI().equals(getCDSSORedirectURI())) {
+            if (request.getRequestURI().startsWith(getCDSSORedirectURI())) {
                 if (isLogMessageEnabled()) {
                     logMessage("XSSDetectionTaskHandler.process: Skipping process of CDSSO redirect request");
                 }
