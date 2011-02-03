@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.authentication.distUI;
@@ -117,7 +117,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         
         try {            
             cookieSupported = AuthClientUtils.checkForCookies(request);
-            client_type = AuthClientUtils.getClientType(request);
+            clientType = AuthClientUtils.getClientType(request);
             ISLocaleContext localeContext = new ISLocaleContext();
             localeContext.setLocale(request);
             locale = localeContext.getLocale();
@@ -148,7 +148,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             ResultVal = rb.getString("logout.successful");
            
             if (logoutDebug.messageEnabled()) {
-                logoutDebug.message("Client Type is: " + client_type);
+                logoutDebug.message("Client Type is: " + clientType);
                 logoutDebug.message("JSPLocale = " + locale);
                 logoutDebug.message("loginURL : " + loginURL);
             }
@@ -479,7 +479,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     String orgName = "";
     String indexName = "";
     AuthContext.IndexType indexType;
-    String client_type = "";
     /** Logout result value */
     public String ResultVal = "";
     /** Goto url */
