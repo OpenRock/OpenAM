@@ -27,6 +27,9 @@
 --%>
 
 
+<%--
+   Portions Copyrighted 2010-2011 ForgeRock AS
+--%>
 
 
 <%@ page import="com.sun.identity.shared.debug.Debug" %>
@@ -39,6 +42,8 @@
 <%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
 <%@ page import="com.sun.identity.saml2.profile.LogoutUtil" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="com.sun.identity.plugin.session.SessionException" %>
+<%@ page import="com.iplanet.am.util.SystemProperties" %>
 
 <%--
     idpSingleLogoutInit.jsp
@@ -65,7 +70,7 @@
 --%>
 
 <%
-    // Retreive the Request Query Parameters
+    // Retrieve the Request Query Parameters
     // binding are the required query parameters
     // binding - binding used for this request
 
@@ -75,7 +80,31 @@
             RelayState = request.getParameter(SAML2Constants.GOTO);
         }
 
-        Object ssoToken = SessionManager.getProvider().getSession(request);
+        Object ssoToken = null;
+        try {
+              ssoToken = SessionManager.getProvider().getSession(request);
+        } catch (SessionException e) {
+            String intermmediatePage = SystemProperties.get(
+                    "openam.idpsloinit.nosession.intermmediate.page", "");
+
+            if ( intermmediatePage.length() != 0 ) {
+               if (RelayState != null) {
+                   intermmediatePage = intermmediatePage + "?RelayState=" +
+                         RelayState;
+               } 
+               response.sendRedirect(intermmediatePage);
+            } else {
+               if (RelayState != null) {
+                   response.sendRedirect(RelayState);
+               } else {
+                   %>
+                     <jsp:forward
+                        page="/saml2/jsp/default.jsp?message=idpSloSuccess" />
+                   <%
+               }
+            }
+            return;
+        }
         if (ssoToken == null) {
             SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
                 "nullSSOToken", SAML2Utils.bundle.getString("nullSSOToken"));
