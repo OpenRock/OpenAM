@@ -311,6 +311,7 @@
                 <include name="com/sun/identity/policy/**"/>
                 <include name="com/sun/identity/authentication/**"/>
                 <include name="com/sun/identity/idm/**"/>
+                <include name="com/sun/identity/sm/**"/>
             </packageset>
             <packageset dir="${library.src.dir}">
                 <include name="com/sun/identity/federation/**"/>
