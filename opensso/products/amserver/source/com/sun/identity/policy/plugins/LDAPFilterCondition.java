@@ -67,6 +67,8 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.ldap.LDAPEntry;
+import com.sun.identity.shared.ldap.LDAPReferralException;
 
 
 /**
@@ -432,25 +434,37 @@ public class LDAPFilterCondition implements Condition {
             }
             if (res.hasMoreElements()) {
                 try {
-                    String dn = res.next().getDN();
-                    if (dn != null && dn.length() != 0) {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPFilterCondition."
-                                    + "searchFilterSatified(): dn=" + dn);
+                    LDAPEntry entry = res.next();
+                    if (entry != null) {
+                        String dn = entry.getDN();
+                        if (dn != null && dn.length() != 0) {
+                            if (debug.messageEnabled()) {
+                                debug.message("LDAPFilterCondition."
+                                        + "searchFilterSatified(): dn=" + dn);
+                            }
+                            filterSatisfied = true;
                         }
-                        filterSatisfied = true;
                     }
-                } catch (LDAPException lde) {
-                    int ldapErrorCode = lde.getLDAPResultCode();
-                    if (ldapErrorCode == LDAPException.LDAP_PARTIAL_RESULTS) {
-                      debug.warning("LDAPFilterCondition.searchFilterSatified()"
-                          + ": Partial results have been received, status code 9."
-                          + " The message provided by the LDAP server is: \n"
-                          + lde.getLDAPErrorMessage());
+                } catch (LDAPReferralException lre) {
+                    debug.warning("LDAPFilterCondition.searchFilterSatified()"
+                            + ": Partial results have been received, status code 9."
+                            + " The message provided by the LDAP server is: \n"
+                            + lre.getLDAPErrorMessage());
+                } catch (LDAPException le) {
+                    int resultCode = le.getLDAPResultCode();
+                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
+                        debug.warning(
+                        "LDAPFilterCondition.searchFilterSatified(): "
+                                + "exceeded the size limit");
+                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
+                        debug.warning(
+                        "LDAPFilterCondition.searchFilterSatified(): "
+                                + "exceeded the time limit");
                     } else {
-                        throw lde;
+                       throw le;
                     }
                 }
+                
             }
         } catch (LDAPException lde) {
             int ldapErrorCode = lde.getLDAPResultCode();
