@@ -40,6 +40,13 @@
     <import file="j2eeagents/j2eeagents.xml" />
     <import file="upgrade/upgrade.xml" />
 
+    <loadfile property="build.number.set" srcFile="${products.basedir}/.svn/entries">
+    	<filterchain>
+        	<headfilter lines="1" skip="3"/>
+                    <deletecharacters chars="\n"/>
+        </filterchain>
+    </loadfile>
+
     <echo message="OpenAM Build Number: ${build.number.set}"/>
 
     <fail message="*** jdk target is not set ***">
