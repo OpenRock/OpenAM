@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
+
 package com.sun.identity.policy.plugins;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -304,7 +308,7 @@ public class LDAPFilterCondition implements Condition {
             }
         }
 
-        // got here so entry not in subject evalauation cache
+        // got here so entry not in subject evaluation cache
         if (debug.messageEnabled()) {
             debug.message("LDAPFilterCondition:isMember():"
                     + " ldapConditionFilter:" + ldapConditionFilter
@@ -334,11 +338,11 @@ public class LDAPFilterCondition implements Condition {
         }
 
         if (debug.messageEnabled()) {
-            debug.message("LDAPFilterCondition.getConditionDecision(): "
+            debug.message("LDAPFilterCondition.isMember(): "
                     + " user search filter is: " + userSearchFilter);
-            debug.message("LDAPFilterCondition.getConditionDecision(): "
+            debug.message("LDAPFilterCondition.isMember(): "
                     + " user mapping filter is: " + userMappingFilter);
-            debug.message("LDAPFilterCondition.getConditionDecision(): "
+            debug.message("LDAPFilterCondition.isMember(): "
                     + " condition ldapConditionFilter is: " 
                     + ldapConditionFilter);
         }
@@ -356,7 +360,7 @@ public class LDAPFilterCondition implements Condition {
         }
 
         if (debug.messageEnabled()) {
-            debug.message("LDAPFilterCondition.getConditionDecision(): "
+            debug.message("LDAPFilterCondition.isMember(): "
                     + " combined filter : " + searchFilter);
         }
 
@@ -427,7 +431,26 @@ public class LDAPFilterCondition implements Condition {
                 }
             }
             if (res.hasMoreElements()) {
-                filterSatisfied =true;
+                try {
+                    String dn = res.next().getDN();
+                    if (dn != null && dn.length() != 0) {
+                        if (debug.messageEnabled()) {
+                            debug.message("LDAPFilterCondition."
+                                    + "searchFilterSatified(): dn=" + dn);
+                        }
+                        filterSatisfied = true;
+                    }
+                } catch (LDAPException lde) {
+                    int ldapErrorCode = lde.getLDAPResultCode();
+                    if (ldapErrorCode == LDAPException.LDAP_PARTIAL_RESULTS) {
+                      debug.warning("LDAPFilterCondition.searchFilterSatified()"
+                          + ": Partial results have been received, status code 9."
+                          + " The message provided by the LDAP server is: \n"
+                          + lde.getLDAPErrorMessage());
+                    } else {
+                        throw lde;
+                    }
+                }
             }
         } catch (LDAPException lde) {
             int ldapErrorCode = lde.getLDAPResultCode();
