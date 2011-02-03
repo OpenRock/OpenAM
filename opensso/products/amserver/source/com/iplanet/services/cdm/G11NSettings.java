@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.iplanet.services.cdm;
 
 import com.iplanet.am.util.QCharset;
@@ -131,7 +134,7 @@ public class G11NSettings implements ServiceListener, ICDMConstants,
                 return result.iterator().next().toString();
             }
         }
-        return "UTF-8";
+        return CDM_DEFAULT_CHARSET;
     }
 
     /**

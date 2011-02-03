@@ -26,7 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.iplanet.services.cdm;
+
+import com.iplanet.am.util.SystemProperties;
 
 interface ICDMConstants {
     public static final String G11N_SETTINGS_SERVICE_NAME = 
@@ -42,7 +47,11 @@ interface ICDMConstants {
 
     public static final String CDM_ACCEPT_CHARSET = "CcppAccept-Charset";
 
-    public static final String CDM_DEFAULT_CHARSET = "ISO-8859-1";
+    public static final String DEFAULT_CHARSET_PROPERTY ="openam.cdm.default.charset";
+
+    public static final String CDM_DEFAULT_CHARSET = 
+            SystemProperties.get(DEFAULT_CHARSET_PROPERTY,
+            "UTF-8");
 
     public static final String CDM_DEFAULT_CLIENT_TYPE ="genericHTML";
 
