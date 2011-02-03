@@ -27,7 +27,7 @@
 -->
 
 <!--
-   Portions Copyrighted [2010] [ForgeRock AS]
+   Portions Copyrighted [2010-2011] [ForgeRock AS]
 -->
 
 <project name="open-source-j2ee-agents" default="usage">
@@ -99,7 +99,7 @@
         <mkdir dir="${container.j2ee_agent.locale.dir}"/>
         <mkdir dir="${container.j2ee_agent.logs.dir}"/>
         <mkdir dir="${container.j2ee_agent.sampleapp.dir}"/>
-        <loadfile property="revision.number" srcFile="${j2eeagents.src.dir}/.svn/entries">
+        <loadfile property="revision.number" srcFile="${j2eeagents.src.dir}/.svn/entries" failonerror="false">
             <filterchain>
                 <headfilter lines="1" skip="3"/>
                     <deletecharacters chars="\n"/>

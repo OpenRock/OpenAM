@@ -40,7 +40,7 @@
     <import file="j2eeagents/j2eeagents.xml" />
     <import file="upgrade/upgrade.xml" />
 
-    <loadfile property="build.number.set" srcFile="${products.basedir}/.svn/entries">
+    <loadfile property="build.number.set" srcFile="${products.basedir}/.svn/entries" failonerror="false">
     	<filterchain>
         	<headfilter lines="1" skip="3"/>
                     <deletecharacters chars="\n"/>
