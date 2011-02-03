@@ -27,7 +27,7 @@
 #
 
 #
-# Portions Copyrighted [2010] [ForgeRock AS]
+# Portions Copyrighted [2010-2011] [ForgeRock AS]
 #
 
 /* The following keys are used to configure the Debug service.
@@ -275,3 +275,11 @@ com.iplanet.services.cdc.invalidGotoStrings=<,>,javascript:,javascript%3a,%3c,%3
  * during the session upgrade process.
  */
 openam.auth.destroy_session_after_upgrade=false
+
+/**
+ * When the DAS server receives an authcookie with an invalid servername, this 
+ * HTTP error should be sent to the application server, so they can show a 
+ * custom error page to the user. This errorpage should only appear if there 
+ * are multiple OpenAM installations within the same cookie domain.
+ */
+openam.untrusted.server.http.error.code=403

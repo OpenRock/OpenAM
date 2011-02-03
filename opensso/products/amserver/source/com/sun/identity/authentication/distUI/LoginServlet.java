@@ -32,6 +32,7 @@
 
 package com.sun.identity.authentication.distUI;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestContextImpl;
@@ -129,12 +130,24 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                         PrintWriter out = response.getWriter();
                         out.print("<h1>" + authCookieValue +
                        	" is not the trusted server</h1>");
-                    }catch(IOException ioe){
+                    } catch(IOException ioe) {
                         if (debug.messageEnabled()) {
                             debug.message("initializeRequestContext(): " +
                                 ioe.getMessage());
                         }                    	
                     }
+
+                    try {
+                        response.setStatus(Integer.parseInt(SystemProperties.get(
+                                UNTRUSTED_SERVER_ERROR_CODE,
+                                DEFAULT_UNTRUSTED_SERVER_ERROR_CODE)));
+                    } catch(NumberFormatException nfe){
+                        if (debug.messageEnabled()) {
+                            debug.message("initializeRequestContext(): invalid errorcode " +
+                                nfe.getMessage());
+                        }
+                    }
+
                     throw new CompleteRequestException();            		
                 }
 
@@ -261,6 +274,9 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
     getPackageName(LoginServlet.class.getName());
     
     private static final String REDIRECT_JSP = "Redirect.jsp";
+    private static final String UNTRUSTED_SERVER_ERROR_CODE =
+            "openam.untrusted.server.http.error.code";
+    private static final String DEFAULT_UNTRUSTED_SERVER_ERROR_CODE = "403";
     
     // the debug file
     private static Debug debug = Debug.getInstance("amLoginServlet");
