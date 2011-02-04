@@ -425,6 +425,11 @@ public interface SAML2Constants {
     public String NOTONORAFTER="NotOnOrAfter";
 
     /**
+     * Constant for NotOnOrAfter
+     */
+    public String NOTBEFORE="NotBefore";
+
+    /**
      * Constant for InResponseTo
      */
     public String INRESPONSETO="InResponseTo";

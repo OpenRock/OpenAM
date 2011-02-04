@@ -753,8 +753,12 @@ public class SAML2Utils extends SAML2SDKUtils {
                 throw new SAML2Exception(bundle.getString(
                         "invalidTimeOnSubjectConfirmationData"));
             }
-            retMap.put(SAML2Constants.NOTONORAFTER, notOnOrAfter); 
-            if (subjectConfData.getNotBefore() != null) {
+            retMap.put(SAML2Constants.NOTONORAFTER, notOnOrAfter);
+
+            Date notBefore = subjectConfData.getNotBefore();
+            if (notBefore != null) {
+                if ((notBefore.getTime() + timeskew * 1000 ) >
+                        System.currentTimeMillis()) {
                 if (debug.messageEnabled()) {
                     debug.message(method + "SubjectConfirmationData included "
                             + "NotBefore.");
@@ -766,8 +770,10 @@ public class SAML2Utils extends SAML2SDKUtils {
                         null);
                 throw new SAML2Exception(bundle.getString(
                         "containedNotBefore"));
+                }
             }
-            
+            retMap.put(SAML2Constants.NOTBEFORE, notBefore);
+           
             String inRespTo = subjectConfData.getInResponseTo();
             if (inRespTo != null && inRespTo.length() != 0) {
                 if (!inRespTo.equals(inRespToResponse)) {
