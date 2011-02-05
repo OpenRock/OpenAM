@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm;
 
 import com.iplanet.am.sdk.AMCommonUtils;
@@ -245,7 +248,7 @@ public final class AMIdentity {
         if ((amsdkdn != null) && (amsdkdn.length() > 0)) {
             this.univDN = (new DN(amsdkdn)).toRFCString();
         }
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         if ((name != null) && (name.indexOf(',') != -1)) {
             DN nameDN = new DN(name);
             if (nameDN.isDN()) {
@@ -267,7 +270,7 @@ public final class AMIdentity {
         if (amsdkdn != null) {
             this.univDN = amsdkdn.toRFCString();
         }
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         if ((name != null) && (name.indexOf(',') != -1)) {
             DN nameDN = new DN(name);
             if (nameDN.isDN()) {
@@ -1354,7 +1357,7 @@ public final class AMIdentity {
      * @return String representation of the <code>ServiceConfig</code> object.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("AMIdentity object: ").append(univIdWithoutDN);
         if (univDN != null) {
             sb.append("AMSDKDN=").append(univDN);

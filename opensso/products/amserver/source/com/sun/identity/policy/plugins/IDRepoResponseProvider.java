@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.policy.PolicyException;
@@ -131,7 +132,7 @@ public class IDRepoResponseProvider implements ResponseProvider {
         // get the organization name
         Set orgNameSet = (Set) configParams.get(
                                      PolicyManager.ORGANIZATION_NAME);
-        if ((orgNameSet != null) && (orgNameSet.size() != 0)) {
+        if ((orgNameSet != null) && (!orgNameSet.isEmpty())) {
             Iterator items = orgNameSet.iterator();
             orgName = (String) items.next();
         }

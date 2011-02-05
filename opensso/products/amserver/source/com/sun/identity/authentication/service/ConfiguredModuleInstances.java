@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.service;
 
 import java.security.AccessController;
@@ -37,7 +38,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.shared.Constants;

@@ -25,11 +25,12 @@
  * $Id: CreateIdentityProvider.java,v 1.2 2008/06/25 05:42:35 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.config.identityProvider;
 
-import net.sf.click.Page;
 import com.sun.identity.config.util.AjaxPage;
-import com.sun.identity.config.pojos.ServiceProvider;
 import com.sun.identity.config.pojos.CircleTrust;
 import com.sun.identity.config.pojos.IdentityProvider;
 

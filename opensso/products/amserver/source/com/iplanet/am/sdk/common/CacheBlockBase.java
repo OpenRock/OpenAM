@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.common;
 
 import com.iplanet.am.sdk.AMHashMap;
@@ -404,7 +407,7 @@ public abstract class CacheBlockBase {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n----------- START CACHE BLOCK -----------");
         sb.append("\nEntry DN: ").append(entryDN);
         sb.append(" Valid Entry: ").append(isValidEntry);
@@ -539,7 +542,7 @@ public abstract class CacheBlockBase {
         }
 
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(" Complete Set: ").append(completeSet);
             sb.append(" Attributes: ").append(readableAttrNames);
             sb.append(" In Accessable attributes: ");

@@ -26,14 +26,12 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.securid;
 
-import java.io.IOException;
 
-import javax.security.auth.*;
-import javax.security.auth.login.*;
-import javax.security.auth.callback.*;
 
 import java.security.Principal;
 

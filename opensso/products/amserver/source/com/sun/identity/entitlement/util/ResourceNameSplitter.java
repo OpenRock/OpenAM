@@ -25,6 +25,9 @@
  * $Id: ResourceNameSplitter.java,v 1.2 2009/08/28 06:16:31 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement.util;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
@@ -222,7 +225,7 @@ public class ResourceNameSplitter implements ISearchIndex {
     }
     
     static String queryToString(List<String> query) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         Collections.sort(query);
         boolean first = true;
         for (String s : query) {

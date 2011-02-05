@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.UI;
 
 import com.sun.identity.shared.locale.AMResourceBundleCache;
@@ -40,12 +41,10 @@ import com.iplanet.jato.view.html.StaticTextField;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.Constants;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Enumeration;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
@@ -122,7 +121,7 @@ public abstract class AuthViewBeanBase extends ViewBeanBase {
     public String getEncodedQueryParams(HttpServletRequest request)
     {
         String returnQueryParams = "";
-        StringBuffer queryParams = new StringBuffer();
+        StringBuilder queryParams = new StringBuilder();
         queryParams.append("");
         Enumeration parameters = request.getParameterNames();
         for ( ; parameters.hasMoreElements() ;) {

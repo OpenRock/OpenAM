@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import java.io.BufferedReader;
@@ -40,7 +43,6 @@ import java.util.StringTokenizer;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.NetworkMonitor;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.nt;
 
 import com.iplanet.am.util.SystemProperties;
@@ -227,7 +230,7 @@ public class NT extends AMLoginModule {
             
             Runtime rt = Runtime.getRuntime();
             int c;
-            StringBuffer buftxt = new StringBuffer(80);
+            StringBuilder buftxt = new StringBuilder(80);
 
             String[] progarr = null;
             if ((smbConfFileName != null) && (smbConfFileName.length() > 0)) {

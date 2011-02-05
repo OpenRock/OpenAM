@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.SSLSocketFactoryManager;
@@ -36,9 +39,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSSchema;
 import java.util.Iterator;
 import java.util.List;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.io.IOException;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPDN;

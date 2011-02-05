@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import java.util.Iterator;
@@ -108,10 +111,10 @@ class AMFilteredRoleImpl extends AMRoleImpl implements AMFilteredRole {
         if (avPairs == null) {
             filter = userFilter;
         } else {
-            if (avPairs.size() == 0) {
+            if (avPairs.isEmpty()) {
                 filter = userFilter;
             } else {
-                StringBuffer filterSB = new StringBuffer();
+                StringBuilder filterSB = new StringBuilder();
 
                 filterSB.append("(&").append(userFilter).append("(|");
                 Iterator iter = avPairs.keySet().iterator();
@@ -175,10 +178,10 @@ class AMFilteredRoleImpl extends AMRoleImpl implements AMFilteredRole {
         if (avPairs == null) {
             filter = userFilter;
         } else {
-            if (avPairs.size() == 0) {
+            if (avPairs.isEmpty()) {
                 filter = userFilter;
             } else {
-                StringBuffer filterSB = new StringBuffer();
+                StringBuilder filterSB = new StringBuilder();
                 filterSB.append("(&").append(userFilter).append("(|");
                 Iterator iter = avPairs.keySet().iterator();
 

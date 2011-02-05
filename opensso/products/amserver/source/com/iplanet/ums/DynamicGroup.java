@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import com.iplanet.services.ldap.Attr;
@@ -270,8 +273,8 @@ public class DynamicGroup extends PersistentObject implements
      * @return LDAP URL.
      */
     protected String toUrlStr(String base, String filter, int scope) {
-        StringBuffer urlBuf = new StringBuffer();
-        urlBuf.append("ldap:///" + base + "?");
+        StringBuilder urlBuf = new StringBuilder();
+        urlBuf.append("ldap:///").append(base).append("?");
 
         switch (scope) {
         case LDAPv2.SCOPE_BASE:
@@ -287,7 +290,7 @@ public class DynamicGroup extends PersistentObject implements
         }
 
         if (filter != null && filter.length() > 0) {
-            urlBuf.append("?" + filter);
+            urlBuf.append("?").append(filter);
         } else {
             urlBuf.append("?");
         }

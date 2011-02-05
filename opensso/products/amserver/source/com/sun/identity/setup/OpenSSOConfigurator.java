@@ -25,6 +25,9 @@
  * $Id: OpenSSOConfigurator.java,v 1.4 2009/08/11 23:50:42 goodearth Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import java.io.BufferedReader;
@@ -34,7 +37,6 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -93,7 +95,7 @@ public class OpenSSOConfigurator {
         String deploymentURI = null;
         String userStoreType = null;
 
-        StringBuffer postBodySB = new StringBuffer();
+        StringBuilder postBodySB = new StringBuilder();
         for(Enumeration e = config.keys(); e.hasMoreElements() ;) {
             String key = (String)e.nextElement();
             String val = (String)config.get(key);

@@ -25,6 +25,9 @@
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.delegation.plugins;
 
 import java.util.Set;
@@ -860,7 +863,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
     private DelegationPrivilege policyToPrivilege(Policy policy) 
         throws DelegationException {
 
-        String pname = null;;
+        String pname = null;
         Set permissions = new HashSet();
         Set svalues = new HashSet();
 
@@ -975,7 +978,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
         String version = perm.getVersion();
         String configType = perm.getConfigType();
         String subConfigName = perm.getSubConfigName();
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(PREFIX);
         if (realmName != null) {
             sb.append(realmName);

@@ -26,11 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.util;
 
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceConfig;

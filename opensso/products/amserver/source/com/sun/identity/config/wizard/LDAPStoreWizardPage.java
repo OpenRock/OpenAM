@@ -25,13 +25,14 @@
  * $Id: LDAPStoreWizardPage.java,v 1.7 2008/06/25 05:42:42 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.pojos.LDAPStore;
 import com.sun.identity.config.util.AjaxPage;
 import net.sf.click.control.ActionLink;
-import com.sun.identity.setup.AMSetupServlet;
-import java.io.File;
 
 /*
  * LDAPStoreWizardPage is the base for steps 2,3, and 4.

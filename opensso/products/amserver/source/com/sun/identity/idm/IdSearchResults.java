@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm;
 
 import java.util.HashMap;
@@ -157,7 +160,7 @@ public class IdSearchResults {
      * @return String representation of the <code>ServiceConfig</code> object.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("IdSearchResults:");
         sb.append("\n\tIdentities: ").append(searchResults);
         sb.append("\n\tAttributes: ").append(resultsMap);

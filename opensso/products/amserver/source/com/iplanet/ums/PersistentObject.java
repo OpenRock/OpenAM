@@ -26,8 +26,12 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
+import com.iplanet.am.sdk.AMException;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -37,8 +41,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.sun.identity.shared.ldap.LDAPAttribute;
 import com.sun.identity.shared.ldap.LDAPModification;
 import com.sun.identity.shared.ldap.util.DN;
@@ -271,7 +273,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
         AttrSet attrSet = new AttrSet();
         if (!cacheOnly) {
             Collection attributesNotInCache = findAttributesNotRead(attrs);
-            if ((attributesNotInCache.size() != 0) && (getGuid() != null)
+            if ((!attributesNotInCache.isEmpty()) && (getGuid() != null)
                     && (getPrincipal() != null)) {
                 readAttributesFromDataStore(attributesNotInCache);
             }
@@ -952,12 +954,12 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @supported.api
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Object ID        :" + m_guid + "\n");
-        sb.append("Naming attribute :" + getNamingAttribute() + "\n");
-        sb.append("Class            :" + getClass().getName() + "\n");
-        sb.append("Principal        :" + m_principal + "\n");
-        sb.append("Attribute Set    :" + m_attrSet + "\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Object ID        :").append(m_guid).append("\n");
+        sb.append("Naming attribute :").append(getNamingAttribute()).append("\n");
+        sb.append("Class            :").append(getClass().getName()).append("\n");
+        sb.append("Principal        :").append(m_principal).append("\n");
+        sb.append("Attribute Set    :").append(m_attrSet).append("\n");
         return sb.toString();
     }
 
@@ -1268,15 +1270,15 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
         String name,
         String[] parentID
     ) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
-        sb.append(namingAttribute + "=" + name);
+        sb.append(namingAttribute).append("=").append(name);
         for (int i = 0; i < parentID.length; i++) {
             if (parentID[i] != null) {
                 // TODO: ??? This is hardcoded to take "o=something" as the
                 // parent node(s). Needs a flexible scheme to handle
                 // flexible DIT.
-                sb.append(",o=" + parentID[i]);
+                sb.append(",o=").append(parentID[i]);
             }
         }
 

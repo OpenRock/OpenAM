@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import java.util.Collections;
@@ -79,7 +82,7 @@ class AMOrganizationImpl extends AMObjectImpl implements AMOrganization {
         Set subOrgs = new HashSet();
 
         while (iter.hasNext()) {
-            StringBuffer subOrgDNSB = new StringBuffer();
+            StringBuilder subOrgDNSB = new StringBuilder();
             subOrgDNSB.append(AMNamingAttrManager.getNamingAttr(ORGANIZATION))
                     .append("=").append((String) iter.next()).append(",")
                     .append(super.entryDN);
@@ -113,7 +116,7 @@ class AMOrganizationImpl extends AMObjectImpl implements AMOrganization {
 
         while (iter.hasNext()) {
             String subOrgName = (String) iter.next();
-            StringBuffer subOrgDNSB = new StringBuffer();
+            StringBuilder subOrgDNSB = new StringBuilder();
             subOrgDNSB.append(AMNamingAttrManager.getNamingAttr(ORGANIZATION))
                     .append("=").append(subOrgName).append(",").append(
                             super.entryDN);
@@ -156,7 +159,7 @@ class AMOrganizationImpl extends AMObjectImpl implements AMOrganization {
             Map attrMap, Map serviceNamesAndAttrs) throws AMException,
             SSOException {
         String subOrgName = orgName;
-        StringBuffer subOrgDNSB = new StringBuffer();
+        StringBuilder subOrgDNSB = new StringBuilder();
         subOrgDNSB.append(AMNamingAttrManager.getNamingAttr(ORGANIZATION));
         subOrgDNSB.append("=").append(subOrgName).append(",");
         subOrgDNSB.append(super.entryDN);
@@ -589,7 +592,7 @@ class AMOrganizationImpl extends AMObjectImpl implements AMOrganization {
         Set roles = new HashSet();
 
         while (iter.hasNext()) {
-            StringBuffer roleDNSB = new StringBuffer();
+            StringBuilder roleDNSB = new StringBuilder();
             roleDNSB.append(AMNamingAttrManager.getNamingAttr(ROLE))
                     .append("=").append((String) iter.next()).append(",")
                     .append(super.entryDN);

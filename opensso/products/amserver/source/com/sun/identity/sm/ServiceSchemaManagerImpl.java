@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -43,8 +46,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -287,13 +288,13 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("\nService Schema Manager: ").append(serviceName).append(
                 "\n\tVersion: ").append(version);
-        sb.append("\nI18n file name: " + getI18NFileName());
-        sb.append("\nI18n Jar URL: " + getI18NJarURL());
-        sb.append("\nService hierarchy: " + getServiceHierarchy());
-        sb.append("\nProperty View Bean: " + getPropertiesViewBeanURL());
+        sb.append("\nI18n file name: ").append(getI18NFileName());
+        sb.append("\nI18n Jar URL: ").append(getI18NJarURL());
+        sb.append("\nService hierarchy: ").append(getServiceHierarchy());
+        sb.append("\nProperty View Bean: ").append(getPropertiesViewBeanURL());
 
         ServiceSchemaImpl ss;
         if ((ss = getSchema(SchemaType.GLOBAL)) != null) {

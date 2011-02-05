@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.policy.remote;
@@ -457,7 +457,7 @@ public class PolicyRequestHandler implements RequestHandler {
     private Map getResponseDecisions(SSOToken token, Set attrs)
         throws PolicyEvaluationException
     {
-        if ((attrs == null) || (attrs.size() == 0)) {
+        if ((attrs == null) || (attrs.isEmpty())) {
             return null;
         }
 
@@ -602,7 +602,7 @@ public class PolicyRequestHandler implements RequestHandler {
     private void convertEnvParams(Map envParams)
         throws PolicyException
     {
-        if ((envParams == null) || (envParams.size() == 0)) {
+        if ((envParams == null) || (envParams.isEmpty())) {
             return;
         }
 
@@ -611,7 +611,7 @@ public class PolicyRequestHandler implements RequestHandler {
         String reqIP = null;
 
         if (reqIPSet != null) {
-            if (reqIPSet.size() != 0) {
+            if (!reqIPSet.isEmpty()) {
                 Iterator items = reqIPSet.iterator();
                 reqIP = (String)items.next();
                 envParams.put(REQUEST_IP, reqIP);
@@ -628,7 +628,7 @@ public class PolicyRequestHandler implements RequestHandler {
         Set reqTimeSet = (Set)envParams.get(REQUEST_TIME);
         Long reqTime = null;
         if (reqTimeSet != null) {
-            if (reqTimeSet.size() != 0) {
+            if (!reqTimeSet.isEmpty()) {
                 Iterator items = reqTimeSet.iterator();
                 String reqTimeStr = (String)items.next();
                 reqTime = new Long(reqTimeStr);
@@ -647,7 +647,7 @@ public class PolicyRequestHandler implements RequestHandler {
             Set reqTimeZoneSet = (Set)envParams.get(REQUEST_TIME_ZONE);
             TimeZone reqTimeZone = null;
             if (reqTimeZoneSet != null) {
-                if (reqTimeZoneSet.size() != 0) {
+                if (!reqTimeZoneSet.isEmpty()) {
                     Iterator items = reqTimeZoneSet.iterator();
                     String reqTimeZoneStr = (String)items.next();
                     reqTimeZone = TimeZone.getTimeZone(reqTimeZoneStr);

@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.ldap;
 
-import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -131,7 +131,7 @@ public class LDAPCallbacks {
         callbacks[2] = new PasswordCallback("Enter Password :", false);
         try {
             callbackHandler.handle(callbacks);
-            username = new String(((NameCallback)callbacks[1]).getName());
+            username = ((NameCallback) callbacks[1]).getName();
             passwd = charToString(
                 ((PasswordCallback)callbacks[2]).getPassword(),callbacks[2]);
             

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.remote;
 
 import java.util.Enumeration;
@@ -149,7 +152,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
     // @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n<<<<<<< BEGIN IDREPO SDK CACHE CONTENTS >>>>>>>>");
         if (!idRepoCache.isEmpty()) { // Should never be null
             Enumeration cacheKeys = idRepoCache.keys();

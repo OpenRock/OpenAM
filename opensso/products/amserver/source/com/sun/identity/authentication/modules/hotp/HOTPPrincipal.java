@@ -25,13 +25,12 @@
  * $Id: HOTPPrincipal.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.hotp;
 
-import java.io.IOException;
 
-import javax.security.auth.*;
-import javax.security.auth.login.*;
-import javax.security.auth.callback.*;
 
 import java.security.Principal;
 

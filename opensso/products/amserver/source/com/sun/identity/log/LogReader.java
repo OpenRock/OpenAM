@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log;
 
 import java.io.File;
@@ -623,7 +626,7 @@ public class LogReader {
     }
 
     private static String getAllFilenames (Set fileNames) {
-        StringBuffer fsSB = new StringBuffer();
+        StringBuilder fsSB = new StringBuilder();
 
         if (fileNames == null) {
             return null;

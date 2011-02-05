@@ -26,9 +26,9 @@
  *
  */
 
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
@@ -665,7 +665,7 @@ public class Subjects {
      * @return xml string representation of this object
      */
     protected String toXML() {
-	StringBuffer sb = new StringBuffer(100);
+	StringBuilder sb = new StringBuilder(100);
 	sb.append("\n").append(SUBJECTS_ELEMENT_BEGIN)
 	    .append(XMLUtils.escapeSpecialCharacters(name))
             .append(SUBJECTS_DESCRIPTION)

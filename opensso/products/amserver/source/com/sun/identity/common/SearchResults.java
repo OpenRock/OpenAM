@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
 import java.util.Map;
@@ -84,7 +87,7 @@ public class SearchResults {
      * @param errorCode Error Code.
      */
     public SearchResults(int count, Set results, int errorCode) {
-        count = count;
+        this.count = count;
         searchResults = results;
         this.errorCode = errorCode;
     }
@@ -98,7 +101,7 @@ public class SearchResults {
      * @param map Map of attributes and values if requested for.
      */
     public SearchResults(int count, Set results, int errorCode, Map map) {
-        count = count;
+        this.count = count;
         searchResults = results;
         this.errorCode = errorCode;
         resultsMap = map;

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import java.util.HashMap;
@@ -103,7 +106,7 @@ class AMDynamicGroupImpl extends AMGroupImpl implements AMDynamicGroup {
                 } else {
                     String targetFilter = aci.substring(0, indx);
                     String restACI = aci.substring(aci.indexOf("(|(nsroledn"));
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     sb.append(targetFilter).append(
                             "iplanet-am-static-group-dn=*").append(entryDN)
                             .append(")").append(this.getFilter()).append("))")

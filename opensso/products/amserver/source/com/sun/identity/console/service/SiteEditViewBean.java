@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.RequestManager;
@@ -153,7 +156,7 @@ public class SiteEditViewBean
         if ((assigned != null) && !assigned.isEmpty()) {
             Set set = new TreeSet();
             set.addAll(assigned);
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             for (Iterator i = set.iterator(); i.hasNext(); ) {
                 buff.append((String)i.next())
                     .append("<br />");

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import com.iplanet.am.sdk.AMConstants;
@@ -464,9 +467,9 @@ public class PolicyUtils {
 
     public static String envParametersToXMLString(Map envMap)
     {
-        StringBuffer xmlSB = new StringBuffer(1000);
+        StringBuilder xmlSB = new StringBuilder(1000);
         
-        xmlSB.append("<" + ENV_PARAMETERS + ">" + CRLF);
+        xmlSB.append('<').append(ENV_PARAMETERS).append('>').append(CRLF);
 
         Set keySet = envMap.keySet();
         Iterator keyIter = keySet.iterator();
@@ -475,7 +478,7 @@ public class PolicyUtils {
             Set values = (Set)envMap.get(name);
             xmlSB.append(attributeValuePairToXMLString(name, values));
         }
-        xmlSB.append("</" + ENV_PARAMETERS + ">" + CRLF);
+        xmlSB.append("</").append(ENV_PARAMETERS).append('>').append(CRLF);
         return xmlSB.toString();
     } 
 
@@ -488,16 +491,15 @@ public class PolicyUtils {
 
     public static String responseAttributesToXMLString(Set attrs)
     {
-        StringBuffer xmlSB = new StringBuffer(1000);
+        StringBuilder xmlSB = new StringBuilder(1000);
         
         xmlSB.append("<" + GET_RESPONSE_DECISIONS + ">" + CRLF);
 
         Iterator names = attrs.iterator(); 
         while (names.hasNext()) {
             String name = (String)names.next();
-            xmlSB.append("<" + ATTRIBUTE + " " + ATTRIBUTE_NAME + "=\""
-                         + XMLUtils.escapeSpecialCharacters(name) 
-                         + "\"/>" + CRLF);
+            xmlSB.append("<").append(ATTRIBUTE).append(" ").append(ATTRIBUTE_NAME).append("=\"").
+                    append(XMLUtils.escapeSpecialCharacters(name)).append("\"/>").append(CRLF);
         }
         xmlSB.append("</" + GET_RESPONSE_DECISIONS + ">" + CRLF);
         return xmlSB.toString();
@@ -513,7 +515,7 @@ public class PolicyUtils {
 
     public static String mapToXMLString(Map envMap)
     {
-        StringBuffer xmlSB = new StringBuffer(1000);
+        StringBuilder xmlSB = new StringBuilder(1000);
         Set keySet = envMap.keySet();
         Iterator keyIter = keySet.iterator();
         while (keyIter.hasNext()) {
@@ -535,12 +537,11 @@ public class PolicyUtils {
 
     public static String attributeValuePairToXMLString(String name, Set values)
     {
-        StringBuffer xmlSB = new StringBuffer(1000);
+        StringBuilder xmlSB = new StringBuilder(1000);
      
-        xmlSB.append("<" + ATTRIBUTE_VALUE_PAIR + ">" + CRLF);
-        xmlSB.append("<" + ATTRIBUTE + " " + ATTRIBUTE_NAME + "=\""
-                         + XMLUtils.escapeSpecialCharacters(name) 
-                         + "\"/>" + CRLF);
+        xmlSB.append('<').append(ATTRIBUTE_VALUE_PAIR).append('>').append(CRLF);
+        xmlSB.append('<').append(ATTRIBUTE).append(' ').append(ATTRIBUTE_NAME).
+                append("=\"").append(XMLUtils.escapeSpecialCharacters(name)).append("\"/>").append(CRLF);
         
         if ( values != null ) {
             Iterator itr = values.iterator();
@@ -730,7 +731,7 @@ public class PolicyUtils {
         String userRDNAttrName, String userName, boolean aliasEnabled)
         throws SSOException {
 
-        StringBuffer userFilter = new StringBuffer();
+        StringBuilder userFilter = new StringBuilder();
         if (aliasEnabled) {
             String principalsString = token.getProperty("Principals");
             if (principalsString != null) {
@@ -908,7 +909,7 @@ public class PolicyUtils {
      * @return the parsed set
      */
     public static Set delimStringToSet(String str, String delimiter) {
-        Set valSet = new HashSet();;
+        Set valSet = new HashSet();
         StringTokenizer st = new StringTokenizer(str, delimiter);
         while (st.hasMoreTokens()) {
             valSet.add(st.nextToken().trim());
@@ -932,7 +933,7 @@ public class PolicyUtils {
         if (!dn.isDN()) {
             displayString = strDN;
         } else {
-            StringBuffer buff = new StringBuffer(1024);
+            StringBuilder buff = new StringBuilder(1024);
             List rdns = dn.getRDNs();
             for (ListIterator iter = rdns.listIterator(rdns.size());
                 iter.hasPrevious();) {
@@ -1049,7 +1050,7 @@ public class PolicyUtils {
             throws PolicyException {
 
         String advicesXML = null;
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append(ADVICES_START_TAG).append(NEW_LINE);
         if (advices != null) {
             sb.append(mapToXMLString(advices));

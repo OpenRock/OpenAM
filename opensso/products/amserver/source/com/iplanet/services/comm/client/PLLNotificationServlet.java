@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.client;
 
 import com.iplanet.services.comm.share.NotificationSet;
@@ -134,7 +137,7 @@ public class PLLNotificationServlet extends HttpServlet {
             throws ServletException {
         NotificationSet set = NotificationSet.parseXML(notificationXML);
         Vector nots = set.getNotifications();
-        if (nots.size() != 0) {
+        if (!nots.isEmpty()) {
             // Each notification in this set shall have the same service id
             String serviceid = set.getServiceID();
 

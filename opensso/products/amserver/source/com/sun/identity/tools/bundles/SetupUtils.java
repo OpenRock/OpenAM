@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.bundles;
 
 import java.io.BufferedReader;
@@ -283,7 +286,7 @@ public class SetupUtils implements SetupConstants{
         } else {
             String fileName = file.getName();
             LinkedList tokensToKeep = new LinkedList();
-            StringBuffer nameToReturn = new StringBuffer();
+            StringBuilder nameToReturn = new StringBuilder();
             String tempFrom = from.trim();
             String tempTo = to.trim();
             int fileNameOffset = 0;

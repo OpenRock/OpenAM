@@ -26,14 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.protocol;
 
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.protocol.SSLSocketFactoryManager;
 
 /**
  * Generate SSLContext can be used to create an SSL socket connection 

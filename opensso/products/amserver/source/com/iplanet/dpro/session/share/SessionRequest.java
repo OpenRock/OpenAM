@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.share;
 
 import com.sun.identity.shared.encode.Base64;
@@ -96,9 +99,9 @@ public class SessionRequest {
 
     public static final int GetSessionCount = 7;
 
-    static final String QUOTE = "\"";
+    static final char QUOTE = '\"';
 
-    static final String NL = "\n";
+    static final char NL = '\n';
 
     static final String AMPERSAND = "&amp;";
 
@@ -426,7 +429,7 @@ public class SessionRequest {
     {
         int idx = 0;
 
-        StringBuffer buffer = new StringBuffer(data.length() * 4);
+        StringBuilder buffer = new StringBuilder(data.length() * 4);
         while ((data != null) && (idx = data.indexOf(ch)) != -1) {
             buffer.append(data.substring(0, idx));
             buffer.append(replacement);
@@ -444,7 +447,7 @@ public class SessionRequest {
     private String replaceEntityRef(String data, String ref, char ch) {
         int idx = 0;
 
-        StringBuffer buffer = new StringBuffer(data.length());
+        StringBuilder buffer = new StringBuilder(data.length());
         while ((idx = data.indexOf(ref)) != -1) {
             buffer.append(data.substring(0, idx));
             buffer.append(ch);
@@ -470,81 +473,79 @@ public class SessionRequest {
      */
     public String toXMLString() {
 
-        StringBuffer xml = new StringBuffer();
-        xml.append("<SessionRequest vers=" + QUOTE + requestVersion + QUOTE
-                + " reqid=" + QUOTE + requestID + QUOTE);
+        StringBuilder xml = new StringBuilder();
+        xml.append("<SessionRequest vers=").append(QUOTE).append(requestVersion).
+                append(QUOTE).append(" reqid=").append(QUOTE).append(requestID).append(QUOTE);
         if (requester != null) {
             try {
                 String data = Base64.encode(requester.getBytes("UTF8"));
-                xml.append(" requester=" + QUOTE + data + QUOTE);
+                xml.append(" requester=").append(QUOTE).append(data).append(QUOTE);
             } catch (java.io.UnsupportedEncodingException e) {
                 throw new IllegalArgumentException(e.getMessage());
             }
         }
-        xml.append(">" + NL);
+        xml.append('>').append(NL);
         switch (methodID) {
         case GetSession:
             xml.append("<GetSession reset=");
             if (resetFlag)
-                xml.append(QUOTE + "true" + QUOTE + ">" + NL);
+                xml.append(QUOTE).append("true").append(QUOTE).append('>').append(NL);
             else
-                xml.append(QUOTE + "false" + QUOTE + ">" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
-            xml.append("</GetSession>" + NL);
+                xml.append(QUOTE).append("false").append(QUOTE).append('>').append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
+            xml.append("</GetSession>").append(NL);
             break;
         case GetValidSessions:
-            xml.append("<GetValidSessions>" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
+            xml.append("<GetValidSessions>").append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
             if (pattern != null) {
-                xml.append("<Pattern>" + pattern + "</Pattern>" + NL);
+                xml.append("<Pattern>").append(pattern).append("</Pattern>").append(NL);
             }
-            xml.append("</GetValidSessions>" + NL);
+            xml.append("</GetValidSessions>").append(NL);
             break;
         case DestroySession:
             if (destroySessionID == null) {
                 return null;
             }
-            xml.append("<DestroySession>" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
-            xml.append("<DestroySessionID>" + destroySessionID
-                    + "</DestroySessionID>" + NL);
-            xml.append("</DestroySession>" + NL);
+            xml.append("<DestroySession>").append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
+            xml.append("<DestroySessionID>").append(destroySessionID).append("</DestroySessionID>").append(NL);
+            xml.append("</DestroySession>").append(NL);
             break;
         case Logout:
-            xml.append("<Logout>" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
-            xml.append("</Logout>" + NL);
+            xml.append("<Logout>").append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
+            xml.append("</Logout>").append(NL);
             break;
         case AddSessionListener:
             if (notificationURL == null) {
                 return null;
             }
-            xml.append("<AddSessionListener>" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
-            xml.append("<URL>" + notificationURL + "</URL>" + NL);
-            xml.append("</AddSessionListener>" + NL);
+            xml.append("<AddSessionListener>").append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
+            xml.append("<URL>").append(notificationURL).append("</URL>").append(NL);
+            xml.append("</AddSessionListener>").append(NL);
             break;
         case AddSessionListenerOnAllSessions:
             if (notificationURL == null) {
                 return null;
             }
-            xml.append("<AddSessionListenerOnAllSessions>" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
-            xml.append("<URL>" + notificationURL + "</URL>" + NL);
-            xml.append("</AddSessionListenerOnAllSessions>" + NL);
+            xml.append("<AddSessionListenerOnAllSessions>").append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
+            xml.append("<URL>").append(notificationURL).append("</URL>").append(NL);
+            xml.append("</AddSessionListenerOnAllSessions>").append(NL);
             break;
         case SetProperty:
             if (propertyName == null || propertyValue == null) {
                 return null;
             }
-            xml.append("<SetProperty>" + NL);
-            xml.append("<SessionID>" + sessionID + "</SessionID>" + NL);
+            xml.append("<SetProperty>").append(NL);
+            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
             xml.append("<Property name=").append(QUOTE).append(
-                    XMLUtils.escapeSpecialCharacters(propertyName)).append(
-                    QUOTE).append(" value=").append(QUOTE).append(
-                    XMLUtils.escapeSpecialCharacters(propertyValue)).append(
-                    QUOTE).append(">").append("</Property>" + NL);
-            xml.append("</SetProperty>" + NL);
+                    XMLUtils.escapeSpecialCharacters(propertyName)).append(QUOTE).
+                    append(" value=").append(QUOTE).append(XMLUtils.escapeSpecialCharacters(propertyValue)).
+                    append(QUOTE).append('>').append("</Property>").append(NL);
+            xml.append("</SetProperty>").append(NL);
             break;
         case GetSessionCount:
             xml.append("<GetSessionCount>").append(NL);

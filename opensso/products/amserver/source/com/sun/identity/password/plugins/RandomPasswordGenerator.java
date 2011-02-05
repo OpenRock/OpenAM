@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.password.plugins;
 
 import com.sun.identity.idm.AMIdentity;
@@ -91,7 +94,7 @@ public class RandomPasswordGenerator implements PasswordGenerator
      */
     public String generatePassword(AMIdentity user) 
         throws PWResetException {
-        StringBuffer buf = new StringBuffer(PASSWORD_LENGTH);
+        StringBuilder buf = new StringBuilder(PASSWORD_LENGTH);
         
         /*
          * Generates a new password value which contains

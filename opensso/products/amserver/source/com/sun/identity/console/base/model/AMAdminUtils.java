@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base.model;
 
 import com.iplanet.jato.view.html.Option;
@@ -310,7 +313,7 @@ public class AMAdminUtils {
     }
 
     public static String getStringFromInputStream(InputStream is) {
-        StringBuffer buff = new StringBuffer(1000);
+        StringBuilder buff = new StringBuilder(1000);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
             String line = reader.readLine();
@@ -426,7 +429,7 @@ public class AMAdminUtils {
         String delimiter,
         boolean reverse
     ) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         if ((collection != null) && !collection.isEmpty()) {
             boolean empty = true;
 

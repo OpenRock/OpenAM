@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 import java.io.BufferedReader;
@@ -186,7 +189,7 @@ public class AttributeValues {
     }
     
     private static String stripEscapeChars(String key) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         int idx = key.indexOf('\\');
         
         while (idx != -1) {
@@ -319,7 +322,7 @@ public class AttributeValues {
     }
     
     private static String hexToString(String str) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         int idx = str.indexOf("\\u");
         while (idx != -1) {
             boolean done = false;

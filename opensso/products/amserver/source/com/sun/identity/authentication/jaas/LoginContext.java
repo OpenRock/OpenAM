@@ -27,22 +27,19 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.authentication.jaas;
 
-import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.shared.debug.Debug;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import javax.security.auth.login.*;
 import javax.security.auth.Subject;
-import javax.security.auth.AuthPermission;
 import javax.security.auth.callback.*;
 
 import com.sun.identity.authentication.spi.*;

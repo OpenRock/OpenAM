@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.core.service;
 
 import java.io.Serializable;
@@ -177,7 +180,7 @@ public class ServiceResponse implements Serializable {
     }
     
     private String toResponseStr(List msg) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (Iterator i = msg.iterator(); i.hasNext(); ) {
             String response = (String)i.next();
             buff.append(response).append("\n");

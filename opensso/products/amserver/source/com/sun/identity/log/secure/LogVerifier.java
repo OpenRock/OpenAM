@@ -26,19 +26,19 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.secure;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.LogManager;
 
-import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManagerUtil;
 import com.sun.identity.log.LogReader;
@@ -174,11 +174,11 @@ public class LogVerifier{
     private boolean verifyLogRecord(String[] record, int macPos)
     throws Exception {
         // Creating the data part for verification
-        StringBuffer data = new StringBuffer();
+        StringBuilder data = new StringBuilder();
         for(int m = 0; m < record.length-2; m++) {
             data.append(record[m]);
         }
-        curMAC = new String(record[macPos]);
+        curMAC = record[macPos];
         verified = 
             helper.verifyMAC(data.toString(), helper.toByteArray(curMAC));
         return verified;
@@ -193,7 +193,7 @@ public class LogVerifier{
      */
     private boolean verifySignature(String[] record, int signPos, int recPos)
     throws Exception {
-        String curSign = new String(record[signPos]);
+        String curSign = record[signPos];
         
         // Regenerate the MAC that was signed.
         byte[] prevMAC = helper.toByteArray(curMAC);
@@ -256,9 +256,8 @@ public class LogVerifier{
                 Vector header = new Vector(result[0].length);
                 // Extracting the field names as header from the first line 
                 // of the returned string array.
-                for( int j = 0; j < result[0].length; j++) {
-                    header.add(result[0][j]);
-                }
+
+                header.addAll(Arrays.asList(result[0]));
                 
                 int signPos = -1, macPos = -1;
                 String signFldName, macFldName;
@@ -357,9 +356,7 @@ public class LogVerifier{
             Vector header = new Vector(tmpResult[0].length);
             // Extracting the field names as header from the first line of the
             // returned string array.
-            for( int j = 0; j < tmpResult[0].length; j++) {
-                header.add(tmpResult[0][j]);
-            }
+            header.addAll(Arrays.asList(tmpResult[0]));
             
             int signPos = -1, macPos = -1;
             String signFldName, macFldName;

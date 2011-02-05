@@ -26,10 +26,11 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log;
 
-import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
 
 /**

@@ -26,21 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
-import com.iplanet.jato.model.ModelControlException;
-import com.iplanet.jato.view.event.DisplayEvent;
-import com.iplanet.jato.view.html.Option;
-import com.iplanet.jato.view.html.OptionList;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
-import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.policy.model.PolicyModel;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
-import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCSelect;
-import com.sun.web.ui.view.html.CCSelectableList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +86,7 @@ public class PMDefaultAuthSchemeConditionEditViewBean
                             propertySheetModel.setValues(
                                 propName, propValue.toArray(), model);
                     } else {
-                        StringBuffer strValue = new StringBuffer(16);
+                        StringBuilder strValue = new StringBuilder(16);
                         for (Iterator x=propValue.iterator(); x.hasNext();) {
                             String tmp = (String)x.next();
                             if (strValue.length() > 0) {

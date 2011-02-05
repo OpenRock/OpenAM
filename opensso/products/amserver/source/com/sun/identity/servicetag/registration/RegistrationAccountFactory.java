@@ -34,11 +34,13 @@
  * holder.
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.servicetag.registration;
 
 
 import java.lang.reflect.Constructor;
-import java.lang.IllegalAccessException;
 import java.lang.reflect.InvocationTargetException;
 
 public class RegistrationAccountFactory {

@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
-import com.sun.identity.shared.encode.Hash;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -143,7 +145,7 @@ public class SMSEnhancedFlatFileObject extends SMSFlatFileObjectBase {
         try {
             in = new FileReader(filename);
             buff = new BufferedReader(in);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             String line = buff.readLine();
             while (line != null) {
                 sb.append(line);

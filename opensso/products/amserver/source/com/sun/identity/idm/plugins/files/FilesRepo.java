@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.plugins.files;
 
 import java.io.BufferedReader;
@@ -38,6 +41,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1107,9 +1111,7 @@ public class FilesRepo extends IdRepo {
                 }
             }
         } else {
-            for (int i = 0; i < files.length; i++) {
-                results.add(files[i]);
-            }
+            results.addAll(Arrays.asList(files));
         }
 
         // Build RepoSearchResults
@@ -1551,7 +1553,7 @@ public class FilesRepo extends IdRepo {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(fileName));
-            StringBuffer encodedMapBuffer = new StringBuffer(200);
+            StringBuilder encodedMapBuffer = new StringBuilder(200);
             String line;
             while ((line = br.readLine()) != null) {
                 encodedMapBuffer.append(line);

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.util.HtmlUtil;
@@ -108,7 +111,7 @@ public class SessionPropertyConditionHelper {
     }
 
     private String formatValues(Set values) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (Iterator i = values.iterator(); i.hasNext(); ) {
             String val = (String)i.next();
             buff.append(HtmlUtil.escape(val));

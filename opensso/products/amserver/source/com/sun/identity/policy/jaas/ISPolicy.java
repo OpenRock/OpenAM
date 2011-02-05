@@ -25,13 +25,15 @@
  * $Id: ISPolicy.java,v 1.6 2008/08/19 19:09:17 veiming Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.jaas;
 
 import com.sun.identity.shared.debug.Debug;
 
 import java.security.CodeSource;
 import java.security.PermissionCollection;
-import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 

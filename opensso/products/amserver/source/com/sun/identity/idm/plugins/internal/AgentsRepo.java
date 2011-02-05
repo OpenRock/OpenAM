@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.plugins.internal;
 
 import java.net.MalformedURLException;
@@ -1632,7 +1635,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
     String constructDN(String groupName, String configName, String orgName, 
         String version, String serviceName) throws SMSException {
        
-        StringBuffer sb = new StringBuffer(50);
+        StringBuilder sb = new StringBuilder(50);
         sb.append("ou=").append(groupName).append(comma).append(
                 configName).append("ou=").append(version)
                 .append(comma).append("ou=").append(serviceName)
@@ -1711,7 +1714,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                            // To be consistent and for easy web agent
                            // parsing,the notification set should start with
                            // "AgentConfigChangeNotification"
-                           StringBuffer xmlsb = new StringBuffer(1000);
+                           StringBuilder xmlsb = new StringBuilder(1000);
                            xmlsb.append("<")
                                 .append(AGENT_NOTIFICATION)
                                 .append(" ")

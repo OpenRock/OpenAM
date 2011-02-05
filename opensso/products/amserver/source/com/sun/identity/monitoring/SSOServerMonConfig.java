@@ -26,9 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
-
-import java.util.Hashtable;
 
 public class SSOServerMonConfig {
     int htmlPort;

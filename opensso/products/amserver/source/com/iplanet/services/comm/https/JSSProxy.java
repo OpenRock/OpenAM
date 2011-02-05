@@ -25,6 +25,9 @@
  * $Id: JSSProxy.java,v 1.6 2009/02/19 05:29:04 beomsuk Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.https;
 
 import java.io.DataInputStream;
@@ -35,7 +38,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import com.sun.identity.common.ShutdownListener;

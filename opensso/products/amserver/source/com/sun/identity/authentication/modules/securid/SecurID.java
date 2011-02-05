@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.securid;
 
 import java.io.*;
@@ -34,8 +36,6 @@ import java.util.*;
 
 import javax.security.auth.*;
 import javax.security.auth.callback.*;
-import javax.security.auth.login.*;
-import javax.security.auth.spi.*;
 
 import com.rsa.authagent.authapi.AuthAgentException;
 import com.rsa.authagent.authapi.AuthSession;
@@ -45,15 +45,12 @@ import com.rsa.authagent.authapi.PinData;
 import com.iplanet.am.util.Misc;
 
 import com.sun.identity.authentication.spi.*;
-import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.Constants;
 import com.sun.identity.shared.debug.Debug;
 
-import java.security.Principal;
 
-import java.io.IOException;
 
 
 /*
@@ -198,7 +195,7 @@ public class SecurID extends AMLoginModule {
     public int process(Callback[] callbacks, int state)
         throws AuthLoginException
     {
-        String nextToken;;
+        String nextToken;
         int rtnval = -1;
         String tmp_passcode = null;
 
@@ -1018,7 +1015,7 @@ public class SecurID extends AMLoginModule {
             debug.message("SecurID.getNewPinMsg:pinState = " + pinState +
                     "\n\tpinMin = " + pinMin + "\n\tpinMax = " + pinMax);
         }
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(bundle.getString("SecurIDEnterNewPin"));
         sb.append(" ").append(pinMin).append(" ");
         sb.append(bundle.getString("SecurIDTo")).append(" ");

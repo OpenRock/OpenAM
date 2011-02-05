@@ -26,15 +26,15 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import java.util.*;
 
 import com.iplanet.sso.*;
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.services.util.*;
 import com.iplanet.am.sdk.*;
 import com.sun.identity.policy.*;
 import com.sun.identity.policy.interfaces.Subject;

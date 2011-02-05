@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
 import java.io.File;
@@ -192,7 +195,7 @@ public class SMSFlatFileObject extends SMSFlatFileObjectBase {
             objKey = objKey.substring(index + 1);
             if ((attrFile = mNameMap.getProperty(objKey)) != null) {
                 String dirName = objName.substring(0, index).trim();
-                StringBuffer sb = new StringBuffer(attrFile.length() +
+                StringBuilder sb = new StringBuilder(attrFile.length() +
                     dirName.length() + 2);
                 sb.append(attrFile.substring(0, attrFile.length() -
                     DEFAULT_ATTRIBUTE_FILENAME.length()));
@@ -204,8 +207,8 @@ public class SMSFlatFileObject extends SMSFlatFileObjectBase {
         }
 
         // Construct the file name
-        StringBuffer sb = 
-            new StringBuffer(mRootDir.length()+objName.length()+20);
+        StringBuilder sb =
+            new StringBuilder(mRootDir.length()+objName.length()+20);
         sb.append(mRootDir);
         sb.append(File.separatorChar);
         // objName is assumed to be a dn so construct the filepath 
@@ -248,7 +251,7 @@ public class SMSFlatFileObject extends SMSFlatFileObjectBase {
         String attr, 
         Set sunserviceids
     ) throws SMSException {
-        StringBuffer sb = new StringBuffer(dirHandle.getPath());
+        StringBuilder sb = new StringBuilder(dirHandle.getPath());
         sb.append(File.separatorChar);
         sb.append(attr);
         sb.append('=');
@@ -388,7 +391,7 @@ public class SMSFlatFileObject extends SMSFlatFileObjectBase {
      */ 
     protected void deleteSunXmlKeyValFiles(File dirHandle) throws SMSException {
         // Construct the file filter and get the files
-        StringBuffer sb = new StringBuffer(SMSEntry.ATTR_XML_KEYVAL);
+        StringBuilder sb = new StringBuilder(SMSEntry.ATTR_XML_KEYVAL);
         sb.append("=*");
         FilenameFilter filter = new FilenameFilter(sb.toString());
         File[] deleteFiles = dirHandle.listFiles(filter);

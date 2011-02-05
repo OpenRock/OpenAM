@@ -26,20 +26,18 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import java.util.*;
 
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyException;
@@ -52,7 +50,6 @@ import com.sun.identity.shared.debug.Debug;
 
 import com.sun.identity.security.AdminTokenAction;
 
-import java.security.Principal;
 import java.security.AccessController;
 
 /**

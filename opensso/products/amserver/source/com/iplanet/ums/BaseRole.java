@@ -26,9 +26,11 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 

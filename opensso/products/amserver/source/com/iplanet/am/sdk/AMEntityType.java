@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import com.iplanet.sso.SSOException;
@@ -130,7 +133,7 @@ public final class AMEntityType {
      * @return a string representation of this Entity.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("Entity Name=\t").append(name).append("\n").append(
                 "Entity type=\t").append(type).append("\n").append(
                 "Object Class=\t").append(objectClass).append("\n").append(

@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.unix;
 
-import java.io.IOException;
 import java.security.Principal;
 
 public class UnixPrincipal implements Principal, java.io.Serializable {

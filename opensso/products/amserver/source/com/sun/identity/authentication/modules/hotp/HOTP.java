@@ -25,9 +25,11 @@
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.hotp;
 
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -35,23 +37,16 @@ import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.authentication.spi.AMAuthCallBackException;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.sm.ServiceConfig;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collections;
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.ConfirmationCallback;
-import java.io.IOException;
 import java.security.Principal;
 
 import java.security.NoSuchAlgorithmException;
@@ -65,12 +60,8 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.AMIdentity;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.am.util.AMSendMail;
-import javax.mail.MessagingException;
 
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
 public class HOTP extends AMLoginModule {
@@ -373,7 +364,7 @@ public class HOTP extends AMLoginModule {
 
             String phone = null;
             Iterator itor = null;
-            if (telephoneNumbers != null && telephoneNumbers.size() != 0) {
+            if (telephoneNumbers != null && !telephoneNumbers.isEmpty()) {
                 itor = telephoneNumbers.iterator();
                 phone = (String) itor.next();
                 if (debug.messageEnabled()) {
@@ -388,7 +379,7 @@ public class HOTP extends AMLoginModule {
             }
 
             String mail = null;
-            if (emails != null && emails.size() != 0) {
+            if (emails != null && !emails.isEmpty()) {
                 itor = emails.iterator();
                 mail = (String) itor.next();
                 if (debug.messageEnabled()) {

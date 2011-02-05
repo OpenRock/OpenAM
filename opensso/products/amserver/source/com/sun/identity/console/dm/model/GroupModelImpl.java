@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm.model;
 
 import com.sun.identity.common.DisplayUtils;
@@ -603,7 +606,7 @@ public class GroupModelImpl extends DMModelBase
         String attributes = getPropertyXML(DMConstants.ENTRY_SPECIFIC_SERVICE,
             SUB_SCHEMA_GROUP, SchemaType.GLOBAL, false);
 
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG)
             .append(CREATE_PROPERTIES)
@@ -621,7 +624,7 @@ public class GroupModelImpl extends DMModelBase
      */  
     public String getCreateDynamicGroupXML() {
 
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG)
             .append(CREATE_PROPERTIES)
@@ -649,7 +652,7 @@ public class GroupModelImpl extends DMModelBase
 	if (type == AMObject.DYNAMIC_GROUP) {
 	    schema = SUB_SCHEMA_FILTERED_GROUP;
 	}
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG);
         buff.append(getPropertyXML(DMConstants.ENTRY_SPECIFIC_SERVICE,
@@ -715,7 +718,7 @@ public class GroupModelImpl extends DMModelBase
             type == AMObject.ORGANIZATIONAL_UNIT) 
         { 
             if (showGroupContainers() == false) {
-                StringBuffer tmp = new StringBuffer(128); 
+                StringBuilder tmp = new StringBuilder(128);
                 tmp.append(AdminInterfaceUtils.getNamingAttribute(
                         AMObject.GROUP_CONTAINER, debug))
                     .append("=")

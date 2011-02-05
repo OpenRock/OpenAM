@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -96,7 +96,7 @@ public class Notifier implements Runnable {
                     String strURL = url + NotificationServlet.CONTEXT_PATH +
                         "/" + action;
 
-                    StringBuffer buff = new StringBuffer();
+                    StringBuilder buff = new StringBuilder();
                     boolean bFirst = true;
                     for (String k : params.keySet()) {
                         if (bFirst) {

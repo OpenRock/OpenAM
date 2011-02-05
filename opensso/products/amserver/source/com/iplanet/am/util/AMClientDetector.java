@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
-
 package com.iplanet.am.util;
 
 import com.iplanet.services.cdm.ClientDetectionInterface;
@@ -37,7 +36,6 @@ import com.iplanet.services.cdm.ClientTypesManager;
 import com.iplanet.services.cdm.DefaultClientTypesManager;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;

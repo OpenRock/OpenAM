@@ -25,10 +25,11 @@
  * $Id: PWResetQuestionModel.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.password.ui.model;
 
-import java.util.Set;
 import java.util.Map;
 
 /**

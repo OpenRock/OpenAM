@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import java.util.Collections;
@@ -119,7 +122,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
         String domainName = attrSet.getValue(IPLANET_DOMAIN_NAME_ATTR);
         // remove the attribute from the attribute set.
         attrSet.remove(IPLANET_DOMAIN_NAME_ATTR);
-        if ((domainName != null) && (domainName != "")) {
+        if ((domainName != null) && (!domainName.equals(""))) {
             try {
                 DomainComponentTree dcTree = new DomainComponentTree(token,
                         new Guid(DCTREE_START_DN));
@@ -172,7 +175,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
         }
 
         // Create a DC tree for specified domain.
-        if ((domainName != null) && (domainName != "")) {
+        if ((domainName != null) && (!domainName.equals(""))) {
             try {
                 DomainComponentTree dcTree = new DomainComponentTree(token,
                         new Guid(DCTREE_START_DN));

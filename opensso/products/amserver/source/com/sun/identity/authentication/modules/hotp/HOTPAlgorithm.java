@@ -30,16 +30,12 @@
  * $Id: HOTPAlgorithm.java,v 1.2 2009/07/11 00:46:56 qcheng Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.hotp;
 
-import java.io.*;
-import java.io.IOException;
-import java.io.File;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.lang.reflect.UndeclaredThrowableException;
 
-import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
 

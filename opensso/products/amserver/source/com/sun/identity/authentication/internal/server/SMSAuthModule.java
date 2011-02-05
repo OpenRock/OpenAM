@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.internal.server;
 
 import com.iplanet.sso.SSOToken;
@@ -300,7 +303,7 @@ public class SMSAuthModule implements LoginModule {
                     + " to Subject");
         }
         Set principals = subject.getPrincipals();
-        if (principals.size() == 0) {
+        if (principals.isEmpty()) {
             principals.add(new AuthPrincipal(userDN));
         }
         return (true);

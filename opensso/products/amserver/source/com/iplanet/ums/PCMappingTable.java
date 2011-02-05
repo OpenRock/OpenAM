@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import java.util.Enumeration;
@@ -217,7 +220,7 @@ class PCMappingTable implements java.io.Serializable {
      */
     private AttrSet getAttrSetFromFilter(String filter) {
         AttrSet attrSet = new AttrSet();
-        String f = new String(filter);
+        String f = filter;
         f.trim();
         if (f.startsWith("(") && f.endsWith(")")) {
             f = f.substring(1, f.length() - 1);

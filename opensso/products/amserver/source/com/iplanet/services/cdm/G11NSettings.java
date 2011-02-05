@@ -37,7 +37,6 @@ import com.iplanet.services.cdm.clientschema.AMClientCapException;
 import com.iplanet.services.cdm.clientschema.AMClientDataListener;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;

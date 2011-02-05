@@ -25,6 +25,9 @@
  * $Id: Rule.java,v 1.8 2009/11/13 23:52:20 asyhuang Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
@@ -606,7 +609,7 @@ public class Rule extends Object implements Cloneable {
      * @supported.api
      */
     public String toXML() {
-        StringBuffer answer = new StringBuffer(100);
+        StringBuilder answer = new StringBuilder(100);
         answer.append("\n").append("<Rule");
         if (ruleName != null) {
             answer.append(" name=\"");
@@ -707,7 +710,7 @@ public class Rule extends Object implements Cloneable {
         String[] resources = serviceType.split(normalizedResName);
         int n = resources.length;
 
-        StringBuffer middle = new StringBuffer(100);
+        StringBuilder middle = new StringBuilder(100);
         // "<Reference name=\"" + resources[n-1]) +
         // "\"><PolicyName name=\"" + policyName +
         // "\"/></Reference>"

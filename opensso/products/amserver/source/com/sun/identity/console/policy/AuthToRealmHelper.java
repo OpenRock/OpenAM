@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.sun.identity.console.base.model.AMAdminUtils;
@@ -36,10 +39,8 @@ import com.sun.identity.console.policy.model.PolicyModel;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 public class AuthToRealmHelper {
     public static final String ATTR_FILTER = "tfSearch";

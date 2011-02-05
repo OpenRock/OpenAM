@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.property;
 
 import com.iplanet.sso.SSOException;
@@ -73,7 +76,7 @@ public class PrivilegeXMLBuilder
     }
 
     public String getXML(String realm, AMModel model) {
-        StringBuffer xml = new StringBuffer(1000);
+        StringBuilder xml = new StringBuilder(1000);
         if (realm == null) {
             realm = model.getStartDN();
         }

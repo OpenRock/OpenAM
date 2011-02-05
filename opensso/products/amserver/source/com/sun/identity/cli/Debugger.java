@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 
@@ -222,7 +225,7 @@ public class Debugger {
      * @return Stack trace of an exception.
      */
     public static String getStackTrace(Throwable e) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (e != null) {
             StringWriter stBuf = new StringWriter(300);
             PrintWriter stackStream = new PrintWriter(stBuf);

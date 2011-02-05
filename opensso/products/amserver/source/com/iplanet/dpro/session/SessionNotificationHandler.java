@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session;
 
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -103,7 +106,7 @@ public class SessionNotificationHandler implements NotificationHandler {
         try {
             if (session == null) {
                 // a new session is created
-                if (Session.getAllSessionEventListeners().size() == 0) {
+                if (Session.getAllSessionEventListeners().isEmpty()) {
                     return;
                 }
                 session = new Session(sid);

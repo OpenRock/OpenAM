@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
-
 package com.iplanet.services.cdm.clientschema;
 
 import com.iplanet.am.sdk.AMEntity;
@@ -355,7 +354,7 @@ public class AMClientCapData implements IDSEventListener {
         //
         // Default configuration if not obtained from service.
         //
-        if (minClient.size() == 0) {
+        if (minClient.isEmpty()) {
             String DEF_MIN_CLIENTS = CLIENTTYPE_ATTR + COMMA + USER_AGENT
                     + COMMA + PARENT_ID;
 
@@ -460,7 +459,7 @@ public class AMClientCapData implements IDSEventListener {
      * @return the dn for the client
      */
     private String generateClientDN(String clientType) {
-        StringBuffer dn = new StringBuffer();
+        StringBuilder dn = new StringBuilder();
         dn.append(CLIENTTYPE_ATTR);
         dn.append(EQUALS);
         dn.append(clientType);
@@ -556,7 +555,7 @@ public class AMClientCapData implements IDSEventListener {
             String attrName = (String) allKeys.next();
             Set vals = (Set) m.get(attrName);
 
-            if (vals.size() == 0) {
+            if (vals.isEmpty()) {
                 continue;
             }
 
@@ -728,7 +727,7 @@ public class AMClientCapData implements IDSEventListener {
 
             if (ldapAttrName == null) // not in schema
             {
-                if ((vals == null) || (vals.size() == 0)) {
+                if ((vals == null) || (vals.isEmpty())) {
                     continue;
                 }
 

@@ -25,13 +25,15 @@
  * $Id: JSSSecureRandomFactoryImpl.java,v 1.2 2008/06/25 05:41:27 qcheng Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-import com.iplanet.am.util.JSSInit;
 import com.sun.identity.shared.debug.Debug;
 
 /**

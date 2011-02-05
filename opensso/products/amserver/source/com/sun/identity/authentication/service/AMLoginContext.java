@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.service;
 
 import com.iplanet.sso.SSOException;
@@ -1710,7 +1711,7 @@ public class AMLoginContext {
         
         if ((moduleSet != null) && (!moduleSet.isEmpty())) {
             Iterator mIterator = moduleSet.iterator();
-            StringBuffer moduleString = new StringBuffer();
+            StringBuilder moduleString = new StringBuilder();
             
             while (mIterator.hasNext()) {
                 String mClassName = (String)mIterator.next();

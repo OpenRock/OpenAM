@@ -26,13 +26,14 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.UI;           
 
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
-import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Locale;

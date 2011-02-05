@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import java.io.UnsupportedEncodingException;
@@ -42,20 +43,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.log.ConnectionException;
 import com.iplanet.log.DriverLoadException;
 import com.iplanet.log.NullLocationException;
-import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.log.AMLogException;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManager;
@@ -445,7 +441,7 @@ public class DBHandler extends Handler {
         if (Debug.messageEnabled()) {
             Debug.message("cols = " + cols);
         }
-        StringBuffer colStrBuffer = new StringBuffer(1000);
+        StringBuilder colStrBuffer = new StringBuilder(1000);
         if (cols != null) {
             colStrBuffer.append("insert into ")
                     .append(tableName)
@@ -654,7 +650,7 @@ public class DBHandler extends Handler {
             for (Iterator iter = recordBuffer.iterator(); iter.hasNext();) {
                 vals = formatter.format((java.util.logging.LogRecord)
                     iter.next());
-                StringBuffer insertStringBuffer = new StringBuffer(2000);
+                StringBuilder insertStringBuffer = new StringBuilder(2000);
                 insertStringBuffer.append(getColString()).
                    append(vals).append(")");
 
@@ -1014,7 +1010,7 @@ public class DBHandler extends Handler {
                  *  Oracle seems to return the column names in uppercase.
                  */
 
-                StringBuffer colList = new StringBuffer();
+                StringBuilder colList = new StringBuilder();
                 String [] allFields = lmanager.getAllFields();
                 boolean addedOne = false;
                 String tmpx = null;
@@ -1097,17 +1093,17 @@ public class DBHandler extends Handler {
 
         if(isMySQL) {
             varCharX = "varchar";
-            sbuffer.append(" data " + mysqlDataType + ", ");
+            sbuffer.append(" data ").append(mysqlDataType).append(", ");
         } else {
-            sbuffer.append(" data " + oraDataType + ", ");
+            sbuffer.append(" data ").append(oraDataType).append(", ");
         }
 
         String [] allFields = lmanager.getAllFields();
         int i = 0;
         for (i = 2; i < allFields.length - 1; i++) {
-            sbuffer.append(allFields[i]).append(" " + varCharX + " (255), ");
+            sbuffer.append(allFields[i]).append(" ").append(varCharX).append(" (255), ");
         }
-        sbuffer.append(allFields[i]).append(" " + varCharX + " (255)) ");
+        sbuffer.append(allFields[i]).append(" ").append(varCharX).append(" (255)) ");
         String createString = sbuffer.toString();
         try {
             Statement stmt = conn.createStatement();
@@ -1322,7 +1318,7 @@ public class DBHandler extends Handler {
                 if (Debug.messageEnabled()) {
                     Debug.message("values = " + vals);
                 }
-                StringBuffer insertStringBuffer = new StringBuffer(2000);
+                StringBuilder insertStringBuffer = new StringBuilder(2000);
                 insertStringBuffer.append(getColString()).
                    append(vals).append(")");
 

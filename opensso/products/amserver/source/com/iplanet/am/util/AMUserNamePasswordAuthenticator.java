@@ -26,9 +26,11 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
-import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
 /*

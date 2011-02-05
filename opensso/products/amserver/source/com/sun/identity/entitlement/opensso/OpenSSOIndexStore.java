@@ -24,6 +24,9 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -691,7 +694,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         boolean sortResults,
         boolean ascendingOrder
     ) throws EntitlementException {
-        StringBuffer strFilter = new StringBuffer();
+        StringBuilder strFilter = new StringBuilder();
         if (filters.isEmpty()) {
             strFilter.append("(ou=*)");
         } else {

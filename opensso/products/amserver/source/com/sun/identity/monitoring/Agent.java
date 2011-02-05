@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -249,8 +252,8 @@ public class Agent {
          *    nn=<proto>://<host>:<port>/<uri>
          */
         if (debug.messageEnabled()) {
-            StringBuffer sb =
-                new StringBuffer("Agent.startMonitoringAgent:ServerInfo:\n");
+            StringBuilder sb =
+                new StringBuilder("Agent.startMonitoringAgent:ServerInfo:\n");
             sb.append("  ServerID = ").append(serverID).append("\n").
             append("  SiteID = ").append(siteID).append("\n").
             append("  ServerProtocol = ").append(serverProtocol).
@@ -351,8 +354,8 @@ public class Agent {
 
         if (debug.messageEnabled()) {
             String svrURL = (String)namingTable.get(ssoServerID);
-            StringBuffer sb2 =
-                new StringBuffer( "    Naming table entry for serverID ");
+            StringBuilder sb2 =
+                new StringBuilder( "    Naming table entry for serverID ");
             sb2.append(ssoServerID).append(": ");
             if ((svrURL != null) && (svrURL.length() > 0)) {
                 sb2.append(svrURL).append("\n");
@@ -428,7 +431,7 @@ public class Agent {
              */
             if ((serverIDTable != null) && !serverIDTable.isEmpty()) {
                 Set ks = serverIDTable.keySet();
-                StringBuffer sb = new StringBuffer("Server ID Table:\n");
+                StringBuilder sb = new StringBuilder("Server ID Table:\n");
                 for (Iterator it = ks.iterator(); it.hasNext(); ) {
                     String svr = (String)it.next();
                     String svrid = (String)serverIDTable.get(svr);
@@ -445,7 +448,7 @@ public class Agent {
              */
             if ((namingTable != null) && !namingTable.isEmpty()) {
                 Set ks = namingTable.keySet();
-                StringBuffer sb = new StringBuffer("Naming Table:\n");
+                StringBuilder sb = new StringBuilder("Naming Table:\n");
                 for (Iterator it = ks.iterator(); it.hasNext(); ) {
                     String svr = (String)it.next();
                     String svrid = (String)namingTable.get(svr);
@@ -1309,7 +1312,7 @@ public class Agent {
      */
     public static void siteNames (HashMap sNames, HashMap urlSites) {
         String classMethod = "Agent.siteNames:";
-        if (sNames.size() == 0) {
+        if (sNames.isEmpty()) {
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "no sites");
             }
@@ -1321,7 +1324,7 @@ public class Agent {
 
         if (debug.messageEnabled()) {
             Set kset = sNames.keySet();
-            StringBuffer sb = new StringBuffer("Site Names and URLs:\n");
+            StringBuilder sb = new StringBuilder("Site Names and URLs:\n");
             for (Iterator it = kset.iterator(); it.hasNext(); ) {
                 String stName = (String)it.next();
                 String stURL = (String)sNames.get(stName);
@@ -1447,8 +1450,8 @@ public class Agent {
          *  realm table here.
          */
         Date startDate = new Date();
-        StringBuffer sb =
-            new StringBuffer("receiving list of realms (size = ");
+        StringBuilder sb =
+            new StringBuilder("receiving list of realms (size = ");
         sb.append(realmList.size()).append("):\n");
         SsoServerInstanceImpl sig =
             (SsoServerInstanceImpl)mib2.getSvrInstanceGroup();
@@ -1661,7 +1664,7 @@ public class Agent {
             } 
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         if (debug.messageEnabled()) {
             sb.append("receiving config info for realm = ").
@@ -1814,7 +1817,7 @@ public class Agent {
             }
         }
 
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
 
         if (debug.messageEnabled()) {
             sb.append("agents for realm ").append(realm).append(", # = ").
@@ -2204,7 +2207,7 @@ public class Agent {
             }
         }
 
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
             sb.append("agents for realm ").append(realm).append(", # = ").
                 append(agtAttrs.size()).append("\n");
@@ -2479,7 +2482,7 @@ public class Agent {
      */
     public static int saml1TPConfig (List s1TPInfo) {
         String classMethod = "Agent.saml1TPConfig:";
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
         int sz = s1TPInfo.size();
         boolean skipSAML1EndPoints = true;  // until instrumentation done
 
@@ -2768,7 +2771,7 @@ public class Agent {
         Map idffEnts = srfi.idffEnts;
         Map cotMembs = srfi.membEnts;
 
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
             sb.append("fed entities for realm ").append(realm).append(":\n");
             sb.append("  Circle of Trusts set has ");
@@ -3188,7 +3191,7 @@ public class Agent {
 
                 if (debug.messageEnabled()) {
                     sb.append("  COT name = ").append(cotname).
-                        append(", SAML members = ");;
+                        append(", SAML members = ");
                 }
 
                 Set fset = (Set)hm.get("SAML");
@@ -3238,7 +3241,7 @@ public class Agent {
 
                 fset = (Set)hm.get("IDFF");
                 if (debug.messageEnabled()) {
-                    sb.append("    IDFF members = ");;
+                    sb.append("    IDFF members = ");
                 }
                 if ((fset != null) && fset.size() > 0) {
                     for (Iterator its = fset.iterator(); its.hasNext(); ) {
@@ -3284,7 +3287,7 @@ public class Agent {
                 fset = (Set)hm.get("WSFed");
 
                 if (debug.messageEnabled()) {
-                    sb.append("    WSFed members = ");;
+                    sb.append("    WSFed members = ");
                 }
 
                 if ((fset != null) && fset.size() > 0) {
@@ -3341,7 +3344,7 @@ public class Agent {
                 DSConfigMgr dscm = DSConfigMgr.getDSConfigMgr();
                 ServerGroup sgrp = dscm.getServerGroup("sms");
                 Collection slist = sgrp.getServersList();
-                StringBuffer sbp1 = new StringBuffer("DSConfigMgr:\n");
+                StringBuilder sbp1 = new StringBuilder("DSConfigMgr:\n");
                 for (Iterator it = slist.iterator(); it.hasNext(); ) {
                     Server sobj = (Server)it.next();
                     String svr = sobj.getServerName();
@@ -3357,7 +3360,7 @@ public class Agent {
 
             Properties props = SystemProperties.getProperties();
             Set kset = props.keySet();
-            StringBuffer sbp = new StringBuffer("SYSPROPS:\n");
+            StringBuilder sbp = new StringBuilder("SYSPROPS:\n");
             for (Iterator it = kset.iterator(); it.hasNext(); ) {
                 String entname = (String)it.next();
                 String val = (String)props.get(entname);

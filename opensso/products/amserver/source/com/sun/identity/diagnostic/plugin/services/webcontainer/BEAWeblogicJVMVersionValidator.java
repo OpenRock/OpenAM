@@ -26,13 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.webcontainer;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.util.Properties; 
 
 import com.sun.identity.diagnostic.base.core.common.DTException;

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli.serverconfig;
 
 import com.iplanet.sso.SSOException;
@@ -33,7 +36,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.CLIUtil;
 import com.sun.identity.cli.ExitCodes;
-import com.sun.identity.cli.FormatUtils;
 import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
@@ -42,7 +44,6 @@ import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Properties;
 import java.util.logging.Level;
 
 /**

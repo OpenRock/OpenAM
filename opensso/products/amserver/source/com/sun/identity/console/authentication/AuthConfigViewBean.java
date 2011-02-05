@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.authentication;
 
 import com.iplanet.jato.RequestManager;
@@ -247,7 +250,7 @@ public class AuthConfigViewBean
         }
         
         if (!invalidSet.isEmpty()) {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             boolean bFirst = true;
             for (Iterator i = invalidSet.iterator(); i.hasNext(); ) {
                 if (bFirst) {

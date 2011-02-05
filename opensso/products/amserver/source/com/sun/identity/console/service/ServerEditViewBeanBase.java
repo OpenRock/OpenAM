@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -42,18 +44,14 @@ import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.AMViewConfig;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.service.model.ServerSiteModel;
 import com.sun.identity.console.service.model.ServerSiteModelImpl;
-import com.sun.identity.sm.SMSException;
 import com.sun.web.ui.model.CCNavNode;
 import com.sun.web.ui.model.CCPageTitleModel;
-import com.sun.web.ui.model.CCTabsModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCCheckBox;
 import com.sun.web.ui.view.html.CCButton;
@@ -65,7 +63,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 /**

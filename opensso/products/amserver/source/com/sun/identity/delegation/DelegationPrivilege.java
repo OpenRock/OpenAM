@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.delegation;
 
 import com.iplanet.sso.SSOException;
@@ -334,7 +337,7 @@ public class DelegationPrivilege {
       * <code>DelegationPrivilege</code> object.
       */
     public String toString() {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("DelegationPrivilege Object:");
         sb.append("\nname=");
         sb.append(name);

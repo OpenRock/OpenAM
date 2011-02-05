@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.cdm;
 
 import com.iplanet.services.cdm.clientschema.AMClientCapData;
@@ -683,7 +686,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
     public Client addClient(SSOToken token, String clientType, Map cMap,
             boolean store) throws AMClientCapException {
         Client client = null;
-        if ((cMap == null) || (cMap.size() == 0)) {
+        if ((cMap == null) || (cMap.isEmpty())) {
             return client; // NO-OP
         }
 
@@ -1074,7 +1077,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
      */
     public int modifyClientExternal(SSOToken token, Map props)
             throws AMClientCapException {
-        if ((props == null) || (props.size() == 0)) {
+        if ((props == null) || (props.isEmpty())) {
             return 0; // NO-OP
         }
 

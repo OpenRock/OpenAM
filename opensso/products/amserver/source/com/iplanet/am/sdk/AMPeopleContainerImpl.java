@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import java.util.Collections;
@@ -84,7 +87,7 @@ class AMPeopleContainerImpl extends AMObjectImpl implements AMPeopleContainer {
 
         Iterator iter = userNames.iterator();
         while (iter.hasNext()) {
-            StringBuffer userDNSB = new StringBuffer();
+            StringBuilder userDNSB = new StringBuilder();
             userDNSB.append(AMNamingAttrManager.getNamingAttr(USER))
                     .append("=").append((String) iter.next()).append(",")
                     .append(super.entryDN);

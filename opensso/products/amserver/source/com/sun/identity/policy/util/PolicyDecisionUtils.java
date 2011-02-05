@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.util;
 
 import com.iplanet.sso.SSOException;
@@ -347,7 +350,7 @@ public class PolicyDecisionUtils {
             if ((value == null) || (value.length() == 0)) {
                 return null;
             }
-            StringBuffer sb = new StringBuffer("/UI/Login");
+            StringBuilder sb = new StringBuilder("/UI/Login");
             if (AuthenticateToRealmCondition.
                 AUTHENTICATE_TO_REALM_CONDITION_ADVICE.equals(adviceType)) {
                 sb.append("?realm=").append(value);

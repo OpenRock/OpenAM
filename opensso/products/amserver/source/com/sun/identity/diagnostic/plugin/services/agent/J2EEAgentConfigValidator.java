@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.agent;
 
 import java.util.Properties;
@@ -241,7 +244,7 @@ public class J2EEAgentConfigValidator extends AgentBase implements
         boolean valid = true;
         boolean enable = isCDSSOenabled(agtProp);
         toolOutWriter.printMessage("agt-cdc-enable-check",
-            new String[] {new Boolean(enable).toString()});
+            new String[] {Boolean.valueOf(enable).toString()});
         String nURL = SystemProperties.get(AM_NAMING_URL);
         if (enable) {
             String cdcURL = (String)agtProp.get(AGENT_CDSSO_URL);

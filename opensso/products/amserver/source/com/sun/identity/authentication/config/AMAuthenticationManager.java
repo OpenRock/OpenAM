@@ -26,13 +26,14 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.config;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.security.AdminTokenAction;

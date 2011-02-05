@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.jaxrpc;
 
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.JAXRPCHelper;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;

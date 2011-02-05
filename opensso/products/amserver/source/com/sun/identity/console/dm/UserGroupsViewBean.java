@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -39,7 +42,6 @@ import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.dm.model.UserModel;
-import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.model.CCAddRemoveModel;
 import com.sun.web.ui.view.addremove.CCAddRemove;
 import com.sun.web.ui.view.alert.CCAlert;

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import java.util.Collections;
@@ -356,7 +359,7 @@ class AMObjectImpl implements AMObject {
             throw new AMException(AMSDKBundle.getString("154", locale), "154");
         }
 
-        if (attributeValue.size() == 0) {
+        if (attributeValue.isEmpty()) {
             throw new AMException(AMSDKBundle.getString("155", locale), "155");
         }
 
@@ -420,7 +423,7 @@ class AMObjectImpl implements AMObject {
             }
         }
 
-        if (attributeValue.size() == 0) {
+        if (attributeValue.isEmpty()) {
             throw new AMException(AMSDKBundle.getString("153", locale), "153");
         }
 
@@ -505,7 +508,7 @@ class AMObjectImpl implements AMObject {
                     serviceName, SchemaType.GLOBAL);
 
             if (!set.isEmpty()) {
-                if (serviceAttributeNames.size() == 0) {
+                if (serviceAttributeNames.isEmpty()) {
                     serviceAttributeNames = set;
                 } else {
                     serviceAttributeNames.addAll(set);
@@ -516,7 +519,7 @@ class AMObjectImpl implements AMObject {
                     SchemaType.USER);
 
             if (!set.isEmpty()) {
-                if (serviceAttributeNames.size() == 0) {
+                if (serviceAttributeNames.isEmpty()) {
                     serviceAttributeNames = set;
                 } else {
                     serviceAttributeNames.addAll(set);
@@ -1338,7 +1341,7 @@ class AMObjectImpl implements AMObject {
 
                 String pcFilter = getSearchFilter(AMObject.PEOPLE_CONTAINER);
                 String userFilter = getSearchFilter(AMObject.USER);
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append("(|").append(pcFilter).append(userFilter);
                 sb.append(")");
                 String filter = sb.toString();
@@ -1371,7 +1374,7 @@ class AMObjectImpl implements AMObject {
             case GROUP_CONTAINER:
                 String gcFilter = getSearchFilter(AMObject.GROUP_CONTAINER);
                 String groupFilter = getSearchFilter(AMObject.GROUP);
-                StringBuffer sbf = new StringBuffer();
+                StringBuilder sbf = new StringBuilder();
                 sbf.append("(|").append(gcFilter).append(groupFilter);
                 sbf.append(")");
                 String flt = sbf.toString();
@@ -1687,7 +1690,7 @@ class AMObjectImpl implements AMObject {
                     + mapToString(avPairs));
         }
 
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
 
         filterSB.append("(&").append(
                 constructFilter(namingAttr, objectClassFilter, wildcard));
@@ -1955,7 +1958,7 @@ class AMObjectImpl implements AMObject {
             return objectClassFilter;
         }
 
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
         filterSB.append(objectClassFilter.substring(0, index)).append("*");
 
         int index2 = objectClassFilter.indexOf("%V");
@@ -2008,7 +2011,7 @@ class AMObjectImpl implements AMObject {
     }
 
     protected static String constructFilter(Map avPairs) {
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
         filterSB.append("(&");
 
         Iterator iter = avPairs.keySet().iterator();
@@ -2326,7 +2329,7 @@ class AMObjectImpl implements AMObject {
             return aci;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         while (true) {
             int index = aci.indexOf(macro);
@@ -2395,7 +2398,7 @@ class AMObjectImpl implements AMObject {
             AMSearchControl searchControl) throws AMException, SSOException {
         SSOTokenManager.getInstance().validateToken(token);
 
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
         filterSB.append("(&").append(
                 constructFilter(namingAttr, objectClassFilter, wildcard));
 
@@ -2427,7 +2430,7 @@ class AMObjectImpl implements AMObject {
             SSOException {
         SSOTokenManager.getInstance().validateToken(token);
 
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
 
         filterSB.append("(&").append(
                 constructFilter(namingAttr, objectClassFilter, wildcard));
@@ -2459,7 +2462,7 @@ class AMObjectImpl implements AMObject {
             SSOException {
         SSOTokenManager.getInstance().validateToken(token);
 
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
         filterSB.append("(&").append(constructFilter(objectClassFilter));
 
         if (avfilter != null) {
@@ -2485,7 +2488,7 @@ class AMObjectImpl implements AMObject {
 
     protected Set searchObjects(int[] objectTypes, String wildcard,
             Map avPairs, int level) throws AMException, SSOException {
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
         filterSB.append("(&");
 
         filterSB.append("(|");
@@ -2518,7 +2521,7 @@ class AMObjectImpl implements AMObject {
             SSOException {
         SSOTokenManager.getInstance().validateToken(token);
 
-        StringBuffer filterSB = new StringBuffer();
+        StringBuilder filterSB = new StringBuilder();
         filterSB.append("(&");
 
         filterSB.append("(|");
@@ -3017,7 +3020,7 @@ class AMObjectImpl implements AMObject {
             return;
         }
 
-        if (aciList.size() == 0) {
+        if (aciList.isEmpty()) {
             return;
         }
 
@@ -3203,7 +3206,7 @@ class AMObjectImpl implements AMObject {
      */
     void unassignPolicies(String serviceName, Set policyDNs, boolean toVerify)
             throws AMException, SSOException {
-        if ((policyDNs == null) || (policyDNs.size() == 0)) {
+        if ((policyDNs == null) || (policyDNs.isEmpty())) {
             return;
         }
 
@@ -3267,7 +3270,7 @@ class AMObjectImpl implements AMObject {
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator iter = set.iterator();
 
         while (iter.hasNext()) {
@@ -3319,7 +3322,7 @@ class AMObjectImpl implements AMObject {
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator iter = map.keySet().iterator();
 
         while (iter.hasNext()) {

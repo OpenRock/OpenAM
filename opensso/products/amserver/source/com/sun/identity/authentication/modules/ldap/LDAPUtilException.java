@@ -26,13 +26,13 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.ldap;
 
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
-import com.sun.identity.shared.locale.Locale;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 

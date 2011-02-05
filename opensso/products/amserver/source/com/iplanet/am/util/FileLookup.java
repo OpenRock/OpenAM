@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -497,7 +500,7 @@ public class FileLookup {
      * Build client path based on the client keys.
      */
     private static String buildClientPath(String[] keys, int len) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; i++) {
             sb.append(Constants.FILE_SEPARATOR).append(keys[i]);
         }

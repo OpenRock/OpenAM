@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums.validation;
 
 import java.util.StringTokenizer;
@@ -109,7 +112,7 @@ public class MailAddressValidator implements IValidator {
         int val;
         Character character;
 
-        StringBuffer buf = new StringBuffer(atom);
+        StringBuilder buf = new StringBuilder(atom);
 
         for (int i = 0; i < buf.length(); i++) {
 

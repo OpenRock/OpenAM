@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import java.security.AccessController;
@@ -149,7 +152,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
      * Prints the contents of the cache. For debug purpose only
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n<<<<<<< BEGIN SDK CACHE CONTENTS >>>>>>>>");
         if (!sdkCache.isEmpty()) { // Should never be null
             Enumeration cacheKeys = sdkCache.keys();

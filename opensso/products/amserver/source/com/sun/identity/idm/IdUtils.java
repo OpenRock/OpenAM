@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm;
 
 import com.iplanet.am.sdk.AMDirectoryAccessFactory;
@@ -53,10 +56,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashSet;
@@ -681,7 +680,7 @@ public final class IdUtils {
             }
         }
         // Add to cache
-        orgStatusCache.put(org, new Boolean(isActive));
+        orgStatusCache.put(org, isActive);
         return isActive;
     }
 
@@ -689,7 +688,7 @@ public final class IdUtils {
         // Initialize root realm, if not already initalized
         if (ROOT_SUFFIX == null) {
             ROOT_SUFFIX = SMSEntry.getRootSuffix();
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             sb.append(SMSEntry.SERVICES_RDN)
                 .append(SMSEntry.COMMA).append(ROOT_SUFFIX);
             SERVICES_SUFFIX = DNUtils.normalizeDN(sb.toString());

@@ -25,6 +25,9 @@
 * $Id: IdRemoteEventListener.java,v 1.7 2009/01/28 05:35:00 ww203982 Exp $
 */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.remote;
 
 import java.net.URL;
@@ -226,7 +229,7 @@ public class IdRemoteEventListener {
         }
 
         // Construct the XML document
-        StringBuffer sb = new StringBuffer(nItem.length() + 50);
+        StringBuilder sb = new StringBuilder(nItem.length() + 50);
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(nItem);
         try {
             // The second argument is set to false so that the xml escaped 

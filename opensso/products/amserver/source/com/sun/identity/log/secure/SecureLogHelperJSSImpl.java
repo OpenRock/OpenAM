@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.secure;
 
 import java.io.BufferedInputStream;
@@ -52,11 +55,8 @@ import org.mozilla.jss.pkix.primitive.Attribute;
 import org.mozilla.jss.util.Password;
 
 import com.iplanet.am.util.JSSInit;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.am.util.JSSPasswordCallback;
 import com.sun.identity.security.keystore.AMPassword;
 import com.sun.identity.log.spi.Debug;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 /**
  * A helper implementation class for secure logging that generates 

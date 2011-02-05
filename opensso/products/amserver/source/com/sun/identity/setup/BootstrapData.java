@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.setup;
@@ -256,10 +256,10 @@ public class BootstrapData {
     public String getServerConfigXML(boolean bCrypt)
         throws UnsupportedEncodingException, MalformedURLException {
         boolean first = true;
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(BOOTSTRAP_SERVER_START_TAG);
         String serverBlob = null;
-        StringBuffer serverBuff = new StringBuffer();
+        StringBuilder serverBuff = new StringBuilder();
         int counter = 1;
         
         for (Iterator i = data.iterator(); i.hasNext(); ) {

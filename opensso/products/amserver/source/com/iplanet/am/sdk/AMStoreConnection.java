@@ -26,10 +26,12 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import com.iplanet.am.sdk.common.IDirectoryServices;
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -673,7 +675,7 @@ public final class AMStoreConnection implements AMConstants {
                         .getNamingAttr(AMObject.ORGANIZATION), searchFilter,
                         domainname);
             } else {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append("(|(&").append(searchFilter).append("(").append(
                         AMNamingAttrManager
                                 .getNamingAttr(AMObject.ORGANIZATION)).append(
@@ -1154,7 +1156,7 @@ public final class AMStoreConnection implements AMConstants {
      */
     public AMOrganization createTopOrganization(String orgName, Map avPairs)
             throws AMException, SSOException {
-        StringBuffer orgDNSB = new StringBuffer();
+        StringBuilder orgDNSB = new StringBuilder();
         orgDNSB
                 .append(
                         AMNamingAttrManager
@@ -1777,7 +1779,7 @@ public final class AMStoreConnection implements AMConstants {
                     .getNamingAttr(AMObject.ORGANIZATION), searchFilter,
                     domainname);
         } else {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("(|(&(").append(
                     AMNamingAttrManager.getNamingAttr(AMObject.ORGANIZATION))
                     .append("=").append(domainname).append(")").append(
@@ -1816,7 +1818,7 @@ public final class AMStoreConnection implements AMConstants {
         }
 
         // Construct the DN
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         ArrayList arr = new ArrayList();
         StringTokenizer strtok = new StringTokenizer(orgName, "/");
 

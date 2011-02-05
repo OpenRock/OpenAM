@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMHashMap;
@@ -214,7 +217,7 @@ class CommonUtils {
     }
 
     protected static String mapSetToString(Map map) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (map != null && !map.isEmpty()) {
             Iterator itr = map.keySet().iterator();
             while (itr.hasNext()) {
@@ -230,7 +233,7 @@ class CommonUtils {
     }
 
     protected static String mapByteToString(Map map) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (map != null && !map.isEmpty()) {
             Iterator itr = map.keySet().iterator();
             while (itr.hasNext()) {

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.remote;
 
 import java.net.URL;
@@ -242,7 +245,7 @@ class EventListener {
         }
 
         // Construct the XML document
-        StringBuffer sb = new StringBuffer(nItem.length() + 50);
+        StringBuilder sb = new StringBuilder(nItem.length() + 50);
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(nItem);
         try {
             Map attrs = CreateServiceConfig.getAttributeValuePairs(SMSSchema

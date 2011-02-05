@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -36,7 +38,6 @@ import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.cli.CLIConstants;
-import com.sun.identity.common.Constants;
 import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.idm.AMIdentity;
@@ -49,7 +50,6 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.SSOServerRealmInfo;
 import com.sun.identity.monitoring.SSOServerMonConfig;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -229,7 +229,7 @@ public class ConfigMonitoring {
 
     private void getAllRealms(String startRealm) {
         String classMethod = "ConfigMonitoring.getAllRealms: ";
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
             sb.append("orgnames starting from ").append(startRealm).
             append(":\n").append("  ").append(startRealm).append("\n");
@@ -344,7 +344,7 @@ public class ConfigMonitoring {
      */
     private void getAllRealmsSpecific(String startRealm) {
         String classMethod = "ConfigMonitoring.getAllRealmsSpecific: ";
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
             sb.append("orgnames starting from ").append(startRealm).
                 append(":\n").append("  ").append(startRealm).append("\n");
@@ -515,7 +515,7 @@ public class ConfigMonitoring {
                     // get auth modules
                     Set insts = getAuthModules(currentRealmAMIdName);
                     if (debug.messageEnabled()) {
-                        StringBuffer sb3 = new StringBuffer(ss);
+                        StringBuilder sb3 = new StringBuilder(ss);
                         sb3.append(" has ").append(insts.size()).
                             append(" auth modules:\n");
                         for (Iterator it4 = insts.iterator(); it4.hasNext(); ){
@@ -627,7 +627,7 @@ public class ConfigMonitoring {
             return;
         }
 
-        StringBuffer sb = new StringBuffer(classMethod);
+        StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
             sb.append("number of AgentTypes = ").append(agents.size()).
                 append(":\n");
@@ -869,7 +869,7 @@ public class ConfigMonitoring {
                     String attrName = (String)it.next();
                     sb.append("           ").append(attrName).append(" = ");
                     Set attrv2 = (Set)amap.get(attrName);
-                    if (attrv2.size() == 0) {
+                    if (attrv2.isEmpty()) {
                         sb.append("NONE");
                     } else {
                         Iterator iu = attrv2.iterator();

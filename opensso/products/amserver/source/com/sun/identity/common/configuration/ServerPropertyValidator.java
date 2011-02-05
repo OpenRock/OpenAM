@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common.configuration;
 
 import com.sun.identity.sm.ServiceAttributeValidator;
@@ -156,7 +159,7 @@ public class ServerPropertyValidator implements ServiceAttributeValidator{
                 throw new UnknownPropertyNameException("unknown.property",
                     param);
             } else {
-                StringBuffer keys = new StringBuffer();
+                StringBuilder keys = new StringBuilder();
                 boolean first = true;
                 for (Iterator i = unknownProperyNames.iterator(); i.hasNext();){
                     if (first){

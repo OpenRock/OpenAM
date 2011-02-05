@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import com.iplanet.am.util.SystemProperties;
@@ -45,6 +48,7 @@ import com.sun.identity.security.ServerInstanceAction;
 import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -957,10 +961,7 @@ public class DataLayer implements java.io.Serializable {
             
             constraints = conn.getSearchConstraints();
             LDAPControl[] existingCtrls = constraints.getServerControls();
-
-            for (int i = 0; i < existingCtrls.length; i++) {
-                ctrls.add(existingCtrls[i]);
-            }
+            ctrls.addAll(Arrays.asList(existingCtrls));
 
             // This should be 0 if intermediate results are not needed,
             // and 1 if results are to be processed as they come in.
@@ -1574,7 +1575,7 @@ public class DataLayer implements java.io.Serializable {
             // Set the default options too for failover and fallback features.
 
             connOptions.put("maxbacklog", new Integer(maxBackLog));
-            connOptions.put("referrals", new Boolean(referrals));
+            connOptions.put("referrals", Boolean.valueOf(referrals));
             connOptions.put("searchconstraints", _defaultSearchConstraints);
 
             ShutdownManager shutdownMan = ShutdownManager.getInstance();

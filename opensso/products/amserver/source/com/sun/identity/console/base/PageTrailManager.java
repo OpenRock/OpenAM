@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import com.sun.identity.shared.debug.Debug;
@@ -151,7 +154,7 @@ public class PageTrailManager
      * @return random string.
      */
     private static String getRandomString() {
-        StringBuffer sb = new StringBuffer(30);
+        StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
         sb.append(System.currentTimeMillis());

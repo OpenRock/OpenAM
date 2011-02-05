@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.sun.identity.console.base.model.AMAdminUtils;
@@ -137,7 +140,7 @@ public class IPConditionHelper {
         String propName,
         AMPropertySheetModel propertySheetModel
     ) {
-        StringBuffer buff = new StringBuffer(20);
+        StringBuilder buff = new StringBuilder(20);
         for (int i = 1; i < 5; i++) {
             if (i > 1) {
                 buff.append(".");

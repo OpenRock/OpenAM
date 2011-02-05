@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -532,9 +532,9 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     }
     
     protected String printNames(Class[] interfaces) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < interfaces.length; i++) {
-            buffer.append("i=" + interfaces[i].getName());
+            buffer.append("i=").append(interfaces[i].getName());
         }
         
         return buffer.toString();
@@ -543,24 +543,24 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("Attributes       : " + internalAttributes)
-              .append("Charcter encoding: " + characterEncoding)
-              .append("Content length   : " + contentLength)
-              .append("Content type     : " + contentType)
-              .append("Parameters       : " + internalParamererMap)
-              .append("Protocol         : " + protocol)
-              .append("Scheme           : " + scheme)
-              .append("Server name      : " + serverName)
-              .append("Server port      : " + serverPort)
-              .append("Remote host      : " + remoteHost)
-              .append("Remote addr      : " + remoteAddr)
-              .append("Locale           : " + locale)
-              .append("Locales          : " + locales)
-              .append("IsSecure         : " + isSecure)
-              .append("Local name       : " + localName)
-              .append("Local addr       : " + localAddr)
-              .append("Local port       : " + localPort)
-              .append("Remote port      : " + remotePort);
+        buffer.append("Attributes       : ").append(internalAttributes)
+                .append("Charcter encoding: ").append(characterEncoding)
+                .append("Content length   : ").append(contentLength)
+                .append("Content type     : ").append(contentType)
+                .append("Parameters       : ").append(internalParamererMap)
+                .append("Protocol         : ").append(protocol)
+                .append("Scheme           : ").append(scheme)
+                .append("Server name      : ").append(serverName)
+                .append("Server port      : ").append(serverPort)
+                .append("Remote host      : ").append(remoteHost)
+                .append("Remote addr      : ").append(remoteAddr)
+                .append("Locale           : ").append(locale)
+                .append("Locales          : ").append(locales)
+                .append("IsSecure         : ").append(isSecure)
+                .append("Local name       : ").append(localName)
+                .append("Local addr       : ").append(localAddr)
+                .append("Local port       : ").append(localPort)
+                .append("Remote port      : ").append(remotePort);
 
         return buffer.toString();
     }

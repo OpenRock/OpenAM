@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import java.io.BufferedReader;
@@ -89,7 +92,7 @@ public final class Resource {
      */
 
     public static String read(Reader aReader) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             BufferedReader bReader = new BufferedReader(aReader);
             char[] data = new char[2048];

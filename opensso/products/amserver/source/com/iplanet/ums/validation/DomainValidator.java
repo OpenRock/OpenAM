@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums.validation;
 
 import java.util.StringTokenizer;
@@ -82,7 +85,7 @@ public class DomainValidator implements IValidator {
         char ch;
         Character character;
 
-        StringBuffer buf = new StringBuffer(dp);
+        StringBuilder buf = new StringBuilder(dp);
 
         // subdomain can not start or end with a hyphen
         if (buf.charAt(0) == '-' || buf.charAt(buf.length() - 1) == '-') {

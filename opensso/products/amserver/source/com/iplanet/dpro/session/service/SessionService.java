@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
-
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -2256,7 +2255,7 @@ public class SessionService {
      */
     private String getClusterServerList() {
 
-        StringBuffer clusterServerList = new StringBuffer();
+        StringBuilder clusterServerList = new StringBuilder();
         Set serverIDs = clusterMemberMap.keySet();
         for (Iterator m = serverIDs.iterator(); m.hasNext();) {
             String serverID = (String) m.next();
@@ -2287,7 +2286,7 @@ public class SessionService {
             boolean remoteURLExists = false;
             Map urls = session.getSessionEventURLs();
             // CHECK THE GLOBAL URLS FIRST
-            if (sessionService.sessionEventURLs.size() != 0) {
+            if (!sessionService.sessionEventURLs.isEmpty()) {
                 Enumeration aenum = sessionService.sessionEventURLs.elements();
 
                 SessionNotification snGlobal = new SessionNotification(session
@@ -2316,7 +2315,7 @@ public class SessionService {
             }
 
             // CHECK THE INDVIDUAL URL LIST
-            if (urls.size() != 0) {
+            if (!urls.isEmpty()) {
                 synchronized (urls) {
 
                     Iterator iter = urls.entrySet().iterator();
@@ -2355,7 +2354,7 @@ public class SessionService {
          */
         public void run() {
             Map urls = session.getSessionEventURLs();
-            if (sessionService.sessionEventURLs.size() != 0) {
+            if (!sessionService.sessionEventURLs.isEmpty()) {
 
                 SessionNotification snGlobal = new SessionNotification(session
                         .toSessionInfo(), eventType, System.currentTimeMillis());
@@ -2384,7 +2383,7 @@ public class SessionService {
                 }
             }    
                 // CHECK THE INDIVIDUAL URLS LIST
-            if(urls.size() != 0) {
+            if(!urls.isEmpty()) {
                 synchronized (urls) {
                     Iterator iter = urls.entrySet().iterator();
                     while (iter.hasNext()) {

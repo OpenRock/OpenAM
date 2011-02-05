@@ -25,11 +25,10 @@
  * $Id: Attribute.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.radius.client;
-import java.util.*;
-import java.math.*;
-import java.security.*;
-import java.net.*;
 import java.io.*;
 
 public abstract class Attribute

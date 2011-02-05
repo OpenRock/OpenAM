@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.property;
 
 import com.sun.identity.console.base.model.AMModel;
@@ -688,7 +691,7 @@ public abstract class PropertyXMLBuilderBase
         String escaped = null;
 
         if ((text != null) && (text.trim().length() > 0)) {
-            StringBuffer sb = new StringBuffer(text.length());
+            StringBuilder sb = new StringBuilder(text.length());
             int len = text.length();
 
             for (int i = 0; i < len; i++) {
@@ -788,7 +791,7 @@ public abstract class PropertyXMLBuilderBase
         String attrName,
         Set choices
     ) {
-        StringBuffer xml = new StringBuffer();
+        StringBuilder xml = new StringBuilder();
         Set sorted = new TreeSet();
         if ((choices != null) && !choices.isEmpty()) {
             for (Iterator iter = choices.iterator(); iter.hasNext(); ) {

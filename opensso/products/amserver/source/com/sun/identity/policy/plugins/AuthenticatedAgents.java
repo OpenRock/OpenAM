@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import java.util.Collections;
@@ -45,8 +47,6 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;

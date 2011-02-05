@@ -25,6 +25,9 @@
  * $Id: AMTuneUtil.java,v 1.14 2009/05/04 23:34:10 ykwon Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.util;
 
 import com.sun.identity.tune.common.FileHandler;
@@ -589,7 +592,7 @@ import java.util.zip.ZipOutputStream;
             }
             if (exitValue != 0 && errorOccured){
                 //In some cases original error code may be used by calling func.
-                resultBuffer.append("\n Exit value:" + exitValue);
+                resultBuffer.append("\n Exit value:").append(exitValue);
                 throw new AMTuneException(AMTuneUtil.getResourceBundle()
                         .getString("pt-error-cmd-error"));
             } 
@@ -990,7 +993,7 @@ import java.util.zip.ZipOutputStream;
           }
           String[] arr = new String[matList.size()];
           for (i = 0; i < matList.size(); i++) {
-              arr[i] = new String(matList.get(i).toString());
+              arr[i] = matList.get(i).toString();
           }
           return arr;
       }
@@ -1452,7 +1455,7 @@ import java.util.zip.ZipOutputStream;
     public static void validatePwdFilePermissions(String fileName)
     throws AMTuneException {
         if (System.getProperty("path.separator").equals(":")) {
-            StringBuffer lsCmd = new StringBuffer("/bin/ls");
+            StringBuilder lsCmd = new StringBuilder("/bin/ls");
             lsCmd.append(" -l ");
             lsCmd.append(fileName);
             StringBuffer rBuf = new StringBuffer();

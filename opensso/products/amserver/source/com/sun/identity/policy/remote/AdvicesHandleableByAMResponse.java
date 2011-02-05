@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.remote;
 
-import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyUtils;
 import java.util.Set;
 import org.w3c.dom.Node;
@@ -119,7 +121,7 @@ public class AdvicesHandleableByAMResponse {
      * @return a XML string representation of this object.
      */
     public String toXMLString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(LT).append( ADVICES_HANDLEABLE_BY_AM_RESPONSE)
                 .append(">").append(NEW_LINE);
         sb.append(PolicyUtils.attributeValuePairToXMLString(

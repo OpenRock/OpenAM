@@ -26,19 +26,18 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.UI.taglib;
 
 import javax.servlet.jsp.JspException;
 import com.iplanet.jato.taglib.html.FormTag;
 import com.iplanet.jato.util.NonSyncStringBuffer;
-import com.sun.identity.authentication.UI.CallBackTiledView;
 import com.sun.identity.authentication.UI.AuthViewBeanBase;
 import com.iplanet.jato.view.ViewBean;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.Iterator;
 
 /**

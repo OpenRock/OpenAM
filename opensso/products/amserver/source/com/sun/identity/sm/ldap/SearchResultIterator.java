@@ -25,6 +25,9 @@
  * $Id: SearchResultIterator.java,v 1.2 2009/04/02 20:22:43 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.ldap;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -35,6 +38,7 @@ import com.sun.identity.shared.ldap.LDAPEntry;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.sm.SMSDataEntry;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -114,10 +118,7 @@ public class SearchResultIterator implements Iterator {
                 if (attr != null) {
                     Set values = new HashSet();
                     String[] value = attr.getStringValueArray();
-
-                    for (int i = 0; i < value.length; i++) {
-                        values.add(value[i]);
-                    }
+                    values.addAll(Arrays.asList(value));
                     if (answer == null) {
                         answer = new CaseInsensitiveHashMap(10);
                     }

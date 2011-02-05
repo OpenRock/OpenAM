@@ -26,11 +26,10 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.spi;
-
-import com.sun.identity.log.spi.Debug;
 
 /**
  *  DSAME Implementation of the result of a Verifier Output.

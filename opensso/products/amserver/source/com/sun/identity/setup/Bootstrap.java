@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.AdminUtils;
@@ -326,7 +329,7 @@ public class Bootstrap {
         String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
         String bootstrapFile = baseDir + "/" + AMSetupServlet.BOOTSTRAP_EXTRA;
         List urls = readFile(bootstrapFile);
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (Iterator i = urls.iterator(); i.hasNext(); ) {
             String url = (String)i.next();
             buff.append(modifyDSAMEUserPassword(url, password)).append("\n");

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import com.sun.identity.entitlement.opensso.PrivilegeUtils;
@@ -427,7 +430,7 @@ public final class PolicyManager {
         getPolicy(policyName);
 
         // Policy is present, construct the DN and return
-        StringBuffer answer = new StringBuffer(100);
+        StringBuilder answer = new StringBuilder(100);
         answer.append("ou=");
         answer.append(policyName);
         answer.append(",ou=");

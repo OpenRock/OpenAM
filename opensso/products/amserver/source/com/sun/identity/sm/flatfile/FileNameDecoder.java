@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
 import java.io.UnsupportedEncodingException;
@@ -90,7 +93,7 @@ public class FileNameDecoder {
 
         boolean needToChange = false;
         int numChars = s.length();
-        StringBuffer sb = new StringBuffer(numChars > 500 ? numChars / 2
+        StringBuilder sb = new StringBuilder(numChars > 500 ? numChars / 2
                 : numChars);
         int i = 0;
 

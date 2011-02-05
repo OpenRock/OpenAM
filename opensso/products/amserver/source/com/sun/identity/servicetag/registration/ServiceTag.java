@@ -34,11 +34,12 @@
  * holder.
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.servicetag.registration;
 
-import java.util.Date;
 import java.util.UUID;
-import java.util.Map;
 import java.util.Date;
 import java.util.Properties;
 import java.util.List;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import java.io.File;
 
 import com.sun.scn.servicetags.SvcTag;
 

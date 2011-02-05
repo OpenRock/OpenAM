@@ -26,21 +26,18 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.share.SessionBundle;
 import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +45,6 @@ import java.util.Map;
 import javax.jms.IllegalStateException;
 import com.sun.identity.ha.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
-import com.sun.identity.ha.jmqdb.FAMRecordJMQPersister;
 import com.sun.identity.ha.FAMPersisterManager;
 
 /**

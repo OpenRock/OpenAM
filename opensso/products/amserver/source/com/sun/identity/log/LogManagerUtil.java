@@ -26,14 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log;
 
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Enumeration;
-import java.util.logging.LogManager;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.ShutdownListener;

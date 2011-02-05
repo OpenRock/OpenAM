@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.util;
 
 import java.util.Enumeration;
@@ -95,14 +98,14 @@ public class CreateXmlTree {
      */
 
     public static String parseAttValue(String s) {
-        if ((s == null) || (s == "")) {
+        if ((s == null) || (s.equals(""))) {
             return s;
         }
         char dquote = '\"';
         char quote = '\'';
         int i;
 
-        StringBuffer sb = new StringBuffer(s);
+        StringBuilder sb = new StringBuilder(s);
 
         while ((i = s.indexOf(quote)) != -1) {
             sb.replace(i, i + 1, "&apos;");

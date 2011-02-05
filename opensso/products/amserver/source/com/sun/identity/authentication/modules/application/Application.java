@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.application;
 
 import java.security.AccessController;
@@ -43,7 +44,6 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.modules.ldap.LDAPAuthUtils;
 import com.sun.identity.authentication.modules.ldap.LDAPUtilException;

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm.model;
  
 import com.iplanet.am.sdk.AMAssignableDynamicGroup;
@@ -44,10 +47,8 @@ import com.iplanet.am.sdk.AMSearchControl;
 import com.iplanet.am.sdk.AMSearchResults;
 import com.iplanet.am.sdk.AMStaticGroup;
 import com.iplanet.am.sdk.AMStoreConnection;
-import com.iplanet.am.sdk.AMTemplate;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.common.admin.AdminInterfaceUtils;
-import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.property.PropertyTemplate;
 import com.sun.identity.console.property.PropertyXMLBuilder;
@@ -57,15 +58,11 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import com.sun.identity.shared.ldap.util.DN;
 
@@ -397,7 +394,7 @@ public class SearchModelImpl extends DMModelBase
         String attributes = getPropertyXML(DMConstants.ENTRY_SPECIFIC_SERVICE,
             SUB_SCHEMA_GROUP, SchemaType.GLOBAL, false);
 
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG)
             .append(START_SECTION)
@@ -456,7 +453,7 @@ public class SearchModelImpl extends DMModelBase
      * @return sub realm creation property XML.
      */  
     public String getSearchXML() {
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG)
             .append(START_SECTION)
@@ -918,7 +915,7 @@ public class SearchModelImpl extends DMModelBase
             Set value = (Set)mapEntry.getValue();
             if (value == null || value.isEmpty()) {
                 if (key.equals(USER_SERVICE_UID)) {
-                    avBuf.append("(" + key + "=*)");
+                    avBuf.append("(").append(key).append("=*)");
                 }
                 continue;
             }
@@ -957,7 +954,7 @@ public class SearchModelImpl extends DMModelBase
                             .append(val)
                             .append(")");
                     } else if (key.equals(USER_SERVICE_UID)) {
-                        avBuf.append("(" + USER_SERVICE_UID + "=*)");
+                        avBuf.append('(').append(USER_SERVICE_UID).append("=*)");
                     }
                 }
 	    }
@@ -967,7 +964,7 @@ public class SearchModelImpl extends DMModelBase
             }
         }
 
-        StringBuffer avFilter = new StringBuffer(100);
+        StringBuilder avFilter = new StringBuilder(100);
         if (avBuf.length() != 0) {
             // add the & or | only if there is more than one av pair
             if (avPairs.size() > 1) {
@@ -977,7 +974,7 @@ public class SearchModelImpl extends DMModelBase
                 } else {
                     avFilter.append("(|");
                 }
-                avFilter.append(avBuf + ")");
+                avFilter.append(avBuf).append(")");
             } else {
                 avFilter.append(avBuf);
             }

@@ -25,7 +25,9 @@
  * $Id: AMTuneLogger.java,v 1.2 2008/08/29 10:13:08 kanduls Exp $
  */
 
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.common;
 
 import com.sun.identity.tune.constants.AMTuneConstants;
@@ -127,7 +129,7 @@ public class AMTuneLogger {
     public void logException(String methodName, Throwable th) {
         String prefix = this.dateFormat.format(new Date())
                         + ": " + Thread.currentThread().toString();
-        StringBuffer buf = new StringBuffer(prefix);
+        StringBuilder buf = new StringBuilder(prefix);
         buf.append("\n");
         if(th != null) {
             buf.append('\n');

@@ -26,19 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.logdoc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class LogMessagesFormatter {
 
     private void generateHTMLFiles()
         throws IOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (LogMessages lm : logMessages) {
             String htmlpage = lm.getName() + ".html";
             String link = LogHtmlTemplate.indexLink.replaceAll(
@@ -148,7 +149,7 @@ public class LogMessagesFormatter {
         try {
             reader = new BufferedReader(new FileReader(new
                 File(fileName))); 
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             String line = reader.readLine();
 
             while (line != null) {

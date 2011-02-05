@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import com.iplanet.am.util.SystemProperties;
@@ -78,7 +81,7 @@ public final class AMConsoleConfig {
         if (!IS_CONSOLE_REMOTE) {
             String host = req.getHeader("Host");
             if (host != null) {
-                StringBuffer sb = new StringBuffer(200);
+                StringBuilder sb = new StringBuilder(200);
                                                                                 
                 String protocol = RequestUtils.getRedirectProtocol(
                     req.getScheme(), host);

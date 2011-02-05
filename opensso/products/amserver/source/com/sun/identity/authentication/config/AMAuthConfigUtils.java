@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.config;
 
 import com.iplanet.sso.SSOException;
@@ -279,15 +280,15 @@ public class AMAuthConfigUtils {
         if (debug.messageEnabled()) {
             debug.message("convertToXMLString : " + configs.toString());
         }
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         Iterator it = configs.iterator();
         if (it != null) {
-            sb.append("<" + ATTR_VALUE_PAIR_NODE + ">");
+            sb.append('<').append(ATTR_VALUE_PAIR_NODE).append('>');
             while (it.hasNext()) {
-                sb.append("<" + ATTR_VALUE_NODE + ">" + it.next() +
-                    "</" + ATTR_VALUE_NODE + ">");
+                sb.append('<').append(ATTR_VALUE_NODE).append('>').append(it.next()).
+                        append("</").append(ATTR_VALUE_NODE).append('>');
             }
-            sb.append("</" + ATTR_VALUE_PAIR_NODE + ">");
+            sb.append("</").append(ATTR_VALUE_PAIR_NODE).append('>');
         }
         if (debug.messageEnabled()) {
             debug.message("convertToXMLString : return " + sb.toString());
@@ -822,22 +823,22 @@ public class AMAuthConfigUtils {
             debug.message("convertToXMLString : " + entries);
         }
         if (entries != null) {
-            StringBuffer sb = new StringBuffer(100);
-            sb.append("<" + ATTR_VALUE_PAIR_NODE + ">");
+            StringBuilder sb = new StringBuilder(100);
+            sb.append('<').append(ATTR_VALUE_PAIR_NODE).append('>');
             int len = entries.size();
             for (int i = 0; i < len; i++) {
                 AuthConfigurationEntry entry = 
                     (AuthConfigurationEntry)entries.get(i);
-                sb.append("<").append(ATTR_VALUE_NODE).append(">")
-                  .append(entry.getLoginModuleName()).append(" ")
-                  .append(entry.getControlFlag().toString()).append(" ");
+                sb.append('<').append(ATTR_VALUE_NODE).append('>')
+                  .append(entry.getLoginModuleName()).append(' ')
+                  .append(entry.getControlFlag().toString()).append(' ');
                 String options = entry.getOptions();
                 if (options != null) {
                   sb.append(options.toString());
                 }
-                sb.append("</").append(ATTR_VALUE_NODE).append(">");
+                sb.append("</").append(ATTR_VALUE_NODE).append('>');
             }
-            sb.append("</" + ATTR_VALUE_PAIR_NODE + ">");
+            sb.append("</").append(ATTR_VALUE_PAIR_NODE).append('>');
             if (debug.messageEnabled()) {
                 debug.message("convertToXMLString : return " + sb.toString());
             }

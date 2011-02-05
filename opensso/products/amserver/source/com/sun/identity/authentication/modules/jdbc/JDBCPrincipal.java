@@ -26,10 +26,11 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package  com.sun.identity.authentication.modules.jdbc;
 
-import java.io.IOException;
 import java.security.Principal;
 
 public class JDBCPrincipal implements Principal, java.io.Serializable {

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.log.s1is;
@@ -285,7 +285,7 @@ public class LogConfigReader implements ServiceListener{
         try {
             key = LogConstants.LOG_FIELDS;
             set = (Set) logAttributes.get(key);
-            if ((set != null) && (set.size()!=0)) {
+            if ((set != null) && (!set.isEmpty())) {
                 it = set.iterator();
                 tempBuffer = new StringBuilder();
                 tempBuffer.append((String) it.next());

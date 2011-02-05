@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.logdoc;
 
 import java.io.IOException;
@@ -75,7 +78,7 @@ public class LogMessages {
     }
 
     private String getOptions() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (LogMessage m : messages) {
             buff.append(LogHtmlTemplate.option.replaceAll("@id@",
                 prefix + "-" + m.getID()));
@@ -84,7 +87,7 @@ public class LogMessages {
     }
 
     private String getMessagesHtml() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (LogMessage m : messages) {
             buff.append(m.getHTML(prefix));
         }
@@ -147,7 +150,7 @@ public class LogMessages {
                 return "&nbsp;";
             }
 
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             for (String s : list) {
                 buff.append(s).append("<br />");
             }

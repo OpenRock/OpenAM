@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.Set;
@@ -1045,7 +1046,7 @@ public class PolicyEvaluator {
         SSOToken token, String rootResource)  
         throws SSOException, PolicyException 
     {
-        if ( (rootResource == null) || (rootResource == "") ) {
+        if ( (rootResource == null) || (rootResource.equals("")) ) {
             rootResource = EMPTY_RESOURCE_NAME;
         }
         Set protectedResources = new HashSet();
@@ -1252,7 +1253,7 @@ public class PolicyEvaluator {
                 .append(orgsToVisit.toString())
                 .toString() );
         }
-        while (orgsToVisit.size() != 0 ) {
+        while (!orgsToVisit.isEmpty() ) {
             String orgToVisit = (String) orgsToVisit.iterator().next();
             orgsToVisit.remove(orgToVisit);
             visitedOrgs.add(orgToVisit);
@@ -1677,7 +1678,7 @@ public class PolicyEvaluator {
 
         ResourceResult resourceResult = null;
 
-        if ( (resourceName == null) || (resourceName == "") ) {
+        if ( (resourceName == null) || (resourceName.equals("")) ) {
             resourceName = Rule.EMPTY_RESOURCE_NAME;
         }
         resourceName = serviceType.canonicalize(resourceName);
@@ -2037,7 +2038,7 @@ public class PolicyEvaluator {
          }
 
          orgsToVisit.removeAll(visitedOrgs);
-         while (orgsToVisit.size() != 0 ) {
+         while (!orgsToVisit.isEmpty() ) {
              String orgToVisit = (String) orgsToVisit.iterator().next();
              orgsToVisit.remove(orgToVisit);
              visitedOrgs.add(orgToVisit);
@@ -2276,7 +2277,7 @@ public class PolicyEvaluator {
 
         Cache resourceNamesCache    
                 = (Cache)resourceNamesMap.get(serviceTypeName);
-        if ((resourceNamesCache == null) || (resourceNamesCache.size() == 0)) {
+        if ((resourceNamesCache == null) || (resourceNamesCache.isEmpty())) {
             return;
         }
         try {

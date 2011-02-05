@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -76,7 +79,7 @@ class PluginSchemaImpl extends ServiceSchemaImpl {
         this.version = version;
         this.name = pluginName;
         this.interfaceName = interfaceName;
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         // Construct the DN and get CachedSMSEntry
         sb.append("ou=").append(pluginName).append(",").append("ou=").append(
                 interfaceName).append(",").append(
@@ -255,7 +258,7 @@ class PluginSchemaImpl extends ServiceSchemaImpl {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         if (getName() != null) {
             sb.append("Plugin Schema name: ").append(getName()).append("\n");
         }
@@ -315,7 +318,7 @@ class PluginSchemaImpl extends ServiceSchemaImpl {
             String version, String pluginName, String iName, String orgName)
             throws SMSException {
         String oName = DNMapper.orgNameToDN(orgName);
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(oName).append(iName).append(pluginName).append(serviceName)
                 .append(version);
         String cName = sb.toString().toLowerCase();

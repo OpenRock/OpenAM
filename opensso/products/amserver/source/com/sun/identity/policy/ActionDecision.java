@@ -26,12 +26,12 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.util.Map;
 import java.util.HashMap;
@@ -226,10 +226,10 @@ public class ActionDecision {
      * @supported.api
      */
      public String toXML() {
-        StringBuffer sb  = new StringBuffer(300);
+        StringBuilder sb  = new StringBuilder(300);
         sb.append("<").append(ACTION_DECISION).append(" ");
         sb.append(TIME_TO_LIVE).append("=").append(
-            PolicyUtils.quote(timeToLive) + ">");
+                PolicyUtils.quote(timeToLive)).append(">");
         sb.append(PolicyUtils.CRLF);
         sb.append(PolicyUtils.attributeValuePairToXMLString(getActionName(), 
             values));

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.idm.model;
 
 import com.iplanet.sso.SSOException;
@@ -1844,7 +1847,7 @@ public class EntitiesModelImpl
                 return false;
             }
             Set names = cfg.getSubConfigNames();
-            if (names == null || names.size() == 0) {
+            if (names == null || names.isEmpty()) {
                 return false;
             }
             return true;

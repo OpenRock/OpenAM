@@ -26,30 +26,19 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.UI.taglib;
 
 import com.iplanet.jato.CompleteRequestException;
-import com.iplanet.jato.model.Model;
 import com.iplanet.jato.taglib.DisplayFieldTagBase;
 import com.iplanet.jato.util.NonSyncStringBuffer;
-import com.iplanet.jato.view.CommandField;
-import com.iplanet.jato.view.ContainerView;
-import com.iplanet.jato.view.DisplayField;
-import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.ViewBean;
-import com.iplanet.jato.view.ViewBeanBase;
-import com.iplanet.jato.view.html.HREF;
-import com.iplanet.jato.view.html.HtmlDisplayField;
 import com.sun.identity.authentication.UI.AuthViewBeanBase;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.shared.locale.Locale;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTag;

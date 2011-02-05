@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import com.sun.identity.policy.interfaces.Subject;
@@ -1680,7 +1682,7 @@ public class Policy implements Cloneable {
             String resourceName, Set actionNames) throws NameNotFoundException {
         String resourceTypeName = resourceType.getName();
         Map answer = null;
-        StringBuffer cacheKeyBuffer = new StringBuffer(100);
+        StringBuilder cacheKeyBuffer = new StringBuilder(100);
         String cacheKey = cacheKeyBuffer.append(resourceTypeName)
                 .append(resourceName).append(actionNames).toString();
         answer = (Map) matchRulesResultsCache.get(cacheKey);
@@ -1770,7 +1772,7 @@ public class Policy implements Cloneable {
                     resourceNames.add(ruleResource);
                 } 
             if ( DEBUG.messageEnabled() ) {
-                StringBuffer sb = new StringBuffer(200);
+                StringBuilder sb = new StringBuilder(200);
                 sb.append("at Policy.getResourceNames : ");
                 sb.append(" for policyName, serviceType, resourceName, ");
                 sb.append(" ruleResource, resourceMatch :");
@@ -1787,7 +1789,7 @@ public class Policy implements Cloneable {
             resourceNames.addAll(rResourceNames);
         }
         if ( DEBUG.messageEnabled() ) {
-            StringBuffer sb = new StringBuffer(200);
+            StringBuilder sb = new StringBuilder(200);
             sb.append("at Policy.getResourceNames : ");
             sb.append(" for policyName, serviceType, resourceName, ");
             sb.append(" followReferral, resourceNames :");
@@ -1851,7 +1853,7 @@ public class Policy implements Cloneable {
             Referral referral = (Referral) referrals.getReferral(referralName);
             if ( referral instanceof OrgReferral ) {
                 Set values = referral.getValues();
-                if ( (values != null) && (values.size() != 0) ) {
+                if ( (values != null) && (!values.isEmpty()) ) {
                     String orgName = (String) values.iterator().next();
                     referredToOrgs.add(orgName.toLowerCase());
                 }

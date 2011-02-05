@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -174,7 +177,7 @@ public class PageTrail
     }
 
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (Iterator iter = trail.iterator(); iter.hasNext(); ) {
             Marker m = (Marker)iter.next();
             buff.append(m.toString());

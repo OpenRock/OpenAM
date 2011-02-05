@@ -25,6 +25,9 @@
  * $Id: TuneDS6Impl.java,v 1.4 2008/08/29 10:25:40 kanduls Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.impl;
 
 import com.sun.identity.tune.base.AMTuneDSBase;
@@ -156,7 +159,7 @@ public class TuneDS6Impl extends AMTuneDSBase {
             if (configInfo.isReviewMode()) {
                 return;
             }
-            pLogger.log(Level.FINE, "tuneUsingDSE", "Modify dse.ldif");;
+            pLogger.log(Level.FINE, "tuneUsingDSE", "Modify dse.ldif");
             if (curDBHomeLocation.equals(newDBHomeLocation)) {
                 pLogger.log(Level.INFO, "tuneUsingDSE",
                         "Current DB Location is " +

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.reports;
 
 import java.io.BufferedReader;
@@ -104,7 +107,7 @@ public class ServerReportService implements ToolConstants,
         try {
             Map validatorMap = (HashMap)getValidators();
             for (Iterator j = commandSet.iterator(); j.hasNext();) {
-                String cmd = ((String)j.next()).toLowerCase();;
+                String cmd = ((String)j.next()).toLowerCase();
                 String path = getBootFileName(
                     (String)params.get(CONFIG_DIR), cmd);
                 if (!path.toLowerCase().contains("agent")) {

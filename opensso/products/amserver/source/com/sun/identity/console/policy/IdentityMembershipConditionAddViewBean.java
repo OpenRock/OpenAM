@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -33,26 +36,17 @@ import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.policy.model.PolicyModel;
 import com.sun.identity.console.policy.model.IdentitySubjectModel;
 import com.sun.identity.console.policy.model.IdentitySubjectModelImpl;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.policy.PolicyUtils;
 import com.sun.web.ui.view.addremove.CCAddRemove;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCDropDownMenu;
 import com.sun.web.ui.view.html.CCTextField;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;

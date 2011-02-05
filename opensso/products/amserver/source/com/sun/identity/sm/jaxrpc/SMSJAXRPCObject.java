@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.jaxrpc;
 
 import java.net.URL;
@@ -565,7 +568,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
     static String toMods(ModificationItem[] mods) throws SMSException {
         if (mods == null)
             return (null);
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<Modifications size=\"");
         sb.append(mods.length);
         sb.append("\">");

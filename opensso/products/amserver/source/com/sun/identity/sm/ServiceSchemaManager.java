@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -717,7 +720,7 @@ public class ServiceSchemaManager {
         if ((interfaceName == null) || (interfaceClass == null)) {
             throw (new IllegalArgumentException());
         }
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<").append(SMSUtils.PLUGIN_INTERFACE).append(" ").append(
             SMSUtils.NAME).append("=\"").append(interfaceName)
             .append("\" ").append(SMSUtils.PLUGIN_INTERFACE_CLASS).append(
@@ -772,7 +775,7 @@ public class ServiceSchemaManager {
         SMSEntry.validateToken(token);
         validate();
         // Construct the DN to get CachedSubEntries
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("ou=").append(interfaceName).append(",").append(
             CreateServiceConfig.PLUGIN_CONFIG_NODE).append("ou=").append(
             version).append(",").append("ou=").append(serviceName).append(

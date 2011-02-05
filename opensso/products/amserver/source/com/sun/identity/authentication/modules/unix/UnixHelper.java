@@ -26,13 +26,13 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.unix;
 
 import java.io.*;
 import java.net.*;
-import java.text.*;
 import java.util.*;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.shared.debug.Debug;

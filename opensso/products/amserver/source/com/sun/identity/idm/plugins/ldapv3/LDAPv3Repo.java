@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.plugins.ldapv3;
 
 import java.io.UnsupportedEncodingException;
@@ -772,7 +775,7 @@ public class LDAPv3Repo extends IdRepo {
                 }
 
                 ldc.connect(ldapServerHost, ldapServerPort, authid, authpw);
-                connOptions.put("referrals", new Boolean(referrals));
+                connOptions.put("referrals", Boolean.valueOf(referrals));
 
                 // Construct the pool by cloning the successful connection
                 ShutdownManager shutdownMan = ShutdownManager.getInstance();

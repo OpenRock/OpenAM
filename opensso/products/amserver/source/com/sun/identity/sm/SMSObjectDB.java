@@ -26,13 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.services.ldap.*;
 
 import com.iplanet.ums.IUMSConstants;
 
-import com.iplanet.ums.UMSException;
 
 
 

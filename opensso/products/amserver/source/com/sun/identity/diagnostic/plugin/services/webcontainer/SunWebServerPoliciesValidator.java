@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.webcontainer;
 
 import java.io.File;
@@ -102,11 +105,11 @@ public class SunWebServerPoliciesValidator implements IWebContainerValidate {
                                 if ((validStart.length > 1) ||
                                     (!validStart[0].equals(line))) {                                   
                                     buffer = new StringBuffer();
-                                    buffer.append(line + "\n");
+                                    buffer.append(line).append("\n");
                                     policiesStarted = true;
                                 }                                                                                   
                             } else {                                
-                                buffer.append(line + "\n");
+                                buffer.append(line).append("\n");
                                 String[] validEnd = line.split(
                                     WebContainerConstant.
                                     POLICY_GRANT_END_PATTERN);                                

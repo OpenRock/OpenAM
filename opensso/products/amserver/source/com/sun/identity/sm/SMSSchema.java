@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm;
@@ -330,7 +330,7 @@ public class SMSSchema {
     public static String nodeToString(Node a) {
         String nodeName = a.getNodeName();
         if (nodeName.equalsIgnoreCase("#comment")) {
-            return new String("");
+            return "";
         }
         String answer = "<" + nodeName + getNodeAttributes(a) + ">";
         answer += getNodeValue(a);
@@ -447,15 +447,15 @@ public class SMSSchema {
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_parser_error, params));
         } catch (SAXException sax) {
-            Object params[] = { new String(sax.toString()) };
+            Object params[] = { sax.toString()};
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_exception_message, params));
         } catch (ParserConfigurationException pc) {
-            Object params[] = { new String(pc.toString()) };
+            Object params[] = { pc.toString()};
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_invalid_xml_document, params));
         } catch (IOException ioe) {
-            Object params[] = { new String(ioe.toString()) };
+            Object params[] = { ioe.toString()};
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_invalid_input_stream, params));
         }
@@ -499,7 +499,7 @@ public class SMSSchema {
             return txt;
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         for (int i = 0; i < len; i++) {
             char c = txt.charAt(i);

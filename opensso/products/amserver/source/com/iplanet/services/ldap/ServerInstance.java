@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 /**
@@ -215,7 +218,7 @@ public class ServerInstance {
     boolean status;
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Server Group Name =");
         buf.append(serverGroup.serverGroupName());
         buf.append(" Server ID:=");

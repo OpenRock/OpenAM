@@ -26,15 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.setup.Bootstrap;
-import com.sun.identity.shared.Constants;
 import java.text.MessageFormat;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -214,7 +214,7 @@ public class CLIRequest {
     }
 
     static String addAllArgs(String[] argv) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (int i = 0; i < argv.length; i++) {
             buff.append(" ").append(argv[i]);
         }

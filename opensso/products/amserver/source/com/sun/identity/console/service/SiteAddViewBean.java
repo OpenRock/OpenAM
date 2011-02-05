@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.RequestManager;
@@ -44,7 +47,6 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import java.net.MalformedURLException;
 import javax.servlet.http.HttpServletRequest;
 
 /**

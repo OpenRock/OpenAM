@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.RequestManager;
@@ -250,7 +253,7 @@ public class PolicyViewBean
                             model.getLocalizedString(
                         "policy.resources.empty.message"));
                 } else {
-                    StringBuffer sbResources = new StringBuffer();
+                    StringBuilder sbResources = new StringBuilder();
                     boolean first = true;
                     for(Iterator i=resourceNames.iterator(); i.hasNext();) {
                         String resourceName = (String)i.next();

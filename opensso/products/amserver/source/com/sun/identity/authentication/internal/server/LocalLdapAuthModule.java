@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.internal.server;
 
 import java.io.IOException;
@@ -59,7 +62,6 @@ import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
-import com.sun.identity.shared.ldap.util.ConnectionPool;
 import com.sun.identity.shared.ldap.util.DN;
 
 public class LocalLdapAuthModule implements LoginModule {
@@ -312,7 +314,7 @@ public class LocalLdapAuthModule implements LoginModule {
             // Ignore the exception and use the default naming attribute
         }
 
-        StringBuffer filter = new StringBuffer();
+        StringBuilder filter = new StringBuilder();
         filter.append('(').append(namingAttribute).append('=').append(uid)
                 .append(')');
         String[] attrs = { "noAttr" };
@@ -351,7 +353,7 @@ public class LocalLdapAuthModule implements LoginModule {
         } catch (LDAPException ex) {
             throw (new LoginException(ex.getMessage()));
         }
-        if (retVal == "")
+        if (retVal == null || retVal.equals(""))
             throw (new LoginException("INVALID_USER_NAME"));
         return retVal;
     }

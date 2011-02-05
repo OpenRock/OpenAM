@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 import com.sun.identity.policy.interfaces.PolicyListener;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -197,11 +199,11 @@ public class PolicyCache implements ServiceListener {
     Policy getPolicy(String orgName, String policyName) {
         String cacheKey = buildCacheKey(orgName, policyName);
         if ( DEBUG.messageEnabled() ) {
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             sb.append("at PolicyCache.getPolicy(orgName,policyName):");
             sb.append("orgName=").append(orgName).append(":")
                     .append("policyName=").append(policyName)
-                    .append("cacheKey=").append(cacheKey);;
+                    .append("cacheKey=").append(cacheKey);
             DEBUG.message(sb.toString());
         }
         return getPolicy(cacheKey);
@@ -247,7 +249,7 @@ public class PolicyCache implements ServiceListener {
         String orgName = cacheKeyTokens[5];
         String policyName = cacheKeyTokens[1];
         if ( DEBUG.messageEnabled() ) {
-            StringBuffer sb = new StringBuffer(500);
+            StringBuilder sb = new StringBuilder(500);
             sb.append("at PolicyCache.refreshPolicy refreshing policy for - ")
                  .append("cacheKey=").append(cacheKey).append(":")
                  .append("policyName=").append(policyName).append(":")
@@ -350,7 +352,7 @@ public class PolicyCache implements ServiceListener {
             String orgName, String groupName, String serviceComponent, 
             int changeType) {
         if ( DEBUG.messageEnabled() ) {
-            StringBuffer sb = new StringBuffer(255);
+            StringBuilder sb = new StringBuilder(255);
             sb.append("Received SMS notification, orgConfigChanged");
             sb.append("serviceName, version, orgName, groupName, ");
             sb.append(" serviceComponent, changeType:");
@@ -471,7 +473,7 @@ public class PolicyCache implements ServiceListener {
 
     private String buildCacheKey(String serviceName, String version,
             String orgName, String groupName, String serviceComponent) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(serviceComponent).append(CACHE_KEY_DELIMITER);
         sb.append(groupName).append(CACHE_KEY_DELIMITER);
         sb.append(version).append(CACHE_KEY_DELIMITER);
@@ -528,7 +530,7 @@ public class PolicyCache implements ServiceListener {
     private void firePolicyChanged(String serviceName, 
             Set affectedResourceNames, int changeType) {
         if( DEBUG.messageEnabled() ) {
-            StringBuffer sb = new StringBuffer(255);
+            StringBuilder sb = new StringBuilder(255);
             sb.append( 
                    "at firePolicyChanged(serrviceName,affectedResourceNames):");
             sb.append(serviceName).append(":");
@@ -614,7 +616,7 @@ public class PolicyCache implements ServiceListener {
             pm = new PolicyManager(token, orgName);
             policyManagers.put(orgName, pm);
             if( DEBUG.messageEnabled() ) {
-                StringBuffer sb = new StringBuffer(255);
+                StringBuilder sb = new StringBuilder(255);
                 sb.append( 
                         "at PolicyCache.getPolicyManager():");
                 sb.append("creating and caching pm for orgname ");
@@ -634,7 +636,7 @@ public class PolicyCache implements ServiceListener {
     void policyConfigChanged(String orgName) {
         String pattern = CACHE_KEY_DELIMITER + orgName;
         if( DEBUG.messageEnabled() ) {
-            StringBuffer sb = new StringBuffer(255);
+            StringBuilder sb = new StringBuilder(255);
             sb.append( 
                     "at PolicyCache.policyConfigChanged():");
             sb.append("updating policy config for orgname ");

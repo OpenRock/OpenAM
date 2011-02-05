@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -240,7 +243,7 @@ class PluginConfigImpl {
     }
 
     static String getCacheName(PluginSchemaImpl ps, String orgName) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(ps.getName()).append(ps.getVersion()).append(orgName);
         return (sb.toString().toLowerCase());
     }

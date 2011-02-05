@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import com.iplanet.services.util.ParseOutput;
@@ -154,11 +157,11 @@ public class Server implements ParseOutput {
      * @return String the string rep.
      */
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("Server Name=").append(serverName);
         str.append(" Server Port=").append(serverPort);
         str.append(" Status=").append(serverStatus);
-        return new String(str);
+        return str.toString();
     }
 
     // Connection pool parameters

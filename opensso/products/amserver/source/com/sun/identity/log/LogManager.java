@@ -25,13 +25,14 @@
  * $Id: LogManager.java,v 1.14 2009/12/09 00:34:22 bigfatrat Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log;
 
 import java.io.IOException;
 import java.io.File;
-import java.lang.SecurityException;
 import java.lang.reflect.Constructor;
-import java.net.URL;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.logging.Level;
@@ -42,7 +43,6 @@ import java.util.HashSet;
 import java.util.logging.Formatter;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.messageid.LogMessageProviderBase;
 import com.sun.identity.log.messageid.MessageProviderFactory;
@@ -425,7 +425,7 @@ public class LogManager extends java.util.logging.LogManager {
                         String handlerClass = LogManager.HANDLER;
                         Class clz = null;
                         Class[] parameters = {String.class};
-                        Object[] parameterObjects = {new String(l.getName())};
+                        Object[] parameterObjects = {l.getName()};
                         Constructor cons = null;
                         Handler h = null;
                         try {

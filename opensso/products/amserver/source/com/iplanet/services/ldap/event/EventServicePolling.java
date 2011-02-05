@@ -26,16 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap.event;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPMessage;
@@ -43,12 +40,10 @@ import com.sun.identity.shared.ldap.LDAPResponse;
 import com.sun.identity.shared.ldap.LDAPSearchResult;
 import com.sun.identity.shared.ldap.LDAPSearchResultReference;
 import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.PeriodicGroupMap;
 import com.sun.identity.common.ScheduleableGroupAction;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 
 /**
  * This class extends the EventService class and provides the functionality to

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -221,7 +224,7 @@ public class ServerSiteViewBean
                 if ((assignedServers != null) && !assignedServers.isEmpty()) {
                     Set set = new TreeSet();
                     set.addAll(assignedServers);
-                    StringBuffer buff = new StringBuffer();
+                    StringBuilder buff = new StringBuilder();
                     for (Iterator j = set.iterator(); j.hasNext(); ) {
                         buff.append((String)j.next()).append("<br />");
                     }

@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.httpbasic;
 
-import com.iplanet.am.util.Cache;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.spi.AuthLoginException;

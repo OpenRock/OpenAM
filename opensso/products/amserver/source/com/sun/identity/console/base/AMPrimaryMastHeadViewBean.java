@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import com.iplanet.jato.RequestContext;
@@ -38,7 +41,6 @@ import com.iplanet.jato.view.html.HREF;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMCommonNameGenerator;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.delegation.model.DelegationConfig;
@@ -53,7 +55,6 @@ import com.sun.web.ui.view.masthead.CCPrimaryMasthead;
 import com.sun.web.ui.view.tabs.CCNodeEventHandlerInterface;
 import com.sun.web.ui.view.tabs.CCTabs;
 import java.io.Serializable;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -61,7 +62,6 @@ import java.util.Map;
 import java.util.Set;
 import java.text.MessageFormat;
 import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.errors.EncodingException;
 import javax.servlet.http.HttpServletRequest;
 
 /**

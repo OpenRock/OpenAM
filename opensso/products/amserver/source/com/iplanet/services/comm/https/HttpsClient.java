@@ -26,12 +26,14 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.https;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Vector;
@@ -171,8 +173,7 @@ public final class HttpsClient extends HttpClient
                 = new java.util.StringTokenizer(rawList, "|", false);
             try {
                 while (st.hasMoreTokens()) {
-                    dontProxy.add(st.nextToken().toLowerCase(),
-                            new Boolean(true));
+                    dontProxy.add(st.nextToken().toLowerCase(), Boolean.TRUE);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

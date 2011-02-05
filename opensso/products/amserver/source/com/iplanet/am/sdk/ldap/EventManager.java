@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import java.util.Map;
@@ -39,7 +42,6 @@ import com.iplanet.am.sdk.AMEventManagerException;
 import com.iplanet.am.sdk.AMSDKBundle;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.am.util.SystemProperties;
 
 /**
  * This <code>AMEventManager</code> adds Listeners to the EventService and

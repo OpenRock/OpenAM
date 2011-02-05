@@ -25,6 +25,9 @@
  * $Id: ConfigureData.java,v 1.11 2009/05/02 23:05:13 kevinserwin Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.sso.SSOException;
@@ -39,7 +42,6 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.HashSet;
@@ -167,7 +169,7 @@ public class ConfigureData {
 
         InputStreamReader fin = new InputStreamReader(
             AMSetupServlet.getResourceAsStream(sctx, xmlFile));
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         char[] cbuf = new char[1024];
         int len;
         while ((len = fin.read(cbuf)) > 0) {
@@ -230,7 +232,7 @@ public class ConfigureData {
     private String getFileContent(String fileName)
         throws IOException
     {
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         InputStreamReader fin = new InputStreamReader(
             AMSetupServlet.getResourceAsStream(sctx, baseDir + "/" + fileName));
         char[] cbuf = new char[1024];

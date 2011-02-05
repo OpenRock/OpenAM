@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.httpbasic;
 
-import java.io.IOException;
 import java.security.Principal;
 
 public class HTTPBasicPrincipal implements Principal, java.io.Serializable {

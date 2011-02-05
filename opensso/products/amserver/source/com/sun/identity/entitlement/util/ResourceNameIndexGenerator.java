@@ -25,6 +25,9 @@
  * $Id: ResourceNameIndexGenerator.java,v 1.3 2009/12/07 19:46:47 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement.util;
 
 import com.sun.identity.entitlement.ResourceSaveIndexes;
@@ -195,7 +198,7 @@ public class ResourceNameIndexGenerator implements ISaveIndex {
         String str = (idx != -1) ? pathIndex.substring(0, idx) + "/dummy" 
             : pathIndex;
         StringTokenizer st = new StringTokenizer(str, "/");
-        StringBuffer tracker = new StringBuffer();
+        StringBuilder tracker = new StringBuilder();
         tracker.append("/");
         while (st.hasMoreElements()) {
             String s = st.nextToken();

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
 import java.io.ByteArrayOutputStream;
@@ -122,7 +125,7 @@ public class FileNameEncoder {
         boolean needToChange = false;
         boolean wroteUnencodedChar = false;
         int maxBytesPerChar = 10; // rather arbitrary limit, but safe for now
-        StringBuffer out = new StringBuffer(s.length());
+        StringBuilder out = new StringBuilder(s.length());
         ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
 
         OutputStreamWriter writer = new OutputStreamWriter(buf, enc);

@@ -26,14 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Class that implements to get backend datastore based on the vendor

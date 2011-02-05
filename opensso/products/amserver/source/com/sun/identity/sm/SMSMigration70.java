@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import java.util.Collections;
@@ -445,7 +448,7 @@ public class SMSMigration70 {
                         serviceID = subEntryName;
                     }
                     System.out.println("serviceID " + serviceID);
-                    StringBuffer sb = new StringBuffer(8);
+                    StringBuilder sb = new StringBuilder(8);
 
                     String subConfigDN = "ou=" + subEntryName + SMSEntry.COMMA
                             + "ou=" + subConfigName + SMSEntry.COMMA

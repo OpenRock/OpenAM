@@ -34,10 +34,12 @@
  * holder.
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.servicetag.registration;
 
 import java.util.Map;
-import java.util.HashMap;
 import com.sun.scn.servicetags.SunOnlineAccount;
 
 public class SOAccount implements RegistrationAccount {

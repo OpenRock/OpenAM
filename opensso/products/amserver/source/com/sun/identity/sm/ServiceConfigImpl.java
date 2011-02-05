@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm;
@@ -635,7 +635,7 @@ class ServiceConfigImpl implements ServiceListener {
 
     static String getCacheName(String sName, String version, String oName,
             String gName, String cName, boolean global) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(sName).append(version).append(oName).append(gName).append(
                 cName).append(global);
         return (sb.toString().toLowerCase());
@@ -711,7 +711,7 @@ class ServiceConfigImpl implements ServiceListener {
             return "";
         }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append("<").append(nodeName);
         
         if (nodeName.equals(SMSUtils.GLOBAL_CONFIG) ||

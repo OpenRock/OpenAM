@@ -26,10 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base.model;
 
 import com.iplanet.jato.view.html.OptionList;
-import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
@@ -46,7 +48,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.shared.ldap.LDAPDN;
 
 /**
@@ -204,7 +205,7 @@ public class AMFormatUtils
      * @param set Set of strings.
      */
     public static String toCommaSeparatedFormat(Set set) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         boolean firstEntry = true;
         for (Iterator iter = set.iterator(); iter.hasNext(); ) {
             if (!firstEntry) {

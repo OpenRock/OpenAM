@@ -25,6 +25,9 @@
  * $Id: OpenSSOCoreTokenStore.java,v 1.1 2009/11/19 00:07:41 qcheng Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.coretoken.spi;
 
 import com.iplanet.sso.SSOException;
@@ -527,7 +530,7 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
             throw new CoreTokenException(218, null, 400);
         }
         StringTokenizer attrs = new StringTokenizer(query, "&");
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("(&");
         while (attrs.hasMoreTokens()) {
             String attr = (String) attrs.nextToken();
@@ -556,9 +559,9 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
             }
             sb.append("(").append(SMSEntry.ATTR_XML_KEYVAL + "=");
             if (searchableAttrs.contains(lcKey)) {
-                sb.append(SEARCHABLE_ATTR + "=");
+                sb.append(SEARCHABLE_ATTR).append("=");
             }
-            sb.append(lcKey + "=" + value)
+            sb.append(lcKey).append("=").append(value)
               .append(")");
         }
         sb.append(")");

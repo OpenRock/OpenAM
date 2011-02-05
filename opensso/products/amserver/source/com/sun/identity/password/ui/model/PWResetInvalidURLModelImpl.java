@@ -26,9 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.password.ui.model;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * <code>PWResetInvalidURLModelImpl</code> contains a set of methods required by

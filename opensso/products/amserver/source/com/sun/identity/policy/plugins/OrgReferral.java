@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.policy.*;
@@ -206,7 +207,7 @@ abstract public class OrgReferral implements Referral {
          organization name.
          */
         PolicyEvaluator policyEvaluator = null;
-        StringBuffer cacheNameBuffer = new StringBuffer();
+        StringBuilder cacheNameBuffer = new StringBuilder();
         String cacheName = cacheNameBuffer.append(_orgName)
             .append(resourceType).toString();
         if ((policyEvaluator = (PolicyEvaluator) cachedPolicyEvaluators
@@ -247,7 +248,7 @@ abstract public class OrgReferral implements Referral {
             String resourceName) throws PolicyException, SSOException {
         Set resourceNames = null;
         PolicyEvaluator policyEvaluator = null;
-        StringBuffer cacheNameBuffer = new StringBuffer();
+        StringBuilder cacheNameBuffer = new StringBuilder();
         String cacheName = cacheNameBuffer.append(_orgName)
                 .append(serviceTypeName).toString();
         if ((policyEvaluator = (PolicyEvaluator) cachedPolicyEvaluators

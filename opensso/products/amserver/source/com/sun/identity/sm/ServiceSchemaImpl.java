@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.am.util.SystemProperties;
@@ -291,7 +294,7 @@ class ServiceSchemaImpl {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         if (getName() != null) {
             sb.append("Schema name: ").append(getName()).append("\n");
         }

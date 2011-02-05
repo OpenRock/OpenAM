@@ -26,26 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.password.ui;
 
-import com.iplanet.am.util.AMClientDetector;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.ViewBeanBase;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
-import com.iplanet.services.cdm.Client;
-import com.iplanet.services.cdm.ClientsManager;
-import com.iplanet.services.cdm.ClientException;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetModelImpl;
-import java.io.IOException;
-import java.util.Locale;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 /**

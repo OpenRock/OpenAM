@@ -44,10 +44,7 @@ import java.util.HashSet;
 import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchConstraints;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.util.ConnectionPool;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.LDAPBindRequest;
 import com.sun.identity.shared.ldap.LDAPRequestParser;
 import com.sun.identity.shared.ldap.LDAPSearchRequest;
@@ -591,7 +588,7 @@ public class LDAPFilterCondition implements Condition {
         // get the organization name
         Set orgNameSet 
                 = (Set) configParams.get(PolicyManager.ORGANIZATION_NAME);
-        if ((orgNameSet != null) && (orgNameSet.size() != 0)) {
+        if ((orgNameSet != null) && (!orgNameSet.isEmpty())) {
             Iterator items = orgNameSet.iterator();
             orgName = (String) items.next();
         }

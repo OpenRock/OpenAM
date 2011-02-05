@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.service;
 
 import java.util.Hashtable;
@@ -58,7 +61,7 @@ public class SessionMaxStats implements StatsListener {
      *
      */
    public void printStats() {
-       if (sessionTable.size() != 0 ) {
+       if (!sessionTable.isEmpty() ) {
            
            int maxSessions = sessionTable.size();
            int maxActiveSessions = SessionService.getActiveSessions();

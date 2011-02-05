@@ -25,6 +25,9 @@
  * $Id: TuneFAM8Impl.java,v 1.11 2009/12/09 00:40:35 ykwon Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.impl;
 
 import com.sun.identity.tune.base.AMTuneFAMBase;
@@ -32,7 +35,6 @@ import com.sun.identity.tune.common.FileHandler;
 import com.sun.identity.tune.common.AMTuneException;
 import com.sun.identity.tune.config.AMTuneConfigInfo;
 import com.sun.identity.tune.util.AMTuneUtil;
-import com.sun.identity.tune.constants.AMTuneConstants;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -290,7 +292,7 @@ public class TuneFAM8Impl extends AMTuneFAMBase {
         try {
             String newMinPool = "8";
             String newMaxPool = "32";
-            StringBuffer getCmd = new StringBuffer(famCmdPath);
+            StringBuilder getCmd = new StringBuilder(famCmdPath);
             getCmd.append(GET_SVRCFG_XML_SUB_CMD);
             getCmd.append(famadmCommonParamsNoServer);
             getCmd.append(" ");
@@ -384,7 +386,7 @@ public class TuneFAM8Impl extends AMTuneFAMBase {
             fh.replaceLine(lineNo, reqLine);
             fh.close();
             rBuff.setLength(0);
-            StringBuffer setCmd = new StringBuffer(famCmdPath);
+            StringBuilder setCmd = new StringBuilder(famCmdPath);
             setCmd.append(SET_SVRCFG_XML_SUB_CMD);
             setCmd.append(famadmCommonParamsNoServer);
             setCmd.append(" ");
@@ -425,7 +427,7 @@ public class TuneFAM8Impl extends AMTuneFAMBase {
     throws AMTuneException {
         try {
             String minMaxRatio = "8:32";
-            StringBuffer getCmd = new StringBuffer(famCmdPath);
+            StringBuilder getCmd = new StringBuilder(famCmdPath);
             getCmd.append(GET_ATTR_DEFS_SUB_CMD);
             getCmd.append(famadmCommonParamsNoServer);
             getCmd.append(" ");
@@ -477,7 +479,7 @@ public class TuneFAM8Impl extends AMTuneFAMBase {
                     minMaxRatio.equals(curLdapConVal)) {
                 return;
             }
-            StringBuffer setCmd = new StringBuffer(famCmdPath);
+            StringBuilder setCmd = new StringBuilder(famCmdPath);
             setCmd.append(SET_ATTR_DEFS_SUB_CMD);
             setCmd.append(famadmCommonParamsNoServer);
             setCmd.append(" ");
@@ -530,7 +532,7 @@ public class TuneFAM8Impl extends AMTuneFAMBase {
             String poolMin = "8";
             String poolMax = "32";
             mWriter.writeln(LINE_SEP);
-            StringBuffer dataStoreInfoCmd = new StringBuffer(famCmdPath);
+            StringBuilder dataStoreInfoCmd = new StringBuilder(famCmdPath);
             dataStoreInfoCmd.append(SHOW_DATASTORE_SUB_CMD);
             dataStoreInfoCmd.append(" ");
             dataStoreInfoCmd.append(REALM_OPT);
@@ -541,7 +543,7 @@ public class TuneFAM8Impl extends AMTuneFAMBase {
             dataStoreInfoCmd.append("\"");
             dataStoreInfoCmd.append(famadmCommonParamsNoServer);
             
-            StringBuffer dataStoreUpdateCmd = new StringBuffer(famCmdPath);
+            StringBuilder dataStoreUpdateCmd = new StringBuilder(famCmdPath);
             dataStoreUpdateCmd.append(UPDATE_DATASTORE_SUB_CMD);
             dataStoreUpdateCmd.append(" ");
             dataStoreUpdateCmd.append(REALM_OPT);

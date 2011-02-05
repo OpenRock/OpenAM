@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import com.iplanet.am.util.Cache;
@@ -47,6 +50,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,7 +154,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
                         + ssoe.toString());
             }
 
-            if (entityAttributes.size() == 0)
+            if (entityAttributes.isEmpty())
                 continue;
 
             for (Iterator it = entityAttributes.entrySet().iterator(); it
@@ -864,9 +868,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
             Attr attr = attrs.getAttribute(names[i]);
             String[] values = attr.getStringValues();
             HashSet set = new HashSet();
-            for (int j = 0; j < values.length; j++) {
-                set.add(values[j]);
-            }
+            set.addAll(Arrays.asList(values));
             map.put(names[i], set);
         }
         return map;

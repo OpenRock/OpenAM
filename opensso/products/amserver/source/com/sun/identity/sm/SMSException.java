@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
@@ -304,7 +307,7 @@ public class SMSException extends Exception implements L10NMessage {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (exceptionStatus != -1) {
             buf.append("SMSException Exception Code:");
             buf.append(exceptionStatus);

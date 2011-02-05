@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli.schema;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AccessManagerConstants;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -47,7 +49,6 @@ import java.io.InputStreamReader;
 import java.security.AccessController;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;

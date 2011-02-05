@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.share;
 
 import java.util.Vector;
@@ -65,9 +68,9 @@ import java.util.Vector;
 
 public class RequestSet {
 
-    static final String QUOTE = "\"";
+    static final char QUOTE = '\"';
 
-    static final String NL = "\n";
+    static final char NL = '\n';
 
     static final String BEGIN_CDATA = "<![CDATA[";
 
@@ -173,7 +176,7 @@ public class RequestSet {
      * @return An XML RequestSet document in String format.
      */
     public String toXMLString() {
-        StringBuffer xml = new StringBuffer(300);
+        StringBuilder xml = new StringBuilder(300);
         xml.append("<?xml version=").append(QUOTE).append("1.0").append(QUOTE)
                 .append(" encoding=").append(QUOTE).append("UTF-8").append(
                         QUOTE).append(" standalone=").append(QUOTE).append(
@@ -182,7 +185,7 @@ public class RequestSet {
         xml.append("<RequestSet vers=").append(QUOTE).append(requestSetVersion)
                 .append(QUOTE).append(" svcid=").append(QUOTE)
                 .append(serviceID).append(QUOTE).append(" reqid=")
-                .append(QUOTE).append(requestSetID).append(QUOTE).append(">")
+                .append(QUOTE).append(requestSetID).append(QUOTE).append('>')
                 .append(NL);
 
         int numRequests = requestVector.size();
@@ -197,7 +200,7 @@ public class RequestSet {
                 xml.append(" sid=").append(QUOTE).append(req.getSessionID())
                         .append(QUOTE);
             }
-            xml.append(">");
+            xml.append('>');
             xml.append(BEGIN_CDATA).append(req.getContent()).append(END_CDATA);
             xml.append("</Request>").append(NL);
         }

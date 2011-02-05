@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.connect;
 
 import java.io.BufferedReader;
@@ -108,7 +111,7 @@ public class ServerConnectionService implements ToolConstants,
             }
             Map validatorMap = (HashMap)getValidators();
             for (Iterator j = commandSet.iterator(); j.hasNext();){
-                String cmd = ((String)j.next()).toLowerCase();;
+                String cmd = ((String)j.next()).toLowerCase();
                 ((IConnectService)validatorMap.get(cmd)).testConnection(path);
             }
             toolOutWriter.printResult(sRes.getStatus());

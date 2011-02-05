@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.nightly;
 
 import java.io.BufferedReader;
@@ -75,8 +78,6 @@ public class MergeSDKProperties {
         String baseDir,
         String targetDir
     ) throws IOException {
-        StringBuffer buff = new StringBuffer();
-
         File dir = new File(baseDir);
         File[] directories = dir.listFiles(dirFilter);
         for (int i = 0; i < directories.length; i++) {
@@ -100,7 +101,7 @@ public class MergeSDKProperties {
 
     private String getMergeContent(Set files)
         throws IOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (Iterator i = files.iterator(); i.hasNext(); ) {
             buff.append(readFile((String)i.next()));
             buff.append("\n");
@@ -136,7 +137,7 @@ public class MergeSDKProperties {
 
     private static String readFile(String filename)
         throws IOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         FileReader input = new FileReader(filename);
         BufferedReader bufRead = new BufferedReader(input);
 

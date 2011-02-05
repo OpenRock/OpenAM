@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.delegation;
 
 import com.iplanet.sso.SSOException;
@@ -41,8 +44,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import java.security.AccessController;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Service Configuration listener class to clean the delegation polcies

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.agentconfig;
 
 import com.iplanet.jato.RequestManager;
@@ -1081,7 +1084,7 @@ public class AgentsViewBean
             }
             model = new CCBreadCrumbsModel(SMSSchema.unescapeName(subRealm));
 
-            StringBuffer baseDN = new StringBuffer(200);
+            StringBuilder baseDN = new StringBuilder(200);
             baseDN.append(startDN);
             /*
              * each row added to the model is a selectable entry in the

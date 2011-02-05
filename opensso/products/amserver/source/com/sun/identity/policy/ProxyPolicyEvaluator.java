@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -43,7 +44,6 @@ import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;

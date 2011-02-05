@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.util;
 
 import java.io.ByteArrayInputStream;
@@ -115,20 +117,19 @@ public class DerValue {
      * TODO-JAVADOC
      */
     public static String printByteArray(byte[] token, int from, int len) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         int bytePerLine = 16;
         int line;
         for (line = 1; line*bytePerLine < len; line++) {
             for (int j = 0; j < bytePerLine; j ++) {
-                buf.append(printByte(token[(line-1)*bytePerLine + j+from])
-                + " ");
+                buf.append(printByte(token[(line - 1) * bytePerLine + j + from])).append(" ");
             }
             buf.append("\n");
         }
         line --;
         if (line*bytePerLine < len) {
             for (int j = line*bytePerLine; j < len; j ++) {
-                buf.append(printByte(token[j+from]) + " ");
+                buf.append(printByte(token[j + from])).append(" ");
             }
         }
         return buf.toString();

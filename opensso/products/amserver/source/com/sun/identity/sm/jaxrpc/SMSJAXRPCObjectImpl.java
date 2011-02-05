@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -598,7 +598,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         int date = calendar.get(Calendar.DATE);
         int hour = calendar.get(Calendar.HOUR);
         int minute = calendar.get(Calendar.MINUTE);
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append(serverURL);
         sb.append(":").append(year).append(month).append(date);
         sb.append(hour).append(minute);

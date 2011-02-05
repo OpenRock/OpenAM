@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.RequestManager;
@@ -56,7 +59,7 @@ public class ActionSchemaGUI {
         ActionSchema actionSchema,
         String actionTableName
     ) throws JspException {
-        StringBuffer buff = new StringBuffer(1000);
+        StringBuilder buff = new StringBuilder(1000);
         int syntax = AMDisplayType.getInstance().getDisplaySyntax(actionSchema);
         HttpServletRequest req = viewBean.getRequestContext().getRequest();
         CCTagBase parentTag = getCCTag(req, CCTagClass.ACTIONTABLE);

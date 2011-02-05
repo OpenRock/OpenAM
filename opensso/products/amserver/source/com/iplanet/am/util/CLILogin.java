@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import java.io.BufferedReader;
@@ -243,7 +246,7 @@ public class CLILogin {
                 .getInputStream()));
 
         if (print) {
-            StringBuffer in_buf = new StringBuffer();
+            StringBuilder in_buf = new StringBuilder();
             int len;
             char[] buf = new char[1024];
             while ((len = in.read(buf, 0, buf.length)) != -1) {

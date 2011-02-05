@@ -26,13 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.spi;
 
 import java.util.logging.LogManager;
 
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManagerUtil;
-import com.sun.identity.log.spi.IDebug;
 
 /**
  * This class is the class which instantaites the debug implementation

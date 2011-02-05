@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.server;
 
 import java.io.IOException;
@@ -475,7 +478,7 @@ public class ServerConfigValidator extends ServerConfigBase {
                 i.hasNext(); ) {
                 Map.Entry entry = (Map.Entry)i.next();
                 Set sList = (Set)entry.getValue();
-                StringBuffer sBuf = new StringBuffer();
+                StringBuilder sBuf = new StringBuilder();
                 Iterator iter = sList.iterator();
                 while (iter.hasNext()) {
                     String var = (String)iter.next();

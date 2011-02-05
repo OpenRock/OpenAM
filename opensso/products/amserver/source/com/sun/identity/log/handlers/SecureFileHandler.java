@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import java.io.BufferedOutputStream;
@@ -53,11 +55,8 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 import com.iplanet.log.NullLocationException;
-import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManagerUtil;
 import com.sun.identity.log.LogQuery;

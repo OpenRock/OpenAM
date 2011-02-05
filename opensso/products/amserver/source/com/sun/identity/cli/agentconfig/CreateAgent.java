@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli.agentconfig;
 
 import com.iplanet.sso.SSOToken;
@@ -50,7 +53,6 @@ import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

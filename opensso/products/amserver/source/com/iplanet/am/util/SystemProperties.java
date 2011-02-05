@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
-
 package com.iplanet.am.util;
 
 import com.iplanet.sso.SSOToken;
@@ -182,7 +181,7 @@ public class SystemProperties {
                     String serverURI = props.getProperty(
                             Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
                     serverURI = serverURI.replace('/', '_').toLowerCase();
-                    StringBuffer fileName = new StringBuffer();
+                    StringBuilder fileName = new StringBuilder();
                     fileName.append(newConfigFileLoc).append("/").append(
                             AMCONFIG_FILE_NAME).append(serverURI).append(
                             hostName).append(
@@ -194,7 +193,7 @@ public class SystemProperties {
                         modProp.load(fis);
                         props.putAll(modProp);
                     } catch (IOException ioe) {
-                        StringBuffer fileNameOrig = new StringBuffer();
+                        StringBuilder fileNameOrig = new StringBuilder();
                         fileNameOrig.append(newConfigFileLoc).append("/")
                                 .append(AMCONFIG_FILE_NAME).append(".").append(
                                         PROPERTIES);

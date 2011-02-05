@@ -25,6 +25,9 @@
 * $Id: Utils.java,v 1.2 2008/09/04 22:26:12 kevinserwin Exp $
 */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.manifest;
 
 import java.io.InputStream;
@@ -84,7 +87,7 @@ public class Utils implements ManifestConstants {
      */
     
     public static String translateHashToString(byte[] hash){
-        StringBuffer hashBuffer = new StringBuffer();
+        StringBuilder hashBuffer = new StringBuilder();
         for (int i = 0; i < hash.length; i++) {
             hashBuffer.append(Character.forDigit((hash[i] >> 4) & 0x0F, 16));
             hashBuffer.append(Character.forDigit(hash[i] & 0x0F, 16));

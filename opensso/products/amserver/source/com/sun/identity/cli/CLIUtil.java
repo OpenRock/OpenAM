@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 
@@ -92,7 +95,7 @@ public class CLIUtil {
                     "error-message-file-does-not-exist"), param),
                 ExitCodes.CANNOT_READ_FILE);
         }
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         BufferedReader in = null;
         try {
             in = new BufferedReader(new FileReader(fileName));

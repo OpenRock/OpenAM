@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import java.io.IOException;
@@ -144,7 +145,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
             String columns = "*";        // default all
             ArrayList sCol = logQuery.getColumns();
             if (sCol != null) {
-                StringBuffer colSB = new StringBuffer();
+                StringBuilder colSB = new StringBuilder();
                 int sSize = sCol.size();
                 for (int i = 0; i < sSize; i++) {
                     colSB.append((String)sCol.get(i));
@@ -445,7 +446,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
         // (e.g., "amAuthentication_access") of the table names
         // 
         Set tblNames = new HashSet();
-        StringBuffer allTablesSB = new StringBuffer("");
+        StringBuilder allTablesSB = new StringBuilder("");
         for (Iterator it = tableNames.iterator(); it.hasNext(); ) {
             String ss = (String)it.next();
             String ss2 = ss.replace('.', '_');
@@ -516,7 +517,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
                 String columns = "*";        // default all
                 ArrayList sCol = logQuery.getColumns();
                 if (sCol != null) {
-                    StringBuffer colSB = new StringBuffer();
+                    StringBuilder colSB = new StringBuilder();
                     int sSize = sCol.size();
                     for (int i = 0; i < sSize; i++) {
                         colSB.append((String)sCol.get(i));
@@ -753,7 +754,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
                 columns = "*";        // default all
                 ArrayList sCol = logQuery.getColumns();
                 if (sCol != null) {
-                    StringBuffer colSB = new StringBuffer();
+                    StringBuilder colSB = new StringBuilder();
                     int sSize = sCol.size();
                     for (int i = 0; i < sSize; i++) {
                         colSB.append((String)sCol.get(i));
@@ -1668,7 +1669,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
             //  no query, so the select should look like:
             //  selectSBuf currently contains "select "
             //
-            String baseSelect = new String ("select " + whatSBuf + " from ");
+            String baseSelect = "select " + whatSBuf + " from ";
 
             for (Iterator it = tblNames.iterator(); it.hasNext(); ) {
                 selectSBuf.append(baseSelect).append(it.next());
@@ -1891,7 +1892,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
         //
         int qrySize = qes.size();
         QueryElement qe;
-        StringBuffer whereSBuf = new StringBuffer();
+        StringBuilder whereSBuf = new StringBuilder();
 
         boolean moreThanOneQuery = false;
 
@@ -2021,7 +2022,7 @@ public class LogReadDBHandler implements ReadDBHandler  {
         int qrySize = qes.size();
         QueryElement qe;
         boolean moreThanOneQuery = false;
-        StringBuffer whereSBuf = new StringBuffer();
+        StringBuilder whereSBuf = new StringBuilder();
 
         //
         //  if more than one query element, then they all should be with

@@ -26,13 +26,13 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.spi;
 
 import com.sun.identity.log.LogManager;
 import com.sun.identity.log.LogConstants;
-import com.sun.identity.log.spi.Debug;
 import com.sun.identity.log.LogManagerUtil;
 
 /** Class containing static methods that first instantiate a class

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 
@@ -90,10 +93,10 @@ public class PluginInterface extends Object {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
-        sb.append("PluginInterface name: " + name).append(
-                "\n\tInterface class: " + interfaceClass).append(
-                "\n\tI18N Key: " + key);
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("PluginInterface name: ").append(name).
+                append("\n\tInterface class: ").append(interfaceClass).
+                append("\n\tI18N Key: ").append(key);
         return (sb.toString());
     }
 }

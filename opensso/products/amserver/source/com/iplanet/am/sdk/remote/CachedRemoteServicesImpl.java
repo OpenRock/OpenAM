@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.remote;
 
 import java.security.AccessController;
@@ -145,7 +148,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
      * Prints the contents of the cache. For getDebug() purpose only
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n<<<<<<< BEGIN SDK CACHE CONTENTS >>>>>>>>");
         if (!sdkCache.isEmpty()) { // Should never be null
             Enumeration cacheKeys = sdkCache.keys();

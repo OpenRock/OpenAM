@@ -26,15 +26,13 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.radius.client;
 
 
 import java.util.*;
-import java.math.*;
-import java.security.*;
-import java.net.*;
-import java.io.*;
 
 public class AttributeSet 
 {

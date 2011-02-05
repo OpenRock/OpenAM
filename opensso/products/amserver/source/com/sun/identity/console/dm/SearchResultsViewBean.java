@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm;
 
 import com.iplanet.jato.RequestManager;
@@ -37,10 +40,8 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
-import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.components.view.html.SerializedField;
 import com.sun.identity.console.dm.model.SearchModel;

@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
-
 package com.sun.identity.authentication.modules.ldap;
 
 import com.iplanet.am.util.SystemProperties;
@@ -43,15 +42,11 @@ import com.sun.identity.authentication.spi.UserNamePasswordValidationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
-import java.io.IOException;
 import java.security.Principal;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,7 +60,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import com.sun.identity.shared.ldap.util.ConnectionPool;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 
@@ -372,7 +366,7 @@ public class LDAP extends AMLoginModule {
             if (subConfigNamesIter == null) {
                 if (sc != null) {
                     Set subConfigNames = sc.getSubConfigNames();
-                    if (subConfigNames == null || subConfigNames.size() == 0) {
+                    if (subConfigNames == null || subConfigNames.isEmpty()) {
                         return false;
                     }
                     subConfigNamesIter = subConfigNames.iterator();

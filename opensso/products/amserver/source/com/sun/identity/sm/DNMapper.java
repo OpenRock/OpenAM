@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import java.util.ArrayList;
@@ -205,7 +208,7 @@ public class DNMapper {
         }
 
         // If realm is not enabled, remove "ou=services" node
-        StringBuffer buf = new StringBuffer(dn.length());
+        StringBuilder buf = new StringBuilder(dn.length());
         String orgAttr = OrgConfigViaAMSDK.getNamingAttrForOrg();
 
         // If orgAttr is null or is "o", return after removing "ou=services"
@@ -347,7 +350,7 @@ public class DNMapper {
     static String normalizeDN(String orgName) {
         String orgAttr = "";
         String placeHold = "";
-        StringBuffer buf = new StringBuffer(orgName.length());
+        StringBuilder buf = new StringBuilder(orgName.length());
         String[] rdns = LDAPDN.explodeDN(orgName, false);
         int size = rdns.length;
 

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.sun.identity.security.DecodeAction;
@@ -163,7 +166,7 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues();
         }
-        if ((defaultValues != null) && (defaultValues.size() != 0)) {
+        if ((defaultValues != null) && (!defaultValues.isEmpty())) {
             HashSet answer = new HashSet();
             answer.addAll(defaultValues);
             return (answer);
@@ -183,7 +186,7 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues(envParams);
         }
-        if ((defaultValues != null) && (defaultValues.size() != 0)) {
+        if ((defaultValues != null) && (!defaultValues.isEmpty())) {
             HashSet answer = new HashSet();
             answer.addAll(defaultValues);
             return (answer);
@@ -426,7 +429,7 @@ public class AttributeSchemaImpl {
      * String represenation of the AttributeSchema
      */
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Attr Name=").append(name);
         buf.append("\n\tType=").append(type);
         buf.append("\n\tUIType=").append(uitype);

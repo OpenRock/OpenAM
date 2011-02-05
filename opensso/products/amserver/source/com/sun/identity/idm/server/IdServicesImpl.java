@@ -26,6 +26,9 @@
 *
 */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.server;
 
 import java.util.Collections;
@@ -695,7 +698,7 @@ public class IdServicesImpl implements IdServices {
                        + ide.getMessage());
                }
                noOfSuccess--;
-               origEx = (origEx == null) ? ide : origEx;;
+               origEx = (origEx == null) ? ide : origEx;
            } catch (IdRepoFatalException idf) {
                // fatal ..throw it all the way up
                getDebug().error("GetAttributes: Fatal Exception ", idf);

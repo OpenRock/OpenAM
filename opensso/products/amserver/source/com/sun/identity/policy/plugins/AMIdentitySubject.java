@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import com.iplanet.sso.SSOToken;
@@ -36,7 +37,6 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
@@ -341,7 +341,7 @@ public class AMIdentitySubject implements Subject {
                     }
 
 
-                    AMIdentity tmpIdentity = IdUtils.getIdentity(token);;
+                    AMIdentity tmpIdentity = IdUtils.getIdentity(token);
                     String univId = IdUtils.getUniversalId(tmpIdentity);
                     AMIdentity userIdentity = IdUtils.getIdentity(
                         getAdminToken(), univId);

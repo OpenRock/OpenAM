@@ -26,23 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.Option;
 import com.iplanet.jato.view.html.OptionList;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.policy.model.PolicyModel;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
-import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCSelect;
-import com.sun.web.ui.view.html.CCSelectableList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm;
 
 import java.util.HashSet;
@@ -34,8 +37,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.common.CaseInsensitiveHashSet;
 
 /**
  * This is a helper class which is used in the <code> AMIdentityRepository
@@ -253,7 +254,7 @@ public final class IdSearchControl {
      * object.
      */
     public String toString() {
-       StringBuffer sb = new StringBuffer(100);
+       StringBuilder sb = new StringBuilder(100);
        sb.append("IdSearchControl:");
        sb.append("\n\tReturnAllAttributes: ").append(getAllAttributesEnabled);
        sb.append("\n\tReturn Attributes: ").append(returnAttributes);

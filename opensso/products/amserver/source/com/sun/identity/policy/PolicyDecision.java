@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.Map;
@@ -235,14 +236,14 @@ public class PolicyDecision {
      * @supported.api
      */
      public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if ((responseAttributes != null) && 
             (responseAttributes != Collections.EMPTY_MAP)) {
              Iterator attrNames = responseAttributes.keySet().iterator();
              while ( attrNames.hasNext() ) {
                  String attrName = (String) attrNames.next();
                  Set attrValues = (Set) responseAttributes.get(attrName);
-                 sb.append(attrName + "=" + attrValues + "\n");
+                 sb.append(attrName).append("=").append(attrValues).append("\n");
              }
         }
         Iterator actionNames = actionDecisions.keySet().iterator();
@@ -251,7 +252,7 @@ public class PolicyDecision {
             ActionDecision actionDecision = 
                 (ActionDecision) actionDecisions.get(actionName);
             Set actionValues = (Set) actionDecision.getValues();
-            sb.append(actionName + "=" + actionValues + "\n");
+            sb.append(actionName).append("=").append(actionValues).append("\n");
         }
         return sb.toString();
      }
@@ -264,7 +265,7 @@ public class PolicyDecision {
      * @supported.api
      */
      public String toXML() {
-        StringBuffer sb  = new StringBuffer(300);
+        StringBuilder sb  = new StringBuilder(300);
         sb.append("<").append(POLICY_DECISION)
                /*
                 .append(" ").append("timeToLive")

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.naming.share;
 
 /**
@@ -50,9 +53,9 @@ package com.iplanet.services.naming.share;
 
 public class NamingRequest {
 
-    static final String QUOTE = "\"";
+    static final char QUOTE = '\"';
 
-    static final String NL = "\n";
+    static final char NL = '\n';
 
     private String requestVersion = null;
 
@@ -184,7 +187,7 @@ public class NamingRequest {
      * @return An XML String representing the request.
      */
     public String toXMLString() {
-        StringBuffer xml = new StringBuffer(150);
+        StringBuilder xml = new StringBuilder(150);
         xml.append("<NamingRequest vers=").append(QUOTE).append(requestVersion)
            .append(QUOTE).append(" reqid=").append(QUOTE).append(requestID);
         if (sessionId != null) {
@@ -196,7 +199,7 @@ public class NamingRequest {
             xml.append(QUOTE).append(preferredNamingURL);
         }
 
-        xml.append(QUOTE).append(">").append(NL);
+        xml.append(QUOTE).append('>').append(NL);
         xml.append("<GetNamingProfile>").append(NL);
         xml.append("</GetNamingProfile>").append(NL);
         xml.append("</NamingRequest>");

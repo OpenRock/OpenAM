@@ -26,13 +26,12 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.shared.ldap.*; 
-import com.sun.identity.shared.ldap.controls.*; 
-import com.sun.identity.shared.ldap.util.*;
 import com.sun.identity.shared.debug.Debug;    
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 import com.sun.identity.common.LDAPConnectionPool;
@@ -42,8 +41,6 @@ import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.ResBundleUtils;
 import java.util.*; 
-import java.io.*;
-import java.net.*; 
 
 /**
  * Provides a pool of <code>LDAPConnection</code>

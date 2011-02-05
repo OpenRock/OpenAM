@@ -25,6 +25,9 @@
  * $Id: AMSendMail.java,v 1.6 2009/12/22 19:57:19 qcheng Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.Constants;
@@ -35,7 +38,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.PasswordAuthentication;
 
 
 /*

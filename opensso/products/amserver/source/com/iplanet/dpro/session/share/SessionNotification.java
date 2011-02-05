@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.share;
 
 /**
@@ -214,7 +217,7 @@ public class SessionNotification {
      * @return An XML String representing the notification.
      */
     public String toXMLString() {
-        StringBuffer xml = new StringBuffer(300);
+        StringBuilder xml = new StringBuilder(300);
         xml.append("<SessionNotification vers=").append(QUOTE).append(
                 notificationVersion).append(QUOTE).append(" notid=").append(
                 QUOTE).append(notificationID).append(QUOTE).append(">").append(

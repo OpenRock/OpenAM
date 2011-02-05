@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.lang.Integer;
 
 public class SSOServerRealmInfo {
     String realmName;

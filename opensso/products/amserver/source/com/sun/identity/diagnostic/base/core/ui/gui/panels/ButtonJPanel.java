@@ -26,13 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.core.ui.gui.panels;
 
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import com.sun.identity.diagnostic.base.core.common.ToolConstants;
 
 public class ButtonJPanel extends javax.swing.JPanel {
     

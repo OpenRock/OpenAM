@@ -26,10 +26,11 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.ad;
 
-import java.io.IOException;
 import java.security.Principal;
 
 public class ADPrincipal implements Principal, java.io.Serializable {

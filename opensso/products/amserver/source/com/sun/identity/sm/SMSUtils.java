@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import java.util.Collections;
@@ -214,7 +217,7 @@ public class SMSUtils {
 
     public static String getUniqueID() {
         int id = counter++;
-        StringBuffer sb = new StringBuffer(8);
+        StringBuilder sb = new StringBuilder(8);
         return (sb.append(id).toString());
     }
 
@@ -227,7 +230,7 @@ public class SMSUtils {
                 new CaseInsensitiveHashMap()
                 : new HashMap();
 
-        if (attributes.size() == 0) {
+        if (attributes.isEmpty()) {
             return (answer);
         }
 
@@ -507,7 +510,7 @@ public class SMSUtils {
             return "";
         }
         
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         
         for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry e = (Map.Entry)i.next();

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.share;
 
 import com.iplanet.am.util.SystemProperties;
@@ -347,7 +350,7 @@ public class SessionEncodeURL {
             sessionDelimiter = SESS_DELIMITER;
         }
 
-        StringBuffer encodedURLBuf = new StringBuffer();
+        StringBuilder encodedURLBuf = new StringBuilder();
         if (url.indexOf(cookieStr) == -1) {
             int i = url.indexOf(QUERY);
             if (i != -1) {
@@ -403,7 +406,7 @@ public class SessionEncodeURL {
 
     public static String createCookieString(String cookieName, String sessionID)
     {
-        StringBuffer cookieStrBuf = new StringBuffer();
+        StringBuilder cookieStrBuf = new StringBuilder();
         cookieStrBuf.append(URLEncDec.encode(cookieName)).append(EQUAL);
         if (sessionID != null) {
             cookieStrBuf.append(URLEncDec.encode(sessionID));
@@ -451,7 +454,7 @@ public class SessionEncodeURL {
         if (!escape) {
             escapeChar = AMPERSAND;
         }
-        StringBuffer urlBuf = new StringBuffer();
+        StringBuilder urlBuf = new StringBuilder();
         urlBuf.append(QUERY);
         if (qString != null) {
             int index = qString.indexOf(getCookieName());

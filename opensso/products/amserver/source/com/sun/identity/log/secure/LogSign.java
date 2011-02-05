@@ -26,10 +26,12 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.secure;
 
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Handler;
 
@@ -63,9 +65,7 @@ public class LogSign {
         Vector header = new Vector(recordListHeader.length);
         // Extracting the field names as header from the first line of the
         // returned string array.
-        for( int i = 0; i < recordListHeader.length; i++) {
-            header.add(recordListHeader[i]);
-        }
+        header.addAll(Arrays.asList(recordListHeader));
         
         /* Getting the position of the Signature field in the array.
          * This is required to check if the record is a signature or a

@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.security;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import java.security.AccessController;
 

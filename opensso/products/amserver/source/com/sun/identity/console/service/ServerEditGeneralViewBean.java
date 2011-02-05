@@ -26,40 +26,23 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
-import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
-import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.Option;
 import com.iplanet.jato.view.html.OptionList;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
-import com.sun.identity.console.base.AMPropertySheet;
-import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
-import com.sun.identity.console.base.AMViewBeanBase;
-import com.sun.identity.console.base.AMViewConfig;
-import com.sun.identity.console.base.model.AMAdminConstants;
-import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.service.model.ServerSiteModel;
-import com.sun.identity.console.service.model.ServerSiteModelImpl;
-import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCDropDownMenu;
-import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import com.sun.web.ui.view.tabs.CCTabs;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Server Configuration, General Tab.

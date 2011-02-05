@@ -33,6 +33,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.servicetag.registration;
 
 import java.io.BufferedInputStream;
@@ -44,8 +47,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Tranfers service tag information from the local product repository to the

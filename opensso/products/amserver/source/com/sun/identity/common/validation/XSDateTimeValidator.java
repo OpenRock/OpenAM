@@ -26,14 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common.validation;
 
 import com.sun.identity.shared.DateUtils;
-import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.validation.ValidationException;
 import java.text.ParseException;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Validator for <code>xs:dateTime</code> format.

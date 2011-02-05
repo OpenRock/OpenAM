@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
 import java.security.AccessController;
@@ -73,7 +76,7 @@ public class AMUserPasswordValidationPlugin extends AMUserPasswordValidation
     public void validateUserID(String userID, Map envParams) throws AMException 
     {
 
-        StringBuffer errorString = new StringBuffer(10);
+        StringBuilder errorString = new StringBuilder(10);
         SSOToken token = (SSOToken) AccessController
                 .doPrivileged(AdminTokenAction.getInstance());
         String orgDN = (String) envParams

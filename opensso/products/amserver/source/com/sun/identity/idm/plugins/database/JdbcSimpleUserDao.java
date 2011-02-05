@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.plugins.database;
 
 import java.sql.Connection;
@@ -898,16 +901,16 @@ public class JdbcSimpleUserDao implements DaoInterface {
                             if(sb.length()==0 ) {
                                 sb.append(SPACE + "(");
                             } else {
-                                sb.append(SPACE + filterOperand + SPACE);
+                                sb.append(SPACE).append(filterOperand).append(SPACE);
                             }
                             //save the value to later set in perparedstatement ?
                             avPairsBindPosMapCount++;
                             avPairsBindingPositionMap.put(avPairsBindPosMapCount, v);
                             //add the attr to be set attr=? for preparedstatement
                             if (queryType.equals(QUERY_LIKE_TYPE)) {
-                                sb.append(SPACE + attrName + " LIKE ? ");
+                                sb.append(SPACE).append(attrName).append(" LIKE ? ");
                             } else {
-                                sb.append(SPACE + attrName + "= ? ");
+                                sb.append(SPACE).append(attrName).append("= ? ");
                             }
                         }
                     }
@@ -939,7 +942,7 @@ public class JdbcSimpleUserDao implements DaoInterface {
         ResultSet result = null;
                 
         Map<String, Map<String, Set<String>>> allUsers = 
-                           new HashMap<String, Map<String, Set<String>>>();;
+                           new HashMap<String, Map<String, Set<String>>>();
         try {
             con = getConnection();
             stmt = con.prepareStatement(queryToRun);       

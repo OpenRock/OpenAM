@@ -25,10 +25,12 @@
  * $Id: BaseRecord.java,v 1.2 2008/06/25 05:43:27 qcheng Exp $
  *
  */
- 
+
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.ha.jmqdb.client;
 
-import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.Persistent;
 import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.Relationship;

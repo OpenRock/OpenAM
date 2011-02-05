@@ -25,7 +25,9 @@
  * $Id: ServiceXMLTemplates.java,v 1.2 2009/05/02 23:07:18 kevinserwin Exp $
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.sun.identity.shared.debug.Debug;
@@ -73,7 +75,7 @@ public class ServiceXMLTemplates {
         ServletContext servletCtx
     ) {
         InputStreamReader fin = null;
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
 
         try {
             fin = new InputStreamReader(

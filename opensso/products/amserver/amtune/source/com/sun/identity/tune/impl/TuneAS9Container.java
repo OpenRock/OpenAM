@@ -25,6 +25,9 @@
  * $Id: TuneAS9Container.java,v 1.11 2009/12/09 00:38:36 ykwon Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.impl;
 
 import com.sun.identity.tune.common.FileHandler;
@@ -33,7 +36,6 @@ import com.sun.identity.tune.common.AMTuneException;
 import com.sun.identity.tune.common.AMTuneLogger;
 import com.sun.identity.tune.config.AS9ContainerConfigInfo;
 import com.sun.identity.tune.config.AMTuneConfigInfo;
-import com.sun.identity.tune.constants.AMTuneConstants;
 import com.sun.identity.tune.constants.WebContainerConstants;
 import com.sun.identity.tune.intr.TuneAppServer;
 import com.sun.identity.tune.util.AMTuneUtil;
@@ -489,7 +491,7 @@ public class TuneAS9Container extends TuneAppServer implements
      */
     private void setASParams() {
         try {
-            StringBuffer asAdminSetParams = new StringBuffer();
+            StringBuilder asAdminSetParams = new StringBuilder();
             if (curCfgMap.get(ACCEPTOR_THREAD_PARAM) != null) {
                 int curAccVal = Integer.parseInt(
                         curCfgMap.get(ACCEPTOR_THREAD_PARAM).toString());
@@ -546,8 +548,8 @@ public class TuneAS9Container extends TuneAppServer implements
                 return;
             }
             StringBuffer resultBuffer = new StringBuffer();
-            StringBuffer setCmd =
-                    new StringBuffer(asConfigInfo.getASAdminCmd());
+            StringBuilder setCmd =
+                    new StringBuilder(asConfigInfo.getASAdminCmd());
             setCmd.append("set ");
             setCmd.append(asConfigInfo.getAsAdminCommonParamsNoTarget());
             setCmd.append(" ");
@@ -577,7 +579,7 @@ public class TuneAS9Container extends TuneAppServer implements
      */
     private void deleteCurJVMOptions(List curJvmOptions) {
         try {
-            StringBuffer delOpts = new StringBuffer();
+            StringBuilder delOpts = new StringBuilder();
             if (AMTuneUtil.isWindows()) {
                 delOpts.append(" \"");
             } else {
@@ -601,8 +603,8 @@ public class TuneAS9Container extends TuneAppServer implements
                         "No JVM options to delete");
                 return;
             }
-            StringBuffer depOptCmd = 
-                    new StringBuffer(asConfigInfo.getASAdminCmd());
+            StringBuilder depOptCmd =
+                    new StringBuilder(asConfigInfo.getASAdminCmd());
             depOptCmd.append("delete-jvm-options ");
             depOptCmd.append(asConfigInfo.getAsAdminCommonParams());
             depOptCmd.append(delOpts.toString());
@@ -628,7 +630,7 @@ public class TuneAS9Container extends TuneAppServer implements
      */
     private void insertNewJVMOptions(List newJVMOpts) {
         try {
-            StringBuffer newOpts = new StringBuffer();
+            StringBuilder newOpts = new StringBuilder();
             if (AMTuneUtil.isWindows()) {
                 newOpts.append(" \"");
             } else {
@@ -652,8 +654,8 @@ public class TuneAS9Container extends TuneAppServer implements
                 return;
             }
             StringBuffer resultBuffer = new StringBuffer();
-            StringBuffer newOptCmd = 
-                    new StringBuffer(asConfigInfo.getASAdminCmd());
+            StringBuilder newOptCmd =
+                    new StringBuilder(asConfigInfo.getASAdminCmd());
             newOptCmd.append("create-jvm-options ");
             newOptCmd.append(asConfigInfo.getAsAdminCommonParams());
             newOptCmd.append(newOpts.toString());

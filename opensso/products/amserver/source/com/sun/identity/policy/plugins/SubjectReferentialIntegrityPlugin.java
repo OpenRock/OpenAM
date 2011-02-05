@@ -26,12 +26,13 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.sdk.AMCallBack;
 import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMObject;

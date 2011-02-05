@@ -25,7 +25,9 @@
  * $Id: LDIFTemplates.java,v 1.5 2009/10/27 05:33:39 hengming Exp $
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.sun.identity.shared.debug.Debug;
@@ -89,7 +91,7 @@ public class LDIFTemplates {
         ServletContext servletCtx
     ) {
         InputStreamReader fin = null;
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
 
         try {
             fin = new InputStreamReader(

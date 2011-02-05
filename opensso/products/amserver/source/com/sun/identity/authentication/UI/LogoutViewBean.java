@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.UI;
 
 import java.io.IOException;
@@ -42,11 +43,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.CookieUtils;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.model.ModelControlException;
@@ -55,7 +54,6 @@ import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.StaticTextField;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;

@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common.validation;
 
-import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.validation.ValidatorBase;
 import com.sun.identity.shared.validation.ValidationException;
 

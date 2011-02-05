@@ -26,12 +26,14 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.Debug;
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;

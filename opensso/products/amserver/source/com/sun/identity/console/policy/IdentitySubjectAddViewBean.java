@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.sso.SSOToken;
@@ -44,7 +47,6 @@ import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.web.ui.view.addremove.CCAddRemove;
 import com.sun.web.ui.view.alert.CCAlert;

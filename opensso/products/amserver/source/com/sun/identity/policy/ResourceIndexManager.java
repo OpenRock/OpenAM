@@ -26,9 +26,9 @@
  *
  */
 
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package  com.sun.identity.policy;
 
 import java.util.Set;
@@ -936,7 +936,7 @@ class ResourceIndexManager {
         /** Returns the XML representation of this resource index
          */
          String toXML() {
-             StringBuffer sb = new StringBuffer(256);
+             StringBuilder sb = new StringBuilder(256);
              sb.append(ResourceIndexManager.LTS)
                     .append(ResourceIndexManager.POLICY_CROSS_REFERENCES)
                     .append(ResourceIndexManager.SPACE)
@@ -1284,7 +1284,7 @@ class ResourceIndexManager {
          * @return  a string representation of this index entry
          */
         public String toString () {
-            StringBuffer sb = new StringBuffer(120);
+            StringBuilder sb = new StringBuilder(120);
             sb.append("ResourceName:").append(resourceName).append(";");
             sb.append("PolicyNames:").append(policyNames.toString());
             return  sb.toString();
@@ -1322,7 +1322,7 @@ class ResourceIndexManager {
              if ( policyNames.isEmpty() && childEntries.isEmpty() ) {
                  xmlString = "";
              } else {
-                 StringBuffer sb = new StringBuffer(256);
+                 StringBuilder sb = new StringBuilder(256);
                  sb.append(ResourceIndexManager.LTS)
                         .append(ResourceIndexManager.REFERENCE)
                         .append(ResourceIndexManager.SPACE)

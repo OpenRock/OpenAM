@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.delegation;
 
 import com.sun.identity.shared.debug.Debug;
@@ -273,7 +276,7 @@ public class DelegationPermission {
       * <code>DelegationPermission</code> object.
       */
     public String toString() {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("\nDelegationPermission Object:");
         sb.append("\norgName=");
         sb.append(orgName);

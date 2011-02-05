@@ -26,9 +26,9 @@
  *
  */
 
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import java.util.*;
@@ -173,7 +173,7 @@ public class LDAPUsers implements Subject {
         // get the organization name
         Set orgNameSet = (Set) configParams.get(
             PolicyManager.ORGANIZATION_NAME);
-        if ((orgNameSet != null) && (orgNameSet.size() != 0)) {
+        if ((orgNameSet != null) && (!orgNameSet.isEmpty())) {
             Iterator items = orgNameSet.iterator();
             orgName = (String) items.next();
         }

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.nightly;
 
 import java.io.File;
@@ -56,7 +59,7 @@ public class PrepNight {
         throws IOException
     {
         Set fileNames = getFileContent(baseDir);
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(HEADER);
 
         for (Iterator i = fileNames.iterator(); i.hasNext(); ) {

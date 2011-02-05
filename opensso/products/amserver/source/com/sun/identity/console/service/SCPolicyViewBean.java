@@ -26,38 +26,31 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
-import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.model.ModelControlException;
 import com.sun.identity.console.base.AMPropertySheet;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AMServiceProfileModel;
-import com.sun.identity.console.delegation.model.DelegationConfig;
 import com.sun.identity.console.property.PropertyXMLBuilderBase;
 import com.sun.identity.console.service.model.PolicyResourceComparator;
 import com.sun.identity.console.service.model.SCPolicyModel;
-import com.sun.identity.console.service.model.SCPolicyModelImpl;
-import com.sun.identity.console.service.model.SCModel;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.table.CCActionTable;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * SCPolicyViewBean is responsible for constructing the Policy Config

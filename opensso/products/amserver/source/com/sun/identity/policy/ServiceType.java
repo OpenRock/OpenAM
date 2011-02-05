@@ -26,10 +26,9 @@
  *
  */
 
-
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
@@ -39,7 +38,6 @@ import org.w3c.dom.*;
 import com.sun.identity.sm.*;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.policy.interfaces.*;
-import com.sun.identity.policy.plugins.*;
 
 
 /**
@@ -315,7 +313,7 @@ public class ServiceType {
      */
     public boolean validateActionValues(Map actionValues)
         throws InvalidNameException {
-        if ((actionValues == null) || (actionValues.size() == 0)) {
+        if ((actionValues == null) || (actionValues.isEmpty())) {
             // nothing really to validate
             return (true);
         }

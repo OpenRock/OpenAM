@@ -26,12 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import com.sun.identity.monitoring.*;
 
 /**
  * The LinkTrapGenerator class is used by the agent to trigger the 

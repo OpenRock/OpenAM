@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import java.util.Collections;
@@ -158,7 +161,7 @@ public class ServiceInstance {
      *         object.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("\nService Instance: ").append(getName()).append(
                 "\n\tGroup: ").append(getGroup()).append("\n\tURI: ").append(
                 getURI()).append("\n\tAttributes: ").append(getAttributes());

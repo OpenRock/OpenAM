@@ -25,6 +25,9 @@
  * $Id: JSSSocketFactory.java,v 1.3 2009/01/28 05:34:49 ww203982 Exp $
  *
  */
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import java.io.Serializable;
@@ -37,7 +40,6 @@ import com.sun.identity.shared.ldap.LDAPSocketFactory;
 import org.mozilla.jss.ssl.SSLSocket;
 
 import com.iplanet.am.util.JSSInit;
-import com.iplanet.am.util.JSSPasswordCallback;
 import com.iplanet.services.comm.https.ApprovalCallback;
 import com.sun.identity.shared.debug.Debug;
 

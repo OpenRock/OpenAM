@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import java.util.Map;
@@ -92,7 +93,7 @@ public class ELFFormatter extends Formatter {
             logInfoTable = ((com.sun.identity.log.ILogRecord) logRecord)
                 .getLogInfoMap();
         }
-        StringBuffer sbuffer = new StringBuffer();
+        StringBuilder sbuffer = new StringBuilder();
         try {
             String strTime;
             if(secureTimestampGenerator != null) {
@@ -179,7 +180,7 @@ public class ELFFormatter extends Formatter {
      */
     @Override
     public String getHead(Handler handler) {
-        StringBuffer sbuffer = new StringBuffer();
+        StringBuilder sbuffer = new StringBuilder();
         sbuffer.append("#Version: 1.0").append("\n");
         sbuffer.append("#Fields: ").append(constructHeader()).append("\n");
         // to be done: append correct Fields after gettting from logmanager.
@@ -197,7 +198,7 @@ public class ELFFormatter extends Formatter {
     }
     
     private String constructHeader() {
-        StringBuffer sbuffer = new StringBuffer();
+        StringBuilder sbuffer = new StringBuilder();
         String[] allFields = lmanager.getAllFields();
         for (int i = 0; i < allFields.length; i ++) {
             sbuffer.append(allFields[i]).append("\t");

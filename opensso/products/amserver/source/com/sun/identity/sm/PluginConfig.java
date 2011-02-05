@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import java.util.HashMap;
@@ -120,7 +123,7 @@ public class PluginConfig {
      */
     public void setPriority(int priority) throws SSOException, SMSException {
         validatePluginConfig();
-        StringBuffer sb = new StringBuffer(8);
+        StringBuilder sb = new StringBuilder(8);
         String[] priorities = { sb.append(priority).toString() };
         SMSEntry e = pc.getSMSEntry();
         e.setAttribute(SMSEntry.ATTR_PRIORITY, priorities);
@@ -315,10 +318,10 @@ public class PluginConfig {
      * defined and sub configurations.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         // Print the attributes
-        sb.append("Plugin name: " + getName());
-        sb.append("\n\tAttributes: " + getAttributes()).append("\n");
+        sb.append("Plugin name: ").append(getName());
+        sb.append("\n\tAttributes: ").append(getAttributes()).append("\n");
         return (sb.toString());
     }
 

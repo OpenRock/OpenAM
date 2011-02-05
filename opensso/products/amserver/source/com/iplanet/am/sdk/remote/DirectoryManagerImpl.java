@@ -26,12 +26,16 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.remote;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -100,7 +104,7 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
     }
 
     protected void initialize() throws RemoteException {
-        super.initialize_idrepo();
+        initialize_idrepo();
         if (initialized) {
             return;
         }
@@ -364,9 +368,7 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
             String[] array = dsServices.getGroupFilterAndScope(ssoToken,
                 entryDN, profileType);
             LinkedList list = new LinkedList();
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
+            list.addAll(Arrays.asList(array));
             return list;
         } catch (AMException amex) {
             if (debug.messageEnabled()) {
@@ -1034,7 +1036,7 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
         }
         
         // Construct the XML document for the event change
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<EventNotification><AttributeValuePair>").append(
             "<Attribute name=\"method\" /><Value>").append(method).append(
             "</Value></AttributeValuePair>").append(

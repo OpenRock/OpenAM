@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy.model;
 
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.iplanet.sso.SSOException;
@@ -209,7 +211,7 @@ public class PolicyCache
      * @return random string
      */
     private static String getRandomString() {
-        StringBuffer sb = new StringBuffer(30);
+        StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
         sb.append(System.currentTimeMillis());

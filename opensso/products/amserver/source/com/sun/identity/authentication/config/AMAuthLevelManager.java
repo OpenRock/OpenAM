@@ -26,22 +26,18 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.config;
 
 import java.util.*;
-import javax.security.auth.*;
-import javax.security.auth.callback.*;
-import javax.security.auth.spi.*;
 import javax.security.auth.login.*;
 import com.sun.identity.authentication.service.*;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.sm.*;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.iplanet.am.util.Cache;
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.debug.Debug;
 
 /**

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service.model;
 
 import com.sun.identity.console.base.model.AMAdminUtils;
@@ -65,7 +68,7 @@ public class PolicyResourceComparator {
     }
 
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(TOKEN_NAME_SERVICE_TYPE)
             .append("=")
             .append(serviceType.trim());

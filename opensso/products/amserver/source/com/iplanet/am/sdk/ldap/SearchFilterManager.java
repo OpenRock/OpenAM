@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMConstants;
@@ -213,7 +216,7 @@ public class SearchFilterManager {
         case AMObject.ROLE:
         case AMObject.FILTERED_ROLE:
             // Filter out Access Manager private filtered role
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("(&").append(filter);
             sb.append("(objectClass=ldapsubentry)").append("(!(cn=");
             sb.append(AMConstants.CONTAINER_DEFAULT_TEMPLATE_ROLE);
@@ -286,7 +289,7 @@ public class SearchFilterManager {
                 case AMObject.DYNAMIC_GROUP:
                 case AMObject.ASSIGNABLE_DYNAMIC_GROUP:
                 case AMObject.GROUP:
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     sb.append("(&").append(originalFilter).append("(!(");
                     sb.append(NamingAttributeManager.getNamingAttribute(
                             AMObject.ASSIGNABLE_DYNAMIC_GROUP));
@@ -330,7 +333,7 @@ public class SearchFilterManager {
             if (!ignoreComplianceFilter
                     && ComplianceServicesImpl.isComplianceUserDeletionEnabled())
             {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 switch (objectType) {
                 case AMObject.USER:
                     sb.append("(&").append(originalFilter);

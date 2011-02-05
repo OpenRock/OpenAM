@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 
@@ -141,7 +144,7 @@ public class UsageFormatter {
             }
         }
         
-        StringBuffer buffCmd = new StringBuffer();
+        StringBuilder buffCmd = new StringBuilder();
         boolean started = false;
         String webEnabledURL = mgr.getWebEnabledURL();
         for (Iterator i = orderCmds.iterator(); i.hasNext(); ) {
@@ -158,7 +161,7 @@ public class UsageFormatter {
         String cmdName,
         String description
     ) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
         if (webEnabledURL != null) {
             buff.append("  <a href=\"")

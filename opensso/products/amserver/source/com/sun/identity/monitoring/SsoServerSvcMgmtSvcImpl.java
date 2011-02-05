@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import com.iplanet.services.ldap.ServerGroup;
@@ -37,8 +40,6 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
-import java.lang.Integer;
-import java.lang.NumberFormatException;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.management.MBeanServer;

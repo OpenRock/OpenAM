@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
 import java.util.HashMap;
@@ -118,7 +121,7 @@ public class CaseInsensitiveHashMap extends HashMap {
     }
 
     public void putAll(Map map) {
-        if (map == null || map.size() == 0) {
+        if (map == null || map.isEmpty()) {
             return;
         }
         for (Iterator iter = map.entrySet().iterator(); iter.hasNext();) {

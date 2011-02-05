@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.sun.identity.shared.StringUtils;
@@ -74,7 +77,7 @@ public class InsertContent {
 
     private String getMatched(String fileName)
         throws IOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         String content = getFileContent(fileName);
         Matcher m = pattern.matcher(content);
         while (m.find()) {
@@ -85,7 +88,7 @@ public class InsertContent {
 
     private String getFileContent(String fileName)
         throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         FileReader in = null;
 
         try {

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -539,7 +542,7 @@ public class ServiceConfigManager {
     public Set getPluginConfigNames(String pluginSchemaName,
             String interfaceName, String orgName) throws SMSException,
             SSOException {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("ou=").append(pluginSchemaName).append(",ou=").append(
                 interfaceName).append(",").append(
                 CreateServiceConfig.PLUGIN_CONFIG_NODE).append("ou=").append(
@@ -670,7 +673,7 @@ public class ServiceConfigManager {
      * @supported.api
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\nService Config Manager: ").append(serviceName).append(
                 "\n\tVersion: ").append(version);
 
@@ -709,7 +712,7 @@ public class ServiceConfigManager {
     
     public String toXML(AMEncryption encryptObj) 
         throws SMSException, SSOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append("<" + SMSUtils.CONFIGURATION + ">");
 
         Set instances = getInstanceNames();

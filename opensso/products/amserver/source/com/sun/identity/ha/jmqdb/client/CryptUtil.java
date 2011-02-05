@@ -26,17 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.ha.jmqdb.client;
 
 import java.io.*;
-import java.util.*;
-import java.security.Security;
-import java.security.Provider;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.NoSuchPaddingException;
@@ -78,7 +77,7 @@ public class CryptUtil {
         // Serialize the data, i.e., remove \n and \r
         BufferedReader bufReader = 
             new BufferedReader(new StringReader(str));
-        StringBuffer strClean = new StringBuffer(str.length());
+        StringBuilder strClean = new StringBuilder(str.length());
         String strTemp = null;
         try {
             while ((strTemp = bufReader.readLine()) != null) {

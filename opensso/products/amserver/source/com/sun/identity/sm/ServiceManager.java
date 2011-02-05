@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm;
@@ -919,13 +919,13 @@ public class ServiceManager {
     }
 
     protected static String getCacheIndex(String serviceName, String version) {
-        StringBuffer sb = new StringBuffer(20);
+        StringBuilder sb = new StringBuilder(20);
         return (
             sb.append(serviceName).append(version).toString().toLowerCase());
     }
 
     protected static String getServiceNameDN(String serviceName) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(SMSEntry.PLACEHOLDER_RDN).append(SMSEntry.EQUALS).append(
                 serviceName).append(SMSEntry.COMMA).append(serviceDN);
         return (sb.toString());
@@ -933,7 +933,7 @@ public class ServiceManager {
 
     protected static String getServiceNameDN(String serviceName, String version)
     {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(SMSEntry.PLACEHOLDER_RDN).append(SMSEntry.EQUALS).append(
                 version).append(SMSEntry.COMMA).append(
                 getServiceNameDN(serviceName));
@@ -1031,7 +1031,7 @@ public class ServiceManager {
                         }
 
                         // Construct the encrypted "Value" node
-                        StringBuffer sb = new StringBuffer(100);
+                        StringBuilder sb = new StringBuilder(100);
                         sb.append(AttributeSchema.VALUE_BEGIN).append(encValue)
                           .append(AttributeSchema.VALUE_END);
                         Document newDoc = SMSSchema.getXMLDocument(
@@ -1207,7 +1207,7 @@ public class ServiceManager {
     public String toXML(AMEncryption encryptObj)
         throws SMSException, SSOException
     {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(SMSSchema.XML_ENC)
             .append("\n")
             .append("<!DOCTYPE ServicesConfiguration\n")

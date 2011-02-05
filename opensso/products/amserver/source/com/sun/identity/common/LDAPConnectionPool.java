@@ -26,25 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.HeadTaskRunnable;
-import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.SystemTimerPool;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.StringTokenizer;
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
-import com.sun.identity.common.FallBackManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
@@ -558,9 +553,9 @@ public class LDAPConnectionPool {
         }
 
         if (debug.messageEnabled()) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("");
-            buf.append("New Connection pool name =" + name);
+            buf.append("New Connection pool name =").append(name);
             buf.append(" LDAP host =").append(host);
             buf.append(" Port =").append(port);
             buf.append(" Min =").append(minSize);

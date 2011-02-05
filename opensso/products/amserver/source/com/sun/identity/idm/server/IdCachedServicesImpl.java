@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.server;
 
 import java.util.Enumeration;
@@ -174,7 +177,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n<<<<<<< BEGIN SDK CACHE CONTENTS >>>>>>>>");
         if (!idRepoCache.isEmpty()) { // Should never be null
             Enumeration cacheKeys = idRepoCache.keys();

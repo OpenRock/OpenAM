@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import java.util.HashMap;
@@ -66,7 +69,7 @@ public class AMPipeDelimitAttrTokenizer {
     }
 
     public String deTokenizes(Map map) {
-        StringBuffer buff = new StringBuffer(200);
+        StringBuilder buff = new StringBuilder(200);
         boolean firstElement = true;
 
         if ((map != null) && !map.isEmpty()) {
@@ -78,7 +81,7 @@ public class AMPipeDelimitAttrTokenizer {
 
                 String name = (String)iter.next();
                 String value = (String)map.get(name);
-                buff.append(name + "=" + value);
+                buff.append(name).append("=").append(value);
             }
         }
 

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 import com.sun.identity.shared.locale.Locale;
@@ -36,9 +39,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.util.Date;
 import java.util.HashSet;

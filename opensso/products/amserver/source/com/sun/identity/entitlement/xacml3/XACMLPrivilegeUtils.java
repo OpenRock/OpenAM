@@ -24,6 +24,9 @@
  *
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement.xacml3;
 
 import com.sun.identity.entitlement.Entitlement;
@@ -37,7 +40,6 @@ import com.sun.identity.entitlement.ResourceAttribute;
 
 import com.sun.identity.entitlement.UserSubject;
 
-import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.XACMLOpenSSOPrivilege;
 import com.sun.identity.entitlement.xacml3.core.AllOf;
 import com.sun.identity.entitlement.xacml3.core.Apply;
@@ -57,8 +59,6 @@ import com.sun.identity.entitlement.xacml3.core.Version;
 
 import com.sun.identity.shared.JSONUtils;
 
-import com.sun.identity.sm.ServiceManager;
-
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -76,7 +76,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.Constants;
@@ -341,13 +344,13 @@ public class XMLUtils {
             Object params[] = { new Integer(pe.getLineNumber()) };
             throw (new Exception(msg + "XMLUtils.parser_error" + params));
         } catch (SAXException sax) {
-            Object params[] = { new String(sax.getMessage()) };
+            Object params[] = { sax.getMessage()};
             throw (new Exception("XMLUtils.exception_message" + params));
         } catch (ParserConfigurationException pc) {
-            Object params[] = { new String(pc.getMessage()) };
+            Object params[] = { pc.getMessage()};
             throw (new Exception("XMLUtils.invalid_xml_document" + params));
         } catch (IOException ioe) {
-            Object params[] = { new String(ioe.getMessage()) };
+            Object params[] = { ioe.getMessage()};
             throw (new Exception("XMLUtils.invalid_input_stream" + params));
         }
     }
@@ -433,7 +436,7 @@ public class XMLUtils {
         if (element == null) {
             return null;
         }
-        StringBuffer sb = new StringBuffer(1000);
+        StringBuilder sb = new StringBuilder(1000);
         NodeList nl = element.getChildNodes();
         Node child = null;
         int length = nl.getLength();
@@ -460,7 +463,7 @@ public class XMLUtils {
         if (element == null) {
             return null;
         }
-        StringBuffer sb = new StringBuffer(1000);
+        StringBuilder sb = new StringBuilder(1000);
         NodeList nl = element.getChildNodes();
         Node child = null;
         for (int i = 0, length = nl.getLength(); i < length; i++) {
@@ -533,7 +536,7 @@ public class XMLUtils {
     public static String getValueOfValueNode(Node n) {
         NodeList textNodes = n.getChildNodes();
         Node textNode;
-        StringBuffer value = new StringBuffer("");
+        StringBuilder value = new StringBuilder("");
         for (int j = 0; j < textNodes.getLength(); j++) {
             textNode = textNodes.item(j);
             value.append(textNode.getNodeValue());
@@ -590,7 +593,7 @@ public class XMLUtils {
             return null;
         }
 
-        StringBuffer xml = new StringBuffer(100);
+        StringBuilder xml = new StringBuilder(100);
         xml.append('<');
         xml.append(prefix).append(node.getLocalName());
         NamedNodeMap attrs = node.getAttributes();

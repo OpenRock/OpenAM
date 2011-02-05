@@ -1570,7 +1570,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
         String qString = AuthClientUtils.getQueryStrFromParameters(
                 rc.getRedirectData());
-        StringBuffer redirectUrl = new StringBuffer(rc.getRedirectUrl());
+        StringBuilder redirectUrl = new StringBuilder(rc.getRedirectUrl());
         if (qString != null && qString.length() != 0) {
             redirectUrl.append(qString);
         }

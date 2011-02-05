@@ -26,18 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.model.ModelControlException;
-import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-import com.iplanet.jato.view.html.Option;
-import com.iplanet.jato.view.html.OptionList;
-import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.service.model.ServerSiteModel;
-import com.sun.web.ui.view.alert.CCAlert;
-import com.sun.web.ui.view.html.CCDropDownMenu;
-import java.util.Set;
 
 /**
  * Server Configuration, SDK Tab.

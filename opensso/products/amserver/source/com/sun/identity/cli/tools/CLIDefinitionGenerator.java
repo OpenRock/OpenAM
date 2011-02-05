@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli.tools;
 
 import com.sun.identity.cli.annotation.DefinitionClassInfo;
@@ -38,6 +41,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -219,9 +223,7 @@ public class CLIDefinitionGenerator {
     public static List toList(String[] array) {
         List list = new ArrayList();
         if ((array != null) && (array.length > 0)) {
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
+            list.addAll(Arrays.asList(array));
         }
         return list;
     }
@@ -234,9 +236,7 @@ public class CLIDefinitionGenerator {
      */
     public static void appendToList(List list, String[] array) {
         if ((array != null) && (array.length > 0)) {
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
+            list.addAll(Arrays.asList(array));
         }
     }
 }

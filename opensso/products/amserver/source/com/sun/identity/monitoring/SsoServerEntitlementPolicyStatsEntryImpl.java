@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.entitlement.opensso.OpenSSOIndexStore;
@@ -35,9 +38,6 @@ import com.sun.management.snmp.agent.SnmpMib;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 
 

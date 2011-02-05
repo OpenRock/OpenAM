@@ -26,28 +26,25 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.safeword;
 
 import java.io.*;
 import java.util.*;
-import java.net.*;
 
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.Misc;
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.Constants;
 import com.sun.identity.authentication.spi.AMLoginModule;
 
 import javax.security.auth.*;
 import javax.security.auth.callback.*;
-import javax.security.auth.login.*;
-import javax.security.auth.spi.*;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 
 import securecomputing.swec.SafeWordClient;
-import securecomputing.swec.Authentication;
 import securecomputing.swec.AuthenState;
 import securecomputing.swec.EasspMessage;
 import securecomputing.swec.AuthenticatorData;
@@ -55,7 +52,6 @@ import securecomputing.swec.FixedPwdData;
 import securecomputing.swec.DynamicPwdData;
 import securecomputing.swec.SwecConfig;
 import securecomputing.ssl.SimpleSSLClient;
-import securecomputing.util.SccDebug;
 
 
 public class SafeWord extends AMLoginModule {
@@ -646,7 +642,7 @@ public class SafeWord extends AMLoginModule {
     
     private String getServerConfigPath() {
         if (serverVerifFilesPath == null) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(DEFAULT_VAR_DIR)
             .append("/auth/safeword/serverVerification");
             serverVerifFilesPath=buf.toString();
@@ -656,7 +652,7 @@ public class SafeWord extends AMLoginModule {
     
     private String getServerLogPath() {
         if (statusLogFilePath == null) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(DEFAULT_VAR_DIR)
             .append("/auth/safeword/safe.log");
             statusLogFilePath=buf.toString();

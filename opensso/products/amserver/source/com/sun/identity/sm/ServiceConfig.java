@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -136,7 +139,7 @@ public class ServiceConfig {
      */
     public void setPriority(int priority) throws SSOException, SMSException {
         validateServiceConfigImpl();
-        StringBuffer sb = new StringBuffer(8);
+        StringBuilder sb = new StringBuilder(8);
         String[] priorities = { sb.append(priority).toString() };
         SMSEntry e = sc.getSMSEntry();
         e.setAttribute(SMSEntry.ATTR_PRIORITY, priorities);
@@ -164,7 +167,7 @@ public class ServiceConfig {
      */
     public void setLabeledUri(String luri) throws SSOException, SMSException {
         validateServiceConfigImpl();
-        StringBuffer sb = new StringBuffer(8);
+        StringBuilder sb = new StringBuilder(8);
         String[] lUris = { sb.append(luri).toString() };
         SMSEntry e = sc.getSMSEntry();
         e.setAttribute(SMSEntry.ATTR_LABELED_URI, lUris);
@@ -320,7 +323,7 @@ public class ServiceConfig {
         }
 
         // Convert priority to string
-        StringBuffer sb = new StringBuffer(8);
+        StringBuilder sb = new StringBuilder(8);
         sb.append(priority);
 
         // Create the entry
@@ -805,7 +808,7 @@ public class ServiceConfig {
      * @return String representation of the <code>ServiceConfig</code> object.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         // Print the attributes
         sb.append("Service Component name: " + getComponentName());
         sb.append("\n\tAttributes: " + getAttributes()).append("\n");

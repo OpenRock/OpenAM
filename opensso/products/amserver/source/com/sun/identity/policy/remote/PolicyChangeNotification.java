@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.remote;
 
 import com.sun.identity.shared.debug.Debug;
@@ -217,7 +220,7 @@ public class PolicyChangeNotification {
      * @return a XML representation of this object.
      */
     public String toXMLString() {
-        StringBuffer xmlsb = new StringBuffer(200);
+        StringBuilder xmlsb = new StringBuilder(200);
      
         xmlsb.append("<")
              .append(PolicyNotification.POLICY_CHANGE)

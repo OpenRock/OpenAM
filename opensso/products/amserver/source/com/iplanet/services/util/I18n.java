@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.util;
 
 import java.io.UnsupportedEncodingException;
@@ -100,7 +103,7 @@ public class I18n {
      * should match with name of the resource bundle
      */
     protected I18n(String serviceName) {
-        this.serviceName = new String(serviceName);
+        this.serviceName = serviceName;
     }
 
     private void initialize() {

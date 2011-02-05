@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.ldap;
 
 import com.iplanet.am.util.SystemProperties;
@@ -296,8 +299,8 @@ class SMDataLayer {
             // Construct the pool by cloning the successful connection
             // Set the default options too for failover and fallback features.
 
-            connOptions.put("maxbacklog", new Integer(maxBackLog));
-            connOptions.put("referrals", new Boolean(referrals));
+            connOptions.put("maxbacklog", Integer.valueOf(maxBackLog));
+            connOptions.put("referrals", Boolean.valueOf(referrals));
             connOptions.put("searchconstraints", _defaultSearchConstraints);
 
             ShutdownManager shutdownMan = ShutdownManager.getInstance();

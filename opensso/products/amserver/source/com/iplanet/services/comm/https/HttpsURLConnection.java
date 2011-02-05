@@ -26,12 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.https;
 
 import java.net.URL;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.InputStream;
 
 import sun.net.www.http.*;
 import sun.net.www.protocol.http.*;

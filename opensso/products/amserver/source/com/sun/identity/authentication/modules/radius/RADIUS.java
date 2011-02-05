@@ -26,32 +26,27 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.radius;
 
-import java.io.*;
 import java.util.*;
 import java.net.*;
 import com.iplanet.am.util.*;
 
-import javax.security.auth.*;
-import javax.security.auth.callback.*;
-import javax.security.auth.login.*;
-import javax.security.auth.spi.*;
 
 import com.sun.identity.authentication.spi.*;
 
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 
-import java.security.Principal;
 
-import com.iplanet.dpro.session.*;
 import com.sun.identity.authentication.modules.radius.client.*;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import java.io.IOException;
 import javax.security.auth.*;
 import javax.security.auth.callback.*;
-import javax.security.auth.login.*;
 
 public class RADIUS extends AMLoginModule {
     // initial state

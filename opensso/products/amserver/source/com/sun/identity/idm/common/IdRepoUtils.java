@@ -25,6 +25,9 @@
  * $Id: IdRepoUtils.java,v 1.3 2010/01/06 22:31:55 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.common;
 
 import java.io.ByteArrayInputStream;
@@ -56,7 +59,6 @@ import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.setup.ServicesDefaultValues;
-import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -251,7 +253,7 @@ public class IdRepoUtils {
             fin = new InputStreamReader(servletCtx.getResourceAsStream(
                 schemaFile));
 
-            StringBuffer sbuf = new StringBuffer();
+            StringBuilder sbuf = new StringBuilder();
             char[] cbuf = new char[1024];
             int len;
             while ((len = fin.read(cbuf)) > 0) {

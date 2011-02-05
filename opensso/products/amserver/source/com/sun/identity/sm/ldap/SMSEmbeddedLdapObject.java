@@ -24,6 +24,9 @@
 *
 * $Id: SMSEmbeddedLdapObject.java,v 1.3 2009/10/28 04:24:27 hengming Exp $
 */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.ldap;
 
 import java.text.MessageFormat;
@@ -49,11 +52,9 @@ import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSNotificationManager;
@@ -66,8 +67,6 @@ import org.opends.server.protocols.internal.InternalClientConnection;
 import org.opends.server.protocols.internal.InternalSearchOperation;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.protocols.ldap.LDAPModification;
-import org.opends.server.types.Attribute;
-import org.opends.server.types.AttributeValue;
 import org.opends.server.types.DereferencePolicy;
 import org.opends.server.types.DirectoryException;
 import org.opends.server.types.ModificationType;
@@ -880,7 +879,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
          * 
          */
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("(&");
         for (Iterator itr = values.iterator(); itr.hasNext();) {
             String val = (String) itr.next();

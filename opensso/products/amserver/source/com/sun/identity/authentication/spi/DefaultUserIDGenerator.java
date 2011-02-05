@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.spi;
 
 import java.util.Collections;
@@ -113,7 +114,7 @@ public class DefaultUserIDGenerator implements UserIDGenerator {
 
     private String filterNonAsciiChars(String userName){
         char[] chUserName = userName.toCharArray();
-        StringBuffer newUserName = new StringBuffer("");
+        StringBuilder newUserName = new StringBuilder("");
 
         for(int i=0; i < chUserName.length; i++){
                 if (chUserName[i] <= (int)0x80){

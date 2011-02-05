@@ -26,13 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.cli.CommandManager;
-import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.common.ISResourceBundle;
 import com.sun.identity.sm.SMSException;
 import java.io.BufferedReader;

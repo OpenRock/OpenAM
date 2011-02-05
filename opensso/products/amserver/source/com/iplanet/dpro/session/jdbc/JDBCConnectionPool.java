@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.jdbc;
 
 import com.iplanet.dpro.session.service.SessionService;
@@ -272,7 +275,7 @@ public class JDBCConnectionPool implements DataSource, ConnectionEventListener {
 
                 synchronized (this) {
                     try {
-                        if (free.size() == 0) {
+                        if (free.isEmpty()) {
                             this.wait(remainingWaitTime);
                         }
                     } catch (InterruptedException ex) {
@@ -499,7 +502,7 @@ public class JDBCConnectionPool implements DataSource, ConnectionEventListener {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer("Pool [");
+        StringBuilder sb = new StringBuilder("Pool [");
         sb.append("] PoolSize=");
         sb.append(connectionStates.size());
         sb.append("  FreeConnections=");

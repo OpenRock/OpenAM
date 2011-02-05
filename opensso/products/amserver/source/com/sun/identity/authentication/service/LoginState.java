@@ -93,11 +93,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -1081,7 +1079,7 @@ public class LoginState {
             String id = token;
             id = DNUtils.DNtoName(token);
             
-            StringBuffer s = new StringBuffer(200);
+            StringBuilder s = new StringBuilder(200);
             s.append(userNamingAttr).append("=").append(id).append(",")
             .append(userContainerDN);
             // set flag, indicate user DN is constructed from userContainerDN
@@ -1329,7 +1327,7 @@ public class LoginState {
                 Map.Entry entry = (Map.Entry)iter.next();
                 String moduleName = (String)entry.getKey();
                 String authTime = (String)entry.getValue();
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 if (!firstElement) {
                     sb.append(ISAuthConstants.PIPE_SEPARATOR);
                 }
@@ -1510,7 +1508,7 @@ public class LoginState {
                                 !(userAttrValueSet.isEmpty())) {
                                 Iterator valueIter = userAttrValueSet.
                                     iterator();
-                                StringBuffer strBuffValues = new StringBuffer();
+                                StringBuilder strBuffValues = new StringBuilder();
                                 while (valueIter.hasNext()) {
                                     String userAttrValue = (String)
                                         valueIter.next();
@@ -2055,7 +2053,7 @@ public class LoginState {
      */
     private static String byteArrayToHexString(byte[] byteArray) {
         int readBytes = byteArray.length;
-        StringBuffer hexData = new StringBuffer();
+        StringBuilder hexData = new StringBuilder();
         int onebyte;
         for (int i=0; i < readBytes; i++) {
           onebyte = ((0x000000ff & byteArray[i]) | 0xffffff00);
@@ -4505,7 +4503,7 @@ public class LoginState {
             debug.message("createAuthContext: userOrg is : " + userOrg);
         }
         
-        if ((this.userOrg == "") || (this.userOrg == null)) {
+        if ((this.userOrg == null) || (this.userOrg.equals(""))) {
             debug.error("domain is null, error condtion");
             logFailed(ad.bundle.getString("invalidDomain"),"INVALIDDOMAIN");
             throw new AuthException(AMAuthErrorCode.AUTH_INVALID_DOMAIN, null);
@@ -4667,7 +4665,7 @@ public class LoginState {
             String logSuccess = ad.bundle.getString("loginSuccess");
             ArrayList dataList = new ArrayList();
             dataList.add(logSuccess);
-            StringBuffer messageId = new StringBuffer();
+            StringBuilder messageId = new StringBuilder();
             messageId.append("LOGIN_SUCCESS");
             if (indexType != null) {
                 messageId.append("_").append(indexType.toString()
@@ -4785,7 +4783,7 @@ public class LoginState {
             }
             ArrayList dataList = new ArrayList();
             dataList.add(logFailed);
-            StringBuffer messageId = new StringBuffer();
+            StringBuilder messageId = new StringBuilder();
             messageId.append(logId);
             if ((indexType != null) &&
             (indexType != AuthContext.IndexType.COMPOSITE_ADVICE)){
@@ -4862,7 +4860,7 @@ public class LoginState {
             String logLogout = ad.bundle.getString("logout");
             ArrayList dataList = new ArrayList();
             dataList.add(logLogout);
-            StringBuffer messageId = new StringBuffer();
+            StringBuilder messageId = new StringBuilder();
             messageId.append("LOGOUT");
             if (indexType != null) {
                 messageId.append("_").append(indexType.toString()
@@ -5073,9 +5071,9 @@ public class LoginState {
             debug.message("prevModuleList : " + prevModuleList);
         }
         String upgradeModuleList = null;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(newModuleList);
-        if (prevModuleList != newModuleList) {
+        if (prevModuleList == null ? newModuleList != null : !prevModuleList.equals(newModuleList)) {
             upgradeModuleList = parsePropertyList(prevModuleList,newModuleList);
         } else {
             upgradeModuleList = sb.toString();
@@ -5124,7 +5122,7 @@ public class LoginState {
                 + oldModulesList);
         }
         
-        StringBuffer sb = new StringBuffer();          
+        StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(oldModulesList,"|");
         while (st.hasMoreTokens()) {
             String module = (String)st.nextToken();
@@ -5153,7 +5151,7 @@ public class LoginState {
             debug.message("newProperty : " + newProperty);
         }
         
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(newProperty);
         StringTokenizer st = new StringTokenizer(oldProperty,"|");
         while (st.hasMoreTokens()) {
@@ -5375,7 +5373,7 @@ public class LoginState {
 
         if ((postLoginClassSet != null) && (!postLoginClassSet.isEmpty())) {
             postLoginInstanceSet = new HashSet();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for(Iterator iter = postLoginClassSet.iterator(); iter.hasNext();) {
                 postLoginClassName = (String)iter.next();
                 if (sb.length() > 0) {

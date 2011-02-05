@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.server;
 
 import java.io.BufferedReader;
@@ -86,7 +89,7 @@ public class NotificationSender {
             // notification
             // URLs of the apps in case the apps died.
             // Read input stream fully
-            StringBuffer in_buf = new StringBuffer();
+            StringBuilder in_buf = new StringBuilder();
             BufferedReader in = new BufferedReader(new InputStreamReader(conn
                     .getInputStream()));
             String in_string;

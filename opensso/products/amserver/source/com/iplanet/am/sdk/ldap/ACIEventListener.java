@@ -26,9 +26,11 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
-import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMObjectListener;
 import com.iplanet.am.sdk.common.ICachedDirectoryServices;
 import com.iplanet.am.sdk.common.IDirectoryServices;

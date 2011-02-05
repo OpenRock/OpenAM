@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import com.iplanet.am.sdk.common.IComplianceServices;
@@ -34,7 +37,6 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.sdk.common.IDirectoryServicesProvider;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;

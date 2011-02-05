@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log;
 
 import java.io.File;
@@ -171,7 +174,7 @@ public class Logger extends java.util.logging.Logger {
 
         Class clz = null;
         Class [] parameters = {String.class};
-        Object [] parameterObjects = {new String(result.logName)};
+        Object [] parameterObjects = {result.logName};
         Constructor cons = null;
         Handler handler = null;
         

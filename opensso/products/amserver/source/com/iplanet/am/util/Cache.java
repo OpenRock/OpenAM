@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import java.io.IOException;
@@ -571,13 +574,13 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
      */
     public synchronized String toString() {
         int max = size() - 1;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Iterator it = entrySet().iterator();
 
         buf.append("{");
         for (int i = 0; i <= max; i++) {
             Entry e = (Entry) (it.next());
-            buf.append(e.key + "=" + e.value);
+            buf.append(e.key).append("=").append(e.value);
             if (i < max)
                 buf.append(", ");
         }

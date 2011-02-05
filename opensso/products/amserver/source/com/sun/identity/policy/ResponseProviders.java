@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
@@ -37,7 +38,6 @@ import org.w3c.dom.*;
 import com.sun.identity.policy.interfaces.ResponseProvider;
 import com.iplanet.sso.*;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * The class <code>ResponseProviders</code> provides methods to maintain
@@ -477,7 +477,7 @@ public class ResponseProviders {
     }
 
     protected String toXML() {
-	StringBuffer sb = new StringBuffer(100);
+	StringBuilder sb = new StringBuilder(100);
 	sb.append("\n").append(RESPONSE_PROVIDERS_ELEMENT_BEGIN)
 	    .append(XMLUtils.escapeSpecialCharacters(name))
             .append(RESPONSE_PROVIDERS_DESCRIPTION)

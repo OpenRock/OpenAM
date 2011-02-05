@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common.configuration;
 
 import java.util.HashSet;
@@ -70,7 +73,7 @@ public class LegacyServer {
     }
 
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(name)
             .append("|")
             .append(id);

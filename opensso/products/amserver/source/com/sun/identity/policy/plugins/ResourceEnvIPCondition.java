@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import java.util.Set;
@@ -173,7 +176,7 @@ public class ResourceEnvIPCondition implements Condition {
         // check if the value is valid
         Set envCondVal = (Set) properties.get(ENV_CONDITION_VALUE);
         if (( envCondVal == null ) || envCondVal.isEmpty() 
-            || ( envCondVal.size() == 0 )) {
+            || ( envCondVal.isEmpty() )) {
             throw new PolicyException(ResBundleUtils.rbName,
                 "null_env_cond_value", null, null);
         }

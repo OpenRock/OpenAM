@@ -33,6 +33,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.servicetag.registration;
 
 import com.sun.identity.servicetag.registration.RegistrationService.RegistrationStatus;
@@ -40,7 +43,6 @@ import com.sun.identity.servicetag.registration.RegistrationService.Registration
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;

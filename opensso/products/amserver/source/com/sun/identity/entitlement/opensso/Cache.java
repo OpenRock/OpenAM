@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement.opensso;
 
 import java.io.Serializable;
@@ -644,13 +647,13 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
         
         try {
             int max = size() - 1;
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("{");
 
             Iterator it = entrySet().iterator();
             for (int i = 0; i <= max; i++) {
                 Entry e = (Entry) (it.next());
-                buf.append(e.key + "=" + e.value);
+                buf.append(e.key).append("=").append(e.value);
                 if (i < max) {
                     buf.append(", ");
                 }

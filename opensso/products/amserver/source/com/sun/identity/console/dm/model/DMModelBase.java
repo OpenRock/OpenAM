@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm.model;
 
 /*import com.iplanet.am.sdk.AMAssignableDynamicGroup;
@@ -884,13 +887,12 @@ public class DMModelBase
 
     protected String getMultiValue(Set attrValues) {
         // Handle multi-valued attributes
-        StringBuffer sb = new StringBuffer(25);
+        StringBuilder sb = new StringBuilder(25);
         if (attrValues != null && !attrValues.isEmpty()) {
             Iterator iter = attrValues.iterator();
             while (iter.hasNext()) {
                  if (sb.length() != 0) {
-                     sb.append(getLocalizedString(
-                         "multiValuedAttrSeparator")+" ");
+                     sb.append(getLocalizedString("multiValuedAttrSeparator")).append(" ");
                  }
                  sb.append((String)iter.next());
             }
@@ -1485,17 +1487,17 @@ public class DMModelBase
      * in the filter.
      */
     private String getFilterSectionXML() {
-        StringBuffer xml = new StringBuffer(1000);
+        StringBuilder xml = new StringBuilder(1000);
 
         xml.append("<property>")
            .append("<label name=\"LogicalOperatorLabel\" ")
            .append("defaultValue=\"search.user.logical.operator\" ") 
-           .append("labelFor=\""+ATTR_NAME_LOGICAL_OPERATOR+"\" />")
-           .append("<cc name=\""+ATTR_NAME_LOGICAL_OPERATOR+"\" tagclass=")
+           .append("labelFor=\"").append(ATTR_NAME_LOGICAL_OPERATOR).append("\" />")
+           .append("<cc name=\"").append(ATTR_NAME_LOGICAL_OPERATOR).append("\" tagclass=")
            .append("\"com.sun.web.ui.taglib.html.CCDropDownMenuTag\">")
-           .append("<option label=\""+getLogicalOrOpLabel() + "\" value=\"")
-           .append(getLogicalOrOpValue()+"\" /><option label=\"")
-           .append(getLogicalAndOpLabel()+"\" value=\""+getLogicalAndOpValue())
+           .append("<option label=\"").append(getLogicalOrOpLabel()).append("\" value=\"")
+           .append(getLogicalOrOpValue()).append("\" /><option label=\"")
+           .append(getLogicalAndOpLabel()).append("\" value=\"").append(getLogicalAndOpValue())
            .append("\" /></cc><cc name=\"matchLabel\" tagclass=\"")
            .append("com.sun.web.ui.taglib.html.CCStaticTextFieldTag\">")
            .append("<attribute name=\"defaultValue\" ")
@@ -1612,7 +1614,7 @@ public class DMModelBase
     }
 
     protected String generateFilter(Map attributes) {
-        StringBuffer filter = new StringBuffer(512);
+        StringBuilder filter = new StringBuilder(512);
 
         for (Iterator iter = attributes.keySet().iterator(); iter.hasNext(); ) {
             AttributeSchema as = (AttributeSchema)iter.next();
@@ -1620,7 +1622,7 @@ public class DMModelBase
             Set value = (Set)attributes.remove(key);
             if (value == null || value.isEmpty()) {
                 if (key.equals(USER_SERVICE_UID)) {
-                    filter.append("(" + key + "=*)");
+                    filter.append("(").append(key).append("=*)");
                 }
                 continue;
             }
@@ -1941,7 +1943,7 @@ public class DMModelBase
      * @return validated user attribute names.
      */
     protected String getValidUserAttributes(String value) {
-        StringBuffer userAttributes = new StringBuffer(16);
+        StringBuilder userAttributes = new StringBuilder(16);
         if ((value != null) && (value.length() > 0)) {
             StringTokenizer tokenizer = new StringTokenizer(value);
             try {
@@ -2322,7 +2324,7 @@ public class DMModelBase
      * @return the formated string.
      */
     public String getDisplayPath(String dn) {
-        StringBuffer path = new StringBuffer(64);
+        StringBuilder path = new StringBuilder(64);
         List nodes = pathToDisplayString(dn);
         int size = nodes.size();
 
@@ -2745,7 +2747,7 @@ public class DMModelBase
                     AMObject.USER, debug);
             }
         }
-        StringBuffer searchFilter = new StringBuffer(20);
+        StringBuilder searchFilter = new StringBuilder(20);
         searchFilter.append("(")
             .append(searchAttribute).append("=").append(pattern)
             .append(")");

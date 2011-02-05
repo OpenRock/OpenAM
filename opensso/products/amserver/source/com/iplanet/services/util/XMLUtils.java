@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.util;
 
 import com.iplanet.ums.IUMSConstants;
@@ -151,15 +154,15 @@ public class XMLUtils {
             throw (new XMLException(msg
                     + i18n.getString("XMLUtils.parser_error", params)));
         } catch (SAXException sax) {
-            Object params[] = { new String(sax.getMessage()) };
+            Object params[] = { sax.getMessage()};
             throw (new XMLException(i18n.getString(
                     "XMLUtils.exception_message", params)));
         } catch (ParserConfigurationException pc) {
-            Object params[] = { new String(pc.getMessage()) };
+            Object params[] = { pc.getMessage()};
             throw (new XMLException(i18n.getString(
                     "XMLUtils.invalid_xml_document", params)));
         } catch (IOException ioe) {
-            Object params[] = { new String(ioe.getMessage()) };
+            Object params[] = { ioe.getMessage()};
             throw (new XMLException(i18n.getString(
                     "XMLUtils.invalid_input_stream", params)));
         }
@@ -246,7 +249,7 @@ public class XMLUtils {
     public static String getValueOfValueNode(Node n) {
         NodeList textNodes = n.getChildNodes();
         Node textNode;
-        StringBuffer value = new StringBuffer("");
+        StringBuilder value = new StringBuilder();
         for (int j = 0; j < textNodes.getLength(); j++) {
             textNode = textNodes.item(j);
             value.append(textNode.getNodeValue());

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.session.model;
 
 import com.iplanet.dpro.session.Session;
@@ -61,8 +64,6 @@ public class SMProfileModelImpl extends AMModelBase
 {
     private final static String SERVER_LIST = 
         "iplanet-am-platform-server-list";
-    private final static String PLATFORM_SERVICE = "iPlanetAMPlatformService";
-    private final static int DEFAULT_PAGE_SIZE = 25;
 
     public  final static String USER_ID = "UserId";
 

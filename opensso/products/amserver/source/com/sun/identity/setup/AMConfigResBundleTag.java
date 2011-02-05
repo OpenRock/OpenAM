@@ -26,13 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.Locale;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;

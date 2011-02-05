@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.setup;
@@ -569,7 +569,7 @@ public class AMSetupServlet extends HttpServlet {
 
     private static void writeInputToFile(IHttpServletRequest request)
         throws IOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         Map map = request.getParameterMap();
         for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
             String key = (String)i.next();
@@ -2426,7 +2426,7 @@ public class AMSetupServlet extends HttpServlet {
     }
 
     private static String mapToString(Map map) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
             String key = (String)i.next();
             buff.append(key).append("=").append((String)map.get(key))

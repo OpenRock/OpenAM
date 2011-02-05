@@ -25,6 +25,9 @@
  * $Id: SsoServerEntitlementSvcImpl.java,v 1.1 2009/10/20 23:55:28 bigfatrat Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.entitlement.opensso.DataStore;
@@ -72,7 +75,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
         int i = DataStore.getNumberOfReferrals();
         NumReferrals = new Integer(i);
         if (debug.messageEnabled()) {
-            StringBuffer sb = new StringBuffer(classMethod);
+            StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
             debug.message(sb.toString());
         }
@@ -85,7 +88,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
         int i = DataStore.getNumberOfPolicies();
         NumPolicies = new Integer(i);
         if (debug.messageEnabled()) {
-            StringBuffer sb = new StringBuffer(classMethod);
+            StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
             debug.message(sb.toString());
         }
@@ -99,7 +102,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
         int i = OpenSSOIndexStore.getNumCachedPolicies();
         NumCachedPolicies = new Integer(i);
         if (debug.messageEnabled()) {
-            StringBuffer sb = new StringBuffer(classMethod);
+            StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
             debug.message(sb.toString());
         }
@@ -113,7 +116,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
         int i = OpenSSOIndexStore.getNumCachedReferrals();
         NumCachedReferrals = new Integer(i);
         if (debug.messageEnabled()) {
-            StringBuffer sb = new StringBuffer(classMethod);
+            StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
             debug.message(sb.toString());
         }

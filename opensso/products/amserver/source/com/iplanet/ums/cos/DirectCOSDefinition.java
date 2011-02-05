@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums.cos;
 
 import java.util.ArrayList;
@@ -144,7 +147,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      */
     public void addCOSAttribute(String attrName, int qualifier)
             throws UMSException {
-        StringBuffer attrStr = new StringBuffer();
+        StringBuilder attrStr = new StringBuilder();
         if (qualifier < ICOSDefinition.minQualifier
                 || qualifier > ICOSDefinition.maxQualifier) {
             String msg = i18n.getString(IUMSConstants.BAD_COS_ATTR_QUALIFIER);

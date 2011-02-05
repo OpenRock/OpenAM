@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm;
 
 import com.sun.identity.shared.debug.Debug;
@@ -219,7 +222,7 @@ public class IdRepoException extends Exception implements L10NMessage {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String msg = message;
         if (msg != null && msg.length() > 0) {
             buf.append("Message:");

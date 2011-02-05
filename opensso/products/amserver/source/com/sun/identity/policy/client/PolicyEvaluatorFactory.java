@@ -26,14 +26,14 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.client;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.security.AppSSOTokenProvider;
 import com.iplanet.sso.SSOException;

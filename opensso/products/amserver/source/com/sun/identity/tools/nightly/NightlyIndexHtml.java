@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tools.nightly;
 
 import java.io.DataInputStream;
@@ -60,7 +63,7 @@ public class NightlyIndexHtml {
         URL url = new URL(indexURL);
         URLConnection conn = url.openConnection();
         DataInputStream dis = new DataInputStream(conn.getInputStream());
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
         String line = dis.readLine();
         while (line != null) {

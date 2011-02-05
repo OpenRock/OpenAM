@@ -25,6 +25,9 @@
  * $Id: AgentDumpViewBean.java,v 1.1 2008/12/10 18:25:14 farble1670 Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.agentconfig;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -157,10 +160,10 @@ public class AgentDumpViewBean extends AMPrimaryMastHeadViewBean
     }
 
     private static String getFormattedAttributes(Map<String,Set<String>> values) {
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         for (String key: values.keySet()) {
             Set<String> vals = values.get(key);
-            if (vals == null || vals.size() == 0) {
+            if (vals == null || vals.isEmpty()) {
                 b.append(key);
                 b.append("=\n");
             } else {

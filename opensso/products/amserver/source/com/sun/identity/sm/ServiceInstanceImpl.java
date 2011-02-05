@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -80,7 +83,7 @@ class ServiceInstanceImpl {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("\nService Instance: ").append(name).append("\n\tGroup: ")
                 .append(getGroup()).append("\n\tURI: ").append(getURI())
                 .append("\n\tAttributes: ").append(attributes);
@@ -189,7 +192,7 @@ class ServiceInstanceImpl {
     }
 
     static String getCacheName(String sName, String version, String ins) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(sName).append(version).append(ins);
         return (sb.toString().toLowerCase());
     }
@@ -248,7 +251,7 @@ class ServiceInstanceImpl {
     private static Debug debug = SMSEntry.debug;
     
     public String toXML() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append("<")
             .append(SMSUtils.INSTANCE)
             .append(" ").append(SMSUtils.NAME).append("=\"").append(name)

@@ -45,12 +45,10 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.Bootstrap;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.tools.bundles.VersionCheck;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -638,7 +636,7 @@ public class CommandManager {
             strCode = " " + strCode;
         }
         
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(strCode).append(" ");
         
         for (int i = 0; i < options.length; i++) {

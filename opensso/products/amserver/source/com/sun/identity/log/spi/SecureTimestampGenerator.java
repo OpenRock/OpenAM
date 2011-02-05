@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.spi;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import com.sun.identity.log.spi.ITimestampGenerator;
 
 /**
  * Generates Secure time stamp either using hardware or a secure time stamp

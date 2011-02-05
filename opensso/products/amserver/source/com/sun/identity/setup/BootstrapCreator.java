@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.SystemProperties;
@@ -166,7 +169,7 @@ public class BootstrapCreator {
             String rootSuffix = svrCfg.getBaseDN();
 
             Collection serverList = sg.getServersList();
-            StringBuffer bootstrap = new StringBuffer();
+            StringBuilder bootstrap = new StringBuilder();
 
             for (Iterator i = serverList.iterator(); i.hasNext(); ) {
                 Server serverObj = (Server)i.next();

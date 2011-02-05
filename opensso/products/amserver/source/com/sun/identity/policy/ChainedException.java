@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.io.*;
@@ -278,12 +279,12 @@ class ChainedException extends Exception implements L10NMessage {
          * the point at which the respective exception is thrown.
          */    
         String stackString = null;
-        StringBuffer messageBuffer = new StringBuffer();
+        StringBuilder messageBuffer = new StringBuilder();
         int exCount = 1;
         Throwable rootException = this;
-        messageBuffer.append(rootException.getClass().getName() + "(" +
-            exCount + ")" + ":" +
-            ((ChainedException)rootException).getLocalMessage() + "\n");
+        messageBuffer.append(rootException.getClass().getName()).
+                append("(").append(exCount).append(")" + ":").
+                append(((ChainedException) rootException).getLocalMessage()).append("\n");
 
         while ((rootException instanceof ChainedException) &&
             (((ChainedException)rootException)._nestedException != null)
@@ -291,14 +292,13 @@ class ChainedException extends Exception implements L10NMessage {
             rootException = ((ChainedException)rootException)._nestedException;
             exCount++;
             if ( rootException instanceof ChainedException ) {
-                messageBuffer.append(rootException.getClass().getName() 
-                    + "(" + exCount + ")" + ":" 
-                    + ((ChainedException)rootException).getLocalMessage() +
-                    "\n");
+                messageBuffer.append(rootException.getClass().getName()).
+                        append("(").append(exCount).append(")" + ":").
+                        append(((ChainedException) rootException).getLocalMessage()).append("\n");
             } else {
-                messageBuffer.append(rootException.getClass().getName() 
-                    + "(" + exCount + ")" + ":" 
-                    + rootException.getMessage() + "\n");
+                messageBuffer.append(rootException.getClass().getName()).
+                        append("(").append(exCount).append(")" + ":").
+                        append(rootException.getMessage()).append("\n");
             }
         }
 

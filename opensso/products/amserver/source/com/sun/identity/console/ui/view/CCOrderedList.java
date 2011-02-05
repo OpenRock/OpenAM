@@ -25,6 +25,9 @@
  * $Id: CCOrderedList.java,v 1.1 2008/07/02 17:21:46 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.ui.view;
 
 import com.iplanet.jato.view.ContainerView;
@@ -102,7 +105,7 @@ public class CCOrderedList extends CCOrderableList {
     }
     
     protected String getOptions(OptionList optionList) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (optionList != null) {
             for (int i = 0; i < optionList.size(); i++) {

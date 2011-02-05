@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.core.service;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.sun.identity.diagnostic.base.core.jaxbgen.CategoryType;

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMException;
@@ -280,8 +283,8 @@ public class EmailNotificationHelper {
                     boolean valuesChanged = false;
                     Attr newAttrVal = null;
                     Attr oldAttrVal = null;
-                    StringBuffer newSB = new StringBuffer();
-                    StringBuffer oldSB = new StringBuffer();
+                    StringBuilder newSB = new StringBuilder();
+                    StringBuilder oldSB = new StringBuilder();
                     if (attrSet.contains(attrName)) {
                         newAttrVal = attrSet.getAttribute(attrName);
                         if (newAttrVal != null) {
@@ -366,7 +369,7 @@ public class EmailNotificationHelper {
                             Attr newAttr = attrSet.getAttribute(attrName);
 
                             String sub = AMSDKBundle.getString("492", locale);
-                            StringBuffer msgSB = new StringBuffer();
+                            StringBuilder msgSB = new StringBuilder();
                             msgSB.append(AMSDKBundle.getString("495", locale))
                                     .append(" ").append(entryDN).append("\n")
                                     .append(

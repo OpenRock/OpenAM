@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import java.util.ArrayList;
@@ -353,7 +356,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
             //
             String localeStr = locale.toString();
             if (localeStr.length() > 0) {
-                StringBuffer sb = new StringBuffer(baseName);
+                StringBuilder sb = new StringBuilder(baseName);
                 sb.append(";lang-");
                 sb.append(localeStr);
                 name = sb.toString();
@@ -401,7 +404,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
         if (_stringValues == null) {
             setupStringValues();
         }
-        if (_stringValues.size() != 0) {
+        if (!_stringValues.isEmpty()) {
             value = (String) _stringValues.get(0);
         }
         return value;
@@ -474,7 +477,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
         if (_byteValues == null) {
             setupByteValues();
         }
-        if (_byteValues.size() != 0) {
+        if (!_byteValues.isEmpty()) {
             value = (byte[]) _byteValues.get(0);
         }
         return value;

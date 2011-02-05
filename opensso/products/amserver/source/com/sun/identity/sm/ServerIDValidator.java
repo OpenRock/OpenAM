@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import java.security.AccessController;
@@ -72,7 +75,7 @@ public class ServerIDValidator implements ServiceAttributeValidator {
      * @return true if all of the values are valid; false otherwise
      */
     public boolean validate(Set values) {
-        if (values.size() == 0) {
+        if (values.isEmpty()) {
             return true;
         }
 
@@ -85,7 +88,7 @@ public class ServerIDValidator implements ServiceAttributeValidator {
             String value = (String) it.next();
             StringTokenizer tok = new StringTokenizer(value, "|");
             String url = tok.nextToken();
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             int count = 0;
             while (tok.hasMoreTokens()) {
                 String lbid = tok.nextToken();

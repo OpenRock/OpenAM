@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.realm;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -36,7 +39,6 @@ import com.iplanet.jato.view.html.HREF;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.sm.SMSSchema;
 import com.sun.web.ui.model.CCBreadCrumbsModel;
@@ -126,7 +128,7 @@ public abstract class RMRealmViewBeanBase
             }
             model = new CCBreadCrumbsModel(SMSSchema.unescapeName(subRealm));
 
-            StringBuffer baseDN = new StringBuffer(200);
+            StringBuilder baseDN = new StringBuilder(200);
             baseDN.append(startDN);
             /*
              * each row added to the model is a selectable entry in the

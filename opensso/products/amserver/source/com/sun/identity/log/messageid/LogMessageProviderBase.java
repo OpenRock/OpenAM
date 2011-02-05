@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.messageid;
 
 /**
@@ -152,7 +153,7 @@ public class LogMessageProviderBase
     }
 
     private String formatMessage(String[] dataInfo, LogMessageID logMsgId) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
         if (dataInfo != null) {
             int sz = dataInfo.length;

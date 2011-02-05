@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.authentication.share;
@@ -42,8 +42,6 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -366,7 +364,7 @@ public class AuthXMLUtils {
         }
         
         // Construct the xml string
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.CALLBACKS_BEGIN)
             .append(AuthXMLTags.SPACE)
             .append(AuthXMLTags.LENGTH)
@@ -923,7 +921,7 @@ public class AuthXMLUtils {
     }
 
     static String getNameCallbackXML(NameCallback nameCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.NAME_CALLBACK_BEGIN)
             .append(AuthXMLTags.PROMPT_BEGIN)
             .append(XMLUtils.escapeSpecialCharacters(nameCallback.getPrompt()))
@@ -950,7 +948,7 @@ public class AuthXMLUtils {
     }
     
     static String getPasswordCallbackXML(PasswordCallback passwordCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.PASSWORD_CALLBACK_BEGIN)
             .append(AuthXMLTags.SPACE)
             .append(AuthXMLTags.ECHO_PASSWORD)
@@ -982,7 +980,7 @@ public class AuthXMLUtils {
     }
     
     static String getChoiceCallbackXML(ChoiceCallback choiceCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         
         xmlString.append(AuthXMLTags.CHOICE_CALLBACK_BEGIN)
             .append(AuthXMLTags.SPACE)
@@ -1042,7 +1040,7 @@ public class AuthXMLUtils {
     }
     
     static String getConfirmationCallbackXML(ConfirmationCallback conCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         
         xmlString.append(AuthXMLTags.CONFIRMATION_CALLBACK_BEGIN)
             .append(AuthXMLTags.SPACE)
@@ -1122,7 +1120,7 @@ public class AuthXMLUtils {
     }
     
     static String getTextInputCallbackXML(TextInputCallback textInputCallback) {
-        StringBuffer xmlString  = new StringBuffer();
+        StringBuilder xmlString  = new StringBuilder();
         
         xmlString.append(AuthXMLTags.TEXTINPUT_CALLBACK_BEGIN)
             .append(AuthXMLTags.PROMPT_BEGIN)
@@ -1152,7 +1150,7 @@ public class AuthXMLUtils {
     
     static String getTextOutputCallbackXML(
         TextOutputCallback textOutputCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         
         xmlString.append(AuthXMLTags.TEXTOUTPUT_CALLBACK_BEGIN)
             .append(AuthXMLTags.SPACE)
@@ -1182,7 +1180,7 @@ public class AuthXMLUtils {
     
     static String getPagePropertiesCallbackXML(
         PagePropertiesCallback pagePCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         
         xmlString.append(AuthXMLTags.PAGEP_CALLBACK_BEGIN)
             .append(AuthXMLTags.SPACE)
@@ -1223,7 +1221,7 @@ public class AuthXMLUtils {
 
     static String getX509CertificateCallbackXML(
         X509CertificateCallback certCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
 
         xmlString.append(AuthXMLTags.CERT_CALLBACK_BEGIN)
         .append(AuthXMLTags.SPACE)
@@ -1255,7 +1253,7 @@ public class AuthXMLUtils {
     }
 
     static String getHttpCallbackXML(HttpCallback hc) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.HTTP_CALLBACK_BEGIN).
                 append(AuthXMLTags.HTTP_HEADER_BEGIN).
                 append(hc.getAuthorizationHeader()).
@@ -1281,7 +1279,7 @@ public class AuthXMLUtils {
 
     static String getRedirectCallbackXML(
         RedirectCallback redirectCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         String redirectMethod = redirectCallback.getMethod();
 
         // <RedirectCallback>
@@ -1468,7 +1466,7 @@ public class AuthXMLUtils {
     
     static String getCustomCallbackXML(DSAMECallbackInterface dsameCallback) {
         try {
-            StringBuffer xmlString  = new StringBuffer();
+            StringBuilder xmlString  = new StringBuilder();
             String className = dsameCallback.getClass().getName();
             
             if (debug.messageEnabled()) {
@@ -1811,7 +1809,7 @@ public class AuthXMLUtils {
     }
     
     static String getLanguageCallbackXML(LanguageCallback languageCallback) {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.LANGUAGE_CALLBACK_BEGIN)
             .append(AuthXMLTags.LOCALE_BEGIN);
         

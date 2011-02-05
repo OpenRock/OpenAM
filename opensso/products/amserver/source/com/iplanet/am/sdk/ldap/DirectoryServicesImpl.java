@@ -26,11 +26,15 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import java.security.AccessController;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -836,7 +840,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         String orgUnitSearchFilter = SearchFilterManager.getSearchFilter(
                 AMObject.ORGANIZATIONAL_UNIT, entryDN, null, true);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("(|").append(orgSearchFilter).append(orgUnitSearchFilter);
         sb.append(")");
         return sb.toString();
@@ -1309,9 +1313,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         if (um != null) {
             String[] values = um.getStringValues();
             Set members = new HashSet();
-            for (int i = 0; i < values.length; i++) {
-                members.add(values[i]);
-            }
+            members.addAll(Arrays.asList(values));
             updateUserAttribute(token, members, sgroup.getDN(), true);
         }
         // Invoke Post processing impls
@@ -1914,7 +1916,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         if (recursive) {
             String roleSearchFilter = SearchFilterManager.getSearchFilter(
                     AMObject.ROLE, orgDN);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("(&").append(roleSearchFilter).append("(");
             sb.append(roleNameAttr).append("=*").append(newdn).append("))");
             adminRoles = search(token, orgDN, sb.toString(),
@@ -2788,7 +2790,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         case ADD_MEMBER:
             Guid[] membersGuid = CommonUtils.toGuidArray(members);
             adgroup.addMembers(CommonUtils.toGuidArray(members));
-            if (complianceImpl
+            if (ComplianceServicesImpl
                     .isAdminGroupsEnabled(AMStoreConnection.getAMSdkBaseDN())) {
                 complianceImpl.verifyAndLinkGroupToRole(token, membersGuid,
                         target);
@@ -2801,7 +2803,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             }
             // COMPLIANCE: if admin group then perform iplanet
             // compliance related operations if needed.
-            if (complianceImpl
+            if (ComplianceServicesImpl
                     .isAdminGroupsEnabled(AMStoreConnection.getAMSdkBaseDN())) {
                 complianceImpl.verifyAndUnLinkGroupToRole(token, members,
                         target);
@@ -3726,7 +3728,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             debug.message("DirectoryServicesImpl.getTopLevelContainers");
             iter = resultSet.iterator();
 
-            StringBuffer tmpBuffer = new StringBuffer();
+            StringBuilder tmpBuffer = new StringBuilder();
 
             while (iter.hasNext()) {
                 String tmpDN = (String) iter.next();

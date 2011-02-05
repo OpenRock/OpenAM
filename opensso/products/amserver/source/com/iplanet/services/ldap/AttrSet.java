@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import java.util.ArrayList;
@@ -382,10 +385,10 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * @supported.api
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer("AttrSet: ");
+        StringBuilder sb = new StringBuilder("AttrSet: ");
         int size = _attrs.size();
         for (int i = 0; i < size; i++) {
-            sb.append(_attrs.get(i).toString() + "\n");
+            sb.append(_attrs.get(i).toString()).append("\n");
         }
         return sb.toString();
     }

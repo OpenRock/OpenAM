@@ -26,13 +26,12 @@
  *
  */
 
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
-import java.io.*;
 
 import org.w3c.dom.*;
 import com.sun.identity.shared.debug.Debug;
@@ -255,7 +254,7 @@ public class ResourceResult {
      */
     public String toString() {
         if (stringForm == null) {
-            StringBuffer sb = new StringBuffer(200);
+            StringBuilder sb = new StringBuilder(200);
             sb.append("Resource Result for resourceName : ")
                     .append(resourceName)
                     .append(PolicyUtils.CRLF)
@@ -275,7 +274,7 @@ public class ResourceResult {
      */
     public String toXML() {
         if (xmlForm == null) {
-            StringBuffer xmlsb = new StringBuffer(1000);
+            StringBuilder xmlsb = new StringBuilder(1000);
 
             xmlsb.append("<")
                     .append(RESOURCE_RESULT)

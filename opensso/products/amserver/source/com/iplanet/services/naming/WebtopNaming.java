@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.iplanet.services.naming;
@@ -35,7 +35,6 @@ package com.iplanet.services.naming;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -57,7 +56,6 @@ import com.iplanet.services.naming.service.NamingService;
 import com.iplanet.services.naming.share.NamingBundle;
 import com.iplanet.services.naming.share.NamingRequest;
 import com.iplanet.services.naming.share.NamingResponse;
-import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.util.HashMap;
@@ -75,12 +73,6 @@ import com.sun.identity.monitoring.SSOServerInfo;
 /*
  *  and this stuff is here for retrieving session config
  */
-import java.security.AccessController;
-import com.sun.identity.security.AdminTokenAction;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceConfig;
 
 
 /**
@@ -1342,7 +1334,7 @@ public class WebtopNaming {
                 }
             }
 
-            if (urlList.size() == 0) {
+            if (urlList.isEmpty()) {
                 throw new Exception(
                     NamingBundle.getString("noNamingServiceURL"));
             } else {
@@ -1716,7 +1708,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
 
     static Vector getAvailableSites() throws Exception {
         Vector sites = null;
-        if (availableSiteList.size() == 0) {
+        if (availableSiteList.isEmpty()) {
             String[] namingURLs = getNamingServiceURL();
             for (int i = 0; i < namingURLs.length; i++) {
                 URL url = new URL(namingURLs[i]);
@@ -1761,7 +1753,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
             return;
         }
 
-        if ((list == null) || (list.size() == 0)) {
+        if ((list == null) || (list.isEmpty())) {
             return;
         }
 

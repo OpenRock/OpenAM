@@ -25,6 +25,9 @@
  * $Id: CCOrderedListTag.java,v 1.1 2008/07/02 17:21:46 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.ui.taglib;
 
 import com.iplanet.jato.view.View;
@@ -130,7 +133,7 @@ public class CCOrderedListTag extends CCOrderableListTag  {
     }
     
     private String getJavascript(View view) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         
         String jsName = "Editable_" +
             view.getQualifiedName().replace('.', '_').replace('-', '_');

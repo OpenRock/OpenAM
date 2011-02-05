@@ -25,6 +25,9 @@
  * $Id: FileHandler.java,v 1.14 2009/07/27 19:50:55 bigfatrat Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import java.io.BufferedOutputStream;
@@ -47,11 +50,8 @@ import java.util.logging.LogRecord;
 
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.log.NullLocationException;
-import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManager;
 import com.sun.identity.log.LogManagerUtil;

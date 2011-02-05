@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.server;
 
 import java.io.IOException;
@@ -207,7 +209,7 @@ public class AuthXMLResponse {
      * @return error XML string
      */
     public String createXMLErrorString() {
-        StringBuffer errorXMLString = new StringBuffer();
+        StringBuilder errorXMLString = new StringBuilder();
         errorXMLString.append(AuthXMLTags.EXCEPTION_BEGIN)
                       .append(AuthXMLTags.SPACE);
 
@@ -520,7 +522,7 @@ public class AuthXMLResponse {
      * @return XML for query information.
      */
     public String getXMLForQueryInfo() {
-        StringBuffer xmlString = new StringBuffer();
+        StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.QUERY_RESULT_BEGIN)
                  .append(AuthXMLTags.SPACE)
                  .append(AuthXMLTags.REQUESTED_INFO)

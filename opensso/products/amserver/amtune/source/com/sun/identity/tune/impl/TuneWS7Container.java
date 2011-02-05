@@ -25,6 +25,9 @@
  * $Id: TuneWS7Container.java,v 1.11 2009/12/09 00:39:15 ykwon Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.impl;
 
 import com.sun.identity.tune.common.MessageWriter;
@@ -35,10 +38,7 @@ import com.sun.identity.tune.config.WS7ContainerConfigInfo;
 import com.sun.identity.tune.constants.WebContainerConstants;
 import com.sun.identity.tune.intr.TuneWebServer;
 import com.sun.identity.tune.util.AMTuneUtil;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -688,7 +688,7 @@ public class TuneWS7Container extends TuneWebServer implements
      */
     private boolean deleteJVMOptionUsingWSAdmin(List jvmOptions,
             boolean combined) {
-        if (jvmOptions.size() == 0) {
+        if (jvmOptions.isEmpty()) {
             pLogger.log(Level.WARNING, "deleteJVMOptionUsingWSAdmin",
                     "JVM to be deleted are null");
             return false;
@@ -696,7 +696,7 @@ public class TuneWS7Container extends TuneWebServer implements
         mWriter.writeln(" ");
         mWriter.writeLocaleMsg("pt-web-del-jvm-options");
         mWriter.writeln(jvmOptions.toString().replace(NO_VAL_SET, ""));
-        StringBuffer jvmOpts = new StringBuffer();
+        StringBuilder jvmOpts = new StringBuilder();
         Iterator optItr = jvmOptions.iterator();
         if (combined) {
             jvmOpts.append("\"");
@@ -756,7 +756,7 @@ public class TuneWS7Container extends TuneWebServer implements
      */
      private boolean insertJVMOptionUsingWSAdmin(List jvmOptions,
              boolean combined) {
-        if (jvmOptions.size() == 0) {
+        if (jvmOptions.isEmpty()) {
             pLogger.log(Level.WARNING, "insertJVMOptionUsingWSAdmin",
                     "JVM options to add are null");
             return false;
@@ -764,7 +764,7 @@ public class TuneWS7Container extends TuneWebServer implements
         mWriter.writeln(" ");
         mWriter.writelnLocaleMsg("pt-web-add-jvm-options");
         mWriter.writeln(jvmOptions.toString());
-        StringBuffer jvmOpts = new StringBuffer();
+        StringBuilder jvmOpts = new StringBuilder();
         Iterator optItr = jvmOptions.iterator();
         if (combined) {
             jvmOpts.append("\"");

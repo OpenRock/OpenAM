@@ -26,9 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.services.systeminfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -61,9 +65,7 @@ public class PatchCommandExecutorForHpux implements SystemInfoConstants {
             new String[]{"/usr/bin/sh", "/tmp/patch_info.sh"});
         String[] cmdOp = executor.execute(true);
         ArrayList retList = new ArrayList();
-        for (int i = 0; i < cmdOp.length; i++) {
-            retList.add(cmdOp[i]);
-        }
+        retList.addAll(Arrays.asList(cmdOp));
         return retList;
     }
     
@@ -118,7 +120,7 @@ public class PatchCommandExecutorForHpux implements SystemInfoConstants {
                 }
             }
         }
-        if (arrayOfObsoletes.size() == 0) {
+        if (arrayOfObsoletes.isEmpty()) {
             return arrayOfObsoletes;
         }
         ArrayList cleanedList = 

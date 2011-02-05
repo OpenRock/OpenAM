@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import java.util.Vector;
@@ -69,7 +72,7 @@ public class StatsRunner extends Thread {
             } catch (Exception ex) {
             }
 
-            if (Stats.statsListeners.size() != 0) {
+            if (!Stats.statsListeners.isEmpty()) {
                 Vector lsnrs = Stats.statsListeners;
                 for (int i = 0; i < lsnrs.size(); i++) {
                     StatsListener lsnr = (StatsListener) (lsnrs.elementAt(i));

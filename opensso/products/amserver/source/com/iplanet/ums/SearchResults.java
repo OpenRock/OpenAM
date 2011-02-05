@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import com.iplanet.services.ldap.Attr;
@@ -400,7 +403,7 @@ public class SearchResults implements java.io.Serializable {
             return new Integer(vlvResponse.getResultCode());
         } else if (name.equalsIgnoreCase(VLVRESPONSE_CONTEXT)
                 && vlvResponse != null) {
-            return new String(vlvResponse.getContext());
+            return vlvResponse.getContext();
         }
 
         // For all other unknown attribute names,

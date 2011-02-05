@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.iplanet.am.util;
@@ -683,7 +683,7 @@ public class Locale {
         int inputLen = input.length();
 
         byte[] byteOut = input.getBytes(enc);
-        StringBuffer result = new StringBuffer(inputLen * 4); // approx size
+        StringBuilder result = new StringBuilder(inputLen * 4); // approx size
         for (int i = 0; i < byteOut.length; i++) {
             int c = byteOut[i] & 0xff;
             if (dontEncode.get(c)) {
@@ -738,7 +738,7 @@ public class Locale {
             return input;
         }
 
-        StringBuffer result = new StringBuffer(inputLen * 4); // approx size
+        StringBuilder result = new StringBuilder(inputLen * 4); // approx size
         for (int i = 0; i < byteOut.length; i++) {
             int c = byteOut[i] & 0xff;
             if (dontEncode.get(c)) {

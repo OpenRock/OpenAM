@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
-
 package com.sun.identity.authentication;
 
 import com.iplanet.am.util.SystemProperties;
@@ -816,7 +815,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         try {
             String xmlString = null;
             // remote auth
-            StringBuffer request = new StringBuffer(100);
+            StringBuilder request = new StringBuilder(100);
             String[] authHandles = new String[1];
             authHandles[0] = getAuthHandle();
             if ((ssoTokenID != null) && (authHandles[0].equals("0"))) {
@@ -908,7 +907,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             }
 
             if (params != null) {
-                StringBuffer paramString = new StringBuffer();
+                StringBuilder paramString = new StringBuilder();
                 for (int i = 0; i < params.length; i++) {
                     if (i != 0 ) {
                         paramString.append(ISAuthConstants.PIPE_SEPARATOR);
@@ -920,7 +919,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                     .append(AuthXMLTags.PARAMS_END);
             }
             if ((envMap != null) && !envMap.isEmpty()) {
-                StringBuffer envString = new StringBuffer();
+                StringBuilder envString = new StringBuilder();
                 Iterator keys = envMap.keySet().iterator();
                 while (keys.hasNext()) {
                     // convert Map to XMLString as follows:
@@ -1025,7 +1024,7 @@ public class AuthContext extends Object implements java.io.Serializable {
 
     private void runRemoteOldAuthContext() throws AuthLoginException {
         try {
-            StringBuffer request = new StringBuffer(100);
+            StringBuilder request = new StringBuilder(100);
             String[] objs = { "0" };
             if (ssoTokenID != null) {
                 objs[0] = ssoTokenID;
@@ -1255,7 +1254,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             
             // Construct the XML
             try {
-                StringBuffer xml = new StringBuffer(100);
+                StringBuilder xml = new StringBuilder(100);
                 String[] authHandles = new String[1];
                 authHandles[0] = getAuthenticationHandle(receivedDocument);
                 xml.append(MessageFormat.format(
@@ -1352,7 +1351,7 @@ public class AuthContext extends Object implements java.io.Serializable {
 
         // Construct the XML
         try {
-            StringBuffer xml = new StringBuffer(100);
+            StringBuilder xml = new StringBuilder(100);
             String[] authHandles = new String[1];
             authHandles[0] = getAuthenticationHandle(receivedDocument);
             xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
@@ -1416,7 +1415,7 @@ public class AuthContext extends Object implements java.io.Serializable {
 
         // Construct the XML
         try {
-            StringBuffer xml = new StringBuffer(100);
+            StringBuilder xml = new StringBuilder(100);
             String[] authHandles = new String[1];
             authHandles[0] = ssoToken.getTokenID().toString();
             xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
@@ -1675,7 +1674,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         
         // Construct the XML
         try {
-            StringBuffer xml = new StringBuffer(100);
+            StringBuilder xml = new StringBuilder(100);
             String[] authHandles = new String[1];
             authHandles[0] = getAuthenticationHandle(receivedDocument);
             xml.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX,
@@ -1916,7 +1915,7 @@ public class AuthContext extends Object implements java.io.Serializable {
     protected void sendQueryInformation(String reqInfo) {
         // Construct the XML
         try {
-            StringBuffer xml = new StringBuffer(100);
+            StringBuilder xml = new StringBuilder(100);
             String[] authHandles = new String[1];
             authHandles[0] = getAuthHandle();
             
@@ -2093,7 +2092,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         if (subject == null) {
             return ("");
         }
-        StringBuffer request = new StringBuffer(100);
+        StringBuilder request = new StringBuilder(100);
         request.append(AuthXMLTags.SUBJECT_BEGIN);
         String serializeSubject = AuthXMLUtils.getSerializedSubject(subject);
         request.append(serializeSubject);

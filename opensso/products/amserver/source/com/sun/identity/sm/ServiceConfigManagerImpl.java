@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm;
@@ -168,7 +168,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
         ServiceConfigImpl answer = null;
         // Check the cache
         if (SMSEntry.cacheSMSEntries) {
-            StringBuffer sb = new StringBuffer(50);
+            StringBuilder sb = new StringBuilder(50);
             cacheName = sb.append(token.getTokenID().toString()).append(
                     groupName).toString().toLowerCase();
             if ((answer = (ServiceConfigImpl) globalConfigs.get(cacheName)) 
@@ -214,7 +214,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
         // Check the cache
         String orgdn = DNMapper.orgNameToDN(orgName);
         if (SMSEntry.cacheSMSEntries) {
-            StringBuffer sb = new StringBuffer(50);
+            StringBuilder sb = new StringBuilder(50);
             cacheName = sb.append(token.getTokenID().toString()).append(
                     groupName).append(orgdn).toString().toLowerCase();
             if (((answer = (ServiceConfigImpl) orgConfigs.get(cacheName))
@@ -266,7 +266,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
                     "sms-invalid-plugin-schema-name", null));
         }
         // Construct the DN
-        StringBuffer groupName = new StringBuffer(100);
+        StringBuilder groupName = new StringBuilder(100);
         groupName.append(name).append(",ou=").append(schemaName).append(",ou=")
                 .append(interfaceName);
         String dn = constructServiceConfigDN(groupName.toString(),
@@ -499,7 +499,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
 
     String constructServiceConfigDN(String groupName, String configName,
             String orgName) throws SMSException {
-        StringBuffer sb = new StringBuffer(50);
+        StringBuilder sb = new StringBuilder(50);
         sb.append("ou=").append(groupName).append(SMSEntry.COMMA).append(
                 configName).append("ou=").append(version)
                 .append(SMSEntry.COMMA).append("ou=").append(serviceName)
@@ -577,7 +577,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
      * @supported.api
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("ServiceConfigManagerImpl: ").append(serviceName).append(
                 " Version: ").append(version);
         return (sb.toString());

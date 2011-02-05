@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010 ForgeRock AS
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.idsvcs.opensso;
@@ -38,6 +38,7 @@ import com.sun.identity.idsvcs.InvalidToken;
 import com.sun.identity.policy.PolicyException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -368,9 +369,7 @@ public class IdentityServicesImpl
         List attrNames = null;
         if ((attributeNames != null) && (attributeNames.length > 0)) {
             attrNames = new ArrayList();
-            for (int i = 0; i < attributeNames.length; i++) {
-                attrNames.add(attributeNames[i]);
-            }
+            attrNames.addAll(Arrays.asList(attributeNames));
         }
         return attributes(attrNames, subject);
     }
@@ -532,10 +531,7 @@ public class IdentityServicesImpl
 
         if ((attributes != null) && (attributes.length > 0)) {
             searchAttrsList = new ArrayList();
-
-            for (int i = 0; i < attributes.length; i++) {
-                searchAttrsList.add(attributes[i]);
-            }
+            searchAttrsList.addAll(Arrays.asList(attributes));
         }
 
         List identities = search(filter, searchAttrsList, admin);
@@ -910,10 +906,7 @@ public class IdentityServicesImpl
 
         if ((attributes != null) && (attributes.length > 0)) {
             attrList = new ArrayList();
-
-            for (int i = 0; i < attributes.length; i++) {
-                attrList.add(attributes[i]);
-            }
+            attrList.addAll(Arrays.asList(attributes));
         }
 
         return read(name, attrList, admin);
@@ -1068,10 +1061,7 @@ public class IdentityServicesImpl
                     if ((attrValues != null) && (attrValues.length > 0)) {
                         // attribute to add or modify
                         Set idAttrValues = new HashSet(attrValues.length);
-
-                        for (int j = 0; j < attrValues.length; j++) {
-                            idAttrValues.add(attrValues[j]);
-                        }
+                        idAttrValues.addAll(Arrays.asList(attrValues));
 
                         if (idAttrs == null) {
                             idAttrs = new HashMap();
@@ -1109,10 +1099,7 @@ public class IdentityServicesImpl
 
                 if (roleNames != null) {
                     Set roleMemberships = new HashSet(roleNames.length);
-
-                    for (int i = 0; i < roleNames.length; i++) {
-                        roleMemberships.add(roleNames[i]);
-                    }
+                    roleMemberships.addAll(Arrays.asList(roleNames));
 
                     setMemberships(repo, amIdentity, roleMemberships, IdType.ROLE);
                 }
@@ -1121,10 +1108,7 @@ public class IdentityServicesImpl
 
                 if (groupNames != null) {
                     Set groupMemberships = new HashSet(groupNames.length);
-
-                    for (int i = 0; i < groupNames.length; i++) {
-                        groupMemberships.add(groupNames[i]);
-                    }
+                    groupMemberships.addAll(Arrays.asList(groupNames));
 
                     setMemberships(repo, amIdentity, groupMemberships, IdType.GROUP);
                 }
@@ -1137,10 +1121,7 @@ public class IdentityServicesImpl
 
                 if (memberNames != null) {
                     Set members = new HashSet(memberNames.length);
-
-                    for (int i = 0; i < memberNames.length; i++) {
-                        members.add(memberNames[i]);
-                    }
+                    members.addAll(Arrays.asList(memberNames));
 
                     setMembers(repo, amIdentity, members, IdType.USER);
                 }
@@ -1822,9 +1803,7 @@ public class IdentityServicesImpl
                 Set idAttrValues = null;
                 if ((attrValues != null) && (attrValues.length > 0)) {
                     idAttrValues = new HashSet(attrValues.length);
-                    for (int j = 0; j < attrValues.length; j++) {
-                        idAttrValues.add(attrValues[j]);
-                    }
+                    idAttrValues.addAll(Arrays.asList(attrValues));
                 } else {
                     idAttrValues = Collections.EMPTY_SET;
                 }

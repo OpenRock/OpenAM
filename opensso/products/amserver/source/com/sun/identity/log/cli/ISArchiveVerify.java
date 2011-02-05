@@ -26,9 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.cli;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -202,11 +206,11 @@ public class ISArchiveVerify{
     private boolean verifyLogRecord(String[] record, int macPos)
     throws Exception {
         // Creating the data part for verification
-        StringBuffer data = new StringBuffer();
+        StringBuilder data = new StringBuilder();
         for(int m = 0; m < record.length-2; m++) {
             data.append(record[m]);
         }
-        curMAC = new String(record[macPos]);
+        curMAC = record[macPos];
         verified = 
             helper.verifyMAC(data.toString(), helper.toByteArray(curMAC));
         return verified;
@@ -222,7 +226,7 @@ public class ISArchiveVerify{
      */
     private boolean verifySignature(String[] record, int signPos, int recPos)
         throws Exception {
-        String curSign = new String(record[signPos]);
+        String curSign = record[signPos];
         
         //
         //  if curMAC is null, there's apparently a missing
@@ -353,9 +357,7 @@ public class ISArchiveVerify{
                     Vector header = new Vector(result[0].length);
                     // Extracting the field names as header from the first 
                     // line of the returned string array.
-                    for( int k = 0; k < result[0].length; k++){
-                        header.add(result[0][k]);
-                    }
+                    header.addAll(Arrays.asList(result[0]));
                     int signPos = -1, macPos = -1;
                     String signFldName, macFldName;
                     signFldName = LogConstants.SIGNATURE_FIELDNAME;

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.internal;
 
 import java.io.ByteArrayInputStream;
@@ -890,7 +893,7 @@ public final class AuthContext extends Object {
                  // Since internal auth will be used during install time
                  // and during boot strap for users "dsame" and "amadmin"
                  // the IdType will be hardcoded to User
-                 StringBuffer uuid = new StringBuffer(100);
+                 StringBuilder uuid = new StringBuilder(100);
                  uuid.append("id=").append(username)
                  .append(",ou=user,").append(getOrganizationName());
                  token.setProperty(Constants.UNIVERSAL_IDENTIFIER,

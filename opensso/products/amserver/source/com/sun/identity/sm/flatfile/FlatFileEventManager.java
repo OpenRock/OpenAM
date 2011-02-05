@@ -26,14 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SMSUtils;
-import java.security.AccessController;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.tamper;
 
 import java.io.BufferedReader;
@@ -99,7 +102,7 @@ public class TamperDetectionService extends ServiceBase implements ToolService {
         try {
             Map validatorMap = (HashMap) getValidators();
             for (Iterator j = commandSet.iterator(); j.hasNext();){
-                String cmd = ((String)j.next()).toLowerCase();;
+                String cmd = ((String)j.next()).toLowerCase();
                 String configPath = (String) params.get(CONFIG_DIR);
                 File configDir = new File(configPath);
                 if (configDir.exists() && configDir.isDirectory()) {

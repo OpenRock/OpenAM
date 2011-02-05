@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
 import com.iplanet.am.util.AMSendMail;
@@ -479,7 +482,6 @@ public class ISAccountLockout {
             AMSendMail sm = new AMSendMail();
             StringTokenizer emailTokens = new StringTokenizer(
                 lockoutNotification, SPACE_DELIM);
-            StringBuffer sb = new StringBuffer();
             
             while(emailTokens.hasMoreTokens()) {
                 StringTokenizer stz2 = new StringTokenizer(
@@ -744,7 +746,7 @@ public class ISAccountLockout {
     private static String createInvalidAttemptsXML(
         int invalidCount, long lastFailed, long lockedOutAt, 
         long actualLockoutDuration) {
-        StringBuffer xmlBuffer = new StringBuffer(150);
+        StringBuilder xmlBuffer = new StringBuilder(150);
         xmlBuffer.append(BEGIN_XML).append(INVALID_PASS_COUNT_BEGIN)
             .append(String.valueOf(invalidCount)).append(INVALID_PASS_COUNT_END)
             .append(LAST_FAILED_BEGIN).append(String.valueOf(lastFailed))

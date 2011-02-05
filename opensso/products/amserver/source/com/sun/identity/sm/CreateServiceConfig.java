@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.services.util.AMEncryption;
@@ -105,7 +108,7 @@ public class CreateServiceConfig {
             // Get Attribute Value Pairs, if any
             Map insAttrs = getAttributeValuePairs(insNode);
 
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             sb.append("ou=").append(insName).append(",").append(INSTANCES_NODE)
                     .append(baseDN);
             CachedSMSEntry cEntry = CachedSMSEntry.getInstance(token, sb
@@ -151,7 +154,7 @@ public class CreateServiceConfig {
             if (globalGroup == null) {
                 globalGroup = SMSUtils.DEFAULT;
             }
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             sb.append("ou=").append(globalGroup).append(",").append(
                     GLOBAL_CONFIG_NODE).append(baseDN);
             createSubConfig(token, sb.toString(), globalNode, ss, baseDN, 
@@ -184,7 +187,7 @@ public class CreateServiceConfig {
             checkBaseNodesForOrg(token, orgDN, sName, version, createRealms);
 
             // create sub-config node
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             sb.append("ou=").append(orgGroup).append(",").append(
                     ORG_CONFIG_NODE).append("ou=").append(version).append(
                     ",ou=").append(sName).append(",ou=services,").append(orgDN);
@@ -224,7 +227,7 @@ public class CreateServiceConfig {
             checkBaseNodesForOrg(token, orgName, sName, version);
 
             // Check and create interfaces node
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             sb.append("ou=").append(intName).append(",").append(
                     PLUGIN_CONFIG_NODE).append("ou=").append(version).append(
                     ",ou=").append(sName).append(",ou=services,").append(

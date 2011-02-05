@@ -26,11 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm.model;
 
-import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.console.property.PropertyXMLBuilder;
 import com.sun.identity.console.property.PropertyTemplate;
 import com.sun.identity.sm.SMSException;

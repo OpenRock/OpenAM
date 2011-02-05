@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.stats.StatsListener;
@@ -354,7 +357,7 @@ public class Stats {
         synchronized (dateFormat) {
             buf.write(dateFormat.format(new Date()));
         }
-        if ((serverInstance != null) && (serverInstance != "")) {
+        if ((serverInstance != null) && (!serverInstance.equals(""))) {
             buf.write(": ");
             buf.write("Server Instance: " + serverInstance);
         }

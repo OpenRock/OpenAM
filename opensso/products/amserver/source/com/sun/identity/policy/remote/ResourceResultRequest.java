@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.remote;
 
 import com.sun.identity.shared.debug.Debug;
@@ -315,7 +318,7 @@ public class ResourceResultRequest {
      * @return a XML representation of this object.
      */
     public String toXMLString() {
-        StringBuffer xmlsb = new StringBuffer(1000);
+        StringBuilder xmlsb = new StringBuilder(1000);
 
         xmlsb.append("<")
              .append(GET_RESOURCE_RESULTS);

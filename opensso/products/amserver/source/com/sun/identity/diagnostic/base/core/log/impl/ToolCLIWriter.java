@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.core.log.impl;
 
 import java.text.MessageFormat;
@@ -232,7 +235,7 @@ public class ToolCLIWriter implements IToolOutput {
      */
     public void printMessage(String[] msgArray){
         try {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append((rb == null) ? msgArray[0] : rb.getString(msgArray[0]))
                 .append("................: ")
                 .append((rb == null) ? msgArray[1] : rb.getString(msgArray[1]));
@@ -241,7 +244,7 @@ public class ToolCLIWriter implements IToolOutput {
             sResponse.setMessage(buff.toString());
             System.out.println(buff.toString());
         } catch (Exception ex) {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append(msgArray[0])
                 .append("................: ")
                 .append(msgArray[1]);

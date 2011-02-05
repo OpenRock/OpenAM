@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base.model;
 
 import com.iplanet.am.util.SystemProperties;
@@ -42,7 +45,6 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.log.LogRecord;
@@ -296,7 +298,7 @@ public class AMModelBase
      * @return random string
      */
     public String getRandomString() {
-        StringBuffer sb = new StringBuffer(30);
+        StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
         sb.append(System.currentTimeMillis());
@@ -722,7 +724,7 @@ public class AMModelBase
      * @return URL of hyperlink to logout page
      */
     public static String getLogoutURL() {
-        StringBuffer url = new StringBuffer(30);
+        StringBuilder url = new StringBuilder(30);
         url.append(AMSystemConfig.serverDeploymentURI)
            .append(AMAdminConstants.URL_LOGOUT);
 
@@ -1011,7 +1013,7 @@ public class AMModelBase
             // get the values for the search attribute
             Set a = id.getAttribute(getUserSearchAttribute());
             if ((a != null) && (a.size() > 0)) {
-                StringBuffer tmp = new StringBuffer(56);
+                StringBuilder tmp = new StringBuilder(56);
 
                 // we know there is at least one entry, so add it
                 Iterator i = a.iterator();

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common;
 
 import java.util.HashMap;
@@ -99,7 +102,7 @@ public class ISResourceBundle extends ListResourceBundle {
             String key = (String) it.next();
             String value;
             Set values = (Set) keyValues.get(key);
-            if (values.size() != 0) {
+            if (!values.isEmpty()) {
                 value = (String) values.iterator().next();
                 rbArray[count][0] = convertUnicode(key);
                 rbArray[count][1] = convertUnicode(value);

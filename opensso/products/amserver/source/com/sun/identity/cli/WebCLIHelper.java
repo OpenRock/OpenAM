@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 import com.iplanet.sso.SSOToken;
@@ -72,7 +75,7 @@ public class WebCLIHelper {
         String cmdName = request.getParameter("cmd");
 
         if (cmdName != null) {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append(getNavBackLinkHTML());
 
             String submit = request.getParameter("submit");

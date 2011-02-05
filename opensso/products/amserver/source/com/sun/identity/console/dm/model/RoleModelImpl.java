@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm.model;
 
 import com.iplanet.am.sdk.AMConstants;
@@ -38,14 +41,11 @@ import com.iplanet.am.sdk.AMRole;
 import com.iplanet.am.sdk.AMSearchControl;
 import com.iplanet.am.sdk.AMSearchResults;
 import com.iplanet.sso.SSOException;
-import com.iplanet.am.sdk.AMTemplate;
 
 import com.sun.identity.common.admin.AdminInterfaceUtils;
-import com.sun.identity.common.admin.DisplayOptionsUtils;
 
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.console.property.PropertyTemplate;
 import com.sun.identity.console.property.PropertyXMLBuilder;
 import com.sun.identity.console.property.PropertyXMLBuilderBase;
@@ -322,7 +322,7 @@ public class RoleModelImpl extends DMModelBase
     }
 
     public String getServiceXML(String service) {
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG);
 
@@ -357,7 +357,7 @@ public class RoleModelImpl extends DMModelBase
     }
 
     public String getRoleProfileXML(int type) {
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG)
             .append(START_SECTION)
@@ -372,7 +372,7 @@ public class RoleModelImpl extends DMModelBase
     }
 
     public String getRoleCreateXML(int type) {
-        StringBuffer buff = new StringBuffer(2000);
+        StringBuilder buff = new StringBuilder(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
             .append(PropertyTemplate.START_TAG)
             .append(CREATE_PROPERTIES);
@@ -944,7 +944,7 @@ public class RoleModelImpl extends DMModelBase
                 Set value = (Set)dataIn.remove(key);
                 if (value == null || value.isEmpty()) {
                     if (key.equals(USER_SERVICE_UID)) {
-                        avPairs.append("(" + key + "=*)");
+                        avPairs.append("(").append(key).append("=*)");
                     }
                     continue;
                 }
@@ -978,7 +978,7 @@ public class RoleModelImpl extends DMModelBase
                 }
             }
  
-            StringBuffer avFilter = new StringBuffer(100);
+            StringBuilder avFilter = new StringBuilder(100);
             
             // add inetorgperson to filter to return only users
             avFilter.append("(&(objectclass=inetorgperson)");
@@ -993,7 +993,7 @@ public class RoleModelImpl extends DMModelBase
                     } else {
                         avFilter.append("(|");
                     }
-                    avFilter.append(avPairs + ")");
+                    avFilter.append(avPairs).append(")");
                 } else {
                     avFilter.append(avPairs);
                 }

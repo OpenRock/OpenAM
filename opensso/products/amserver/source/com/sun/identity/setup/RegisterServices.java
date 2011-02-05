@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.sso.SSOException;
@@ -172,7 +175,7 @@ public class RegisterServices {
         try {
             rawReader = new BufferedReader(new InputStreamReader(
                 getClass().getClassLoader().getResourceAsStream(resName)));
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             String line = null;
 
             while ((line = rawReader.readLine()) != null) {

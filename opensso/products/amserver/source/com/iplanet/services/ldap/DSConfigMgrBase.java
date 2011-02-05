@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import com.iplanet.am.util.SystemProperties;
@@ -68,7 +71,7 @@ public class DSConfigMgrBase implements IDSConfigMgr {
         ServerGroup serverGrp = getServerGroup(serverGroupID);
         Collection serverList = serverGrp.getServersList();
 
-        StringBuffer hostName = new StringBuffer();
+        StringBuilder hostName = new StringBuilder();
 
         Iterator serverIterator = serverList.iterator();
 

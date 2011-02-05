@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.authentication.spi;
@@ -419,7 +419,7 @@ public abstract class AMLoginModule implements LoginModule {
         
         // construct external Callback[]
         Callback[] ext = new Callback[extCallbacks.size()];
-        if (extCallbacks.size() != 0) {
+        if (!extCallbacks.isEmpty()) {
             Iterator it = extCallbacks.iterator();
             int i = 0;
             while (it.hasNext()) {

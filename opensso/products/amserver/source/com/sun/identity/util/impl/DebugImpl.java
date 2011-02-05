@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.util.impl;
 
 import java.io.File;
@@ -37,7 +40,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.debug.IDebug;
@@ -292,7 +294,7 @@ public class DebugImpl implements IDebug {
         String msg,
         Throwable th
     ) {
-        StringBuffer buf = new StringBuffer(prefix);
+        StringBuilder buf = new StringBuilder(prefix);
         buf.append('\n');
         buf.append(msg);
         if(th != null) {

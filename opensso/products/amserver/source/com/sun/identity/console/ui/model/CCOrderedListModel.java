@@ -25,12 +25,12 @@
  * $Id: CCOrderedListModel.java,v 1.1 2008/07/02 17:21:45 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.ui.model;
 
-import com.iplanet.jato.view.html.OptionList;
 import com.sun.web.ui.model.CCOrderableListModel;
-import com.sun.web.ui.view.orderedlist.CCOrderedListBase;
-import java.util.StringTokenizer;
 
 /**
  * This is the model for <code>CCOrderedListView</code>.

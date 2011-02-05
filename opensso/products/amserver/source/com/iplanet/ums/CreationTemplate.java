@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import java.util.ArrayList;
@@ -473,7 +476,7 @@ public class CreationTemplate extends Template {
         if (rule == null) {
             return className;
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(className);
         sb.append("(");
         sb.append(rule);

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.authentication.model;
 
 import com.iplanet.sso.SSOException;
@@ -208,7 +211,7 @@ public  class AuthPropertiesModelImpl extends AMModelBase
     }
 
     public void removeAuthInstance(Set names) throws AMConsoleException {
-        StringBuffer errorList = new StringBuffer();
+        StringBuilder errorList = new StringBuilder();
         String message = null;
 
         try {

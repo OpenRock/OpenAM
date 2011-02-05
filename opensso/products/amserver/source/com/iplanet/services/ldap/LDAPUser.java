@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import com.iplanet.services.util.Crypt;
@@ -140,7 +143,7 @@ public class LDAPUser implements ParseOutput {
     private String userPasswd;
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         buf.append("UserID=");
         buf.append(userID);

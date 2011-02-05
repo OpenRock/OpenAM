@@ -26,14 +26,13 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.msisdn;
 
 import java.util.ResourceBundle;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Cookie;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.authentication.util.ISAuthConstants;

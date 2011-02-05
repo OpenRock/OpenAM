@@ -26,9 +26,9 @@
  *
  */
 
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.HashSet;
@@ -101,7 +101,7 @@ public class ResourceResults {
      *
      */
     public String toXML() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator iter = resourceResults.iterator();
         while (iter.hasNext()) {
             ResourceResult rr = (ResourceResult)iter.next();
@@ -117,7 +117,7 @@ public class ResourceResults {
      *
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator iter = resourceResults.iterator();
         while (iter.hasNext()) {
             ResourceResult rr = (ResourceResult)iter.next();

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm;
@@ -226,14 +226,14 @@ public class PluginSchema {
      * Returns the <code>String</code> represenation of the Plugin schema.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer(100);
-        sb.append("PluginSchema name: " + getName()).append(
-                "\n\tInterface name: " + getInterfaceName()).append(
-                "\n\tClass name: " + getClassName()).append(
-                "\n\tJar URL: " + getJarURL()).append(
-                "\n\tI18N URL: " + getI18NJarURL()).append(
-                "\n\tI18N File name: " + getI18NFileName()).append(
-                "\n\tI18N Key: " + getI18NKey());
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("PluginSchema name: ").append(getName()).
+                append("\n\tInterface name: ").append(getInterfaceName()).
+                append("\n\tClass name: ").append(getClassName()).
+                append("\n\tJar URL: ").append(getJarURL()).
+                append("\n\tI18N URL: ").append(getI18NJarURL()).
+                append("\n\tI18N File name: ").append(getI18NFileName()).
+                append("\n\tI18N Key: ").append(getI18NKey());
         for (Iterator i = getAttributeSchemaNames().iterator(); i.hasNext();) {
             sb.append("\n").append(getAttributeSchema((String) i.next()));
         }
@@ -323,7 +323,7 @@ public class PluginSchema {
                 .getServiceName(), smsSchema.getServiceVersion());
 
         // Construct the DN for the interfaces node
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("ou=").append(interfaceName).append(",").append(
                 CreateServiceConfig.PLUGIN_CONFIG_NODE).append("ou=").append(
                 smsSchema.getServiceVersion()).append(",").append("ou=")

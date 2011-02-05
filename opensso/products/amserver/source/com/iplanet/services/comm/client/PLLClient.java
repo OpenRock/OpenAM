@@ -26,13 +26,15 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.client;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.share.PLLBundle;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.ResponseSet;
-import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.naming.WebtopNaming.SiteMonitor;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -195,7 +197,7 @@ public class PLLClient {
             // Input ...
             in = new BufferedReader(new InputStreamReader(conn
                     .getInputStream(), "UTF-8"));
-            StringBuffer in_buf = new StringBuffer();
+            StringBuilder in_buf = new StringBuilder();
             int len;
             char[] buf = new char[1024];
             while ((len = in.read(buf, 0, buf.length)) != -1) {

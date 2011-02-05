@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.ldap;
 
 import java.security.Principal;
@@ -56,7 +59,6 @@ import com.sun.identity.shared.ldap.LDAPAddRequest;
 import com.sun.identity.shared.ldap.LDAPModifyRequest;
 import com.sun.identity.shared.ldap.LDAPSearchRequest;
 import com.sun.identity.shared.ldap.LDAPDeleteRequest;
-import com.sun.identity.shared.ldap.LDAPSearchConstraints;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
@@ -1243,7 +1245,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
          * 
          */
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("(&");
         for (Iterator itr = values.iterator(); itr.hasNext();) {
             String val = (String) itr.next();
@@ -1404,7 +1406,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                 dataStore.equals(SMSEntry.DATASTORE_ACTIVE_DIR)
             ) {
                 String[] dns = LDAPDN.explodeDN(dn, false);
-                StringBuffer buff = new StringBuffer();
+                StringBuilder buff = new StringBuilder();
 
                 String s = dns[0];
                 int idx = s.indexOf('=');

@@ -25,6 +25,9 @@
  * $Id: LogReadFileHandler.java,v 1.8 2009/04/07 23:21:01 hvijay Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import java.io.BufferedReader;
@@ -398,7 +401,7 @@ public class LogReadFileHandler implements LogReadHandler {
             throws IOException, RuntimeException {
         String bufferedStr;
         String dummyStr = null;
-        StringBuffer dummySbuf = new StringBuffer(" ");
+        StringBuilder dummySbuf = new StringBuilder(" ");
         int dcnt = 0;
 
         if (columnIndices != null) {

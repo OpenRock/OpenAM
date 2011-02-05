@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.common;
 
 public class CryptUtils {
@@ -138,9 +141,7 @@ public class CryptUtils {
                 pk_len++;
             }
             pk = new int[keylen];
-            for (int i = 0; i < keylen; i++) {
-                pk[i] = key[i];
-            }
+            System.arraycopy(key, 0, pk, 0, keylen);
             xk[0] = 0xb7e15163;
             for (int i = 1; i < xk_len; i++) {
                 xk[i] = xk[i - 1] + 0x9e3779b9;

@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.policy.interfaces.Condition;
@@ -723,7 +724,7 @@ public class SimpleTimeCondition implements Condition {
         boolean allowed = false; 
         long currentGmt = System.currentTimeMillis();
         if (env != null) {
-            Long currentGmtLong = (Long) env.get(REQUEST_TIME);;
+            Long currentGmtLong = (Long) env.get(REQUEST_TIME);
             if ( currentGmtLong != null ) {
                 currentGmt = currentGmtLong.longValue();
             } 

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.services.util.AMEncryption;
@@ -115,7 +118,7 @@ public class JCECrypt {
 
         // Serialize the data, i.e., remove \n and \r
         BufferedReader bufReader = new BufferedReader(new StringReader(str));
-        StringBuffer strClean = new StringBuffer(str.length());
+        StringBuilder strClean = new StringBuilder(str.length());
         String strTemp = null;
         try {
             while ((strTemp = bufReader.readLine()) != null) {

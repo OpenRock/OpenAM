@@ -25,10 +25,12 @@
  * $Id: OnlineHelp2Servlet.java,v 1.1 2009/07/29 22:32:15 asyhuang Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.web.ui.servlet.help2;
 
 import com.iplanet.jato.*;
-import com.sun.web.ui.servlet.*;
 import java.io.IOException;
 import javax.servlet.*;
 import javax.servlet.http.*;

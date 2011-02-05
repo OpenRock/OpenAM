@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.protocol.https;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -35,7 +38,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.protocol.SSLSocketFactoryManager;
-import com.sun.identity.security.keystore.AMX509KeyManager;
 
 public class Https {
     static private SSLSocketFactory sf = null;

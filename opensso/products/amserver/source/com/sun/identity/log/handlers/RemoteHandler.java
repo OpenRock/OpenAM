@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
 import com.iplanet.am.util.ThreadPoolException;
@@ -47,19 +49,14 @@ import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.naming.URLNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.log.AMLogException;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogManager;
 import com.sun.identity.log.LogManagerUtil;
 import com.sun.identity.log.ILogRecord;
 import com.sun.identity.log.spi.Debug;
-import com.sun.identity.log.handlers.LoggingThread;
-import com.sun.identity.log.Logger;
 
 /**
  * The class which publishes the log message to a remote log service. Also

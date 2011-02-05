@@ -26,13 +26,14 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.util;
 
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
@@ -40,10 +41,8 @@ import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.common.DateUtils;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSEntry;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,7 +50,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;

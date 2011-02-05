@@ -26,10 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.common;
 
 import com.sun.identity.shared.Constants;
-import com.sun.identity.diagnostic.base.core.common.ToolConstants;
 
 /**
  * This interface contains the property names used by the 

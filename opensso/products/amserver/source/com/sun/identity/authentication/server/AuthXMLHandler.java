@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.authentication.server;
@@ -87,7 +87,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 
 /**
  * <code>AuthXMLHandler</code> class implements the <code>RequestHandler</code>.
@@ -183,7 +182,7 @@ public class AuthXMLHandler implements RequestHandler {
                     SessionID sessionID = new SessionID(authIdentifier);
                     URL sessionServerURL = Session.getSessionServiceURL(
                         sessionID);
-                    StringBuffer srtBuff = new StringBuffer(100);
+                    StringBuilder srtBuff = new StringBuilder(100);
                     srtBuff.append(sessionServerURL.getProtocol()).append("://")
                         .append(sessionServerURL.getHost()).append(":")
                         .append(Integer.toString(sessionServerURL.getPort()))

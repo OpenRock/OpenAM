@@ -25,6 +25,9 @@
 * $Id: IdRepoJAXRPCObjectImpl.java,v 1.13 2010/01/06 01:58:27 veiming Exp $
 */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idm.server;
 
 import com.iplanet.am.sdk.remote.*;
@@ -52,7 +55,6 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
@@ -749,7 +751,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         
          // Construct the XML document for the event change
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<EventNotification><AttributeValuePair>")
             .append("<Attribute name=\"method\" /><Value>").append(method)
             .append("</Value></AttributeValuePair>")

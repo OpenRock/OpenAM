@@ -26,12 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
-import java.lang.Integer;
-import java.lang.NumberFormatException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
@@ -110,11 +111,11 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
                 debug.error(classModule + "invalid URL: " +
                     svrURL + "; " + mue.getMessage());
             }
-            Integer iport = new Integer(1);;
-            Integer iid = new Integer(0);
+            Integer iport = Integer.valueOf(1);
+            Integer iid = Integer.valueOf(0);
             try {
-                iport = new Integer(port);
-                iid = new Integer(svrId);
+                iport = Integer.valueOf(port);
+                iid = Integer.valueOf(svrId);
             } catch (NumberFormatException nfe) {
                 debug.error(classModule + "invalid port (" +
                     port + ") or server id (" + svrId + "): " +

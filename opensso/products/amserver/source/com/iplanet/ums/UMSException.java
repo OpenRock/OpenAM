@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums;
 
 import java.io.PrintWriter;
@@ -209,7 +212,7 @@ public class UMSException extends java.lang.Exception {
         if (getRootCause() == null)
             return xcptMessage;
 
-        StringBuffer theMsg = new StringBuffer();
+        StringBuilder theMsg = new StringBuilder();
 
         // get the root cause message
         String nestedMsg;
@@ -278,7 +281,7 @@ public class UMSException extends java.lang.Exception {
      */
     public String toString() {
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("--------------------------------------");
         buf.append("Got UMS Exception\n");
 

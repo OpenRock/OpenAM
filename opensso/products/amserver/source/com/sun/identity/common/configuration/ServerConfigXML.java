@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common.configuration;
 
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -92,7 +95,7 @@ public class ServerConfigXML implements Serializable {
      * @return the XML representation of this object.
      */
     public String toXML() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append("<").append(DSConfigMgr.ROOT).append(">\n");
         buff.append(defaultServerGroup.toXML(DSConfigMgr.DEFAULT));
         buff.append(smsServerGroup.toXML("sms"));
@@ -177,7 +180,7 @@ public class ServerConfigXML implements Serializable {
          * @return the XML representation of this object.
          */
         public String toXML(String groupName) {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append("<").append(DSConfigMgr.SERVERGROUP)
                 .append(" ")
                 .append(DSConfigMgr.NAME).append("=\"")
@@ -243,7 +246,7 @@ public class ServerConfigXML implements Serializable {
          * @return the XML representation of this object.
          */
         public String toXML() {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append("<").append(DSConfigMgr.SERVER)
                 .append(" ")
                 .append(DSConfigMgr.NAME).append("=\"")
@@ -301,7 +304,7 @@ public class ServerConfigXML implements Serializable {
          * @return the XML representation of this object.
          */
         public String toXML() {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append("<").append(DSConfigMgr.USER)
                 .append(" ")
                 .append(DSConfigMgr.NAME).append("=\"")

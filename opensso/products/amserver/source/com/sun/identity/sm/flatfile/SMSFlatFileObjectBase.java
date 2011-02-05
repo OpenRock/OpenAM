@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
 import com.iplanet.am.util.SystemProperties;
@@ -209,7 +212,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * encoding special characters in the values as necessary.
      */
     protected String toValString(Set vals) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         
         for (Iterator i = vals.iterator(); i.hasNext(); ) {
@@ -276,7 +279,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * in a particular order.
      */
     protected String toValString(Enumeration en) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         while (en.hasMoreElements()) {
             String val = (String)en.nextElement();
@@ -300,7 +303,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      */
     protected String encodeVal(String v) {
         char[] chars = v.toCharArray();
-        StringBuffer sb = new StringBuffer(chars.length+20);
+        StringBuilder sb = new StringBuilder(chars.length+20);
         int i = 0, lastIdx = 0;
         for (i = 0; i < chars.length; i++) {
             if (chars[i] == '%') {
@@ -366,7 +369,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      */
     protected String decodeVal(String v) {
         char[] chars = v.toCharArray();
-        StringBuffer sb = new StringBuffer(chars.length);
+        StringBuilder sb = new StringBuilder(chars.length);
         int i = 0, lastIdx = 0;
         for (i = 0; i < chars.length; i++) {
             if (chars[i] == '%' && i+2 < chars.length && chars[i+1] == '2') {

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.core.ui.cli;
 
 import java.io.File;
@@ -56,7 +59,7 @@ public class ToolCLISave {
     }
     
     private String formatInput(ArrayList params, ResourceBundle rb) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append("========================\n")
         .append(rb.getString("cli-save-status-msg")).append("\n")
         .append(params.get(0))

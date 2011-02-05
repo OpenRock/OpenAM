@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.tamper;
 
 import java.io.File;
@@ -99,7 +102,7 @@ public class TamperDetectionUtils {
     }
     
     private static String translateHashToString(byte[] hash) {
-        StringBuffer hashBuffer = new StringBuffer();
+        StringBuilder hashBuffer = new StringBuilder();
         for (int i = 0; i < hash.length; i++) {
             hashBuffer.append(Character.forDigit((hash[i] >> 4) & 0x0F, 16));
             hashBuffer.append(Character.forDigit(hash[i] & 0x0F, 16));

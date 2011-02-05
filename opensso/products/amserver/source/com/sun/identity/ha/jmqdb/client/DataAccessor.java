@@ -25,7 +25,10 @@
  * $Id: DataAccessor.java,v 1.3 2008/06/25 05:43:28 qcheng Exp $
  *
  */
- 
+
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.ha.jmqdb.client;
 
 import com.sleepycat.je.DatabaseException;
@@ -35,7 +38,6 @@ import com.sleepycat.persist.SecondaryIndex;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.Set;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;

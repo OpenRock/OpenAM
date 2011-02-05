@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.dm.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -89,7 +92,7 @@ public class ContainerModelImpl extends DMModelBase
             searchControl, 
             DMConstants.GROUP_CONTAINERS);
 
-	boolean bOrganization = false;;
+	boolean bOrganization = false;
 	try {
             String[] params = {location, filter};
 	    switch (getObjectType(location)) {

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 
@@ -57,7 +60,7 @@ public class FormatUtils {
         String template,
         SSOToken ssoToken
     ) throws SMSException, SSOException {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         String[] arg = new String[1];
         if (serviceNames != null) {
             for (Iterator i = serviceNames.iterator(); i.hasNext(); ) {
@@ -107,7 +110,7 @@ public class FormatUtils {
         String template,
         Map attributeValues
     ) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         if (attributeValues != null) {
             String[] args = new String[2];
             for (Iterator i = attributeValues.keySet().iterator(); i.hasNext();
@@ -134,7 +137,7 @@ public class FormatUtils {
     }
 
     public static String formatProperties(Map prop) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         if (prop != null) {
             Set sorted = new TreeSet();
             for (Iterator i = prop.keySet().iterator(); i.hasNext(); ) {
@@ -167,7 +170,7 @@ public class FormatUtils {
      * @return a formatted string of a map.
      */
     public static String formatMap(String keyLabel, String propLabel, Map map) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         int szColKey = keyLabel.length();
         for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
             String key = (String)i.next();

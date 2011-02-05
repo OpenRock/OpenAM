@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.share;
 
 import java.util.HashMap;
@@ -98,9 +101,9 @@ import com.sun.identity.common.SearchResults;
 
 public class SessionResponse {
 
-    static final String QUOTE = "\"";
+    static final char QUOTE = '\"';
 
-    static final String NL = "\n";
+    static final char NL = '\n';
 
     private String responseVersion = "1.0";
 
@@ -322,14 +325,14 @@ public class SessionResponse {
      * @return An XML String representing the response.
      */
     public String toXMLString() {
-        StringBuffer xml = new StringBuffer();
-        xml.append("<SessionResponse vers=" + QUOTE + responseVersion + QUOTE
-                + " reqid=" + QUOTE + requestID + QUOTE + ">" + NL);
+        StringBuilder xml = new StringBuilder();
+        xml.append("<SessionResponse vers=").append(QUOTE).append(responseVersion).append(QUOTE).
+                append(" reqid=").append(QUOTE).append(requestID).append(QUOTE).append('>').append(NL);
         switch (methodID) {
         case SessionRequest.GetSession:
-            xml.append("<GetSession>" + NL);
+            xml.append("<GetSession>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
                 if (sessionInfoVector.size() != 1) {
                     return null;
@@ -337,69 +340,68 @@ public class SessionResponse {
                 SessionInfo info = (SessionInfo) sessionInfoVector.elementAt(0);
                 xml.append(info.toXMLString());
             }
-            xml.append("</GetSession>" + NL);
+            xml.append("</GetSession>").append(NL);
             break;
         case SessionRequest.GetValidSessions:
-            xml.append("<GetValidSessions>" + NL);
+            xml.append("<GetValidSessions>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                xml.append("<SessionList>" + NL);
+                xml.append("<SessionList>").append(NL);
                 for (int i = 0; i < sessionInfoVector.size(); i++) {
                     SessionInfo info = (SessionInfo) sessionInfoVector
                             .elementAt(i);
                     xml.append(info.toXMLString());
                 }
-                xml.append("</SessionList>" + NL);
-                xml.append("<Status>" + Integer.toString(status) + "</Status>"
-                        + NL);
+                xml.append("</SessionList>").append(NL);
+                xml.append("<Status>").append(Integer.toString(status)).append("</Status>").append(NL);
             }
-            xml.append("</GetValidSessions>" + NL);
+            xml.append("</GetValidSessions>").append(NL);
             break;
         case SessionRequest.DestroySession:
-            xml.append("<DestroySession>" + NL);
+            xml.append("<DestroySession>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                xml.append("<OK></OK>" + NL);
+                xml.append("<OK></OK>").append(NL);
             }
-            xml.append("</DestroySession>" + NL);
+            xml.append("</DestroySession>").append(NL);
             break;
         case SessionRequest.Logout:
-            xml.append("<Logout>" + NL);
+            xml.append("<Logout>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                xml.append("<OK></OK>" + NL);
+                xml.append("<OK></OK>").append(NL);
             }
-            xml.append("</Logout>" + NL);
+            xml.append("</Logout>").append(NL);
             break;
         case SessionRequest.AddSessionListener:
-            xml.append("<AddSessionListener>" + NL);
+            xml.append("<AddSessionListener>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                xml.append("<OK></OK>" + NL);
+                xml.append("<OK></OK>").append(NL);
             }
-            xml.append("</AddSessionListener>" + NL);
+            xml.append("</AddSessionListener>").append(NL);
             break;
         case SessionRequest.AddSessionListenerOnAllSessions:
-            xml.append("<AddSessionListenerOnAllSessions>" + NL);
+            xml.append("<AddSessionListenerOnAllSessions>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                xml.append("<OK></OK>" + NL);
+                xml.append("<OK></OK>").append(NL);
             }
-            xml.append("</AddSessionListenerOnAllSessions>" + NL);
+            xml.append("</AddSessionListenerOnAllSessions>").append(NL);
             break;
         case SessionRequest.SetProperty:
-            xml.append("<SetProperty>" + NL);
+            xml.append("<SetProperty>").append(NL);
             if (exception != null) {
-                xml.append("<Exception>" + exception + "</Exception>" + NL);
+                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                xml.append("<OK></OK>" + NL);
+                xml.append("<OK></OK>").append(NL);
             }
-            xml.append("</SetProperty>" + NL);
+            xml.append("</SetProperty>").append(NL);
             break;
         case SessionRequest.GetSessionCount:
             xml.append("<GetSessionCount>").append(NL);
@@ -417,7 +419,7 @@ public class SessionResponse {
                             .append(QUOTE).append(
                                     ((Long) allSessionsforGivenUUID.get(sid))
                                             .toString()).append(QUOTE).append(
-                                    ">").append("</SessionExpirationTimeInfo>");
+                                    '>').append("</SessionExpirationTimeInfo>");
                 }
                 xml.append("</AllSessionsGivenUUID>").append(NL);
             }

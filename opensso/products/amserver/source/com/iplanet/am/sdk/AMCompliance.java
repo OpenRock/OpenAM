@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk;
 
 import com.iplanet.am.sdk.common.IComplianceServices;
@@ -33,7 +36,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -86,7 +88,7 @@ class AMCompliance implements AMConstants {
      */
     protected static void init() {
         rootSuffix = AMStoreConnection.getAMSdkBaseDN();
-        if (rootSuffix == null || rootSuffix == "") {
+        if (rootSuffix == null || rootSuffix.equals("")) {
             debug.error("com.iplanet.am.rootsuffix property value "
                     + "should not be null");
             return;

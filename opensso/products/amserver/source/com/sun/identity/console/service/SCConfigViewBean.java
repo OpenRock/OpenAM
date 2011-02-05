@@ -26,10 +26,12 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.RequestManager;
-import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.View;
 import com.sun.identity.console.base.AMPostViewBean;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;

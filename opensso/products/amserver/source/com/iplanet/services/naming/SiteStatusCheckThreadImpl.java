@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.naming;
 
 import java.io.IOException;
@@ -44,7 +47,6 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.naming.WebtopNaming.SiteStatusCheck;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.Constants;
 
 /**
@@ -326,7 +328,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
             if (port == -1) {
             	port = protocol.equalsIgnoreCase("http") ? 80 : 443;
             }
-            StringBuffer buff = new StringBuffer(protocol);
+            StringBuilder buff = new StringBuilder(protocol);
             buff.append("://").append(u.getHost()).append(":").append(port)
                     .append(hcPath);
             try {

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.comm.share;
 
 import java.util.Vector;
@@ -65,9 +68,9 @@ import java.util.Vector;
 
 public class NotificationSet {
 
-    static final String QUOTE = "\"";
+    static final char QUOTE = '\"';
 
-    static final String NL = "\n";
+    static final char NL = '\n';
 
     static final String BEGIN_CDATA = "<![CDATA[";
 
@@ -155,7 +158,7 @@ public class NotificationSet {
      * @return An XML NotificationSet document in String format.
      */
     public String toXMLString() {
-        StringBuffer xml = new StringBuffer(300);
+        StringBuilder xml = new StringBuilder(300);
         xml.append("<?xml version=").append(QUOTE).append("1.0").append(QUOTE)
                 .append(" encoding=").append(QUOTE).append("UTF-8").append(
                         QUOTE).append(" standalone=").append(QUOTE).append(
@@ -165,7 +168,7 @@ public class NotificationSet {
                 notificationSetVersion).append(QUOTE).append(" svcid=").append(
                 QUOTE).append(serviceID).append(QUOTE).append(" notid=")
                 .append(QUOTE).append(notificationSetID).append(QUOTE).append(
-                        ">").append(NL);
+                        '>').append(NL);
 
         int numNotifications = notificationVector.size();
         for (int i = 0; i < numNotifications; i++) {
@@ -175,7 +178,7 @@ public class NotificationSet {
                 xml.append(" dtdid=").append(QUOTE).append(notif.getDtdID())
                         .append(QUOTE);
             }
-            xml.append(">");
+            xml.append('>');
             xml.append(BEGIN_CDATA).append(notif.getContent())
                     .append(END_CDATA);
             xml.append("</Notification>").append(NL);

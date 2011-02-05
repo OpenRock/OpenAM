@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import java.util.StringTokenizer;
@@ -148,7 +150,7 @@ public class URLResourceName
             throw (new PolicyException(me));
         }
 
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append(proto);
         sb.append("://");
         sb.append(hostName);
@@ -186,8 +188,7 @@ public class URLResourceName
                 // reconstruct the url in canonicalized form
                 for (int i = 0; i < size; i++) {
                    if (i < (size-1)) {
-                       sb.append((String)al.get(i) + 
-                                 QUERY_PARAMETER_DELIMITER);
+                        sb.append((String) al.get(i)).append(QUERY_PARAMETER_DELIMITER);
                    } else {
                        sb.append((String)al.get(i));
                    }
@@ -283,7 +284,7 @@ public class URLResourceName
         if (idx != -1) {
             int begin = 0; 
             int wildcardLen = wildcard.length();
-            StringBuffer sb = new StringBuffer(100);
+            StringBuilder sb = new StringBuilder(100);
             while (idx != -1) {
                 sb.append(port.substring(begin, idx));
                 begin = idx + wildcardLen;

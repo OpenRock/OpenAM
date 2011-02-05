@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import com.sun.identity.shared.ldap.LDAPException;
@@ -175,7 +178,7 @@ public class LDAPServiceException extends Exception {
      * @return String The exception string.
      */
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (rootCause != null) {
             buf.append(rootCause.toString());
         }

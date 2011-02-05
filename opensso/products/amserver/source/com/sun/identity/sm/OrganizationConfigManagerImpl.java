@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -218,7 +221,7 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
     
     public void objectChanged(String dn, int type) {
         // Check for listeners
-        if (listenerObjects.size() == 0) {
+        if (listenerObjects.isEmpty()) {
             if (SMSEntry.eventDebug.messageEnabled()) {
                 SMSEntry.eventDebug.message("OrgConfigMgrImpl::entryChanged"
                         + " No listeners registered: " + dn
@@ -284,7 +287,7 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
 
                 // The subconfig names should be "/" separated and left to right
                 if (size >= 5) {
-                    StringBuffer sbr = new StringBuffer();
+                    StringBuilder sbr = new StringBuilder();
                     for (int i = size - 4; i >= 0; i--) {
                         sbr.append('/').append(rdns[i]);
                     }

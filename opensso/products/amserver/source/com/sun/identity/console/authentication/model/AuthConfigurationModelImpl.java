@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.authentication.model;
 
 import com.iplanet.sso.SSOException;
@@ -33,7 +36,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AuthConfigurationEntry;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
@@ -200,7 +202,7 @@ public  class AuthConfigurationModelImpl extends AMModelBase
      public void deleteAuthConfiguration(String realm, Set names)
          throws AMConsoleException
     {
-        StringBuffer errorList = new StringBuffer();
+        StringBuilder errorList = new StringBuilder();
             String message = null;
 
         for (Iterator i=names.iterator(); i.hasNext(); ) {

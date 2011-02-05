@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.ldap;
 
 import java.util.HashMap;
@@ -85,12 +88,6 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
     static private Map groupToRoleMap = new HashMap();
 
     static private Map deletedOrg = new HashMap();
-
-    protected static final String ADMIN_GROUPS_ENABLED_ATTR = 
-        "iplanet-am-admin-console-compliance-admin-groups";
-
-    protected static final String COMPLIANCE_USER_DELETION_ATTR = 
-        "iplanet-am-admin-console-compliance-user-deletion";
 
     static private String USER_STATUS_ATTRIBUTE = "inetuserstatus";
 

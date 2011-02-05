@@ -26,13 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.realm.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /* - NEED NOT LOG - */
 

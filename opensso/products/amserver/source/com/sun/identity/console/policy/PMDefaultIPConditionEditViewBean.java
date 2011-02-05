@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.policy;
 
-import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.policy.model.PolicyModel;
 import java.util.Map;
 

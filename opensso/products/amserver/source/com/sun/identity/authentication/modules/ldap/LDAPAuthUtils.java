@@ -26,12 +26,12 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.ldap;
 
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.LDAPConnectionPool;
 import com.sun.identity.common.ShutdownListener;
@@ -41,8 +41,6 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,7 +65,6 @@ import com.sun.identity.shared.ldap.LDAPModifyRequest;
 import com.sun.identity.shared.ldap.LDAPSearchRequest;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPSearchConstraints;
-import com.sun.identity.shared.ldap.controls.LDAPPasswordExpiredControl;
 import com.sun.identity.shared.ldap.controls.LDAPPasswordExpiringControl;
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 
@@ -572,7 +569,7 @@ public class LDAPAuthUtils {
     }
     
     private String buildUserFilter() {
-        StringBuffer buf = new StringBuffer(100);
+        StringBuilder buf = new StringBuilder(100);
         buf.append("(");
         if (userSearchAttrs.size() == 1) {
             buf.append((String)userSearchAttrs.iterator().next());
@@ -607,7 +604,7 @@ public class LDAPAuthUtils {
         
         if (searchScope == LDAPConnection.SCOPE_BASE) {
             if (userSearchAttrs.size() == 1) {
-                StringBuffer dnBuffer = new StringBuffer();
+                StringBuilder dnBuffer = new StringBuilder();
                 dnBuffer.append((String) userSearchAttrs.iterator().next());
                 dnBuffer.append("=");
                 dnBuffer.append(userId);
@@ -639,7 +636,7 @@ public class LDAPAuthUtils {
         if (searchFilter == null || searchFilter.length() == 0) {
             searchFilter = buildUserFilter();
         } else {
-            StringBuffer bindFilter = new StringBuffer(200);
+            StringBuilder bindFilter = new StringBuilder(200);
             if (userId != null) {
                 bindFilter.append("(&");
                 bindFilter.append(buildUserFilter());

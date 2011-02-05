@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import com.iplanet.am.util.BrowserEncoding;
@@ -548,7 +551,7 @@ public abstract class AMViewBeanBase
      * @param url Target URL
      */
     protected String appendPgSession(String url) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(url);
 
         if (url.indexOf("?") == -1) {
@@ -935,7 +938,7 @@ public abstract class AMViewBeanBase
     // this builds a display string only
     public String getPath(String child) {
         AMModel model = getModel();
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder();
         String startDN = model.getStartDN();
         if (startDN.charAt(0) != '/') {
             startDN = "/" + startDN;
@@ -970,7 +973,7 @@ public abstract class AMViewBeanBase
     }
     
     public static String stringToHex(String str) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         str = str.replaceAll("\\\\u", "\\\\\\\\u");
         int len = str.length();
         for (int i = 0; i < len; i++) {
@@ -980,7 +983,7 @@ public abstract class AMViewBeanBase
     }
     
     public static String charToHex(char c) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         if (c <= 0x7E) {
             buffer.append(c);
         } else {
@@ -995,7 +998,7 @@ public abstract class AMViewBeanBase
     }
     
     public static String hexToString(String str) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         int idx = str.indexOf("\\u");
         while (idx != -1) {
             boolean done = false;

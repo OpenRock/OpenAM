@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums.validation;
 
 /**
@@ -64,7 +67,7 @@ public class AlphaValidator implements IValidator {
     public boolean validate(String value) {
         char aChar;
 
-        StringBuffer buf = new StringBuffer(value);
+        StringBuilder buf = new StringBuilder(value);
 
         for (int aIndex = 0; aIndex < buf.length(); aIndex++) {
             aChar = buf.charAt(aIndex);

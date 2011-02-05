@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.spi;
 
 import com.sun.identity.shared.locale.AMResourceBundleCache;
@@ -323,17 +326,13 @@ public class AuthLoginException extends LoginException implements L10NMessage {
          * the point at which the respective exception is thrown.
          */
         String stackString = null;
-        StringBuffer messageBuffer = new StringBuffer();
+        StringBuilder messageBuffer = new StringBuilder();
         int exCount = 1;
         Throwable rootException = this;
-        messageBuffer
-                .append(rootException.getClass().getName()
-                        + "("
-                        + exCount
-                        + ")"
-                        + ":"
-                        + ((AuthLoginException) rootException)
-                                .getLocalMessage() + "\n");
+        messageBuffer.append(rootException.getClass().getName()).
+                append("(").append(exCount).append(")").
+                append(":").append(((AuthLoginException) rootException).getLocalMessage())
+                .append("\n");
         while ((rootException instanceof AuthLoginException)
             && (((AuthLoginException) rootException)._nestedException != null)) 
         {
@@ -341,17 +340,15 @@ public class AuthLoginException extends LoginException implements L10NMessage {
                 ((AuthLoginException) rootException)._nestedException;
             exCount++;
             if (rootException instanceof AuthLoginException) {
-                messageBuffer.append(rootException.getClass().getName()
-                        + "("
-                        + exCount
-                        + ")"
-                        + ":"
-                        + ((AuthLoginException) rootException)
-                                .getLocalMessage() + "\n");
+                messageBuffer.append(rootException.getClass().getName()).
+                        append("(").append(exCount).append(")").
+                        append(":").append(((AuthLoginException) rootException).getLocalMessage()).
+                        append("\n");
             } else {
-                messageBuffer.append(rootException.getClass().getName() + "("
-                        + exCount + ")" + ":" + rootException.getMessage()
-                        + "\n");
+                messageBuffer.append(rootException.getClass().getName()).
+                        append("(").append(exCount).append(")").
+                        append(":").append(rootException.getMessage()).
+                        append("\n");
             }
         }
 

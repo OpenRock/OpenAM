@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import com.iplanet.jato.RequestContext;
@@ -34,8 +36,6 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
-import com.sun.identity.console.base.model.AMSystemConfig;
-import com.sun.identity.sm.ServiceManager;
 import javax.servlet.http.HttpServletRequest;
 
 public class AMAdminFrameViewBean

@@ -26,16 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.unix;
 
 import java.util.*;
 import java.io.*;
-import java.net.*;
 
 import javax.security.auth.*;
 import javax.security.auth.callback.*;
-import javax.security.auth.login.*;
-import javax.security.auth.spi.*;
 
 import com.iplanet.am.util.Misc;
 

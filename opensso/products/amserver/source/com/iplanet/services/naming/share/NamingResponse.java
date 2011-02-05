@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.naming.share;
 
 import java.util.Enumeration;
@@ -58,9 +61,9 @@ import java.util.Hashtable;
 
 public class NamingResponse {
 
-    static final String QUOTE = "\"";
+    static final char QUOTE = '\"';
 
-    static final String NL = "\n";
+    static final char NL = '\n';
 
     private String responseVersion = "1.0";
 
@@ -238,10 +241,10 @@ public class NamingResponse {
      * @return An XML String representing the response.
      */
     public String toXMLString() {
-        StringBuffer xml = new StringBuffer(200);
+        StringBuilder xml = new StringBuilder(200);
         xml.append("<NamingResponse vers=").append(QUOTE).append(
                 responseVersion).append(QUOTE).append(" reqid=").append(QUOTE)
-                .append(requestID).append(QUOTE).append(">").append(NL);
+                .append(requestID).append(QUOTE).append('>').append(NL);
         xml.append("<GetNamingProfile>").append(NL);
         if (exception != null) {
             xml.append("<Exception>").append(exception).append("</Exception>")
@@ -251,14 +254,14 @@ public class NamingResponse {
             while (e.hasMoreElements()) {
                 String name = (String) e.nextElement();
                 String value = (String) namingTable.get(name);
-                xml.append("<Attribute name=").append(QUOTE).append(name)
-                        .append(QUOTE).append(" value=").append(QUOTE).append(
-                                value).append(QUOTE + ">").append(
+                xml.append("<Attribute name=").append(QUOTE).append(name).append(QUOTE)
+                        .append(" value=").append(QUOTE).append(value).append(
+                                QUOTE).append('>').append(
                                 "</Attribute>").append(NL);
             }
 
         }
-        xml.append("</GetNamingProfile>" + NL);
+        xml.append("</GetNamingProfile>").append(NL);
         xml.append("</NamingResponse>");
 
         return xml.toString();

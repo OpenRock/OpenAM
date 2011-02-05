@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
@@ -474,7 +477,7 @@ public class SessionID implements Serializable {
     public static String makeSessionID(String encryptedID, Map extensions,
             String tail) throws SessionException {
         try {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(encryptedID);
             if (extensions != null || tail != null) {
                 buf.append("@");

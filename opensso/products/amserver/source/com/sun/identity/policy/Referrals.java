@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
@@ -442,7 +443,7 @@ public class Referrals implements Cloneable {
      * Returns an XML representaion of this <code>Referrals</code> object
      */
     protected String toXML() {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("\n").append(REFERRALS_ELEMENT_BEGIN)
             .append(XMLUtils.escapeSpecialCharacters(name))
             .append(REFERRALS_DESCRIPTION)

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 
@@ -192,7 +195,7 @@ public class ServerGroup implements ParseOutput {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Server Group Name=");
         buf.append(groupName);
         for (int i = 0; i < users.size(); i++) {

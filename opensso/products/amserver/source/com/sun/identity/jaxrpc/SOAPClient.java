@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.jaxrpc;
 
 import java.io.BufferedReader;
@@ -358,7 +361,7 @@ public class SOAPClient {
     }
     
     String encodeInt(String name, Integer i) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<").append(name);
         sb.append(" xsi:type=\"xsd:int\">");
         sb.append(i).append("</").append(name).append(">");
@@ -370,7 +373,7 @@ public class SOAPClient {
     }
     
     String encodeBoolean(String name, Boolean b) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<").append(name);
         sb.append(" xsi:type=\"xsd:boolean\">");
         sb.append(b).append("</").append(name).append(">");
@@ -382,7 +385,7 @@ public class SOAPClient {
     }
     
     String encodeString(String name, String str) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<").append(name);
         sb.append(" xsi:type=\"xsd:string\">");
         // Make string to be XML compliant
@@ -396,7 +399,7 @@ public class SOAPClient {
     }
     
     String encodeSet(String name, Set set) {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("<").append(name);
         sb.append(" xsi:type=\"ns1:hashSet\" enc:arrayType=\"xsd:anyType[");
         sb.append(set.size());
@@ -413,7 +416,7 @@ public class SOAPClient {
     }
     
     String encodeList(String name, List list) {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("<").append(name);
         sb.append(" xsi:type=\"ns1:linkedList\" enc:arrayType=\"xsd:anyType[");
         sb.append(list.size());
@@ -434,7 +437,7 @@ public class SOAPClient {
     }
     
     public String encodeMap(String name, Map map) {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append("<").append(name);
         sb.append(" xsi:type=\"ns1:hashMap\" enc:arrayType=\"ns1:mapEntry[");
         sb.append(map.size()).append("]\">");
@@ -465,7 +468,7 @@ public class SOAPClient {
             return (Collections.EMPTY_MAP);
         }
         // Add prefix and suffix to the xmlMap
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append(DECODE_HEADER);
         sb.append(xmlMap);
         sb.append(DECODE_FOOTER);
@@ -509,7 +512,7 @@ public class SOAPClient {
      */
     public synchronized String encodeMessage(String function, Object[] params) {
         int index = 1;
-        StringBuffer sb = new StringBuffer(1000);
+        StringBuilder sb = new StringBuilder(1000);
         sb.append(ENVELOPE).append(HEADSTART).append(HEADEND).append(ENV_BODY);
         sb.append("<ans1:").append(function).append(
             " xmlns:ans1=\"http://isp.com/wsdl\">");

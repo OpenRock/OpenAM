@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.common.configuration;
 
 import com.iplanet.am.util.SystemProperties;
@@ -123,7 +126,7 @@ public class ServerConfiguration extends ConfigurationBase {
                                 (String)setSiteId.iterator().next();
                             Set ids = getSiteConfigurationIds(
                                 ssoToken, null, siteName, false);
-                            StringBuffer buff = new StringBuffer();
+                            StringBuilder buff = new StringBuilder();
                             for (Iterator it = ids.iterator(); it.hasNext(); ) {
                                 buff.append("|").append((String)it.next());
                             }
@@ -1081,7 +1084,7 @@ public class ServerConfiguration extends ConfigurationBase {
             ServiceConfig cfg = getServerConfig(ssoToken, serverName);
             if (cfg != null) {
                 Map map = cfg.getAttributes();
-                StringBuffer buff = new StringBuffer();
+                StringBuilder buff = new StringBuilder();
                 
                 buff.append("<ServerConfiguration>\n");
                 for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {

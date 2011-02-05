@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.plugin.services.common;
 
 import java.io.BufferedReader;
@@ -283,7 +286,7 @@ public abstract class ClientBase extends ServiceBase implements ClientConstants 
             if (content != null) {
                 buffer = new StringBuffer();
                 for (int i=0; i<content.size(); i++) {
-                    buffer.append(content.get(i) + "\n");
+                    buffer.append(content.get(i)).append("\n");
                 }
             }
             return buffer.toString();

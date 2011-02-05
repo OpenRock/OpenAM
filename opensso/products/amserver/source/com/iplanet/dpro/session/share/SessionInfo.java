@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.dpro.session.share;
 
 import java.util.Enumeration;
@@ -89,7 +92,7 @@ public class SessionInfo {
     * @return An XML String representing the information
     */
    public String toXMLString() {
-        StringBuffer xml = new StringBuffer(200);
+        StringBuilder xml = new StringBuilder(200);
         xml.append("<Session sid=").append(QUOTE).append(sid).append(QUOTE)
                 .append(" stype=").append(QUOTE).append(stype).append(QUOTE)
                 .append(" cid=").append(QUOTE).append(

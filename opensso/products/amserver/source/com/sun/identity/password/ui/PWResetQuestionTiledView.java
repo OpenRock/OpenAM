@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.password.ui;
 
 import com.iplanet.jato.RequestHandler;
@@ -39,10 +42,8 @@ import com.iplanet.jato.view.html.HiddenField;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.jato.view.html.TextField;
 import com.sun.identity.console.user.model.UMUserPasswordResetOptionsModelImpl;
-import com.sun.identity.console.user.model.UMUserPasswordResetOptionsModel; 
 import com.sun.identity.password.ui.model.PWResetQuestionModel;
 import com.sun.identity.sm.DNMapper;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

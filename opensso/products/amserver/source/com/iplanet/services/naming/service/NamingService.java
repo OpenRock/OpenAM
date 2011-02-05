@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.iplanet.services.naming.service;
@@ -338,7 +338,7 @@ public class NamingService implements RequestHandler, ServiceListener {
     }
 
     static String setToString(Set s) {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         Iterator iter = s.iterator();
         while (iter.hasNext()) {
             sb.append((String) iter.next());
@@ -729,7 +729,7 @@ public class NamingService implements RequestHandler, ServiceListener {
             "LBCookie Mappings : " + lbCookieMappings.toString());
         }
 
-        StringBuffer strBuffer = new StringBuffer(); 
+        StringBuilder strBuffer = new StringBuilder();
         Set s = lbCookieMappings.keySet();
         Iterator iter = s.iterator();
         while (iter.hasNext()) {

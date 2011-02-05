@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.util;
 
 import java.io.IOException;
@@ -43,16 +46,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.iplanet.am.sdk.AMOrganization;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.share.AuthXMLTags;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.common.RequestUtils;
@@ -121,7 +121,7 @@ public class Gateway extends HttpServlet {
         String authLevel = null;
         String gotoUrl = null;
         ActionDecision ad = null;
-        Map advices = null;;
+        Map advices = null;
         String orgName = null;
 
         // Check content length
@@ -138,7 +138,7 @@ public class Gateway extends HttpServlet {
         }
 
         // Construct the default forwarding URL
-        StringBuffer forwardUrl = new StringBuffer(200);
+        StringBuilder forwardUrl = new StringBuilder(200);
         forwardUrl.append(LOGIN_URL);
                 
         String queryString = request.getQueryString();
@@ -297,7 +297,7 @@ public class Gateway extends HttpServlet {
     }
 
     private GatewayServletUtils initGWServletUtilsMap(String orgName) {
-        GatewayServletUtils utils = null;;
+        GatewayServletUtils utils = null;
         OrganizationConfigManager orgConfigMgr = 
             authD.getOrgConfigManager(orgName);
                 
@@ -329,7 +329,7 @@ public class Gateway extends HttpServlet {
 
     private GatewayServletUtils addGWServletUtilsToMap
             (String orgName, String module) {
-        GatewayServletUtils utils = null;;
+        GatewayServletUtils utils = null;
         String authService= AMAuthConfigUtils.getModuleServiceName(module);
 
         try {

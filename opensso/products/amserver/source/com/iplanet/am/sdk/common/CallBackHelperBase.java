@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.am.sdk.common;
 
 import com.iplanet.am.sdk.AMConstants;
@@ -44,9 +47,6 @@ import java.util.Set;
 public class CallBackHelperBase implements AMConstants {
 
     protected static Debug debug = MiscUtils.getDebugInstance();
-
-    protected static final String PRE_POST_PROCESSING_MODULES_ATTR = 
-        "iplanet-am-admin-console-pre-post-processing-modules";
 
     protected static final String EXTERNAL_ATTRIBUTES_FETCH_ENABLED_ATTR = 
         "iplanet-am-admin-console-external-attribute-fetch-enabled";

@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy;
 
 import java.util.*;
@@ -274,7 +276,7 @@ public class ResourceManager {
                                   PolicyException, SSOException {
 
         // %%% Need to flush the cache when policy's are changed
-        StringBuffer cacheNameBuffer = new StringBuffer();
+        StringBuilder cacheNameBuffer = new StringBuilder();
         String cacheName = cacheNameBuffer.append(serviceType)
                 .append(resource)
                 .append(includePoliciesForSuperResources).toString();
@@ -1506,7 +1508,7 @@ public class ResourceManager {
      * 
      */
     private static String resourcePrefixesToXml(Map resourcePrefixes) {
-        StringBuffer sb = new StringBuffer(128);
+        StringBuilder sb = new StringBuilder(128);
         sb.append(LTS).append(RESOURCE_PREFIXES).append(GTS)
                 .append(NEW_LINE);
         Iterator prefixes = resourcePrefixes.keySet().iterator();

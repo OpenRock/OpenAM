@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -202,7 +205,7 @@ public class ServerConfigMgr {
     
     private String getXMLDeclarationHeader(SSOToken ssoToken, String configFile)
     throws Exception {
-        StringBuffer xml = new StringBuffer();
+        StringBuilder xml = new StringBuilder();
         InputStream is = null;
         
         try {

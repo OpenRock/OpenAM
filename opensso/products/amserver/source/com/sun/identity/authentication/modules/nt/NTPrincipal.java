@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.nt;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.security.Principal;
 

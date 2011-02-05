@@ -25,6 +25,9 @@
  * $Id: AjaxPage.java,v 1.24 2010/01/04 19:15:16 veiming Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.config.util;
 
 import com.sun.identity.config.Configurator;
@@ -36,7 +39,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import java.io.IOException;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;

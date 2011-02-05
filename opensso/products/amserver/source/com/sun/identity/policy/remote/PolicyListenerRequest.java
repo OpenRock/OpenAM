@@ -26,13 +26,13 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.remote;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.PolicyEvent;
 import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.interfaces.PolicyListener;
@@ -166,12 +166,11 @@ public class PolicyListenerRequest implements PolicyListener {
      */
     public String toXMLString()
     {
-        StringBuffer xmlsb = new StringBuffer(100);
+        StringBuilder xmlsb = new StringBuilder(100);
         
-        xmlsb.append("<" + POLICY_LISTENER + " " 
-                     + SERVICE_NAME + "=" + "\"" + serviceName + "\" "
-                     + NOTIFICATION_URL + "=" + "\"" + notificationURL
-                     + "\"/>" + CRLF);
+        xmlsb.append('<').append(POLICY_LISTENER).append(' ').
+                append(SERVICE_NAME).append('=').append('\"').append(serviceName).append("\" ").
+                append(NOTIFICATION_URL).append("=\"").append(notificationURL).append("\"/>").append(CRLF);
         return xmlsb.toString();
     }
 

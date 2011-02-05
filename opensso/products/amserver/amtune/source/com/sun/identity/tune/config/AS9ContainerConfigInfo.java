@@ -25,6 +25,9 @@
  * $Id: AS9ContainerConfigInfo.java,v 1.8 2009/12/09 00:36:57 ykwon Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.config;
 
 import com.sun.identity.tune.base.WebContainerConfigInfoBase;
@@ -168,7 +171,7 @@ public class AS9ContainerConfigInfo extends WebContainerConfigInfoBase {
     private void fillCfgMap() 
     throws AMTuneException {
         try {
-            StringBuffer getCmd = new StringBuffer(getASAdminCmd());
+            StringBuilder getCmd = new StringBuilder(getASAdminCmd());
             getCmd.append("get ");
             getCmd.append(asAdminCommonParamsNoTarget.toString());
             getCmd.append(" ");
@@ -224,7 +227,7 @@ public class AS9ContainerConfigInfo extends WebContainerConfigInfoBase {
             }
             String jvmOptParam = getASAdminTarget() + 
                     ".java-config.jvm-options";
-            StringBuffer getJvmOptCmd = new StringBuffer(getASAdminCmd());
+            StringBuilder getJvmOptCmd = new StringBuilder(getASAdminCmd());
             getJvmOptCmd.append("get ");
             getJvmOptCmd.append(asAdminCommonParamsNoTarget.toString());
             getJvmOptCmd.append(" ");
@@ -645,7 +648,7 @@ public class AS9ContainerConfigInfo extends WebContainerConfigInfoBase {
     private void checkAppServer64BitEnabled() 
     throws AMTuneException {
         mWriter.writelnLocaleMsg("pt-app-check-jvmbits");
-        StringBuffer jvmcmd = new StringBuffer(getASAdminCmd());
+        StringBuilder jvmcmd = new StringBuilder(getASAdminCmd());
         jvmcmd.append(GENERATE_JVM_REPORT_SUB_CMD);
         jvmcmd.append(" ");
         jvmcmd.append(getAsAdminCommonParamsNoTarget());

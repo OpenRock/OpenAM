@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.sm;
@@ -1191,13 +1191,13 @@ public class SMSEntry implements Cloneable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("DN\t\t: " + dn + "\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("DN\t\t: ").append(dn).append("\n");
         if (newEntry) {
             sb.append("\t(NEW Entry)");
         }
-        sb.append("Attribute Set\t: " + attrSet + "\n");
-        sb.append("Modifcation Set\t: " + modSet + "\n");
+        sb.append("Attribute Set\t: ").append(attrSet).append("\n");
+        sb.append("Modifcation Set\t: ").append(modSet).append("\n");
         return (sb.toString());
     }
 
@@ -1367,7 +1367,7 @@ public class SMSEntry implements Cloneable {
                     // Logic here is to reverse the string from dn format to
                     // slash format.
                     String tmpStr = "";
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     while (origStr.length() != 0) {
                         int id = origStr.lastIndexOf(SLASH_STR);
                         if (id >= 0) {
@@ -1498,7 +1498,7 @@ public class SMSEntry implements Cloneable {
 
         // The subconfig names should be "/" separated and left to right
         if (size >= 4) {
-            StringBuffer sbr = new StringBuffer();
+            StringBuilder sbr = new StringBuilder();
             for (int i = size - 4; i >= 0; i--) {
                 sbr.append('/').append(rdns[i]);
             }

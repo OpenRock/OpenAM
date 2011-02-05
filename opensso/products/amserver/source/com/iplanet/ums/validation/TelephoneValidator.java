@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.ums.validation;
 
 /**
@@ -61,7 +64,7 @@ public class TelephoneValidator implements IValidator {
     public boolean validate(String telephone) {
         char aChar;
 
-        StringBuffer buf = new StringBuffer(telephone);
+        StringBuilder buf = new StringBuilder(telephone);
 
         for (int aIndex = 0; aIndex < buf.length(); aIndex++) {
             aChar = buf.charAt(aIndex);

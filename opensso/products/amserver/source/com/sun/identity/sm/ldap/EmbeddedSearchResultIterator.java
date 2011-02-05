@@ -25,24 +25,21 @@
  * $Id: EmbeddedSearchResultIterator.java,v 1.1 2009/05/13 21:27:25 hengming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.ldap;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSDataEntry;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;
-import org.opends.server.protocols.ldap.LDAPAttribute;
-import org.opends.server.types.ByteString;
 import org.opends.server.types.SearchResultEntry;
 
 /**

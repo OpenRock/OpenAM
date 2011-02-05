@@ -26,9 +26,9 @@
  *
  */
 
-
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.policy.interfaces.Condition;
@@ -245,7 +245,7 @@ public class IPCondition implements Condition {
 
         if ( (ip != null) && isAllowedByIp(ip) ) {
             allowed = true;
-        } else if ((reqDnsNames != null) && (reqDnsNames.size() != 0)) {
+        } else if ((reqDnsNames != null) && (!reqDnsNames.isEmpty())) {
             Iterator names = reqDnsNames.iterator();
             while (names.hasNext()) {
                 String dnsName = (String) names.next();

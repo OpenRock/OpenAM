@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli;
 
 
@@ -137,7 +140,7 @@ public abstract class CLICommandBase implements CLICommand {
     }
 
     protected String tokenize(Collection collection) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         if ((collection != null) && !collection.isEmpty()) {
             boolean first = true;
             for (Iterator i = collection.iterator(); i.hasNext(); ) {

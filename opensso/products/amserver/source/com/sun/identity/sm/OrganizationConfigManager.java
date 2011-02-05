@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.am.util.SystemProperties;
@@ -1231,7 +1234,7 @@ public class OrganizationConfigManager {
                 if (ssmi.getSchema(SchemaType.ORGANIZATION) != null) {
                     // Need to check if the user has permission
                     // to add/assign the service
-                    StringBuffer d = new StringBuffer(100);
+                    StringBuilder d = new StringBuilder(100);
                     // Need to construct
                     // "ou=default,ou=organizationconfig,ou=1.0,ou="
                     d.append(SMSEntry.PLACEHOLDER_RDN).append(SMSEntry.EQUALS)

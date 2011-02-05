@@ -652,7 +652,6 @@ public class AuthClientUtils {
             cookieString.append(URLEncDec.encode(getCookieName()))
             .append("=").append(URLEncDec.encode(logoutCookie));
 
-            StringBuffer encodedURL = new StringBuffer();
             if (url.indexOf("?") != -1) {
                 cookieString.insert(0,"&amp;");
             } else {
@@ -1557,7 +1556,7 @@ public class AuthClientUtils {
         String requestURI = servletRequest.getRequestURI();
         String queryString = servletRequest.getQueryString();
 
-        StringBuffer urlBuffer = new StringBuffer();
+        StringBuilder urlBuffer = new StringBuilder();
         urlBuffer.append(scheme).append("://")
         .append(validHostName).append(":")
         .append(port).append(requestURI);
@@ -1588,7 +1587,7 @@ public class AuthClientUtils {
     }
 
     public static String constructLoginURL(HttpServletRequest request) {
-        StringBuffer loginURL = new StringBuffer(serviceURI);
+        StringBuilder loginURL = new StringBuilder(serviceURI);
         String queryString = "";
         String clientEncoding = request.getCharacterEncoding();
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
@@ -1661,7 +1660,7 @@ public class AuthClientUtils {
      * URL encodes "sunamcompositeadvice" parameter out of it.
      */
      private static String URLencodedCompositeAdvice(String queryParams) {
-         StringBuffer sb = new StringBuffer(400);
+         StringBuilder sb = new StringBuilder(400);
          StringTokenizer st = new StringTokenizer(queryParams, "&");
          String adviceString = null;
          while (st.hasMoreTokens()) {
@@ -1686,7 +1685,7 @@ public class AuthClientUtils {
      */
       private static String URLencodedSunQueryParamsString(String queryParams,
               String encoding){
-          StringBuffer sb = new StringBuffer(400);
+          StringBuilder sb = new StringBuilder(400);
           StringTokenizer st = new StringTokenizer(queryParams, "&");
           String adviceString = null;
           while (st.hasMoreTokens()) {
@@ -2047,7 +2046,7 @@ public class AuthClientUtils {
         AuthContext.IndexType indexType, String indexName) {
         String filePath = getFilePath(getClientType(request));
         String serviceName = null;
-        StringBuffer filePathBuffer = new StringBuffer();
+        StringBuilder filePathBuffer = new StringBuilder();
         // only if index name is service type then need it
         // as part of the filePath since  service can have
         // have different auth template
@@ -2334,7 +2333,7 @@ public class AuthClientUtils {
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 
                 // Input from Original servlet...
-                StringBuffer in_buf = new StringBuffer();
+                StringBuilder in_buf = new StringBuilder();
                 BufferedReader in = new BufferedReader(
                     new InputStreamReader(conn.getInputStream(), "UTF-8"));
                 int len;
@@ -2393,7 +2392,7 @@ public class AuthClientUtils {
 
     // Gets the request form data in the form of string
     private static String getFormData(HttpServletRequest request) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("");
         Enumeration requestEnum = request.getParameterNames();
         while (requestEnum.hasMoreElements()) {
@@ -2614,7 +2613,7 @@ public class AuthClientUtils {
 
     // Returns Query String from request parameters Map
     public static String getQueryStrFromParameters(Map paramMap) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         boolean first = true;
 
         if (paramMap != null && !paramMap.isEmpty()) {
@@ -2985,7 +2984,7 @@ public class AuthClientUtils {
         // escape "|" as it will be used as separator
         int i = text.indexOf("|");
         if (i != -1) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             int len = 0;
             if (text != null) {
                 len = text.length();

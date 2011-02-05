@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.service;
 
 import com.iplanet.am.sdk.AMStoreConnection;
@@ -741,7 +742,7 @@ public class AuthD  {
             String logLogout = bundle.getString("logout");
             List dataList = new ArrayList();
             dataList.add(logLogout);
-            StringBuffer messageId = new StringBuffer();
+            StringBuilder messageId = new StringBuilder();
             messageId.append("LOGOUT");
             String indexType = ssot.getProperty(ISAuthConstants.INDEX_TYPE);
             if (indexType != null) {
@@ -1254,7 +1255,7 @@ public class AuthD  {
         HttpServletRequest servletRequest) {
         if (rawURL.indexOf("%") != -1) {
             int index;
-            StringBuffer sb = new StringBuffer(200);
+            StringBuilder sb = new StringBuilder(200);
             // protocol processing
             if ((index = rawURL.indexOf("%protocol")) != -1) {
                 sb.append(rawURL.substring(0,index));

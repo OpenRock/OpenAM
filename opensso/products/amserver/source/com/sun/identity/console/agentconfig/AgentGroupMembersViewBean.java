@@ -26,20 +26,18 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.agentconfig;
 
 import com.iplanet.jato.model.ModelControlException;
-import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.console.agentconfig.model.AgentsModel;
-import com.sun.identity.console.agentconfig.model.AgentsModelImpl;
-import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import java.text.MessageFormat;
@@ -50,7 +48,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * View Bean to displays group members.
@@ -129,7 +126,7 @@ public class AgentGroupMembersViewBean
                     ordered.add(name);
                     nameToId.put(name, amid.getUniversalId());
                 }
-                StringBuffer buff = new StringBuffer();
+                StringBuilder buff = new StringBuilder();
                 for (Iterator i = ordered.iterator(); i.hasNext(); ) {
                     String name = (String)i.next();
                     buff.append(name)

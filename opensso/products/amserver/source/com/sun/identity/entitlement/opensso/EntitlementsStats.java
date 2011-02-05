@@ -25,6 +25,9 @@
  * $Id: EntitlementsStats.java,v 1.2 2009/10/13 22:36:30 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.entitlement.opensso;
 
 import java.util.Set;
@@ -43,15 +46,15 @@ public class EntitlementsStats implements StatsListener {
 
 	@Override
 	public void printStats() {
-		StringBuffer sb = new StringBuffer(100);
+		StringBuilder sb = new StringBuilder(100);
 		sb.append("Entitlements statistics:");
 		sb.append("\n-----------------------------");
 		Set<String> ntwStats = NetworkMonitor.getInstanceNames();
 		for (String ntwStat : ntwStats) {
 			NetworkMonitor nm = NetworkMonitor.getInstance(ntwStat);
-			sb.append("\nNetworkMonitor: " + ntwStat);
-			sb.append("\nResponse Time(ms): " + nm.responseTime());
-			sb.append("\nThroughput: " + nm.throughput());
+			sb.append("\nNetworkMonitor: ").append(ntwStat);
+			sb.append("\nResponse Time(ms): ").append(nm.responseTime());
+			sb.append("\nThroughput: ").append(nm.throughput());
 			nm.reset();
 			sb.append("\n-----------------------------");
 		}

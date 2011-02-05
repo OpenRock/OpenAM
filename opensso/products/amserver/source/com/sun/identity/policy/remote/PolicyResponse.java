@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.policy.remote;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.ResourceResult;
 import java.util.HashSet;
@@ -277,7 +279,7 @@ public class PolicyResponse {
         }
 
         Set nodeSet = XMLUtils.getChildNodes(pNode, RESOURCE_RESULT);
-        if ((nodeSet != null) && (nodeSet.size() != 0)) {
+        if ((nodeSet != null) && (!nodeSet.isEmpty())) {
             Set resResults = new HashSet();
             Iterator nodes = nodeSet.iterator();
             while (nodes.hasNext()) {
@@ -341,7 +343,7 @@ public class PolicyResponse {
      * @return string representation of this object.
      */
     public String toXMLString() {
-        StringBuffer xmlsb = new StringBuffer(1000);
+        StringBuilder xmlsb = new StringBuilder(1000);
 
         xmlsb.append("<")
              .append(POLICY_RESPONSE)

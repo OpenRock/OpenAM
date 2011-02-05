@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.iplanet.services.ldap.event;
@@ -67,17 +67,12 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
-import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.services.util.I18n;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.providers.dpro.SSOProviderBundle;
 import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.authentication.internal.AuthContext;
-import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.ServerInstanceAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -246,9 +241,7 @@ public class EventService implements Runnable {
         
         // Copy the default listeners
         String[] tmpListeners = new String[ALL_LISTENERS.length];
-        for (int i = 0; i < ALL_LISTENERS.length; i++) {
-            tmpListeners[i] = ALL_LISTENERS[i];
-        }
+        System.arraycopy(ALL_LISTENERS, 0, tmpListeners, 0, ALL_LISTENERS.length);
         
         // Process the configured disabled list first
         boolean disableACI = false, disableUM = false, disableSM = false;

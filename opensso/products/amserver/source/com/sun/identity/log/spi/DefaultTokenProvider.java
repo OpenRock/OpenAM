@@ -26,9 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.spi;
-
-import com.sun.identity.log.spi.ITokenProvider;
 
 /**
  * This class implements <code>ITokenProvider</code> interface and

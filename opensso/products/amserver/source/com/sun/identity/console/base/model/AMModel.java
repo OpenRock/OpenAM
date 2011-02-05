@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base.model;
 
 import com.iplanet.sso.SSOToken;
@@ -41,11 +44,6 @@ import java.util.Map;
 public interface AMModel
     extends AMAdminConstants
 {
-    /**
-     * OpenSSO's administration console service name.
-     */
-    String ADMIN_CONSOLE_SERVICE = "iPlanetAMAdminConsoleService";
-
     /**
      * Name of paging page size limit.
      */

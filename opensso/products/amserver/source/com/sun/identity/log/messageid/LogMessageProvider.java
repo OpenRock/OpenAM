@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.messageid;
 
-import com.sun.identity.log.Level;
 import com.sun.identity.log.LogRecord;
 import java.util.List;
 

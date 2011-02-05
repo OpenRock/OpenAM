@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.modules.datastore;
 
 import com.sun.identity.shared.debug.Debug;
@@ -35,19 +37,15 @@ import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.authentication.spi.AMAuthCallBackException;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.sm.ServiceConfig;
 import java.util.Map;
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import java.io.IOException;
 import java.security.Principal;
 
 public class DataStore extends AMLoginModule {

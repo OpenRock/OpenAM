@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.diagnostic.base.core.ui.cli;
 
 import java.io.BufferedReader;
@@ -322,7 +325,7 @@ public class CLIHandler implements CLIConstants {
     }
     
     public static void printUsage(){
-        StringBuffer sBuff = new StringBuffer();
+        StringBuilder sBuff = new StringBuilder();
         int size = usageSet.size();
         int i = 1;
         for (Iterator it = usageSet.iterator(); it.hasNext(); i++) {
@@ -456,7 +459,7 @@ public class CLIHandler implements CLIConstants {
     }
     
     private static String getSubCmds(String cName) {
-        StringBuffer sBuff = new StringBuffer();
+        StringBuilder sBuff = new StringBuilder();
         HashMap opCodeMap = null;
         try {
             String keyName = cName.toLowerCase();

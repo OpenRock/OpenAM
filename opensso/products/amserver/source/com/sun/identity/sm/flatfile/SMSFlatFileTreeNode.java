@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.sm.flatfile;
 
 import com.sun.identity.shared.debug.Debug;
@@ -307,7 +310,7 @@ public class SMSFlatFileTreeNode {
      * @return XML String of this tree.
      */
     public String toXML() {
-        StringBuffer xml = new StringBuffer();
+        StringBuilder xml = new StringBuilder();
         if (parentNode == null) {
             xml.append(XML_DIRECTIVES)
                .append(XML_ROOT_START_TAG)

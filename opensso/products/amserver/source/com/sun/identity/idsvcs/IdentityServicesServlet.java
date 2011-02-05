@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.idsvcs;
 
 import com.sun.xml.rpc.server.http.JAXRPCServlet;
@@ -73,7 +76,7 @@ public class IdentityServicesServlet extends JAXRPCServlet {
                         "/WEB-INF/wsdl/IdentityServices.wsdl");
                     BufferedReader br = new BufferedReader(
                         new InputStreamReader(is));
-                    StringBuffer sb = new StringBuffer(1000);
+                    StringBuilder sb = new StringBuilder(1000);
                     String line;
                     while ((line = br.readLine()) != null) {
                         sb.append(line).append("\n");

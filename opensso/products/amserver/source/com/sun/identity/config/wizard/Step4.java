@@ -25,6 +25,9 @@
  * $Id: Step4.java,v 1.20 2009/10/27 05:31:45 hengming Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.config.wizard;
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.sun.identity.config.SessionAttributeNames;
@@ -39,14 +42,11 @@ import com.sun.identity.shared.ldap.util.DN;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Hashtable;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
 
 /**
  * Step 4 is the input of the remote user data store properties.

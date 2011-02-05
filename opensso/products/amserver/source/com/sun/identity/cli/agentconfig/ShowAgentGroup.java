@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.cli.agentconfig;
 
 import com.iplanet.sso.SSOToken;
@@ -99,7 +102,7 @@ public class ShowAgentGroup extends AuthenticatedCommand {
                 amid, AttributeSchema.Syntax.PASSWORD);
 
             if ((values != null) && !values.isEmpty()) {
-                StringBuffer buff = new StringBuffer();
+                StringBuilder buff = new StringBuilder();
                 for (Iterator i = values.keySet().iterator(); i.hasNext();) {
                     String attrName = (String)i.next();
 

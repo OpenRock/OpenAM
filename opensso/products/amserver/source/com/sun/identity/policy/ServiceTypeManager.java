@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 
@@ -43,8 +43,6 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
-import com.iplanet.services.ldap.*;
-import com.sun.identity.authentication.internal.*;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.Constants;
@@ -233,7 +231,7 @@ public class ServiceTypeManager {
      * @return the generated random name
      */
     static String generateRandomName() {
-        StringBuffer sb = new StringBuffer(30);
+        StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
         sb.append(System.currentTimeMillis()).toString();

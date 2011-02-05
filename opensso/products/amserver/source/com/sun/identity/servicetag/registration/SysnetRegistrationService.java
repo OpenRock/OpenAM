@@ -34,12 +34,14 @@
  * holder.
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.servicetag.registration;
 
 import com.sun.scn.servicetags.AuthenticationCredential;
 import com.sun.scn.servicetags.EnvironmentInformation;
 import com.sun.scn.servicetags.SvcTag;
-import com.sun.scn.client.comm.SvcTagException;
 import com.sun.scn.servicetags.SunOnlineAccount;
 import com.sun.scn.client.comm.RegistrationWrapper;
 import com.sun.scn.client.comm.SvcTagException;
@@ -53,8 +55,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.io.File;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 public class SysnetRegistrationService implements RegistrationService {
         

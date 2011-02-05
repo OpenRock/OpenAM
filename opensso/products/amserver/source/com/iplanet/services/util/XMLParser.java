@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.util;
 
 import com.sun.identity.shared.xml.XMLUtils;
@@ -109,7 +112,7 @@ public class XMLParser {
             try {
                 po = (ParseOutput) Class.forName(po_name).newInstance();
             } catch (Exception ex) {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append("Got Exception while creating class instance of ");
                 buf.append(nd.getNodeName());
                 buf.append(" :");

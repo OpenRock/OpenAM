@@ -25,9 +25,10 @@
  * $Id: ActiveSessionTimeCondition.java,v 1.2 2008/06/25 05:42:37 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.config.pojos.condition;
-
-import com.sun.identity.config.pojos.condition.Condition;
 
 /**
  * @author Victor Alfaro

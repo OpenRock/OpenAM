@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.realm.model;
 
 import com.iplanet.sso.SSOToken;
@@ -38,16 +41,12 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.OrganizationConfigManager;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;

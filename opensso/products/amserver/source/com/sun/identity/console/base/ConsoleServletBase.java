@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 
@@ -112,7 +115,7 @@ public abstract class ConsoleServletBase
         HttpServletRequest req,
         String newHostName
     ) {
-        StringBuffer buff = new StringBuffer(1024);
+        StringBuilder buff = new StringBuilder(1024);
         String protocol = RequestUtils.getRedirectProtocol(
             req.getScheme(), newHostName);
         buff.append(protocol)
@@ -259,7 +262,7 @@ public abstract class ConsoleServletBase
      * @param request HTTP Servlet request
      */  
     private String formGotoUrl(HttpServletRequest request) {
-        StringBuffer redirectURL = new StringBuffer(2048);
+        StringBuilder redirectURL = new StringBuilder(2048);
         String host = request.getHeader("Host");
 
         if (host == null) {

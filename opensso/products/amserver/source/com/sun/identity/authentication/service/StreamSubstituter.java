@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.authentication.service;
 
 import java.io.BufferedReader;
@@ -151,7 +152,7 @@ public class StreamSubstituter {
     private void filter(StringBuffer sb, BufferedWriter o)
         throws IOException {
         int ch;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         int state = st_normal;
         boolean shouldCopyBody = false;
     

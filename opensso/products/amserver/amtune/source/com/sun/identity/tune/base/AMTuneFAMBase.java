@@ -25,6 +25,9 @@
  * $Id: AMTuneFAMBase.java,v 1.9 2009/04/02 06:19:35 kanduls Exp $
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.tune.base;
 
 import com.sun.identity.tune.common.MessageWriter;
@@ -118,7 +121,7 @@ public abstract class AMTuneFAMBase extends TuneFAM {
     protected void updateFAMServiceCfg(List attrs) {
         StringBuffer resultBuffer = new StringBuffer();
         try {
-            StringBuffer updateCmd = new StringBuffer(famCmdPath);
+            StringBuilder updateCmd = new StringBuilder(famCmdPath);
             updateCmd.append(UPDATE_SERVER_SUB_CMD);
             updateCmd.append(famadmCommonParamsNoServer);
             updateCmd.append(" ");
@@ -180,8 +183,8 @@ public abstract class AMTuneFAMBase extends TuneFAM {
         try {
             pLogger.log(Level.INFO, "getDataStoreList",
                     "Getting datastore list. ");
-            StringBuffer dataStoreListCmd = 
-                    new StringBuffer(famCmdPath);
+            StringBuilder dataStoreListCmd =
+                    new StringBuilder(famCmdPath);
             dataStoreListCmd.append(LIST_DATA_STORES_SUB_CMD);
             dataStoreListCmd.append(" -e ");
             dataStoreListCmd.append(realmName);
@@ -226,7 +229,7 @@ public abstract class AMTuneFAMBase extends TuneFAM {
     protected Map getFAMServerConfig() 
     throws AMTuneException {
         Map famCfgInfo = new HashMap();
-        StringBuffer listSerCfgCmd = new StringBuffer(famCmdPath);
+        StringBuilder listSerCfgCmd = new StringBuilder(famCmdPath);
         listSerCfgCmd.append(LIST_SERVER_CFG_SUB_CMD);
         listSerCfgCmd.append(" ");
         listSerCfgCmd.append(SERVER_NAME_OPT);

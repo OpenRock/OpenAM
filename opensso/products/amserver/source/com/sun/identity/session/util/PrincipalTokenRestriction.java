@@ -26,12 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.session.util;
 
 import com.iplanet.am.util.Misc;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 
 /**
  * This Class represents a PrincipalTokenRestriction

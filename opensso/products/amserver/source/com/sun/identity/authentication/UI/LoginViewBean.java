@@ -1160,7 +1160,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }
             }
                  
-            StringBuffer redirectUrl = new StringBuffer(rc.getRedirectUrl());
+            StringBuilder redirectUrl = new StringBuilder(rc.getRedirectUrl());
             if (qString != null && qString.length() != 0) {
                 redirectUrl.append(qString);
             }

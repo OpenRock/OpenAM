@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.console.base;
 
 import java.util.ArrayList;
@@ -64,7 +67,7 @@ public class AMDelimitAttrTokenizer {
     }
 
     public String deTokenizes(List list, String delimit) {
-        StringBuffer buff = new StringBuffer(200);
+        StringBuilder buff = new StringBuilder(200);
         boolean firstElement = true;
 
         if ((list != null) && !list.isEmpty()) {

@@ -26,15 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.password.ui.model;
 
 import com.iplanet.am.util.AMSendMail;
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
@@ -52,7 +53,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * <code>PWResetModelImpl</code> defines the basic and commonly used 

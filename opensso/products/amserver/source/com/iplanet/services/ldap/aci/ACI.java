@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.iplanet.services.ldap.aci;
 
 import java.util.ArrayList;
@@ -630,7 +633,7 @@ public class ACI {
      * @supported.api
      */
     public String toString() {
-        StringBuffer aci = new StringBuffer();
+        StringBuilder aci = new StringBuilder();
         StringBuffer bindRule = new StringBuffer();
         StringBuffer tempBuffer = new StringBuffer();
         String value = null;
@@ -648,7 +651,7 @@ public class ACI {
         String operator;
         qc = getTargetAttributes();
         if (qc != null && qc.getCollection() != null
-                && qc.getCollection().size() != 0) {
+                && !qc.getCollection().isEmpty()) {
             exclusive = qc.isExclusive();
             operator = exclusive ? NE : EQ;
             aci.append(SPACE).append(OPENPARENTH).append(TARGETATTR).append(
@@ -687,7 +690,7 @@ public class ACI {
 
         qc = getPermissions();
         if (qc != null && qc.getCollection() != null
-                && qc.getCollection().size() != 0) {
+                && !qc.getCollection().isEmpty()) {
             exclusive = qc.isExclusive();
             String permissionType = exclusive ? DENY : ALLOW;
             aci.append(permissionType).append(OPENPARENTH);
@@ -705,7 +708,7 @@ public class ACI {
 
         Collection collection = null;
         collection = getUsers();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -725,7 +728,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getGroups();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -748,7 +751,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getRoles();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -771,7 +774,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getUserDNAttrs();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -794,7 +797,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getGroupDNAttrs();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -817,7 +820,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getUserAttrs();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -846,7 +849,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getAuthMethods();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -870,7 +873,7 @@ public class ACI {
 
         StringBuffer ipBuffer = new StringBuffer();
         collection = getClientIP();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -887,7 +890,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getClientHostNames();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -917,7 +920,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getDaysOfWeek();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -941,7 +944,7 @@ public class ACI {
 
         tempBuffer.setLength(0);
         collection = getTimesOfDay();
-        if (collection != null && collection.size() != 0) {
+        if (collection != null && !collection.isEmpty()) {
             iter = collection.iterator();
             if (iter.hasNext()) {
                 value = (String) iter.next();
@@ -1357,8 +1360,8 @@ class ACITargetExpression {
      * @supported.api
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(_keyword + ":" + _operator + ":" + _value);
+        StringBuilder sb = new StringBuilder();
+        sb.append(_keyword).append(":").append(_operator).append(":").append(_value);
         return sb.toString();
     }
 
@@ -1957,7 +1960,7 @@ class BindRuleBuilder {
      * @supported.api
      */
     public String toString() {
-        StringBuffer bindRule = new StringBuffer();
+        StringBuilder bindRule = new StringBuilder();
         return bindRule.toString();
     }
 
@@ -1980,7 +1983,7 @@ class BindRuleTokenizer {
     }
 
     String nextToken() {
-        StringBuffer token = new StringBuffer();
+        StringBuilder token = new StringBuilder();
         if (_currentIndex < _textLength) {
             for (; _currentIndex < _textLength; _currentIndex++) {
                 char c = _text.charAt(_currentIndex);

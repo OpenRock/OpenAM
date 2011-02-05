@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.SSLSocketFactoryManager;
@@ -59,7 +62,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPAttribute;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPEntry;
@@ -295,7 +297,7 @@ class UserIdRepo {
             String file = st.nextToken();
             InputStreamReader fin = new InputStreamReader(
                 AMSetupServlet.getResourceAsStream(servletCtx, file));
-            StringBuffer sbuf = new StringBuffer();
+            StringBuilder sbuf = new StringBuilder();
             char[] cbuf = new char[1024];
             int len;
             while ((len = fin.read(cbuf)) > 0) {
@@ -355,7 +357,7 @@ class UserIdRepo {
         try {
             rawReader = new BufferedReader(new InputStreamReader(
                 getClass().getClassLoader().getResourceAsStream(resName)));
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             String line = null;
 
             while ((line = rawReader.readLine()) != null) {

@@ -26,11 +26,11 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
+ */
 package com.sun.identity.log.handlers;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -160,7 +160,7 @@ public class DBFormatter extends Formatter {
             logInfoTable = ((com.sun.identity.log.ILogRecord) logRecord)
                 .getLogInfoMap();
         }
-        StringBuffer sbuffer = new StringBuffer();
+        StringBuilder sbuffer = new StringBuilder();
         String strTime;
         if(secureTimestampGenerator != null) {
             strTime = secureTimestampGenerator.getTimestamp();
@@ -230,7 +230,7 @@ public class DBFormatter extends Formatter {
                     (tempstr.indexOf("'") != -1)
                 ) {
                     StringTokenizer tmps = new StringTokenizer(tempstr, "'");
-                    StringBuffer thisfield = new StringBuffer();
+                    StringBuilder thisfield = new StringBuilder();
                     if (Debug.messageEnabled()) {
                         Debug.message("DBFormatter:found single-quote in: "
                                       + tempstr);
@@ -298,7 +298,7 @@ public class DBFormatter extends Formatter {
         String doubledChar)
     {
         StringTokenizer tmps = new StringTokenizer(theString, charToEscape);
-        StringBuffer thisfield = new StringBuffer();
+        StringBuilder thisfield = new StringBuilder();
         if (Debug.messageEnabled()) {
             Debug.message("DBFormatter:looking for " + charToEscape +
             " in data: " + theString);
