@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.UI;
 
 import com.iplanet.am.util.SystemProperties;
@@ -173,6 +174,7 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                     String redirect_url = null;
                     String clientType = null;
                     String output_data = null;
+                    String contentType = null;
                     if (origRequestData != null && !origRequestData.isEmpty()) {
                         redirect_url =
                             (String)origRequestData.get("AM_REDIRECT_URL");
@@ -180,6 +182,8 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                             (String)origRequestData.get("OUTPUT_DATA");
                         clientType =
                             (String)origRequestData.get("AM_CLIENT_TYPE");
+                        contentType =
+                            (String)origRequestData.get("CONTENT_TYPE");
                     }
                     if (debug.messageEnabled()) {
                         debug.message("redirect_url : " + redirect_url);
@@ -193,7 +197,18 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                     }
                     if ((output_data != null) && (!output_data.equals(""))) {
                         debug.message("Printing the forwarded response");
-                        response.setContentType("text/html; charset=UTF-8");
+                        if (contentType != null) {
+                            if (debug.messageEnabled()) {
+                                debug.message("Content type is " + contentType);
+                            }
+                            response.setContentType(contentType);
+                        } else {
+                            if (debug.messageEnabled()) {
+                                debug.message("Content type is default; " + DEFAULT_CONTENT_TYPE);
+                            }
+                            response.setContentType(DEFAULT_CONTENT_TYPE);
+                        }
+
                         java.io.PrintWriter outP = response.getWriter();
                         outP.println(output_data);
                     }
@@ -387,6 +402,7 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
     getPackageName(LoginServlet.class.getName());
     
     private static final String REDIRECT_JSP = "Redirect.jsp";
+    private static final String DEFAULT_CONTENT_TYPE = "text/html";
     
     // the debug file
     private Debug debug;
