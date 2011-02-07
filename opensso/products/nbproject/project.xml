@@ -158,32 +158,44 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
             <compilation-unit>
                 <package-root>amserver/amtune/source</package-root>
+                <built-to>amserver/amtune/built/classes</built-to>
+                <built-to>amserver/amtune/built/dist/lib/amtune.jar</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>amserver/source</package-root>
                 <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDS.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/swec.jar</classpath>
+                <built-to>amserver/built/classes</built-to>
+                <built-to>amserver/built/dist/amserver.jar</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/library/source</package-root>
                 <classpath mode="compile">extlib/esapiport.jar:extlib/j2ee.jar:extlib/jaxrpc-api.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/jaxrpc-impl.jar:extlib/jersey-client-1.1.1-ea-SNAPSHOT.jar:extlib/jsr311-api-1.1.jar:extlib/webservices-rt.jar</classpath>
+                <built-to>federation/library/built/classes</built-to>
+                <built-to>federation/library/built/dist/openfedlib.jar</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/openfm/source</package-root>
                 <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/backport-util-concurrent-2.2.jar:extlib/commons-collections-3.2.jar:extlib/esapiport.jar:extlib/icefaces-comps.jar:extlib/icefaces.jar:extlib/j2ee.jar:extlib/jdom.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/rome-1.0.jar:extlib/saaj-api.jar:extlib/scn_stprs_util.jar:extlib/webservices-rt.jar</classpath>
+                <built-to>federation/openfm/built/classes</built-to>
+                <built-to>federation/openfm/built/dist/opensso.jar</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>shared/source</package-root>
                 <classpath mode="compile">extlib/j2ee.jar:extlib/json.jar:extlib/jss4.jar</classpath>
+                <built-to>shared/built/dist/opensso-sharedlib.jar</built-to>
+                <built-to>shared/built/classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/openfm/unittest/source</package-root>
                 <unit-tests/>
                 <classpath mode="compile">amserver/built/classes:extlib/jersey-client-1.1.1-ea-SNAPSHOT.jar:extlib/jersey-core-1.1.1-ea.jar:extlib/jsr311-api-1.1.jar:extlib/esapiport.jar:extlib/j2ee.jar:extlib/json.jar:extlib/testng-5.9-jdk15.jar</classpath>
+                <built-to>federation/openfm/unittest/built/classes</built-to>
+                <built-to>federation/openfm/unittest/built/dist/unittest.jar</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>
