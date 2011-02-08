@@ -1064,6 +1064,12 @@ public interface Constants {
     public static final String USE_OLD_LOG_FORMAT =
         "openam.logging.use.old.log.format";
 
+    public static final String SESSION_UPGRADER_IMPL =
+        "openam.auth.session_property_upgrader";
+
+    public static final String DEFAULT_SESSION_UPGRADER_IMPL =
+        "org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader";
+
     /**
      * Property for dist auth cookie name.
      */

@@ -105,6 +105,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 
 /**
  * This class maintains the User's login state information from the time user 
@@ -368,7 +370,8 @@ public class LoginState {
     
     public static Set internalUsers = new HashSet();
     
-    private static SecureRandom secureRandom = null;    
+    private static SecureRandom secureRandom = null;
+    private static SessionPropertyUpgrader propertyUpgrader = null;
 
     static {
         
@@ -431,6 +434,21 @@ public class LoginState {
         } catch (NoSuchAlgorithmException ex) {
             debug.error("LoginState.static() : " + "LoginState : "
             + "SecureRandom.getInstance() Failed", ex);
+        }
+
+        String upgraderClass = SystemProperties.get(Constants.SESSION_UPGRADER_IMPL,
+                Constants.DEFAULT_SESSION_UPGRADER_IMPL);
+        try {
+            propertyUpgrader = Class.forName(upgraderClass).
+                    asSubclass(SessionPropertyUpgrader.class).newInstance();
+            if (debug.messageEnabled()) {
+                debug.message("SessionUpgrader implementation ('" + upgraderClass
+                        + ") successfully loaded.");
+            }
+        } catch (Exception ex) {
+            debug.error("Unable to load the following Session Upgrader implementation: " +
+                    upgraderClass + "\nFallbacking to DefaultSessionUpgrader", ex);
+            propertyUpgrader = new DefaultSessionPropertyUpgrader();
         }
     }
     
@@ -5171,12 +5189,10 @@ public class LoginState {
     
     // Upgrade all Properties from the existing (old) session to new session
     void upgradeAllProperties(InternalSession oldSession) {
-        Enumeration allProperties = oldSession.getPropertyNames();
-        while (allProperties.hasMoreElements()) {
-            String key = (String)allProperties.nextElement();
-            String value = (String)oldSession.getProperty(key);
-            updateSessionProperty(key,value);
+        if (debug.messageEnabled()) {
+            debug.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
+        propertyUpgrader.populateProperties(oldSession, session, forceAuth);
     }
     
     void setCookieSet(boolean flag) {
