@@ -52,6 +52,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -362,6 +364,15 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 logoutDebug.message("Redirect to 'goto' URL : " + gotoUrl);
             }
             try {
+                URL url = new URL(gotoUrl);
+            } catch (MalformedURLException murle) {
+                if (logoutDebug.warningEnabled()) {
+                    logoutDebug.warning("Invalid gotoURL supplied for LogoutViewBean: "
+                            + gotoUrl);
+                }
+                return false;
+            }
+            try {
                 if (doSendRedirect(gotoUrl)) {
                     response.sendRedirect(appendLogoutCookie(gotoUrl));
                     return true;
@@ -369,7 +380,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             } catch (Exception e) {
                 if (logoutDebug.messageEnabled()) {
                     logoutDebug.message(
-                        "'goto' Redirect failed : " + gotoUrl, e);
+                            "'goto' Redirect failed : " + gotoUrl, e);
                 }
                 ResultVal = getL10NMessage(e, locale);
             }
