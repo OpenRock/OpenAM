@@ -32,11 +32,6 @@
 
 package com.sun.identity.agents.filter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,12 +44,14 @@ import com.sun.identity.agents.policy.AmWebPolicyManager;
 import com.sun.identity.agents.policy.AmWebPolicyResult;
 import com.sun.identity.agents.policy.AmWebPolicyResultStatus;
 import com.sun.identity.agents.policy.IAmWebPolicy;
+import com.sun.identity.agents.util.IUtilConstants;
 import com.sun.identity.agents.util.NameValuePair;
 import com.sun.identity.agents.util.ResourceReader;
 import com.sun.identity.agents.util.StringUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.io.UnsupportedEncodingException;
+import org.forgerock.openam.agents.filter.PDPInitHelper;
 
 /**
  * <p>
@@ -194,8 +191,26 @@ public class URLPolicyTaskHandler extends AmFilterTaskHandler
             AmWebPolicyResult amWebPolicyResult) throws AgentException {
         String param = Constants.COMPOSITE_ADVICE;
         String value = "";
-        // should return auth url without nvp
-        StringBuilder action = new StringBuilder(ctx.getAuthRedirectURL());
+        StringBuilder action = new StringBuilder();
+
+        String redirectUrl = null;
+        //let's execute PostDataPreservation task. If PDP is not enabled, then
+        //we just use the original URL for goto.
+        if (ctx.getHttpServletRequest().getMethod().equalsIgnoreCase(IUtilConstants.HTTP_METHOD_POST)) {
+            AmFilterResult pdpResult = PDPInitHelper.initializePDP(this, ctx, getSSOContext());
+
+            if (pdpResult != null) {
+                redirectUrl = pdpResult.getRedirectURL();
+            }
+        }
+        if (redirectUrl != null) {
+            //we have a redirect url for PDP
+            action.append(ctx.getAuthRedirectURL(redirectUrl));
+        } else {
+            // should return auth url without nvp
+            action.append(ctx.getAuthRedirectURL());
+        }
+
         if (amWebPolicyResult != null && amWebPolicyResult.hasNameValuePairs()) {
             NameValuePair[] nvp = amWebPolicyResult.getNameValuePairs();
             

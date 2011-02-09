@@ -26,7 +26,7 @@
  *
  */
  /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2011] [ForgeRock AS]
  */
 
 package com.sun.identity.agents.filter;
@@ -39,11 +39,10 @@ import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.arch.AgentConfiguration;
 import com.sun.identity.agents.arch.ServiceFactory;
-import com.sun.identity.agents.arch.ServiceResolver;
 import com.sun.identity.agents.common.ISSOTokenValidator;
 import com.sun.identity.agents.common.SSOValidationResult;
 import com.sun.identity.agents.common.ICookieResetHelper;
-import com.sun.identity.agents.filter.ApplicationLogoutHandler;
+import org.forgerock.openam.agents.filter.PDPInitHelper;
 
 /**
  * <p>
@@ -99,22 +98,7 @@ implements ISSOTaskHandler {
             
             if (result == null) {
                 //implementation of CR openam-307
-                try {
-                    String pdpTaskHandlerImplClass =
-                            AgentConfiguration.getServiceResolver().
-                            getInitialPDPTaskHandlerImpl();
-                    InitialPDPTaskHandler pdpHandler = (InitialPDPTaskHandler)
-                            ServiceFactory.getServiceInstance(getManager(),
-                            pdpTaskHandlerImplClass);
-                    pdpHandler.initialize(ssoContext, ctx.getFilterMode());
-                    if (pdpHandler.isActive()) {
-                        result = pdpHandler.process(ctx);
-                    }
-                } catch (Exception ex) {
-                    logError("SSOTaskHandler: Error while " +
-                             " delegating to PDPTaskHandler.", ex);
-                    result = null;
-                }
+                result = PDPInitHelper.initializePDP(this, ctx, ssoContext);
                 //end of implementation of CR openam-307
                 if (result == null) {
                     if(isLogMessageEnabled()) {
