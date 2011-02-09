@@ -26,6 +26,10 @@
  *
  */
 
+/* Portions Copyrighted 2011 ForgeRock AS */
+
+/* author Bernhard Thalmayr */
+
 package com.sun.identity.agents.filter;
 
 import java.io.BufferedReader;
@@ -50,6 +54,7 @@ import com.sun.identity.agents.util.ResourceReader;
 import com.sun.identity.agents.util.StringUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.io.UnsupportedEncodingException;
 
 /**
  * <p>
@@ -60,15 +65,28 @@ import com.sun.identity.shared.debug.Debug;
 public class URLPolicyTaskHandler extends AmFilterTaskHandler
         implements IURLPolicyTaskHandler {
     
+    private static final String FIRST_PARAM_SEPARATOR = "?";
+    private static final String NEXT_PARAM_SEPARATOR = "&";
+    private static final String PARAM_VALUE_SEPARATOR = "=";
+    private static final String ENCODING = "UTF-8";
+    private static final String ADVICE_REDIRECT_PROP = "policy.advice.use.redirect";
+    private static final String DEFAULT_ADVICE_REDIRECT_VALUE = "false";
+
+    private boolean redirectUsedForAdvice = false;
+    
     public URLPolicyTaskHandler(Manager manager) {
         super(manager);
     }
     
+    @Override
     public void initialize(ISSOContext context, AmFilterMode mode)
     throws AgentException {
         super.initialize(context, mode);
+        setRedirectUsedForAdvice(getAdviceConfiguration());
         setAmWebPolicy(AmWebPolicyManager.getAmWebPolicyInstance());
-        initCompositeAdviceFormContent();
+        if (!isRedirectUsedForAdvice()) {
+            initCompositeAdviceFormContent();
+        }
         pathInfoIgnored = getConfigurationBoolean(
                 CONFIG_IGNORE_PATH_INFO, DEFAULT_IGNORE_PATH_INFO);
     }
@@ -153,36 +171,76 @@ public class URLPolicyTaskHandler extends AmFilterTaskHandler
     public AmFilterResult getServeDataResult(AmFilterRequestContext ctx,
             AmWebPolicyResult policyResult)
             throws AgentException {
-        String data = getModifiedCompositeAdviceFormContent(ctx, policyResult);
+        String data = getCompositeAdviceTarget(ctx, policyResult);
         if (isLogMessageEnabled()) {
-            logMessage("URLPolicyTaskHandler: insufficient credentials - "
-                    + "Post advices to Authentication Service "+ data);
+            StringBuilder message = new StringBuilder("URLPolicyTaskHandler: insufficient credentials - ");
+            if (isRedirectUsedForAdvice()) {
+                message.append("Send redirect with advices to Login URL: ");
+            } else {
+                message.append("Post advices to Authentication Service: ");
+            }
+            message.append(data);
+            logMessage(message.toString());
         }
-        
-        return ctx.getServeDataResult(data);
+        if (isRedirectUsedForAdvice()) {
+            return new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT, data);
+        } else {
+            return ctx.getServeDataResult(data);
+        }
     }
     
     
-    private String getModifiedCompositeAdviceFormContent(
-            AmFilterRequestContext ctx,
+    private String getCompositeAdviceTarget(AmFilterRequestContext ctx,
             AmWebPolicyResult amWebPolicyResult) throws AgentException {
         String param = Constants.COMPOSITE_ADVICE;
         String value = "";
         // should return auth url without nvp
-        String action = ctx.getAuthRedirectURL(); 
+        StringBuilder action = new StringBuilder(ctx.getAuthRedirectURL());
         if (amWebPolicyResult != null && amWebPolicyResult.hasNameValuePairs()) {
             NameValuePair[] nvp = amWebPolicyResult.getNameValuePairs();
             
             if (nvp.length == 1) {
-                param = URLEncoder.encode(nvp[0].getName());
-                value = URLEncoder.encode(nvp[0].getValue());
+                try {
+                    param = URLEncoder.encode(nvp[0].getName(), ENCODING);
+                    value = URLEncoder.encode(nvp[0].getValue(), ENCODING);
+                } catch (UnsupportedEncodingException ex) {
+                    throw new AgentException("URL-encoding failed", ex);
+                }
             } else {
                 throw new AgentException("Advice NVP length more than 1");
             }
         }
-        
+
+        if (isRedirectUsedForAdvice()) {
+            if (action.indexOf(FIRST_PARAM_SEPARATOR) != -1) {
+                action.append(NEXT_PARAM_SEPARATOR);
+            } else {
+                action.append(FIRST_PARAM_SEPARATOR);
+            }
+            action.append(param).append(PARAM_VALUE_SEPARATOR).append(value);
+            return action.toString();
+        } else {
+            return getModifiedCompositeAdviceFormContent(action.toString(), param, value);
+        }
+    }
+
+    /*
+     * replaces the values in the HTTP-Post template
+     *
+     * @param authRedirectURL, URL cliets are sent for authentication
+     *
+     * @param param, the name of the parameter used for the composite advice
+     *
+     * @param value, the value of the composite advice
+     *
+     * @return modified HTTP-Post template as <code>String</code>
+     *
+     * @throws AgentException if this request cannot be handled by the task
+     * handler successfully.
+     */
+    private String getModifiedCompositeAdviceFormContent(String authRedirectURL,String param, String value) throws AgentException {
         StringBuffer buff = new StringBuffer(getCompositeAdviceFormContent());
-        StringUtils.replaceString(buff, AM_FILTER_ADVICE_FORM_ACTION, action);
+        StringUtils.replaceString(buff, AM_FILTER_ADVICE_FORM_ACTION, authRedirectURL);
         StringUtils.replaceString(buff, AM_FILTER_ADVICE_NAME, param);
         StringUtils.replaceString(buff, AM_FILTER_ADVICE_VALUE, value);
         
@@ -240,4 +298,33 @@ public class URLPolicyTaskHandler extends AmFilterTaskHandler
     private boolean pathInfoIgnored = false;
     private static final String COMPOSITE_ADVICE_FILENAME =
             "CompositeAdviceForm.txt";
+
+    /**
+     * @return the redirectUsedForAdvice
+     */
+    public boolean isRedirectUsedForAdvice() {
+        return redirectUsedForAdvice;
+    }
+
+    /**
+     * @param redirectUsedForAdvice the redirectUsedForAdvice to set
+     */
+    public void setRedirectUsedForAdvice(boolean redirectUsedForAdvice) {
+        this.redirectUsedForAdvice = redirectUsedForAdvice;
+    }
+
+    private boolean getAdviceConfiguration() {
+        Manager manager = getManager();
+        String config = manager.getConfigurationString(ADVICE_REDIRECT_PROP);
+        /*
+         * TODO remove workaround if update issue is fixed
+         * Workaround for OpenAM update issue begin
+         * read freeform properties
+         */
+        if ((null == config) || (config.trim().length() == 0)) {
+                config = manager.getSystemConfiguration(ADVICE_REDIRECT_PROP,DEFAULT_ADVICE_REDIRECT_VALUE);
+        }
+        // Workaround end
+        return Boolean.valueOf(config.trim());
+    }
 }
