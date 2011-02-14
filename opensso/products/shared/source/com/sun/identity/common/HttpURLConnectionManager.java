@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.common;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import com.sun.identity.protocol.AMURLStreamHandlerFactory;
@@ -40,66 +42,64 @@ import com.sun.identity.shared.debug.Debug;
 
 /**
  * The <code>HttpURLConnectionManager</code> class is used to get
- * <code>HttpURLConnection</code> instances and set connection timeout
- * if it supported by the JDK
+ * <code>HttpURLConnection</code> instances and set read as well as connect timeout
+ *
+ * @author Bernhard Thalmayr
  */
 
 public class HttpURLConnectionManager {
   
     private static Debug debug = Debug.getInstance("PLLClient");
-    private static int READTIMEOUT = 30000;
-    private static final String URL_READTIMEOUT = 
-           "com.sun.identity.url.readTimeout";
-    private static Method method, method_s;
-    private static Object[] args;
+    private static int READ_TIMEOUT = 30000;
+    private static int CONNECT_TIMEOUT = 10000;
+    private static final String URL_READ_TIMEOUT = "com.sun.identity.url.readTimeout";
+    private static final String URL_CONNECT_TIMEOUT = "org.forgerock.openam.url.connectTimeout";
     private static String prot_handler_string = null;
-    private static AMURLStreamHandlerFactory stFactory = 
-            new AMURLStreamHandlerFactory();
+    private static AMURLStreamHandlerFactory stFactory = new AMURLStreamHandlerFactory();
     
     static {
-        String rto = SystemPropertiesManager.get(URL_READTIMEOUT);
-        prot_handler_string = 
-                SystemPropertiesManager.get(Constants.PROTOCOL_HANDLER, null);
+        initialize();
+    }
+
+    private static void initialize() {
+        prot_handler_string = SystemPropertiesManager.get(Constants.PROTOCOL_HANDLER, null);
         if (debug.messageEnabled()) {
-            debug.message("Configured Protocol Handler : " + 
+            debug.message("Configured Protocol Handler : " +
                     prot_handler_string);
         }
-        
+
+        String rto = SystemPropertiesManager.get(URL_READ_TIMEOUT);
         if (rto != null && rto.length() > 0) {
             try {
-                READTIMEOUT = Integer.valueOf(rto).intValue();
-                if (debug.messageEnabled()) { 
-                    debug.message("HttpURLConnectionManager.<init>: " + 
-                        "Set READTIMEOUT to " + READTIMEOUT);
+                READ_TIMEOUT = Integer.valueOf(rto);
+                if (debug.messageEnabled()) {
+                    debug.message("HttpURLConnectionManager.initialize(): " +
+                        "Set READTIMEOUT to " + READ_TIMEOUT);
                 }
             } catch (Exception e) {
-                debug.error("HttpURLConnectionManager.<init>: Fail to read " +
-                        URL_READTIMEOUT + " set READTIMEOUT to the default " +
-                        READTIMEOUT, e);
+                debug.error("HttpURLConnectionManager.initialize(): Fail to read " +
+                        URL_READ_TIMEOUT + " using default READTIMEOUT " +
+                        READ_TIMEOUT, e);
             }
-
+        }
+        String cto = SystemPropertiesManager.get(URL_CONNECT_TIMEOUT);
+        if ((cto != null) && (cto.length() > 0)) {
             try {
-                URL url = new URL("http://opensso.dev.java.net");
-                HttpURLConnection conn = 
-                        (HttpURLConnection)url.openConnection();
-                Class[] param = { Integer.TYPE };
-                method = conn.getClass().getMethod("setReadTimeout", param);
-                url = new URL("https://opensso.dev.java.net");
-                conn = (HttpURLConnection)url.openConnection();
-                method_s = conn.getClass().getMethod("setReadTimeout", param);
-                args = new Object[] { new Integer(READTIMEOUT) };
-            } catch (NoSuchMethodException e) {
-                debug.warning("HttpURLConnectionManager.<init>: " +
-                    "setReadTimeout is not supported by the JVM", e);
-            } catch (Exception e) {
-                debug.error("HttpURLConnectionManager.<init>: " + 
-                    "Failed to find setReadTimeout method ", e);
+                CONNECT_TIMEOUT = Integer.valueOf(cto);
+                if (debug.messageEnabled()) {
+                    debug.message("HttpURLConnectionManager.initialize(): " +
+                        "Set CONNECT_TIMEOUT to " + CONNECT_TIMEOUT);
+                }
+            } catch (Exception ex) {
+                debug.error("HttpURLConnectionManager.initialize(): Fail to read " +
+                        URL_CONNECT_TIMEOUT + " using default CONNECT_TIMEOUT " +
+                        CONNECT_TIMEOUT, ex);
             }
         }
     }
     
     /**
-     * Get the <code>HttpURLConnection</code> and set read timeout when possible
+     * Get the <code>HttpURLConnection</code> and set read and connect timeout
      * @param url The <code>URL</code> to open connection with
      * @exception IOException when calling <code>URL.openConnection</code> fails
      * @return A <code>HttpURLConnection</code>.
@@ -113,28 +113,8 @@ public class HttpURLConnectionManager {
         }
         
         HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-        if (method != null) {
-            try {
-                if (prot.equalsIgnoreCase("http")) {
-                    method.invoke(conn, args);
-                } else {
-                    method_s.invoke(conn, args);
-                }
-                if (debug.messageEnabled()) {
-                    debug.message("HttpURLConnectionManager.getConnection: " + 
-                            "set read timeout to " + READTIMEOUT);
-                }
-            } catch(IllegalAccessException e) {
-                debug.error("HttpURLConnectionManager.getConnection: " + 
-                        "Failed to set read timeout", e);
-            } catch(IllegalArgumentException e) {
-                debug.error("HttpURLConnectionManager.getConnection: " + 
-                        "Failed to set read timeout", e);
-            } catch(InvocationTargetException e) {
-                debug.error("HttpURLConnectionManager.getConnection: " + 
-                        "Failed to set read timeout", e);
-            }
-        }
+        conn.setReadTimeout(READ_TIMEOUT);
+        conn.setConnectTimeout(CONNECT_TIMEOUT);
         return conn;
     }
 }
