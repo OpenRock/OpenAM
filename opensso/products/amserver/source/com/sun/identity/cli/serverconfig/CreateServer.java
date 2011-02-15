@@ -97,14 +97,9 @@ public class CreateServer extends ServerConfigBase {
             if (!ServerConfiguration.isServerInstanceExist(
                 adminSSOToken, serverName)) {
 
-                try {
-                    ServerConfiguration.createServerInstance(
-                        adminSSOToken, serverName, attributeValues, 
-                        serverconfigxml);
-                } catch (UnknownPropertyNameException ex) {
-                    outputWriter.printlnMessage(ex.getMessage());
-                    outputWriter.printlnMessage("");
-                }
+                ServerConfiguration.createServerInstance(
+                    adminSSOToken, serverName, attributeValues,
+                    serverconfigxml);
 
                 outputWriter.printlnMessage(MessageFormat.format(
                     getResourceString("create-server-config-succeeded"),
@@ -117,6 +112,12 @@ public class CreateServer extends ServerConfigBase {
             
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "SUCCEED_CREATE_SERVER", params);
+        } catch (UnknownPropertyNameException e) {
+            String[] args = {serverName, e.getMessage()};
+            debugError("CreateServer.handleRequest", e);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO,
+                "FAILED_CREATE_SERVER", args);
+            throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (ConfigurationException e) {
             String[] args = {serverName, e.getMessage()};
             debugError("CreateServer.handleRequest", e);
