@@ -28,6 +28,9 @@
 
 -->
 
+<!--
+   "Portions Copyrighted [2011] [ForgeRock AS]"
+-->
 <project name="diagnostic" default="createZipFile" basedir=".">
     <description>OpenWebSingle Sign-On: Diagnostic Tool</description>
 
@@ -274,7 +277,7 @@
         <java classname="com.sun.tools.xjc.Driver"
               maxmemory="128m" failonerror="true" fork="true">
             <classpath refid="build.class.path"/>
-            <arg line="-b ${xsd.services.dir}/binding.xjb -d ${amserver.src.dir} ${xsd.services.files}"/>
+            <arg line="-b &quot;${xsd.services.dir}/binding.xjb&quot; -d &quot;${amserver.src.dir}&quot; &quot;${xsd.services.files}&quot;"/>
         </java>
     </target>
     

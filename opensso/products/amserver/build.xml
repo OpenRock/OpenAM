@@ -111,7 +111,7 @@
             refid="amserver.basedir.forXSD" />
         <filter token="ENTITLEMENT_BASE_DIR"
             value="${amserver.basedir.forXSD}"/>
-        <copy todir="${amserver.built.xsd.dir}" filtering="true">
+        <copy todir="${amserver.built.xsd.dir}">
             <fileset dir="${amserver.basedir}/xsd" includes="*.*" />
         </copy>
 
@@ -455,7 +455,7 @@
             dest="${amserver.built.dir}/jdmk" />
         <java classname="com.sun.jdmk.tools.MibGen" fork="true"
             classpath="${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jmx.jar:${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jdmkrt.jar:${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jdmktk.jar">
-            <arg line="-d ${amserver.built.dir}/mib -tp com.sun.identity.monitoring ${amserver.base.dir}/resources/mib/SUN-OPENSSO-SERVER.mib"/>
+            <arg line="-d &quot;${amserver.built.dir}/mib&quot; -tp com.sun.identity.monitoring &quot;${amserver.base.dir}/resources/mib/SUN-OPENSSO-SERVER.mib&quot;"/>
         </java>
 	<delete file="${amserver.built.dir}/mib/SUN_OPENSSO_SERVER_MIB.java" />
         <property name="amserver.mib.done" value="true" />
@@ -466,7 +466,7 @@
         <java classname="com.sun.tools.internal.xjc.Driver"
             classpath="${env.JAVA_HOME}/lib/tools.jar"
             maxmemory="256m" failonerror="true" fork="true">
-            <arg line="-b ${amserver.built.xsd.dir}/xacml-core-v3.xjb -extension -d ${amserver.built.src.dir} ${amserver.built.xsd.dir}/xacml-core-v3-schema-cd-1.xsd"/>
+            <arg line="-b &quot;${amserver.built.xsd.dir}/xacml-core-v3.xjb&quot; -extension -d &quot;${amserver.built.src.dir}&quot; &quot;${amserver.built.xsd.dir}/xacml-core-v3-schema-cd-1.xsd&quot;"/>
         </java>
         <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
               destdir="${amserver.classes.dir}" source="1.5" target="1.5"
