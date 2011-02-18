@@ -369,14 +369,16 @@ function singleLogin() {
 function getReport() {
     var url = "validatorRpt.jsp";
     <%
-        out.println("url += '?idp=' + '" +
-            URLEncoder.encode(validator.getIDPEntityId()) + "';");
-        if (validator.isFedlet()) {
-            out.println("url += '&fedlet=' + '" +
-                URLEncoder.encode(validator.getSPEntityId()) + "';");
-        } else {
-            out.println("url += '&sp=' + '" +
-                URLEncoder.encode(validator.getSPEntityId()) + "';");
+        if (validator != null) {
+            out.println("url += '?idp=' + '" +
+                URLEncoder.encode(validator.getIDPEntityId()) + "';");
+            if (validator.isFedlet()) {
+                out.println("url += '&fedlet=' + '" +
+                    URLEncoder.encode(validator.getSPEntityId()) + "';");
+            } else {
+                out.println("url += '&sp=' + '" +
+                    URLEncoder.encode(validator.getSPEntityId()) + "';");
+            }
         }
     %>
     if (statusAuthIdp > -1) {
@@ -413,10 +415,12 @@ function ssoPassed() {
     top.showFooter('');
     statusSSO = 1;
     <%
-    if (!validator.isFedlet()) {
-        out.println("accTermination();");
-    } else {
-       out.println("getReport();");
+    if (validator != null) {
+        if (!validator.isFedlet()) {
+            out.println("accTermination();");
+        } else {
+            out.println("getReport();");
+        }
     }
     %>
 }
