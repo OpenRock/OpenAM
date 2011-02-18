@@ -52,6 +52,8 @@ import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.shared.locale.Locale;
 
 public class ValidateSAML2 {
+    
+    private static Debug debug = Debug.getInstance("workflow");
     private static final String LOGIN_URL = "/UI/Login";
     private static final String LOGOUT_URL = "/UI/Logout";
     
@@ -109,6 +111,7 @@ public class ValidateSAML2 {
             }
             validateURL(idpBaseURL);
         } catch (SAML2MetaException ex) {
+            debug.error("ValidateSAML2: Error while validating IdP", ex);
             Object[] param = {idpEntityId};
             throw new WorkflowException("cannot.locate.idp", param);
         }
@@ -168,6 +171,7 @@ public class ValidateSAML2 {
             }
             
         } catch (SAML2MetaException ex) {
+            debug.error("ValidateSAML2: Error while validating SP", ex);
             Object[] param = {spEntityId};
             throw new WorkflowException("cannot.locate.sp", param);
         }
@@ -183,6 +187,7 @@ public class ValidateSAML2 {
             Object[] params = {strUrl};
             throw new WorkflowException("malformedurl", params);
         } catch (IOException ex) {
+            debug.error("ValidateSAML2: IO Error while validating URL", ex);
             Object[] params = {strUrl};
             throw new WorkflowException("unable.to.reach.url", params);
         }
