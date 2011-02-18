@@ -181,10 +181,10 @@ public class ValidateSAML2 {
             connection.connect();
         } catch (MalformedURLException ex) {
             Object[] params = {strUrl};
-            throw new WorkflowException("cannot.reach.url", params);
+            throw new WorkflowException("malformedurl", params);
         } catch (IOException ex) {
             Object[] params = {strUrl};
-            throw new WorkflowException("cannot.reach.url", params);
+            throw new WorkflowException("unable.to.reach.url", params);
         }
     }
     
