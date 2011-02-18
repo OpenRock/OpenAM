@@ -49,6 +49,7 @@ import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 
 public class ValidateSAML2 {
