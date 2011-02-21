@@ -1128,11 +1128,15 @@ public class SessionService {
      * Decrements number of active sessions
      */
     public static synchronized void decrementActiveSessions() {
-        numberOfActiveSessions--;
-        if (SystemProperties.isServerMode() && Agent.isRunning()) {
-            SsoServerSessSvcImpl sessImpl =
-                (SsoServerSessSvcImpl)Agent.getSessSvcMBean();
-            sessImpl.decSessionActiveCount();
+        // Fix for OPENAM-486: this is a sanity-check for sessioncount, so it
+        // can't go below zero any more in case of erroneus behavior..
+        if (numberOfActiveSessions > 0) {
+            numberOfActiveSessions--;
+            if (SystemProperties.isServerMode() && Agent.isRunning()) {
+                SsoServerSessSvcImpl sessImpl =
+                    (SsoServerSessSvcImpl)Agent.getSessSvcMBean();
+                sessImpl.decSessionActiveCount();
+            }
         }
     }
 
