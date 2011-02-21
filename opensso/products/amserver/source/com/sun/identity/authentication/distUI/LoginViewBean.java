@@ -2108,8 +2108,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     }
 
    public void enableCookieTimeToLive() {
-       int cookieTimeToLive = 0;
-       boolean cookieTimeToLiveEnabled = false;
        String cookieTimeToLiveString = SystemProperties.get(
             com.sun.identity.common.Constants.AM_COOKIE_TIME_TO_LIVE);
        if ((cookieTimeToLiveString != null)
