@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.iplanet.services.cdc.client;
@@ -151,6 +151,8 @@ extends HttpServlet {
     boolean serverMode = Boolean.valueOf(System.getProperty(
         Constants.SERVER_MODE, SystemProperties.get(Constants.SERVER_MODE, 
         "false"))).booleanValue();
+    private static boolean cookieEncoding =
+            SystemProperties.getAsBoolean(Constants.AM_COOKIE_ENCODE);
     
     /**
      * @param config the ServletConfig object that contains configutation
@@ -419,6 +421,10 @@ extends HttpServlet {
             for (int nCookie = 0; nCookie < cookies.length; nCookie++) {
                 String cookieName = cookies[nCookie].getName();
                 String cookieVal = cookies[nCookie].getValue();
+                if (cookieName.equals(CookieUtils.getAmCookieName()) &&
+                        cookieEncoding) {
+                    cookieVal = URLEncDec.encode(cookieVal);
+                }
                 if (debug.messageEnabled()) {
                     debug.message("CDCClientServlet.getCookiesFromRequest:"
                         +"Cookie name = " + cookieName);
