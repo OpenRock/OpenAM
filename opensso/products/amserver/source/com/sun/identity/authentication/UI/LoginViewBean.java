@@ -398,7 +398,15 @@ public class LoginViewBean extends AuthViewBeanBase {
                             Constants.FORWARD_YES_VALUE);
                         dispatcher.forward(request, response);
                     } else {            
-                        response.sendRedirect(redirect_url);
+                        if (redirect_url.startsWith(SSO_REDIRECT)) {
+                            if (loginDebug.messageEnabled()) {
+                                loginDebug.message("LoginViewBean.forwardTo():" +
+                                    "Redirect to: " + redirect_url);
+                            }
+                            response.sendRedirect(serviceUri + redirect_url);
+                        } else {
+                            response.sendRedirect(redirect_url);
+                        }
                     }
                     return;
                 }
