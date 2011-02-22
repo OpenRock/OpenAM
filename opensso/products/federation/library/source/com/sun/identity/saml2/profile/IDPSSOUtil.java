@@ -965,9 +965,7 @@ public class IDPSSOUtil {
                  (sessionProvider.getTimeLeft(session));
             if (SAML2Utils.isSAML2FailOverEnabled()) {
                 SAML2Repository.getInstance().save(sessionIndex,
-                    new IDPSessionCopy((IDPSession) 
-                    IDPCache.idpSessionsByIndices.get(
-                    sessionIndex)), sessionExpireTime, null);
+                    new IDPSessionCopy(idpSession), sessionExpireTime, null);
             }
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("SAVE IDPSession!");
