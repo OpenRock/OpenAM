@@ -614,7 +614,15 @@ public class LoginViewBean extends AuthViewBeanBase {
                             Constants.FORWARD_YES_VALUE);
                         dispatcher.forward(request, response);
                     } else {
-                        response.sendRedirect(redirect_url);
+                        if (redirect_url.startsWith("/SSORedirect")) {
+                            if (loginDebug.messageEnabled()) {
+                                loginDebug.message("LoginViewBean.forwardTo():" +
+                                    "Redirect to: " + redirect_url);
+                            }
+                            response.sendRedirect(serviceUri + redirect_url);
+                        } else {
+                            response.sendRedirect(redirect_url);
+                        }
                     }
                     forward = false;
                     
@@ -2485,6 +2493,8 @@ public class LoginViewBean extends AuthViewBeanBase {
     public static final String HTML_TITLE_NEWORG = "htmlTitle_NewOrg";
     /** Default parameter name of html title for max session */
     public static final String HTML_TITLE_MAXSESSIONS = "htmlTitle_MaxSessions";
+
+    public static final String SSO_REDIRECT = "/SSORedirect";
     
     ////////////////////////////////////////////////////////////////////////////
     // Instance variables
