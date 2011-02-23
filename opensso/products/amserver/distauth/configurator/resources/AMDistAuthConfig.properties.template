@@ -304,3 +304,10 @@ openam.retained.http.headers=X-DSAMEVersion
  * protect from erroneus header settings.
  */
 openam.forbidden.to.copy.headers=connection
+
+/**
+ * If this property is enabled the DAS logout screen will not redirect the 
+ * clients to the value of the 'goto' parameter in any circumstances, instead 
+ *  it will only display the Logout successful screen.
+ */
+openam.authentication.ignore_goto_during_logout=false

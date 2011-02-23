@@ -31,6 +31,7 @@
  */
 package com.sun.identity.authentication.UI;
 
+import com.iplanet.am.util.SystemProperties;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -62,6 +63,7 @@ import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.locale.L10NMessage;
 
 /**
@@ -503,9 +505,11 @@ public class LogoutViewBean extends AuthViewBeanBase {
                 logoutDebug.message("Redirect to 'goto' URL : " + gotoUrl);
             }
             try {
-                if (doSendRedirect(gotoUrl)) {
-                    response.sendRedirect(appendLogoutCookie(gotoUrl));
-                    return true;
+                if (!SystemProperties.getAsBoolean(Constants.IGNORE_GOTO_DURING_LOGOUT)) {
+                    if (doSendRedirect(gotoUrl)) {
+                        response.sendRedirect(appendLogoutCookie(gotoUrl));
+                        return true;
+                    }
                 }
             } catch (Exception e) {
                 if (logoutDebug.messageEnabled()) {

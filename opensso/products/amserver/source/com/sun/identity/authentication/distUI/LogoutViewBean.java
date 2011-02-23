@@ -373,9 +373,11 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 return false;
             }
             try {
-                if (doSendRedirect(gotoUrl)) {
-                    response.sendRedirect(appendLogoutCookie(gotoUrl));
-                    return true;
+                if (!SystemProperties.getAsBoolean(Constants.IGNORE_GOTO_DURING_LOGOUT)) {
+                    if (doSendRedirect(gotoUrl)) {
+                        response.sendRedirect(appendLogoutCookie(gotoUrl));
+                        return true;
+                    }
                 }
             } catch (Exception e) {
                 if (logoutDebug.messageEnabled()) {

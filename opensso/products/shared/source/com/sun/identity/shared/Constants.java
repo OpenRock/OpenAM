@@ -1090,4 +1090,7 @@ public interface Constants {
 
     public static final String FORBIDDEN_TO_COPY_HEADERS =
             "openam.forbidden.to.copy.headers";
+
+    public static final String IGNORE_GOTO_DURING_LOGOUT =
+            "openam.authentication.ignore_goto_during_logout";
 }
