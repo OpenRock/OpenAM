@@ -1084,4 +1084,10 @@ public interface Constants {
 
     public static final String DESTROY_ALL_SESSIONS =
         "openam.session.destroy_all_sessions";
+
+    public static final String RETAINED_HTTP_HEADERS_LIST =
+            "openam.retained.http.headers";
+
+    public static final String FORBIDDEN_TO_COPY_HEADERS =
+            "openam.forbidden.to.copy.headers";
 }

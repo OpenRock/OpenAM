@@ -37,16 +37,22 @@ import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestContextImpl;
 import com.iplanet.jato.ViewBeanManager;
+import com.iplanet.services.cdm.G11NSettings;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -164,6 +170,7 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                     String clientType = null;
                     String output_data = null;
                     String contentType = null;
+                    Map<String, List<String>> headers = null;
                     if (origRequestData != null && !origRequestData.isEmpty()) {
                         redirect_url =
                             (String)origRequestData.get("AM_REDIRECT_URL");
@@ -173,6 +180,8 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                             (String)origRequestData.get("AM_CLIENT_TYPE");
                         contentType =
                             (String)origRequestData.get("CONTENT_TYPE");
+                        headers =
+                            (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
                     } else {
                         Set domainsList = AuthClientUtils.getCookieDomains();
 
@@ -186,6 +195,19 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
 
                                 if (debug.messageEnabled()) {
                                     debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                                }
+                            }
+                        }
+                    }
+                    if (headers != null) {
+                        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                            String headerName = entry.getKey();
+                            if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
+                                List<String> headerValues = entry.getValue();
+                                if (headerValues != null) {
+                                    for (String headerValue : headerValues) {
+                                        response.setHeader(headerName, headerValue);
+                                    }
                                 }
                             }
                         }
@@ -281,8 +303,28 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
     // the debug file
     private static Debug debug = Debug.getInstance("amLoginServlet");
 
-    private static final String DEFAULT_CONTENT_TYPE = "text/html";
-    
+    private static final String DEFAULT_CONTENT_TYPE = "text/html; charset=" + G11NSettings.CDM_DEFAULT_CHARSET;
+    private static final List<String> RETAINED_HTTP_HEADERS = new ArrayList<String>();
+    private static final List<String> FORBIDDEN_TO_COPY_HEADERS = new ArrayList<String>();
+
+    static {
+        initialize();
+    }
+
+    private static void initialize() {
+        String retainedHeaders = SystemProperties.get(
+                Constants.RETAINED_HTTP_HEADERS_LIST);
+        String forbiddenHeaders = SystemProperties.get(
+                Constants.FORBIDDEN_TO_COPY_HEADERS);
+        if (retainedHeaders != null) {
+            RETAINED_HTTP_HEADERS.addAll(Arrays.asList(retainedHeaders.toLowerCase().split(",")));
+        }
+        if (forbiddenHeaders != null) {
+            FORBIDDEN_TO_COPY_HEADERS.addAll(Arrays.asList(forbiddenHeaders.toLowerCase().split(",")));
+        }
+        //configuration sanity check
+        RETAINED_HTTP_HEADERS.removeAll(FORBIDDEN_TO_COPY_HEADERS);
+    }
     ////////////////////////////////////////////////////////////////////////////
     // Instance variables
     ////////////////////////////////////////////////////////////////////////////
