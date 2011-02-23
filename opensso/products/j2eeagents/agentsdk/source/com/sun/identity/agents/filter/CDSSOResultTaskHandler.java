@@ -25,9 +25,6 @@
  *
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.agents.filter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +35,6 @@ import com.sun.identity.agents.arch.AgentConfiguration;
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
 import com.sun.identity.agents.common.ILibertyAuthnResponseHelper;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class CDSSOResultTaskHandler extends AmFilterTaskHandler
 implements ICDSSOResultTaskHandler {
@@ -59,7 +54,7 @@ implements ICDSSOResultTaskHandler {
         HttpServletResponse response = cxt.getHttpServletResponse();
         ICDSSOContext cdssoCxt = getCDSSOContext();
 
-        if (request.getRequestURI().startsWith(cdssoCxt.getCDSSORedirectURI())) {
+        if (request.getRequestURI().equals(cdssoCxt.getCDSSORedirectURI())) {
             // Now get the Original request from the saved cookie
             String cdssoCookie = cxt.getRequestCookieValue(
                 cdssoCxt.getCDSSOCookieName());
@@ -137,7 +132,7 @@ implements ICDSSOResultTaskHandler {
         response.addCookie(getCDSSOContext().getRemoveCDSSOCookie());
         AmFilterResult result = new AmFilterResult(
             AmFilterResultStatus.STATUS_REDIRECT,
-            getRedirectUrl(cxt.getHttpServletRequest(), cdssoTokens));
+            cdssoTokens[CDSSOContext.INDEX_REQUESTED_URL]);
 
         return result;
     }
@@ -179,7 +174,7 @@ implements ICDSSOResultTaskHandler {
             // Remove the temporary CDSSO Cookie
             response.addCookie(cdssoContext.getRemoveCDSSOCookie());
             result = new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT,
-                getRedirectUrl(cxt.getHttpServletRequest(), cdssoTokens));
+                cdssoTokens[CDSSOContext.INDEX_REQUESTED_URL]);
         } catch (AgentException ae) {
             logError("CDSSOResultTaskHandler : One or more AuthnResponse "
                    + "conditions might not have been met. Denying "
@@ -188,23 +183,6 @@ implements ICDSSOResultTaskHandler {
         }
 
         return result;
-    }
-
-    private String getRedirectUrl(HttpServletRequest request, String[] cdssoTokens) {
-        String gotoUrl = request.getParameter(
-                getConfigurationString(IFilterConfigurationConstants.CONFIG_REDIRECT_PARAM_NAME,
-                DEFAULT_REDIRECT_PARAM_NAME));
-        if (gotoUrl != null) {
-            try {
-                URI uri = new URI(gotoUrl);
-                return gotoUrl;
-            } catch (URISyntaxException se) {
-                logMessage("The supplied goto URL is not a valid URI, fallbacking to cookie goto url");
-                //the goto param is not a valid uri, fallback to cookie
-            }
-        }
-
-        return cdssoTokens[CDSSOContext.INDEX_REQUESTED_URL];
     }
 
     protected ICDSSOContext getCDSSOContext() {
