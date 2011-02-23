@@ -25,6 +25,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +41,8 @@ import com.sun.identity.agents.common.ILibertyAuthnResponseHelper;
 
 public class CDSSOResultTaskHandler extends AmFilterTaskHandler
 implements ICDSSOResultTaskHandler {
+
+    private static final String DEFAULT_GOTO_URL = "openam.agent.default_goto_url";
 
     public CDSSOResultTaskHandler(Manager manager)
         throws AgentException
@@ -63,9 +68,18 @@ implements ICDSSOResultTaskHandler {
             if (cdssoCookie != null) {
                 cdssoTokens = cdssoCxt.parseCDSSOCookieValue(cdssoCookie);
             } else {
-                result = cxt.getBlockAccessResult();
-                logError("CDSSOResultTaskHandler : CDSSO cookie not found. "
-                       + "Hence denying access.");
+                String redirectUrl = getSystemConfiguration(DEFAULT_GOTO_URL);
+                if (redirectUrl != null) {
+                    result = cxt.getCustomRedirectResult(redirectUrl);
+                    logError("CDSSOResultTaskHandler : CDSSO cookie not found. "
+                            + "Hence redirecting the user to the default goto url");
+                } else {
+                    result = cxt.getBlockAccessResult();
+                    logError("CDSSOResultTaskHandler : CDSSO cookie not found. "
+                            + "Hence denying access.");
+                }
+
+                return result;
             }
 
             // Handle the CDSSO Notification. First check if the user token
