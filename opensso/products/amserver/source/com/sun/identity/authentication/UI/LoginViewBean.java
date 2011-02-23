@@ -1971,7 +1971,8 @@ public class LoginViewBean extends AuthViewBeanBase {
         }
 
         // handle InternalSession timeout
-        if (errorCode.equals("110") && (loginURL.equals(Constants.EMPTY))) {
+        if (errorCode != null && loginURL != null && errorCode.equals("110")
+                && (loginURL.equals(Constants.EMPTY))) {
             setDisplayFieldValue(LOGIN_URL, AuthUtils.constructLoginURL(request));
         }
         
