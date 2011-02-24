@@ -2286,9 +2286,9 @@ public class AuthClientUtils {
                 utilDebug.message("Connecting to : " + authURL);
             }
             conn = HttpURLConnectionManager.getConnection(authURL);
-            conn.setDoOutput( true );
+            conn.setDoOutput(request.getMethod().equalsIgnoreCase("POST"));
             conn.setUseCaches( useCache );
-            conn.setRequestMethod("POST");
+            conn.setRequestMethod(request.getMethod());
             conn.setFollowRedirects(false);
             conn.setInstanceFollowRedirects(false);
 
