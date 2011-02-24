@@ -196,15 +196,7 @@ public class SOAPClient {
             connection.setRequestProperty("Content-Type",
                 "text/xml; charset=\"utf-8\"");
             connection.setRequestProperty("SOAPAction", "\"\"");
-            if (cookies == null) {
-                if (SystemProperties.iasGXId != null) {
-                    connection.setRequestProperty("Cookie", "GX_jst="
-                        + SystemProperties.iasGXId);
-                }
-            } else {
-                if (SystemProperties.iasGXId != null) {
-                    cookies = cookies + "; GX_jst=" + SystemProperties.iasGXId;
-                }
+            if (cookies != null) {
                 connection.setRequestProperty("Cookie", cookies);
             }
             String userInfo = endpoint.getUserInfo();

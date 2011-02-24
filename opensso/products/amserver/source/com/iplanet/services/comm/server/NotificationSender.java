@@ -66,10 +66,6 @@ public class NotificationSender {
             conn.setDoOutput(true);
             conn.setUseCaches(useCache);
             conn.setRequestMethod("POST");
-            if (SystemProperties.iasGXId != null) {
-                conn.setRequestProperty("Cookie", "GX_jst="
-                        + SystemProperties.iasGXId);
-            }
             conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
             String xml = set.toXMLString();
             // compute length in case iWS set arbitrary length

@@ -105,11 +105,6 @@ public class SystemProperties {
 
     private static String initSecondaryError;
 
-    /**
-     * Application Server specific deployment configuration
-     */
-    public static String iasGXId = null;
-
     private static final String SERVER_NAME_PROPERTY = "server.name";
 
     private static final String CONFIG_NAME_PROPERTY = "amconfig";
