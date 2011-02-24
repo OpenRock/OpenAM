@@ -4819,9 +4819,14 @@ public class LoginState {
             }
             String[] data = (String[])dataList.toArray(new String[0]);
             String contextId = null;
-            SSOToken localSSOToken = getSSOToken();
-            if (localSSOToken != null) {
-                contextId = localSSOToken.getProperty(Constants.AM_CTX_ID);
+            try {
+                SSOToken localSSOToken = getSSOToken();
+                if (localSSOToken != null) {
+                    contextId = localSSOToken.getProperty(Constants.AM_CTX_ID);
+                }
+            } catch (SSOException ssoe) {
+                debug.message("Error while retrieving SSOToken for login failure: "
+                        + ssoe.getMessage());
             }
             
             Hashtable props = new Hashtable();
