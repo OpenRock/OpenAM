@@ -163,8 +163,17 @@
     </target>
     
     <target name="nightly" depends="all">
-        <filter token="DATE" value="${nightly.date}" />
+        <filter token="BUILD_DATE" value="${nightly.date}" />
+<!--
         <copy file="${j2eeagents.docs.dir}/nightly.html" tofile="${j2eeagents.dist.dir}/index.html" filtering="true" />
+-->
+        <copy file="${j2eeagents.basedir}/appserver/build_date.js.template" tofile="${j2eeagents.dist.dir}/appserver_v10_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/jboss/build_date.js.template" tofile="${j2eeagents.dist.dir}/jboss_v42_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/jetty/build_date.js.template" tofile="${j2eeagents.dist.dir}/jetty_v61_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/jsr196/build_date.js.template" tofile="${j2eeagents.dist.dir}/jsr196_jsr115_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/tomcat/build_date.js.template" tofile="${j2eeagents.dist.dir}/tomcat_v6_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/weblogic/build_date.js.template" tofile="${j2eeagents.dist.dir}/weblogic_v10_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/websphere/build_date.js.template" tofile="${j2eeagents.dist.dir}/websphere_v61_build_date.js" filtering="true" />
     </target>
 
     <target name="prenightly">
