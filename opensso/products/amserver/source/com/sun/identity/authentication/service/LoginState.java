@@ -1907,7 +1907,7 @@ public class LoginState {
             SSOToken ssoToken = ssoManager.createSSOToken(session.getID().toString());
             return ssoToken;
         } catch (SSOException ex) {
-            debug.error("Error retrieving SSOToken :", ex);
+            debug.message("Error retrieving SSOToken :", ex);
             throw new SSOException(AuthD.BUNDLE_NAME,
                 AMAuthErrorCode.AUTH_ERROR, null);
         }

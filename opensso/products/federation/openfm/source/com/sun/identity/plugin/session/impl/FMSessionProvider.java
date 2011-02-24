@@ -418,8 +418,8 @@ public class FMSessionProvider implements SessionProvider {
                 SSOTokenManager.getInstance().refreshSession(token);
                 return token;
             } catch (Throwable ex) {
-                debug.error("FMSessionProvider.getSession: Could not get the session" +
-                        " from the HTTP request", ex);
+                debug.message("FMSessionProvider.getSession: Could not get the session" +
+                        " from the HTTP request: " + ex.getMessage());
                 throw new SessionException(ex);
             }
         }
