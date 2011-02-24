@@ -202,11 +202,13 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                     if (headers != null) {
                         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
                             String headerName = entry.getKey();
-                            if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
-                                List<String> headerValues = entry.getValue();
-                                if (headerValues != null) {
-                                    for (String headerValue : headerValues) {
-                                        response.setHeader(headerName, headerValue);
+                            if (headerName != null) {
+                                if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
+                                    List<String> headerValues = entry.getValue();
+                                    if (headerValues != null) {
+                                        for (String headerValue : headerValues) {
+                                            response.setHeader(headerName, headerValue);
+                                        }
                                     }
                                 }
                             }
