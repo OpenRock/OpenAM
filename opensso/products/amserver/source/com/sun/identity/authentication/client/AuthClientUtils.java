@@ -2286,9 +2286,7 @@ public class AuthClientUtils {
                 utilDebug.message("Connecting to : " + authURL);
             }
             conn = HttpURLConnectionManager.getConnection(authURL);
-            conn.setDoOutput(request.getMethod().equalsIgnoreCase("POST"));
             conn.setUseCaches( useCache );
-            conn.setRequestMethod(request.getMethod());
             conn.setFollowRedirects(false);
             conn.setInstanceFollowRedirects(false);
 
@@ -2313,11 +2311,15 @@ public class AuthClientUtils {
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("Request data : " + in_requestData);
             }
-            out = conn.getOutputStream();
-            PrintWriter pw = new PrintWriter(out);
-            pw.print(in_requestData); // here we "send" the request body
-            pw.flush();
-            pw.close();
+            if (in_requestData.trim().length() > 0) {
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
+                out = conn.getOutputStream();
+                PrintWriter pw = new PrintWriter(out);
+                pw.print(in_requestData); // here we "send" the request body
+                pw.flush();
+                pw.close();
+            }
 
             // Receiving input from Original Auth server...
             utilDebug.message("RECEIVING DATA ... ");
