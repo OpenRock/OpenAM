@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.cli;
 
 
@@ -300,14 +303,4 @@ public interface CLIConstants {
      * Import configuration data sub command name.
      */
     String CMD_NAME_IMPORT_SVC_CONFIG = "import_svc_cfg";
-
-    /**
-     * Name of ignore version check argument/option.
-     */
-    String ARGUMENT_IGNORE_VERSION = "noversioncheck";
-
-    /**
-     * Short name of ignore version check argument/option.
-     */
-    String SHORT_ARGUMENT_IGNORE_VERSION = "O";
 }

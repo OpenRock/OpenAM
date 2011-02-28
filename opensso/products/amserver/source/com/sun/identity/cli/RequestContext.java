@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.cli;
 
 import com.sun.identity.shared.locale.Locale;
@@ -254,8 +257,7 @@ public class RequestContext {
         int skip = -1;
         if (option.equals(CLIConstants.ARGUMENT_DEBUG) ||
             option.equals(CLIConstants.ARGUMENT_VERBOSE) ||
-            option.equals(CLIConstants.ARGUMENT_NOLOG) ||
-            option.equals(CLIConstants.ARGUMENT_IGNORE_VERSION)
+            option.equals(CLIConstants.ARGUMENT_NOLOG)
         ) {
             skip = 0;
         } else if (option.equals(CLIConstants.ARGUMENT_LOCALE)) {
@@ -268,8 +270,7 @@ public class RequestContext {
         int skip = -1;
         if (option.equals(CLIConstants.SHORT_ARGUMENT_DEBUG) ||
             option.equals(CLIConstants.SHORT_ARGUMENT_VERBOSE) ||
-            option.equals(CLIConstants.SHORT_ARGUMENT_NOLOG) ||
-            option.equals(CLIConstants.SHORT_ARGUMENT_IGNORE_VERSION)
+            option.equals(CLIConstants.SHORT_ARGUMENT_NOLOG)
         ) {
             skip = 0;
         } else if (option.equals(CLIConstants.SHORT_ARGUMENT_LOCALE)) {

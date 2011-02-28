@@ -75,6 +75,7 @@ public class VersionCheck implements SetupConstants {
             javaExpectedVersion)) {
             System.out.println(bundle.getString("message.error.version.jvm") +
                 " " + javaExpectedVersion + " .");
+            //don't ignore JVM version mismatch
             return 1;
         }
 
@@ -95,7 +96,7 @@ public class VersionCheck implements SetupConstants {
                 System.out.println(bundle.getString("message.error.version.am")
                         + " " + amExpectedVersion + " .");
             }
-            return 1;
+            getValidationResult();
         }
         
         if (!versionCompatible(configVersion, amExpectedVersion)) {
@@ -107,9 +108,22 @@ public class VersionCheck implements SetupConstants {
                 System.out.println(bundle.getString("message.error.version.am")
                         + " " + amExpectedVersion + " .");
             }
-            return 1;
+            getValidationResult();
         }
         return 0;
+    }
+
+    private static int getValidationResult() {
+        Boolean ignoreVersion = Boolean.valueOf(
+                SystemProperties.get(IGNORE_VERSION_CHECK, "true"));
+        if (ignoreVersion) {
+            Debug.getInstance("amCLI").warning("VersionCheck.getValidationResult: "
+                    + "The versions of the OpenAM and admin tool did not"
+                    + " match, however the version check was ignored");
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     /**
