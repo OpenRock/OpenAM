@@ -1093,4 +1093,10 @@ public interface Constants {
 
     public static final String IGNORE_GOTO_DURING_LOGOUT =
             "openam.authentication.ignore_goto_during_logout";
+
+    public static final String AM_DISTAUTH_LB_COOKIE_NAME =
+            "openam.auth.distauth.lb_cookie_name";
+
+    public static final String AM_DISTAUTH_LB_COOKIE_VALUE =
+            "openam.auth.distauth.lb_cookie_value";
 }

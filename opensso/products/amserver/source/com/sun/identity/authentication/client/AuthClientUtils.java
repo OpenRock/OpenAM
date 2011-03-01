@@ -163,11 +163,8 @@ public class AuthClientUtils {
     private static String distAuthCookieName=
         SystemProperties.get(com.sun.identity.shared.Constants.AM_DIST_AUTH_COOKIE_NAME,
         ISAuthConstants.DIST_AUTH_COOKIE_NAME);
-    private static String loadBalanceCookieName = null;
     private static String persistentCookieName=
         SystemProperties.get(Constants.AM_PCOOKIE_NAME);
-    private static String loadBalanceCookieValue=
-        SystemProperties.get(Constants.AM_LB_COOKIE_VALUE);
     private static String serviceURI = getServiceURI() + "/UI/Login";
     private static boolean setCookieToAllDomains = true;
 
@@ -203,13 +200,6 @@ public class AuthClientUtils {
             }
         }
         bundle = Locale.getInstallResourceBundle(BUNDLE_NAME);
-        if (SystemProperties.isServerMode()) {
-            loadBalanceCookieName =
-                SystemProperties.get(Constants.AM_LB_COOKIE_NAME,"amlbcookie");
-        } else {
-            loadBalanceCookieName =
-                SystemProperties.get(Constants.AM_LB_COOKIE_NAME);
-        }
         String proto = SystemProperties.get(Constants.DISTAUTH_SERVER_PROTOCOL);
         String host = null;
         String port = null;
@@ -1219,13 +1209,20 @@ public class AuthClientUtils {
     }
 
     public static String getlbCookieName() {
-        loadBalanceCookieName =
-            SystemProperties.get(Constants.AM_LB_COOKIE_NAME,"amlbcookie");
+        String loadBalanceCookieName = null;
+        if (SystemProperties.isServerMode()) {
+            loadBalanceCookieName = SystemProperties.get(
+                    Constants.AM_LB_COOKIE_NAME,"amlbcookie");
+        } else {
+            loadBalanceCookieName = SystemProperties.get(
+                    com.sun.identity.shared.Constants.AM_DISTAUTH_LB_COOKIE_NAME);
+        }
+
         if(utilDebug.messageEnabled()){
         	utilDebug.message("AuthClientUtils.getlbCookieName()" +
                 "loadBalanceCookieName is:" + loadBalanceCookieName);        	
         }
-        return (loadBalanceCookieName);
+        return loadBalanceCookieName;
     }
 
     public static String getlbCookieValue() {
@@ -1236,8 +1233,10 @@ public class AuthClientUtils {
             } catch (Exception e) {
                 return (null);
             }
+        } else {
+            return SystemProperties.get(
+                    com.sun.identity.shared.Constants.AM_DISTAUTH_LB_COOKIE_VALUE);
         }
-        return (loadBalanceCookieValue);
     }
 
     public static Set getCookieDomains() {
