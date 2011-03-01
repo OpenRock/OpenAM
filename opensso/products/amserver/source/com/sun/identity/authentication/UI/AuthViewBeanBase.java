@@ -311,8 +311,7 @@ public abstract class AuthViewBeanBase extends ViewBeanBase {
     /**
      * Configured service uri.
      */
-    public static String serviceUri =
-    SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+    public static String serviceUri = AuthClientUtils.getServiceURI();
     
     //to be used in case session is destroyed
     protected java.util.Locale fallbackLocale;

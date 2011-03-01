@@ -522,10 +522,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     private final static String DEFAULT_LOGOUT_PAGE = "openam.authentication.distUI.defaultLogoutPage";
     
     static {
-        serviceUri = SystemProperties.get(
-             Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
         LOGINURL = serviceUri + "/UI/Login";
-        AuthClientUtils.setServiceURI(LOGINURL);
     }
 }
 

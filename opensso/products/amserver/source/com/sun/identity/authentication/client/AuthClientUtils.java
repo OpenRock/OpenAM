@@ -168,8 +168,7 @@ public class AuthClientUtils {
         SystemProperties.get(Constants.AM_PCOOKIE_NAME);
     private static String loadBalanceCookieValue=
         SystemProperties.get(Constants.AM_LB_COOKIE_VALUE);
-    private static String serviceURI = SystemProperties.get(
-        Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
+    private static String serviceURI = getServiceURI() + "/UI/Login";
     private static boolean setCookieToAllDomains = true;
 
     private static String serverURL = null;
@@ -2769,19 +2768,16 @@ public class AuthClientUtils {
         return returnForcedAuth;
     }
     
-    /**
-     *  Sets the service URI
-     */    
-    public static void setServiceURI(String strServiceURI) {
-    	serviceURI =  strServiceURI;  	
-    }
-
     /** 
      * Returns the service URI
      * @return a String the Service URI
      */
-    public static String getServiceURI(){
-    	return serviceURI;
+    public static String getServiceURI() {
+        if (SystemProperties.isServerMode()) {
+            return SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+        } else {
+            return SystemProperties.get(com.sun.identity.shared.Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
+        }
     }
 
     /**

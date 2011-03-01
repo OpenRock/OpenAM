@@ -2371,11 +2371,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     ////////////////////////////////////////////////////////////////////////////
     
     static {
-        serviceUri = SystemProperties.get(
-       	           Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
         LOGINURL = serviceUri + "/UI/Login";
-        AuthClientUtils.setServiceURI(LOGINURL);
     }
-    
 }
 
