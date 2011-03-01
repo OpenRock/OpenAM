@@ -207,7 +207,7 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                                     List<String> headerValues = entry.getValue();
                                     if (headerValues != null) {
                                         for (String headerValue : headerValues) {
-                                            response.setHeader(headerName, headerValue);
+                                            response.addHeader(headerName, headerValue);
                                         }
                                     }
                                 }
