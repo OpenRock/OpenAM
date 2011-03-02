@@ -1,19 +1,19 @@
 <%--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
    compliance with the License.
-  
+
    You can obtain a copy of the License at
    https://opensso.dev.java.net/public/CDDLv1.0.html or
    opensso/legal/CDDLv1.0.txt
    See the License for the specific language governing
    permission and limitations under the License.
-  
+
    When distributing Covered Code, include this CDDL
    Header Notice in each file and include the License file
    at opensso/legal/CDDLv1.0.txt.
@@ -21,13 +21,13 @@
    with the fields enclosed by brackets [] replaced by
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
-  
+
    $Id: Debug.jsp,v 1.15 2009/01/28 05:35:06 ww203982 Exp $
-  
+
 --%>
 
 <%--
-   Portions Copyrighted 2010 ForgeRock AS
+   Portions Copyrighted 2010-2011 ForgeRock AS
 --%>
 
 <%@ page pageEncoding="UTF-8" %>
@@ -46,6 +46,7 @@
         java.text.MessageFormat,
         java.util.ArrayList,
         java.util.Enumeration,
+        java.util.Collections,
         java.util.HashMap,
         java.util.HashSet,
         java.util.Iterator,
@@ -59,15 +60,17 @@
 %>
 
 <% 
-    String category= request.getParameter("category");
-    String level= request.getParameter("level");
+    String category = request.getParameter("category");
+    String instance = request.getParameter("instance");
+    String level = request.getParameter("level");
     boolean performAction = Boolean.valueOf(request.getParameter("do")).
         booleanValue();
 
     ResourceBundle resourceBundle = ResourceBundle.getBundle("debug", request.getLocale());
     ResourceBundle rbFiles = ResourceBundle.getBundle("debugfiles");
     Map categories = new HashMap();
-    Set adminUserSet = new HashSet();
+    String adminUserDN = "";
+    List<String> instances = new ArrayList<String>();
     AMIdentity adminUserId = null;
 
     try {
@@ -78,7 +81,7 @@
         String adminUser = SystemProperties.get(
             "com.sun.identity.authentication.super.user");
         if (adminUser != null) {
-            adminUserSet.add(DNUtils.normalizeDN(adminUser));
+            adminUserDN = DNUtils.normalizeDN(adminUser);
             // This will give you the 'amAdmin' Identity
             adminUserId = new AMIdentity(ssoToken, adminUser,
                 IdType.USER, "/", null);
@@ -87,7 +90,7 @@
         // This will be your incoming user/token.
         AMIdentity user = new AMIdentity(ssoToken);
 
-        if ((!adminUserSet.contains(DNUtils.normalizeDN(
+        if ((!adminUserDN.equals(DNUtils.normalizeDN(
             ssoToken.getPrincipal().getName()))) &&
             (!user.equals(adminUserId))) {
 
@@ -95,6 +98,12 @@
             return;
         }
 
+        // Make a copy to prevent ConcurrentModificationException
+        List<Debug> temp = new ArrayList<Debug>(Debug.getInstances());
+        for (Debug debug : temp) {
+            instances.add(debug.getName());
+        }
+        Collections.sort(instances);
         for (Enumeration e = rbFiles.getKeys();
             e.hasMoreElements();
         ) {
@@ -143,8 +152,8 @@
 <td>
 
 <%
-if ((category == null) || (level == null) ||
-    (category.length() == 0) || (level.length() == 0)
+if ((instance == null || instance.length() == 0) && (category == null || category.length() == 0)
+    || level == null || level.length() == 0
 ) {
 %>
 <form name="frm" action="Debug.jsp" method="GET">
@@ -161,6 +170,47 @@ if ((category == null) || (level == null) ||
     for (Iterator i = categories.keySet().iterator(); i.hasNext(); ) {
         String key = (String)i.next();
         out.println("<option>" + key + "</option>");
+    }
+%>
+</select>
+</td>
+<td>&nbsp;&nbsp;</td>
+<td>
+<%
+    out.println(resourceBundle.getString("label-level"));
+%>
+:</td>
+<td>
+<select name="level">
+<%
+    out.println("<option value=\"1\">" +
+        resourceBundle.getString("label-level-error") + "</option>");
+    out.println("<option value=\"2\">" +
+        resourceBundle.getString("label-level-warning") + "</option>");
+    out.println("<option value=\"3\">" +
+        resourceBundle.getString("label-level-message") + "</option>");
+%>
+</select>
+</td>
+<td><input type="submit" value="Submit" class="Btn1" onclick="this.form.submit();" onmouseover="javascript: this.className='Btn1Hov'" onmouseout="javascript: this.className='Btn1'" onblur="javascript: javascript: this.className='Btn1'" onfocus="javascript: this.className='Btn1Hov'" /> 
+</td>
+</tr>
+</table>
+</form>
+
+<form name="frm" action="Debug.jsp" method="GET">
+<table>
+<tr>
+<td>
+<%
+    out.println(resourceBundle.getString("label-instance"));
+%>
+:</td>
+<td>
+<select name="instance">
+<%
+    for (String inst : instances) {
+        out.println("<option>" + inst + "</option>");
     }
 %>
 </select>
@@ -227,7 +277,11 @@ if ((category == null) || (level == null) ||
 
 <%
 } else {
-    out.println(resourceBundle.getString("label-category") + " = " + category);
+    if (category != null) {
+        out.println(resourceBundle.getString("label-category") + " = " + category);
+    } else {
+        out.println("Instance" + " = " + instance);
+    }
     out.println("<br />");
     String strLevel = "message";
     if (level.equals("1")) {
@@ -238,39 +292,49 @@ if ((category == null) || (level == null) ||
 
     out.println(resourceBundle.getString("label-level") + " = " + strLevel);
     out.println("<br />");
-    Object[] param = {strLevel};
-    out.println(MessageFormat.format(
-        resourceBundle.getString("message-setting-level-on-modules"), param));
-    out.println("<br />");
-
     int levelint = Integer.parseInt(level);
-    List values = (List)categories.get(category);
-    out.println("<ul>");
-    for (Iterator i = values.iterator(); i.hasNext(); ) {
-        String mname = (String)i.next();
-        out.println( "<li>" + mname + "</li>" );
+    if (category != null) {
+        Object[] param = {strLevel};
+        out.println(MessageFormat.format(
+            resourceBundle.getString("message-setting-level-on-modules"), param));
+        out.println("<br />");
+        List values = (List)categories.get(category);
+        out.println("<ul>");
+        for (Iterator i = values.iterator(); i.hasNext(); ) {
+            String mname = (String)i.next();
+            out.println( "<li>" + mname + "</li>" );
 
+            if (performAction) {
+                Debug debug = Debug.getInstance(mname); 
+                debug.setDebug(levelint);
+            }
+        }
+        out.println("</ul>");
+    } else {
+        Object[] param = {strLevel, instance};
+        out.println(MessageFormat.format(
+            resourceBundle.getString("message-setting-level-on-instance"), param));
         if (performAction) {
-            Debug debug = Debug.getInstance(mname); 
-            debug.setDebug(levelint);
+            Debug.getInstance(instance).setDebug(levelint);
         }
     }
-    out.println("</ul>");
 
     String backURL = "Debug.jsp";
 
     if (!performAction) {
-       String url = "?category=" + category + "&level=" +
-            levelint + "&do=true";
         out.println("<form name='frm' method='GET' action='Debug.jsp'>");
-        out.println("<input name='category' type='hidden' value='" + category + "' />");
+        if (category != null) {
+            out.println("<input name='category' type='hidden' value='" + category + "' />");
+        } else {
+            out.println("<input name='instance' type='hidden' value='" + instance + "' />");
+        } 
         out.println("<input name='level' type='hidden' value='" + levelint + "' />");
         out.println("<input name='do' type='hidden' value='true' />");
         out.println("<table border=0>");
         out.println("<tr><td>");
         out.println("<input type=\"button\" name=\"do\" value=\"" + resourceBundle.getString("button-confirm") + "\" class=\"Btn1\" onclick=\"this.form.submit();\" onmouseover=\"javascript: this.className='Btn1Hov'\" onmouseout=\"javascript: this.className='Btn1'\" onblur=\"javascript: javascript: this.className='Btn1'\" onfocus=\"javascript: this.className='Btn1Hov'\" /></form>");
         out.println("</td><td>");
-    out.println("<input type=\"button\" name=\"back\" value=\"" + resourceBundle.getString("button-back") + "\" class=\"Btn1\" onclick=\"this.form.elements['category'].value='';this.form.elements['level'].value='';this.form.elements['do'].value='';this.form.submit();\" onmouseover=\"javascript: this.className='Btn1Hov'\" onmouseout=\"javascript: this.className='Btn1'\" onblur=\"javascript: javascript: this.className='Btn1'\" onfocus=\"javascript: this.className='Btn1Hov'\" />");
+    out.println("<input type=\"button\" name=\"back\" value=\"" + resourceBundle.getString("button-back") + "\" class=\"Btn1\" onclick=\"var elements=this.form.elements;for (var i=0;i<elements.length;i++){if(elements[i].type && elements[i].type==='hidden'){elements[i].value=''}};this.form.submit();\" onmouseover=\"javascript: this.className='Btn1Hov'\" onmouseout=\"javascript: this.className='Btn1'\" onblur=\"javascript: this.className='Btn1'\" onfocus=\"javascript: this.className='Btn1Hov'\" />");
         out.println("</td></tr></table>");
         out.println("</form>");
 
