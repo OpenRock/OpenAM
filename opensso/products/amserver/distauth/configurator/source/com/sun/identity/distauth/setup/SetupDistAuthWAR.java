@@ -141,8 +141,6 @@ public class SetupDistAuthWAR {
         sbDistAuthConfig.append("#com.iplanet.am.lbcookie.name=");
         sbDistAuthConfig.append("amlbcookie");
         sbDistAuthConfig.append("\n");
-        sbDistAuthConfig.append("#com.iplanet.am.lbcookie.value=01");
-        sbDistAuthConfig.append("\n");
         sbDistAuthConfig.append("\n/*\n");
         sbDistAuthConfig.append(" * DistAuth cookie name\n ");
         sbDistAuthConfig.append(" */\n");
