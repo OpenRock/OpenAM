@@ -27,6 +27,9 @@
     $Id: amAuth.xml,v 1.16 2009/11/25 12:06:32 manish_rustagi Exp $
 
 -->
+<!--
+   "Portions Copyrighted 2011 [ForgeRock AS]"
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -64,6 +67,7 @@
                         <Value>com.sun.identity.authentication.modules.datastore.DataStore</Value>
                         <Value>com.sun.identity.authentication.modules.radius.RADIUS</Value>
                         <Value>com.sun.identity.authentication.modules.hotp.HOTP</Value>
+                        <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"

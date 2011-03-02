@@ -74,7 +74,7 @@
     <property name="amserver.src.dirs" refid="amserver.src.dirs" />
 
     <target name="build"
-        depends="preparebuild,sharedlib,init-enterprise,init-not-enterprise">
+        depends="preparebuild,sharedlib,init">
         <antcall target="idsvcs" />
 
         <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
@@ -135,7 +135,6 @@
 
         <antcall target="jaxrpc" />
         <antcall target="copy-res-files" />
-        <antcall target="postbuild" />
     </target>
 
     <target name="sharedlib">
@@ -172,8 +171,7 @@
 
         <copy todir="${amserver.built.res.dir}" filtering="true">
             <fileset dir="${amserver.config.res.dir}"
-                includes="*.properties"
-                excludes="${amserver.config.properties.exclude}" />
+                includes="*.properties" />
             <fileset dir="${amserver.console.res.dir}"    includes="*.properties" />
             <fileset dir="${amserver.xml.dir}"            includes="*.xml" />
             <fileset dir="${amserver.console.xml.dir}"    includes="*.xml" />
@@ -219,37 +217,13 @@
         </copy>
     </target>
 
-    <target name="postbuild" if="enterprise.authmodules.present">
-        <rename src="${amserver.built.res.dir}/serviceNames-enterprise.properties"
-            dest="${amserver.built.res.dir}/serviceNames.properties" />
-    </target>
-
-    <target name="init-enterprise" if="enterprise.authmodules.present">
+    <target name="init">
         <property name="amserver.build.exclude" value="${build.java.exclude}" />
-        <property name="amserver.config.properties.exclude" value="" />
         <property name="amserver.javadoc.excludes"
             value="${amserver.javadoc-excludes}" />
-        <property name="amserver.public.javadoc.excludes" value="" />
-        <property name="amserver.svc.xml.excludes"
-            value="${amserver-svc-xml-enterprise-excludes}" />
         <property name="war.lib" value="${external.lib},${internal.lib}" />
     </target>
 
-    <target name="init-not-enterprise" unless="enterprise.authmodules.present">
-        <property name="amserver.build.exclude"
-            value="${build.java.exclude},${build.java.not.enterprise.exclude}" />
-        <property name="amserver.config.properties.exclude"
-            value="serviceNames-enterprise.properties" />
-        <property name="amserver.javadoc.excludes"
-            value="${amserver.javadoc-not-enterprise-excludes},${amserver.javadoc-excludes}" />
-        <property name="amserver.public.javadoc.excludes"
-            value="${amserver.public.javadoc.not.enterprise.exclude}" />
-        <property name="amserver.svc.xml.excludes"
-            value="${amserver-svc-xml-not-enterprise-excludes}" />
-        <property name="war.lib" value="${external.lib}" />
-    </target>
-
-    
     <target name="idsvcs" unless="amserver.idsvcs.done">
         <copy file="${amserver.warbase.dir}/xml/IdentityServices.wsdl"
               tofile="IdentityServices.wsdl" />
@@ -309,8 +283,7 @@
                  maxmemory="512M" useexternalfile="yes">
             <classpath refid="build.class.path"/>
             <fileset dir="${amserver.src.dir}" defaultexcludes="yes"
-                includes="${amserver.public.javadoc-includes}"
-                excludes="${amserver.public.javadoc-excludes}" />
+                includes="${amserver.public.javadoc-includes}" />
             <doclet name="com.sun.identity.tools.javadocs.SupportedAPIDoclet"
                 path="${sharedlib.classes.dir}" />
             <tag name="supported.all.api" description="" />
@@ -367,20 +340,13 @@
     
     <target name="prep.xml">
         <copy todir="${amserver.built.war.dir}/xml/services">
-            <fileset dir="${amserver.services.xml.dir}" includes="*.xml"
-                excludes="${amserver.svc.xml.excludes}" />
+            <fileset dir="${amserver.services.xml.dir}" includes="*.xml" />
             <fileset dir="${amserver.xml.dir}" includes="AccessManagerCLI.xml" />
             <fileset dir="${amserver.productregistry.xml.dir}" includes="*.xml" />
         </copy>
         <copy todir="${amserver.built.war.dir}/xml">
             <fileset dir="${amserver.xml.dir}" includes="serverconfig.xml" />
         </copy>
-        <antcall target="post.prep.xml" />
-    </target>
-    
-    <target name="post.prep.xml" if="enterprise.authmodules.present">
-        <copy file="${amserver.services.xml.dir}/amAuth-Enterprise.xml"
-              tofile="${amserver.built.war.dir}/xml/services/amAuth.xml" />
     </target>
     
     <target name="sample-war" depends="war">

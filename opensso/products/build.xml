@@ -59,18 +59,6 @@
     <delete file="${products.basedir}/amserver/test/source/com/sun/identity/cli/stubs/MockCLI.java" />
     <delete file="${products.basedir}/amserver/source/com/sun/identity/cli/stubs/AccessManagerCLI.java" />
 
-    <target name="enterprise">
-        <property name="build.enterprise" value="true"/>
-        <property name="enterprise.authmodules.present" value="true" />
-        <antcall target="nightly" />
-    </target>
-
-    <target name="express">
-        <property name="build.express" value="true"/>
-        <property name="enterprise.authmodules.present" value="true" />
-        <antcall target="nightly" />
-    </target>
-
     <target name="nightly">
         <property name="build.nightly" value="true"/>
         <delete dir="${prd.nightly.dist.dir}" />
@@ -269,13 +257,6 @@
         <tstamp>
             <format property="time.stamp" pattern="yyyyMMdd"/>
         </tstamp> 
-        <condition property="zipname.set" value="enterprise_${time.stamp}" >
-            <isset property="build.enterprise"/>
-        </condition>
-        <condition property="zipname.set" value="express_${time.stamp}" >
-            <isset property="build.express"/>
-        </condition>           
-        <!-- note that if version.set is set above, the following line is ignored -->
         <property name="zipname.set" value="nightly_${time.stamp}"/>            
     </target>
     
@@ -283,13 +264,6 @@
         <tstamp>
             <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm"/>
         </tstamp>       
-        <condition property="version.set" value="${opensso.enterprise} Build ${build.number.set}" >
-            <isset property="build.enterprise"/>
-        </condition>
-        <condition property="version.set" value="${opensso.express} Build ${build.number.set}" >
-            <isset property="build.express"/>
-        </condition>           
-        <!-- note that if version.set is set above, the following line is ignored -->
         <property name="version.set" value=""/>    
             
         <filter token="DATESTAMP" value="${war.time.stamp}"/>        
