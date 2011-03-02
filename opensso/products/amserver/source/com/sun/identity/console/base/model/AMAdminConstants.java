@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.console.base.model;
 
 /* - NEED NOT LOG - */
@@ -389,4 +392,11 @@ public interface AMAdminConstants {
      * Administration Console service.
      */
     String CONSOLE_UM_ENABLED_ATTR = "iplanet-am-admin-console-um-enabled";
+
+    /**
+     * Agent Configuration property which tells where the agent configuration
+     * is being stored.
+     */
+    String AGENT_REPOSITORY_LOCATION_ATTR =
+            "com.sun.identity.agents.config.repository.location";
 }

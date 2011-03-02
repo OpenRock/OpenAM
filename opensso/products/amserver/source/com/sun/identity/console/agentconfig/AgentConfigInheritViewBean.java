@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.console.agentconfig;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -339,9 +342,12 @@ public class AgentConfigInheritViewBean
         Collection propertyNames
     ) {
         propertyNames.remove(AMAdminConstants.ATTR_USER_PASSWORD);
+        // Fix for OPENAM-440
+        propertyNames.remove(AMAdminConstants.AGENT_REPOSITORY_LOCATION_ATTR);
         for (Iterator i = nameToSchema.keySet().iterator(); i.hasNext(); ) {
             String name = (String)i.next();
-            if (name.equalsIgnoreCase(AMAdminConstants.ATTR_USER_PASSWORD)) {
+            if (name.equalsIgnoreCase(AMAdminConstants.ATTR_USER_PASSWORD)
+                    || name.equalsIgnoreCase(AMAdminConstants.AGENT_REPOSITORY_LOCATION_ATTR)) {
                 i.remove();
                 break;
             }
