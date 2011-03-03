@@ -74,7 +74,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
     static {
         if (hcPath == null) {
             String deployuri = SystemProperties.get
-                (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/opensso");
+                (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
             hcPath = deployuri + "/namingservice";
             if (!hcPath.startsWith("/")) {
                 hcPath += "/" + hcPath;

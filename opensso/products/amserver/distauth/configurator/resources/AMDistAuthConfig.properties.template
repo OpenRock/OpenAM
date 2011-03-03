@@ -138,6 +138,7 @@ com.sun.identity.sm.cacheTime=1
 com.iplanet.am.server.protocol=@SERVER_PROTOCOL@
 com.iplanet.am.server.host=@SERVER_HOST@
 com.iplanet.am.server.port=@SERVER_PORT@
+com.iplanet.am.services.deploymentDescriptor=@DEPLOY_URI@
 
 com.iplanet.am.cookie.name=@AM_COOKIE_NAME@
 
