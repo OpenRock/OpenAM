@@ -1067,7 +1067,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
             const Properties& propertiesRef =
                 *reinterpret_cast<Properties *>(this->properties);
 
-            if (this->setUserProfileAttrsMode == SET_ATTRS_AS_COOKIE) {
+            if (this->setUserProfileAttrsMode == SET_ATTRS_AS_COOKIE || this->setUserProfileAttrsMode == SET_ATTRS_AS_HEADER) {
                 Properties attributeMap;
                 const std::string &headerAttrs =
                       propertiesRef.get(AM_POLICY_PROFILE_ATTRS_MAP, "");
@@ -1082,7 +1082,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 }
             }
 
-            if (this->setUserSessionAttrsMode == SET_ATTRS_AS_COOKIE) {
+            if (this->setUserSessionAttrsMode == SET_ATTRS_AS_COOKIE || this->setUserSessionAttrsMode == SET_ATTRS_AS_HEADER) {
                   // Repeat the same for the session attribute map
                   Properties sessionAttributeMap;
                   const std::string &sessionAttrs =
@@ -1101,7 +1101,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                       this->attrList.push_back(attr);
                   }
               }
-             if (this->setUserResponseAttrsMode == SET_ATTRS_AS_COOKIE) {
+             if (this->setUserResponseAttrsMode == SET_ATTRS_AS_COOKIE || this->setUserResponseAttrsMode == SET_ATTRS_AS_HEADER) {
                   // Repeat the same for the response attribute map
                   Properties responseAttributeMap;
                   const std::string &responseAttrs =
