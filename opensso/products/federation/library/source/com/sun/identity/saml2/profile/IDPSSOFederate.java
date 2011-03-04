@@ -484,7 +484,7 @@ public class IDPSSOFederate {
                             authnReq, request, returnedBinding);
                         String acsBinding = returnedBinding.toString();
                         IDPSSOUtil.sendResponse(request, response, acsBinding,
-                            spEntityID, idpEntityID, idpMetaAlias, realm, null,
+                            spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
                             acsURL, res, session);
                     } catch (SAML2Exception sme) {
                         SAML2Utils.debug.error(classMethod, sme);
@@ -592,7 +592,7 @@ public class IDPSSOFederate {
                                         authnReq, request, returnedBinding);
                                 String acsBinding = returnedBinding.toString();
                                 IDPSSOUtil.sendResponse(request, response, acsBinding,
-                                        spEntityID, idpEntityID, idpMetaAlias, realm, null,
+                                        spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
                                         acsURL, res, session);
                             } catch (SAML2Exception sme) {
                                 SAML2Utils.debug.error(classMethod, sme);
@@ -752,7 +752,7 @@ public class IDPSSOFederate {
                                             authnReq, request, returnedBinding);
                                     String acsBinding = returnedBinding.toString();
                                     IDPSSOUtil.sendResponse(request, response, acsBinding,
-                                            spEntityID, idpEntityID, idpMetaAlias, realm, null,
+                                            spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
                                             acsURL, res, session);
                                 } catch (SAML2Exception sme) {
                                     SAML2Utils.debug.error(classMethod, sme);
