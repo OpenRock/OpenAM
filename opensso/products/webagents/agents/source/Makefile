@@ -52,7 +52,7 @@ BUILD_AGENT := apache sjsws apache22 proxy40
 endif
 endif
 ifeq ($(OS_ARCH), WINNT)
-BUILD_AGENT += iis6 iis7
+BUILD_AGENT += iis6 iis7 domino
 endif
 endif
 
