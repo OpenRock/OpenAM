@@ -26,6 +26,8 @@
 
 -->
 
+<!-- Portions Copyrighted 2010 ForgeRock AS -->
+
 <project name="open-source-web-agents-install-apache22" default="build">
     <description>Open Web Single Sign-On Apache agent install</description>
 

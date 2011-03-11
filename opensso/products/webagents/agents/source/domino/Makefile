@@ -98,6 +98,8 @@ all: depends export_libs
 
 $(EXPORTED_LIBS): $(OBJS)  $(LIB_MAPFILE)
 	$(MAKE_SHARED_LIB)
+	$(INCLUDE_MANIFEST)
+	$(INCLUDE_MANIFEST_LOCAL)
 
 endif 
 
