@@ -28,6 +28,9 @@
 # Makefile file for building the Agents tree.
 #
 #
+
+# Portions Copyrighted 2010-2011 ForgeRock AS
+
 USERX_ROOT := ../..
 
 include $(USERX_ROOT)/arch/components.mk
