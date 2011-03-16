@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
+
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -870,7 +871,8 @@ public class SessionService {
         return localURL != null
                 && localURL.getProtocol().equalsIgnoreCase(url.getProtocol())
                 && localURL.getHost().equalsIgnoreCase(url.getHost())
-                && localURL.getPort() == url.getPort();
+                && localURL.getPort() == url.getPort()
+		&& localURL.getPath().equalsIgnoreCase(url.getPath());
     }
 
     /**
