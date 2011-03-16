@@ -26,6 +26,8 @@
 #
 #
 
+# Portions Copyrighted 2011 ForgeRock AS
+
 #------------------------------------------------------------------------------
 # Property File for:
 # @PRODUCT_AGENT_NAME@ for:
@@ -302,7 +304,7 @@ com.iplanet.am.naming.url=@NAMING_SERVICE_URL@
 #
 # Notification URL as registered by the Agent to receive session notifications.
 # Not hot-swappable.
-com.iplanet.am.notification.url=@NOTIFICATION_URI@
+com.sun.identity.client.notification.url=@NOTIFICATION_URI@
 
 #
 # Client IP check for session validation
