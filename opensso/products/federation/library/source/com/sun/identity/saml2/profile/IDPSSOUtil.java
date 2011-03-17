@@ -575,9 +575,6 @@ public class IDPSSOUtil {
             boolean signResponse = 
                 SAML2Utils.wantPOSTResponseSigned(realm,
                     spEntityID,SAML2Constants.SP_ROLE) ;
-            if (signResponse) {
-                signAssertion = false;
-            }
             // signing assertion is a must for POST profile if
             // response signing is not enabled.
             // encryption is optional based on SP config settings.
