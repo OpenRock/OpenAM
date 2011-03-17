@@ -872,7 +872,7 @@ public class SessionService {
                 && localURL.getProtocol().equalsIgnoreCase(url.getProtocol())
                 && localURL.getHost().equalsIgnoreCase(url.getHost())
                 && localURL.getPort() == url.getPort()
-		&& localURL.getPath().equalsIgnoreCase(url.getPath());
+		&& url.getPath().startsWith(localURL.getPath());
     }
 
     /**
