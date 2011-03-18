@@ -112,6 +112,7 @@ import com.sun.identity.sm.SMSEntry;
 
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
+import java.util.Arrays;
 
 public class AuthClientUtils {
 
@@ -2271,22 +2272,35 @@ public class AuthClientUtils {
                 Enumeration value = (Enumeration)request.getHeaders(name);
                 utilDebug.message("Header name = " + name + 
                                   " Value = " + value);
-            }// w
+            }
         }
 
         // Open URL connection
         HttpURLConnection conn = null;
         OutputStream  out = null;
         String strCookies = null;
+        URL authURL = null;
         try {
-            URL authURL = new URL(cookieURL);
+            String queryString = request.getQueryString();
+
+            if (queryString != null) {
+                authURL = new URL(cookieURL + "?" + queryString);
+            } else {
+                authURL = new URL(cookieURL);
+            }
+
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("Connecting to : " + authURL);
             }
+
             conn = HttpURLConnectionManager.getConnection(authURL);
-            conn.setUseCaches( useCache );
+            conn.setUseCaches(useCache);
             conn.setFollowRedirects(false);
             conn.setInstanceFollowRedirects(false);
+            conn.setRequestProperty(ISAuthConstants.ACCEPT_LANG_HEADER, request.getHeader(ISAuthConstants.ACCEPT_LANG_HEADER));
+            // We should preserve the original host, so the target server will also see the accessed URL
+            // If we don't do this the server might going to deny the request because of invalid domain access.
+            conn.setRequestProperty("Host", request.getHeader("host"));
 
             // replay cookies
             strCookies = getCookiesString(request);
@@ -2296,27 +2310,56 @@ public class AuthClientUtils {
                 }
                 conn.setRequestProperty("Cookie", strCookies);
             }
-            conn.setRequestProperty(
-                "Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty(
-                "Content-Length", request.getHeader("content-length"));
-            conn.setRequestProperty("Host", request.getHeader("host"));
-            conn.setRequestProperty(ISAuthConstants.ACCEPT_LANG_HEADER, request.getHeader(ISAuthConstants.ACCEPT_LANG_HEADER));
 
             // Sending Output to Original Auth server...
             utilDebug.message("SENDING DATA ... ");
-            String in_requestData = getFormData(request);
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("Request data : " + in_requestData);
-            }
-            if (in_requestData.trim().length() > 0) {
-                conn.setDoOutput(true);
-                conn.setRequestMethod("POST");
-                out = conn.getOutputStream();
-                PrintWriter pw = new PrintWriter(out);
-                pw.print(in_requestData); // here we "send" the request body
-                pw.flush();
-                pw.close();
+
+            if (request.getMethod().equals("GET")) {
+                conn.connect();
+            } else {
+                //First we should find out what GET parameters do we have.
+                Map<String, Set<String>> queryParams = new HashMap<String, Set<String>>();
+                for (String param : queryString.split("&")) {
+                    int idx = param.indexOf('=');
+                    if (idx != -1) {
+                        String paramName = param.substring(0, idx);
+                        String paramValue = param.substring(idx + 1);
+                        Set<String> values = queryParams.get(paramName);
+                        if (values == null) {
+                            values = new HashSet<String>();
+                            queryParams.put(paramName, values);
+                        }
+                        values.add(paramValue);
+                    }
+                }
+
+                conn.setRequestProperty(
+                    "Content-Type", "application/x-www-form-urlencoded");
+                // merged parameter list containing both GET and POST parameters
+                Map<String, String[]> params = request.getParameterMap();
+                Map<String, Set<String>> postParams = new HashMap<String, Set<String>>();
+
+                for (Map.Entry<String, String[]> entry : params.entrySet()) {
+                    if (queryParams.containsKey(entry.getKey())) {
+                        // TODO: do we need to care about params that can be both in GET and POST?
+                    } else {
+                        postParams.put(entry.getKey(), new HashSet<String>(Arrays.asList(entry.getValue())));
+                    }
+                }
+
+                String postData = getFormData(postParams);
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("Request data : " + postData);
+                }
+                if (postData.trim().length() > 0) {
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("POST");
+                    out = conn.getOutputStream();
+                    PrintWriter pw = new PrintWriter(out);
+                    pw.print(postData); // here we "send" the request body
+                    pw.flush();
+                    pw.close();
+                }
             }
 
             // Receiving input from Original Auth server...
@@ -2325,8 +2368,6 @@ public class AuthClientUtils {
                 utilDebug.message("Response Code: " + conn.getResponseCode());
                 utilDebug.message("Response Message: " 
                                   + conn.getResponseMessage());
-                utilDebug.message("Follow redirect : " 
-                                  + conn.getFollowRedirects());
             }
 
             // Check response code
@@ -2368,9 +2409,6 @@ public class AuthClientUtils {
             Map headers = conn.getHeaderFields();
             processCookies(headers, request, response);
             origRequestData.put("HTTP_HEADERS", headers);
-
-            out.flush();
-
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("send exception : " , e);
@@ -2392,21 +2430,22 @@ public class AuthClientUtils {
     }
 
     // Gets the request form data in the form of string
-    private static String getFormData(HttpServletRequest request) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("");
-        Enumeration requestEnum = request.getParameterNames();
-        while (requestEnum.hasMoreElements()) {
-            String name = (String) requestEnum.nextElement();
-            String value = request.getParameter(name);
-            buffer.append(URLEncDec.encode(name));
-            buffer.append('=');
-            buffer.append(URLEncDec.encode(value));
-            if (requestEnum.hasMoreElements()) {
-                buffer.append('&');
+    private static String getFormData(Map<String, Set<String>> params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        for (Map.Entry<String, Set<String>> entry : params.entrySet()) {
+            String key = entry.getKey();
+            for (String value : entry.getValue()) {
+                sb.append(URLEncDec.encode(key));
+                sb.append('=');
+                sb.append(URLEncDec.encode(value));
+                sb.append('&');
             }
         }
-        return(buffer.toString());
+
+        sb.deleteCharAt(sb.length() -1);
+
+        return(sb.toString());
     }
 
     // parses the cookies from the response header and adds them in
