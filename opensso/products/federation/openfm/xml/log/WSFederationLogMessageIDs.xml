@@ -659,7 +659,6 @@
         loglevel="LL_FINE"
         description="Obtained all hosted entities.">
         <datainfo>
-            <item>Error message</item>
             <item>Realm or organization name</item>
         </datainfo>
         <triggers>
