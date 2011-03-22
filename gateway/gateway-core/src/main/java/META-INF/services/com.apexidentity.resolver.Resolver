@@ -1,0 +1,8 @@
+com.apexidentity.resolver.EnumerableMapResolver
+com.apexidentity.resolver.ListResolver
+com.apexidentity.resolver.MapResolver
+com.apexidentity.resolver.PrincipalResolver
+com.apexidentity.resolver.ReadableListResolver
+com.apexidentity.resolver.ReadableMapResolver
+com.apexidentity.resolver.WritableMapResolver
+com.apexidentity.resolver.URIResolver
