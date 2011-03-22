@@ -816,7 +816,7 @@ public class CDCServlet extends HttpServlet {
         
         String[] params = {FSUtils.bundle.getString("assertionCreated") + ":"
             + assertion.toString()};
-        LogUtil.access(Level.INFO, "FSAssertionManager", params);
+        LogUtil.access(Level.INFO, "CREATE_ASSERTION", params);
         
         if (debug.messageEnabled()) {
             debug.message("CDCServlet.createAssertion:"
