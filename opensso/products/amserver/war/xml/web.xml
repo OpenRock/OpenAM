@@ -257,6 +257,10 @@
 
     <!-- servlet mapping -->
 
+    <mime-mapping>
+        <extension>ico</extension>
+        <mime-type>image/x-icon</mime-type>
+    </mime-mapping>
     <!-- This tag is for the welcome files such as index.html -->
     <welcome-file-list>
         <welcome-file>
