@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
  * Entitlement related exception.
  */
 public class RestException extends Exception {
-    private static final String RES_BUNDLE_NAME = "RESTException";
+    private static final String RES_BUNDLE_NAME = "RestException";
 
     private int errorCode;
     private String message;
