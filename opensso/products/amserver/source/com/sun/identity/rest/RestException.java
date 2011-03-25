@@ -25,6 +25,9 @@
  * $Id: RestException.java,v 1.1 2009/11/12 18:37:35 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.rest;
 
 import java.text.MessageFormat;
