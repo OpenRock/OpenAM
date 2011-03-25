@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.policy;
 
@@ -784,6 +784,8 @@ public final class PolicyManager {
                         rim.replacePolicyInResourceTree(svtm, token, oldPolicy,
                             policy);
                     }
+
+                    policyCache.sendPolicyChangeNotification(oldPolicy, policy, ServiceListener.MODIFIED);
                 }
             }
         } catch (EntitlementException e) {
