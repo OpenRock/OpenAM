@@ -26,6 +26,12 @@
  *
  */
 
+
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
+
+
 package com.sun.identity.security.cert;
 
 import java.lang.reflect.Method;
@@ -98,7 +104,7 @@ public class AMCertPath {
     /**
      * It does cert path validation together with CRL check and ocsp checking 
      * if they are properly configured.
-     * @param certs
+     * @param X509Certificate[] certs
      **/
     public boolean verify(X509Certificate[] certs, boolean crlEnabled,
                           boolean ocspEnabled) {
@@ -113,9 +119,9 @@ public class AMCertPath {
             Class trustMgrClass = Class.forName(
                   "com.sun.identity.security.keystore.AMX509TrustManager");
             Object trustMgr = (Object) trustMgrClass.newInstance();
-            Method method = trustMgrClass.getMethod("getKeyStore", (Class)null);
-            KeyStore keystore = (KeyStore) method.invoke(trustMgr, (Object)null);
-            PKIXParameters pkixparams= new PKIXParameters(keystore);
+            Method method = trustMgrClass.getMethod("getKeyStore", (Class[])null);
+            KeyStore keystore = (KeyStore) method.invoke(trustMgr, (Object[])null);
+            PKIXParameters pkixparams= new PKIXParameters(keystore);           
             if (debug.messageEnabled()) {
                 debug.message("AMCertPath.verify: crlEnabled ---> " + crlEnabled);
                 debug.message("AMCertPath.verify: ocspEnabled ---> " + ocspEnabled);
@@ -126,7 +132,16 @@ public class AMCertPath {
                 OCSPCheck = true;
             }
 
-            pkixparams.setRevocationEnabled(crlEnabled);
+            // If setRevocationEnabled is not set to true, the
+            // OCSP validation is not performed by JCE
+            if (ocspEnabled) {
+                pkixparams.setRevocationEnabled(true);
+                debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled " +
+                        "set to TRUE");
+            } else {
+                pkixparams.setRevocationEnabled(crlEnabled);
+            }
+
             if (store != null) {
             	pkixparams.addCertStore(store);
             }
@@ -135,7 +150,7 @@ public class AMCertPath {
             CertPathValidatorResult cpvResult= cpv.validate(cp, pkixparams);
 
             if (debug.messageEnabled()) {
-                debug.message("AMCertPath.verify: PASS" + cpvResult.toString());
+                debug.message("AMCertPath.verify: PASS " + cpvResult.toString());
             }
         } catch (java.security.cert.CertPathValidatorException e) {
             debug.error("AMCertPath.verify: FAILED - " + e.getMessage());
