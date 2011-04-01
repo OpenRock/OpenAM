@@ -26,15 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.cli;
 
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.security.DecodeAction;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 
@@ -77,6 +82,11 @@ public abstract class AuthenticatedCommand extends CLICommandBase {
             AccessManagerConstants.ARGUMENT_PASSWORD_FILE);
         String password = CLIUtil.getFileContent(getCommandManager(),
             fileName, true);
+        String decodedPwd = (String) AccessController.doPrivileged(
+                new DecodeAction(password));
+        if (decodedPwd != null) {
+            password = decodedPwd;
+        }
         validatePwdFilePermissions(fileName);
         return password;
     }
