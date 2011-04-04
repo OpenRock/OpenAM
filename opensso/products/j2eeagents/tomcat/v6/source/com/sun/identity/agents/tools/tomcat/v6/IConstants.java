@@ -26,9 +26,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.agents.tools.tomcat.v6;
 
 public interface IConstants {
@@ -78,6 +77,8 @@ public interface IConstants {
     public static final String ATTR_NAME_CLASSNAME = "className";
     public static final String ATTR_VALUE_SERVER_LIFECYCLE_CLASSNAME =
     	"org.apache.catalina.mbeans.ServerLifecycleListener";
+    public static final String ATTR_VALUE_LIFECYCLE_CLASSNAME =
+            "org.forgerock.agents.tomcat.v6.TomcatLifeCycleListener";
     public static final String ATTR_NAME_DESCRIPTORS = "descriptors";
     public static final String ATTR_VAL_AGENT_MBEAN_DESCRIPTOR =
     	"/com/sun/identity/agents/tomcat/v6/mbean-descriptor.xml";

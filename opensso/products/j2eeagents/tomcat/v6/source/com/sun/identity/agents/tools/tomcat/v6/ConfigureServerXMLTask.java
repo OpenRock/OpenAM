@@ -25,6 +25,9 @@
  * $Id: ConfigureServerXMLTask.java,v 1.2 2008/11/28 12:36:21 saueree Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.tools.tomcat.v6;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
@@ -187,6 +190,10 @@ public class ConfigureServerXMLTask extends ServerXMLBase implements ITask {
                         "element found! " + "Mbean descriptor not added");
                 }
             }
+
+            XMLElement lifeCycleElement = xmlDoc.newElement(ELEMENT_LISTENER);
+            lifeCycleElement.updateAttribute(ATTR_NAME_CLASSNAME, ATTR_VALUE_LIFECYCLE_CLASSNAME);
+            xmlDoc.getRootElement().addChildElementAt(lifeCycleElement, 0);
         } catch (Exception ex) {
             Debug.log(
                 "ConfigureServerXMLTask.configureServerLifecycleListener(): "

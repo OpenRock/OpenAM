@@ -25,13 +25,10 @@
  * $Id: ServiceResolver.java,v 1.7 2009/05/26 22:47:57 leiming Exp $
  *
  */
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-/**
- * Portions Copyrighted 2011 ForgeRock AS
- */
 
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
 package com.sun.identity.agents.arch;
 
 import java.util.ArrayList;
@@ -549,7 +546,12 @@ public abstract class ServiceResolver {
     protected boolean isEJBContextAvailable() {
         return _ejbContextAvailable;
     }
-    
+
+    public boolean isLifeCycleMechanismAvailable() {
+        //by default we return with false, because most of the agents does not
+        //support this mechanism
+        return false;
+    }
     
     private static boolean _ejbContextAvailable = false;
     

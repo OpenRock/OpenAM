@@ -25,6 +25,9 @@
  * $Id: ServerXMLBase.java,v 1.2 2008/11/28 12:36:22 saueree Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.tools.tomcat.v6;
 
 import com.sun.identity.install.tools.configurator.IStateAccess;
@@ -77,18 +80,17 @@ public class ServerXMLBase implements IConstants, IConfigKeys {
         try {
             String lifeCycleElemExists = (String) stateAccess.get(
                     KEY_SERVER_LIFECYCLE_ELEM_EXISTS);
+            ArrayList<XMLElement> listenerElements = xmlDoc.getRootElement().getNamedChildElements(
+                    ELEMENT_LISTENER);
 
             if ((lifeCycleElemExists != null)
                     && (lifeCycleElemExists.length() > 0)) {
-                ArrayList listenerElements = xmlDoc.getRootElement()
-                                                   .getNamedChildElements(
-                        ELEMENT_LISTENER);
 
                 String classNameVal = null;
-                Iterator listenerIterator = listenerElements.iterator();
+                Iterator<XMLElement> listenerIterator = listenerElements.iterator();
 
                 while (listenerIterator.hasNext()) {
-                    listener = (XMLElement) listenerIterator.next();
+                    listener = listenerIterator.next();
                     classNameVal = listener.getAttributeValue(
                             ATTR_NAME_CLASSNAME);
 
@@ -124,6 +126,16 @@ public class ServerXMLBase implements IConstants, IConfigKeys {
                         }
                     } else {
                         listener.delete();
+                    }
+                }
+            }
+            for (XMLElement elem : listenerElements) {
+                String className = elem.getAttributeValue(ATTR_NAME_CLASSNAME);
+
+                if (className != null) {
+                    if (className.equals(ATTR_VALUE_LIFECYCLE_CLASSNAME)) {
+                        elem.delete();
+                        break;
                     }
                 }
             }
