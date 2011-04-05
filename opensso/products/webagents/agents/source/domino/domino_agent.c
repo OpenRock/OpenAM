@@ -1394,7 +1394,7 @@ set_all_request_headers(void **args) {
     return sts;
 }
 
-am_status_t validate_domino_sso(char *ssoCfgName, char *ltpaTokenValue,
+am_status_t validate_domino_sso(char *ssoOrgName, char *ssoCfgName, char *ltpaTokenValue,
                                 char *fullName)
 {
     char *thisfunc="validate_domino_sso";
@@ -1404,7 +1404,7 @@ am_status_t validate_domino_sso(char *ssoCfgName, char *ltpaTokenValue,
     TIMEDATE retExpiration;
     STATUS error = NOERROR;
 
-    error = SECTokenValidate(NULL, NULL, ssoCfgName, ltpaTokenValue,
+    error = SECTokenValidate(NULL, ssoOrgName, ssoCfgName, ltpaTokenValue,
                       (char *)&user, &retCreation, &retExpiration,
                       (DWORD)0, (void *)NULL);
     if(error != NOERROR) {
@@ -1798,7 +1798,7 @@ check_domino_access(void  **args, const char *userName, char **fullName) {
             } else {
                 am_web_log_max_debug("%s: Found LTPA Token:%s",
                                       thisfunc, ltpaTokenValue);
-                lclStatus = validate_domino_sso((char *)ssoConfigName, ltpaTokenValue,
+                lclStatus = validate_domino_sso((char *)ssoOrgName, (char *)ssoConfigName, ltpaTokenValue,
                                                 *fullName);
                 if(lclStatus == AM_INVALID_SESSION) {
                     am_web_log_debug("%s: Outdated LTPA Token:%s.",
