@@ -339,6 +339,30 @@ REQUEST_NOTIFICATION_STATUS send_post_data(IHttpContext* pHttpContext, char *pag
 	return retStatus;
 }
 
+static void send_ok(IHttpContext* pHttpContext) 
+{
+	am_web_log_debug("send_ok(): sending http response ok");
+       HRESULT hr;
+	IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
+	pHttpResponse->Clear();
+       PCSTR pszBuffer;
+	pszBuffer = "200 Status OK";
+	hr = pHttpResponse->SetStatus(200,"Status OK",0, S_OK);
+	hr = pHttpResponse->SetHeader("Content-Type", "text/plain", (USHORT)strlen("text/plain"), TRUE);
+	hr = pHttpResponse->SetHeader("Content-Length", "13", (USHORT)strlen("13"),TRUE);
+	if (FAILED(hr)) {
+		am_web_log_error("send_ok(): SetHeader failed.");
+	}
+       HTTP_DATA_CHUNK dataChunk;
+	dataChunk.DataChunkType = HttpDataChunkFromMemory;
+	DWORD cbSent;
+	dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
+	dataChunk.FromMemory.BufferLength = (USHORT) strlen(pszBuffer);
+	hr = pHttpResponse->WriteEntityChunks(&dataChunk,1,FALSE,TRUE,&cbSent);
+	if (FAILED(hr)) {
+		am_web_log_error("send_ok(): WriteEntityChunks failed.");
+	}
+}
 
 /*
 *This function gets invoked at every request by OnBeginRequest.
@@ -434,6 +458,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 		GetEntity(pHttpContext, data);
 		am_web_handle_notification(data.c_str(), data.size(), agent_config);
 		OphResourcesFree(pOphResources);
+		send_ok(pHttpContext);
 		retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
 		am_web_delete_agent_configuration(agent_config);
 		return retStatus;
