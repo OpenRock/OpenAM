@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 package com.iplanet.dpro.session;
 
@@ -1639,9 +1639,17 @@ public class Session extends GeneralTaskRunnable {
                     if (sessionDebug.messageEnabled()) {
                         sessionDebug.message("Session."
                             + "processSessionResponseException: creating New AppToken"
-                            + "TokenID = " + newAppSSOToken);
+                            + " TokenID = " + newAppSSOToken);
                     }
                     createContext(newAppSSOToken);
+                } else {
+                    if (sessionDebug.messageEnabled()) {
+                        sessionDebug.message("Session."
+                            + "processSessionResponseException: AppToken invalid in" +
+                              " server mode; throwing exception");
+                    }
+                    RestrictedTokenContext.clear();
+                    throw new SessionException(sres.getException());
                 }
             } else {
                 throw new SessionException(sres.getException());
