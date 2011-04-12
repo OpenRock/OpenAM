@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.sm.ldap;
 
 import com.iplanet.am.util.SystemProperties;
@@ -227,8 +230,7 @@ public class LDAPEventManager implements IDSEventListener {
      * @see com.iplanet.services.ldap.event.IDSEventListener#getFilter()
      */
     public String getFilter() {
-        return ("(|(objectclass="
-            + OC_SERVICE + ")(objectclass=" + OC_SERVICE_COMP + "))");
+        return SEARCH_FILTER;
     }
 
     /*
@@ -266,6 +268,9 @@ public class LDAPEventManager implements IDSEventListener {
 
     protected static final String OC_SERVICE_COMP = "sunServiceComponent";
 
+    protected static final String OC_SERVICE_REALM = "sunRealmService";
+
     protected static final String SEARCH_FILTER = "(|(objectclass="
-            + OC_SERVICE + ")(objectclass=" + OC_SERVICE_COMP + "))";
+            + OC_SERVICE + ")(objectclass=" + OC_SERVICE_COMP
+            + ")(objectclass=" + OC_SERVICE_REALM + "))";
 }
