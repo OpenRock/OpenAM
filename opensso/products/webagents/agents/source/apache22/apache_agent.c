@@ -22,11 +22,15 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2011 TOOLS.LV SIA
  *
+ * $Id: apache_agent.c,v 1.1 2011/04/06 13:13:11 mareks Exp $
  */
 #include <limits.h>
 #include <signal.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #if defined(LINUX)
 #include <dlfcn.h>
@@ -38,75 +42,211 @@
 #include <http_request.h>
 #include <http_main.h>
 #include <http_log.h>
-
-#if defined(WINNT)
-#include <windows.h>
-#include <winbase.h>
-#endif
-typedef void (*sighandler_t)(int);
-
 #include <apr.h>
 #include <apr_strings.h>
+#include <apr_general.h>
+#include <apr_shm.h>
+#include <apr_rmm.h>
+#include <apr_global_mutex.h>
+#include <apr_tables.h>
+#ifdef _MSC_VER
+#include <process.h>
+#include <windows.h>
+#include <winbase.h>
+#else
+#include <unistd.h>
+#endif
 
 #include "am_web.h"
 
-#define  DSAME   "DSAME"
-#define  OpenSSO   "OpenSSO"								
+#define DSAME                   "DSAME"
+#define OpenSSO                 "OpenSSO"
 
+module AP_MODULE_DECLARE_DATA dsame_module;
+
+static apr_status_t pre_cleanup_dsame(void *data);
+static apr_status_t cleanup_dsame(void *data);
+
+typedef void (*sighandler_t)(int);
 boolean_t agentInitialized = B_FALSE;
+/* This is used to hold SIGTERM while agent is cleaning up
+ * and released when done.
+ */
+static int sigterm_delivered = 0;
+/* Notification listener thread sleep interval, in sec.
+ * Values equal to 0 will shut down listener thread.
+ */
+static int am_watchdog_interval = 0;
 
 /* Mutex variable */
 static apr_thread_mutex_t *init_mutex = NULL;
+/* Notification listener thread handle */
+static apr_thread_t *notification_listener_t = NULL;
+
+typedef struct am_notification_list_item* am_notification_list_ptr;
+
+typedef struct am_notification_list_item {
+    pid_t pid;
+    int read; /*0 - value is unread by pid, 1 - read*/
+    char *value;
+    am_notification_list_ptr next;
+} am_notification_list_item_t;
 
 typedef struct {
     char *properties_file;
     char *bootstrap_file;
-} agent_config_rec_t;
+    char *notification_lockfile;
+    int notification_shm_size;
+    int max_pid_count;
+} agent_server_config;
 
-module AP_MODULE_DECLARE_DATA dsame_module;
+static struct notification_hash_table {
+    am_notification_list_item_t **table;
+    unsigned int tbl_len;
+    unsigned int num_entries;
+} *notification_list;
 
-static const char *set_properties_file(
-        cmd_parms *, agent_config_rec_t *, const char *);
 
-static const char *set_bootstrap_file(
-        cmd_parms *, agent_config_rec_t *, const char *);
+static apr_shm_t *notification_shm = NULL; /* the APR shared segment object */
+static apr_rmm_t *notification_rmm = NULL; /* the APR relocatable memory management handler */
+static apr_global_mutex_t *notification_lock = NULL; /* the cross-thread/cross-process mutex */
 
-static agent_config_rec_t agent_config;
+static void register_process(int pid) {
+    int bucket;
+    am_notification_list_ptr entry;
+    bucket = pid % notification_list->tbl_len;
+    apr_global_mutex_lock(notification_lock);
+    entry = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (am_notification_list_item_t)));
+    entry->pid = pid;
+    entry->read = 1; /*new pid is just registered, nothing to see here for a listener thread*/
+    entry->value = NULL;
+    entry->next = notification_list->table[bucket];
+    notification_list->table[bucket] = entry;
+    notification_list->num_entries++;
+    apr_global_mutex_unlock(notification_lock);
+}
+
+static void post_notification(char *value) {
+    am_notification_list_ptr entry, prev;
+    unsigned int i;
+    prev = NULL;
+    apr_global_mutex_lock(notification_lock);
+    for (i = 0; i < notification_list->tbl_len; i++) {
+        entry = notification_list->table[i];
+        while (entry) {
+            prev = entry;
+            if (entry->value) {
+                /*if value exists, clear it first here*/
+                apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, entry->value));
+            }
+            entry->read = 0;
+            entry->value = apr_rmm_addr_get(notification_rmm, apr_rmm_calloc(notification_rmm, strlen(value) + 1));
+            memcpy(entry->value, value, strlen(value));
+            entry = entry->next;
+        }
+    }
+    apr_global_mutex_unlock(notification_lock);
+}
+
+static const char *am_set_string_slot(cmd_parms *cmd, void *dummy, const char *arg) {
+    char *error_str = NULL;
+    int offset = (int) (long) cmd->info;
+    agent_server_config *fsc = ap_get_module_config(cmd->server->module_config, &dsame_module);
+    *(const char **) ((char *) fsc + offset) = arg;
+    if (*arg == '\0') {
+        error_str = apr_psprintf(cmd->pool,
+                "Invalid value for directive %s, expected string",
+                cmd->directive->directive);
+    }
+    return error_str;
+}
+
+static const char *am_set_int_slot(cmd_parms *cmd, void *dummy, const char *arg) {
+    char *endptr;
+    char *error_str = NULL;
+    int offset = (int) (long) cmd->info;
+    agent_server_config *fsc = ap_get_module_config(cmd->server->module_config, &dsame_module);
+    *(int *) ((char *) fsc + offset) = strtol(arg, &endptr, 10);
+    if ((*arg == '\0') || (*endptr != '\0')) {
+        error_str = apr_psprintf(cmd->pool,
+                "Invalid value for directive %s, expected integer",
+                cmd->directive->directive);
+    }
+    return error_str;
+}
 
 static const command_rec dsame_auth_cmds[] = {
-    AP_INIT_TAKE1("Agent_Config_File", set_properties_file, NULL, RSRC_CONF,
+    AP_INIT_TAKE1("Agent_Config_File", am_set_string_slot, (void *) APR_OFFSETOF(agent_server_config, properties_file), RSRC_CONF,
     "Full path of the Agent configuration file"),
-    // Tag directive Agent_Bootstrap_File should be set in the dsame.conf file
-    // -- For this appropriate changes need to be done in the apache install
-    // webagents/install/apache/source/com/sun/identity/agents/install/apache
-    // files (java files) particularly ConfigureDsameFileTask.java file and
-    // and any other related files.
-    AP_INIT_TAKE1("Agent_Bootstrap_File", set_bootstrap_file, NULL, RSRC_CONF,
-    "Full path of the Agent bootstrap file"), {
-        NULL}
+    AP_INIT_TAKE1("Agent_Bootstrap_File", am_set_string_slot, (void *) APR_OFFSETOF(agent_server_config, bootstrap_file), RSRC_CONF,
+    "Full path of the Agent bootstrap file"),
+    AP_INIT_TAKE1("Agent_Notification_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, notification_shm_size), RSRC_CONF,
+    "Agent notification module shared memory segment size in bytes"), {
+        NULL
+    }
 };
 
-/*
- * The next group of routines are used to capture the path to the
- * OpenSSOAgentBootstrap.properties file and the directory where the shared libraries
- * needed by the DSAME agent are stored during module configuration.
- */
-static const char *set_properties_file(cmd_parms *cmd,
-        agent_config_rec_t *config_rec_ptr,
-        const char *arg) {
-    config_rec_ptr->properties_file = apr_pstrdup(cmd->pool, arg);
+static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data) {
+    server_rec *s = (server_rec *) data;
+    pid_t pid = 0;
+    apr_status_t ms;
+    unsigned int i;
+#ifdef _MSC_VER
+    pid = _getpid();
+#else
+    pid = getpid();
+#endif
+    am_web_log_info("Starting agent notification listener thread for pid: %d", pid);
+    for (;;) {
+        if (am_watchdog_interval <= 0)
+            break;
+        if (agentInitialized == B_TRUE && pid > 0) {
+            am_notification_list_ptr entry, prev = NULL;
+            ms = apr_global_mutex_trylock(notification_lock);
+            if (!APR_STATUS_IS_EBUSY(ms)) {
+                am_web_log_max_debug("Notification listener pid: %d, got lock", pid);
+                for (i = 0; i < notification_list->tbl_len; i++) {
+                    entry = notification_list->table[i];
+                    while (entry && pid == entry->pid && entry->read == 0) {
+                        prev = entry;
+                        am_web_log_max_debug("Notification listener pid: %d, read: %d, value: %s", pid, entry->read, (entry->value ? entry->value : "NULL"));
+                        if (entry->value) {
+                            apr_thread_mutex_lock(init_mutex);
+                            am_web_handle_notification(entry->value, strlen(entry->value), am_web_get_agent_configuration());
+                            apr_thread_mutex_unlock(init_mutex);
+                        }
+                        entry->read = 1;
+                        entry = entry->next;
+                    }
+                }
+                apr_global_mutex_unlock(notification_lock);
+                am_web_log_max_debug("Notification listener pid: %d, lock released", pid);
+            } else {
+                am_web_log_max_debug("Notification listener pid: %d, lock busy", pid);
+            }
+        }
+#ifdef _MSC_VER
+        Sleep(am_watchdog_interval * 1000);
+#else
+        sleep(am_watchdog_interval);
+#endif
+    }
+    am_web_log_info("Shutting down policy web agent notification listener thread for pid: %d", pid);
     return NULL;
 }
 
-static const char *set_bootstrap_file(cmd_parms *cmd,
-        agent_config_rec_t *config_rec_ptr,
-        const char *arg) {
-    config_rec_ptr->bootstrap_file = apr_pstrdup(cmd->pool, arg);
-    return NULL;
-}
-
-static void *create_agent_config_rec(apr_pool_t *pool_ptr, char *dir_name) {
-    return &agent_config;
+static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
+    char *tmpdir = NULL;
+    agent_server_config *cfg = apr_pcalloc(p, sizeof (agent_server_config));
+    if (apr_temp_dir_get((const char**) &tmpdir, p) != APR_SUCCESS) {
+        ap_log_error(__FILE__, __LINE__, APLOG_ALERT, 0, s,
+                "Policy web agent failed to locate temporary storage directory");
+    }
+    /*default values*/
+    ((agent_server_config *) cfg)->notification_lockfile = apr_pstrcat(p, tmpdir, "/AMNotifLock", NULL);
+    ((agent_server_config *) cfg)->max_pid_count = 256;
+    ((agent_server_config *) cfg)->notification_shm_size = 268435456; //256MB
+    return (void *) cfg;
 }
 
 /*
@@ -114,17 +254,35 @@ static void *create_agent_config_rec(apr_pool_t *pool_ptr, char *dir_name) {
  * loaded.  It handles loading all of the shared libraries that are needed
  * to instantiate the DSAME Policy Agent.  If all of the libraries can
  * successfully be loaded, then the routine looks up the two entry points
- * in the actual policy agent: init_policy and dsame_check_access.  The
- * first routine is invoked directory and an error is logged if it returns
+ * in the actual policy agent: am_web_init and dsame_check_access.  The
+ * first routine is invoked directly and an error is logged if it returns
  * an error.  The second routine is inserted into the module interface
  * table for use by Apache during request processing.
  */
-static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog,
-        apr_pool_t *ptemp, server_rec *server_ptr) {
+static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server_ptr) {
     void *lib_handle;
-    int requestResult = HTTP_FORBIDDEN;
     int ret = OK;
     am_status_t status = AM_SUCCESS;
+    apr_status_t rv;
+    apr_size_t shm_size;
+    int idx;
+    void *data; /* These two help ensure that we only init once. */
+    const char *data_key = "init_dsame";
+    agent_server_config *scfg;
+    int mp;
+
+    /*
+     * The following checks if this routine has been called before.
+     * This is necessary because the parent process gets initialized
+     * a couple of times as the server starts up, and we don't want
+     * to create any more mutexes and shared memory segments than
+     * we're actually going to use.
+     */
+    apr_pool_userdata_get(&data, data_key, server_ptr->process->pool);
+    if (!data) {
+        apr_pool_userdata_set((const void *) 1, data_key, apr_pool_cleanup_null, server_ptr->process->pool);
+        return OK;
+    }
 
 #if defined(WINNT)
     LoadLibrary("libnspr4.dll");
@@ -138,12 +296,21 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog,
         exit(1);
     }
 #endif
-    status = am_web_init(agent_config.bootstrap_file, agent_config.properties_file);
+
+    scfg = ap_get_module_config(server_ptr->module_config, &dsame_module);
+
+    /* If the shared memory/lock file already exists then delete it.  Otherwise we are
+     * going to run into problems creating the shared memory.
+     */
+    if (scfg->notification_lockfile)
+        apr_file_remove(scfg->notification_lockfile, pconf);
+
+    status = am_web_init(scfg->bootstrap_file, scfg->properties_file);
 
     if (status == AM_SUCCESS) {
-        am_web_log_debug("Process initialization result:%s",
-                am_status_to_string(status));
+        am_web_log_debug("Process initialization result:%s", am_status_to_string(status));
 
+        ap_add_version_component(pconf, "DSAME/3.0");
 
         if ((apr_thread_mutex_create(&init_mutex, APR_THREAD_MUTEX_UNNESTED,
                 pconf)) != APR_SUCCESS) {
@@ -152,83 +319,102 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog,
                     am_status_to_string(status));
             ret = HTTP_BAD_REQUEST;
         }
+
+        rv = apr_global_mutex_create(&notification_lock, scfg->notification_lockfile, APR_LOCK_DEFAULT, pconf);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                    "policy web agent notification global mutex file '%s'",
+                    scfg->notification_lockfile);
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        shm_size = APR_ALIGN_DEFAULT(scfg->notification_shm_size);
+
+        rv = apr_shm_create(&notification_shm, shm_size, NULL, pconf);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                    "policy web agent notification anonymous shared segment");
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        rv = apr_rmm_init(&notification_rmm, NULL, apr_shm_baseaddr_get(notification_shm), shm_size, pconf);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                    "policy web agent notification relocatable memory management handler");
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        mp = scfg->max_pid_count;
+        notification_list = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (*notification_list) +
+                sizeof (am_notification_list_item_t*) * mp));
+
+        notification_list->table = (am_notification_list_item_t**) (notification_list + 1);
+        for (idx = 0; idx < mp; idx++) {
+            notification_list->table[idx] = NULL;
+        }
+        notification_list->tbl_len = mp;
+        notification_list->num_entries = 0;
+
+        ap_log_error(__FILE__, __LINE__, APLOG_NOTICE, 0, server_ptr,
+                "Policy web agent shared memory configuration: notif_shm_size[%d], max_pid_count[%d]",
+                shm_size, mp);
     }
     return ret;
 }
 
-static apr_status_t dummy_cleanup_func(void *data) {
-    // this func intentionally left blank
-    return OK;
-}
-
-// This is used to hold SIGTERM while agent is cleaning up
-// and released when done.
-static int sigterm_delivered = 0;
-
-static void sigterm_handler(int sig) {
-    // remember that a SIGTERM was delivered so we can raise it later.
-    sigterm_delivered = 1;
-}
-
-static apr_status_t cleanup_dsame(void *data) {
-    /*
-     * Apache calls the cleanup func then sends a SIGTERM before
-     * the routine finishes. so hold SIGTERM to let destroy agent session
-     * complete and release it after.
-     * The signal() interface (ANSI C) is chosen to hold the signal instead of
-     * sigaction() or other signal handling interfaces since it seems
-     * to work best across platforms.
-     */
-    sighandler_t prev_handler = signal(SIGTERM, sigterm_handler);
-
-    am_web_log_info("Cleaning up web agent..");
-    if (init_mutex) {
-        apr_thread_mutex_destroy(init_mutex);
-        am_web_log_info("Destroyed mutex...");
-        init_mutex = NULL;
-    }
-
-    (void) am_web_cleanup();
-
-    // release SIGTERM
-    (void) signal(SIGTERM, prev_handler);
-    if (sigterm_delivered) {
-        raise(SIGTERM);
-    }
-    return OK;
-}
-
 /*
- * Called in the child_init hook in apache 2, this function is needed to
- * register the cleanup_dsame routine to be called upon the child's exit.
- * Registration is using apr_pool_cleanup_register(), which replaces the
- * child_exit hook in apache 1.3.x.
- * Note that init_dsame in apache 2 is called in the post_config hook
- * instead of the child_init hook. See comments in register_hooks().
+ * Called in the child_init hook, this function is needed to
+ * register the pre_cleanup_dsame and cleanup_dsame routines to be called upon the child's exit
+ * as well as initialize global mutexes, attach to shared memory segment and register
+ * process id with a notification listener
  */
-static void apache2_child_init(apr_pool_t *pool_ptr, server_rec *server_ptr) {
-    /*
-     * The first cleanup func, "plain_cleanup" as it is declared in
-     * apache headers, is called when the pool is cleaned up, i.e.
-     * when the child spawned by the initial parent exits.
-     * This is where we really need to clean up agents.
-     * The 2nd cleanup func, "child_cleanup" as it is declared, is
-     * called when any child, including one forked from another child
-     * to run cgi scripts, exits. We do not need or want to do anything
-     * there. A dummy func still needs to be passed, however, or
-     * apache crashes on the null pointer.
-     */
-    apr_pool_cleanup_register(pool_ptr, server_ptr,
-            cleanup_dsame, dummy_cleanup_func);
+static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
+    apr_status_t rv;
+    agent_server_config *scfg = ap_get_module_config(server_ptr->module_config, &dsame_module);
+
+    /*register callback - shut down notification listener thread before apr pool cleanup*/
+    apr_pool_pre_cleanup_register(pool_ptr, NULL, pre_cleanup_dsame);
+    /*register callback - clean up apr pool and release shared memory, shut down amsdk backend*/
+    apr_pool_cleanup_register(pool_ptr, server_ptr, cleanup_dsame, apr_pool_cleanup_null);
+
+    rv = apr_rmm_attach(&notification_rmm, NULL, apr_shm_baseaddr_get(notification_shm), pool_ptr);
+    if (rv != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
+                "policy web agent notification shared memory management object");
+        return;
+    }
+
+    rv = apr_global_mutex_child_init(&notification_lock, scfg->notification_lockfile, pool_ptr);
+    if (rv != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
+                "policy web agent notification global mutex file '%s'",
+                scfg->notification_lockfile);
+        return;
+    }
+
+#ifdef _MSC_VER
+    register_process(_getpid());
+#else
+    register_process(getpid());
+#endif
+
+    /*all is set, setup notification thread watchdog interval and start listener thread*/
+    am_watchdog_interval = 1; //1 sec
+    rv = apr_thread_create(&notification_listener_t, NULL, notification_listener, (void *) server_ptr, pool_ptr);
+    if (rv != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                "policy web agent notification changes listener");
+        return;
+    }
 }
 
-static am_status_t
-render_result(void **args, am_web_result_t http_result, char *data) {
+static am_status_t render_result(void **args, am_web_result_t http_result, char *data) {
     request_rec *r = NULL;
     const char *thisfunc = "render_result()";
     int *apache_ret = NULL;
     am_status_t sts = AM_SUCCESS;
     core_dir_config *conf;
+    void *agent_config = am_web_get_agent_configuration();
     int len = 0;
 
     if (args == NULL || (r = (request_rec *) args[0]) == NULL,
@@ -257,15 +443,6 @@ render_result(void **args, am_web_result_t http_result, char *data) {
                 }
                 break;
             case AM_WEB_RESULT_REDIRECT:
-                // The following lines are added to work around the problem for
-                // Apache Bug 8334 for older apache versions (< 1.3.20).
-                // See http://bugs.apache.org/index.cgi/full/8334 for details
-                if ((conf = ap_get_module_config(
-                        r->per_dir_config, &core_module)) != NULL) {
-                    conf->response_code_strings = NULL;
-                    ap_set_module_config(r->per_dir_config,
-                            &core_module, conf);
-                }
                 ap_custom_response(r, HTTP_MOVED_TEMPORARILY, data);
                 *apache_ret = HTTP_MOVED_TEMPORARILY;
                 break;
@@ -276,8 +453,7 @@ render_result(void **args, am_web_result_t http_result, char *data) {
                 *apache_ret = HTTP_INTERNAL_SERVER_ERROR;
                 break;
             default:
-                am_web_log_error("%s: Unrecognized process result %d.",
-                        thisfunc, http_result);
+                am_web_log_error("%s: Unrecognized process result %d.", thisfunc, http_result);
                 *apache_ret = HTTP_INTERNAL_SERVER_ERROR;
                 break;
         }
@@ -289,9 +465,7 @@ render_result(void **args, am_web_result_t http_result, char *data) {
 /**
  * gets request URL
  */
-static am_status_t
-get_request_url(request_rec *r, char **requestURL)
-{
+static am_status_t get_request_url(request_rec *r, char **requestURL) {
     const char *thisfunc = "get_request_url()";
     am_status_t status = AM_SUCCESS;
     const char *args = r->args;
@@ -326,7 +500,7 @@ get_request_url(request_rec *r, char **requestURL)
     if (server_name == NULL) {
         server_name = (char *) r->server->server_hostname;
         am_web_log_debug("%s: Host set to server hostname %s.",
-                         thisfunc, server_name);
+                thisfunc, server_name);
     }
     if (server_name == NULL || strlen(server_name) == 0) {
         am_web_log_error("%s: Could not get the hostname.", thisfunc);
@@ -344,7 +518,7 @@ get_request_url(request_rec *r, char **requestURL)
         if (port_num == 0) {
             port_num = ap_default_port(r);
             am_web_log_debug("%s: Port is 0. Set to default port %u.",
-                thisfunc, ap_default_port(r));
+                    thisfunc, ap_default_port(r));
         }
     }
     am_web_log_debug("%s: port = %u", thisfunc, port_num);
@@ -363,22 +537,22 @@ get_request_url(request_rec *r, char **requestURL)
     // Construct the url
     // <method>:<host><:port or nothing><uri><? or nothing><args or nothing>
     *requestURL = apr_psprintf(r->pool, "%s://%s%s%s%s%s",
-                               http_method,
-                               server_name,
-                               port_num_str,
-                               r->uri,
-                               args_sep_str,
-                               args);
+            http_method,
+            server_name,
+            port_num_str,
+            r->uri,
+            args_sep_str,
+            args);
 
     am_web_log_debug("%s: Returning request URL = %s.", thisfunc, *requestURL);
+
     return status;
 }
 
 /**
  * gets content if this is notification.
  */
-static am_status_t
-content_read(void **args, char **rbuf) {
+static am_status_t content_read(void **args, char **rbuf) {
     const char *thisfunc = "content_read()";
     request_rec *r = NULL;
     int rc = 0;
@@ -396,8 +570,7 @@ content_read(void **args, char **rbuf) {
         char argsbuffer[HUGE_STRING_LEN];
         long length = r->remaining;
         *rbuf = apr_pcalloc(r->pool, length + 1);
-        while ((len_read = ap_get_client_block(r, argsbuffer,
-                sizeof (argsbuffer))) > 0) {
+        while ((len_read = ap_get_client_block(r, argsbuffer, sizeof (argsbuffer))) > 0) {
             if ((rpos + len_read) > length) {
                 rsize = length - rpos;
             } else {
@@ -414,6 +587,7 @@ content_read(void **args, char **rbuf) {
     // If the content length is not reset, servlet containers think
     // the request is a POST.
     if (sts == AM_SUCCESS) {
+
         r->clength = 0;
         apr_table_unset(r->headers_in, "Content-Length");
         new_clen_val = apr_table_get(r->headers_in, "Content-Length");
@@ -424,8 +598,7 @@ content_read(void **args, char **rbuf) {
     return sts;
 }
 
-static am_status_t
-set_header_in_request(void **args, const char *key, const char *values) {
+static am_status_t set_header_in_request(void **args, const char *key, const char *values) {
     const char *thisfunc = "set_header_in_request()";
     request_rec *r = NULL;
     am_status_t sts = AM_SUCCESS;
@@ -437,6 +610,7 @@ set_header_in_request(void **args, const char *key, const char *values) {
         // remove all instances of the header first.
         apr_table_unset(r->headers_in, key);
         if (values != NULL && *values != '\0') {
+
             apr_table_set(r->headers_in, key, values);
         }
         sts = AM_SUCCESS;
@@ -444,8 +618,7 @@ set_header_in_request(void **args, const char *key, const char *values) {
     return sts;
 }
 
-static am_status_t
-add_header_in_response(void **args, const char *key, const char *values) {
+static am_status_t add_header_in_response(void **args, const char *key, const char *values) {
     const char *thisfunc = "add_header_in_response()";
     request_rec *r = NULL;
     am_status_t sts = AM_SUCCESS;
@@ -454,6 +627,7 @@ add_header_in_response(void **args, const char *key, const char *values) {
         am_web_log_error("%s: invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
+
         apr_table_add(r->headers_out, key, values);
         apr_table_add(r->err_headers_out, key, values);
         sts = AM_SUCCESS;
@@ -461,8 +635,7 @@ add_header_in_response(void **args, const char *key, const char *values) {
     return sts;
 }
 
-static am_status_t
-set_method(void **args, am_web_req_method_t method) {
+static am_status_t set_method(void **args, am_web_req_method_t method) {
     const char *thisfunc = "set_method()";
     request_rec *r = NULL;
     am_status_t sts = AM_SUCCESS;
@@ -607,8 +780,7 @@ set_method(void **args, am_web_req_method_t method) {
     return sts;
 }
 
-static am_status_t
-set_user(void **args, const char *user) {
+static am_status_t set_user(void **args, const char *user) {
     const char *thisfunc = "set_user()";
     request_rec *r = NULL;
     am_status_t sts = AM_SUCCESS;
@@ -628,8 +800,7 @@ set_user(void **args, const char *user) {
     return sts;
 }
 
-static int
-get_apache_method_num(am_web_req_method_t am_num) {
+static int get_apache_method_num(am_web_req_method_t am_num) {
     int apache_num = -1;
     switch (am_num) {
         case AM_WEB_REQUEST_GET:
@@ -712,13 +883,13 @@ get_apache_method_num(am_web_req_method_t am_num) {
             break;
         case AM_WEB_REQUEST_MERGE:
             apache_num = M_MERGE;
+
             break;
     }
     return apache_num;
 }
 
-static am_web_req_method_t
-get_method_num(request_rec *r) {
+static am_web_req_method_t get_method_num(request_rec *r) {
     const char *thisfunc = "get_method_num()";
     am_web_req_method_t method_num = AM_WEB_REQUEST_UNKNOWN;
     // get request method from method number first cuz it's
@@ -828,25 +999,12 @@ get_method_num(request_rec *r) {
         // correct the method string. But if the method number is invalid
         // the method string needs to be preserved in case Apache is
         // used as a proxy (in front of Exchange Server for instance)
+
         r->method = am_web_method_num_to_str(method_num);
         am_web_log_debug("%s: Set method string to %s", thisfunc, r->method);
     }
     return method_num;
 }
-
-/**
- * This function is invoked to initialize the agent
- * during the first request.
- */
-void init_at_request() {
-    am_status_t status;
-    status = am_agent_init(&agentInitialized);
-    if (status != AM_SUCCESS) {
-        am_web_log_debug("Initialization of the agent failed: "
-                "status = %s (%d)", am_status_to_string(status), status);
-    }
-}
-
 
 /**
  * Deny the access in case the agent is found uninitialized
@@ -860,7 +1018,40 @@ static int do_deny(request_rec *r, am_status_t status) {
             " found in Access Manager.");
     am_web_log_info("do_deny() Status code= %s.",
             am_status_to_string(status));
+
     return retVal;
+}
+
+static am_status_t set_cookie(const char *header, void **args) {
+    am_status_t ret = AM_INVALID_ARGUMENT;
+    char *currentCookies;
+    if (header != NULL && args != NULL) {
+        request_rec *rq = (request_rec *) args[0];
+        if (rq == NULL) {
+            am_web_log_error("in set_cookie: Invalid Request structure");
+        } else {
+            apr_table_add(rq->err_headers_out, "Set-Cookie", header);
+            if ((currentCookies = (char *) apr_table_get(rq->headers_in, "Cookie")) == NULL)
+                apr_table_add(rq->headers_in, "Cookie", header);
+            else
+                apr_table_set(rq->headers_in, "Cookie", (apr_pstrcat(rq->pool, header, ";", currentCookies, NULL)));
+            ret = AM_SUCCESS;
+        }
+    }
+    return ret;
+}
+
+/**
+ * This function is invoked to initialize the agent
+ * during the first request.
+ */
+void init_at_request() {
+    am_status_t status;
+    status = am_agent_init(&agentInitialized);
+    if (status != AM_SUCCESS) {
+        am_web_log_debug("Initialization of the agent failed: "
+                "status = %s (%d)", am_status_to_string(status), status);
+    }
 }
 
 /**
@@ -898,11 +1089,12 @@ int dsame_check_access(request_rec *r) {
             if (agentInitialized != B_TRUE) {
                 ret = do_deny(r, status);
                 status = AM_FAILURE;
-            } 
+            }
         }
         apr_thread_mutex_unlock(init_mutex);
         am_web_log_info("%s: Unlocked initialization section.", thisfunc);
-    }    
+    }
+
     if (status == AM_SUCCESS) {
         // Get the agent config
         agent_config = am_web_get_agent_configuration();
@@ -927,15 +1119,33 @@ int dsame_check_access(request_rec *r) {
     if (status == AM_SUCCESS) {
         status = get_request_url(r, &url);
     }
+
     // Get the request method
     if (status == AM_SUCCESS) {
         method = get_method_num(r);
         if (method == AM_WEB_REQUEST_UNKNOWN) {
             am_web_log_error("%s: Request method is unknown.", thisfunc);
             status = AM_FAILURE;
-        } 
+        }
     }
-     
+
+    // Check notification URL
+    if (status == AM_SUCCESS) {
+        if (B_TRUE == am_web_is_notification(url, agent_config)) {
+            char* data = NULL;
+            status = content_read((void*) &r, &data);
+            if (status == AM_SUCCESS) {
+                post_notification(data);
+                if (status != AM_SUCCESS) {
+                    am_web_log_error("%s: post_notification failed", thisfunc);
+                }
+                /*data is allocated on apr pool, will be freed together with a pool*/
+                am_web_delete_agent_configuration(agent_config);
+                return HTTP_OK;
+            }
+        }
+    }
+
     // If there is a proxy in front of the agent, the user can set in the
     // properties file the name of the headers that the proxy uses to set
     // the real client IP and host name. In that case the agent needs
@@ -944,36 +1154,34 @@ int dsame_check_access(request_rec *r) {
         // Get the client IP address header set by the proxy, if there is one
         clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
         if (clientIP_hdr_name != NULL) {
-            clientIP_hdr = (char *)apr_table_get(r->headers_in, 
-                                                 clientIP_hdr_name);
+            clientIP_hdr = (char *) apr_table_get(r->headers_in,
+                    clientIP_hdr_name);
         }
         // Get the client host name header set by the proxy, if there is one
-        clientHostname_hdr_name = 
-                 am_web_get_client_hostname_header_name(agent_config);
+        clientHostname_hdr_name =
+                am_web_get_client_hostname_header_name(agent_config);
         if (clientHostname_hdr_name != NULL) {
-            clientHostname_hdr = (char *)apr_table_get(r->headers_in, 
-                                                 clientHostname_hdr_name);
+            clientHostname_hdr = (char *) apr_table_get(r->headers_in,
+                    clientHostname_hdr_name);
         }
         // If the client IP and host name headers contain more than one
         // value, take the first value.
         if ((clientIP_hdr != NULL && strlen(clientIP_hdr) > 0) ||
-            (clientHostname_hdr != NULL && strlen(clientHostname_hdr) > 0))
-        {
+                (clientHostname_hdr != NULL && strlen(clientHostname_hdr) > 0)) {
             status = am_web_get_client_ip_host(clientIP_hdr,
-                                               clientHostname_hdr,
-                                               &clientIP, &clientHostname);
+                    clientHostname_hdr,
+                    &clientIP, &clientHostname);
         }
     }
     // Set the client ip in the request parameters structure
     if (status == AM_SUCCESS) {
         if (clientIP == NULL) {
-            req_params.client_ip = (char *)r->connection->remote_ip;
+            req_params.client_ip = (char *) r->connection->remote_ip;
         } else {
             req_params.client_ip = clientIP;
         }
         if ((req_params.client_ip == NULL) ||
-            (strlen(req_params.client_ip) == 0))
-        {
+                (strlen(req_params.client_ip) == 0)) {
             am_web_log_error("%s: Could not get the remote IP.", thisfunc);
             status = AM_FAILURE;
         }
@@ -1003,19 +1211,21 @@ int dsame_check_access(request_rec *r) {
         req_func.render_result.args = args;
 
         (void) am_web_process_request(&req_params, &req_func,
-                                      &status, agent_config);
+                &status, agent_config);
+
         if (status != AM_SUCCESS) {
             am_web_log_error("%s: Error encountered rendering result %d.",
                     thisfunc, ret);
         }
     }
     // Cleaning
-    if(clientIP != NULL) {
+    if (clientIP != NULL) {
         am_web_free_memory(clientIP);
     }
-    if(clientHostname != NULL) {
+    if (clientHostname != NULL) {
         am_web_free_memory(clientHostname);
     }
+
     am_web_delete_agent_configuration(agent_config);
     // Failure handling
     if (status == AM_FAILURE) {
@@ -1026,48 +1236,93 @@ int dsame_check_access(request_rec *r) {
     return ret;
 }
 
-static apr_status_t shutdownNSS(void *data)
-{    
+static void sigterm_handler(int sig) {
+    // remember that a SIGTERM was delivered so we can raise it later.
+    sigterm_delivered = 1;
+}
+
+static apr_status_t pre_cleanup_dsame(void *data) {
+    apr_status_t ret = APR_SUCCESS;
+    am_watchdog_interval = 0;
+    if (notification_listener_t) {
+        apr_thread_join(&ret, notification_listener_t);
+    }
+    return APR_SUCCESS;
+}
+
+static apr_status_t cleanup_dsame(void *data) {
+    /*
+     * Apache calls the cleanup func then sends a SIGTERM before
+     * the routine finishes. so hold SIGTERM to let destroy agent session
+     * complete and release it after.
+     * The signal() interface (ANSI C) is chosen to hold the signal instead of
+     * sigaction() or other signal handling interfaces since it seems
+     * to work best across platforms.
+     */
+    sighandler_t prev_handler = signal(SIGTERM, sigterm_handler);
+
+    am_web_log_info("Cleaning up web agent..");
+    if (init_mutex) {
+        apr_thread_mutex_destroy(init_mutex);
+        am_web_log_info("Destroyed mutex...");
+        init_mutex = NULL;
+    }
+
+    if (notification_rmm) {
+        apr_rmm_destroy(notification_rmm);
+        am_web_log_info("Destroyed shared memory manager...");
+        notification_rmm = NULL;
+    }
+
+    if (notification_shm) {
+        apr_shm_destroy(notification_shm);
+        am_web_log_info("Destroyed shared memory...");
+        notification_shm = NULL;
+    }
+
+    if (notification_lock) {
+        apr_global_mutex_destroy(notification_lock);
+        am_web_log_info("Destroyed shared memory global mutex...");
+        notification_lock = NULL;
+    }
+
+    (void) am_web_cleanup();
+
+    // release SIGTERM
+    (void) signal(SIGTERM, prev_handler);
+    if (sigterm_delivered) {
+        raise(SIGTERM);
+    }
+    return APR_SUCCESS;
+}
+
+static apr_status_t shutdownNSS(void *data) {
     am_status_t status = am_shutdown_nss();
     if (status != AM_SUCCESS) {
-       am_web_log_error("shutdownNSS(): Failed to shutdown NSS.");
+        am_web_log_error("shutdownNSS(): Failed to shutdown NSS.");
     }
     return OK;
 }
 
-static void register_hooks(apr_pool_t *p) {
+static void dsame_register_hooks(apr_pool_t *p) {
     ap_hook_access_checker(dsame_check_access, NULL, NULL, APR_HOOK_MIDDLE);
-
-    // register hook for agent initialization.
-    // In apache 2 the post_config hook is used in place of child_init
-    // for initialization.  The post_config hook is called by the
-    // apache parent process before any child process is created.
-    // The child process then inherits the agent_info initialized by
-    // am_web_init() in init_dsame(), and creates its own Service objects
-    // with connections to the IS on the first request handled by the child.
-    // This saves each child from having to read from the properties file
-    // when it is first started.
+    /*main agent init, called once per server lifecycle*/
     ap_hook_post_config(init_dsame, NULL, NULL, APR_HOOK_LAST);
-
-    // NSS needs to be shutdown when a child process exits
-    apr_pool_cleanup_register(p, NULL, shutdownNSS, dummy_cleanup_func);
-
-    // register hook for agent cleanup.
-    // A hook for child_init is still needed to register cleanup_dsame
-    // to be called upon the child's exit.
-    // This takes the place of the child_exit hook in apache 1.3.x.
-    ap_hook_child_init(apache2_child_init, NULL, NULL, APR_HOOK_LAST);
+    /*NSS shutdown hook*/
+    apr_pool_cleanup_register(p, NULL, shutdownNSS, apr_pool_cleanup_null);
+    /*agent child init, called upon new server child process creation*/
+    ap_hook_child_init(child_init_dsame, NULL, NULL, APR_HOOK_LAST);
 }
 
 /*
  * Interface table used by Apache 2.x to interact with this module.
  */
-module AP_MODULE_DECLARE_DATA dsame_module ={
+module AP_MODULE_DECLARE_DATA dsame_module = {
     STANDARD20_MODULE_STUFF,
-    create_agent_config_rec, /* create per-directory config structures */
-    NULL, /* create per-server config structures */
-    NULL, /* merge per-server config structures */
-    NULL, /* command handlers */
-    dsame_auth_cmds, /* handlers */
-    register_hooks /* register hooks */
+    NULL, /* per-directory config creator */
+    NULL, /* dir config merger */
+    dsame_create_server_config, /* server config creator */
+    NULL, /* server config merger */
+    dsame_auth_cmds, /* command table */
+    dsame_register_hooks /* set up other request processing hooks */
 };
