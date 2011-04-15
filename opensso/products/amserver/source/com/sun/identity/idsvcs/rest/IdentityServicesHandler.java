@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.idsvcs.rest;
 
 import com.iplanet.sso.SSOException;
@@ -47,7 +50,11 @@ import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.IdentityServicesImpl;
 import com.sun.identity.idsvcs.IdentityServicesFactory;
+import com.sun.identity.idsvcs.AccountExpired;
 import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.OrgInactive;
+import com.sun.identity.idsvcs.UserInactive;
+import com.sun.identity.idsvcs.UserLocked;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.idsvcs.UserDetails;
 import java.io.StringWriter;
@@ -650,8 +657,11 @@ public class IdentityServicesHandler extends HttpServlet {
                     mar.newInstance(Throwable.class).marshall(sw, e);
                     if (e instanceof UnsupportedOperationException) {
                         response.sendError(501, sw.toString());
+                    } else if (e instanceof OrgInactive || e instanceof UserLocked
+                            || e instanceof UserInactive || e instanceof AccountExpired){
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, sw.toString());
                     } else {
-                        response.sendError(401, sw.toString());
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     }
                 } catch (Exception ex) {
                     throw new ServletException(ex);

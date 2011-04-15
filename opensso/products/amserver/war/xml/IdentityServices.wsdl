@@ -14,7 +14,9 @@
             targetNamespace="http://opensso.idsvcs.identity.sun.com/">
             
             <xsd:element name="AccessDenied" type="tns:AccessDenied"></xsd:element>
-            
+
+            <xsd:element name="AccountExpired" type="tns:AccountExpired"></xsd:element>
+
             <xsd:element name="GeneralFailure" type="tns:GeneralFailure"></xsd:element>
             
             <xsd:element name="InvalidCredentials" type="tns:InvalidCredentials"></xsd:element>
@@ -24,11 +26,19 @@
             <xsd:element name="InvalidToken" type="tns:InvalidToken"></xsd:element>
             
             <xsd:element name="NeedMoreCredentials" type="tns:NeedMoreCredentials"></xsd:element>
-            
+
+            <xsd:element name="OrgInactive" type="tns:OrgInactive"></xsd:element>
+
             <xsd:element name="TokenExpired" type="tns:TokenExpired"></xsd:element>
-            
+
+            <xsd:element name="UserInactive" type="tns:UserInactive"></xsd:element>
+
+            <xsd:element name="UserLocked" type="tns:UserLocked"></xsd:element>
+
             <xsd:element name="UserNotFound" type="tns:UserNotFound"></xsd:element>
+
             <xsd:element name="ObjectNotFound" type="tns:ObjectNotFound"></xsd:element>
+
             <xsd:element name="DuplicateObject" type="tns:DuplicateObject"></xsd:element>
             
             <xsd:element name="attributes" type="tns:attributes"></xsd:element>
@@ -120,6 +130,30 @@
                 </xsd:sequence>
             </xsd:complexType>
             
+            <xsd:complexType name="OrgInactive">
+                <xsd:sequence>
+                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="UserInactive">
+                <xsd:sequence>
+                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="UserLocked">
+                <xsd:sequence>
+                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="AccountExpired">
+                <xsd:sequence>
+                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
             <xsd:complexType name="attributes">
                 <xsd:sequence>
                     <xsd:element name="attributeNames" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
@@ -347,6 +381,18 @@
     <message name="GeneralFailure">
         <part name="fault" element="tns:GeneralFailure"></part>
     </message>
+    <message name="OrgInactive">
+        <part name="fault" element="tns:OrgInactive"></part>
+    </message>
+    <message name="UserInactive">
+        <part name="fault" element="tns:UserInactive"></part>
+    </message>
+    <message name="UserLocked">
+        <part name="fault" element="tns:UserLocked"></part>
+    </message>
+    <message name="AccountExpired">
+        <part name="fault" element="tns:AccountExpired"></part>
+    </message>
     <message name="attributes">
         <part name="parameters" element="tns:attributes"></part>
     </message>
@@ -462,6 +508,10 @@
             <fault message="tns:InvalidPassword" name="InvalidPassword"></fault>
             <fault message="tns:NeedMoreCredentials" name="NeedMoreCredentials"></fault>
             <fault message="tns:InvalidCredentials" name="InvalidCredentials"></fault>
+            <fault message="tns:OrgInactive" name="OrgInactive"></fault>
+            <fault message="tns:UserInactive" name="UserInactive"></fault>
+            <fault message="tns:UserLocked" name="UserLocked"></fault>
+            <fault message="tns:AccountExpired" name="AccountExpired"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
         </operation>
         <operation name="logout">
@@ -593,6 +643,18 @@
             </fault>
             <fault name="InvalidCredentials">
                 <soap:fault name="InvalidCredentials" use="literal"></soap:fault>
+            </fault>
+            <fault name="OrgInactive">
+                <soap:fault name="OrgInactive" use="literal"></soap:fault>
+            </fault>
+            <fault name="UserInactive">
+                <soap:fault name="UserInactive" use="literal"></soap:fault>
+            </fault>
+            <fault name="UserLocked">
+                <soap:fault name="UserLocked" use="literal"></soap:fault>
+            </fault>
+            <fault name="AccountExpired">
+                <soap:fault name="AccountExpired" use="literal"></soap:fault>
             </fault>
             <fault name="GeneralFailure">
                 <soap:fault name="GeneralFailure" use="literal"></soap:fault>

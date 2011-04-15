@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.idsvcs.opensso;
 
 import com.iplanet.am.util.SystemProperties;
@@ -57,6 +56,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
+import com.sun.identity.idsvcs.AccountExpired;
 import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
@@ -68,9 +68,12 @@ import com.sun.identity.idsvcs.LogResponse;
 import com.sun.identity.idsvcs.LogoutResponse;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.OrgInactive;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.idsvcs.UpdateResponse;
 import com.sun.identity.idsvcs.UserDetails;
+import com.sun.identity.idsvcs.UserInactive;
+import com.sun.identity.idsvcs.UserLocked;
 import com.sun.identity.idsvcs.UserNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.Attribute;
@@ -99,6 +102,7 @@ import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.util.DN;
 import java.util.regex.Matcher;
@@ -133,7 +137,8 @@ public class IdentityServicesImpl
      */
     public Token authenticate(String username, String password, String uri)
         throws UserNotFound, InvalidPassword, NeedMoreCredentials,
-        InvalidCredentials, GeneralFailure, RemoteException {
+        InvalidCredentials, OrgInactive, UserInactive, AccountExpired,
+        UserLocked, GeneralFailure, RemoteException {
         
 
         assert username != null && password != null;
@@ -206,11 +211,14 @@ public class IdentityServicesImpl
                 if(ec.equals(AMAuthErrorCode.AUTH_INVALID_PASSWORD)) {
                     throw new InvalidPassword(em);
                 } else if (ec.equals(AMAuthErrorCode.AUTH_PROFILE_ERROR) ||
-                    ec.equals(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED) ||
-                    ec.equals(AMAuthErrorCode.AUTH_USER_INACTIVE) ||
-                    ec.equals(AMAuthErrorCode.AUTH_USER_NOT_FOUND) ||
-                    ec.equals(AMAuthErrorCode.AUTH_ORG_INACTIVE)) {
+                    ec.equals(AMAuthErrorCode.AUTH_USER_NOT_FOUND)) {
                     throw new UserNotFound(em);
+                } else if (ec.equals(AMAuthErrorCode.AUTH_USER_INACTIVE)) {
+                    throw new UserInactive(em);
+                } else if (ec.equals(AMAuthErrorCode.AUTH_USER_LOCKED)) {
+                    throw new UserLocked(em);
+                } else if (ec.equals(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED)) {
+                    throw new AccountExpired(em);
                 } else if (ec.equals(AMAuthErrorCode.AUTH_LOGIN_FAILED)) {
                     throw new InvalidCredentials(em);
                 }
@@ -230,9 +238,12 @@ public class IdentityServicesImpl
             }
         } catch (AuthLoginException le) {
             debug.error("IdentityServicesImpl:authContext AuthException", le);
+            if (le.getErrorCode().equals(AMAuthErrorCode.AUTH_ORG_INACTIVE)) {
+                throw new OrgInactive(le.getL10NMessage(Locale.getDefault()));
+            }
             // we're going to throw a generic error
             // because the system is likely down..
-            throw (new GeneralFailure(le.getMessage()));
+            throw new GeneralFailure(le.getMessage());
         }
         return ret;
     }
