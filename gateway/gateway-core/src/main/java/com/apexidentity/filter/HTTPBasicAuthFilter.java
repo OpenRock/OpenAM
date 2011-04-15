@@ -106,7 +106,9 @@ public class HTTPBasicAuthFilter extends GenericFilter {
         // loop to retry for intitially retrieved (or refreshed) credentials
         for (int n = 0; n < 2; n++) {
             // put a branch of the trunk in the entity to allow retries
-            exchange.request.entity = trunk.branch();
+            if (trunk != null) {
+                exchange.request.entity = trunk.branch();
+            }
             // because credentials are sent in every request, this class caches them in the session
             String userpass = (String)exchange.session.get(attributeName(exchange.request));
             if (userpass != null) {
