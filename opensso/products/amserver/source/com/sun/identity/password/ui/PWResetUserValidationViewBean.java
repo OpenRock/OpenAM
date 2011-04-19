@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.password.ui;
 
 import com.iplanet.jato.RequestContext;
@@ -38,13 +41,14 @@ import com.iplanet.jato.view.html.Button;
 import com.iplanet.jato.view.html.HiddenField;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.jato.view.html.TextField;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetUserValidationModel;
 import com.sun.identity.password.ui.model.PWResetUserValidationModelImpl;
 import javax.servlet.http.HttpServletRequest;
 import com.sun.identity.shared.debug.Debug;
+import java.util.Hashtable;
 
 /**
  * <code>PWResetUserValidationViewBean</code> validates user's identity for
@@ -199,33 +203,24 @@ public class PWResetUserValidationViewBean extends PWResetViewBeanBase  {
 
         String orgDN = (String)getPageSessionAttribute(ORG_DN);
         if (orgDN == null) {
-            String orgName = req.getParameter(ORG);
+            Hashtable reqDataHash = AuthUtils.parseRequestParameters(req);
+            String orgParam = AuthUtils.getOrgParam(reqDataHash);
+            String queryOrg = AuthUtils.getQueryOrgName(req, orgParam);
+            orgDN = AuthUtils.getOrganizationDN(queryOrg, true, req);
+
+            model.setValidRealm(orgDN);
             if (debug.messageEnabled()) {
-	        debug.message(classMethod + "org parameter is:" + orgName);
+                debug.message(classMethod + "orgDN is :" + orgDN);
             }
-	    if (orgName == null || orgName.length() <= 0) {
-		orgName = req.getParameter(REALM);
-                if (debug.messageEnabled()) {
-	            debug.error(classMethod + "realmParameter is:" + orgName);
-                }
-	    }
-            try {
-                 orgDN = model.getRealm(orgName);
-                 if (debug.messageEnabled()) {
-		     debug.message(classMethod + "orgDN is :" + orgDN);
-                 }
-                 setPageSessionAttribute(ORG_DN,orgDN);
-                 /*
-                  * Set the flag to indicate that user enter the orgname in
-                  * the url.
-                  */
-                 if (orgName != null && orgName.length() > 0) {
-                     setPageSessionAttribute(ORG_DN_FLAG, STRING_TRUE);
-                     model.setRealmFlag(true);
-                 }
-            } catch (PWResetException pwe) {
-                 setErrorMessage(model.getErrorTitle(), pwe.getMessage());
-            }  
+            setPageSessionAttribute(ORG_DN, orgDN);
+            /*
+             * Set the flag to indicate that user enter the orgname in
+             * the url.
+             */
+            if (orgParam != null && orgParam.length() > 0) {
+                setPageSessionAttribute(ORG_DN_FLAG, STRING_TRUE);
+                model.setRealmFlag(true);
+            }
         } else {
             model.setValidRealm(orgDN);
         }
