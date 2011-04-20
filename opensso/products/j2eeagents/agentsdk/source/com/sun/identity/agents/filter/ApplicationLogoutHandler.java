@@ -31,18 +31,10 @@
  */
 package com.sun.identity.agents.filter;
 
-import java.util.Hashtable;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Manager;
-import com.sun.identity.agents.common.ICookieResetHelper;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionID;
 
 /**
  * <p>
@@ -52,6 +44,8 @@ import com.iplanet.dpro.session.SessionID;
  */
 public class ApplicationLogoutHandler extends AmFilterTaskHandler
 implements IApplicationLogoutHandler {
+
+    private LogoutHelper helper;
 
     public ApplicationLogoutHandler(Manager manager){
         super(manager);
@@ -64,6 +58,7 @@ implements IApplicationLogoutHandler {
                 CONFIG_LOGOUT_INTROSPECT_ENABLE,
                 DEFAULT_LOGOUT_INTROSPECT_ENABLE));
         setIsActiveFlag();
+        helper = new LogoutHelper(this);
     }
 
     /**
@@ -94,28 +89,8 @@ implements IApplicationLogoutHandler {
                         "ApplicationLogoutHandler: Detected need to logout.");
             }
 
-            // Call the container specific logout handler in ALL or J2EE_POLICY
-            // mode
-            if (ctx.getFilterMode().equals(AmFilterMode.MODE_J2EE_POLICY)
-                    || ctx.getFilterMode().equals(AmFilterMode.MODE_ALL)) {
-                invokeApplicationLogoutHandler(ctx);
-            }
+            helper.doLogout(ctx);
 
-            // remove the SSO Token from the local caches
-            removeSSOToken(ctx);
-
-            // Even if logout handler fails, we will Destroy local session and
-            // redirect to AM
-            if (isLogMessageEnabled()) {
-                logMessage(
-                    "ApplicationLogoutHandler : Invalidating HTTP Session.");
-            }
-
-            HttpSession session = ctx.getHttpServletRequest().getSession(false);
-            if (session != null) {
-                session.invalidate();
-            }
-            doCookiesReset(ctx);
             String logoutURL = getLogoutURL(ctx);
             result = new AmFilterResult(
                     AmFilterResultStatus.STATUS_REDIRECT,
@@ -123,55 +98,6 @@ implements IApplicationLogoutHandler {
         }
 
         return result;
-    }
-
-    /**
-     * @param ctx  the <code>AmFilterRequestContext</code> that carries
-     *            information about the incoming request and response objects.
-     */
-    private boolean invokeApplicationLogoutHandler(AmFilterRequestContext ctx)
-            throws AgentException {
-
-        boolean result = false;
-
-        try {
-            String appName = getApplicationName(ctx.getHttpServletRequest());
-
-            IJ2EELogoutHandler localAuthHandler =
-                    getApplicationLogoutHandler(appName);
-
-            if (localAuthHandler != null) {
-                if (isLogMessageEnabled()) {
-                    logMessage(
-                        "ApplicationLogoutHandler : " +
-                            "Invoking Local Logout handler");
-                }
-
-                localAuthHandler.logout(ctx.getHttpServletRequest(), ctx
-                        .getHttpServletResponse(), null);
-                result = true;
-            }
-        } catch (Exception ex) {
-            throw new AgentException(
-                    "ApplicationLogoutHandler.invokeApplicationLogoutHandler()"
-                         + " failed to invoke Local Logout with exception", ex);
-        }
-
-        return result;
-    }
-
-    /**
-     * Remove SSO Token from local cache during logout.
-     * If notification is enabled this code is probably a noop, but if the
-     * browser was faster then the logout notification this method will work
-     * as a safety net.
-     *
-     * @param ctx RequestContext
-     */
-    private void removeSSOToken(AmFilterRequestContext ctx) {
-        HttpServletRequest request = ctx.getHttpServletRequest();
-        String rawToken = getSSOTokenValidator().getSSOTokenValue(request);
-        Session.removeSID(new SessionID(rawToken));
     }
 
     private String getApplicationEntryURL(AmFilterRequestContext ctx) {
@@ -196,64 +122,6 @@ implements IApplicationLogoutHandler {
             result = request.getContextPath();
         }
         return result;
-    }
-
-    /**
-     * Method getApplicationLogoutHandler
-     *
-     * @param appName Application Name
-     *  @ return IJ2EELogoutHandler Mapped Local Logout Handler
-     *
-     * @see Returns the Application Logout Handler for the context URI. If the
-     *      application does not have an entry in the configuration.
-     *
-     */
-    private IJ2EELogoutHandler getApplicationLogoutHandler(String appName)
-            throws AgentException {
-        IJ2EELogoutHandler localLogoutHandlerClass = null;
-
-        if ((appName != null) && (appName.length() > 0)) {
-            localLogoutHandlerClass =
-                    (IJ2EELogoutHandler) getApplicationLogoutHandlers()
-                    .get(appName);
-
-            if (localLogoutHandlerClass == null) {
-                String localLogoutHandlerClassName = 
-                     getManager().getApplicationConfigurationString(
-                     CONFIG_LOGOUT_APPLICATION_HANDLER_MAP, appName);
-
-                if ((localLogoutHandlerClassName != null)
-                        && (localLogoutHandlerClassName.length() > 0)) {
-                    try {
-                        localLogoutHandlerClass = (IJ2EELogoutHandler) Class
-                                .forName(localLogoutHandlerClassName)
-                                .newInstance();
-
-                        getApplicationLogoutHandlers().put(appName,
-                                localLogoutHandlerClass);
-                        if (isLogMessageEnabled()) {
-                            logMessage(
-                                "ApplicationLogoutHandler: Application Name = "
-                                + appName
-                                + " registering"
-                                + " Local Logout Handler = "
-                                + localLogoutHandlerClass);
-                        }
-                    } catch (Exception ex) {
-                        throw new AgentException(
-                                "Failed to load Local Logout Handler "
-                                        + "for Application = " + appName
-                                        + " with exception :", ex);
-                    }
-                }
-            }
-        }
-
-        return localLogoutHandlerClass;
-    }
-
-    private Hashtable getApplicationLogoutHandlers() {
-        return _localLogoutHandlers;
     }
 
     /**
@@ -554,18 +422,7 @@ implements IApplicationLogoutHandler {
         }
     }
 
-    private void doCookiesReset(AmFilterRequestContext ctx) {
-        HttpServletRequest request = ctx.getHttpServletRequest();
-        HttpServletResponse response = ctx.getHttpServletResponse();
-        ICookieResetHelper cookieResetHelper =
-            getSSOContext().getCookieResetHelper();
-        if (cookieResetHelper != null && cookieResetHelper.isActive()) {
-            cookieResetHelper.doCookiesReset(request, response);
-        }
-    }
-
     private boolean _isActiveFlag;
     private boolean _introSpectRequestAllow;
-    private Hashtable _localLogoutHandlers = new Hashtable();
 }
 

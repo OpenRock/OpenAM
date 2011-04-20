@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +48,9 @@ import com.sun.identity.agents.common.INotenforcedIPHelper;
 
 public class NotenforcedIPTaskHandler extends AmFilterTaskHandler
         implements INotenforcedIPTaskHandler {
-    
+
+    private LogoutHelper helper;
+
     /**
      * The constructor takes a <code>Manager</code> instance in order
      * to gain access to the infrastructure services such as configuration
@@ -78,6 +83,7 @@ public class NotenforcedIPTaskHandler extends AmFilterTaskHandler
         CommonFactory cf = new CommonFactory(getModule());
         setNotenforcedIPHelper(cf.newNotenforcedIPHelper(
                 cacheEnabled, cacheSize, isInverted, entries));
+        helper = new LogoutHelper(this);
     }
     
     /**
@@ -99,6 +105,22 @@ public class NotenforcedIPTaskHandler extends AmFilterTaskHandler
             //if non enforcement is true, skip the rest
             result = ctx.getContinueResult();
             result.markAsNotEnforced();
+
+            HttpServletRequest request = ctx.getHttpServletRequest();
+            if (isModeJ2EEPolicyActive()) {
+                if ((request.getUserPrincipal() != null || request.getRemoteUser() != null)
+                        && !getSSOTokenValidator().validate(request).isValid()) {
+                    try {
+                        helper.doLogout(ctx);
+                        //if the logout was successful we need to redirect the
+                        //user, because the current request will still see the
+                        //just logged out user.
+                        result = ctx.getRedirectToSelfResult();
+                    } catch (AgentException ae) {
+                        logWarning("Unable to log out the user while processing not enforced URI's", ae);
+                    }
+                }
+            }
         }
         return result;
     }
