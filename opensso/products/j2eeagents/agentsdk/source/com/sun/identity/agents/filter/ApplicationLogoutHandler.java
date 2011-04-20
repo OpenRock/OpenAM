@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.filter;
 
 import java.util.Hashtable;
@@ -158,13 +160,18 @@ implements IApplicationLogoutHandler {
         return result;
     }
 
-    /*
-     * remove SSO Token from local cache during logout.
+    /**
+     * Remove SSO Token from local cache during logout.
+     * If notification is enabled this code is probably a noop, but if the
+     * browser was faster then the logout notification this method will work
+     * as a safety net.
+     *
+     * @param ctx RequestContext
      */
     private void removeSSOToken(AmFilterRequestContext ctx) {
-
         HttpServletRequest request = ctx.getHttpServletRequest();
-        Session.removeSID(new SessionID(request));
+        String rawToken = getSSOTokenValidator().getSSOTokenValue(request);
+        Session.removeSID(new SessionID(rawToken));
     }
 
     private String getApplicationEntryURL(AmFilterRequestContext ctx) {
