@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 package com.sun.identity.cli.schema;
 
@@ -116,8 +116,10 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
             
             DirectoryServerVendor.Vendor vendor = 
                 DirectoryServerVendor.getInstance().query(ldConnection);
-            if (!vendor.name.equals(DirectoryServerVendor.OPENDS) &&
-                !vendor.name.equals(DirectoryServerVendor.SUNDS)) {
+            if (!vendor.name.equals(DirectoryServerVendor.OPENDJ)
+                    && !vendor.name.equals(DirectoryServerVendor.OPENDS)
+                    && !vendor.name.equals(DirectoryServerVendor.SUNDS)
+                    ) {
                 throw new CLIException(getResourceString(
                         "import-service-configuration-unknown-ds"),
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);

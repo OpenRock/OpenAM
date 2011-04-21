@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.sm;
 
 import java.util.Enumeration;
@@ -46,8 +45,10 @@ import com.sun.identity.shared.ldap.LDAPv2;
  */
 public class DirectoryServerVendor {
     public static String OPENDS = "opends";
+    public static String OPENDJ = "opendj";
     public static String SUNDS = "sunds";
 
+    private static String VENDOR_OPENDJ = "OpenDJ ";
     private static String VENDOR_OPENDS = "OpenDS Directory Server ";
     private static String VENDOR_SUNDS_5 = "Sun-ONE-Directory/";
     private static String VENDOR_SUNDS_6 = "Sun-Java(tm)-System-Directory/";
@@ -106,7 +107,10 @@ public class DirectoryServerVendor {
         Vendor vendor = unknownVendor;
         
         if (result != null) {
-            if (result.startsWith(VENDOR_OPENDS)) {
+            if (result.startsWith(VENDOR_OPENDJ)) {
+                String version = result.substring(VENDOR_OPENDJ.length());
+                vendor = new Vendor(OPENDJ, version);
+            } else if (result.startsWith(VENDOR_OPENDS)) {
                 String version = result.substring(VENDOR_OPENDS.length());
                 vendor = new Vendor(OPENDS, version);
             } else if (result.startsWith(VENDOR_SUNDS_5)) {
