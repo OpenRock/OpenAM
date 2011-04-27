@@ -346,10 +346,10 @@ static void send_ok(IHttpContext* pHttpContext)
 	IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
 	pHttpResponse->Clear();
        PCSTR pszBuffer;
-	pszBuffer = "200 Status OK";
+	pszBuffer = "OK";
 	hr = pHttpResponse->SetStatus(200,"Status OK",0, S_OK);
 	hr = pHttpResponse->SetHeader("Content-Type", "text/plain", (USHORT)strlen("text/plain"), TRUE);
-	hr = pHttpResponse->SetHeader("Content-Length", "13", (USHORT)strlen("13"),TRUE);
+	hr = pHttpResponse->SetHeader("Content-Length", "2", (USHORT)strlen("2"),TRUE);
 	if (FAILED(hr)) {
 		am_web_log_error("send_ok(): SetHeader failed.");
 	}
@@ -764,6 +764,14 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 
 		case AM_INVALID_SESSION:
 			am_web_log_info("%s: Invalid session.",thisfunc);
+			// reset the CDSSO cookie first
+			if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+				am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
+				if(cdStatus != AM_SUCCESS) {
+					am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
+				}
+			}
+			// reset cookies on invalid session.
 			am_web_do_cookies_reset(reset_cookie, args, agent_config);
 
 			// If the post data preservation feature is enabled
@@ -794,6 +802,16 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 			am_web_log_info("%s: Access denied to %s",thisfunc,
 				OphResources.result.remote_user ?
 				OphResources.result.remote_user : "unknown user");
+			// reset the CDSSO cookie first
+			if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+				am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
+				if(cdStatus != AM_SUCCESS) {
+					am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
+				}
+			}
+			// reset cookies on invalid session.
+			am_web_do_cookies_reset(reset_cookie, args, agent_config);
+
 			// If the post data preservation feature is enabled
 			// save the post data in the cache for post requests.
 			// This needs to be done when the access has been denied
