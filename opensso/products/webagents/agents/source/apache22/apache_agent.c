@@ -22,10 +22,13 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2011 TOOLS.LV SIA
- *
- * $Id: apache_agent.c,v 1.1.1 2011/04/26 15:13:00 mareks Exp $
+ * $Id: apache_agent.c,v 1.1 2011/04/26 15:13:00 dknab Exp $
  */
+
+/*
+ * Portions Copyrighted 2011 TOOLS.LV SIA
+ */
+
 #include <limits.h>
 #include <signal.h>
 #include <errno.h>
@@ -61,6 +64,8 @@
 
 #define DSAME                   "DSAME"
 #define OpenSSO                 "OpenSSO"
+#define	MAGIC_STR		"sunpostpreserve"
+#define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
 
 module AP_MODULE_DECLARE_DATA dsame_module;
 
@@ -92,11 +97,22 @@ typedef struct am_notification_list_item {
     am_notification_list_ptr next;
 } am_notification_list_item_t;
 
+typedef struct am_post_data_list_item* am_post_data_item_ptr;
+
+typedef struct am_post_data_list_item {
+    char *key; //post data key in a cache
+    char *action_url; //orig. action url
+    char *value; //orig. post data value
+    am_post_data_item_ptr next;
+} am_post_data_list_item_t;
+
 typedef struct {
     char *properties_file;
     char *bootstrap_file;
     char *notification_lockfile;
+    char *postdata_lockfile;
     int notification_shm_size;
+    int postdata_shm_size;
     int max_pid_count;
 } agent_server_config;
 
@@ -106,10 +122,18 @@ static struct notification_hash_table {
     unsigned int num_entries;
 } *notification_list;
 
+static struct post_data_hash_table {
+    am_post_data_list_item_t **table;
+    unsigned int tbl_len;
+    unsigned int num_entries;
+} *post_data_list;
 
 static apr_shm_t *notification_shm = NULL; /* the APR shared segment object */
 static apr_rmm_t *notification_rmm = NULL; /* the APR relocatable memory management handler */
 static apr_global_mutex_t *notification_lock = NULL; /* the cross-thread/cross-process mutex */
+static apr_shm_t *postdata_shm = NULL;
+static apr_rmm_t *postdata_rmm = NULL;
+static apr_global_mutex_t *postdata_lock = NULL;
 
 static void register_process(int pid) {
     int bucket;
@@ -148,6 +172,118 @@ static void post_notification(char *value) {
     apr_global_mutex_unlock(notification_lock);
 }
 
+static void listall_post_data() {
+    unsigned int i;
+    am_post_data_item_ptr entry = NULL;
+    if (am_web_is_max_debug_on()) {
+        am_web_log_max_debug("PDP=========START===========");
+        apr_global_mutex_lock(postdata_lock);
+        for (i = 0; i < post_data_list->tbl_len; i++) {
+            entry = post_data_list->table[i];
+            while (entry) {
+                am_web_log_max_debug("PDP=========[ %d ]===========", i);
+                am_web_log_max_debug("PDP-KEY: %s", entry->key);
+                am_web_log_max_debug("PDP-ACTIONURL: %s", entry->action_url);
+                am_web_log_max_debug("PDP-VALUE: %s", entry->value);
+                am_web_log_max_debug("PDP========================");
+                entry = entry->next;
+            }
+        }
+        apr_global_mutex_unlock(postdata_lock);
+        am_web_log_max_debug("PDP=========END============");
+    }
+}
+
+static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd) {
+    unsigned int i;
+    am_post_data_item_ptr entry = NULL;
+    am_status_t status = AM_FAILURE;
+    am_bool_t entry_found = AM_FALSE;
+    apr_global_mutex_lock(postdata_lock);
+    for (i = 0; i < post_data_list->tbl_len; i++) {
+        entry = post_data_list->table[i];
+        while (entry) {
+            if (id != NULL && entry->key != NULL && strcmp(entry->key, id) == 0) {
+                /*found it, copy values out and release the memory*/
+                pd->url = strdup(entry->action_url);
+                pd->value = strdup(entry->value);
+                if (entry->key)
+                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->key));
+                if (entry->value)
+                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->value));
+                if (entry->action_url)
+                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->action_url));
+                entry_found = AM_TRUE;
+                break;
+            }
+            entry = entry->next;
+        }
+        if (entry_found == AM_TRUE) {
+            /*remove this row from post-data table*/
+            apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, post_data_list->table[i]));
+            post_data_list->table[i] = NULL;
+            status = AM_SUCCESS;
+            break;
+        }
+    }
+    apr_global_mutex_unlock(postdata_lock);
+    return status;
+}
+
+static am_status_t update_post_data_for_request(void **args, const char *key, const char *acturl, const char *value) {
+    const char *thisfunc = "update_post_data_for_request()";
+    am_web_log_info("%s: updating post data cache for key: %s", thisfunc, key);
+    request_rec *r = NULL;
+    am_status_t sts = AM_SUCCESS;
+    unsigned int idx;
+    int bucket;
+    am_post_data_item_ptr entry = NULL;
+    if (args == NULL || (r = (request_rec *) args[0]) == NULL ||
+            key == NULL || acturl == NULL) {
+        am_web_log_error("%s: invalid argument passed.", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else {
+        apr_global_mutex_lock(postdata_lock);
+        bucket = post_data_list->num_entries;
+        /* check if there are empty rows (deleted by find_post_data)
+         * if so - reuse first one found
+         */
+        for (idx = 0; idx < post_data_list->tbl_len; idx++) {
+            if (post_data_list->table[idx] == NULL) {
+                bucket = idx;
+                break;
+            }
+        }
+        entry = apr_rmm_addr_get(postdata_rmm, apr_rmm_malloc(postdata_rmm, sizeof (am_post_data_list_item_t)));
+        if (key) {
+            entry->key = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(key) + 1));
+            memcpy(entry->key, key, strlen(key));
+        }
+        if (acturl) {
+            entry->action_url = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(acturl) + 1));
+            memcpy(entry->action_url, acturl, strlen(acturl));
+        }
+        if (value) {
+            entry->value = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(value) + 1));
+            memcpy(entry->value, value, strlen(value));
+        }
+        entry->next = post_data_list->table[bucket];
+        post_data_list->table[bucket] = entry;
+        if (bucket == post_data_list->num_entries) {
+            /* increase entry count only when adding to the table,
+             * not when replacing empty rows
+             */
+            post_data_list->num_entries++;
+        }
+        apr_global_mutex_unlock(postdata_lock);
+        sts = AM_SUCCESS;
+    }
+    if (am_web_is_max_debug_on()) {
+        listall_post_data();
+    }
+    return sts;
+}
+
 static const char *am_set_string_slot(cmd_parms *cmd, void *dummy, const char *arg) {
     char *error_str = NULL;
     int offset = (int) (long) cmd->info;
@@ -181,7 +317,9 @@ static const command_rec dsame_auth_cmds[] = {
     AP_INIT_TAKE1("Agent_Bootstrap_File", am_set_string_slot, (void *) APR_OFFSETOF(agent_server_config, bootstrap_file), RSRC_CONF,
     "Full path of the Agent bootstrap file"),
     AP_INIT_TAKE1("Agent_Notification_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, notification_shm_size), RSRC_CONF,
-    "Agent notification module shared memory segment size in bytes"), {
+    "Agent notification module shared memory segment size in bytes"),
+    AP_INIT_TAKE1("Agent_PostData_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, postdata_shm_size), RSRC_CONF,
+    "Agent pdp module shared memory segment size in bytes"), {
         NULL
     }
 };
@@ -244,8 +382,10 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
     }
     /*default values*/
     ((agent_server_config *) cfg)->notification_lockfile = apr_pstrcat(p, tmpdir, "/AMNotifLock", NULL);
+    ((agent_server_config *) cfg)->postdata_lockfile = apr_pstrcat(p, tmpdir, "/AMPostLock", NULL);
     ((agent_server_config *) cfg)->max_pid_count = 256;
     ((agent_server_config *) cfg)->notification_shm_size = 268435456; //256MB
+    ((agent_server_config *) cfg)->postdata_shm_size = 67108864; //64MB
     return (void *) cfg;
 }
 
@@ -264,7 +404,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     int ret = OK;
     am_status_t status = AM_SUCCESS;
     apr_status_t rv;
-    apr_size_t shm_size;
+    apr_size_t shm_size, pd_shm_size;
     int idx;
     void *data; /* These two help ensure that we only init once. */
     const char *data_key = "init_dsame";
@@ -304,6 +444,8 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
      */
     if (scfg->notification_lockfile)
         apr_file_remove(scfg->notification_lockfile, pconf);
+    if (scfg->postdata_lockfile)
+        apr_file_remove(scfg->postdata_lockfile, pconf);
 
     status = am_web_init(scfg->bootstrap_file, scfg->properties_file);
 
@@ -328,12 +470,28 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
+        rv = apr_global_mutex_create(&postdata_lock, scfg->postdata_lockfile, APR_LOCK_DEFAULT, pconf);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                    "policy web agent postdata global mutex file '%s'",
+                    scfg->postdata_lockfile);
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+
         shm_size = APR_ALIGN_DEFAULT(scfg->notification_shm_size);
+        pd_shm_size = APR_ALIGN_DEFAULT(scfg->postdata_shm_size);
 
         rv = apr_shm_create(&notification_shm, shm_size, NULL, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "policy web agent notification anonymous shared segment");
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        rv = apr_shm_create(&postdata_shm, pd_shm_size, NULL, pconf);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                    "policy web agent postdata anonymous shared segment");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
@@ -344,7 +502,14 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
+        rv = apr_rmm_init(&postdata_rmm, NULL, apr_shm_baseaddr_get(postdata_shm), pd_shm_size, pconf);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
+                    "policy web agent postdata relocatable memory management handler");
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
         mp = scfg->max_pid_count;
+
         notification_list = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (*notification_list) +
                 sizeof (am_notification_list_item_t*) * mp));
 
@@ -355,9 +520,19 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         notification_list->tbl_len = mp;
         notification_list->num_entries = 0;
 
+        post_data_list = apr_rmm_addr_get(postdata_rmm, apr_rmm_malloc(postdata_rmm, sizeof (*post_data_list) +
+                sizeof (am_post_data_list_item_t*) * mp));
+
+        post_data_list->table = (am_post_data_list_item_t**) (post_data_list + 1);
+        for (idx = 0; idx < mp; idx++) {
+            post_data_list->table[idx] = NULL;
+        }
+        post_data_list->tbl_len = mp;
+        post_data_list->num_entries = 0;
+
         ap_log_error(__FILE__, __LINE__, APLOG_NOTICE, 0, server_ptr,
-                "Policy web agent shared memory configuration: notif_shm_size[%d], max_pid_count[%d]",
-                shm_size, mp);
+                "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d]",
+                shm_size, pd_shm_size, mp);
     }
     return ret;
 }
@@ -392,6 +567,21 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
         return;
     }
 
+    rv = apr_rmm_attach(&postdata_rmm, NULL, apr_shm_baseaddr_get(postdata_shm), pool_ptr);
+    if (rv != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
+                "policy web agent postdata shared memory management object");
+        return;
+    }
+
+    rv = apr_global_mutex_child_init(&postdata_lock, scfg->postdata_lockfile, pool_ptr);
+    if (rv != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
+                "policy web agent postdata global mutex file '%s'",
+                scfg->postdata_lockfile);
+        return;
+    }
+
 #ifdef _MSC_VER
     register_process(_getpid());
 #else
@@ -413,10 +603,7 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
     const char *thisfunc = "render_result()";
     int *apache_ret = NULL;
     am_status_t sts = AM_SUCCESS;
-    core_dir_config *conf;
-    void *agent_config = am_web_get_agent_configuration();
     int len = 0;
-
     if (args == NULL || (r = (request_rec *) args[0]) == NULL,
             (apache_ret = (int *) args[1]) == NULL ||
             ((http_result == AM_WEB_RESULT_OK_DONE ||
@@ -543,9 +730,7 @@ static am_status_t get_request_url(request_rec *r, char **requestURL) {
             r->uri,
             args_sep_str,
             args);
-
     am_web_log_debug("%s: Returning request URL = %s.", thisfunc, *requestURL);
-
     return status;
 }
 
@@ -587,7 +772,6 @@ static am_status_t content_read(void **args, char **rbuf) {
     // If the content length is not reset, servlet containers think
     // the request is a POST.
     if (sts == AM_SUCCESS) {
-
         r->clength = 0;
         apr_table_unset(r->headers_in, "Content-Length");
         new_clen_val = apr_table_get(r->headers_in, "Content-Length");
@@ -610,7 +794,6 @@ static am_status_t set_header_in_request(void **args, const char *key, const cha
         // remove all instances of the header first.
         apr_table_unset(r->headers_in, key);
         if (values != NULL && *values != '\0') {
-
             apr_table_set(r->headers_in, key, values);
         }
         sts = AM_SUCCESS;
@@ -628,7 +811,7 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
         sts = AM_INVALID_ARGUMENT;
     } else {
         /* Apache keeps two separate server response header tables in the request 
-         * record?one for normal response headers and one for error headers. 
+         * record—one for normal response headers and one for error headers. 
          * The difference between them is that the error headers are sent to 
          * the client even (not only) on an error response (REDIRECT is one of them)
          */
@@ -886,7 +1069,6 @@ static int get_apache_method_num(am_web_req_method_t am_num) {
             break;
         case AM_WEB_REQUEST_MERGE:
             apache_num = M_MERGE;
-
             break;
     }
     return apache_num;
@@ -1002,7 +1184,6 @@ static am_web_req_method_t get_method_num(request_rec *r) {
         // correct the method string. But if the method number is invalid
         // the method string needs to be preserved in case Apache is
         // used as a proxy (in front of Exchange Server for instance)
-
         r->method = am_web_method_num_to_str(method_num);
         am_web_log_debug("%s: Set method string to %s", thisfunc, r->method);
     }
@@ -1021,8 +1202,36 @@ static int do_deny(request_rec *r, am_status_t status) {
             " found in Access Manager.");
     am_web_log_info("do_deny() Status code= %s.",
             am_status_to_string(status));
-
     return retVal;
+}
+
+/**
+ * Send HTTP_INTERNAL_SERVER_ERROR in case of an error
+ */
+static int send_error(request_rec *r) {
+    int retVal = HTTP_INTERNAL_SERVER_ERROR;
+    r->content_type = "text/plain";
+    ap_custom_response(r, HTTP_INTERNAL_SERVER_ERROR,
+            "Server encountered an error while processing"
+            " request to/from OpenAM.");
+    am_web_log_info("send_error() HTTP_INTERNAL_SERVER_ERROR");
+    return retVal;
+}
+
+static char *get_cookie(request_rec *r, const char *cookie_name) {
+    char *raw_cookie_start = NULL, *raw_cookie_end, *cookie;
+    char *raw_cookie = (char*) apr_table_get(r->headers_in, "Cookie");
+    if (!(raw_cookie)) return 0;
+    do {
+        if (!(raw_cookie = strstr(raw_cookie, cookie_name))) return NULL;
+        raw_cookie_start = raw_cookie;
+        if (!(raw_cookie = strchr(raw_cookie, '='))) return NULL;
+    } while (strncmp(cookie_name, raw_cookie_start, raw_cookie - raw_cookie_start) != 0);
+    raw_cookie++; //skip '='
+    if (!((raw_cookie_end = strchr(raw_cookie, ';')) || (raw_cookie_end = strchr(raw_cookie, '\0')))) return NULL;
+    if (!(cookie = apr_pstrndup(r->pool, raw_cookie, raw_cookie_end - raw_cookie))) return NULL;
+    if (!(ap_unescape_url(cookie) == 0)) return NULL;
+    return cookie;
 }
 
 static am_status_t set_cookie(const char *header, void **args) {
@@ -1057,12 +1266,94 @@ void init_at_request() {
     }
 }
 
+static am_status_t check_for_post_data(char *requestURL, char **page, void *agent_config) {
+    const char *thisfunc = "check_for_post_data()";
+    const char *post_data_query = NULL;
+    am_web_postcache_data_t get_data = {NULL, NULL};
+    const char *actionurl = NULL;
+    const char *postdata_cache = NULL;
+    am_status_t status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
+    char* buffer_page = NULL;
+    char *stickySessionValue = NULL;
+    char *stickySessionPos = NULL;
+    char *temp_uri = NULL;
+    *page = NULL;
+
+    if (requestURL == NULL) {
+        status = AM_INVALID_ARGUMENT;
+    }
+    // Check if magic URI is present in the URL
+    if (status == AM_SUCCESS) {
+        post_data_query = strstr(requestURL, POST_PRESERVE_URI);
+        if (post_data_query != NULL) {
+            post_data_query += strlen(POST_PRESERVE_URI);
+            // Check if a query parameter for the  sticky session has been
+            // added to the dummy URL. Remove it if it is the case.
+            status_tmp = am_web_get_postdata_preserve_URL_parameter
+                    (&stickySessionValue, agent_config);
+            if (status_tmp == AM_SUCCESS) {
+                stickySessionPos = strstr(post_data_query, stickySessionValue);
+                if (stickySessionPos != NULL) {
+                    size_t len = strlen(post_data_query) -
+                            strlen(stickySessionPos) - 1;
+                    temp_uri = malloc(len + 1);
+                    memset(temp_uri, 0, len + 1);
+                    strncpy(temp_uri, post_data_query, len);
+                    post_data_query = temp_uri;
+                }
+            }
+        }
+    }
+    // If magic uri present search for corresponding value in shared cache
+    if ((status == AM_SUCCESS) && (post_data_query != NULL) &&
+            (strlen(post_data_query) > 0)) {
+        am_web_log_debug("%s: POST Magic Query Value: %s", thisfunc, post_data_query);
+        if (am_web_is_max_debug_on()) {
+            listall_post_data();
+        }
+        if ((find_post_data((char*) post_data_query, &get_data)) == AM_SUCCESS) {
+            postdata_cache = get_data.value;
+            actionurl = get_data.url;
+            am_web_log_debug("%s: POST cache actionurl: %s",
+                    thisfunc, actionurl);
+            // Create the post page
+            buffer_page = am_web_create_post_page(post_data_query,
+                    postdata_cache, actionurl, agent_config);
+            *page = strdup(buffer_page);
+            if (*page == NULL) {
+                am_web_log_error("%s: Not enough memory to allocate page");
+                status = AM_NO_MEMORY;
+            }
+            am_web_postcache_data_cleanup(&get_data);
+            if (buffer_page != NULL) {
+                am_web_free_memory(buffer_page);
+            }
+        } else {
+            am_web_log_error("%s: Found magic URI (%s) but entry is not in POST"
+                    " hash table", thisfunc, post_data_query);
+            status = AM_FAILURE;
+        }
+    }
+    if (temp_uri != NULL) {
+        free(temp_uri);
+        temp_uri = NULL;
+    }
+    if (stickySessionValue != NULL) {
+        am_web_free_memory(stickySessionValue);
+        stickySessionValue = NULL;
+    }
+    return status;
+}
+
 /**
  * Grant access depending on policy and session evaluation
  */
 int dsame_check_access(request_rec *r) {
     const char *thisfunc = "dsame_check_access()";
     am_status_t status = AM_SUCCESS;
+    am_status_t pdp_status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
     int ret = OK;
     char *url = NULL;
     void *args[] = {(void *) r, (void *) & ret};
@@ -1076,13 +1367,16 @@ int dsame_check_access(request_rec *r) {
     am_web_request_params_t req_params;
     am_web_request_func_t req_func;
     void* agent_config = NULL;
+    char *post_page = NULL;
+    char *dpro_cookie = NULL;
+    char *response = NULL;
 
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
 
     /**
      * Initialize the agent during first request
-     * Should not be repeated during subsequest requests.
+     * Should not be repeated during subsequent requests.
      */
     if (agentInitialized != B_TRUE) {
         apr_thread_mutex_lock(init_mutex);
@@ -1097,7 +1391,6 @@ int dsame_check_access(request_rec *r) {
         apr_thread_mutex_unlock(init_mutex);
         am_web_log_info("%s: Unlocked initialization section.", thisfunc);
     }
-
     if (status == AM_SUCCESS) {
         // Get the agent config
         agent_config = am_web_get_agent_configuration();
@@ -1107,6 +1400,7 @@ int dsame_check_access(request_rec *r) {
             status = AM_FAILURE;
         }
     }
+    am_web_log_info("%s: starting...", thisfunc);
     // Check arguments
     if (r == NULL) {
         am_web_log_error("%s: Request to http server is NULL.", thisfunc);
@@ -1151,6 +1445,22 @@ int dsame_check_access(request_rec *r) {
         }
     }
 
+    // If post preserve data is enabled, check if there is post data
+    // in the post data cache
+    if (status == AM_SUCCESS) {
+        if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+            pdp_status = check_for_post_data(url, &post_page, agent_config);
+        }
+    }
+
+    //Check if the SSO token is in the HTTP_COOKIE header
+    if (status == AM_SUCCESS) {
+        const char *cookieName = am_web_get_cookie_name(agent_config);
+        if (cookieName != NULL) {
+            dpro_cookie = get_cookie(r, cookieName);
+        }
+    }
+
     // If there is a proxy in front of the agent, the user can set in the
     // properties file the name of the headers that the proxy uses to set
     // the real client IP and host name. In that case the agent needs
@@ -1178,6 +1488,37 @@ int dsame_check_access(request_rec *r) {
                     &clientIP, &clientHostname);
         }
     }
+
+    if (am_web_is_max_debug_on()) {
+        am_web_log_max_debug("%s: post page: [%s], dpro cookie: [%s]", thisfunc, post_page, dpro_cookie);
+    }
+
+    //In CDSSO mode, check if the sso token is in the post data
+    if (status == AM_SUCCESS) {
+        if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) && method == AM_WEB_REQUEST_POST) {
+            if ((dpro_cookie == NULL || (strlen(dpro_cookie) == 0))
+                    && post_page != NULL) {
+                char *recv_token = NULL;
+                status = content_read((void*) &r, &response);
+                if (status == AM_SUCCESS) {
+                    status = am_web_get_token_from_assertion(response, &recv_token, agent_config);
+                    if (status != AM_SUCCESS) {
+                        am_web_log_error("%s: am_web_get_token_from_assertion() "
+                                "failed with error code: %s",
+                                thisfunc, am_status_to_string(status));
+                    } else {
+                        am_web_log_debug("%s: recv_token : %s", thisfunc, recv_token);
+                        // Set cookie in browser for the foreign domain.
+                        am_web_do_cookie_domain_set(set_cookie, args, recv_token, agent_config);
+                    }
+                }
+                if (recv_token) {
+                    free(recv_token);
+                }
+            }
+        }
+    }
+
     // Set the client ip in the request parameters structure
     if (status == AM_SUCCESS) {
         if (clientIP == NULL) {
@@ -1214,11 +1555,47 @@ int dsame_check_access(request_rec *r) {
         req_func.add_header_in_response.args = args;
         req_func.render_result.func = render_result;
         req_func.render_result.args = args;
+        // post data preservation (create shared cache table entry)
+        req_func.reg_postdata.func = update_post_data_for_request;
+        req_func.reg_postdata.args = args;
 
         (void) am_web_process_request(&req_params, &req_func,
                 &status, agent_config);
 
-        if (status != AM_SUCCESS) {
+        if (status == AM_SUCCESS) {
+            if (post_page != NULL && strlen(post_page) > 0) {
+                /* If post_page is not null it means that the request 
+                 * contains the "/dummypost/sunpostpreserve" string and
+                 * that the post data of the original request need to be
+                 * posted.
+                 * If using a LB cookie, it needs to be set to NULL.
+                 * If am_web_get_postdata_preserve_lbcookie() returns
+                 * AM_INVALID_ARGUMENT, it means that the sticky session
+                 * feature is disabled (ie no LB) or that the sticky
+                 * session mode is URL
+                 **/
+                char *lbCookieHeader = NULL;
+                status_tmp = am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_TRUE, agent_config);
+                if (status_tmp != AM_NO_MEMORY) {
+                    if (status_tmp == AM_SUCCESS) {
+                        am_web_log_debug("%s: Setting LB cookie for post data preservation to null.", thisfunc);
+                        set_cookie(lbCookieHeader, args);
+                    }
+                    int len = strlen(post_page);
+                    ap_set_content_type(r, "text/html");
+                    ap_set_content_length(r, len);
+                    ap_rwrite(post_page, len, r);
+                    ap_rflush(r);
+                    ret = DONE;
+                } else {
+                    am_web_log_debug("%s: get LB cookie error %d", thisfunc, status_tmp);
+                }
+                if (lbCookieHeader != NULL) {
+                    am_web_free_memory(lbCookieHeader);
+                    lbCookieHeader = NULL;
+                }
+            }
+        } else {
             am_web_log_error("%s: Error encountered rendering result %d.",
                     thisfunc, ret);
         }
@@ -1230,7 +1607,14 @@ int dsame_check_access(request_rec *r) {
     if (clientHostname != NULL) {
         am_web_free_memory(clientHostname);
     }
-
+    if (response != NULL) {
+        free(response);
+        response = NULL;
+    }
+    if (post_page != NULL) {
+        free(post_page);
+        post_page = NULL;
+    }
     am_web_delete_agent_configuration(agent_config);
     // Failure handling
     if (status == AM_FAILURE) {
@@ -1291,11 +1675,30 @@ static apr_status_t cleanup_dsame(void *data) {
         notification_lock = NULL;
     }
 
+    if (postdata_rmm) {
+        apr_rmm_destroy(postdata_rmm);
+        am_web_log_info("Destroyed shared memory manager...");
+        postdata_rmm = NULL;
+    }
+
+    if (postdata_shm) {
+        apr_shm_destroy(postdata_shm);
+        am_web_log_info("Destroyed shared memory...");
+        postdata_shm = NULL;
+    }
+
+    if (postdata_lock) {
+        apr_global_mutex_destroy(postdata_lock);
+        am_web_log_info("Destroyed shared memory global mutex...");
+        postdata_lock = NULL;
+    }
+
     (void) am_web_cleanup();
 
     // release SIGTERM
     (void) signal(SIGTERM, prev_handler);
     if (sigterm_delivered) {
+
         raise(SIGTERM);
     }
     return APR_SUCCESS;

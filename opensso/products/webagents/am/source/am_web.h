@@ -493,6 +493,29 @@ typedef struct {
 } am_web_add_header_in_response_t;
 
 /**
+ * Store post data, generated magic url key and
+ * original action url in agent shared cache
+ *
+ * Arguments:
+ *
+ * args - agent defined arguments to pass in.
+ * key - generated post data preservation key (part of Magic url)
+ * acturl - action url (original request url)
+ * value - actual post data
+ *
+ * Return:
+ *
+ * This function should return AM_SUCCESS if store was successfully 
+ * and appropriate am_status_t code otherwise.
+ */
+typedef am_status_t (*am_web_register_postdata_func_t)(
+			void **args, const char *key, const char *acturl, const char *value);
+typedef struct {
+    am_web_register_postdata_func_t func;
+    void **args;
+} am_web_register_postdata_t;
+
+/**
  * structure for all the functions above
  */
 typedef struct {
@@ -518,6 +541,9 @@ typedef struct {
 
     // render http result
     am_web_render_result_t render_result;
+    
+    //PDP
+    am_web_register_postdata_t reg_postdata;
 
 } am_web_request_func_t;
 

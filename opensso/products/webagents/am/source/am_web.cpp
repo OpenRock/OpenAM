@@ -4905,6 +4905,7 @@ get_token_from_assertion(
 	am_web_get_post_data_t get_post_data,
 	am_web_free_post_data_t free_post_data,
 	char **sso_token,
+        char **post_data,
         void* agent_config)
 {
     const char *thisfunc = "get_token_from_assertion()";
@@ -4957,12 +4958,12 @@ get_token_from_assertion(
 			     "postdata %s",
 			     thisfunc, am_status_to_string(sts),
 			     postdata == NULL ? "NULL": "empty");
-	    if (postdata != NULL) {
+	    /*if (postdata != NULL) {
 		if (free_post_data.func != NULL) {
 		    free_post_data.func(free_post_data.args, postdata);
 		}
 		postdata = NULL;
-	    }
+	    }*/
 	    sts = AM_NOT_FOUND;
 	}
 	else if ((sts = am_web_get_token_from_assertion(
@@ -4980,14 +4981,15 @@ get_token_from_assertion(
 	}
 	else {
 	    // all is ok - free post data.
-	    if (postdata != NULL) {
+	    /*if (postdata != NULL) {
 		if (free_post_data.func != NULL) {
 		    free_post_data.func(free_post_data.args, postdata);
 		}
 		postdata = NULL;
-	    }
+	    }*/
 	}
     }
+    *post_data = postdata;    
     return sts;
 }
 
@@ -5261,6 +5263,7 @@ process_cdsso(
      am_web_request_func_t *req_func,
      am_web_req_method_t orig_method,
      char **sso_token,
+     char **post_data,
      void* agent_config)
 {
     const char *thisfunc = "process_cdsso()";
@@ -5284,7 +5287,7 @@ process_cdsso(
                                req_params->method,
                                req_func->get_post_data,
                                req_func->free_post_data,
-                               sso_token,
+                               sso_token, post_data,
                                agent_config)) != AM_SUCCESS) {
         // Get sso token from assertion.
         am_web_log_error("%s: Error getting token from assertion: %s",
@@ -5744,7 +5747,7 @@ process_access_redirect(char *url,
 static am_status_t
 get_sso_token(am_web_request_params_t *req_params,
               am_web_request_func_t *req_func,
-              char **sso_token,
+              char **sso_token, char **post_data,
               am_web_req_method_t *orig_method,
               void* agent_config)
 {
@@ -5777,7 +5780,7 @@ get_sso_token(am_web_request_params_t *req_params,
                     req_params->client_ip, agent_config) == B_TRUE))) {
         req_method = AM_WEB_REQUEST_GET;
         sts = process_cdsso(req_params, req_func, req_method, 
-                            sso_token, agent_config);
+                            sso_token, post_data, agent_config);
         if (sts == AM_SUCCESS &&
              (*sso_token == NULL || (*sso_token)[0] == '\0')) {
             sts = AM_NOT_FOUND;
@@ -5824,6 +5827,7 @@ process_request(am_web_request_params_t *req_params,
     am_map_t env_map = NULL;
     am_policy_result_t policy_result = AM_POLICY_RESULT_INITIALIZER;
     char *redirect_url = NULL;
+    char *post_data = NULL;
     char *advice_response = NULL;
     void *args[1];
     boolean_t cdsso_enabled = am_web_is_cdsso_enabled(agent_config);
@@ -5833,7 +5837,7 @@ process_request(am_web_request_params_t *req_params,
     // get sso token from either cookie header or assertion in cdsso mode.
     // OK if it's not found - am_web_is_access_allowed will check if
     // access is enforced.
-    sts = get_sso_token(req_params, req_func, &sso_token, 
+    sts = get_sso_token(req_params, req_func, &sso_token, &post_data,
                         &orig_method, agent_config);
     if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
         am_web_log_error("%s: Error while getting sso token from "
@@ -5877,7 +5881,9 @@ process_request(am_web_request_params_t *req_params,
                               agent_config);
                 break;
             case AM_INVALID_SESSION:
+            case AM_ACCESS_DENIED:
                 args[0] = req_func;
+                am_web_log_debug("%s: session is invalid, will redirect (postdata: %s)", thisfunc, post_data);
                 // reset the CDSSO cookie first
                 if (cdsso_enabled == B_TRUE) {
                     am_status_t cdStatus = am_web_do_cookie_domain_set(add_cookie_in_response, 
@@ -5899,14 +5905,49 @@ process_request(am_web_request_params_t *req_params,
                                 thisfunc, req_params->url,
                                 am_status_to_string(local_sts));
                 }
+                if (req_params->method == AM_WEB_REQUEST_POST &&
+                        B_TRUE == am_web_is_postpreserve_enabled(agent_config) &&
+                        req_func->get_post_data.func != NULL &&
+                        req_func->reg_postdata.func != NULL) {
+                    /*
+                     * post data preservation is enabled - check if method is POST, register post data
+                     * function exists, post data is available and proceed with creating appropriate redirection and storing
+                     * generated data in agent shared cache for later retrieval when cdsso servlet posts back
+                     */
+                    am_status_t pds = AM_SUCCESS;
+                    post_urls_t *pu = NULL;
+                    if (post_data == NULL) {
+                        am_web_log_debug("%s: post_data is empty, trying to read it here...");
+                        pds = req_func->get_post_data.func(req_func->get_post_data.args, &post_data);
+                        am_web_log_debug("%s: post data: %s", thisfunc, post_data);
+                    }
+                    if (pds == AM_SUCCESS) {
+                        pds = am_web_create_post_preserve_urls(req_params->url,
+                            &pu, agent_config);
+                    }
+                    if (pds == AM_SUCCESS) {
+                        pds = req_func->reg_postdata.func(req_func->reg_postdata.args,
+                            pu->post_time_key, pu->action_url, post_data);
+                    }
+                    if (pds == AM_SUCCESS)
+                        result = process_access_redirect(pu->dummy_url, orig_method,
+                                sts, policy_result,
+                                req_func,
+                                &redirect_url,
+                                NULL, agent_config);
+                    if (pu != NULL) {
+                        am_web_clean_post_urls(pu);
+                        pu = NULL;
+                    }
+                } else {
                 // will be either forbidden or redirect to auth
                 result = process_access_redirect(req_params->url, orig_method,
                                 sts, policy_result,
                                 req_func,
                                 &redirect_url,
                                 NULL, agent_config);
+                }
                 break;
-            case AM_ACCESS_DENIED:
             case AM_INVALID_FQDN_ACCESS:
                 result = process_access_redirect(req_params->url, orig_method,
                                 sts, policy_result,
