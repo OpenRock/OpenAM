@@ -24,7 +24,7 @@
  *
  * Portions Copyrighted 2011 TOOLS.LV SIA
  *
- * $Id: apache_agent.c,v 1.1 2011/04/06 13:13:11 mareks Exp $
+ * $Id: apache_agent.c,v 1.1.1 2011/04/26 15:13:00 mareks Exp $
  */
 #include <limits.h>
 #include <signal.h>
@@ -627,8 +627,11 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
         am_web_log_error("%s: invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
-
-        apr_table_add(r->headers_out, key, values);
+        /* Apache keeps two separate server response header tables in the request 
+         * record?one for normal response headers and one for error headers. 
+         * The difference between them is that the error headers are sent to 
+         * the client even (not only) on an error response (REDIRECT is one of them)
+         */
         apr_table_add(r->err_headers_out, key, values);
         sts = AM_SUCCESS;
     }
@@ -1136,12 +1139,14 @@ int dsame_check_access(request_rec *r) {
             status = content_read((void*) &r, &data);
             if (status == AM_SUCCESS) {
                 post_notification(data);
-                if (status != AM_SUCCESS) {
-                    am_web_log_error("%s: post_notification failed", thisfunc);
-                }
-                /*data is allocated on apr pool, will be freed together with a pool*/
+                /*notification is received, respond with HTTP200 and OK in response body*/
+                ap_set_content_type(r, "text/html");
+                ap_set_content_length(r, 2);
+                ap_rwrite("OK", 2, r);
+                ap_rflush(r);
+                /*data is allocated on apr pool, will be released together with a pool*/
                 am_web_delete_agent_configuration(agent_config);
-                return HTTP_OK;
+                return DONE;
             }
         }
     }
