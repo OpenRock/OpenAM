@@ -35,6 +35,8 @@
 
             <xsd:element name="UserLocked" type="tns:UserLocked"></xsd:element>
 
+            <xsd:element name="MaximumSessionReached" type="tns:MaximumSessionReached"></xsd:element>
+
             <xsd:element name="UserNotFound" type="tns:UserNotFound"></xsd:element>
 
             <xsd:element name="ObjectNotFound" type="tns:ObjectNotFound"></xsd:element>
@@ -149,6 +151,12 @@
             </xsd:complexType>
 
             <xsd:complexType name="AccountExpired">
+                <xsd:sequence>
+                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="MaximumSessionReached">
                 <xsd:sequence>
                     <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
                 </xsd:sequence>
@@ -393,6 +401,9 @@
     <message name="AccountExpired">
         <part name="fault" element="tns:AccountExpired"></part>
     </message>
+    <message name="MaximumSessionReached">
+        <part name="fault" element="tns:MaximumSessionReached"></part>
+    </message>
     <message name="attributes">
         <part name="parameters" element="tns:attributes"></part>
     </message>
@@ -512,6 +523,7 @@
             <fault message="tns:UserInactive" name="UserInactive"></fault>
             <fault message="tns:UserLocked" name="UserLocked"></fault>
             <fault message="tns:AccountExpired" name="AccountExpired"></fault>
+            <fault message="tns:MaximumSessionReached" name="MaximumSessionReached"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
         </operation>
         <operation name="logout">
@@ -655,6 +667,9 @@
             </fault>
             <fault name="AccountExpired">
                 <soap:fault name="AccountExpired" use="literal"></soap:fault>
+            </fault>
+            <fault name="MaximumSessionReached">
+                <soap:fault name="MaximumSessionReached" use="literal"></soap:fault>
             </fault>
             <fault name="GeneralFailure">
                 <soap:fault name="GeneralFailure" use="literal"></soap:fault>

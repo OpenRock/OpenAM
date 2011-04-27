@@ -51,6 +51,7 @@ import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.IdentityServicesImpl;
 import com.sun.identity.idsvcs.IdentityServicesFactory;
 import com.sun.identity.idsvcs.AccountExpired;
+import com.sun.identity.idsvcs.MaximumSessionReached;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.OrgInactive;
 import com.sun.identity.idsvcs.UserInactive;
@@ -658,7 +659,8 @@ public class IdentityServicesHandler extends HttpServlet {
                     if (e instanceof UnsupportedOperationException) {
                         response.sendError(501, sw.toString());
                     } else if (e instanceof OrgInactive || e instanceof UserLocked
-                            || e instanceof UserInactive || e instanceof AccountExpired){
+                            || e instanceof UserInactive || e instanceof AccountExpired
+                            || e instanceof MaximumSessionReached){
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, sw.toString());
                     } else {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);

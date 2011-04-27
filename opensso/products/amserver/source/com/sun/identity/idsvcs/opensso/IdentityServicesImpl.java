@@ -66,6 +66,7 @@ import com.sun.identity.idsvcs.InvalidCredentials;
 import com.sun.identity.idsvcs.InvalidPassword;
 import com.sun.identity.idsvcs.LogResponse;
 import com.sun.identity.idsvcs.LogoutResponse;
+import com.sun.identity.idsvcs.MaximumSessionReached;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.OrgInactive;
@@ -138,7 +139,7 @@ public class IdentityServicesImpl
     public Token authenticate(String username, String password, String uri)
         throws UserNotFound, InvalidPassword, NeedMoreCredentials,
         InvalidCredentials, OrgInactive, UserInactive, AccountExpired,
-        UserLocked, GeneralFailure, RemoteException {
+        UserLocked, GeneralFailure, MaximumSessionReached, RemoteException {
         
 
         assert username != null && password != null;
@@ -221,6 +222,8 @@ public class IdentityServicesImpl
                     throw new AccountExpired(em);
                 } else if (ec.equals(AMAuthErrorCode.AUTH_LOGIN_FAILED)) {
                     throw new InvalidCredentials(em);
+                } else if (ec.equals(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED)) {
+                    throw new MaximumSessionReached(em);
                 }
             } else {
                 try {
