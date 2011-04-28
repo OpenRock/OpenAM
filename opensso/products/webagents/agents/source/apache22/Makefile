@@ -44,7 +44,7 @@ LDFLAGS := ../../../am/source/am_web.res -LIBPATH:$(APACHE22_LIB_DIR) -LIBPATH:$
 LDLIBS := libapr-1.lib libapriconv-1.lib libhttpd.lib amsdk.lib libnspr4.lib nss3.lib ssl3.lib libplc4.lib libxml2.lib user32.lib
 else
 LDFLAGS := ../../../am/source/am_web.res -L$(APACHE22_LIB_DIR) -L$(DEST_LIB_DIR) -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) 
-LDLIBS := -llibapr-1 -llibapriconv-1 -llibhttpd -lamsdk_static -llibnspr4 -lnss3 -lssl3 -llibplc4 -llibxml2 -luser32
+LDLIBS := -llibapr-1 -llibaprutil-1 -llibapriconv-1 -llibhttpd -lamsdk_static -llibnspr4 -lnss3 -lssl3 -llibplc4 -llibxml2 -luser32
 endif
 
 SRCS := apache_agent.c
