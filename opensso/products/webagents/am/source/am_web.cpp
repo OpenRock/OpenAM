@@ -5607,7 +5607,6 @@ process_access_success(char *url,
     //   2) if notenforced_url_attributes_enable is set 
     //      to false, the remote user is not set to anything
 
-    am_web_log_error("%s: Starting", thisfunc);
     if (((*agentConfigPtr)->notenforced_url_attributes_enable == AM_FALSE) &&
             (policy_result.remote_user == NULL)) {
        am_web_log_debug("%s: notenforced.url.attributes.enable is "

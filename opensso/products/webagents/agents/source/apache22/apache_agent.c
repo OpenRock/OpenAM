@@ -232,12 +232,15 @@ static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd) {
 
 static am_status_t update_post_data_for_request(void **args, const char *key, const char *acturl, const char *value) {
     const char *thisfunc = "update_post_data_for_request()";
-    am_web_log_info("%s: updating post data cache for key: %s", thisfunc, key);
-    request_rec *r = NULL;
-    am_status_t sts = AM_SUCCESS;
+    request_rec *r;
+    am_status_t sts;
     unsigned int idx;
     int bucket;
-    am_post_data_item_ptr entry = NULL;
+    am_post_data_item_ptr entry;
+    am_web_log_info("%s: updating post data cache for key: %s", thisfunc, key);
+    r = NULL;
+    sts = AM_SUCCESS;
+    entry = NULL;
     if (args == NULL || (r = (request_rec *) args[0]) == NULL ||
             key == NULL || acturl == NULL) {
         am_web_log_error("%s: invalid argument passed.", thisfunc);
@@ -1214,7 +1217,7 @@ static int send_error(request_rec *r) {
     ap_custom_response(r, HTTP_INTERNAL_SERVER_ERROR,
             "Server encountered an error while processing"
             " request to/from OpenAM.");
-    am_web_log_info("send_error() HTTP_INTERNAL_SERVER_ERROR");
+    am_web_log_debug("send_error() HTTP_INTERNAL_SERVER_ERROR");
     return retVal;
 }
 
@@ -1380,7 +1383,7 @@ int dsame_check_access(request_rec *r) {
      */
     if (agentInitialized != B_TRUE) {
         apr_thread_mutex_lock(init_mutex);
-        am_web_log_info("%s: Locked initialization section.", thisfunc);
+        am_web_log_debug("%s: Locked initialization section.", thisfunc);
         if (agentInitialized != B_TRUE) {
             (void) init_at_request();
             if (agentInitialized != B_TRUE) {
@@ -1389,7 +1392,7 @@ int dsame_check_access(request_rec *r) {
             }
         }
         apr_thread_mutex_unlock(init_mutex);
-        am_web_log_info("%s: Unlocked initialization section.", thisfunc);
+        am_web_log_debug("%s: Unlocked initialization section.", thisfunc);
     }
     if (status == AM_SUCCESS) {
         // Get the agent config
@@ -1441,6 +1444,8 @@ int dsame_check_access(request_rec *r) {
                 /*data is allocated on apr pool, will be released together with a pool*/
                 am_web_delete_agent_configuration(agent_config);
                 return DONE;
+            } else {
+                am_web_log_error("%s: content_read for notification failed, %s", thisfunc, am_status_to_string(status));
             }
         }
     }
@@ -1507,7 +1512,7 @@ int dsame_check_access(request_rec *r) {
                                 "failed with error code: %s",
                                 thisfunc, am_status_to_string(status));
                     } else {
-                        am_web_log_debug("%s: recv_token : %s", thisfunc, recv_token);
+                        am_web_log_max_debug("%s: recv_token : %s", thisfunc, recv_token);
                         // Set cookie in browser for the foreign domain.
                         am_web_do_cookie_domain_set(set_cookie, args, recv_token, agent_config);
                     }
@@ -1575,20 +1580,21 @@ int dsame_check_access(request_rec *r) {
                  * session mode is URL
                  **/
                 char *lbCookieHeader = NULL;
+                int len;
                 status_tmp = am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_TRUE, agent_config);
                 if (status_tmp != AM_NO_MEMORY) {
                     if (status_tmp == AM_SUCCESS) {
-                        am_web_log_debug("%s: Setting LB cookie for post data preservation to null.", thisfunc);
+                        am_web_log_max_debug("%s: Setting LB cookie for post data preservation to null.", thisfunc);
                         set_cookie(lbCookieHeader, args);
                     }
-                    int len = strlen(post_page);
+                    len = strlen(post_page);
                     ap_set_content_type(r, "text/html");
                     ap_set_content_length(r, len);
                     ap_rwrite(post_page, len, r);
                     ap_rflush(r);
                     ret = DONE;
                 } else {
-                    am_web_log_debug("%s: get LB cookie error %d", thisfunc, status_tmp);
+                    am_web_log_max_debug("%s: get LB cookie error %s", thisfunc, am_status_to_string(status_tmp));
                 }
                 if (lbCookieHeader != NULL) {
                     am_web_free_memory(lbCookieHeader);
