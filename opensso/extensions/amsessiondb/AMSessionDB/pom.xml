@@ -147,7 +147,7 @@
             <url>http://www.orientechnologies.com/listing/m2</url> 
             <snapshots> 
                 <enabled>true</enabled> 
-                <updatePolicy>never</updatePolicy> 
+                <updatePolicy>daily</updatePolicy> 
             </snapshots> 
         </repository>
         <repository>  

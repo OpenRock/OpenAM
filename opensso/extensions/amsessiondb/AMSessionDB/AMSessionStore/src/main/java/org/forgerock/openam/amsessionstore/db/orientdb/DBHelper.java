@@ -33,7 +33,10 @@ import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OProperty.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.storage.OStorage;
+import com.orientechnologies.orient.server.OServerMain;
+import com.orientechnologies.orient.server.handler.distributed.ODistributedServerManager;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
 
@@ -55,6 +58,12 @@ public class DBHelper {
      */
     public static ODatabaseDocumentPool initPool(String dbURL, String user, String password, int minSize, int maxSize) {        
         createSchema(dbURL, user, password);
+        
+        try {
+            //shareDatabase(dbURL, user, password);
+        } catch (Exception ex) {
+            
+        }
         
         ODatabaseDocumentPool pool = new ODatabaseDocumentPool(); //ODatabaseDocumentPool.global(); // Moving from 0.9.25 to 1.0 RC had to change this, is it safe?
         pool.setup(minSize, maxSize);
@@ -88,7 +97,7 @@ public class DBHelper {
         ODatabaseDocumentTx db = null;
         
         try {
-            db = new ODatabaseDocumentTx(dbURL).open("admin", "admin"); 
+            db = new ODatabaseDocumentTx(dbURL).open(user, password);
             OSchema schema = db.getMetadata().getSchema();
         
             if (!schema.existsClass(DocumentUtil.CLASS_NAME)) {
@@ -101,11 +110,35 @@ public class DBHelper {
 
                 Log.logger.log(Level.FINE, "Created class in the schema");
             } 
+        } catch (Exception ex) {
+            Log.logger.log(Level.SEVERE, "Unable to load schema into database", ex);
         } finally {
             if (db != null) {
                 db.close();
             }
         }
 
+    }
+    
+    private static void shareDatabase(String dbURL, String user, String password) 
+    throws Exception {
+        ODistributedServerManager manager = OServerMain.server().getHandler(ODistributedServerManager.class);
+        
+        if (manager == null) {
+            throw new Exception("Can't find a ODistributedServerDiscoveryManager");
+        }
+        
+        //if (!manager.isCurrentNodeTheClusterOwner("amsessiondb", "default")) {
+            ODocument servers = manager.getServersForCluster("amsessiondb", "default");
+            manager.getServersForCluster("amsessiondb", "default");
+
+            if (servers == null) {
+                throw new Exception("Node is not distributed");   
+            }
+
+            String leaderId = servers.field("owner");
+        //} 
+        
+        
     }
 }
