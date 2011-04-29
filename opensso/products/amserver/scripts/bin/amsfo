@@ -27,6 +27,8 @@
 #
 #
 
+# Portions Copyrighted 2011 ForgeRock AS
+
 CONF_FILE=/opt/SUNWam/lib/amsfo.conf
 CONF_FILE_LINUX=/opt/sun/identity/lib/amsfo.conf
 CONF_FILE_HPUX=/opt/sun/identity/lib/amsfo.conf
@@ -194,22 +196,34 @@ stop_am() {
 
 }
 
+wait_jmq () {
+	_repeat=true
+	while [ $_repeat ]; do
+		EXIST=`netstat -a |grep 7777|grep LISTEN|wc -l`
+		if [ $EXIST -ge 1 ]; then
+			_repeat=
+		else
+                       sleep 2
+	               echo "\tWait for the broker to start properly"			
+               fi
+        done
+}
+
 case "$1" in
 'start')
        if [ "$START_BROKER" = "true" ]; then
            start_jmq
-           ## Wait for 5 sec for the broker to start ##
-           sleep 5
+	   ## Wait until the broker start up properly ## 
+           wait_jmq
        fi
        start_am
-       sleep 5
        ;;
 
 'stop')
        stop_am
        ## Wait untill the AMDB shuts down properly ## 
-       sleep 5
        if [ "$START_BROKER" = "true" ]; then
+           sleep 5
            stop_jmq
        fi
        ;;
