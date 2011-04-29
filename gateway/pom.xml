@@ -25,6 +25,7 @@
     <modules>
         <module>gateway-core</module>
         <module>gateway-war</module>
+        <module>gateway-fed-war</module>
     </modules>
     <build>
         <plugins>
