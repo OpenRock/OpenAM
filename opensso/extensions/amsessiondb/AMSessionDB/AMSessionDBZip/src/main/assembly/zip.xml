@@ -29,33 +29,11 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>/amsessiondb/lib</outputDirectory>
-            <scope>runtime</scope>
             <excludes>
-                <exclude>*pom</exclude>
+                <exclude>*:*:pom:*</exclude>
             </excludes>
-        </dependencySet>
-        <dependencySet>
-            <unpack>false</unpack>
-            <outputFileNameMapping>amsessioncommon.jar</outputFileNameMapping>
-            <includes>
-                 <include>org.forgerock.openam.amsessionstore.common</include>
-                 <include>org.forgerock.openam.amsessionstore.resources</include>
-            </includes>
-            <outputDirectory>/openidm/lib</outputDirectory>
-        </dependencySet>
-        <dependencySet>
-            <unpack>false</unpack>
-            <outputFileNameMapping>amsessiondb.jar</outputFileNameMapping>
-            <includes>
-                 <include>org.forgerock.openam.amsessionstore</include>
-                 <include>org.forgerock.openam.amsessionstore.db</include>
-                 <include>org.forgerock.openam.amsessionstore.db.memory</include>
-                 <include>org.forgerock.openam.amsessionstore.impl</include>
-                 <include>org.forgerock.openam.amsessionstore.shared</include>
-            </includes>
-            <outputDirectory>/openidm/lib</outputDirectory>
+            <outputDirectory>amsessiondb/lib</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
     </dependencySets>
 </assembly>
