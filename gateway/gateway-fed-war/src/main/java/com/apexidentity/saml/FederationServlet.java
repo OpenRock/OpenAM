@@ -97,6 +97,9 @@ public class FederationServlet extends HttpServlet
 	private String subjectMapping;
     private String redirectURI;
     private String logoutURI;
+    private String assertionConsumerEndpoint;
+    private String SPinitiatedSSOEndpoint;
+    private String singleLogoutEndpoint;
     
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response)
@@ -108,13 +111,13 @@ public class FederationServlet extends HttpServlet
     	
         try {
         	String path = request.getPathInfo();
-            if (path.indexOf("fedletapplication") > 0) {
+            if (path.indexOf(assertionConsumerEndpoint) > 0) {
         	    serviceAssertionConsumer(request, response);
             }
-            else if (path.indexOf("SPInitiatedSSO") > 0) {
+            else if (path.indexOf(SPinitiatedSSOEndpoint) > 0) {
         	    serviceSPInitiatedSSO(request, response);
             }
-            else if (path.indexOf("fedletSlo") > 0){
+            else if (path.indexOf(singleLogoutEndpoint) > 0){
         	    serviceIDPInitiatedSLO(request, response);
             }
             else {
@@ -275,6 +278,9 @@ public class FederationServlet extends HttpServlet
             servlet.subjectMapping = config.get("subjectMapping").asString();
             servlet.redirectURI = config.get("redirectURI").asString();
             servlet.logoutURI = config.get("logoutURI").asString();
+            servlet.assertionConsumerEndpoint = config.get("assertionConsumerEndpoint").defaultTo("fedletapplication").asString();
+            servlet.SPinitiatedSSOEndpoint = config.get("SPinitiatedSSOEndpoint").defaultTo("SPInitiatedSSO").asString();
+            servlet.singleLogoutEndpoint = config.get("singleLogoutEndpoint").defaultTo("fedletSlo").asString();
             
             // Get the Gateway configuration directory and set it as a system property to
             // override the default openFed location
