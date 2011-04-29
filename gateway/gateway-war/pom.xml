@@ -53,14 +53,6 @@
     </dependencies>
     <build>
         <finalName>gateway-${project.version}</finalName>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/java</directory>
-                <includes>
-                    <include>META-INF/**/*</include>
-                </includes>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
