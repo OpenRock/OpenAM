@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.forgerock.openam</groupId>
+  <artifactId>AMSessionRepository</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>AMSessionRepository</name>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <openam.version>snapshot952</openam.version>
+  </properties>
+  
+    <repositories>
+      <repository>
+        <id>forgerock</id>
+        <name>ForgeRock OpenAM Repo</name>
+        <url>http://repo.forgerock.org</url>
+        </repository>
+        <repository>  
+           <id>maven-restlet</id>  
+           <name>Public online Restlet repository</name>  
+           <url>http://maven.restlet.org</url>  
+        </repository> 
+    </repositories>
+    
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.forgerock.openam</groupId>
+        <artifactId>amserver</artifactId>
+        <version>${openam.version}</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.forgerock.openam</groupId>
+        <artifactId>sharedlib</artifactId>
+        <version>${openam.version}</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>AMSessionStoreCommon</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>
