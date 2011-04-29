@@ -25,7 +25,8 @@
 package org.forgerock.openam.amsessionstore.impl;
 
 /**
- *
+ * Implements the read resource functionality
+ * 
  * @author steve
  */
 
@@ -33,7 +34,7 @@ import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 import org.forgerock.openam.amsessionstore.resources.ReadResource;
 import org.forgerock.openam.amsessionstore.shared.Statistics;
@@ -48,7 +49,7 @@ public class ReadResourceImpl extends ServerResource implements ReadResource {
         AMRecord record = null;
         
         try {
-            record = PersistentStoreManager.getInstance().getPersistentStore().read(id);
+            record = PersistentStoreFactory.getPersistentStore().read(id);
         } catch (StoreException sex) {
             Log.logger.log(Level.WARNING, "Unable to read", sex.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());

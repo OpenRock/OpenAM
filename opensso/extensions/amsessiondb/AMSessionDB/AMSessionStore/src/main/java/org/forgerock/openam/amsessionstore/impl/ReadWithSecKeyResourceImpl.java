@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
 import org.restlet.data.Status;
@@ -38,7 +38,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 /**
- *
+ * Implements the read with sec key resource functionality
+ * 
  * @author steve
  */
 public class ReadWithSecKeyResourceImpl extends ServerResource implements ReadWithSecKeyResource {
@@ -47,7 +48,7 @@ public class ReadWithSecKeyResourceImpl extends ServerResource implements ReadWi
         Set<String> records = null;
         
         try {
-            records = PersistentStoreManager.getInstance().getPersistentStore().readWithSecKey(id);
+            records = PersistentStoreFactory.getPersistentStore().readWithSecKey(id);
         } catch (StoreException sex) {
             Log.logger.log(Level.WARNING, "Unable to read with secondary key", sex.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());

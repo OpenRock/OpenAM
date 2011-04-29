@@ -39,7 +39,9 @@ import org.forgerock.openam.amsessionstore.common.Log;
 
 /**
  * A Helper to interact with the OrientDB
+ * 
  * @author aegloff
+ * @auther steve
  */
 public class DBHelper {
     /**

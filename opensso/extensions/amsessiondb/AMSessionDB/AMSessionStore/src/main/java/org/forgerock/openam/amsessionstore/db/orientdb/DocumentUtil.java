@@ -34,7 +34,9 @@ import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 
 /**
- *
+ * A utility class used to move from AMRecord to ODocument representations of 
+ * the underlying data and vice versa.
+ * 
  * @author steve
  */
 public class DocumentUtil {
@@ -54,6 +56,14 @@ public class DocumentUtil {
     
     public final static String CLASS_NAME = "amrecords";
     
+    /**
+     * Given an AMRecord, turn this in its matching ODocument representation.
+     * 
+     * @param record The record to convert
+     * @param db The db reference to use to create the ODocument
+     * @return The converted ODocument
+     * @throws StoreException 
+     */
     protected static ODocument toDocument(AMRecord record, ODatabaseDocumentTx db) 
     throws StoreException {
         ODocument result = null;
@@ -137,6 +147,12 @@ public class DocumentUtil {
         return result;
     }
     
+    /**
+     * Converts a given ODocument back into an AMRecord.
+     * 
+     * @param doc The ODocument to convert
+     * @return The AMRecord representation of the ODocument
+     */
     protected static AMRecord toAMRecord(ODocument doc) {
         AMRecord record = new AMRecord();
         

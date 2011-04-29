@@ -35,14 +35,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.resources.DeleteByDateResource;
-import org.forgerock.openam.amsessionstore.resources.DeleteResource;
 import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
 import org.forgerock.openam.amsessionstore.resources.ReadResource;
 import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
-import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
-import org.forgerock.openam.amsessionstore.resources.WriteResource;
 import org.restlet.resource.ClientResource;
 
 /**
@@ -59,19 +57,37 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
     private final static String BLOBS = "blobs";
     private final static Debug debug = FAMRecordUtils.debug;
     
+    private ExecutorService threadPool = null;
+            
+    
     public AMSessionDBRecordPersister() {
         resourceURL = SessionService.getJdbcURL();
         userName =   SessionService.getSessionStoreUserName();
         password =   SessionService.getSessionStorePassword();
         readTimeOut = SessionService.getConnectionMaxWaitTime();
         
+        threadPool = Executors.newCachedThreadPool();
+        
         if (debug.messageEnabled()) {
             debug.message("AMSessionDBRecordPersister created: URL: " +
                     resourceURL + " : username: " + userName + " : password: " +
                     password + " readTimeOut: " + readTimeOut);
         }
+        
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                shutdown();
+            }
+        });
     }
     
+    /**
+     * 
+     * @param famRecord The record to persist
+     * @return Some operations return their results in a FAMRecord
+     * @throws Exception If something goes wrong
+     */
     public FAMRecord send(FAMRecord famRecord)
     throws Exception {
         String op =  famRecord.getOperation();
@@ -89,13 +105,11 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 throw new Exception("Unable to delete without a primary key");
             }
             
-            ClientResource resource = new ClientResource(resourceURL + DeleteResource.URI);
-            DeleteResource deleteResource = resource.wrap(DeleteResource.class);
-             
-            deleteResource.remove(recordToDelete);
+            Runnable deleteTask = new DeleteTask(resourceURL, recordToDelete);
+            threadPool.execute(deleteTask);
             
             if (debug.messageEnabled()) {
-                debug.message("record: " + recordToDelete + " deleted");
+                debug.message("AMSessionDBRecordPersister: DeleteTasks queued");
             }
         } else if (op.equals(FAMRecord.DELETEBYDATE)) {
             if (debug.messageEnabled()) {
@@ -108,13 +122,11 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 throw new Exception("Invalid expiration time" + expTime);
             }
 
-            ClientResource resource = new ClientResource(resourceURL + DeleteByDateResource.URI);
-            DeleteByDateResource purgeResource = resource.wrap(DeleteByDateResource.class);
-
-            purgeResource.remove(expTime);
-
+            Runnable deleteByDateTask = new DeleteByDateTask(resourceURL, expTime);
+            threadPool.execute(deleteByDateTask);
+            
             if (debug.messageEnabled()) {
-                debug.message("records deleted by exp data: " + expTime);
+                debug.message("AMSessionDBRecordPersister: DeleteByDateTasks queued");
             }
         } else if (op.equals(FAMRecord.WRITE)) {
             if (debug.messageEnabled()) {
@@ -186,24 +198,22 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                record.setExtraStringAttrs(extraStringAttrs);
             }
             
-            ClientResource resource = new ClientResource(resourceURL + WriteResource.URI);
-            WriteResource writeResource = resource.wrap(WriteResource.class);
-            writeResource.write(record);
+            Runnable writeTask = new WriteTask(resourceURL, record);
+            threadPool.execute(writeTask);
             
             if (debug.messageEnabled()) {
-                debug.message("Message written to store: " + record);
+                debug.message("AMSessionDBRecordPersister: WriteTask queued");
             }
         } else if (op.equals(FAMRecord.SHUTDOWN)) {
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: " + FAMRecord.SHUTDOWN);
             }
             
-            ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
-            ShutdownResource shutdownResource = resource.wrap(ShutdownResource.class);
-            shutdownResource.shutdown();
+            Runnable shutdownTask = new ShutdownTask(resourceURL);
+            threadPool.execute(shutdownTask);
             
             if (debug.messageEnabled()) {
-                debug.message("Shutdown message sent");
+                debug.message("AMSessionDBRecordPersister: ShutdownTask queued");
             }
         } else if (op.equals(FAMRecord.READ)) {
             if (debug.messageEnabled()) {
@@ -292,9 +302,21 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
         return null;
     }
 
+    /**
+     * No implementation required with this implementation of FAMRecordPersister
+     * 
+     * @throws Exception 
+     */
     public void close()
     throws Exception {
         // no implementation required
+    }
+    
+    /**
+     * Called by the JVM shutdown hook, shuts down the thread pool
+     */
+    protected void shutdown() {
+        threadPool.shutdown();
     }
     
     /**

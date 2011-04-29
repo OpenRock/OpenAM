@@ -31,17 +31,25 @@ import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.common.SystemProperties;
 
 /**
- *
+ * Singleton used to fetch the shared instance of the persistent store.
+ * 
+ * The persistent store is pluggable and two implementations are provided.
+ * 
+ * <ui>
+ * <li>Memory
+ * <li>OrientDB
+ * </ul>
+ * 
+ * The OrientDB implementation is the default.
+ * 
  * @author steve
  */
-public class PersistentStoreManager {
+public class PersistentStoreFactory {
     private static PersistentStore persistentStore = null; 
-    private static PersistentStoreManager instance = null;
     private static String persistentStoreImpl = null; 
     private static final String DEFAULT_PERSISTER_VALUE = 
         "org.forgerock.openam.amsessionstore.db.memory.MemoryPersistentStore";
     
-
     static {
         try {
             initialize();
@@ -54,19 +62,21 @@ public class PersistentStoreManager {
     throws Exception {
         persistentStoreImpl = SystemProperties.get(Constants.PERSISTER_KEY,
                 DEFAULT_PERSISTER_VALUE);
-        Log.logger.log(Level.FINE, "Initialised Persistent Store: {0}", persistentStoreImpl);
+        Log.logger.log(Level.FINE, "Configured Persistent Store: {0}", persistentStoreImpl);
     }
-
-    private PersistentStoreManager() throws Exception {
-        persistentStore = (PersistentStore) Class.forName(
-            persistentStoreImpl).newInstance();        
-    } 
     
-    public synchronized static PersistentStoreManager getInstance() 
+    /**
+     * Return the singleton instance of the configured persistent store
+     * 
+     * @return The persistent store instance
+     * @throws Exception 
+     */
+    public synchronized static PersistentStore getPersistentStore() 
     throws Exception {
-        if (instance == null) {
+        if (persistentStore == null) {
             try {
-                instance = new PersistentStoreManager();
+                persistentStore = (PersistentStore) Class.forName(
+                persistentStoreImpl).newInstance(); 
                 Log.logger.log(Level.FINE, "Created PersistentStoreManager instance");
             } catch (Exception ex) {
                 Log.logger.log(Level.SEVERE, "Unable to create PersistentStoreManager", ex);
@@ -74,11 +84,6 @@ public class PersistentStoreManager {
             }
         }
         
-        return instance; 
-    }
-   
-    public static PersistentStore getPersistentStore() {
         return persistentStore; 
     }
-
 }

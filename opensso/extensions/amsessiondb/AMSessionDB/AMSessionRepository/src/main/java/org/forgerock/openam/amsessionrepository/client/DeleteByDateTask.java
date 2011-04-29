@@ -23,30 +23,40 @@
  *
  */
 
-package org.forgerock.openam.amsessionstore.impl;
+package org.forgerock.openam.amsessionrepository.client;
 
-import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.resources.DeleteByDateResource;
-import org.restlet.data.Status;
-import org.restlet.resource.Delete;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
+import org.restlet.resource.ClientResource;
 
 /**
- * Implements the delete by date resource.
- * 
+ *
  * @author steve
  */
-public class DeleteByDateResourceImpl extends ServerResource implements DeleteByDateResource {
-    @Delete
-    public void remove(long expDate) {
-        try {
-            PersistentStoreFactory.getPersistentStore().deleteExpired(expDate);
-        } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to delete expired", ex.getMessage());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
+public class DeleteByDateTask extends AbstractTask {
+    protected long expTime;
+    
+    public DeleteByDateTask(String resourceURL, long expTime) {
+        this.resourceURL = resourceURL;
+        this.expTime = expTime;
+    }
+
+    public void doTask() 
+    throws Exception {
+        ClientResource resource = new ClientResource(resourceURL + DeleteByDateResource.URI);
+        DeleteByDateResource purgeResource = resource.wrap(DeleteByDateResource.class);
+
+        purgeResource.remove(expTime);
+
+        if (debug.messageEnabled()) {
+            debug.message("records deleted by exp data: " + expTime);
         }
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        output.append(DeleteByDateTask.class).append(": expTime=").append(expTime);
+        
+        return output.toString();        
     }
 }

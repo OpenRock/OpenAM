@@ -27,22 +27,22 @@ package org.forgerock.openam.amsessionstore.impl;
 
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
 import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- *
+ * This class implements the shutdown REST call sent by OpenAM when it is 
+ * shutting down. Currently does nothing.
+ * 
+ * TODO: Could be clean up expired records?
+ * 
  * @author steve
  */
 public class ShutdownResourceImpl extends ServerResource implements ShutdownResource {
     @Get
     public void shutdown() {
-        try {
-            PersistentStoreManager.getInstance().getPersistentStore().shutdown();
-        } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to shutdown", ex.getMessage());
-        }
+        Log.logger.log(Level.FINEST, "Shutdown called");
+
     }
 }

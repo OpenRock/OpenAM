@@ -22,21 +22,37 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.amsessionstore.impl;
 
-import org.forgerock.openam.amsessionstore.resources.ConfigResource;
-import org.forgerock.openam.amsessionstore.common.Config;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
+package org.forgerock.openam.amsessionrepository.client;
+
+import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
+import org.restlet.resource.ClientResource;
 
 /**
- * This implementation outputs the configuration of the amsessiondb server
- * 
+ *
  * @author steve
  */
-public class ConfigResourceImpl extends ServerResource implements ConfigResource {
-    @Get
-    public Config getConfig() {
-        return Config.getInstance();
+public class ShutdownTask extends AbstractTask {
+    public ShutdownTask(String resourceURL) {
+        this.resourceURL = resourceURL;
+    }
+    
+    public void doTask()
+    throws Exception {
+        ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
+        ShutdownResource shutdownResource = resource.wrap(ShutdownResource.class);
+        shutdownResource.shutdown();
+
+        if (debug.messageEnabled()) {
+            debug.message("Shutdown message sent");
+        }
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        output.append(ShutdownTask.class);
+        
+        return output.toString();        
     }
 }

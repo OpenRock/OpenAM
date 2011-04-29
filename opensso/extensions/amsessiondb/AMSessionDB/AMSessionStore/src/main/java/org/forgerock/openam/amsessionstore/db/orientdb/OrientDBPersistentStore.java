@@ -48,7 +48,8 @@ import org.forgerock.openam.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 
 /**
- *
+ * The OrientDB implementation of the PersistentStore interface.
+ * 
  * @author steve
  */
 public class OrientDBPersistentStore implements PersistentStore, Runnable {
@@ -403,8 +404,9 @@ public class OrientDBPersistentStore implements PersistentStore, Runnable {
             }
         }
         
-        DBStatistics.getInstance().setNumSessions(docs.size());
-        return DBStatistics.getInstance();
+        DBStatistics stats = DBStatistics.getInstance();
+        stats.setNumRecords(docs.size());
+        return stats;
     }
     
     public Set<String> getDBOverview() {

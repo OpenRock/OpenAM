@@ -49,7 +49,8 @@ import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
 /**
- *
+ * Adds the REST resources into the RESTlet router.
+ * 
  * @author steve
  */
 public class AmSessionDbApplication extends Application {
@@ -71,6 +72,7 @@ public class AmSessionDbApplication extends Application {
         router.attach(GetRecordCountResource.URI, GetRecordCountResourceImpl.class);
         router.attach(StatsResource.URI, StatsResourceImpl.class);
         router.attach(ConfigResource.URI, ConfigResourceImpl.class);
+        // TODO remove as this is debugging code
         router.attach(DBDumpResource.URI, DBDumpResourceImpl.class);
 
         return router;

@@ -38,7 +38,8 @@ import org.forgerock.openam.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 
 /**
- *
+ * Demonstration implementation of the PersistentStore interface
+ * 
  * @author steve
  */
 public class MemoryPersistentStore implements PersistentStore, Runnable {
@@ -155,9 +156,10 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
     }
     
     public DBStatistics getDBStatistics() {
-        DBStatistics.getInstance().setNumSessions(store.size());
+        DBStatistics stats = DBStatistics.getInstance();
+        stats.setNumRecords(store.size());
         
-        return DBStatistics.getInstance();
+        return stats;
     }
     
     protected void internalShutdown() {

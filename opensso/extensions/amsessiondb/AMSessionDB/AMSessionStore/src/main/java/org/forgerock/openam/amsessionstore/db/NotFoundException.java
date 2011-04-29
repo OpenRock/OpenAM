@@ -26,7 +26,8 @@
 package org.forgerock.openam.amsessionstore.db;
 
 /**
- *
+ * Encapsulates a user not found exception
+ * 
  * @author steve
  */
 public class NotFoundException extends Exception {

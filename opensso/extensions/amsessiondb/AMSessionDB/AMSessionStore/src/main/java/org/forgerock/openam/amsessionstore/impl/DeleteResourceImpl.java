@@ -28,7 +28,7 @@ package org.forgerock.openam.amsessionstore.impl;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 import org.forgerock.openam.amsessionstore.resources.DeleteResource;
 import org.forgerock.openam.amsessionstore.shared.Statistics;
@@ -38,14 +38,15 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 /**
- *
+ * Implements the delete resource functionality
+ * 
  * @author steve
  */
 public class DeleteResourceImpl extends ServerResource implements DeleteResource {
     @Delete
     public void remove(String id) {
         try {
-            PersistentStoreManager.getInstance().getPersistentStore().delete(id);
+            PersistentStoreFactory.getPersistentStore().delete(id);
         } catch (StoreException sex) {
             Log.logger.log(Level.WARNING, "Unable to delete", sex.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());

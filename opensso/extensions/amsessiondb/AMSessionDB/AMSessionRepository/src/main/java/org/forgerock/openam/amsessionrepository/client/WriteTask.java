@@ -23,37 +23,40 @@
  *
  */
 
-package org.forgerock.openam.amsessionstore.impl;
+package org.forgerock.openam.amsessionrepository.client;
 
-import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.resources.WriteResource;
-import org.forgerock.openam.amsessionstore.shared.Statistics;
-import org.restlet.data.Status;
-import org.restlet.resource.Put;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
+import org.restlet.resource.ClientResource;
 
 /**
- * Implements the write resource functionality
- * 
+ *
  * @author steve
  */
-public class WriteResourceImpl extends ServerResource implements WriteResource {
-    @Put
-    public void write(AMRecord record) 
+public class WriteTask extends AbstractTask {
+    protected AMRecord record = null;
+    
+    public WriteTask(String resourceURL, AMRecord record) {
+        this.resourceURL = resourceURL;
+        this.record = record;
+    }
+    
+    public void doTask() 
     throws Exception {
-        try {
-            PersistentStoreFactory.getPersistentStore().write(record);
-        } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to process write", ex);
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, ex.getMessage());
-        }
+        ClientResource resource = new ClientResource(resourceURL + WriteResource.URI);
+        WriteResource writeResource = resource.wrap(WriteResource.class);
+        writeResource.write(record);
+
+        if (debug.messageEnabled()) {
+            debug.message("Message written to store: " + record);
+        }        
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        output.append(WriteTask.class).append(": record=").append(record.getPrimaryKey());
         
-        if (Statistics.isEnabled()) {
-            Statistics.getInstance().incrementTotalWrites();
-        }
+        return output.toString();        
     }
 }

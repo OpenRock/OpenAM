@@ -26,7 +26,8 @@
 package org.forgerock.openam.amsessionstore.db;
 
 /**
- *
+ * Encapsulates a problem in the store
+ * 
  * @author steve
  */
 public class StoreException extends Exception {

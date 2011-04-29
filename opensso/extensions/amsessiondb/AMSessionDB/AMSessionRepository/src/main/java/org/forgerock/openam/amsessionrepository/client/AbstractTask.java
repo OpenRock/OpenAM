@@ -22,21 +22,39 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.amsessionstore.impl;
 
-import org.forgerock.openam.amsessionstore.resources.ConfigResource;
-import org.forgerock.openam.amsessionstore.common.Config;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
+package org.forgerock.openam.amsessionrepository.client;
+
+import com.sun.identity.ha.FAMRecordUtils;
+import com.sun.identity.shared.debug.Debug;
 
 /**
- * This implementation outputs the configuration of the amsessiondb server
+ * Abstract class to the session persister tasks
+ * 
+ * TODO: Would be nice to have a retry count and be able to put failed tasks
+ * back in the queue to be retried.
  * 
  * @author steve
  */
-public class ConfigResourceImpl extends ServerResource implements ConfigResource {
-    @Get
-    public Config getConfig() {
-        return Config.getInstance();
+public abstract class AbstractTask implements Runnable {
+    protected static Debug debug = null;
+    protected String resourceURL = null;
+    
+    static {
+        initialize();
     }
+    
+    private static void initialize() {
+        debug = FAMRecordUtils.debug;
+    }
+    
+    public void run() {
+        try {
+            doTask();
+        } catch (Exception ex) {
+            debug.warning("Unable to execute task: " + toString());
+        }
+    }
+    
+    public abstract void doTask() throws Exception;
 }

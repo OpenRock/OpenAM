@@ -31,12 +31,16 @@ import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
 
 /**
- *
+ * Simple class used to start and stop the embedded OrientDB server.
+ * 
  * @author steve
  */
 public class EmbeddedOServer {
     private static OServer server = null;
     
+    /**
+     * Starts the embedded OrientDB server
+     */
     public static void startEmbedded() {
         Log.logger.log(Level.INFO, "Start embedded DB server");
         
@@ -48,6 +52,9 @@ public class EmbeddedOServer {
         }
     }
     
+    /**
+     * Stops the embedded OrientDB server
+     */
     public static void stopEmbedded() {
         if (server != null) {
             server.shutdown();

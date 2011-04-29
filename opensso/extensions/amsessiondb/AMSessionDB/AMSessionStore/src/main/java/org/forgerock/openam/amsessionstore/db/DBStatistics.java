@@ -26,11 +26,12 @@
 package org.forgerock.openam.amsessionstore.db;
 
 /**
- *
+ * This singleton class is used to keep statistics about the running db.
+ * 
  * @author steve
  */
 public class DBStatistics {
-    private int numSessions;
+    private int numRecords;
     private static DBStatistics instance = null;
     private static long startTime;
     
@@ -39,6 +40,7 @@ public class DBStatistics {
     }
     
     private static void initialize() {
+        // remember when we started.
         startTime = System.currentTimeMillis();
     }
     
@@ -46,7 +48,7 @@ public class DBStatistics {
         // do nothing
     }
     
-    public static DBStatistics getInstance() {
+    public static synchronized DBStatistics getInstance() {
         if (instance == null) {
             instance = new DBStatistics();
         }
@@ -54,14 +56,29 @@ public class DBStatistics {
         return instance;
     }
     
-    public int getNumSessions() {
-        return numSessions;
+    /**
+     * Returns the number of records in the database
+     * 
+     * @return the number of records
+     */
+    public int getNumRecords() {
+        return numRecords;
     }
     
-    public void setNumSessions(int numSessions) {
-        this.numSessions = numSessions;
+    /**
+     * Sets the number of records currently in the database
+     * 
+     * @param numRecords The current number of records
+     */
+    public synchronized void setNumRecords(int numRecords) {
+        this.numRecords = numRecords;
     }
     
+    /**
+     * Returns the current uptime (in ms.) of the amsessiondb server
+     * 
+     * @return 
+     */
     public long getUptime() {
         return System.currentTimeMillis() - startTime;
     }

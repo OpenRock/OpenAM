@@ -26,14 +26,15 @@ package org.forgerock.openam.amsessionstore.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.resources.StatsResource;
 import org.forgerock.openam.amsessionstore.shared.Statistics;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- *
+ * Implements the statistics functionality
+ * 
  * @author steve
  */
 public class StatsResourceImpl extends ServerResource implements StatsResource {
@@ -42,7 +43,7 @@ public class StatsResourceImpl extends ServerResource implements StatsResource {
     throws Exception {
         Set results = new HashSet();
         results.add(Statistics.getInstance());
-        results.add(PersistentStoreManager.getInstance().getPersistentStore().getDBStatistics());
+        results.add(PersistentStoreFactory.getPersistentStore().getDBStatistics());
         
         return results;
     }

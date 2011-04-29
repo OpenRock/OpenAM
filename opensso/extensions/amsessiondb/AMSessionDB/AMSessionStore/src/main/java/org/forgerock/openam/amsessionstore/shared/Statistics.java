@@ -30,7 +30,11 @@ import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import java.io.Serializable;
 
 /**
- *
+ * Statistics implementation used by the store to keep track of the number
+ * and type of received requests.
+ * 
+ * Statistics can be enabled/disabled using the configuration file.
+ * 
  * @author steve
  */
 public class Statistics implements Serializable {
@@ -59,7 +63,12 @@ public class Statistics implements Serializable {
         // do nothing
     }
     
-    public static Statistics getInstance() {
+    /**
+     * Returns the singleton instance
+     * 
+     * @return 
+     */
+    public static synchronized Statistics getInstance() {
         if (instance == null) {
             instance = new Statistics();
         }
@@ -67,46 +76,86 @@ public class Statistics implements Serializable {
         return instance;
     }
     
+    /**
+     * Returns the total number of requests
+     * 
+     * @return The total number of requests
+     */
     public int getTotalRequests() {
         return totalRequests;
     }
     
+    /**
+     * Returns the total number of reads
+     * 
+     * @return The total number of reads
+     */
     public int getTotalReads() {
         return totalReads;
     }
     
+    /**
+     * Increment the total read count
+     */
     public void incrementTotalReads() {
         totalReads++;
         totalRequests++;
     }
     
+    /**
+     * Get the total number of writes
+     * 
+     * @return The total number of writes
+     */
     public int getTotalWrites() {
         return totalWrites;
     }
     
+    /**
+     * Increment the total number of writes
+     */
     public void incrementTotalWrites() {
         totalWrites++;
         totalRequests++;
     }
     
+    /**
+     * Get the total number of deletes
+     * 
+     * @return The total number of deletes 
+     */
     public int getTotalDeletes() {
         return totalDeletes;
     }
     
+    /**
+     * Increment the total number of deletes
+     */
     public void incrementTotalDeletes() {
         totalDeletes++;
         totalRequests++;
     }
     
+    /**
+     * Get the total number of reads session count
+     * 
+     * @return 
+     */
     public int getTotalReadSessionCount() {
         return totalReadSessionCount;
     }
     
+    /**
+     * Increment the total read session count total
+     */
     public void incrementsTotalReadSessionCount() {
         totalReadSessionCount++;
         totalRequests++;
     }
     
+    /**
+     * Resets the statistics counters to zero.
+     */
     public void resetStatistics() {
         totalRequests = 0;
         totalReads = 0;
@@ -115,6 +164,11 @@ public class Statistics implements Serializable {
         totalReadSessionCount = 0;
     }
     
+    /** 
+     * Used to determine if statistics is enabled in the server 
+     * 
+     * @return true if stats are enabled, false otherwise.
+     */
     public static boolean isEnabled() {
         return enabled;
     }

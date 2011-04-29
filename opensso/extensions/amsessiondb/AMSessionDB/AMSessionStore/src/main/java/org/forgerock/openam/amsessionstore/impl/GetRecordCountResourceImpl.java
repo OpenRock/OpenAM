@@ -28,7 +28,7 @@ package org.forgerock.openam.amsessionstore.impl;
 import java.util.Map;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
 import org.forgerock.openam.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
@@ -37,7 +37,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 /**
- *
+ * Implements the get record count functionality
+ * 
  * @author steve
  */
 public class GetRecordCountResourceImpl extends ServerResource implements GetRecordCountResource {
@@ -46,7 +47,7 @@ public class GetRecordCountResourceImpl extends ServerResource implements GetRec
         Map<String, Long> sessions = null;
         
         try {
-            sessions = PersistentStoreManager.getInstance().getPersistentStore().getRecordCount(uuid);
+            sessions = PersistentStoreFactory.getPersistentStore().getRecordCount(uuid);
         } catch (Exception ex) {
             Log.logger.log(Level.WARNING, "Unable to get record count", ex.getMessage());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());

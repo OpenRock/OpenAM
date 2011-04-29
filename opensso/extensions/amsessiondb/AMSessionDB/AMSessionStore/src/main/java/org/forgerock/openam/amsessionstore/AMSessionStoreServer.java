@@ -28,12 +28,15 @@ import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.common.SystemProperties;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreManager;
+import org.forgerock.openam.amsessionstore.db.DBStatistics;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 
 /**
- *
+ * This is the main class of the amsessiondb server. Starts the RESTlet server
+ * component and initialises the underlying persistent store implementation.
+ * 
  * @author steve
  */
 
@@ -60,10 +63,11 @@ public class AMSessionStoreServer {
         // Attach the sample application.  
         component.getDefaultHost().attach(uri, new AmSessionDbApplication());  
   
-        // Start the component.  
+        // Start the component, persistents store and statistics framework.  
         try {
             component.start(); 
-            PersistentStoreManager.getInstance().getPersistentStore();
+            PersistentStoreFactory.getPersistentStore();
+            DBStatistics.getInstance();
         } catch (Exception ex) {
             Log.logger.log(Level.WARNING, "Unable to start amsessiondb", ex);
         }
