@@ -41,20 +41,14 @@ import org.restlet.data.Protocol;
  */
 
 public class AMSessionStoreServer {
-    private final static String DEFAULT_PORT = "8182";
+    private static final int DEFAULT_PORT = 8182;
     private final static String DEFAULT_URI = "/amsessiondb";
     
     public static void main( String[] args ) {
         // Create a new Component.  
         Component component = new Component();  
   
-        String listenPort = SystemProperties.get(Constants.PORT, DEFAULT_PORT);
-        int port = 8182;
-        
-        if (listenPort != null) {
-            port = Integer.parseInt(listenPort);
-        }
-        
+        int port = SystemProperties.getAsInt(Constants.PORT, DEFAULT_PORT);
         String uri = SystemProperties.get(Constants.URI, DEFAULT_URI);
         
         // Add a new HTTP server listening.  
@@ -72,6 +66,6 @@ public class AMSessionStoreServer {
             Log.logger.log(Level.WARNING, "Unable to start amsessiondb", ex);
         }
         
-        Log.logger.log(Level.FINE, "amsessiondb started on port {0}", listenPort);
+        Log.logger.log(Level.FINE, "amsessiondb started on port {0}", port);
     }
 }

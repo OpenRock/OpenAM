@@ -52,7 +52,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
     private String resourceURL = null;
     private String userName = null;
     private String password = null;
-    private int readTimeOut = 5 * 1000;
+    private int readTimeOut = 5000;
     
     private final static String BLOBS = "blobs";
     private final static Debug debug = FAMRecordUtils.debug;
@@ -119,7 +119,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             long expTime = famRecord.getExpDate(); 
 
             if (expTime < 0) {
-                throw new Exception("Invalid expiration time" + expTime);
+                throw new IllegalArgumentException("Invalid expiration time" + expTime);
             }
 
             Runnable deleteByDateTask = new DeleteByDateTask(resourceURL, expTime);
@@ -146,7 +146,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 return null;
             }
 
-            if (pKey != null && (!pKey.equals(""))) {
+            if (pKey != null && !pKey.isEmpty()) {
                 record.setPrimaryKey(pKey);
             }
 
@@ -159,13 +159,13 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             // Write Secondary Key such as UUID
             String sKey = famRecord.getSecondarykey(); 
 
-            if (sKey != null && (!sKey.equals(""))) {
+            if (sKey != null && !sKey.isEmpty()) {
                 record.setSecondaryKey(sKey);
             } 
 
             // Write AuxData such as Master ID 
             String auxData = famRecord.getAuxData();
-            if (auxData != null && (!auxData.equals(""))) {
+            if (auxData != null && !auxData.isEmpty()) {
                 record.setAuxdata(auxData);
             }
 
@@ -181,22 +181,17 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
                
             // Write extra bytes 
-            HashMap<String, byte[]> extraByteAttrs = famRecord.getExtraByteAttributes();
+            Map<String, byte[]> extraByteAttrs = famRecord.getExtraByteAttributes();
 
             if (extraByteAttrs != null) {
                for (Map.Entry<String, byte[]> entry : extraByteAttrs.entrySet()) {
-                   byte[] bt = famRecord.getBytes(entry.getKey());
-                   String data = Base64.encode(bt);
+                   String data = Base64.encode(entry.getValue());
                    record.setExtraByteAttrs(entry.getKey(), data);
                }
             }
 
             // Write extra String 
-            HashMap<String, String> extraStringAttrs = famRecord.getExtraStringAttributes(); 
-
-            if (extraStringAttrs != null) {
-               record.setExtraStringAttrs(extraStringAttrs);
-            }
+            record.setExtraStringAttrs(famRecord.getExtraStringAttributes());
             
             Runnable writeTask = new WriteTask(resourceURL, record);
             threadPool.execute(writeTask);
@@ -224,7 +219,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             
             if (recordToRead == null) {
                 debug.error("Unable to delete without a primary key");
-                throw new Exception("Unable to delete without a primary key");
+                throw new IllegalArgumentException("Unable to delete without a primary key");
             }
             
             ClientResource resource = new ClientResource(resourceURL + ReadResource.URI);
@@ -286,7 +281,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             record.setPrimaryKey(pKey);
 
             @SuppressWarnings("UseOfObsoleteCollectionType")
-            Vector blobs = new Vector();
+            Vector<String> blobs = new Vector<String>();
             
             for (String session : records) {
                 blobs.add(session);
@@ -319,6 +314,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
         threadPool.shutdown();
     }
     
+    //Cumbersome code, read TODO on AMRecord
     /**
      * For a set of operations turns an AMRecord into a FAMRecord
      * 
@@ -347,19 +343,19 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
         
         String service = record.getService();
         
-        if (service == null || service.equals("")) {
+        if (service == null || service.isEmpty()) {
             throw new Exception("Service cannot be null");
         }
         
         String operation = record.getOperation();
         
-        if (operation == null || operation.equals("")) {
+        if (operation == null || operation.isEmpty()) {
             throw new Exception("Operation cannot be null");
         }
         
         String pKey = record.getPrimaryKey();
 
-        if (pKey == null || pKey.equals("")) {
+        if (pKey == null || pKey.isEmpty()) {
             throw new Exception("Primary key cannot be null");
         }
        
@@ -382,7 +378,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 throw new Exception("blobs cannot be null");
             }
             result = new FAMRecord(service, operation, pKey, 0, null, 0, null, null);
-            HashMap blobs = new HashMap();
+            HashMap<String, Vector<String>> blobs = new HashMap<String, Vector<String>>();
             blobs.put(BLOBS, sessions);
             result.setStringAttrs(blobs);
         } else {

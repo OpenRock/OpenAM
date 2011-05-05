@@ -46,7 +46,19 @@
                 <groupId>com.forgerock.openam</groupId>
                 <artifactId>AMSessionStoreCommon</artifactId>
                 <version>${project.version}</version>
-            </dependency> 
+            </dependency>
+            <dependency>
+                <groupId>com.forgerock.openam</groupId>
+                <artifactId>amserver</artifactId>
+                <version>${openam.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.forgerock.openam</groupId>
+                <artifactId>sharedlib</artifactId>
+                <version>${openam.version}</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet</artifactId>

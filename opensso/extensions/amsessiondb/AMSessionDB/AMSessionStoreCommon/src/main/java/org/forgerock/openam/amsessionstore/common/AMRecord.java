@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * @author peter.major
  * @author steve
  */
 public class AMRecord implements Serializable {
@@ -184,11 +184,11 @@ public class AMRecord implements Serializable {
     }
     
     public String getString(String key) {
-      return (String) extraStringAttrs.get(key);
+      return extraStringAttrs.get(key);
     }
     
     public String getBytes(String key) {
-       return (String) extraByteAttrs.get(key);
+       return extraByteAttrs.get(key);
     }
     
     @Override
@@ -203,7 +203,7 @@ public class AMRecord implements Serializable {
         buffer.append("Aux Data: ").append(auxdata).append("\n");
         
         if (data != null) {
-            buffer.append("Data: ").append(new String(data)).append("\n");
+            buffer.append("Data: ").append(data).append("\n");
         }
         
         buffer.append("Extra String Attrs: ").append(extraStringAttrs).append("\n");

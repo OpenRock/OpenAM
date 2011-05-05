@@ -38,13 +38,10 @@
         <dependency>
             <groupId>com.forgerock.openam</groupId>
             <artifactId>sharedlib</artifactId>
-            <version>${openam.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>AMSessionStoreCommon</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

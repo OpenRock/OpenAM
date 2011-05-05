@@ -44,7 +44,7 @@ import org.forgerock.openam.amsessionstore.db.StoreException;
  */
 public class MemoryPersistentStore implements PersistentStore, Runnable {
     private Map<String, AMRecord> store = null;
-    private boolean shutdown = false;
+    private volatile boolean shutdown = false;
     private Thread storeThread;
     private int sleepInterval = 60 * 1000;
     private final static String ID = "MemoryPersistentStore";
@@ -72,7 +72,7 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
                 long curTime = System.currentTimeMillis() / 1000;
                 deleteExpired(curTime);
             } catch (InterruptedException ie) {
-                Log.logger.log(Level.WARNING, "Thread interupted", ie);
+                Log.logger.log(Level.WARNING, "Thread interrupted", ie);
             } catch (StoreException se) {
                 Log.logger.log(Level.WARNING, "Store Exception", se);
             } 
@@ -119,7 +119,7 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
         return records;
     }*/
 
-     public void delete(String id)
+    public void delete(String id)
     throws StoreException, NotFoundException {
         Object removed = store.remove(id);
         

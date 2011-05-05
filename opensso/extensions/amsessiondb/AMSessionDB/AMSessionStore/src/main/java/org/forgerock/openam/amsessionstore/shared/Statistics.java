@@ -39,7 +39,6 @@ import java.io.Serializable;
  */
 public class Statistics implements Serializable {
     private static boolean enabled = true;
-    private static String enabledProperty = null;
     private static Statistics instance = null;
     
     static {
@@ -47,9 +46,7 @@ public class Statistics implements Serializable {
     }
     
     private static void initialize() {
-        enabledProperty = SystemProperties.get(Constants.STATS_ENABLED,
-                Constants.TRUE);        
-        enabled = (enabledProperty.equalsIgnoreCase(Constants.TRUE)) ? true : false;
+        enabled = SystemProperties.getAsBoolean(Constants.STATS_ENABLED, true);
     }
     
     private int totalRequests;

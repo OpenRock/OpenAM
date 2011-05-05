@@ -27,40 +27,53 @@ package org.forgerock.openam.amsessionstore.common;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PropertyResourceBundle;
+import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  *
+ * @author peter.major
  * @author steve
  */
-public class SystemProperties {
-    private static Map<String, String> properties;
+public final class SystemProperties {
+    private static Properties properties;
     
     static {
         initialize();
     }
     
     private static void initialize() {
-        properties = new HashMap();
-        
+        properties = new Properties();
         InputStream pin = ClassLoader.getSystemResourceAsStream(Constants.PROPERTIES_FILE);
-        PropertyResourceBundle propertyBundle = null;
         
         try {
-            propertyBundle = new PropertyResourceBundle(pin);
+            properties.load(pin);
         } catch (IOException ioe) {
             System.out.println("IOException " + ioe.getMessage());
         }
-        
-        for (String key : propertyBundle.keySet()) {
-            properties.put(key, propertyBundle.getString(key));
-        }
     }
-    
+
+    public static String get(String key) {
+        return properties.getProperty(key);
+    }
+
     public static String get(String key, String defaultValue) {
-        String value = properties.get(key);
+        String value = get(key);
         return (value != null) ? value : defaultValue;
+    }
+
+    public static boolean getAsBoolean(String key, boolean defaultValue) {
+        String value = get(key);
+        return value != null ? Boolean.valueOf(value) : defaultValue;
+    }
+
+    public static int getAsInt(String key, int defaultValue) {
+        String value = get(key);
+        try {
+            return value != null? Integer.parseInt(value) : defaultValue;
+        } catch (NumberFormatException nfe) {
+            Log.logger.log(Level.WARNING, "Error while converting property value: {0}", new Object[]{value});
+            return defaultValue;
+        }
     }
 }

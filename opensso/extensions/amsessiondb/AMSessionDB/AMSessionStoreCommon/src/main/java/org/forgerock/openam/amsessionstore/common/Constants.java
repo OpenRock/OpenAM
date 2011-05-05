@@ -27,9 +27,10 @@ package org.forgerock.openam.amsessionstore.common;
 
 /**
  *
+ * @author peter.major
  * @author steve
  */
-public class Constants {
+public final class Constants {
     public static final String PROPERTIES_FILE = "amsessiondb.properties";
     
     public static final String PERSISTER_KEY = 
@@ -51,10 +52,6 @@ public class Constants {
     public static final String DB_POOL_MIN = "amsessiondb.db.poolMinSize";
     
     public static final String DB_POOL_MAX = "amsessiondb.db.poolMaxSize";
-    
-    public static final String TRUE = "true";
-    
-    public static final String FALSE = "false";
     
     public static final String LOCAL = "local";
 }

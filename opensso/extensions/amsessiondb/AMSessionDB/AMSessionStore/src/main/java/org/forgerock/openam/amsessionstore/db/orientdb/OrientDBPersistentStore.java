@@ -351,8 +351,10 @@ public class OrientDBPersistentStore implements PersistentStore, Runnable {
             }
         }  
 
-        String[] objs = { new Date(expDate * 1000).toString(), Integer.toString(deletedCount) };
-        Log.logger.log(Level.FINE, "Delete By Exp Date: {0} deleted {1} records", objs);
+        if (Log.logger.isLoggable(Level.FINE)) {
+            String[] objs = {new Date(expDate * 1000).toString(), Integer.toString(deletedCount)};
+            Log.logger.log(Level.FINE, "Delete By Exp Date: {0} deleted {1} records", objs);
+        }
     }
     
     public void shutdown() {
