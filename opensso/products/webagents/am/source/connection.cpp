@@ -25,6 +25,9 @@
  * $Id: connection.cpp,v 1.10 2010/03/10 05:09:38 dknab Exp $
  *
  */
+/*
+* Portions Copyrighted [2011] [ForgeRock AS]
+*/
 #include <stdexcept>
 #include <prinit.h>
 #include <plstr.h>
@@ -262,13 +265,13 @@ PRFileDesc *Connection::secureSocket(const std::string &certDBPasswd,
 	    if (SECSuccess == secStatus) {
                 sslMethodName = "SSL_OptionSet";
                 {
-                    bool state;
-                    secStatus = SSL_OptionGet(sslSocket,SSL_SECURITY, (PRBool*)&state);
-                    printf("\nSSL Security = %s",(state)?"True":"False");
-                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL3, (PRBool*)&state);
-                    printf("\nSSL SSL_ENABLE_SSL3 = %s",(state)?"True":"False");
-                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL2, (PRBool*)&state);
-                    printf("\nSSL SSL_ENABLE_SSL2 = %s",(state)?"True":"False");
+                    PRBool state;
+                    secStatus = SSL_OptionGet(sslSocket,SSL_SECURITY, &state);
+                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::secureSocket() " " SSL SSL_Security = %s",(state)?"true":"false");
+                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL3, &state);
+                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::secureSocket() " " SSL SSL_ENABLE_SSL3 = %s",(state)?"true":"false");
+                    secStatus = SSL_OptionGet(sslSocket,SSL_ENABLE_SSL2, &state);
+                    Log::log(Log::ALL_MODULES, Log::LOG_MAX_DEBUG, "Connection::secureSocket() " " SSL SSL_ENABLE_SSL2 = %s",(state)?"true":"false");
                 }
                 secStatus = SSL_OptionSet(sslSocket, SSL_SECURITY, PR_TRUE);
 	    }
