@@ -103,6 +103,7 @@ typedef struct am_post_data_list_item {
     char *key; //post data key in a cache
     char *action_url; //orig. action url
     char *value; //orig. post data value
+    apr_time_t created;
     am_post_data_item_ptr next;
 } am_post_data_list_item_t;
 
@@ -114,6 +115,7 @@ typedef struct {
     int notification_shm_size;
     int postdata_shm_size;
     int max_pid_count;
+    int max_pdp_count;
 } agent_server_config;
 
 static struct notification_hash_table {
@@ -151,14 +153,12 @@ static void register_process(int pid) {
 }
 
 static void post_notification(char *value) {
-    am_notification_list_ptr entry, prev;
+    am_notification_list_ptr entry = NULL;
     unsigned int i;
-    prev = NULL;
     apr_global_mutex_lock(notification_lock);
     for (i = 0; i < notification_list->tbl_len; i++) {
         entry = notification_list->table[i];
         while (entry) {
-            prev = entry;
             if (entry->value) {
                 /*if value exists, clear it first here*/
                 apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, entry->value));
@@ -174,6 +174,7 @@ static void post_notification(char *value) {
 
 static void listall_post_data() {
     unsigned int i;
+    char datestring[APR_RFC822_DATE_LEN];
     am_post_data_item_ptr entry = NULL;
     if (am_web_is_max_debug_on()) {
         am_web_log_max_debug("PDP=========START===========");
@@ -183,6 +184,8 @@ static void listall_post_data() {
             while (entry) {
                 am_web_log_max_debug("PDP=========[ %d ]===========", i);
                 am_web_log_max_debug("PDP-KEY: %s", entry->key);
+                apr_rfc822_date(datestring, entry->created);
+                am_web_log_max_debug("PDP-TIMESTAMP: %s", datestring);
                 am_web_log_max_debug("PDP-ACTIONURL: %s", entry->action_url);
                 am_web_log_max_debug("PDP-VALUE: %s", entry->value);
                 am_web_log_max_debug("PDP========================");
@@ -230,7 +233,45 @@ static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd) {
     return status;
 }
 
-static am_status_t update_post_data_for_request(void **args, const char *key, const char *acturl, const char *value) {
+static void pdp_gc(const unsigned long postcacheentry_life) {
+    unsigned int i, count = 0;
+    am_post_data_item_ptr entry = NULL;
+    am_bool_t entry_found = AM_FALSE;
+    apr_time_t now = apr_time_now();
+    if (postcacheentry_life >= 1L) {
+        now -= apr_time_from_sec(postcacheentry_life * 60);
+    } else {
+        am_web_log_warning("Invalid com.sun.identity.agents.config.postcache.entry.lifetime value, defaulting to 3 minutes");
+        now -= apr_time_from_sec(180);
+    }
+    am_web_log_max_debug("Starting PDP shared cache cleanup. Hash table size = %d", post_data_list->tbl_len);
+    for (i = 0; i < post_data_list->tbl_len; i++) {
+        entry = post_data_list->table[i];
+        while (entry) {
+            if (entry->created < now) {
+                /*found invalid entry, remove it*/
+                if (entry->key)
+                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->key));
+                if (entry->value)
+                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->value));
+                if (entry->action_url)
+                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->action_url));
+                entry_found = AM_TRUE;
+            }
+            entry = entry->next;
+        }
+        if (entry_found == AM_TRUE) {
+            /*remove this row from post-data table*/
+            apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, post_data_list->table[i]));
+            post_data_list->table[i] = NULL;
+            count++;
+        }
+        entry_found = AM_FALSE;
+    }
+    am_web_log_max_debug("Finished PDP shared cache cleanup. Hash table size = %d, reclaimed %d entries", post_data_list->tbl_len, count);
+}
+
+static am_status_t update_post_data_for_request(void **args, const char *key, const char *acturl, const char *value, const unsigned long postcacheentry_life) {
     const char *thisfunc = "update_post_data_for_request()";
     request_rec *r;
     am_status_t sts;
@@ -248,16 +289,37 @@ static am_status_t update_post_data_for_request(void **args, const char *key, co
     } else {
         apr_global_mutex_lock(postdata_lock);
         bucket = post_data_list->num_entries;
-        /* check if there are empty rows (deleted by find_post_data)
-         * if so - reuse first one found
-         */
+        /* check if there are empty rows, if so - reuse first one found */
         for (idx = 0; idx < post_data_list->tbl_len; idx++) {
             if (post_data_list->table[idx] == NULL) {
                 bucket = idx;
                 break;
             }
         }
+        if (idx == post_data_list->tbl_len) {
+            /*no rows available - run through pdp cache cleanup (removing all outdated entries*/
+            pdp_gc(postcacheentry_life);
+            /* check if there are empty rows now, if so - reuse first one found */
+            for (idx = 0; idx < post_data_list->tbl_len; idx++) {
+                if (post_data_list->table[idx] == NULL) {
+                    bucket = idx;
+                    break;
+                }
+            }
+            if (idx == post_data_list->tbl_len) {
+                /*still no rows available, return with error*/
+                apr_global_mutex_unlock(postdata_lock);
+                am_web_log_warning("%s: shared post data cache is full. "
+                        "Consider adjusting Agent_Max_PDP_Count, Agent_PostData_Memory_Size and com.sun.identity.agents.config.postcache.entry.lifetime parameter values ?", thisfunc);
+                am_web_log_warning("%s: post data preservation is disabled. Lower com.sun.identity.agents.config.postcache.entry.lifetime parameter value or reconfigure/restart agent to re-enable it)", thisfunc);
+                if (am_web_is_max_debug_on()) {
+                    listall_post_data();
+                }
+                return AM_FAILURE;
+            }
+        }
         entry = apr_rmm_addr_get(postdata_rmm, apr_rmm_malloc(postdata_rmm, sizeof (am_post_data_list_item_t)));
+        entry->created = apr_time_now();
         if (key) {
             entry->key = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(key) + 1));
             memcpy(entry->key, key, strlen(key));
@@ -322,7 +384,11 @@ static const command_rec dsame_auth_cmds[] = {
     AP_INIT_TAKE1("Agent_Notification_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, notification_shm_size), RSRC_CONF,
     "Agent notification module shared memory segment size in bytes"),
     AP_INIT_TAKE1("Agent_PostData_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, postdata_shm_size), RSRC_CONF,
-    "Agent pdp module shared memory segment size in bytes"), {
+    "Agent pdp module shared memory segment size in bytes"),
+    AP_INIT_TAKE1("Agent_Max_PID_Count", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, max_pid_count), RSRC_CONF,
+    "Agent notification module max pid count"),
+    AP_INIT_TAKE1("Agent_Max_PDP_Count", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, max_pdp_count), RSRC_CONF,
+    "Agent pdp module max cache entry count"), {
         NULL
     }
 };
@@ -345,7 +411,6 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
             am_notification_list_ptr entry, prev = NULL;
             ms = apr_global_mutex_trylock(notification_lock);
             if (!APR_STATUS_IS_EBUSY(ms)) {
-                am_web_log_max_debug("Notification listener pid: %d, got lock", pid);
                 for (i = 0; i < notification_list->tbl_len; i++) {
                     entry = notification_list->table[i];
                     while (entry && pid == entry->pid && entry->read == 0) {
@@ -361,7 +426,6 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
                     }
                 }
                 apr_global_mutex_unlock(notification_lock);
-                am_web_log_max_debug("Notification listener pid: %d, lock released", pid);
             } else {
                 am_web_log_max_debug("Notification listener pid: %d, lock busy", pid);
             }
@@ -387,6 +451,7 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
     ((agent_server_config *) cfg)->notification_lockfile = apr_pstrcat(p, tmpdir, "/AMNotifLock", NULL);
     ((agent_server_config *) cfg)->postdata_lockfile = apr_pstrcat(p, tmpdir, "/AMPostLock", NULL);
     ((agent_server_config *) cfg)->max_pid_count = 256;
+    ((agent_server_config *) cfg)->max_pdp_count = 256;
     ((agent_server_config *) cfg)->notification_shm_size = 268435456; //256MB
     ((agent_server_config *) cfg)->postdata_shm_size = 67108864; //64MB
     return (void *) cfg;
@@ -412,7 +477,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     void *data; /* These two help ensure that we only init once. */
     const char *data_key = "init_dsame";
     agent_server_config *scfg;
-    int mp;
+    int mp, mpp;
 
     /*
      * The following checks if this routine has been called before.
@@ -512,6 +577,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
         mp = scfg->max_pid_count;
+        mpp = scfg->max_pdp_count;
 
         notification_list = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (*notification_list) +
                 sizeof (am_notification_list_item_t*) * mp));
@@ -524,18 +590,18 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         notification_list->num_entries = 0;
 
         post_data_list = apr_rmm_addr_get(postdata_rmm, apr_rmm_malloc(postdata_rmm, sizeof (*post_data_list) +
-                sizeof (am_post_data_list_item_t*) * mp));
+                sizeof (am_post_data_list_item_t*) * mpp));
 
         post_data_list->table = (am_post_data_list_item_t**) (post_data_list + 1);
-        for (idx = 0; idx < mp; idx++) {
+        for (idx = 0; idx < mpp; idx++) {
             post_data_list->table[idx] = NULL;
         }
-        post_data_list->tbl_len = mp;
+        post_data_list->tbl_len = mpp;
         post_data_list->num_entries = 0;
 
         ap_log_error(__FILE__, __LINE__, APLOG_NOTICE, 0, server_ptr,
-                "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d]",
-                shm_size, pd_shm_size, mp);
+                "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d], max_pdp_count[%d]",
+                shm_size, pd_shm_size, mp, mpp);
     }
     return ret;
 }

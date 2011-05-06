@@ -5925,15 +5925,25 @@ process_request(am_web_request_params_t *req_params,
                             &pu, agent_config);
                     }
                     if (pds == AM_SUCCESS) {
+                        AgentConfigurationRefCntPtr* agentConfigPtr =
+                                (AgentConfigurationRefCntPtr*) agent_config; 
                         pds = req_func->reg_postdata.func(req_func->reg_postdata.args,
-                            pu->post_time_key, pu->action_url, post_data);
+                            pu->post_time_key, pu->action_url, post_data, (*agentConfigPtr)->postcacheentry_life);
                     }
-                    if (pds == AM_SUCCESS)
+                    if (pds == AM_SUCCESS) {
                         result = process_access_redirect(pu->dummy_url, orig_method,
                                 sts, policy_result,
                                 req_func,
                                 &redirect_url,
                                 NULL, agent_config);
+                    } else {
+                        /*pdp cache entry registration failed, do not do dummypost*/
+                        result = process_access_redirect(req_params->url, orig_method,
+                                sts, policy_result,
+                                req_func,
+                                &redirect_url,
+                                NULL, agent_config);
+                    }
                     if (pu != NULL) {
                         am_web_clean_post_urls(pu);
                         pu = NULL;

@@ -502,6 +502,7 @@ typedef struct {
  * key - generated post data preservation key (part of Magic url)
  * acturl - action url (original request url)
  * value - actual post data
+ * postcacheentry_life - shared pdp cache entry validity period (in minutes)
  *
  * Return:
  *
@@ -509,7 +510,7 @@ typedef struct {
  * and appropriate am_status_t code otherwise.
  */
 typedef am_status_t (*am_web_register_postdata_func_t)(
-			void **args, const char *key, const char *acturl, const char *value);
+			void **args, const char *key, const char *acturl, const char *value, const unsigned long postcacheentry_life);
 typedef struct {
     am_web_register_postdata_func_t func;
     void **args;
