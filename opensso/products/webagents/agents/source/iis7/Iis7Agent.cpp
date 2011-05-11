@@ -686,17 +686,9 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 				set_header, set_cookie_in_response,
 				set_header_attr_as_cookie,
 				get_cookie_sync, args, agent_config);
-			if (NULL && status == AM_SUCCESS) {
+			if (status == AM_SUCCESS) {
 				if ((set_headers_list != NULL) || (set_cookies_list != NULL) 
 					|| (redirectRequest == TRUE)) {
-						// XXX
-						//the following function also invokes set_headers_in_context() 
-						//to set all the headers in the httpContext.
-						am_web_log_debug("POSTDATA -- Setting Headers :  \n");
-						if (redirectRequest) am_web_log_debug("         --    Redirect :  TRUE ");
-						am_web_log_debug("         --    Headers :  %s ",set_headers_list);
-						am_web_log_debug("         --    Cookies :  %s ",set_cookies_list);
-
 						status = set_request_headers(pHttpContext, args);
 				}
 			}
@@ -1947,7 +1939,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args)
 	string headersList ="";
 	if(set_headers_list)
 		headersList = set_headers_list;
-	set_headers_in_context(pHttpContext, headersList, TRUE);
+	set_headers_in_context(pHttpContext, headersList, FALSE);
 
 
 	//Add custom headers and/or set_cookie header to original headers
