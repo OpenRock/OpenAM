@@ -137,18 +137,66 @@ static apr_shm_t *postdata_shm = NULL;
 static apr_rmm_t *postdata_rmm = NULL;
 static apr_global_mutex_t *postdata_lock = NULL;
 
-static void register_process(int pid) {
-    int bucket;
-    am_notification_list_ptr entry;
-    bucket = pid % notification_list->tbl_len;
+static void register_process(pid_t pid) {
+    const char *thisfunc = "register_process()";
+    int bucket, i;
+    am_notification_list_ptr entry = NULL;
     apr_global_mutex_lock(notification_lock);
+    bucket = notification_list->num_entries;
+    /* check if there are empty rows, if so - reuse first one found */
+    for (i = 0; i < notification_list->tbl_len; i++) {
+        if (notification_list->table[i] == NULL) {
+            bucket = i;
+            break;
+        }
+    }
+    if (i == notification_list->tbl_len) {
+        apr_global_mutex_unlock(notification_lock);
+        am_web_log_warning("%s: notification data cache is full. "
+                "Consider adjusting Agent_Max_PID_Count and Agent_Notification_Memory_Size parameter values ?", thisfunc);
+        am_web_log_warning("%s: notification processing for pid %d is disabled. Reconfigure/restart agent to re-enable it.", thisfunc);
+        return;
+    }
     entry = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (am_notification_list_item_t)));
     entry->pid = pid;
     entry->read = 1; /*new pid is just registered, nothing to see here for a listener thread*/
     entry->value = NULL;
     entry->next = notification_list->table[bucket];
     notification_list->table[bucket] = entry;
-    notification_list->num_entries++;
+    if (bucket == notification_list->num_entries) {
+        /* increase entry count only when adding to the table,
+         * not when replacing empty rows
+         */
+        notification_list->num_entries++;
+    }
+    apr_global_mutex_unlock(notification_lock);
+}
+
+static void deregister_process(pid_t pid) {
+    unsigned int i;
+    am_notification_list_ptr entry = NULL;
+    am_bool_t entry_found = AM_FALSE;
+    apr_global_mutex_lock(notification_lock);
+    for (i = 0; i < notification_list->tbl_len; i++) {
+        entry = notification_list->table[i];
+        while (entry) {
+            if (pid == entry->pid) {
+                /*found pid entry, remove it*/
+                if (entry->value) {
+                    apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, entry->value));
+                }
+                entry_found = AM_TRUE;
+            }
+            entry = entry->next;
+        }
+        if (entry_found == AM_TRUE) {
+            /*remove this row from notification-data table*/
+            apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, notification_list->table[i]));
+            notification_list->table[i] = NULL;
+            notification_list->num_entries--;
+        }
+        entry_found = AM_FALSE;
+    }
     apr_global_mutex_unlock(notification_lock);
 }
 
@@ -225,6 +273,7 @@ static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd) {
             /*remove this row from post-data table*/
             apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, post_data_list->table[i]));
             post_data_list->table[i] = NULL;
+            post_data_list->num_entries--;
             status = AM_SUCCESS;
             break;
         }
@@ -264,6 +313,7 @@ static void pdp_gc(const unsigned long postcacheentry_life) {
             /*remove this row from post-data table*/
             apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, post_data_list->table[i]));
             post_data_list->table[i] = NULL;
+            post_data_list->num_entries--;
             count++;
         }
         entry_found = AM_FALSE;
@@ -311,7 +361,7 @@ static am_status_t update_post_data_for_request(void **args, const char *key, co
                 apr_global_mutex_unlock(postdata_lock);
                 am_web_log_warning("%s: shared post data cache is full. "
                         "Consider adjusting Agent_Max_PDP_Count, Agent_PostData_Memory_Size and com.sun.identity.agents.config.postcache.entry.lifetime parameter values ?", thisfunc);
-                am_web_log_warning("%s: post data preservation is disabled. Lower com.sun.identity.agents.config.postcache.entry.lifetime parameter value or reconfigure/restart agent to re-enable it)", thisfunc);
+                am_web_log_warning("%s: post data preservation is disabled. Lower com.sun.identity.agents.config.postcache.entry.lifetime parameter value or reconfigure/restart agent to re-enable it.", thisfunc);
                 if (am_web_is_max_debug_on()) {
                     listall_post_data();
                 }
@@ -394,7 +444,6 @@ static const command_rec dsame_auth_cmds[] = {
 };
 
 static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data) {
-    server_rec *s = (server_rec *) data;
     pid_t pid = 0;
     apr_status_t ms;
     unsigned int i;
@@ -408,18 +457,15 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
         if (am_watchdog_interval <= 0)
             break;
         if (agentInitialized == B_TRUE && pid > 0) {
-            am_notification_list_ptr entry, prev = NULL;
+            am_notification_list_ptr entry = NULL;
             ms = apr_global_mutex_trylock(notification_lock);
             if (!APR_STATUS_IS_EBUSY(ms)) {
                 for (i = 0; i < notification_list->tbl_len; i++) {
                     entry = notification_list->table[i];
                     while (entry && pid == entry->pid && entry->read == 0) {
-                        prev = entry;
                         am_web_log_max_debug("Notification listener pid: %d, read: %d, value: %s", pid, entry->read, (entry->value ? entry->value : "NULL"));
                         if (entry->value) {
-                            apr_thread_mutex_lock(init_mutex);
                             am_web_handle_notification(entry->value, strlen(entry->value), am_web_get_agent_configuration());
-                            apr_thread_mutex_unlock(init_mutex);
                         }
                         entry->read = 1;
                         entry = entry->next;
@@ -437,6 +483,7 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
 #endif
     }
     am_web_log_info("Shutting down policy web agent notification listener thread for pid: %d", pid);
+    deregister_process(pid);
     return NULL;
 }
 
