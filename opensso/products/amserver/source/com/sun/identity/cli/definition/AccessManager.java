@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.cli.definition;
 
 
@@ -1710,7 +1709,7 @@ public class AccessManager {
         mandatoryOptions={
             "realm|e|s|Name of realm.",
             "name|m|s|Name of datastore.",
-            "datatype|t|s|Type of datastore."},
+            "datatype|t|s|Type of datastore. Use the list-datastore-types subcommand to get a list of supported datastore types."},
         optionAliases={},
         macro="authentication",
         optionalOptions={
