@@ -146,9 +146,9 @@ public class DispatchServlet extends HttpServlet {
             }
             else if (object instanceof HttpServlet) {
                 HttpServlet servlet = (HttpServlet)object;
-                LogTimer timer = logger.getTimer(servlet.getServletConfig().getServletName() + ".service").start();
+                //LogTimer timer = logger.getTimer(servlet.getServletConfig().getServletName() + ".service").start();
                 servlet.service(request, response);
-                timer.stop();
+                //timer.stop();
             }
             else {
                 throw new ServletException("object in chain is not a " + Filter.class.getName() + " or " + HttpServlet.class.getName());
