@@ -123,27 +123,25 @@ public class FederationServlet extends HttpServlet
             else {
         	    System.out.println("FederationServlet: URI not in service");
             }
-            
-        } 
+        }
         catch (NodeException ne) {
-            SAMLUtils.sendError(request, response,
-                response.SC_INTERNAL_SERVER_ERROR, "Failed to process SSO request",
-                ne.getMessage());
+            errorResponse(response, ne.getMessage());
             return;
         } 
         catch (SAML2Exception sme) {
-            SAMLUtils.sendError(request, response,
-                response.SC_INTERNAL_SERVER_ERROR, "Failed to process SSO request",
-                sme.getMessage());
+            errorResponse(response, sme.getMessage());
             return;
         } 
         catch (SessionException se) {
-            SAMLUtils.sendError(request, response,
-                response.SC_INTERNAL_SERVER_ERROR, "Failed to process SSO request",
-                se.getMessage());
+            errorResponse(response, se.getMessage());
             return;
         }
         
+    }
+    
+    private void errorResponse(HttpServletResponse response, String message) throws IOException {
+     
+        response.sendError(response.SC_INTERNAL_SERVER_ERROR, "SSO Failed:" +  message);
         
     }
     
