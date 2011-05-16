@@ -66,11 +66,16 @@
 #define OpenSSO                 "OpenSSO"
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
+#define MAX_NOTIF_MSG_SIZE      8192
+#define MAX_PDP_KEY_SIZE        256
+#define MAX_PDP_URL_SIZE        4096
+#define MAX_PDP_VALUE_SIZE      8192
 
 module AP_MODULE_DECLARE_DATA dsame_module;
 
 static apr_status_t pre_cleanup_dsame(void *data);
 static apr_status_t cleanup_dsame(void *data);
+static am_status_t set_cookie(const char *header, void **args);
 
 typedef void (*sighandler_t)(int);
 boolean_t agentInitialized = B_FALSE;
@@ -88,23 +93,17 @@ static apr_thread_mutex_t *init_mutex = NULL;
 /* Notification listener thread handle */
 static apr_thread_t *notification_listener_t = NULL;
 
-typedef struct am_notification_list_item* am_notification_list_ptr;
-
-typedef struct am_notification_list_item {
+typedef struct am_notification_list_item_t {
     pid_t pid;
-    int read; /*0 - value is unread by pid, 1 - read*/
-    char *value;
-    am_notification_list_ptr next;
+    int read;
+    char value[MAX_NOTIF_MSG_SIZE];
 } am_notification_list_item_t;
 
-typedef struct am_post_data_list_item* am_post_data_item_ptr;
-
-typedef struct am_post_data_list_item {
-    char *key; //post data key in a cache
-    char *action_url; //orig. action url
-    char *value; //orig. post data value
+typedef struct am_post_data_list_item_t {
+    char key[MAX_PDP_KEY_SIZE];
+    char action_url[MAX_PDP_URL_SIZE];
+    char value[MAX_PDP_VALUE_SIZE];
     apr_time_t created;
-    am_post_data_item_ptr next;
 } am_post_data_list_item_t;
 
 typedef struct {
@@ -112,291 +111,224 @@ typedef struct {
     char *bootstrap_file;
     char *notification_lockfile;
     char *postdata_lockfile;
-    int notification_shm_size;
-    int postdata_shm_size;
     int max_pid_count;
     int max_pdp_count;
+    apr_shm_t *notification_cache;
+    apr_global_mutex_t *notification_lock;
+    apr_shm_t *pdp_cache;
+    apr_global_mutex_t *pdp_lock;
 } agent_server_config;
 
-static struct notification_hash_table {
-    am_notification_list_item_t **table;
-    unsigned int tbl_len;
-    unsigned int num_entries;
-} *notification_list;
-
-static struct post_data_hash_table {
-    am_post_data_list_item_t **table;
-    unsigned int tbl_len;
-    unsigned int num_entries;
-} *post_data_list;
-
-static apr_shm_t *notification_shm = NULL; /* the APR shared segment object */
-static apr_rmm_t *notification_rmm = NULL; /* the APR relocatable memory management handler */
-static apr_global_mutex_t *notification_lock = NULL; /* the cross-thread/cross-process mutex */
-static apr_shm_t *postdata_shm = NULL;
-static apr_rmm_t *postdata_rmm = NULL;
-static apr_global_mutex_t *postdata_lock = NULL;
-
-static void register_process(pid_t pid) {
-    const char *thisfunc = "register_process()";
-    int bucket, i;
-    am_notification_list_ptr entry = NULL;
-    apr_global_mutex_lock(notification_lock);
-    bucket = notification_list->num_entries;
-    /* check if there are empty rows, if so - reuse first one found */
-    for (i = 0; i < notification_list->tbl_len; i++) {
-        if (notification_list->table[i] == NULL) {
-            bucket = i;
-            break;
+static int get_global_lock(apr_global_mutex_t * mutex) {
+    apr_status_t rs;
+    int i;
+    for (i = 0; i < 10; i++) {
+        rs = apr_global_mutex_trylock(mutex);
+        if (APR_STATUS_IS_EBUSY(rs)) {
+            apr_sleep(10);
+        } else if (rs == APR_SUCCESS) {
+            return 1;
+        } else if (APR_STATUS_IS_ENOTIMPL(rs)) {
+            rs = apr_global_mutex_lock(mutex);
+            if (rs == APR_SUCCESS) {
+                return 1;
+            } else {
+                /*could not acquire hard mutex_lock*/
+                return 0;
+            }
+        } else {
+            /*unknown return status from mutex_trylock*/
+            return 0;
         }
     }
-    if (i == notification_list->tbl_len) {
-        apr_global_mutex_unlock(notification_lock);
-        am_web_log_warning("%s: notification data cache is full. "
-                "Consider adjusting Agent_Max_PID_Count and Agent_Notification_Memory_Size parameter values ?", thisfunc);
-        am_web_log_warning("%s: notification processing for pid %d is disabled. Reconfigure/restart agent to re-enable it.", thisfunc);
+    /*timed out mutex_trylock*/
+    return 0;
+}
+
+static void register_process(pid_t pid, server_rec *s) {
+    am_notification_list_item_t *table;
+    int i;
+    agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
+    if (get_global_lock(scfg->notification_lock) != 0) {
+        table = apr_shm_baseaddr_get(scfg->notification_cache);
+        if (table != NULL) {
+            for (i = 0; i < scfg->max_pid_count; i++) {
+                if (table[i].pid == 0) {
+                    table[i].pid = pid;
+                    table[i].read = 1;
+                    table[i].value[0] = '\0';
+                    break;
+                }
+            }
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, "Failed to register notification listener for process id [%d] (shared memory error)", pid);
+        }
+        apr_global_mutex_unlock(scfg->notification_lock);
+    }
+}
+
+static void deregister_process(pid_t pid, server_rec *s) {
+    am_notification_list_item_t *table;
+    int i;
+    agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
+    if (get_global_lock(scfg->notification_lock) != 0) {
+        table = apr_shm_baseaddr_get(scfg->notification_cache);
+        if (table != NULL) {
+            for (i = 0; i < scfg->max_pid_count; i++) {
+                if (table[i].pid == pid) {
+                    table[i].pid = 0;
+                    table[i].read = 1;
+                    table[i].value[0] = '\0';
+                    break;
+                }
+            }
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, "Failed to deregister notification listener for process id [%d] (shared memory error)", pid);
+        }
+        apr_global_mutex_unlock(scfg->notification_lock);
+    }
+}
+
+static void post_notification(char *value, server_rec *s) {
+    am_notification_list_item_t *table;
+    int slen, i;
+    agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
+    if (value == NULL || (slen = strlen(value)) == 0 || slen > MAX_NOTIF_MSG_SIZE) {
+        am_web_log_max_debug("Notification message is empty or exceeds MAX_NOTIF_MSG_SIZE size [%d]", slen);
         return;
     }
-    entry = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (am_notification_list_item_t)));
-    entry->pid = pid;
-    entry->read = 1; /*new pid is just registered, nothing to see here for a listener thread*/
-    entry->value = NULL;
-    entry->next = notification_list->table[bucket];
-    notification_list->table[bucket] = entry;
-    if (bucket == notification_list->num_entries) {
-        /* increase entry count only when adding to the table,
-         * not when replacing empty rows
-         */
-        notification_list->num_entries++;
-    }
-    apr_global_mutex_unlock(notification_lock);
-}
-
-static void deregister_process(pid_t pid) {
-    unsigned int i;
-    am_notification_list_ptr entry = NULL;
-    am_bool_t entry_found = AM_FALSE;
-    apr_global_mutex_lock(notification_lock);
-    for (i = 0; i < notification_list->tbl_len; i++) {
-        entry = notification_list->table[i];
-        while (entry) {
-            if (pid == entry->pid) {
-                /*found pid entry, remove it*/
-                if (entry->value) {
-                    apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, entry->value));
+    am_web_log_max_debug("Notification message size [%d]", slen);
+    if (get_global_lock(scfg->notification_lock) != 0) {
+        table = apr_shm_baseaddr_get(scfg->notification_cache);
+        if (table != NULL) {
+            for (i = 0; i < scfg->max_pid_count; i++) {
+                if (table[i].pid > 0) {
+                    table[i].read = 0;
+                    memcpy(table[i].value, value, slen);
+                    table[i].value[slen] = '\0';
                 }
-                entry_found = AM_TRUE;
             }
-            entry = entry->next;
+        } else {
+            am_web_log_warning("Failed to register notification message (shared memory error)");
         }
-        if (entry_found == AM_TRUE) {
-            /*remove this row from notification-data table*/
-            apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, notification_list->table[i]));
-            notification_list->table[i] = NULL;
-            notification_list->num_entries--;
-        }
-        entry_found = AM_FALSE;
+        apr_global_mutex_unlock(scfg->notification_lock);
     }
-    apr_global_mutex_unlock(notification_lock);
 }
 
-static void post_notification(char *value) {
-    am_notification_list_ptr entry = NULL;
-    unsigned int i;
-    apr_global_mutex_lock(notification_lock);
-    for (i = 0; i < notification_list->tbl_len; i++) {
-        entry = notification_list->table[i];
-        while (entry) {
-            if (entry->value) {
-                /*if value exists, clear it first here*/
-                apr_rmm_free(notification_rmm, apr_rmm_offset_get(notification_rmm, entry->value));
-            }
-            entry->read = 0;
-            entry->value = apr_rmm_addr_get(notification_rmm, apr_rmm_calloc(notification_rmm, strlen(value) + 1));
-            memcpy(entry->value, value, strlen(value));
-            entry = entry->next;
-        }
-    }
-    apr_global_mutex_unlock(notification_lock);
-}
-
-static void listall_post_data() {
-    unsigned int i;
+static void listall_post_data(server_rec *s) {
+    am_post_data_list_item_t *table;
+    int i;
     char datestring[APR_RFC822_DATE_LEN];
-    am_post_data_item_ptr entry = NULL;
-    if (am_web_is_max_debug_on()) {
-        am_web_log_max_debug("PDP=========START===========");
-        apr_global_mutex_lock(postdata_lock);
-        for (i = 0; i < post_data_list->tbl_len; i++) {
-            entry = post_data_list->table[i];
-            while (entry) {
-                am_web_log_max_debug("PDP=========[ %d ]===========", i);
-                am_web_log_max_debug("PDP-KEY: %s", entry->key);
-                apr_rfc822_date(datestring, entry->created);
-                am_web_log_max_debug("PDP-TIMESTAMP: %s", datestring);
-                am_web_log_max_debug("PDP-ACTIONURL: %s", entry->action_url);
-                am_web_log_max_debug("PDP-VALUE: %s", entry->value);
-                am_web_log_max_debug("PDP========================");
-                entry = entry->next;
+    agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
+    if (get_global_lock(scfg->pdp_lock) != 0) {
+        table = apr_shm_baseaddr_get(scfg->pdp_cache);
+        if (table != NULL) {
+            for (i = 0; i < scfg->max_pdp_count; i++) {
+                if (table[i].created > 0) {
+                    am_web_log_max_debug("PDP=========[ %d ]===========", i);
+                    am_web_log_max_debug("PDP-KEY: %s", table[i].key);
+                    apr_rfc822_date(datestring, table[i].created);
+                    am_web_log_max_debug("PDP-TIMESTAMP: %s", datestring);
+                    am_web_log_max_debug("PDP-ACTIONURL: %s", table[i].action_url);
+                    am_web_log_max_debug("PDP-VALUE: %s", table[i].value);
+                    am_web_log_max_debug("PDP========================");
+                }
             }
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, "Failed to list post data (shared memory error)");
         }
-        apr_global_mutex_unlock(postdata_lock);
-        am_web_log_max_debug("PDP=========END============");
+        apr_global_mutex_unlock(scfg->pdp_lock);
     }
 }
 
-static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd) {
-    unsigned int i;
-    am_post_data_item_ptr entry = NULL;
+static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd, server_rec *s) {
+    am_post_data_list_item_t *table;
+    int i;
     am_status_t status = AM_FAILURE;
-    am_bool_t entry_found = AM_FALSE;
-    apr_global_mutex_lock(postdata_lock);
-    for (i = 0; i < post_data_list->tbl_len; i++) {
-        entry = post_data_list->table[i];
-        while (entry) {
-            if (id != NULL && entry->key != NULL && strcmp(entry->key, id) == 0) {
-                /*found it, copy values out and release the memory*/
-                pd->url = strdup(entry->action_url);
-                pd->value = strdup(entry->value);
-                if (entry->key)
-                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->key));
-                if (entry->value)
-                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->value));
-                if (entry->action_url)
-                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->action_url));
-                entry_found = AM_TRUE;
-                break;
+    agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
+    if (get_global_lock(scfg->pdp_lock) != 0) {
+        table = apr_shm_baseaddr_get(scfg->pdp_cache);
+        if (table != NULL) {
+            for (i = 0; i < scfg->max_pdp_count; i++) {
+                if (id != NULL && table[i].key != NULL
+                        && table[i].action_url != NULL
+                        && table[i].value != NULL
+                        && strcmp(table[i].key, id) == 0) {
+                    pd->url = strdup(table[i].action_url);
+                    pd->value = strdup(table[i].value);
+                    table[i].key[0] = '\0';
+                    table[i].action_url[0] = '\0';
+                    table[i].value[0] = '\0';
+                    table[i].created = 0;
+                    status = AM_SUCCESS;
+                    break;
+                }
             }
-            entry = entry->next;
+        } else {
+            am_web_log_warning("Failed to find post data for a key [%s] (shared memory error)", id);
         }
-        if (entry_found == AM_TRUE) {
-            /*remove this row from post-data table*/
-            apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, post_data_list->table[i]));
-            post_data_list->table[i] = NULL;
-            post_data_list->num_entries--;
-            status = AM_SUCCESS;
-            break;
-        }
+        apr_global_mutex_unlock(scfg->pdp_lock);
     }
-    apr_global_mutex_unlock(postdata_lock);
     return status;
-}
-
-static void pdp_gc(const unsigned long postcacheentry_life) {
-    unsigned int i, count = 0;
-    am_post_data_item_ptr entry = NULL;
-    am_bool_t entry_found = AM_FALSE;
-    apr_time_t now = apr_time_now();
-    if (postcacheentry_life >= 1L) {
-        now -= apr_time_from_sec(postcacheentry_life * 60);
-    } else {
-        am_web_log_warning("Invalid com.sun.identity.agents.config.postcache.entry.lifetime value, defaulting to 3 minutes");
-        now -= apr_time_from_sec(180);
-    }
-    am_web_log_max_debug("Starting PDP shared cache cleanup. Hash table size = %d", post_data_list->tbl_len);
-    for (i = 0; i < post_data_list->tbl_len; i++) {
-        entry = post_data_list->table[i];
-        while (entry) {
-            if (entry->created < now) {
-                /*found invalid entry, remove it*/
-                if (entry->key)
-                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->key));
-                if (entry->value)
-                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->value));
-                if (entry->action_url)
-                    apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, entry->action_url));
-                entry_found = AM_TRUE;
-            }
-            entry = entry->next;
-        }
-        if (entry_found == AM_TRUE) {
-            /*remove this row from post-data table*/
-            apr_rmm_free(postdata_rmm, apr_rmm_offset_get(postdata_rmm, post_data_list->table[i]));
-            post_data_list->table[i] = NULL;
-            post_data_list->num_entries--;
-            count++;
-        }
-        entry_found = AM_FALSE;
-    }
-    am_web_log_max_debug("Finished PDP shared cache cleanup. Hash table size = %d, reclaimed %d entries", post_data_list->tbl_len, count);
 }
 
 static am_status_t update_post_data_for_request(void **args, const char *key, const char *acturl, const char *value, const unsigned long postcacheentry_life) {
     const char *thisfunc = "update_post_data_for_request()";
+    am_status_t status = AM_FAILURE;
     request_rec *r;
-    am_status_t sts;
-    unsigned int idx;
-    int bucket;
-    am_post_data_item_ptr entry;
-    am_web_log_info("%s: updating post data cache for key: %s", thisfunc, key);
+    int i, klen, ulen, vlen;
+    am_post_data_list_item_t *table;
+    apr_time_t now;
+    agent_server_config *scfg;
+    am_web_log_max_debug("%s: updating post data cache for key: %s", thisfunc, key);
     r = NULL;
-    sts = AM_SUCCESS;
-    entry = NULL;
     if (args == NULL || (r = (request_rec *) args[0]) == NULL ||
             key == NULL || acturl == NULL) {
         am_web_log_error("%s: invalid argument passed.", thisfunc);
-        sts = AM_INVALID_ARGUMENT;
+        status = AM_INVALID_ARGUMENT;
     } else {
-        apr_global_mutex_lock(postdata_lock);
-        bucket = post_data_list->num_entries;
-        /* check if there are empty rows, if so - reuse first one found */
-        for (idx = 0; idx < post_data_list->tbl_len; idx++) {
-            if (post_data_list->table[idx] == NULL) {
-                bucket = idx;
-                break;
-            }
+        if (key == NULL || acturl == NULL || value == NULL
+                || (klen = strlen(key)) > MAX_PDP_KEY_SIZE
+                || (ulen = strlen(acturl)) > MAX_PDP_URL_SIZE
+                || (vlen = strlen(value)) > MAX_PDP_VALUE_SIZE) {
+            am_web_log_warning("%s: key, action_url or value is empty or their values exceed MAX limits [%d],[%d],[%d]", thisfunc, klen, ulen, vlen);
+            return status;
         }
-        if (idx == post_data_list->tbl_len) {
-            /*no rows available - run through pdp cache cleanup (removing all outdated entries*/
-            pdp_gc(postcacheentry_life);
-            /* check if there are empty rows now, if so - reuse first one found */
-            for (idx = 0; idx < post_data_list->tbl_len; idx++) {
-                if (post_data_list->table[idx] == NULL) {
-                    bucket = idx;
-                    break;
+        scfg = ap_get_module_config(r->server->module_config, &dsame_module);
+        am_web_log_max_debug("%s: key size [%d], url size [%d], value size [%d]", thisfunc, klen, ulen, vlen);
+        now = apr_time_now();
+        if (postcacheentry_life >= 1L) {
+            now -= apr_time_from_sec(postcacheentry_life * 60);
+        } else {
+            am_web_log_warning("%s: invalid com.sun.identity.agents.config.postcache.entry.lifetime value, defaulting to 3 minutes", thisfunc);
+            now -= apr_time_from_sec(180);
+        }
+        if (get_global_lock(scfg->pdp_lock) != 0) {
+            table = apr_shm_baseaddr_get(scfg->pdp_cache);
+            if (table != NULL) {
+                for (i = 0; i < scfg->max_pdp_count; i++) {
+                    if (table[i].created == 0 || table[i].created < now) {
+                        memcpy(table[i].key, key, klen);
+                        table[i].key[klen] = '\0';
+                        memcpy(table[i].action_url, acturl, ulen);
+                        table[i].action_url[ulen] = '\0';
+                        memcpy(table[i].value, value, vlen);
+                        table[i].value[vlen] = '\0';
+                        table[i].created = apr_time_now();
+                        status = AM_SUCCESS;
+                        break;
+                    }
                 }
+            } else {
+                am_web_log_warning("%s: failed to update post data cache (shared memory error)", thisfunc);
             }
-            if (idx == post_data_list->tbl_len) {
-                /*still no rows available, return with error*/
-                apr_global_mutex_unlock(postdata_lock);
-                am_web_log_warning("%s: shared post data cache is full. "
-                        "Consider adjusting Agent_Max_PDP_Count, Agent_PostData_Memory_Size and com.sun.identity.agents.config.postcache.entry.lifetime parameter values ?", thisfunc);
-                am_web_log_warning("%s: post data preservation is disabled. Lower com.sun.identity.agents.config.postcache.entry.lifetime parameter value or reconfigure/restart agent to re-enable it.", thisfunc);
-                if (am_web_is_max_debug_on()) {
-                    listall_post_data();
-                }
-                return AM_FAILURE;
-            }
+            apr_global_mutex_unlock(scfg->pdp_lock);
         }
-        entry = apr_rmm_addr_get(postdata_rmm, apr_rmm_malloc(postdata_rmm, sizeof (am_post_data_list_item_t)));
-        entry->created = apr_time_now();
-        if (key) {
-            entry->key = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(key) + 1));
-            memcpy(entry->key, key, strlen(key));
-        }
-        if (acturl) {
-            entry->action_url = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(acturl) + 1));
-            memcpy(entry->action_url, acturl, strlen(acturl));
-        }
-        if (value) {
-            entry->value = apr_rmm_addr_get(postdata_rmm, apr_rmm_calloc(postdata_rmm, strlen(value) + 1));
-            memcpy(entry->value, value, strlen(value));
-        }
-        entry->next = post_data_list->table[bucket];
-        post_data_list->table[bucket] = entry;
-        if (bucket == post_data_list->num_entries) {
-            /* increase entry count only when adding to the table,
-             * not when replacing empty rows
-             */
-            post_data_list->num_entries++;
-        }
-        apr_global_mutex_unlock(postdata_lock);
-        sts = AM_SUCCESS;
     }
     if (am_web_is_max_debug_on()) {
-        listall_post_data();
+        listall_post_data(r->server);
     }
-    return sts;
+    return status;
 }
 
 static const char *am_set_string_slot(cmd_parms *cmd, void *dummy, const char *arg) {
@@ -431,59 +363,48 @@ static const command_rec dsame_auth_cmds[] = {
     "Full path of the Agent configuration file"),
     AP_INIT_TAKE1("Agent_Bootstrap_File", am_set_string_slot, (void *) APR_OFFSETOF(agent_server_config, bootstrap_file), RSRC_CONF,
     "Full path of the Agent bootstrap file"),
-    AP_INIT_TAKE1("Agent_Notification_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, notification_shm_size), RSRC_CONF,
-    "Agent notification module shared memory segment size in bytes"),
-    AP_INIT_TAKE1("Agent_PostData_Memory_Size", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, postdata_shm_size), RSRC_CONF,
-    "Agent pdp module shared memory segment size in bytes"),
     AP_INIT_TAKE1("Agent_Max_PID_Count", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, max_pid_count), RSRC_CONF,
     "Agent notification module max pid count"),
     AP_INIT_TAKE1("Agent_Max_PDP_Count", am_set_int_slot, (void *) APR_OFFSETOF(agent_server_config, max_pdp_count), RSRC_CONF,
-    "Agent pdp module max cache entry count"), {
+    "Agent PDP module max active cache entry count"), {
         NULL
     }
 };
 
 static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data) {
+    server_rec *s = (server_rec *) data;
+    agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
+    am_notification_list_item_t *table;
     pid_t pid = 0;
-    apr_status_t ms;
-    unsigned int i;
+    int len, i;
 #ifdef _MSC_VER
     pid = _getpid();
 #else
     pid = getpid();
 #endif
-    am_web_log_info("Starting agent notification listener thread for pid: %d", pid);
     for (;;) {
         if (am_watchdog_interval <= 0)
             break;
         if (agentInitialized == B_TRUE && pid > 0) {
-            am_notification_list_ptr entry = NULL;
-            ms = apr_global_mutex_trylock(notification_lock);
-            if (!APR_STATUS_IS_EBUSY(ms)) {
-                for (i = 0; i < notification_list->tbl_len; i++) {
-                    entry = notification_list->table[i];
-                    while (entry && pid == entry->pid && entry->read == 0) {
-                        am_web_log_max_debug("Notification listener pid: %d, read: %d, value: %s", pid, entry->read, (entry->value ? entry->value : "NULL"));
-                        if (entry->value) {
-                            am_web_handle_notification(entry->value, strlen(entry->value), am_web_get_agent_configuration());
-                        }
-                        entry->read = 1;
-                        entry = entry->next;
+            if (get_global_lock(scfg->notification_lock) != 0) {
+                table = apr_shm_baseaddr_get(scfg->notification_cache);
+                for (i = 0; i < scfg->max_pid_count; i++) {
+                    if (table[i].pid == pid && table[i].read == 0) {
+                        table[i].read = 1;
+                        len = strlen(table[i].value);
+                        am_web_log_max_debug("Notification listener pid: %d, size: %d, value: %s", pid, len, (table[i].value ? table[i].value : "NULL"));
+                        am_web_handle_notification(table[i].value, len, am_web_get_agent_configuration());
+                        table[i].value[len] = '\0';
+                        break;
                     }
                 }
-                apr_global_mutex_unlock(notification_lock);
-            } else {
-                am_web_log_max_debug("Notification listener pid: %d, lock busy", pid);
+                apr_global_mutex_unlock(scfg->notification_lock);
             }
         }
-#ifdef _MSC_VER
-        Sleep(am_watchdog_interval * 1000);
-#else
-        sleep(am_watchdog_interval);
-#endif
+        apr_sleep(am_watchdog_interval * 1000 * 1000);
     }
     am_web_log_info("Shutting down policy web agent notification listener thread for pid: %d", pid);
-    deregister_process(pid);
+    deregister_process(pid, s);
     return NULL;
 }
 
@@ -499,8 +420,6 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
     ((agent_server_config *) cfg)->postdata_lockfile = apr_pstrcat(p, tmpdir, "/AMPostLock", NULL);
     ((agent_server_config *) cfg)->max_pid_count = 256;
     ((agent_server_config *) cfg)->max_pdp_count = 256;
-    ((agent_server_config *) cfg)->notification_shm_size = 268435456; //256MB
-    ((agent_server_config *) cfg)->postdata_shm_size = 67108864; //64MB
     return (void *) cfg;
 }
 
@@ -516,15 +435,15 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
  */
 static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server_ptr) {
     void *lib_handle;
-    int ret = OK;
+    int i, ret = OK;
     am_status_t status = AM_SUCCESS;
     apr_status_t rv;
     apr_size_t shm_size, pd_shm_size;
-    int idx;
     void *data; /* These two help ensure that we only init once. */
     const char *data_key = "init_dsame";
     agent_server_config *scfg;
-    int mp, mpp;
+    am_notification_list_item_t *notification_list;
+    am_post_data_list_item_t *post_data_list;
 
     /*
      * The following checks if this routine has been called before.
@@ -577,7 +496,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             ret = HTTP_BAD_REQUEST;
         }
 
-        rv = apr_global_mutex_create(&notification_lock, scfg->notification_lockfile, APR_LOCK_DEFAULT, pconf);
+        rv = apr_global_mutex_create(&(scfg->notification_lock), scfg->notification_lockfile, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "policy web agent notification global mutex file '%s'",
@@ -585,7 +504,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        rv = apr_global_mutex_create(&postdata_lock, scfg->postdata_lockfile, APR_LOCK_DEFAULT, pconf);
+        rv = apr_global_mutex_create(&(scfg->pdp_lock), scfg->postdata_lockfile, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "policy web agent postdata global mutex file '%s'",
@@ -593,62 +512,41 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        shm_size = APR_ALIGN_DEFAULT(scfg->notification_shm_size);
-        pd_shm_size = APR_ALIGN_DEFAULT(scfg->postdata_shm_size);
+        shm_size = APR_ALIGN_DEFAULT(sizeof (am_notification_list_item_t) * scfg->max_pid_count);
+        pd_shm_size = APR_ALIGN_DEFAULT(sizeof (am_post_data_list_item_t) * scfg->max_pdp_count);
 
-        rv = apr_shm_create(&notification_shm, shm_size, NULL, pconf);
+        rv = apr_shm_create(&(scfg->notification_cache), shm_size, NULL, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "policy web agent notification anonymous shared segment");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        rv = apr_shm_create(&postdata_shm, pd_shm_size, NULL, pconf);
+        rv = apr_shm_create(&(scfg->pdp_cache), pd_shm_size, NULL, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
                     "policy web agent postdata anonymous shared segment");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        rv = apr_rmm_init(&notification_rmm, NULL, apr_shm_baseaddr_get(notification_shm), shm_size, pconf);
-        if (rv != APR_SUCCESS) {
-            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                    "policy web agent notification relocatable memory management handler");
-            return HTTP_INTERNAL_SERVER_ERROR;
+        notification_list = apr_shm_baseaddr_get(scfg->notification_cache);
+        for (i = 0; i < scfg->max_pid_count; i++) {
+            notification_list[i].pid = 0;
+            notification_list[i].read = 1;
+            notification_list[i].value[0] = '\0';
         }
 
-        rv = apr_rmm_init(&postdata_rmm, NULL, apr_shm_baseaddr_get(postdata_shm), pd_shm_size, pconf);
-        if (rv != APR_SUCCESS) {
-            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
-                    "policy web agent postdata relocatable memory management handler");
-            return HTTP_INTERNAL_SERVER_ERROR;
+        post_data_list = apr_shm_baseaddr_get(scfg->pdp_cache);
+        for (i = 0; i < scfg->max_pdp_count; i++) {
+            post_data_list[i].key[0] = '\0';
+            post_data_list[i].action_url[0] = '\0';
+            post_data_list[i].value[0] = '\0';
+            post_data_list[i].created = 0;
         }
-        mp = scfg->max_pid_count;
-        mpp = scfg->max_pdp_count;
-
-        notification_list = apr_rmm_addr_get(notification_rmm, apr_rmm_malloc(notification_rmm, sizeof (*notification_list) +
-                sizeof (am_notification_list_item_t*) * mp));
-
-        notification_list->table = (am_notification_list_item_t**) (notification_list + 1);
-        for (idx = 0; idx < mp; idx++) {
-            notification_list->table[idx] = NULL;
-        }
-        notification_list->tbl_len = mp;
-        notification_list->num_entries = 0;
-
-        post_data_list = apr_rmm_addr_get(postdata_rmm, apr_rmm_malloc(postdata_rmm, sizeof (*post_data_list) +
-                sizeof (am_post_data_list_item_t*) * mpp));
-
-        post_data_list->table = (am_post_data_list_item_t**) (post_data_list + 1);
-        for (idx = 0; idx < mpp; idx++) {
-            post_data_list->table[idx] = NULL;
-        }
-        post_data_list->tbl_len = mpp;
-        post_data_list->num_entries = 0;
 
         ap_log_error(__FILE__, __LINE__, APLOG_NOTICE, 0, server_ptr,
                 "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d], max_pdp_count[%d]",
-                shm_size, pd_shm_size, mp, mpp);
+                shm_size, pd_shm_size, scfg->max_pid_count, scfg->max_pdp_count);
     }
     return ret;
 }
@@ -668,14 +566,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     /*register callback - clean up apr pool and release shared memory, shut down amsdk backend*/
     apr_pool_cleanup_register(pool_ptr, server_ptr, cleanup_dsame, apr_pool_cleanup_null);
 
-    rv = apr_rmm_attach(&notification_rmm, NULL, apr_shm_baseaddr_get(notification_shm), pool_ptr);
-    if (rv != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
-                "policy web agent notification shared memory management object");
-        return;
-    }
-
-    rv = apr_global_mutex_child_init(&notification_lock, scfg->notification_lockfile, pool_ptr);
+    rv = apr_global_mutex_child_init(&(scfg->notification_lock), scfg->notification_lockfile, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
                 "policy web agent notification global mutex file '%s'",
@@ -683,14 +574,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
         return;
     }
 
-    rv = apr_rmm_attach(&postdata_rmm, NULL, apr_shm_baseaddr_get(postdata_shm), pool_ptr);
-    if (rv != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
-                "policy web agent postdata shared memory management object");
-        return;
-    }
-
-    rv = apr_global_mutex_child_init(&postdata_lock, scfg->postdata_lockfile, pool_ptr);
+    rv = apr_global_mutex_child_init(&(scfg->pdp_lock), scfg->postdata_lockfile, pool_ptr);
     if (rv != APR_SUCCESS) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to attach to "
                 "policy web agent postdata global mutex file '%s'",
@@ -699,9 +583,9 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
     }
 
 #ifdef _MSC_VER
-    register_process(_getpid());
+    register_process(_getpid(), server_ptr);
 #else
-    register_process(getpid());
+    register_process(getpid(), server_ptr);
 #endif
 
     /*all is set, setup notification thread watchdog interval and start listener thread*/
@@ -926,13 +810,18 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
         am_web_log_error("%s: invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
-        /* Apache keeps two separate server response header tables in the request 
-         * record—one for normal response headers and one for error headers. 
-         * The difference between them is that the error headers are sent to 
-         * the client even (not only) on an error response (REDIRECT is one of them)
-         */
-        apr_table_add(r->err_headers_out, key, values);
-        sts = AM_SUCCESS;
+        if (values == NULL) {
+            /*value is empty, sdk is setting a cookie in response*/
+            sts = set_cookie(key, args);
+        } else {
+            /* Apache keeps two separate server response header tables in the request 
+             * record—one for normal response headers and one for error headers. 
+             * The difference between them is that the error headers are sent to 
+             * the client even (not only) on an error response (REDIRECT is one of them)
+             */
+            apr_table_add(r->err_headers_out, key, values);
+            sts = AM_SUCCESS;
+        }
     }
     return sts;
 }
@@ -1382,7 +1271,7 @@ void init_at_request() {
     }
 }
 
-static am_status_t check_for_post_data(char *requestURL, char **page, void *agent_config) {
+static am_status_t check_for_post_data(char *requestURL, char **page, void *agent_config, server_rec *s) {
     const char *thisfunc = "check_for_post_data()";
     const char *post_data_query = NULL;
     am_web_postcache_data_t get_data = {NULL, NULL};
@@ -1426,9 +1315,9 @@ static am_status_t check_for_post_data(char *requestURL, char **page, void *agen
             (strlen(post_data_query) > 0)) {
         am_web_log_debug("%s: POST Magic Query Value: %s", thisfunc, post_data_query);
         if (am_web_is_max_debug_on()) {
-            listall_post_data();
+            listall_post_data(s);
         }
-        if ((find_post_data((char*) post_data_query, &get_data)) == AM_SUCCESS) {
+        if ((find_post_data((char*) post_data_query, &get_data, s)) == AM_SUCCESS) {
             postdata_cache = get_data.value;
             actionurl = get_data.url;
             am_web_log_debug("%s: POST cache actionurl: %s",
@@ -1486,6 +1375,7 @@ int dsame_check_access(request_rec *r) {
     char *post_page = NULL;
     char *dpro_cookie = NULL;
     char *response = NULL;
+    am_bool_t redirectRequest = AM_FALSE;
 
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
@@ -1496,7 +1386,6 @@ int dsame_check_access(request_rec *r) {
      */
     if (agentInitialized != B_TRUE) {
         apr_thread_mutex_lock(init_mutex);
-        am_web_log_debug("%s: Locked initialization section.", thisfunc);
         if (agentInitialized != B_TRUE) {
             (void) init_at_request();
             if (agentInitialized != B_TRUE) {
@@ -1505,7 +1394,6 @@ int dsame_check_access(request_rec *r) {
             }
         }
         apr_thread_mutex_unlock(init_mutex);
-        am_web_log_debug("%s: Unlocked initialization section.", thisfunc);
     }
     if (status == AM_SUCCESS) {
         // Get the agent config
@@ -1517,6 +1405,7 @@ int dsame_check_access(request_rec *r) {
         }
     }
     am_web_log_info("%s: starting...", thisfunc);
+
     // Check arguments
     if (r == NULL) {
         am_web_log_error("%s: Request to http server is NULL.", thisfunc);
@@ -1548,7 +1437,7 @@ int dsame_check_access(request_rec *r) {
             char* data = NULL;
             status = content_read((void*) &r, &data);
             if (status == AM_SUCCESS) {
-                post_notification(data);
+                post_notification(data, r->server);
                 /*notification is received, respond with HTTP200 and OK in response body*/
                 ap_set_content_type(r, "text/html");
                 ap_set_content_length(r, 2);
@@ -1567,7 +1456,7 @@ int dsame_check_access(request_rec *r) {
     // in the post data cache
     if (status == AM_SUCCESS) {
         if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
-            pdp_status = check_for_post_data(url, &post_page, agent_config);
+            pdp_status = check_for_post_data(url, &post_page, agent_config, r->server);
         }
     }
 
@@ -1608,7 +1497,7 @@ int dsame_check_access(request_rec *r) {
     }
 
     if (am_web_is_max_debug_on()) {
-        am_web_log_max_debug("%s: post page: [%s], dpro cookie: [%s]", thisfunc, post_page, dpro_cookie);
+        am_web_log_max_debug("%s: url: [%s], post page: [%s], dpro cookie: [%s]", thisfunc, url, post_page, dpro_cookie);
     }
 
     //In CDSSO mode, check if the sso token is in the post data
@@ -1619,12 +1508,7 @@ int dsame_check_access(request_rec *r) {
                 char *recv_token = NULL;
                 status = content_read((void*) &r, &response);
                 if (status == AM_SUCCESS) {
-                    status = am_web_get_token_from_assertion(response, &recv_token, agent_config);
-                    if (status != AM_SUCCESS) {
-                        am_web_log_error("%s: am_web_get_token_from_assertion() "
-                                "failed with error code: %s",
-                                thisfunc, am_status_to_string(status));
-                    } else {
+                    if ((status = am_web_get_token_from_assertion(response, &recv_token, agent_config)) == AM_SUCCESS) {
                         am_web_log_max_debug("%s: recv_token : %s", thisfunc, recv_token);
                         // Set cookie in browser for the foreign domain.
                         am_web_do_cookie_domain_set(set_cookie, args, recv_token, agent_config);
@@ -1767,6 +1651,7 @@ static apr_status_t cleanup_dsame(void *data) {
      * sigaction() or other signal handling interfaces since it seems
      * to work best across platforms.
      */
+    agent_server_config *scfg = ap_get_module_config(((server_rec *) data)->module_config, &dsame_module);
     sighandler_t prev_handler = signal(SIGTERM, sigterm_handler);
 
     am_web_log_info("Cleaning up web agent..");
@@ -1776,40 +1661,28 @@ static apr_status_t cleanup_dsame(void *data) {
         init_mutex = NULL;
     }
 
-    if (notification_rmm) {
-        apr_rmm_destroy(notification_rmm);
-        am_web_log_info("Destroyed shared memory manager...");
-        notification_rmm = NULL;
-    }
-
-    if (notification_shm) {
-        apr_shm_destroy(notification_shm);
+    if (scfg->notification_cache) {
+        apr_shm_destroy(scfg->notification_cache);
         am_web_log_info("Destroyed shared memory...");
-        notification_shm = NULL;
+        scfg->notification_cache = NULL;
     }
 
-    if (notification_lock) {
-        apr_global_mutex_destroy(notification_lock);
+    if (scfg->notification_lock) {
+        apr_global_mutex_destroy(scfg->notification_lock);
         am_web_log_info("Destroyed shared memory global mutex...");
-        notification_lock = NULL;
+        scfg->notification_lock = NULL;
     }
 
-    if (postdata_rmm) {
-        apr_rmm_destroy(postdata_rmm);
-        am_web_log_info("Destroyed shared memory manager...");
-        postdata_rmm = NULL;
-    }
-
-    if (postdata_shm) {
-        apr_shm_destroy(postdata_shm);
+    if (scfg->pdp_cache) {
+        apr_shm_destroy(scfg->pdp_cache);
         am_web_log_info("Destroyed shared memory...");
-        postdata_shm = NULL;
+        scfg->pdp_cache = NULL;
     }
 
-    if (postdata_lock) {
-        apr_global_mutex_destroy(postdata_lock);
+    if (scfg->pdp_lock) {
+        apr_global_mutex_destroy(scfg->pdp_lock);
         am_web_log_info("Destroyed shared memory global mutex...");
-        postdata_lock = NULL;
+        scfg->pdp_lock = NULL;
     }
 
     (void) am_web_cleanup();

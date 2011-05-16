@@ -5882,27 +5882,34 @@ process_request(am_web_request_params_t *req_params,
             case AM_INVALID_SESSION:
             case AM_ACCESS_DENIED:
                 args[0] = req_func;
-                am_web_log_debug("%s: session is invalid, will redirect (postdata: %s)", thisfunc, post_data);
-                // reset the CDSSO cookie first
-                if (cdsso_enabled == B_TRUE) {
-                    am_status_t cdStatus = am_web_do_cookie_domain_set(add_cookie_in_response, 
+                am_web_log_debug("%s: %s, will redirect (post data: %s)", thisfunc, (sts==AM_INVALID_SESSION ? "AM_INVALID_SESSION" : "AM_ACCESS_DENIED"), post_data);
+                if (sts == AM_INVALID_SESSION) {
+                    // reset the CDSSO cookie first
+                    if (cdsso_enabled == B_TRUE) {
+                        am_status_t cdStatus = am_web_do_cookie_domain_set(add_cookie_in_response, 
                                                args, 
                                                EMPTY_STRING, 
                                                agent_config);
-                    if(cdStatus != AM_SUCCESS) {
-                        am_web_log_error("process_request : CDSSO reset cookie failed");
+                        if(cdStatus != AM_SUCCESS) {
+                            am_web_log_error("process_request : CDSSO reset cookie failed");
+                        }
                     }
-
-                }
-                // reset cookies on invalid session.
-                local_sts = am_web_do_cookies_reset(add_cookie_in_response,
+                    // reset cookies on invalid session.
+                    local_sts = am_web_do_cookies_reset(add_cookie_in_response,
                                                     args, agent_config);
-                if (local_sts != AM_SUCCESS) {
-                    am_web_log_warning("%s: all_cookies_reset after "
+                    if (local_sts != AM_SUCCESS) {
+                        am_web_log_warning("%s: all_cookies_reset after "
                                 "access to url [%s] returned "
                                 "invalid session returned %s.",
                                 thisfunc, req_params->url,
                                 am_status_to_string(local_sts));
+                    }
+                }
+                if (sts == AM_ACCESS_DENIED) {
+                    if (cdsso_enabled == B_TRUE) {
+                        am_web_do_cookies_reset(add_cookie_in_response,
+                                                    args, agent_config);                        
+                    }
                 }
                 if (req_params->method == AM_WEB_REQUEST_POST &&
                         B_TRUE == am_web_is_postpreserve_enabled(agent_config) &&
@@ -5931,18 +5938,29 @@ process_request(am_web_request_params_t *req_params,
                             pu->post_time_key, pu->action_url, post_data, (*agentConfigPtr)->postcacheentry_life);
                     }
                     if (pds == AM_SUCCESS) {
+                        char *lbCookieHeader = NULL;
+                        if (am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_FALSE, agent_config) == AM_SUCCESS) {
+                            am_web_log_debug("%s: setting LB cookie for post data preservation (%s)", thisfunc, lbCookieHeader);
+                            pds = req_func->add_header_in_response.func(req_func->add_header_in_response.args, lbCookieHeader, NULL);
+                        }
+                        if (lbCookieHeader != NULL) {
+                            am_web_free_memory(lbCookieHeader);
+                            lbCookieHeader = NULL;
+                        }
+                    }
+                    if (pds == AM_SUCCESS) {
                         result = process_access_redirect(pu->dummy_url, orig_method,
                                 sts, policy_result,
                                 req_func,
                                 &redirect_url,
-                                NULL, agent_config);
+                                &advice_response, agent_config);
                     } else {
                         /*pdp cache entry registration failed, do not do dummypost*/
                         result = process_access_redirect(req_params->url, orig_method,
                                 sts, policy_result,
                                 req_func,
                                 &redirect_url,
-                                NULL, agent_config);
+                                &advice_response, agent_config);
                     }
                     if (pu != NULL) {
                         am_web_clean_post_urls(pu);
@@ -5954,7 +5972,7 @@ process_request(am_web_request_params_t *req_params,
                                 sts, policy_result,
                                 req_func,
                                 &redirect_url,
-                                NULL, agent_config);
+                                &advice_response, agent_config);
                 }
                 break;
             case AM_INVALID_FQDN_ACCESS:
