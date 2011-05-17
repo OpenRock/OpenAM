@@ -49,9 +49,7 @@
 #include <apr_strings.h>
 #include <apr_general.h>
 #include <apr_shm.h>
-#include <apr_rmm.h>
 #include <apr_global_mutex.h>
-#include <apr_tables.h>
 #ifdef _MSC_VER
 #include <process.h>
 #include <windows.h>
@@ -1271,8 +1269,9 @@ void init_at_request() {
     }
 }
 
-static am_status_t check_for_post_data(char *requestURL, char **page, void *agent_config, server_rec *s) {
+static am_status_t check_for_post_data(void **args, const char *requestURL, char **page) {
     const char *thisfunc = "check_for_post_data()";
+    request_rec *r;
     const char *post_data_query = NULL;
     am_web_postcache_data_t get_data = {NULL, NULL};
     const char *actionurl = NULL;
@@ -1283,9 +1282,12 @@ static am_status_t check_for_post_data(char *requestURL, char **page, void *agen
     char *stickySessionValue = NULL;
     char *stickySessionPos = NULL;
     char *temp_uri = NULL;
+    void *agent_config = NULL;
     *page = NULL;
+    agent_config = am_web_get_agent_configuration();
 
-    if (requestURL == NULL) {
+    if (args == NULL || (r = (request_rec *) args[0]) == NULL || requestURL == NULL) {
+        am_web_log_error("%s: invalid argument passed.", thisfunc);
         status = AM_INVALID_ARGUMENT;
     }
     // Check if magic URI is present in the URL
@@ -1315,9 +1317,9 @@ static am_status_t check_for_post_data(char *requestURL, char **page, void *agen
             (strlen(post_data_query) > 0)) {
         am_web_log_debug("%s: POST Magic Query Value: %s", thisfunc, post_data_query);
         if (am_web_is_max_debug_on()) {
-            listall_post_data(s);
+            listall_post_data(r->server);
         }
-        if ((find_post_data((char*) post_data_query, &get_data, s)) == AM_SUCCESS) {
+        if ((status = find_post_data((char*) post_data_query, &get_data, r->server)) == AM_SUCCESS) {
             postdata_cache = get_data.value;
             actionurl = get_data.url;
             am_web_log_debug("%s: POST cache actionurl: %s",
@@ -1357,8 +1359,6 @@ static am_status_t check_for_post_data(char *requestURL, char **page, void *agen
 int dsame_check_access(request_rec *r) {
     const char *thisfunc = "dsame_check_access()";
     am_status_t status = AM_SUCCESS;
-    am_status_t pdp_status = AM_SUCCESS;
-    am_status_t status_tmp = AM_SUCCESS;
     int ret = OK;
     char *url = NULL;
     void *args[] = {(void *) r, (void *) & ret};
@@ -1372,10 +1372,6 @@ int dsame_check_access(request_rec *r) {
     am_web_request_params_t req_params;
     am_web_request_func_t req_func;
     void* agent_config = NULL;
-    char *post_page = NULL;
-    char *dpro_cookie = NULL;
-    char *response = NULL;
-    am_bool_t redirectRequest = AM_FALSE;
 
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
@@ -1452,22 +1448,6 @@ int dsame_check_access(request_rec *r) {
         }
     }
 
-    // If post preserve data is enabled, check if there is post data
-    // in the post data cache
-    if (status == AM_SUCCESS) {
-        if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
-            pdp_status = check_for_post_data(url, &post_page, agent_config, r->server);
-        }
-    }
-
-    //Check if the SSO token is in the HTTP_COOKIE header
-    if (status == AM_SUCCESS) {
-        const char *cookieName = am_web_get_cookie_name(agent_config);
-        if (cookieName != NULL) {
-            dpro_cookie = get_cookie(r, cookieName);
-        }
-    }
-
     // If there is a proxy in front of the agent, the user can set in the
     // properties file the name of the headers that the proxy uses to set
     // the real client IP and host name. In that case the agent needs
@@ -1493,31 +1473,6 @@ int dsame_check_access(request_rec *r) {
             status = am_web_get_client_ip_host(clientIP_hdr,
                     clientHostname_hdr,
                     &clientIP, &clientHostname);
-        }
-    }
-
-    if (am_web_is_max_debug_on()) {
-        am_web_log_max_debug("%s: url: [%s], post page: [%s], dpro cookie: [%s]", thisfunc, url, post_page, dpro_cookie);
-    }
-
-    //In CDSSO mode, check if the sso token is in the post data
-    if (status == AM_SUCCESS) {
-        if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) && method == AM_WEB_REQUEST_POST) {
-            if ((dpro_cookie == NULL || (strlen(dpro_cookie) == 0))
-                    && post_page != NULL) {
-                char *recv_token = NULL;
-                status = content_read((void*) &r, &response);
-                if (status == AM_SUCCESS) {
-                    if ((status = am_web_get_token_from_assertion(response, &recv_token, agent_config)) == AM_SUCCESS) {
-                        am_web_log_max_debug("%s: recv_token : %s", thisfunc, recv_token);
-                        // Set cookie in browser for the foreign domain.
-                        am_web_do_cookie_domain_set(set_cookie, args, recv_token, agent_config);
-                    }
-                }
-                if (recv_token) {
-                    free(recv_token);
-                }
-            }
         }
     }
 
@@ -1560,47 +1515,14 @@ int dsame_check_access(request_rec *r) {
         // post data preservation (create shared cache table entry)
         req_func.reg_postdata.func = update_post_data_for_request;
         req_func.reg_postdata.args = args;
+        req_func.check_postdata.func = check_for_post_data;
+        req_func.check_postdata.args = args;
 
         (void) am_web_process_request(&req_params, &req_func,
                 &status, agent_config);
 
-        if (status == AM_SUCCESS) {
-            if (post_page != NULL && strlen(post_page) > 0) {
-                /* If post_page is not null it means that the request 
-                 * contains the "/dummypost/sunpostpreserve" string and
-                 * that the post data of the original request need to be
-                 * posted.
-                 * If using a LB cookie, it needs to be set to NULL.
-                 * If am_web_get_postdata_preserve_lbcookie() returns
-                 * AM_INVALID_ARGUMENT, it means that the sticky session
-                 * feature is disabled (ie no LB) or that the sticky
-                 * session mode is URL
-                 **/
-                char *lbCookieHeader = NULL;
-                int len;
-                status_tmp = am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_TRUE, agent_config);
-                if (status_tmp != AM_NO_MEMORY) {
-                    if (status_tmp == AM_SUCCESS) {
-                        am_web_log_max_debug("%s: Setting LB cookie for post data preservation to null.", thisfunc);
-                        set_cookie(lbCookieHeader, args);
-                    }
-                    len = strlen(post_page);
-                    ap_set_content_type(r, "text/html");
-                    ap_set_content_length(r, len);
-                    ap_rwrite(post_page, len, r);
-                    ap_rflush(r);
-                    ret = DONE;
-                } else {
-                    am_web_log_max_debug("%s: get LB cookie error %s", thisfunc, am_status_to_string(status_tmp));
-                }
-                if (lbCookieHeader != NULL) {
-                    am_web_free_memory(lbCookieHeader);
-                    lbCookieHeader = NULL;
-                }
-            }
-        } else {
-            am_web_log_error("%s: Error encountered rendering result %d.",
-                    thisfunc, ret);
+        if (status != AM_SUCCESS) {
+            am_web_log_error("%s: error encountered rendering result: %s", thisfunc, am_status_to_string(status));
         }
     }
     // Cleaning
@@ -1609,14 +1531,6 @@ int dsame_check_access(request_rec *r) {
     }
     if (clientHostname != NULL) {
         am_web_free_memory(clientHostname);
-    }
-    if (response != NULL) {
-        free(response);
-        response = NULL;
-    }
-    if (post_page != NULL) {
-        free(post_page);
-        post_page = NULL;
     }
     am_web_delete_agent_configuration(agent_config);
     // Failure handling

@@ -517,6 +517,27 @@ typedef struct {
 } am_web_register_postdata_t;
 
 /**
+ * Retrieve post data from 
+ * agent shared cache
+ *
+ * Arguments:
+ *
+ * args - agent defined arguments to pass in.
+ * requestURL - magic url 
+ * page - actual data stored in a shared cache (if found)
+ *
+ * Return:
+ *
+ * This function should return AM_SUCCESS if retrieve was successfully 
+ * and appropriate am_status_t code otherwise.
+ */
+typedef am_status_t (*am_web_check_postdata_func_t)(
+			void **args, const char *requestURL, char **page);
+typedef struct {
+    am_web_check_postdata_func_t func;
+    void **args;
+} am_web_check_postdata_t;
+/**
  * structure for all the functions above
  */
 typedef struct {
@@ -545,6 +566,8 @@ typedef struct {
     
     //PDP
     am_web_register_postdata_t reg_postdata;
+    
+    am_web_check_postdata_t check_postdata;
 
 } am_web_request_func_t;
 

@@ -5748,6 +5748,7 @@ get_sso_token(am_web_request_params_t *req_params,
               am_web_request_func_t *req_func,
               char **sso_token, char **post_data,
               am_web_req_method_t *orig_method,
+              char *post_page,
               void* agent_config)
 {
     AgentConfigurationRefCntPtr* agentConfigPtr =
@@ -5774,9 +5775,9 @@ get_sso_token(am_web_request_params_t *req_params,
     //     2) try to get the SSO token from assertion
     if ((*agentConfigPtr)->cdsso_enable == AM_TRUE &&
            ((req_method = req_params->method) == AM_WEB_REQUEST_POST &&
-           sts == AM_NOT_FOUND &&
+           sts == AM_NOT_FOUND && (post_page != NULL ||
            (am_web_is_url_enforced(req_params->url, req_params->path_info,
-                    req_params->client_ip, agent_config) == B_TRUE))) {
+                    req_params->client_ip, agent_config) == B_TRUE)))) {
         req_method = AM_WEB_REQUEST_GET;
         sts = process_cdsso(req_params, req_func, req_method, 
                             sso_token, post_data, agent_config);
@@ -5827,17 +5828,25 @@ process_request(am_web_request_params_t *req_params,
     am_policy_result_t policy_result = AM_POLICY_RESULT_INITIALIZER;
     char *redirect_url = NULL;
     char *post_data = NULL;
+    char *post_data_cache = NULL;
     char *advice_response = NULL;
     void *args[1];
     boolean_t cdsso_enabled = am_web_is_cdsso_enabled(agent_config);
     // initialize reserved field to NULL
     req_params->reserved = NULL;
 
+    /* in case post preserve data is enabled, check if there is post data in
+     * a shared post data cache
+     **/ 
+    if (cdsso_enabled && am_web_is_postpreserve_enabled(agent_config)
+            && req_func->check_postdata.func != NULL) {
+        req_func->check_postdata.func(req_func->check_postdata.args, req_params->url, &post_data_cache);
+    }
     // get sso token from either cookie header or assertion in cdsso mode.
     // OK if it's not found - am_web_is_access_allowed will check if
     // access is enforced.
     sts = get_sso_token(req_params, req_func, &sso_token, &post_data,
-                        &orig_method, agent_config);
+                        &orig_method, post_data_cache, agent_config);
     if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
         am_web_log_error("%s: Error while getting sso token from "
                          "cookie or cdsso assertion: %s",
@@ -5871,13 +5880,28 @@ process_request(am_web_request_params_t *req_params,
                         thisfunc, req_params->url, am_status_to_string(sts));
         // map access check result to web result - OK, FORBIDDEN, etc.
         switch(sts) {
-            case AM_SUCCESS:  // Access to user allowed.
-                // will be either OK or forbidden if sso token user failed
-                // to be set in the web container.
-                // Note - the method passed must be that of this request.
-                result = process_access_success(req_params->url, 
+            case AM_SUCCESS:
+                if (post_data_cache != NULL) {
+                    strcpy(data_buf, post_data_cache);
+                    char *lbCookieHeader = NULL;
+                    if (am_web_get_postdata_preserve_lbcookie(&lbCookieHeader, B_TRUE, agent_config) != AM_NO_MEMORY) {
+                        am_web_log_debug("%s: setting LB cookie for post data preservation to null.", thisfunc, lbCookieHeader);
+                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, lbCookieHeader, NULL);
+                    }
+                    if (lbCookieHeader != NULL) {
+                        am_web_free_memory(lbCookieHeader);
+                        lbCookieHeader = NULL;
+                    }
+                    result = AM_WEB_RESULT_OK_DONE;
+                } else if (post_data_cache == NULL && post_data != NULL && req_func->add_header_in_response.func != NULL) {
+                    req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", req_params->url);
+                    strcpy(data_buf, req_params->url);
+                    result = AM_WEB_RESULT_REDIRECT;
+                } else {
+                    result = process_access_success(req_params->url, 
                               policy_result, req_params, req_func,
                               agent_config);
+                }
                 break;
             case AM_INVALID_SESSION:
             case AM_ACCESS_DENIED:
@@ -5926,6 +5950,16 @@ process_request(am_web_request_params_t *req_params,
                         am_web_log_debug("%s: post_data is empty, trying to read it here...");
                         pds = req_func->get_post_data.func(req_func->get_post_data.args, &post_data);
                         am_web_log_debug("%s: post data: %s", thisfunc, post_data);
+                    }
+                    /*do not store LARES post data in a shared cache*/
+                    if (strncmp(post_data, "LARES", 5) == 0) {
+                        if (post_data != NULL) {
+                            if (req_func->free_post_data.func != NULL) {
+                                req_func->free_post_data.func(req_func->free_post_data.args, post_data);
+                            }
+                            post_data = NULL;
+                        }
+                        pds == AM_FAILURE;
                     }
                     if (pds == AM_SUCCESS) {
                         pds = am_web_create_post_preserve_urls(req_params->url,
@@ -6036,6 +6070,16 @@ process_request(am_web_request_params_t *req_params,
         }
         if (advice_response != NULL) {
             free(advice_response);
+        }
+        if (post_data_cache != NULL) {
+            free(post_data_cache);
+            post_data_cache = NULL;
+        }
+        if (post_data != NULL) {
+            if (req_func->free_post_data.func != NULL) {
+                req_func->free_post_data.func(req_func->free_post_data.args, post_data);
+            }
+            post_data = NULL;
         }
     }
     am_web_log_debug("%s: returning web result %s, data [%s]",
