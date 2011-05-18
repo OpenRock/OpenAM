@@ -5838,7 +5838,7 @@ process_request(am_web_request_params_t *req_params,
     /* in case post preserve data is enabled, check if there is post data in
      * a shared post data cache
      **/ 
-    if (cdsso_enabled && am_web_is_postpreserve_enabled(agent_config)
+    if (am_web_is_postpreserve_enabled(agent_config)
             && req_func->check_postdata.func != NULL) {
         req_func->check_postdata.func(req_func->check_postdata.args, req_params->url, &post_data_cache);
     }
