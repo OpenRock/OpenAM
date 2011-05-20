@@ -66,11 +66,11 @@ public class HaDBEnv {
         ssEnvConfig.setTransactional(!readOnly);
         storeConfig.setTransactional(!readOnly);
         ssEnvConfig.setCachePercent(50);
+        ssEnvConfig.setTxnNoSync(true);
 
         // Open the environment and entity store
         sessionEnv = new Environment(envHome, ssEnvConfig);
         store = new EntityStore(sessionEnv, "EntityStore", storeConfig);
-
     }
 
     // Return a handle to the entity store
@@ -85,26 +85,16 @@ public class HaDBEnv {
 
 
     // Close the store and environment
-    public void close() {
+    public void close() 
+    throws DatabaseException {
         if (store != null) {
-            try {
-                store.close();
-            } catch(DatabaseException dbe) {
-                System.err.println("Error closing store: " + 
-                                    dbe.toString());
-               System.exit(-1);
-            }
+            store.close();
         }
 
         if (sessionEnv != null) {
-            try {
-                // Finally, close the store and environment.
-                sessionEnv.close();
-            } catch(DatabaseException dbe) {
-                System.err.println("Error closing MyDbEnv: " + 
-                                    dbe.toString());
-               System.exit(-1);
-            }
+            // Finally, close the store and environment.
+            sessionEnv.close();
+
         }
     }
 }

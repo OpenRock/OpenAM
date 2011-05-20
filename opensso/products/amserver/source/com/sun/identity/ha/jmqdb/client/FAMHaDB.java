@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
  
 package com.sun.identity.ha.jmqdb.client;
@@ -61,8 +61,10 @@ import com.sun.identity.ha.jmqdb.ConnectionFactoryProvider;
 import com.sun.identity.ha.jmqdb.ConnectionFactoryProviderFactory;
 
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
 import com.sleepycat.je.Transaction;
 import com.sleepycat.persist.EntityCursor;
+import com.sleepycat.persist.EntityStore;
 
 import com.sun.messaging.ConnectionConfiguration;
 import com.sun.messaging.ConnectionFactory;
@@ -175,12 +177,39 @@ public class FAMHaDB implements Runnable {
     private static final String RESOURCE_BUNDLE = "amSessionDB";
     
     private static boolean isServerUp = false;
+    private static boolean isDBUp = false;
     private int sleepTime = 60 * 1000; // 1 min in miillisec
     
     private static int readCount = 0;
     private static int writeCount = 0;
     private static int deleteCount = 0;
     private static int totalTrans = 0;
+    private static int cumTotalTrans = 0;
+    
+    private static long minReadSessionCount = 0;
+    private static double averageReadSessionCount = 0;
+    private static long maxReadSessionCount = 0;
+    private static long cumulativeReadSessionCount = 0;
+    private static long minReadCount = 0;
+    private static double averageReadCount = 0;
+    private static long maxReadCount = 0;
+    private static long cumulativeReadCount = 0;
+    private static long minWriteCount = 0;
+    private static double averageWriteCount = 0;
+    private static long maxWriteCount = 0;
+    private static long cumulativeWriteCount = 0;
+    private static long minDeleteCount = 0;
+    private static double averageDeleteCount = 0;
+    private static long maxDeleteCount = 0;
+    private static long cumulativeDeleteCount = 0;
+    private static long minProcessRequestTime = 0;
+    private static double averageProcessRequestTime = 0;
+    private static long maxProcessRequestTime = 0;
+    private static long cumulativeProcessRequestTime = 0;
+    private static int cumReadCount = 0;
+    private static int cumWriteCount = 0;
+    private static int cumReadSessionCount = 0;
+    private static int cumDeleteCount = 0;
     
     // Session Constraints
     private static int scReadCount = 0;
@@ -227,21 +256,33 @@ public class FAMHaDB implements Runnable {
             bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE, 
                      Locale.getDefault());
         } catch (MissingResourceException mre) {
-            System.err.println("Cannot get the resource bundle.");
+            System.out.println("Cannot get the resource bundle.");
             System.exit(1);
         }
         
         statsWriter = new PrintWriter(System.out);
-
     }    
         
 
     public FAMHaDB(String id) throws Exception {
-        
         _id = id;
     }
     
     private void initDB() throws Exception {
+        try {
+            if (da != null) {
+                System.out.println(bundle.getString("reinitdb"));
+                closeDB();
+            }
+        } catch (Exception ex) {
+            System.out.println("Error in closing db");
+            System.out.println(ex.getMessage());
+            
+            if (verbose) {
+                ex.printStackTrace();
+            }
+        }
+        
         try {
             haDbEnv.setup(sessDbEnvPath, // path to the environment home
                                false);        // is this environment read-only?
@@ -249,12 +290,13 @@ public class FAMHaDB implements Runnable {
             // persistent objects.
             da = new DataAccessor(haDbEnv.getEntityStore(),
                 propertiesfile);
-        } catch (DatabaseException dbe) {
-            // Exception handling goes here
-            System.err.println("Error in creating session data accessor");
-            System.err.println(dbe.getMessage());     
-            if(verbose) {
-                dbe.printStackTrace();
+            isDBUp = true;
+        } catch (Exception ex) {
+            System.out.println("Error in creating session data accessor");
+            System.out.println(ex.getMessage());
+            
+            if (verbose) {
+                ex.printStackTrace();
             }
         } 
     }
@@ -332,9 +374,19 @@ public class FAMHaDB implements Runnable {
             }
         } catch (Exception ex) {
             if(verbose) {
-                System.out.println(bundle.getString("unabletoreinitjmq" + ex.getMessage()));
+                System.out.println(bundle.getString("unabletoclosejmq" + ex.getMessage()));
             }
         }
+    }
+    
+    /**
+     * 
+     * @param args
+     * @throws Exception 
+     */
+    private void closeDB() 
+    throws DatabaseException {
+        haDbEnv.close();
     }
     
     private void initialize(String args[]) throws Exception {
@@ -366,7 +418,7 @@ public class FAMHaDB implements Runnable {
             // be received by the local server. 
             Thread.sleep(nodeUpdateInterval+nodeUpdateGraceperiod);
         } catch (Exception e) {
-            System.err.println(e.getMessage());     
+            System.out.println(e.getMessage());     
             if(verbose) {
                 e.printStackTrace();
             }         
@@ -374,18 +426,37 @@ public class FAMHaDB implements Runnable {
         determineMasterDBNode();
     }
     
-    private void Shutdown() {
+    /**
+     * Shutdown amsessiondb 
+     * 
+     * @param exit true if we should call System.exit
+     */
+    private void shutdown(boolean exit) {
         try {
             shutdownStatus = true;
             Thread.sleep(3000); 
+            closeJMQ();
             haDbEnv.close();
+        } catch(DatabaseException dbe) {
+            System.out.println("Error closing store: " + dbe.toString());
         } catch (Exception e) {
             System.out.println("e.getMessage");
+        }
+        
+        if (exit) {
+            System.exit(0);
         }
     }
 
     public int process()
     throws Exception {
+        long processStart = 0;
+        long pDuration = 0;
+        
+        if(statsEnabled) {
+            processStart = System.currentTimeMillis();
+        }
+
         BytesMessage message = (BytesMessage) reqSub.receive();
                 
         String id = message.getStringProperty(ID);
@@ -396,14 +467,14 @@ public class FAMHaDB implements Runnable {
             System.out.println("service=" + svc);
         }
         //showAllSessionRecords();
+        
         PrimaryIndex recordByPrimaryKey = da.getPrimaryIndex(svc);
+        
         if (op.equals(READ)) {
             if(verbose) {
                 System.out.println(bundle.getString("readmsgrecv"));
             }
-	        if(statsEnabled) {
-                readCount++;
-            }
+	                        
             String pKey = getLenString(message);
 
             if (pKey == null) {
@@ -417,11 +488,29 @@ public class FAMHaDB implements Runnable {
             }
 
             BaseRecord baseRecord = null;
+            long start = System.currentTimeMillis();
             try {
                 baseRecord = (BaseRecord)recordByPrimaryKey.get(pKey);
+                
             } catch (DatabaseException ex) {
                 ex.printStackTrace();
                 System.out.println("READ exc: " + ex);
+            }
+            long duration = System.currentTimeMillis() - start;
+            
+            if(statsEnabled) {
+                readCount++;
+
+                if (duration > 0 && duration < minReadCount) {
+                    minReadCount = duration;
+                }
+
+                if (duration > maxReadCount) {
+                    maxReadCount = duration;
+                }
+
+                cumulativeReadCount += duration;
+                averageReadCount = cumulativeReadCount / (double) readCount;
             }
             
             if(verbose) {
@@ -455,9 +544,7 @@ public class FAMHaDB implements Runnable {
             if(verbose) {
                System.out.println(bundle.getString("writemsgrecv"));
             }    
-	    if(statsEnabled) {
-                writeCount++;
-            }
+	    
             String pKey = getLenString(message);
 
             if (pKey == null) {
@@ -486,8 +573,24 @@ public class FAMHaDB implements Runnable {
             record.setState(state);
             record.setBlob(stuff);
 
+            long start = System.currentTimeMillis();
             recordByPrimaryKey.put(record);
+            long duration = System.currentTimeMillis() - start;
             
+            if(statsEnabled) {
+                writeCount++;
+                
+                if (duration > 0 && duration < minWriteCount) {
+                    minWriteCount = duration;
+                }
+
+                if (duration > maxWriteCount) {
+                    maxWriteCount = duration;
+                }
+
+                cumulativeWriteCount += duration;
+                averageWriteCount = cumulativeWriteCount / (double) writeCount;     
+            }
         } else if (op.equals(DELETEBYDATE)) {
             if(verbose) {
                 System.out.println(bundle.getString("datemsgrecv"));
@@ -501,9 +604,7 @@ public class FAMHaDB implements Runnable {
             if(verbose) {
                 System.out.println(bundle.getString("deletemsgrecv"));
             }
-	        if(statsEnabled) {
-                deleteCount++;
-            }
+	        
             String pKey = getLenString(message);
 
             if (pKey == null) {
@@ -515,6 +616,8 @@ public class FAMHaDB implements Runnable {
             }
 
             Transaction txn = null;
+            long start = System.currentTimeMillis();
+            
             try {
                 txn = haDbEnv.getEnv().beginTransaction(null, null);
                 recordByPrimaryKey.delete(txn, pKey);
@@ -524,11 +627,26 @@ public class FAMHaDB implements Runnable {
                 System.out.println("Aborted txn: " + e.toString());
                 e.printStackTrace();
             }             
+            long duration = System.currentTimeMillis() - start;
+            
+            if (statsEnabled) {
+                deleteCount++;
+                
+                if (duration > 0 && duration < minDeleteCount) {
+                    minDeleteCount = duration;
+                }
+
+                if (duration > maxDeleteCount) {
+                    maxDeleteCount = duration;
+                }
+
+                cumulativeDeleteCount += duration;
+                averageDeleteCount = cumulativeDeleteCount / (double) deleteCount; 
+            }
         } else if (op.equals(SHUTDOWN)) {
-            Shutdown();
+            shutdown(true);
             return(1);
         } else if (op.equals(GET_RECORD_COUNT)) {
-  
             if(verbose) {
                 System.out.println(bundle.getString("getsessioncount"));
             }    
@@ -547,6 +665,22 @@ public class FAMHaDB implements Runnable {
             }
             readWithSecondaryKey(message, id, svc);
         } 
+        
+        if(statsEnabled) {
+            pDuration = System.currentTimeMillis() - processStart;
+
+            if (pDuration > 0 && pDuration < minProcessRequestTime) {
+                minProcessRequestTime = pDuration;
+            }
+
+            if (pDuration > maxProcessRequestTime) {
+                maxProcessRequestTime = pDuration;
+            }
+
+            cumulativeProcessRequestTime += pDuration;
+            averageProcessRequestTime = cumulativeProcessRequestTime / (double) cumTotalTrans;
+        }
+        
         return 0;
     }
 
@@ -574,13 +708,32 @@ public class FAMHaDB implements Runnable {
         int nrows = 0;
         Vector rows = new Vector();
         EntityCursor<? extends BaseRecord> records = null;
+        long start = 0;
+        long duration = 0;
         
         try {
             // Use the BaseRecord secondary key to retrieve
             // these objects.
             SecondaryIndex recordBySecondaryIndx =
                 da.getSecondaryIndex2(service);  
+            start = System.currentTimeMillis();
             records = recordBySecondaryIndx.subIndex(secondKey).entities();
+            duration = System.currentTimeMillis() - start;
+            
+            if(statsEnabled) {
+                if (duration > 0 && duration < minReadSessionCount) {
+                    minReadSessionCount = duration;
+                }
+                
+                if (duration > maxReadSessionCount) {
+                    maxReadSessionCount = duration;
+                }
+                
+                cumulativeReadSessionCount += duration;
+                averageReadSessionCount = cumulativeReadSessionCount / (double) scReadCount;
+                
+            }
+            
             for (BaseRecord record : records) {
                 // only the "valid" non-expired sessions with the 
                 // right secondaryKey will be counted
@@ -750,7 +903,7 @@ public class FAMHaDB implements Runnable {
                 displaySessionRecord(record);
             }
         } catch(DatabaseException de){
-            System.err.println(de.getMessage());     
+            System.out.println(de.getMessage());     
             if(verbose) {
                 de.printStackTrace();
             }        	
@@ -819,14 +972,39 @@ public class FAMHaDB implements Runnable {
 
                     if (statsEnabled && 
                        ((System.currentTimeMillis() - startTime) >= statsInterval)) {
-
+                        cumReadCount += readCount;
+                        cumWriteCount += writeCount;
+                        cumReadSessionCount += scReadCount;
+                        cumDeleteCount += deleteCount;
+                        cumTotalTrans += totalTrans;
                         printStats(); 
+                        
                         startTime = System.currentTimeMillis();
                         totalTrans = 0;
                         readCount = 0;
                         writeCount = 0;
                         deleteCount = 0;
                         scReadCount = 0;
+                        minReadSessionCount = 0;
+                        maxReadSessionCount = 0;
+                        cumulativeReadSessionCount = 0;
+                        averageReadSessionCount = 0;
+                        minReadCount = 0;
+                        averageReadCount = 0;
+                        maxReadCount = 0;
+                        cumulativeReadCount = 0;
+                        minWriteCount = 0;
+                        averageWriteCount = 0;
+                        maxWriteCount = 0;
+                        cumulativeWriteCount = 0;
+                        minDeleteCount = 0;
+                        averageDeleteCount = 0;
+                        maxDeleteCount = 0;
+                        cumulativeDeleteCount = 0;
+                        minProcessRequestTime = 0;
+                        averageProcessRequestTime = 0;
+                        maxProcessRequestTime = 0;
+                        cumulativeProcessRequestTime = 0;
                     }
                 } else {
                     /*
@@ -835,27 +1013,50 @@ public class FAMHaDB implements Runnable {
                      * numCleanSessions value from the Database.
                      */
                     Thread.sleep(sleepTime);
-                    long curTime = System.currentTimeMillis()/1000;
-                    int cleanCount = numCleanSessions * 5;
-                    deleteByDate(curTime, cleanCount);
+                    
+                    if (isDBUp) {
+                        long curTime = System.currentTimeMillis()/1000;
+                        int cleanCount = numCleanSessions * 5;
+                        deleteByDate(curTime, cleanCount);
+                    }
 
                     if(verbose) {
                         System.out.println(bundle.getString("reconnecttobroker"));
                     }
-                    initJMQ();
+                    
+                    if (!isDBUp) {
+                        initDB();
+                    }
+                    
+                    if (isDBUp) {
+                        initJMQ();
+                    }
+                    
                     if(verbose) {
                         System.out.println(bundle.getString("reconnectsuccessfull"));
                     }
                 }
+            } catch (DatabaseException ex) {
+                isDBUp = false;
+                isServerUp = false;
+                closeJMQ();
+                
+                System.out.println(bundle.getString("dbdown"));
+                
+                if (verbose) {
+                    ex.printStackTrace();
+                }
             } catch (Exception ex) {
                 isServerUp = false;
-                System.err.println(bundle.getString("brokerdown"));
-                if(verbose) {
+                closeJMQ();
+                System.out.println(bundle.getString("brokerdown"));
+                
+                if (verbose) {
                     ex.printStackTrace();
                 }    
             } catch (Throwable t) {
-                if(verbose) {
-                     t.printStackTrace();
+                if (verbose) {
+                    t.printStackTrace();
                 }     
             }
         }
@@ -887,9 +1088,11 @@ public class FAMHaDB implements Runnable {
              dbs = new FAMHaDB("FAMHaDB");
              dbs.initialize(args);
              
-             AMDBShutdown shutDownHook = new AMDBShutdown();
-             Runtime.getRuntime().addShutdownHook(shutDownHook);
-            
+             Runtime.getRuntime().addShutdownHook(new Thread() {
+                 public void run() {
+                     dbs.shutdown(false);
+                 }
+             });   
         } catch (Exception ex) {
             System.out.println("Exception main()");
             ex.printStackTrace();
@@ -897,12 +1100,6 @@ public class FAMHaDB implements Runnable {
             
         }
         
-    }
-    
-    static class AMDBShutdown extends Thread {
-        public void run() {
-            dbs.Shutdown();
-        }
     }
     
    private void printCommandError(String errorMessage, String command) {
@@ -916,22 +1113,31 @@ public class FAMHaDB implements Runnable {
        System.exit(1);
    }
    
-   private void printStats() {
-       
-       
+   private void printStats() { 
        statsWriter.println(bundle.getString("printingstats"));
-       statsWriter.println(bundle.getString("totalreq") + " " +
-            totalTrans);
-       statsWriter.println(bundle.getString("totalread") + " " +
-               readCount);
-       statsWriter.println(bundle.getString("totalwrite") + " " +
-               writeCount);
-       statsWriter.println(bundle.getString("totaldelete") + " " +
-               deleteCount);
-       statsWriter.println(bundle.getString("totalreadsessioncount") 
-                           + " " + scReadCount);
+       statsWriter.println(System.currentTimeMillis());
+       statsWriter.println(bundle.getString("totalreq") + " " + totalTrans + "(" + cumTotalTrans + ")");
+       statsWriter.println(bundle.getString("totalread") + " " + readCount + "(" + cumReadCount + ")");
+       statsWriter.println(bundle.getString("totalwrite") + " " + writeCount + "(" + cumWriteCount + ")");
+       statsWriter.println(bundle.getString("totaldelete") + " " + deleteCount + "(" + cumDeleteCount + ")");
+       statsWriter.println(bundle.getString("totalreadsessioncount") + " " + scReadCount + "(" + cumReadSessionCount + ")");
+       statsWriter.print("Min sc time "+ " " + minReadSessionCount + " ");
+       statsWriter.print("Avg sc time "+ " " + averageReadSessionCount + " ");
+       statsWriter.println("Max sc time "+ " " + maxReadSessionCount);
+       statsWriter.print("Min read time "+ " " + minReadCount + " ");
+       statsWriter.print("Avg read time "+ " " + averageReadCount + " ");
+       statsWriter.println("Max read time "+ " " + maxReadCount);
+       statsWriter.print("Min write time "+ " " + minWriteCount + " ");
+       statsWriter.print("Avg write time "+ " " + averageWriteCount + " ");
+       statsWriter.println("Max write time "+ " " + maxWriteCount);
+       statsWriter.print("Min delete time "+ " " + minDeleteCount + " ");
+       statsWriter.print("Avg delete time "+ " " + averageDeleteCount + " ");
+       statsWriter.println("Max delete time "+ " " + maxDeleteCount);  
+       statsWriter.print("Min process time "+ " " + minProcessRequestTime + " ");
+       statsWriter.print("Avg process time "+ " " + averageProcessRequestTime + " ");
+       statsWriter.println("Max process time "+ " " + maxProcessRequestTime); 
+       statsWriter.println("DB Size " + da.getPrimaryIndex("session").getDatabase().count());
        statsWriter.flush();
-       
    }
     
     private void parseCommandLine(String[] argv) throws Exception {
@@ -1066,7 +1272,7 @@ public class FAMHaDB implements Runnable {
                 statsEnabled = true;
                 break;
             case HELP:
-                System.err.println(bundle.getString("usage"));
+                System.out.println(bundle.getString("usage"));
                 System.exit(0);
                 break;
             case VERSION:
@@ -1101,8 +1307,8 @@ public class FAMHaDB implements Runnable {
                 propertiesfile = argv[i];
                 break;
             default:
-                System.err.println(bundle.getString("usage"));
-                System.err.println(bundle.getString("invalid-option") + argv[i]);
+                System.out.println(bundle.getString("usage"));
+                System.out.println(bundle.getString("invalid-option") + argv[i]);
                 System.exit(1);
             }
 
@@ -1134,7 +1340,7 @@ public class FAMHaDB implements Runnable {
 	            arg.equals("-h") ||
 	            arg.equals("--version") ||
 	            arg.equals("-n")) )  {
-		System.err.println(bundle.getString("invalid-option") + arg);
+		System.out.println(bundle.getString("invalid-option") + arg);
 		retValue = false;
 	    }
         } else {
@@ -1286,7 +1492,7 @@ public class FAMHaDB implements Runnable {
                     }
                 } catch (Exception e) {
                     isServerUp = false;
-                    System.err.println(bundle.getString("brokerdown"));
+                    System.out.println(bundle.getString("brokerdown"));
                     if (verbose) {
                         e.printStackTrace();
                     }
@@ -1352,7 +1558,7 @@ public class FAMHaDB implements Runnable {
                     }
                 } catch (Exception e) {
                     isServerUp = false;
-                    System.err.println(bundle.getString("brokerdown"));
+                    System.out.println(bundle.getString("brokerdown"));
                     if (verbose) {
                         e.printStackTrace();
                     }
