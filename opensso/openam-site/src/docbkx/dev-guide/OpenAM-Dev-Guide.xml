@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<book xml:id='dev-guide'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <info>
+  <title>OpenAM <?eval ${project.version}?> Developer's Guide</title>
+  <copyright>
+   <year>2011</year>
+   <holder>ForgeRock AS</holder>
+  </copyright>
+  <authorgroup>
+   <author>
+    <personname>
+     <firstname>Mark</firstname><surname>Craig</surname>
+    </personname>
+   </author>
+  </authorgroup>
+  <xinclude:include href="../legal.xml" />
+  <pubdate><?eval ${maven.build.timestamp}?></pubdate>
+ </info>
+
+ <toc />
+ 
+ <xinclude:include href="preface.xml" />
+
+ <part label="A">
+  <title>Overview</title>
+  <partintro>
+   <para>Although policy agents and standards support make it possible for
+   applications to use OpenAM for access management without changing your
+   code, some deployments require tighter integration, or direct use of
+   supported protocols and OpenAM APIs.</para>
+   
+   <para>OpenAM supports a range of protocols and APIs that allow you not
+   only to define specifically how access is managed in your client
+   applications, but also to extend OpenAM capabilities to meet even
+   those deployment requirements not yet covered in OpenAM.</para>
+  </partintro>
+  
+  <xinclude:include href='chap-api-overview.xml' />
+  <xinclude:include href='chap-best-practices.xml' />
+ </part>
+ 
+ <part label="B">
+  <title>Developing Client Applications</title>
+  <partintro>
+   <para>Client applications access OpenAM services for authentication,
+   authorization, and single sign on/single log out through the use of
+   sessions. Client applications can also be allowed to manage authorization
+   policies.</para>
+   
+   <para>Client application integration with OpenAM can be coupled loosely,
+   as in the case of an application running in a web server with an OpenAM
+   policy agent to handle interaction with OpenAM service, more directly,
+   as in the case where the client interacts with OpenAM over protocol, or
+   tightly, as in the case of an application using the OpenAM Java or C API
+   to interact with OpenAM services.</para>
+   
+   <para>This part of the guide covers client interaction with OpenAM
+   over supported protocols and using OpenAM APIs.</para>
+  </partintro>
+ 
+  <xinclude:include href='chap-authentication.xml' />
+  <xinclude:include href='chap-session.xml' />
+  <xinclude:include href='chap-rest.xml' />
+  <xinclude:include href='chap-oauth.xml' />
+  <xinclude:include href='chap-openid.xml' />
+  <xinclude:include href='chap-fedlet-java.xml' />
+  <xinclude:include href='chap-fedlet-dotnet.xml' />
+  <xinclude:include href='chap-samlv2.xml' />
+  <xinclude:include href='chap-ws-federation.xml' />
+  <xinclude:include href='chap-xacml.xml' />
+  <xinclude:include href='chap-policy-management.xml' />  
+  <xinclude:include href='chap-jdk.xml' />
+  <xinclude:include href='chap-csdk.xml' />
+ </part>
+ 
+ <part label="C">
+  <title>Extending OpenAM</title>
+  <partintro>
+   <para>OpenAM services solve a wide range of access and federation
+   management problems out of the box. Yet, OpenAM also exposes APIs and
+   SPIs that enable you extend OpenAM services when built-in functionality
+   does not fit your deployment.</para>
+   
+   <para>This part of the guide covers OpenAM mechanisms for plugging in
+   additional functionality not available out of the box.</para>
+  </partintro>
+ 
+  <xinclude:include href='chap-customize-gateway.xml' />
+  <xinclude:include href='chap-auth-spi.xml' />
+  <xinclude:include href='chap-policy-spi.xml' />
+  <xinclude:include href='chap-delegation-spi.xml' />
+  <xinclude:include href='chap-identity-repo-spi.xml' />
+  <xinclude:include href='chap-sms-spi.xml' />
+  <xinclude:include href='chap-custom-web-agent.xml' />
+ </part>
+
+ <reference label="D">
+  <title>OpenAM C API Reference</title>
+  
+  <refentry>
+   <refmeta>
+    <refentrytitle>TODO</refentrytitle>
+    <manvolnum>3</manvolnum>
+   </refmeta>
+   <refnamediv>
+    <refname>TODO</refname>
+    <refpurpose>TODO</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+    <synopsis>TODO</synopsis>
+   </refsynopsisdiv>
+   <refsect1>
+    <title>Description</title><para>TODO</para>
+   </refsect1>
+  </refentry>
+ </reference>
+ 
+ <index />
+ <?dbhtml-include href="../ga.html"?>
+</book>

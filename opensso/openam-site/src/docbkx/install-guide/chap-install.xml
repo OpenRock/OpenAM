@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing OpenAM Core Services &amp; Gateway</title>
+
+ <para>This chapter covers tasks required to install OpenAM core services,
+ and to ensure they run properly. It includes instructions on preparing your
+ application server to run OpenAM, preparing your identity repository to
+ handle OpenAM identities, deploying component .war files, installing
+ OpenAM administration tools, and performing post-installation
+ configuration.</para>
+ 
+ <para>To manage access to web resources on other servers, you can install
+ policy agents that provide tight integration with OpenAM. See the
+ <citetitle>Policy Agent Installation Guide</citetitle> for instructions
+ on installing OpenAM agents in supported web servers and Java EE
+ application containers.</para>
+ 
+ <section>
+  <title>Preparing Your Deployment Container</title>
+
+  <itemizedlist>
+   <para>OpenAM core services require the following prerequisite
+   software installed before you begin OpenAM installation.</para>
+   <listitem>
+    <para>A Java 6 runtime environment</para>
+    <screen width='80'>$ java -version
+java version "1.6.0_24"
+Java(TM) SE Runtime Environment (build 1.6.0_24-b07)
+Java HotSpot(TM) 64-Bit Server VM (build 19.1-b02, mixed mode)</screen>
+   </listitem>
+   <listitem>
+    <para>A supported application server as the deployment container</para>
+    <para>See the <citetitle>Release Notes</citetitle> for a list.</para>
+   </listitem>
+   <listitem>
+    <para>A supported identity repository for user identity data</para>
+    <para>See the <citetitle>Release Notes</citetitle> for a list. If you
+   plan to use OpenAM for evaluation or testing, you can use the embedded
+   identity repository. ForgeRock does not recommend using the embedded
+   identity repository for production deployments, however.</para>
+   </listitem>
+  </itemizedlist>
+  
+  <para>OpenAM core services require a minimum JVM heap size of 1 GB,
+  and a permanent generation size of 256 MB. Apply the following JVM options
+  before start your application server.</para>
+  <programlisting width='80' language='none'
+  >-Xmx1024m -XX:MaxPermSize=256m</programlisting>
+  
+  <para>In a Java Security Manager is enable for your deployment container,
+  add permissions before installing OpenAM.</para>
+  <!-- TODO: Define permissions for supported containers. Could these be
+  separate files available in the product directory when you unpack?-->
+  
+  <!-- TODO: see also http://resources.apexidentity.com/projects/docs/wiki/Containerhelp -->
+ </section>
+
+ <section>
+  <title>Obtaining OpenAM Software</title>
+  
+  <para>Download OpenAM releases from <link
+  xlink:href='http://forgerock.com/downloads.html'
+  >http://forgerock.com/downloads.html</link>. At the download location you
+  find links to stable releases, nightly builds for testing, previous
+  releases, and also OpenAM policy agent releases.</para>
+  
+  <para>For each release of the OpenAM core services, you can download the
+  entire package as a .zip archive, only the OpenAM .war file, or only the
+  administrative tools as a .zip archive.</para> 
+  
+  <variablelist>
+   <para>After you unzip the archive of the entire package, you get an
+   <filename>opensso</filename> directory including a README, a set of license
+   files, and the following directories.</para>
+   <!-- TODO: As of nightly from 17 May 2011, where is the universal gateway? -->
+   <varlistentry>
+    <term><filename>deployable-war</filename></term>
+    <listitem><para>The deployable .war file as well as the tools and files
+    required to create any specialized .war files you
+    deploy.</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>docs</filename></term>
+    <listitem><para>Javadoc API specifications for the public APIs exposed by
+    OpenAM</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>fedlet</filename></term>
+    <listitem><para>The lightweight service provider implementation that you
+    embed in your Java EE application to enable it to use federated access
+    management</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>integrations</filename></term>
+    <listitem><para>Resources for integrating OpenAM with third-party access
+    and identity management software</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>ldif</filename></term>
+    <listitem><para>Schema and index definitions for use with external
+    LDAP identity repositories</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>legal</filename></term>
+    <listitem><para>Additional license and entitlement files</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>libraries</filename></term>
+    <listitem><para>Client SDK and policy agent libraries</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>patches</filename></term>
+    <listitem><para>Location for patches to apply to OpenAM</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>samples</filename></term>
+    <listitem><para>Sample source files demonstrating how to use the OpenAM
+    client SDK</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>tools</filename></term>
+    <listitem><para>OpenAM tools for managing SSO, configuring deployed
+    .war files, patching deployed .war files, managing sessions, and diagnosing
+    deployment issues</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>upgrade</filename></term>
+    <listitem><para>Content for upgrading from legacy versions of Sun
+    Access Manager and Federation Manager</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>xml</filename></term>
+    <listitem><para>OpenAM service and default delegation policy configuration
+    files</para></listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section>
+  <title>Preparing Your Identity Repository</title>
+  
+  <para>OpenAM typically stores user identity data in an external identity
+  repository, such as a directory service. OpenAM stores its own metadata about
+  user entries there as well. If your identity repository therefore cannot
+  accept updates to its schema while online, you must add those schema manually
+  before configuring OpenAM. These schema are located under
+  <filename>opensso/ldif</filename> where you unpacked the full package of
+  OpenAM core services.</para>
+ </section>
+
+ <section>
+  <title>Deploying the OpenAM Web Application</title>
+  <!-- TODO: GUI and CLI configuration -->
+  <para>TODO</para>
+ </section>
+
+ <section>
+  <title>Installing OpenAM Tools</title>
+  <!-- TODO -->
+  <para>TODO</para>
+ </section>
+
+ <section>
+  <title>Installing the Universal Gateway</title>
+  <!-- TODO: see http://resources.apexidentity.com/projects/docs/wiki/Installation -->
+  <para>TODO</para>
+ </section>
+ 
+ <section>
+  <title>Installing the Federation Gateway</title>
+  <!-- TODO: see http://resources.apexidentity.com/projects/docs/wiki/Federation -->
+  <para>TODO</para>
+ </section>
+
+ <section>
+  <title>Deploying Distributed Authentication Across a DMZ</title>
+  <!-- TODO -->
+  <para>TODO</para>
+ </section>
+ 
+  <section>
+  <title>Deploying the Identity Provider Discovery Service</title>
+  <!-- TODO -->
+  <para>TODO</para>
+ </section>
+
+ <!-- TODO -->
+</chapter>
+

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-whats-new'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>What's New in OpenAM <?eval ${project.version}?></title>
+
+ <para>OpenAM <?eval ${project.version}?> fixes a number of issues, and
+ provides the following additional features.</para>
+ 
+ <itemizedlist>
+  <listitem>
+   <para>The Universal Gateway is a high-performance reverse proxy server with
+   specialized session management and credential replay functionality. The
+   Universal Gateway may run as a standalone simple single sign-on solution,
+   or be integrated with an existing web access management system. With either
+   method, there is no need to modify the target application or the container
+   that it runs in.</para>
+  </listitem>
+  <listitem>
+   <para>The universal fedlet includes federation capabilities in the
+   gateway, enabling federation capabilities for applications that cannot be
+   modified to use the Fedlet and SAML 2.0.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now handles Active Directory password expiration responses
+   properly. Setup wizards make it easier to use OpenLDAP and OpenDJ as
+   the identity repository.</para>
+  </listitem>
+  <listitem>
+   <para>SAML 2.0 extensions let the system handle situations more flexibly.
+   For example, the extensions let the system handle situations that arise
+   when the identity provider receives failed an authentication request and so
+   must skip some processing, or when there remains additional interaction
+   with the user after a completed assertion but before providing
+   authorization.</para>
+  </listitem>
+  <listitem>
+   <para>A new, beta session failover mechanism introduces a replacement for
+   the existing implementation that relies on Message Queue and Berkeley DB
+   with a highly scalable, pure Java implementation.</para>
+  </listitem>
+  <listitem>
+   <para>Improvements in the upgrade process streamline the move to the
+   new version.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports YubiKey authentication. The YubiKey simplifies
+   the process of logging in with a One Time Password token as it does not
+   require the user to re-type long pass codes from a display device into the
+   login field of the computer. The YubiKey is inserted in the USB-port of any
+   computer and the OTP is generated and automatically entered with a simple
+   touch of a button on the YubiKey, and without the need of any client
+   software or drivers.</para>
+  </listitem>
+ </itemizedlist>
+ 
+</chapter>
+

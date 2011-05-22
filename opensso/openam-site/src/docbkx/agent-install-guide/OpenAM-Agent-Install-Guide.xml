@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<book xml:id='agent-install-guide'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <info>
+  <title>OpenAM <?eval ${project.version}?> Policy Agent Installation Guide</title>
+  <copyright>
+   <year>2011</year>
+   <holder>ForgeRock AS</holder>
+  </copyright>
+  <authorgroup>
+   <author>
+    <personname>
+     <firstname>Mark</firstname><surname>Craig</surname>
+    </personname>
+   </author>
+  </authorgroup>
+  <xinclude:include href="../legal.xml" />
+  <pubdate><?eval ${maven.build.timestamp}?></pubdate>
+ </info>
+
+ <!-- TODO: Consider moving this guide to live with the agents. -->
+
+ <toc />
+ 
+ <xinclude:include href="preface.xml" />
+ 
+ <part label="A">
+  <title>OpenAM Web Policy Agents</title>
+  
+  <partintro>
+   <para>OpenAM web policy agents provide light touch integration for web
+   applications running on supported web servers.</para>
+  </partintro>
+  
+  <xinclude:include href='chap-about-web-agents.xml' />
+  <xinclude:include href='chap-web-agent-common-tasks.xml' />
+  <xinclude:include href='chap-apache-20.xml' />
+  <xinclude:include href='chap-apache-22.xml' />
+  <xinclude:include href='chap-msiss-6.xml' />
+  <xinclude:include href='chap-msiss-7.xml' />
+  <xinclude:include href='chap-sun-proxysvr.xml' />
+  <xinclude:include href='chap-sun-websvr.xml' />
+ </part>
+
+ <part label="B">
+  <title>OpenAM Java EE Policy Agents</title>
+  
+  <partintro>
+   <para>OpenAM Java EE policy agents provide medium touch integration for
+   web applications running in supported web application containers. Java EE
+   policy agents require some configuration and code changes to deployed web
+   applications.</para>
+  </partintro>
+  
+  <xinclude:include href='chap-about-jee-agents.xml' />
+  <xinclude:include href='chap-jee-agent-common-tasks.xml' />
+  <xinclude:include href='chap-apache-tomcat.xml' />
+  <xinclude:include href='chap-glassfish.xml' />
+  <xinclude:include href='chap-jboss.xml' />
+  <xinclude:include href='chap-jetty.xml' />
+  <xinclude:include href='chap-websphere.xml' />
+  <xinclude:include href='chap-weblogic.xml' />
+ </part>
+  
+ <index />
+ <?dbhtml-include href="../ga.html"?>
+</book>

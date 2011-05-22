@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<project name="${project.name}"
+ xmlns="http://maven.apache.org/DECORATION/1.0.1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.1 http://maven.apache.org/xsd/decoration-1.0.1.xsd">
+
+ <skin>
+  <groupId>org.forgerock.commons</groupId>
+  <artifactId>forgerock-community-skin</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+ </skin>
+ <publishDate position="right" format="yyyy.MM.dd" />
+ <version position="right" />
+
+ <body>
+ 
+  <breadcrumbs>
+   <item name="Developer Community" href="http://www.forgerock.org" />
+   <item name="OpenAM" href="http://openam.forgerock.org" />
+  </breadcrumbs>
+ 
+  <menu name="OpenAM">
+   <item name="Welcome" href="index.html" />
+   <item name="News" href="news.html" />
+   <item name="Join" href="https://idp.forgerock.org/openam/UI/Login?service=register" />
+   <item name="Downloads" href="http://forgerock.com/downloads.html" />
+   <item name="FAQ" href="faq.html" />
+   <item name="Mailing List" href="https://lists.forgerock.org/mailman/listinfo/openam" />
+   <item name="Support" href="http://www.forgerock.com/subscriptions.html" />
+   <item name="Partners" href="http://www.forgerock.com/partners.html" />
+   <item name="Wiki" href="http://wikis.forgerock.org/openam/" />
+  </menu>
+  
+  <menu name="Core Documentation">
+   <item name="Release Notes" href="index.html" collapse="true">
+    <item name="EPUB Format" href="./doc/OpenAM-Release-Notes.epub"/>
+    <item name="HTML Format" href="./doc/release-notes/OpenAM-Release-Notes.html"/>
+    <item name="PDF Format" href="./doc/OpenAM-Release-Notes.pdf" />
+    <item name="RTF Format" href="./doc/OpenAM-Release-Notes.rtf" />
+   </item>
+   <item name="Installation Guide" href="index.html" collapse="true">
+    <item name="EPUB Format" href="./doc/OpenAM-Install-Guide.epub"/>
+    <item name="HTML Format" href="./doc/install-guide/OpenAM-Install-Guide.html" />
+    <item name="PDF Format" href="./doc/OpenAM-Install-Guide.pdf" />
+    <item name="RTF Format" href="./doc/OpenAM-Install-Guide.rtf" />
+   </item>
+   <item name="Policy Agent Install Guide" href="index.html" collapse="true">
+    <item name="EPUB Format" href="./doc/OpenAM-Agent-Install-Guide.epub"/>
+    <item name="HTML Format" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
+    <item name="PDF Format" href="./doc/OpenAM-Agent-Install-Guide.pdf" />
+    <item name="RTF Format" href="./doc/OpenAM-Agent-Install-Guide.rtf" />
+   </item>
+   <item name="Administration Guide" href="index.html" collapse="true">
+    <item name="EPUB Format" href="./doc/OpenAM-Admin-Guide.epub" />
+    <item name="HTML Format" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
+    <item name="PDF Format" href="./doc/OpenAM-Admin-Guide.pdf" />
+    <item name="RTF Format" href="./doc/OpenAM-Admin-Guide.rtf" />
+   </item>
+   <item name="Developer Guide" href="index.html" collapse="true">
+    <item name="EPUB Format" href="./doc/OpenAM-Dev-Guide.epub" />
+    <item name="HTML Format" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
+    <item name="PDF Format" href="./doc/OpenAM-Dev-Guide.pdf" />
+    <item name="RTF Format" href="./doc/OpenAM-Dev-Guide.rtf" />
+   </item>
+   <item name="Reference" href="index.html" collapse="true">
+    <item name="EPUB Format" href="./doc/OpenAM-Reference.epub" />
+    <item name="HTML Format" href="./doc/reference/OpenAM-Reference.html" />
+    <item name="PDF Format" href="./doc/OpenAM-Reference.pdf" />
+    <item name="RTF Format" href="./doc/OpenAM-Reference.rtf" />
+   </item>
+   <item name="Javadoc" href="index.html" alt="TODO" />
+   <item name="Gateway Javadoc" href="http://resources.apexidentity.com/javadoc/core/1.0/" alt="TODO: Move to Forgerock.org"/>
+  </menu>
+
+  <!-- TODO: Add QA pages -->
+  
+  <menu ref="reports" />
+  
+ </body>
+ 
+ <custom>
+  <googleAnalytics>UA-23412190-4</googleAnalytics>
+  <openproject>
+   <href>http://openam.forgerock.org/</href>
+   <src>./images/openam-tagline-200x65.png</src>
+   <alt>OpenAM</alt>
+  </openproject>
+ </custom>
+
+</project>
