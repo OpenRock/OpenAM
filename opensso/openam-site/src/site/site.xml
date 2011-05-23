@@ -56,37 +56,37 @@
   </menu>
   
   <menu name="Core Documentation">
-   <item name="Release Notes" href="index.html" collapse="true">
+   <item name="Release Notes" collapse="true" href="docs.html">
     <item name="EPUB Format" href="./doc/OpenAM-Release-Notes.epub"/>
     <item name="HTML Format" href="./doc/release-notes/OpenAM-Release-Notes.html"/>
     <item name="PDF Format" href="./doc/OpenAM-Release-Notes.pdf" />
     <item name="RTF Format" href="./doc/OpenAM-Release-Notes.rtf" />
    </item>
-   <item name="Installation Guide" href="index.html" collapse="true">
+   <item name="Installation Guide" collapse="true" href="docs.html">
     <item name="EPUB Format" href="./doc/OpenAM-Install-Guide.epub"/>
     <item name="HTML Format" href="./doc/install-guide/OpenAM-Install-Guide.html" />
     <item name="PDF Format" href="./doc/OpenAM-Install-Guide.pdf" />
     <item name="RTF Format" href="./doc/OpenAM-Install-Guide.rtf" />
    </item>
-   <item name="Policy Agent Install Guide" href="index.html" collapse="true">
+   <item name="Policy Agent Install Guide" collapse="true" href="docs.html">
     <item name="EPUB Format" href="./doc/OpenAM-Agent-Install-Guide.epub"/>
     <item name="HTML Format" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
     <item name="PDF Format" href="./doc/OpenAM-Agent-Install-Guide.pdf" />
     <item name="RTF Format" href="./doc/OpenAM-Agent-Install-Guide.rtf" />
    </item>
-   <item name="Administration Guide" href="index.html" collapse="true">
+   <item name="Administration Guide" collapse="true" href="docs.html">
     <item name="EPUB Format" href="./doc/OpenAM-Admin-Guide.epub" />
     <item name="HTML Format" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
     <item name="PDF Format" href="./doc/OpenAM-Admin-Guide.pdf" />
     <item name="RTF Format" href="./doc/OpenAM-Admin-Guide.rtf" />
    </item>
-   <item name="Developer Guide" href="index.html" collapse="true">
+   <item name="Developer Guide" collapse="true" href="docs.html">
     <item name="EPUB Format" href="./doc/OpenAM-Dev-Guide.epub" />
     <item name="HTML Format" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
     <item name="PDF Format" href="./doc/OpenAM-Dev-Guide.pdf" />
     <item name="RTF Format" href="./doc/OpenAM-Dev-Guide.rtf" />
    </item>
-   <item name="Reference" href="index.html" collapse="true">
+   <item name="Reference" collapse="true" href="docs.html">
     <item name="EPUB Format" href="./doc/OpenAM-Reference.epub" />
     <item name="HTML Format" href="./doc/reference/OpenAM-Reference.html" />
     <item name="PDF Format" href="./doc/OpenAM-Reference.pdf" />
@@ -98,7 +98,7 @@
 
   <!-- TODO: Add QA pages -->
   
-  <menu ref="reports" />
+  <menu ref="reports" collapse="true"/>
   
  </body>
  
