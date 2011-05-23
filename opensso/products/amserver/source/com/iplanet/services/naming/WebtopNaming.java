@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.iplanet.services.naming;
@@ -109,6 +109,8 @@ public class WebtopNaming {
     private static Hashtable serverIdTable = null;
 
     private static Hashtable siteIdTable = null;
+    
+    private static Map<String, String> siteNameToIdTable = null;
 
     //This is created for storing server id and lbcookievalue mapping
     //key:serverid | value:lbcookievalue      
@@ -908,6 +910,45 @@ public class WebtopNaming {
 
         return primary_site;
     }
+    
+    public static String getSiteIdByName(String siteName) {
+        String siteId = null;
+        
+        if (siteNameToIdTable == null) {
+            return null;
+        }
+        
+        siteId = siteNameToIdTable.get(siteName);
+        
+        if (debug.messageEnabled()) {
+            debug.message("WebtopNaming : Site ID for " + siteName + " is "
+                    + siteId);
+        }
+        
+        return siteId;
+    }
+    
+    public static String getSiteNameById(String siteId) {
+        String siteName = null;
+        
+        if (siteNameToIdTable == null) {
+            return null;
+        }
+        
+        for (Map.Entry<String, String> siteNameEntry : siteNameToIdTable.entrySet()) {
+            if (siteNameEntry.getValue().equals(siteId)) {
+                siteName = siteNameEntry.getKey();
+                break;
+            }
+        }
+        
+        if (debug.messageEnabled()) {
+            debug.message("WebtopNaming : Site Name for " + siteName + " is "
+                    + siteId);
+        }
+        
+        return siteName;
+    }
 
     /**
      * Returns the String representation of the separator delimited
@@ -1178,6 +1219,7 @@ public class WebtopNaming {
         }
         updateServerIdMappings();
         updateSiteIdMappings();
+        updateSiteNameToIDMappings();
         updatePlatformServerIDs();
         updateLBCookieValueMappings();
                 
@@ -1185,6 +1227,7 @@ public class WebtopNaming {
             debug.message("Naming table -> " + namingTable.toString());
             debug.message("Server Id Table -> " + serverIdTable.toString());
             debug.message("Site Id Table -> " + siteIdTable.toString());
+            debug.message("Site Name to Id Table -> " + siteNameToIdTable.toString());
             debug.message("Platform Servers -> " + platformServers.toString());
             debug.message("Platform Server IDs -> "
                           + platformServerIDs.toString());
@@ -1259,6 +1302,36 @@ public class WebtopNaming {
                 platformServerIDs.add(serverID);
             }
         }
+    }
+    
+    private static void updateSiteNameToIDMappings() {
+        Map siteNameToIdTbl = new HashMap();
+        String siteNameToIDs = (String) namingTable.get(Constants.SITE_NAMES_LIST);
+
+        if ((siteNameToIDs == null) || (siteNameToIDs.length() == 0)) {
+            return;
+        }
+
+        StringTokenizer tok = new StringTokenizer(siteNameToIDs, ",");
+        while (tok.hasMoreTokens()) {
+            String siteNameAndID = tok.nextToken();
+            String siteName = siteNameAndID;
+            String siteId = siteNameAndID;
+            
+            int idx = siteNameAndID.indexOf(NODE_SEPARATOR);
+            if (idx != -1) {
+                siteId = siteNameAndID.substring(idx + 1, siteNameAndID.length());
+                siteName = siteNameAndID.substring(0, idx);
+            }
+            siteNameToIdTbl.put(siteName, siteId);
+        }
+
+        siteNameToIdTable = siteNameToIdTbl;
+        if (debug.messageEnabled()) {
+            debug.message("SiteNameToIDs table -> " + siteNameToIdTable.toString());
+        }
+
+        return;
     }
 
     private static void validate(

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.iplanet.services.naming.service;
@@ -217,7 +217,9 @@ public class NamingService implements RequestHandler, ServiceListener {
             Map platformAttrs = sc.getAttributeDefaults();
             Set sites = getSites(platformAttrs);
             Set servers = getServers(platformAttrs, sites);
-
+            Set siteNamesAndIDs = getSiteNamesAndIDs();
+            storeSiteNames(siteNamesAndIDs, namingAttrs);
+            
             if ((sites != null) && !sites.isEmpty()) {
                 if (!forClient) {
                     registFQDNMapping(sites);
@@ -335,6 +337,10 @@ public class NamingService implements RequestHandler, ServiceListener {
             }
         }
         namingAttrs.put(Constants.PLATFORM_LIST, serverList);
+    }
+    
+    static void storeSiteNames(Set siteNames, Map namingAttrs) {
+        namingAttrs.put(Constants.SITE_NAMES_LIST, siteNames);
     }
 
     static String setToString(Set s) {
@@ -627,6 +633,25 @@ public class NamingService implements RequestHandler, ServiceListener {
         }
 
         return sites;
+    }
+    
+    private static Set<String> getSiteNamesAndIDs()
+    throws Exception {
+        Set<String> siteNames = SiteConfiguration.getSites(sso);
+        Set<String> siteNamesAndIDs = new HashSet<String>();
+        
+        for (String siteName : siteNames) {
+            String id = SiteConfiguration.getSiteID(sso, siteName);
+            StringBuilder nameAndID = new StringBuilder();
+            nameAndID.append(siteName).append(delimiter).append(id);
+            siteNamesAndIDs.add(nameAndID.toString());
+        }
+        
+        if (namingDebug.messageEnabled()) {
+            namingDebug.message("Site Names: " + siteNames.toString());
+        }
+        
+        return siteNamesAndIDs;
     }
 
     private static Set getServers(Map platformAttrs, Set sites)

@@ -156,108 +156,126 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
 
                     throw new CompleteRequestException();            		
                 }
+                
+                // check if the server to forward is a member of the local site
+                boolean isServerMemberOfLocalSite =
+                        AuthClientUtils.isServerMemberOfLocalSite(authCookieValue);
 
-                debug.message("Routing the request to Original Auth server");
-                try {
-                    HashMap origRequestData =
-                        AuthClientUtils.sendAuthRequestToOrigServer(
-                            request,response,authCookieValue);
-
+                if (isServerMemberOfLocalSite) {
                     if (debug.messageEnabled()) {
-                        debug.message("origRequestData : " + origRequestData);
+                        debug.message("Routing the request to Original Auth server");
                     }
-                    String redirect_url = null;
-                    String clientType = null;
-                    String output_data = null;
-                    String contentType = null;
-                    Map<String, List<String>> headers = null;
-                    if (origRequestData != null && !origRequestData.isEmpty()) {
-                        redirect_url =
-                            (String)origRequestData.get("AM_REDIRECT_URL");
-                        output_data =
-                            (String)origRequestData.get("OUTPUT_DATA");
-                        clientType =
-                            (String)origRequestData.get("AM_CLIENT_TYPE");
-                        contentType =
-                            (String)origRequestData.get("CONTENT_TYPE");
-                        headers =
-                            (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
-                    } else {
-                        Set domainsList = AuthClientUtils.getCookieDomains();
 
-                        if (domainsList != null) {
-                            Iterator domains = domainsList.iterator();
-                            String domain = null;
+                    try {
+                        HashMap origRequestData =
+                            AuthClientUtils.sendAuthRequestToOrigServer(
+                                request,response,authCookieValue);
 
-                            while (domains.hasNext()) {
-                                domain = (String) domains.next();
-                                response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
+                        if (debug.messageEnabled()) {
+                            debug.message("origRequestData : " + origRequestData);
+                        }
+                        String redirect_url = null;
+                        String clientType = null;
+                        String output_data = null;
+                        String contentType = null;
+                        Map<String, List<String>> headers = null;
+                        if (origRequestData != null && !origRequestData.isEmpty()) {
+                            redirect_url =
+                                (String)origRequestData.get("AM_REDIRECT_URL");
+                            output_data =
+                                (String)origRequestData.get("OUTPUT_DATA");
+                            clientType =
+                                (String)origRequestData.get("AM_CLIENT_TYPE");
+                            contentType =
+                                (String)origRequestData.get("CONTENT_TYPE");
+                            headers =
+                                (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
+                        } else {
+                            Set domainsList = AuthClientUtils.getCookieDomains();
 
-                                if (debug.messageEnabled()) {
-                                    debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                            if (domainsList != null) {
+                                Iterator domains = domainsList.iterator();
+                                String domain = null;
+
+                                while (domains.hasNext()) {
+                                    domain = (String) domains.next();
+                                    response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
+
+                                    if (debug.messageEnabled()) {
+                                        debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (headers != null) {
-                        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                            String headerName = entry.getKey();
-                            if (headerName != null) {
-                                if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
-                                    List<String> headerValues = entry.getValue();
-                                    if (headerValues != null) {
-                                        for (String headerValue : headerValues) {
-                                            response.addHeader(headerName, headerValue);
+                        if (headers != null) {
+                            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                                String headerName = entry.getKey();
+                                if (headerName != null) {
+                                    if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
+                                        List<String> headerValues = entry.getValue();
+                                        if (headerValues != null) {
+                                            for (String headerValue : headerValues) {
+                                                response.addHeader(headerName, headerValue);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    if (((redirect_url != null) && !redirect_url.equals("")) &&
-                        AuthClientUtils.isGenericHTMLClient(clientType)) {
-                        debug.message("Redirecting the response");
-                        response.sendRedirect(redirect_url);
-                    }
-                    if ((output_data != null) && (!output_data.equals(""))) {
-                        debug.message("Printing the forwarded response");
-                        if (contentType != null) {
-                            debug.message("Content type is " + contentType);
-                            response.setContentType(contentType);
-                        } else {
-                            debug.message("Content type is default; " + DEFAULT_CONTENT_TYPE);
-                            response.setContentType(DEFAULT_CONTENT_TYPE);
+                        if (((redirect_url != null) && !redirect_url.equals("")) &&
+                            AuthClientUtils.isGenericHTMLClient(clientType)) {
+                            debug.message("Redirecting the response");
+                            response.sendRedirect(redirect_url);
                         }
-
-                        java.io.PrintWriter outP = response.getWriter();
-                        outP.println(output_data);
-                    }
-                } catch (Exception e) {
-                    if (debug.messageEnabled()) {
-                        debug.message("LoginServlet error in Request Routing : "
-                            + e.toString());
-                    }
-
-                    Set domainsList = AuthClientUtils.getCookieDomains();
-
-                    if (domainsList != null) {
-                        Iterator domains = domainsList.iterator();
-                        String domain = null;
-
-                        while (domains.hasNext()) {
-                            domain = (String) domains.next();
-                            response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
-
-                            if (debug.messageEnabled()) {
-                                debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                        if ((output_data != null) && (!output_data.equals(""))) {
+                            debug.message("Printing the forwarded response");
+                            if (contentType != null) {
+                                debug.message("Content type is " + contentType);
+                                response.setContentType(contentType);
+                            } else {
+                                debug.message("Content type is default; " + DEFAULT_CONTENT_TYPE);
+                                response.setContentType(DEFAULT_CONTENT_TYPE);
                             }
+
+                            java.io.PrintWriter outP = response.getWriter();
+                            outP.println(output_data);
                         }
+                    } catch (Exception ex) {
+                        if (debug.messageEnabled()) {
+                            debug.message("LoginServlet error in Request Routing : "
+                                + ex.toString());
+                        }
+
+                        clearCookies(response);
+                    }
+                    throw new CompleteRequestException();
+                } else {
+                    if (debug.messageEnabled()) {
+                            debug.message("LoginServlet original request out of"
+                                    + " local site; processing as normal");
                     }
                 }
-                throw new CompleteRequestException();
             }
         }
-    }    
+    }
+
+    protected void clearCookies(HttpServletResponse response) {
+       Set domainsList = AuthClientUtils.getCookieDomains();
+
+        if (domainsList != null) {
+            Iterator domains = domainsList.iterator();
+            String domain = null;
+
+            while (domains.hasNext()) {
+                domain = (String) domains.next();
+                response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
+
+                if (debug.messageEnabled()) {
+                    debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                }
+            }
+        }
+    }
    
 
     /**

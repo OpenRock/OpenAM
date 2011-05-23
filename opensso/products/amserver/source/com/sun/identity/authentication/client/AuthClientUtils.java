@@ -188,7 +188,12 @@ public class AuthClientUtils {
     private static final String distAuthCluster =
         SystemProperties.get(com.sun.identity.shared.Constants.DISTAUTH_CLUSTER, "");
     
-    private static ArrayList distAuthClusterList = new ArrayList();                
+    private static ArrayList distAuthClusterList = new ArrayList();     
+    
+    private static final String distAuthSites =
+        SystemProperties.get(com.sun.identity.shared.Constants.AM_DISTAUTH_SITES, "");
+    
+    private static Map<String, Set<String>> distAuthSitesMap = new HashMap();
 
     static {
         // Initialzing variables
@@ -246,7 +251,70 @@ public class AuthClientUtils {
             	utilDebug.error("AuthClientUtils.static(): " + 
                     e.toString());
             }        	
-        }        
+        }
+        
+        if (distAuthSites.length() != 0) {
+            try {
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message(
+                        "AuthClientUtils.static(): "
+                        + "Dist Auth Site list is: " + distAuthSites);
+                }
+                if (distAuthSites.indexOf(",") != -1) {
+                    StringTokenizer distAuthSitesList = 
+                        new StringTokenizer(distAuthSites, ",");
+                    
+                    while (distAuthSitesList.hasMoreTokens()) {
+                        String distAuthServer = 
+                            distAuthSitesList.nextToken().trim();
+                        
+                        if (distAuthServer.indexOf("=") != -1) {
+                            String distAuthServerName = 
+                                    distAuthServer.substring(0, distAuthServer.indexOf("="));
+                            String distAuthSiteName =
+                                    distAuthServer.substring(distAuthServer.indexOf("=") + 1);
+                            Set<String> distAuthSet = distAuthSitesMap.get(distAuthSiteName);
+                            
+                            if (distAuthSet == null) {
+                                distAuthSet = new HashSet<String>();
+                            }
+                            
+                            distAuthSet.add(distAuthServerName);
+                            distAuthSitesMap.put(distAuthSiteName, distAuthSet);
+                        } else {
+                            if (utilDebug.messageEnabled()) {
+                                utilDebug.message("AuthClientUtils.static(): " +
+                                        "invalid dist auth server entry: " + distAuthServer);
+                            }
+                            continue;
+                        }
+                    }
+                } else {
+                    if (distAuthSites.indexOf("=") != -1) {
+                        String distAuthServerName = 
+                                distAuthSites.substring(0, distAuthSites.indexOf("="));
+                        String distAuthSiteName =
+                                distAuthSites.substring(distAuthSites.indexOf("=") + 1);
+                        Set<String> distAuthSet = new HashSet<String>();
+                        distAuthSet.add(distAuthServerName);
+                        distAuthSitesMap.put(distAuthSiteName, distAuthSet);
+                    } else {
+                        if (utilDebug.messageEnabled()) {
+                            utilDebug.message("AuthClientUtils.static(): " +
+                                    "invalid dist auth server entry: " + distAuthSites);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                utilDebug.error("AuthClientUtils.static(): " + 
+                    ex.toString());
+            }
+            
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("AuthClientUtils.static(): " +
+                        "dist auth server to site: " + distAuthSitesMap);
+            }
+        }
     }
 
     /*
@@ -2247,6 +2315,39 @@ public class AuthClientUtils {
         }
         return (isLocalServer(tmpCookieURL+serviceURI, true));
     }
+    
+    public static boolean isServerMemberOfLocalSite(String cookieURL) {
+        boolean isSiteMember = false;
+        
+        try {
+            if (!distAuthSitesMap.isEmpty()) {
+                String localSiteID = WebtopNaming.getSiteID(WebtopNaming.getAMServerID());
+                String localSiteName = WebtopNaming.getSiteNameById(localSiteID);
+                
+                if (localSiteName != null) {
+                    Set distAuthForSite = distAuthSitesMap.get(localSiteName);
+
+                    if (distAuthForSite.contains(cookieURL)) {
+                        isSiteMember = true;
+
+                        if (utilDebug.messageEnabled()) {
+                            utilDebug.message("AuthClientUtils::isServerMemberOfLocalSite:" +
+                                    "local URL " + cookieURL + " found in local site " +
+                                    distAuthForSite);
+                        }
+                    }
+                } else {
+                    isSiteMember = true;
+                }
+            } else {
+                isSiteMember = true;
+            }
+        } catch (Exception ex) {
+            utilDebug.error("AuthClientUtils::isServerMemberOfLocalSite: ", ex);
+        }
+        
+        return isSiteMember;
+    }
 
     /**
      * Sends the request to the original Auth server and receives the result
@@ -2319,17 +2420,19 @@ public class AuthClientUtils {
             } else {
                 //First we should find out what GET parameters do we have.
                 Map<String, Set<String>> queryParams = new HashMap<String, Set<String>>();
-                for (String param : queryString.split("&")) {
-                    int idx = param.indexOf('=');
-                    if (idx != -1) {
-                        String paramName = param.substring(0, idx);
-                        String paramValue = param.substring(idx + 1);
-                        Set<String> values = queryParams.get(paramName);
-                        if (values == null) {
-                            values = new HashSet<String>();
-                            queryParams.put(paramName, values);
+                if (queryString != null) {
+                    for (String param : queryString.split("&")) {
+                        int idx = param.indexOf('=');
+                        if (idx != -1) {
+                            String paramName = param.substring(0, idx);
+                            String paramValue = param.substring(idx + 1);
+                            Set<String> values = queryParams.get(paramName);
+                            if (values == null) {
+                                values = new HashSet<String>();
+                                queryParams.put(paramName, values);
+                            }
+                            values.add(paramValue);
                         }
-                        values.add(paramValue);
                     }
                 }
 

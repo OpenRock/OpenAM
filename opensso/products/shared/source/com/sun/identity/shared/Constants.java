@@ -1099,4 +1099,13 @@ public interface Constants {
 
     public static final String AM_DISTAUTH_LB_COOKIE_VALUE =
             "openam.auth.distauth.lb_cookie_value";
+    
+    public static final String AM_DISTAUTH_SITES =
+            "openam.auth.distauth.sites";
+    
+    /**
+     * Key name for site ID list in naming table.
+     */
+    public static final String SITE_NAMES_LIST = 
+            "openam-am-platform-site-names-list";
 }
