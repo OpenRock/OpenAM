@@ -27,7 +27,7 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns="http://maven.apache.org/FML/1.0"
  xsi:schemaLocation="http://maven.apache.org/FML/1.0 http://maven.apache.org/xsd/fml-1.0.xsd"
- id="OpenDJ FAQ">
+ id="OpenAM FAQ">
  <part id="General">
   <faq id="what">
    <question>What is OpenAM?</question>
@@ -41,7 +41,7 @@
    <question>What's the OpenAM roadmap? Is OpenAM actively developed?</question>
    <answer>
     <p>
-      OpenDJ is actively developed, see <a
+      OpenAM is actively developed, see <a
       href="https://bugster.forgerock.org/jira/browse/OPENAM">the bug database
       activity</a>. Also see the <a
       href="https://wikis.forgerock.org/confluence/display/openam/OpenAM+Roadmap"
