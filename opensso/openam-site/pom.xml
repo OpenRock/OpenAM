@@ -73,8 +73,8 @@
  <packaging>pom</packaging>
  <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated from OpenAM source code.</description>
  <properties>
-  <docbkx-src>${basedir}/src/docbkx</docbkx-src>
-  <dbstyle-dir>${basedir}/src/docbkx-stylesheets</dbstyle-dir>
+  <docbkx-src>${basedir}/src/main/docbkx</docbkx-src>
+  <dbstyle-dir>${basedir}/src/main/docbkx-stylesheets</dbstyle-dir>
   <docbkx-out>${basedir}/target/docbkx</docbkx-out>
   <site-out>${basedir}/target/site</site-out>
  </properties>
@@ -103,6 +103,8 @@
        <goal>generate-manpages</goal>
       </goals>
       <configuration>
+       <sourceDirectory>${basedir}/src/main/docbkx</sourceDirectory>
+      
        <!-- Comment the draft elements out for final build -->
        <draftMode>yes</draftMode>
        <draftWatermarkImage>http://docbook.sourceforge.net/release/images/draft.png</draftWatermarkImage>
@@ -247,4 +249,5 @@
    </plugin>
   </plugins>
  </build>
+ <url>http://openam.forgerock.org/</url>
 </project>
