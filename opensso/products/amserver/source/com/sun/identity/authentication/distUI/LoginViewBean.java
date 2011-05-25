@@ -1675,7 +1675,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             try {
                 cookie = AuthClientUtils.getCookieString(ac, null);
 		if (cookieTimeToLiveEnabled) {
-		    if (cookieTimeToLive > 0) {
+		    if (cookieTimeToLive > 0 && ac.getStatus() == AuthContext.Status.SUCCESS) {
 			if (loginDebug.messageEnabled()) {
 			    loginDebug.message("LoginViewBean.setCookie():"
 				    + "set cookie maxAge=" + cookieTimeToLive);
@@ -1688,21 +1688,23 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 loginDebug.message("Cound not set AM or AMAuth Cookie!");
             }
         } else {
-	    if (cookieTimeToLiveEnabled) {
-		if (cookieTimeToLive > 0) {
-		    if (loginDebug.messageEnabled()) {
-			loginDebug.message("LoginViewBean.setCookie():"
-				+ "would set cookie maxAge=" + cookieTimeToLive);
-		    }
-		}
-	    }
+            if (loginDebug.messageEnabled()) {
+                if (cookieTimeToLiveEnabled && ac.getStatus() == AuthContext.Status.SUCCESS) {
+                    if (cookieTimeToLive > 0) {
+                        loginDebug.message("LoginViewBean.setCookie():"
+                                + "would set cookie maxAge=" + cookieTimeToLive);
+                    }
+                }
+            }
             Iterator iter = cookieDomainSet.iterator();
             while (iter.hasNext()) {
                 cookieDomain = (String)iter.next();
                 cookie = AuthClientUtils.getCookieString(ac, cookieDomain);
-		if (cookieTimeToLive > 0) {
-		    cookie.setMaxAge(cookieTimeToLive);
-		}
+                if (cookieTimeToLiveEnabled && ac.getStatus() == AuthContext.Status.SUCCESS) {
+                    if (cookieTimeToLive > 0) {
+                        cookie.setMaxAge(cookieTimeToLive);
+                    }
+                }
                 if (loginDebug.messageEnabled()) {
                     loginDebug.message("cookie for new request : " + cookie);
                 }

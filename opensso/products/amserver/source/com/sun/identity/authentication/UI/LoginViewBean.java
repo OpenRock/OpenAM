@@ -1734,8 +1734,7 @@ public class LoginViewBean extends AuthViewBeanBase {
 		if (isCookieTimeToLiveEnabled()) {
 		    cookieTimeToLive = getCookieTimeToLive();
 		    if ((cookieTimeToLive > 0)
-			    && cookie.getName().equals(
-			AuthUtils.getCookieName())) {
+			    && ac.getStatus() == AuthContext.Status.SUCCESS) {
 			if (loginDebug.messageEnabled()) {
 			    loginDebug.message("LoginViewBean.setCookie():"
 				    + "set cookie maxAge=" + cookieTimeToLive);
@@ -1752,22 +1751,21 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
         } else {
             Iterator iter = cookieDomainSet.iterator();
-	    int cookieTimeToLive = 0;
-	    if (isCookieTimeToLiveEnabled()) {
-		cookieTimeToLive = getCookieTimeToLive();
-		if (cookieTimeToLive > 0) {
-		    if (loginDebug.messageEnabled()) {
-			loginDebug.message("LoginViewBean.setCookie():"
-				+ "would set cookie maxAge=" + cookieTimeToLive);
-		    }
-		}
-	    }
+            int cookieTimeToLive = 0;
+            if (loginDebug.messageEnabled()) {
+                if (isCookieTimeToLiveEnabled()) {
+                    cookieTimeToLive = getCookieTimeToLive();
+                    if (cookieTimeToLive > 0 && ac.getStatus() == AuthContext.Status.SUCCESS) {
+                        loginDebug.message("LoginViewBean.setCookie():"
+                                + "would set cookie maxAge=" + cookieTimeToLive);
+                    }
+                }
+            }
             while (iter.hasNext()) {
                 cookieDomain = (String)iter.next();
                 cookie = AuthUtils.getCookieString(ac, cookieDomain);
-		if ((cookieTimeToLive > 0) 
-			&& cookie.getName().equals(
-			AuthUtils.getCookieName())) {
+		if (isCookieTimeToLiveEnabled() && cookieTimeToLive > 0
+			&& ac.getStatus() == AuthContext.Status.SUCCESS) {
 		    cookie.setMaxAge(cookieTimeToLive);
 		}
                 if (loginDebug.messageEnabled()) {
