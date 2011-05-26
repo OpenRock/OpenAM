@@ -100,7 +100,7 @@ public class CachedSubEntries {
                 // Clear the cache
                 ssoTokenToSubEntries.clear();
             } else {
-                return (subEntries);
+                return (new LinkedHashSet(subEntries));
             }
         }
         // Obtain sub-entries and add to cache
