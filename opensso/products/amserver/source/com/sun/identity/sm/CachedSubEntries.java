@@ -109,7 +109,7 @@ public class CachedSubEntries {
             // Add to cache
             Set answer = new LinkedHashSet(subEntries);
             ssoTokenToSubEntries.put(tokenID, answer);
-            subEntries = answer;
+            subEntries = new LinkedHashSet(answer);
             lastUpdated = System.currentTimeMillis();
         }
         if (debug.messageEnabled()) {
