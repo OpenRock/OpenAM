@@ -27,11 +27,12 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.authentication.modules.securid;
 
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.*;
 
 import javax.security.auth.*;
@@ -270,7 +271,7 @@ public class SecurID extends AMLoginModule {
                     // null userid is a no-no
                     if (username == null || username.length() == 0) {
                         throw new AuthLoginException (bundleName, 
-                            "securIDUserIdNull", null);
+                            "SecurIDUserIdNull", null);
                     }
 
                     tmp_passcode = charToString(
@@ -1015,17 +1016,11 @@ public class SecurID extends AMLoginModule {
             debug.message("SecurID.getNewPinMsg:pinState = " + pinState +
                     "\n\tpinMin = " + pinMin + "\n\tpinMax = " + pinMax);
         }
-        StringBuilder sb = new StringBuilder(100);
-        sb.append(bundle.getString("SecurIDEnterNewPin"));
-        sb.append(" ").append(pinMin).append(" ");
-        sb.append(bundle.getString("SecurIDTo")).append(" ");
-        sb.append(pinMax).append(" ");
         if (pinData.isAlphanumeric()) {
-            sb.append(bundle.getString("SecurIDChar"));
+            return MessageFormat.format(bundle.getString("SecurIDEnterNewPinChars"), pinMin, pinMax);
         } else {
-            sb.append(bundle.getString("SecurIDDigits"));
+            return MessageFormat.format(bundle.getString("SecurIDEnterNewPinDigits"), pinMin, pinMax);
         }
-        return sb.toString();
     }
 
     public java.security.Principal getPrincipal() {
