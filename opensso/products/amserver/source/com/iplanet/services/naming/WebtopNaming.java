@@ -1309,6 +1309,7 @@ public class WebtopNaming {
         String siteNameToIDs = (String) namingTable.get(Constants.SITE_NAMES_LIST);
 
         if ((siteNameToIDs == null) || (siteNameToIDs.length() == 0)) {
+	     siteNameToIdTable = siteNameToIdTbl;
             return;
         }
 
