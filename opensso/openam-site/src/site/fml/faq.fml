@@ -32,9 +32,9 @@
   <faq id="what">
    <question>What is OpenAM?</question>
    <answer>
-    <p>
-     OpenAM TODO...
-    </p>
+    <p>OpenAM includes everything you need to implement access management
+    services across your organization, and with other trusted organizations
+    using federation. OpenAM is the new name of the OpenSSO project.</p>
    </answer>
   </faq>
   <faq id="roadmap">

@@ -53,9 +53,44 @@
  <groupId>org.forgerock.openam</groupId>
  <artifactId>openam-site</artifactId>
  <version>10.0.0-SNAPSHOT</version>
-<!--  <name>OpenAM Core User Documentation</name> -->
  <name>OpenAM Project</name>
  <inceptionYear>2011</inceptionYear>
+ <packaging>pom</packaging>
+ <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated from OpenAM source code.</description>
+ <url>http://openam.forgerock.org/</url>
+ <mailingLists>
+  <mailingList>
+   <name>OpenAM Users Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+   <post>openam@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Developers Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+   <post>openam-dev@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Commit Notifications</name>
+   <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+   <post>commitopenam@forgerock.org</post>
+  </mailingList>
+ </mailingLists>
+ <scm>
+  <url>https://svn.forgerock.org/openam/trunk/opensso/</url>
+  <connection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</connection>
+  <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</developerConnection>
+  <tag>HEAD</tag>
+ </scm>
+ <issueManagement>
+  <system>Jira</system>
+  <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+ </issueManagement>
  <licenses>
   <license>
    <name>CC BY-NC-ND 3.0</name>
@@ -70,8 +105,6 @@
    <distribution>repo</distribution>
   </license>
  </licenses>
- <packaging>pom</packaging>
- <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated from OpenAM source code.</description>
  <properties>
   <docbkx-src>${basedir}/src/main/docbkx</docbkx-src>
   <dbstyle-dir>${basedir}/src/main/docbkx-stylesheets</dbstyle-dir>
@@ -95,6 +128,7 @@
      <execution>
       <id>build-doc</id>
       <phase>pre-site</phase>
+      <inherited>false</inherited>
       <goals>
        <goal>generate-epub</goal>
        <goal>generate-html</goal>
@@ -185,6 +219,7 @@
      <execution>
       <id>fix-legalnotice</id>
       <phase>site</phase>
+      <inherited>false</inherited>
       <goals>
        <goal>run</goal>
       </goals>
@@ -192,12 +227,12 @@
        <detail>true</detail>
        <tasks>
         <!-- TODO: Figure out how to say foreach in ant. -->
-        <copy file='${env.PWD}/legalnotice.html' todir='${basedir}/target/docbkx/html/admin-guide' />
-        <copy file='${env.PWD}/legalnotice.html' todir='${basedir}/target/docbkx/html/agent-install-guide' />
-        <copy file='${env.PWD}/legalnotice.html' todir='${basedir}/target/docbkx/html/dev-guide' />
-        <copy file='${env.PWD}/legalnotice.html' todir='${basedir}/target/docbkx/html/install-guide' />
-        <copy file='${env.PWD}/legalnotice.html' todir='${basedir}/target/docbkx/html/reference' />
-        <move file='${env.PWD}/legalnotice.html' todir='${basedir}/target/docbkx/html/release-notes' />
+        <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/admin-guide' />
+        <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/agent-install-guide' />
+        <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/dev-guide' />
+        <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/install-guide' />
+        <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/reference' />
+        <move file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/release-notes' />
        </tasks>
       </configuration>
      </execution>
@@ -209,6 +244,7 @@
     <executions>
      <execution>
       <phase>site</phase>
+      <inherited>false</inherited>
       <goals>
        <goal>copy-resources</goal>
       </goals>
@@ -249,5 +285,4 @@
    </plugin>
   </plugins>
  </build>
- <url>http://openam.forgerock.org/</url>
 </project>

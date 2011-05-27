@@ -32,10 +32,10 @@
   <author email="openam-dev@forgerock.org">ForgeRock AS</author>
  </properties>
  <body>
-  <section name="About OpenAM">
-   <p>OpenAM is the market leading, open source Authentication, Authorization,
-   Entitlement and Federation product. Through OpenAM, the community is
-   actively continuing development of OpenSSO.</p>
+  <section name="About the OpenAM Project">
+   <p>OpenAM provides open source Authentication, Authorization, Entitlement
+   and Federation software. Through OpenAM, the community actively continues
+   development of OpenSSO.</p>
    <p>OpenAM provides core identity services to simplify the implementation of
    transparent single sign-on (SSO) as a security component in a network
    infrastructure. OpenAM provides the foundation for integrating diverse
