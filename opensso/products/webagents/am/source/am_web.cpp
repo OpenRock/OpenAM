@@ -5837,10 +5837,11 @@ process_request(am_web_request_params_t *req_params,
 
     /* in case post preserve data is enabled, check if there is post data in
      * a shared post data cache
-     **/ 
+     **/
+    AgentConfigurationRefCntPtr* agentConfigPtr = (AgentConfigurationRefCntPtr*) agent_config;
     if (am_web_is_postpreserve_enabled(agent_config)
             && req_func->check_postdata.func != NULL) {
-        req_func->check_postdata.func(req_func->check_postdata.args, req_params->url, &post_data_cache);
+        req_func->check_postdata.func(req_func->check_postdata.args, req_params->url, &post_data_cache, (*agentConfigPtr)->postcacheentry_life);
     }
     // get sso token from either cookie header or assertion in cdsso mode.
     // OK if it's not found - am_web_is_access_allowed will check if
@@ -5959,15 +5960,13 @@ process_request(am_web_request_params_t *req_params,
                             }
                             post_data = NULL;
                         }
-                        pds == AM_FAILURE;
+                        pds = AM_FAILURE;
                     }
                     if (pds == AM_SUCCESS) {
                         pds = am_web_create_post_preserve_urls(req_params->url,
                             &pu, agent_config);
                     }
                     if (pds == AM_SUCCESS) {
-                        AgentConfigurationRefCntPtr* agentConfigPtr =
-                                (AgentConfigurationRefCntPtr*) agent_config; 
                         pds = req_func->reg_postdata.func(req_func->reg_postdata.args,
                             pu->post_time_key, pu->action_url, post_data, (*agentConfigPtr)->postcacheentry_life);
                     }

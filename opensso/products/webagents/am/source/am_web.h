@@ -532,7 +532,7 @@ typedef struct {
  * and appropriate am_status_t code otherwise.
  */
 typedef am_status_t (*am_web_check_postdata_func_t)(
-			void **args, const char *requestURL, char **page);
+			void **args, const char *requestURL, char **page, const unsigned long postcacheentry_life);
 typedef struct {
     am_web_check_postdata_func_t func;
     void **args;

@@ -239,26 +239,39 @@ static void listall_post_data(server_rec *s) {
     }
 }
 
-static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd, server_rec *s) {
+static am_status_t find_post_data(char *id, am_web_postcache_data_t *pd, const unsigned long postcacheentry_life, server_rec *s) {
     am_post_data_list_item_t *table;
     int i;
+    apr_time_t now;
     am_status_t status = AM_FAILURE;
     agent_server_config *scfg = ap_get_module_config(s->module_config, &dsame_module);
     if (get_global_lock(scfg->pdp_lock) != 0) {
         table = apr_shm_baseaddr_get(scfg->pdp_cache);
         if (table != NULL) {
+            now = apr_time_now();
+            if (postcacheentry_life >= 1L) {
+                now -= apr_time_from_sec(postcacheentry_life * 60);
+            } else {
+                am_web_log_warning("find_post_data(): invalid com.sun.identity.agents.config.postcache.entry.lifetime value, defaulting to 3 minutes");
+                now -= apr_time_from_sec(180);
+            }
             for (i = 0; i < scfg->max_pdp_count; i++) {
                 if (id != NULL && table[i].key != NULL
                         && table[i].action_url != NULL
                         && table[i].value != NULL
                         && strcmp(table[i].key, id) == 0) {
-                    pd->url = strdup(table[i].action_url);
-                    pd->value = strdup(table[i].value);
+                    if (table[i].created < now) {
+                        am_web_log_warning("find_post_data(): entry [%s] is obsolete", id);
+                        status = AM_FAILURE;
+                    } else {
+                        pd->url = strdup(table[i].action_url);
+                        pd->value = strdup(table[i].value);
+                        status = AM_SUCCESS;
+                    }
                     table[i].key[0] = '\0';
                     table[i].action_url[0] = '\0';
                     table[i].value[0] = '\0';
                     table[i].created = 0;
-                    status = AM_SUCCESS;
                     break;
                 }
             }
@@ -1269,7 +1282,7 @@ void init_at_request() {
     }
 }
 
-static am_status_t check_for_post_data(void **args, const char *requestURL, char **page) {
+static am_status_t check_for_post_data(void **args, const char *requestURL, char **page, const unsigned long postcacheentry_life) {
     const char *thisfunc = "check_for_post_data()";
     request_rec *r;
     const char *post_data_query = NULL;
@@ -1319,7 +1332,7 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
         if (am_web_is_max_debug_on()) {
             listall_post_data(r->server);
         }
-        if ((status = find_post_data((char*) post_data_query, &get_data, r->server)) == AM_SUCCESS) {
+        if ((status = find_post_data((char*) post_data_query, &get_data, postcacheentry_life, r->server)) == AM_SUCCESS) {
             postdata_cache = get_data.value;
             actionurl = get_data.url;
             am_web_log_debug("%s: POST cache actionurl: %s",
