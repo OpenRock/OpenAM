@@ -1939,7 +1939,7 @@ am_status_t set_request_headers(IHttpContext *pHttpContext, void** args)
 	string headersList ="";
 	if(set_headers_list)
 		headersList = set_headers_list;
-	set_headers_in_context(pHttpContext, headersList, FALSE);
+	set_headers_in_context(pHttpContext, headersList, TRUE);
 
 
 	//Add custom headers and/or set_cookie header to original headers
