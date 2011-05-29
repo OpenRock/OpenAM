@@ -6,13 +6,13 @@
   <meta http-equiv="refresh" content="0; url=am.filter.request.url" />
 </head>
 <body text="#000000" bgcolor="#ffffff">
- <font face="Helvetica, Arial, sans-serif"><b>Attempting Redirect to Destination</b><br>
- <br>
+ <font face="Helvetica, Arial, sans-serif"><b>Attempting Redirect to Destination</b><br/>
+ <br/>
  Your browser should automatically redirect you to the desired location.
 If your browser does not support support auto-refresh, please click <a
- href="am.filter.request.url"><tt>HERE</tt></a> to continue...</font><br>
- <br>
- <br>
+ href="am.filter.request.url"><tt>HERE</tt></a> to continue...</font><br/>
+ <br/>
+ <br/>
 
 </body>
 </html>
