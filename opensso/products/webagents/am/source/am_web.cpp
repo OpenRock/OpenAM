@@ -5830,6 +5830,7 @@ process_request(am_web_request_params_t *req_params,
     char *post_data = NULL;
     char *post_data_cache = NULL;
     char *advice_response = NULL;
+    std::string request_url_str;
     void *args[1];
     boolean_t cdsso_enabled = am_web_is_cdsso_enabled(agent_config);
     // initialize reserved field to NULL
@@ -5895,8 +5896,15 @@ process_request(am_web_request_params_t *req_params,
                     }
                     result = AM_WEB_RESULT_OK_DONE;
                 } else if (post_data_cache == NULL && post_data != NULL && req_func->add_header_in_response.func != NULL) {
-                    req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", req_params->url);
-                    strcpy(data_buf, req_params->url);
+                    URL url(req_params->url);
+                    if (overrideProtoHostPort(url, agent_config)) {
+                        url.getURLString(request_url_str);
+                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", request_url_str.c_str());
+                        strcpy(data_buf, request_url_str.c_str());                   
+                    } else {
+                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", req_params->url);
+                        strcpy(data_buf, req_params->url);
+                    }
                     result = AM_WEB_RESULT_REDIRECT;
                 } else {
                     result = process_access_success(req_params->url, 
