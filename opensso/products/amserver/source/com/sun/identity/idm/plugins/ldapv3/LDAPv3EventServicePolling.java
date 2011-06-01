@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.idm.plugins.ldapv3;
 
 import java.util.Date;
@@ -100,7 +104,7 @@ public class LDAPv3EventServicePolling extends LDAPv3EventService {
         super(pluginConfig, serverNames);
         map = _requestList;
         _requestList = new PeriodicGroupMap(new ScheduleableGroupAction() {                        
-            public void doGroupAction(Object obj) {
+                public void doGroupAction(Object obj) {
                 Request req = (Request) map.remove(obj);
                 // it should not be null, just for safety.
                 if (req != null) {
@@ -132,13 +136,12 @@ public class LDAPv3EventServicePolling extends LDAPv3EventService {
                         processExceptionErrorCodes(le, errorCode, false);
                     } catch (LDAPException e) {
                         // Probably psearch could not be established
-                        if (debugger.messageEnabled()) {
-                            debugger.message(
-                                "LDAPv3EventServicePolling.resetAllSearches(): "
-                                + "LDAPException occurred, while trying to " +
-                                "re-establish persistent searches. randomID=" +
-                                randomID, e);
-                        }
+                        debugger.error(
+                            "LDAPv3EventServicePolling.resetAllSearches(): "
+                            + "LDAPException occurred, while trying to " +
+                            "re-establish persistent searches. randomID=" +
+                            randomID, e);
+                        
                         int errorCode = e.getLDAPResultCode();
                         processExceptionErrorCodes(e, errorCode, false);
                     }
@@ -220,13 +223,34 @@ public class LDAPv3EventServicePolling extends LDAPv3EventService {
     private boolean processExceptionErrorCodes(Exception ex, int errorCode,
             boolean interrupt) {
         boolean successState = true;
-        if (_retryErrorCodes.contains(Integer.toString(errorCode))) {
-            // Call Only the parent method, because at this point we
-            // want to interrupt only if required.
-            resetErrorSearches(true);
-        } else { // Some other error
-            processNetworkError(ex);
+        
+        if (ex instanceof LDAPException) {
+            LDAPException lex = (LDAPException) ex;
+            String msg = lex.getLDAPErrorMessage();
+            
+            if ((errorCode == LDAPException.OTHER) &&
+                (msg != null) && msg.equals("Invalid response")) {
+                // We should not try to resetError and retry
+                processNetworkError(ex);
+            } else {
+                if (_retryErrorCodes.contains("" + Integer.toString(errorCode))) {
+                    // Call Only the parent method, because at this point we
+                    // want to interrupt only if required.
+                    resetErrorSearches(true);
+                } else { // Some other network error
+                    processNetworkError(ex);
+                }
+            }
+        } else {
+            if (_retryErrorCodes.contains("" + Integer.toString(errorCode))) {
+                // Call Only the parent method, because at this point we
+                // want to interrupt only if required.
+                resetErrorSearches(true);
+            } else { // Some other network error
+                processNetworkError(ex);
+            }
         }
+        
         return successState;
     }
 
@@ -234,3 +258,5 @@ public class LDAPv3EventServicePolling extends LDAPv3EventService {
         return _monitorThread;
     }
 }
+
+                        
