@@ -29,7 +29,7 @@
 -->
 
 <!--
-  "Portions Copyrighted [2010] [ForgeRock AS]"
+   Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
 <project name="openssozip" default="all" basedir=".">
@@ -242,10 +242,6 @@
         <copy todir="${zip.temp.dir}/xml">
             <fileset dir="${openfm.services.xml.dir}" includes="**/*.xml"/>
             <fileset dir="${amserver.services.xml.dir}" includes="**/*.xml"/>
-        </copy>
-
-        <copy todir="${zip.temp.dir}/legal">
-            <fileset dir="${products.basedir}/legal"/>
         </copy>
 
         <zip destfile="${fm.dist.dir}/opensso.zip" whenempty="create">
