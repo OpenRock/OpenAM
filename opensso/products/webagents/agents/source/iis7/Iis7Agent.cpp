@@ -819,6 +819,15 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 					requestURL.c_str(), requestMethod, 
 					args, agent_config);
 			}
+                        {
+				HRESULT hr;
+				// Buffer to store the byte count.
+				DWORD cbSent = 0;
+				// Buffer to store if asynchronous completion is pending.
+				BOOL fCompletionExpected = false;
+				hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
+
+			}
 			break;
 
 		case AM_INVALID_FQDN_ACCESS:
@@ -2078,6 +2087,7 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
 						itoa(data_length,buff,10);
 						advice_headers_len = strlen(advice_headers_template) + 3;
 						advice_headers = (char *) malloc(advice_headers_len);
+                                                pHttpResponse->Clear();
 						hr = pHttpResponse->SetStatus(200,"Status OK",0, S_OK);
 						hr = pHttpResponse->SetHeader("Content-Type","text/html",
 							(USHORT)strlen("text/html"),TRUE);
