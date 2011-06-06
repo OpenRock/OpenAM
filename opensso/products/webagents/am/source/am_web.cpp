@@ -5971,8 +5971,13 @@ process_request(am_web_request_params_t *req_params,
                         pds = AM_FAILURE;
                     }
                     if (pds == AM_SUCCESS) {
-                        pds = am_web_create_post_preserve_urls(req_params->url,
-                            &pu, agent_config);
+                        URL url(req_params->url);
+                        if (overrideProtoHostPort(url, agent_config)) {
+                            url.getURLString(request_url_str);
+                            pds = am_web_create_post_preserve_urls(request_url_str.c_str(), &pu, agent_config);
+                        } else {
+                            pds = am_web_create_post_preserve_urls(req_params->url, &pu, agent_config);
+                        }
                     }
                     if (pds == AM_SUCCESS) {
                         pds = req_func->reg_postdata.func(req_func->reg_postdata.args,
