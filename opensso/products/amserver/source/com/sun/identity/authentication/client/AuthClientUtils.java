@@ -2322,11 +2322,30 @@ public class AuthClientUtils {
         try {
             if (!distAuthSitesMap.isEmpty()) {
                 String localSiteID = WebtopNaming.getSiteID(WebtopNaming.getAMServerID());
+                
+                if (localSiteID == null) {
+                    if (utilDebug.warningEnabled()) {
+                        utilDebug.warning("AuthClientUtils::isServerMemberOfLocalSite:" +
+                                "unable to determine local site id: " + WebtopNaming.getAMServerID());
+                    }
+                    
+                    return false;
+                }
+                
                 String localSiteName = WebtopNaming.getSiteNameById(localSiteID);
                 
                 if (localSiteName != null) {
                     Set distAuthForSite = distAuthSitesMap.get(localSiteName);
-
+                    
+                    if (distAuthForSite == null) {
+                        if (utilDebug.warningEnabled()) {
+                            utilDebug.warning("AuthClientUtils::isServerMemberOfLocalSite:" +
+                                "unable to determine distAuthForSite: " + localSiteName);
+                        }
+                    
+                        return false;   
+                    }
+                    
                     if (distAuthForSite.contains(cookieURL)) {
                         isSiteMember = true;
 
