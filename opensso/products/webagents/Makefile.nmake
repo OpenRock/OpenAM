@@ -119,7 +119,7 @@ iis6i : ii6.obj
 
 
 iis7.obj : $(AM_IIS7_SRC)
-	$(CC) /I"C:\Program Files\Microsoft SDKs\Windows\v7.0A\Include" $(CFLAGS) $(DEP_INCPATH) /DWIN32 /Iagents\source\iis7 /Foagents\source\iis7\ $(AM_IIS7_SRC)
+	$(CC) /I"C:\Program Files\Microsoft SDKs\Windows\v7.1\Include" $(CFLAGS) $(DEP_INCPATH) /DWIN32 /Iagents\source\iis7 /Foagents\source\iis7\ $(AM_IIS7_SRC)
 
 iis7i	: iis7.obj 
 	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /DEF:"agents\source\iis7\Iis7Agent.def" \
