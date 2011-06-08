@@ -57,49 +57,13 @@
   
   <menu name="OpenAM Documentation">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" collapse="true"
-         href="./doc/release-notes/OpenAM-Release-Notes.html">
-    <item name="EPUB Format" href="./doc/OpenAM-Release-Notes.epub"/>
-    <item name="HTML Format" href="./doc/release-notes/OpenAM-Release-Notes.html"/>
-    <item name="PDF Format" href="./doc/OpenAM-Release-Notes.pdf" />
-    <item name="RTF Format" href="./doc/OpenAM-Release-Notes.rtf" />
-   </item>
-   <item name="Installation Guide" collapse="true"
-         href="./doc/install-guide/OpenAM-Install-Guide.html">
-    <item name="EPUB Format" href="./doc/OpenAM-Install-Guide.epub"/>
-    <item name="HTML Format" href="./doc/install-guide/OpenAM-Install-Guide.html" />
-    <item name="PDF Format" href="./doc/OpenAM-Install-Guide.pdf" />
-    <item name="RTF Format" href="./doc/OpenAM-Install-Guide.rtf" />
-   </item>
-   <item name="Policy Agent Install Guide" collapse="true"
-         href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html">
-    <item name="EPUB Format" href="./doc/OpenAM-Agent-Install-Guide.epub"/>
-    <item name="HTML Format" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
-    <item name="PDF Format" href="./doc/OpenAM-Agent-Install-Guide.pdf" />
-    <item name="RTF Format" href="./doc/OpenAM-Agent-Install-Guide.rtf" />
-   </item>
-   <item name="Administration Guide" collapse="true"
-         href="./doc/admin-guide/OpenAM-Admin-Guide.html">
-    <item name="EPUB Format" href="./doc/OpenAM-Admin-Guide.epub" />
-    <item name="HTML Format" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
-    <item name="PDF Format" href="./doc/OpenAM-Admin-Guide.pdf" />
-    <item name="RTF Format" href="./doc/OpenAM-Admin-Guide.rtf" />
-   </item>
-   <item name="Developer Guide" collapse="true"
-         href="./doc/dev-guide/OpenAM-Dev-Guide.html">
-    <item name="EPUB Format" href="./doc/OpenAM-Dev-Guide.epub" />
-    <item name="HTML Format" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
-    <item name="PDF Format" href="./doc/OpenAM-Dev-Guide.pdf" />
-    <item name="RTF Format" href="./doc/OpenAM-Dev-Guide.rtf" />
-   </item>
-   <item name="Reference" collapse="true"
-         href="./doc/reference/OpenAM-Reference.html">
-    <item name="EPUB Format" href="./doc/OpenAM-Reference.epub" />
-    <item name="HTML Format" href="./doc/reference/OpenAM-Reference.html" />
-    <item name="PDF Format" href="./doc/OpenAM-Reference.pdf" />
-    <item name="RTF Format" href="./doc/OpenAM-Reference.rtf" />
-   </item>
-   <item name="Javadoc" href="404.html" alt="TODO" />
+   <item name="Release Notes" href="./doc/release-notes/OpenAM-Release-Notes.html" />
+   <item name="Installation Guide" href="./doc/install-guide/OpenAM-Install-Guide.html" />
+   <item name="Policy Agent Install Guide" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
+   <item name="Administration Guide" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
+   <item name="Developer Guide" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
+   <item name="Reference" href="./doc/reference/OpenAM-Reference.html" />
+   <item name="Javadoc" href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/" alt="TODO: Generate with Maven" />
    <item name="Gateway Javadoc" href="http://resources.apexidentity.com/javadoc/core/1.0/" alt="TODO: Move to Forgerock.org"/>
   </menu>
   

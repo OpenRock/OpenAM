@@ -72,7 +72,7 @@
     <a href="./doc/OpenAM-Reference.rtf">RTF</a></dd>
     
     <dt>Javadoc</dt>
-    <dd><a href="404.html">HTML</a></dd>
+    <dd><a href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/">HTML</a></dd>
     
     <dt>Gateway Javadoc</dt>
     <dd><a href="http://resources.apexidentity.com/javadoc/core/1.0/">HTML</a></dd>
