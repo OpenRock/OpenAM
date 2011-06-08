@@ -756,16 +756,15 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 
 		case AM_INVALID_SESSION:
 			am_web_log_info("%s: Invalid session.",thisfunc);
-			// reset the CDSSO cookie first
+                        // reset ldap cookies on invalid session.
+			am_web_do_cookies_reset(reset_cookie, args, agent_config);
+			// reset the CDSSO cookie 
 			if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
 				am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
 				if(cdStatus != AM_SUCCESS) {
 					am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
 				}
 			}
-			// reset cookies on invalid session.
-			am_web_do_cookies_reset(reset_cookie, args, agent_config);
-
 			// If the post data preservation feature is enabled
 			// save the post data in the cache for post requests.
 			if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
@@ -787,23 +786,20 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 				hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
 
 			}
-
 			break;
 
 		case AM_ACCESS_DENIED:
 			am_web_log_info("%s: Access denied to %s",thisfunc,
 				OphResources.result.remote_user ?
 				OphResources.result.remote_user : "unknown user");
-			// reset the CDSSO cookie first
+			// reset ldap and CDSSO cookies
 			if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
-				am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
-				if(cdStatus != AM_SUCCESS) {
-					am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
-				}
+                            am_web_do_cookies_reset(reset_cookie, args, agent_config);
+                            am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
+                            if(cdStatus != AM_SUCCESS) {
+                                am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
+                            }
 			}
-			// reset cookies on invalid session.
-			am_web_do_cookies_reset(reset_cookie, args, agent_config);
-
 			// If the post data preservation feature is enabled
 			// save the post data in the cache for post requests.
 			// This needs to be done when the access has been denied
@@ -826,7 +822,6 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 				// Buffer to store if asynchronous completion is pending.
 				BOOL fCompletionExpected = false;
 				hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
-
 			}
 			break;
 
@@ -2093,6 +2088,10 @@ static am_status_t do_redirect(IHttpContext* pHttpContext,
 							(USHORT)strlen("text/html"),TRUE);
 						hr = pHttpResponse->SetHeader("Content-Length",buff, 
 							(USHORT)strlen(buff),TRUE);
+                                                CHAR* set_cookies_list = *((CHAR**) args[2]);
+                                                if(set_cookies_list != NULL) {
+                                                    set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
+                                                }
 						if (FAILED(hr)) {
 							am_web_log_error("%s: SetHeader failed.", thisfunc);
 							status = AM_FAILURE;
