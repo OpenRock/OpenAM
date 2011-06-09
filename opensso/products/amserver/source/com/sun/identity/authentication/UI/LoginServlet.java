@@ -176,12 +176,20 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                 try {
                     HashMap origRequestData =
                         AuthUtils.sendAuthRequestToOrigServer(
-                        request,response,cookieURL);                    
+                        request,response,cookieURL);
+                    Exception fwdEx = (Exception) origRequestData.get("EXCEPTION");
+                    if (fwdEx != null) {
+                        AuthUtils.clearHostUrlCookie(response);
+                        AuthUtils.clearlbCookie(request, response);
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        throw fwdEx;
+                    }
                     String redirect_url = null;
                     String clientType = null;
                     String output_data = null;
                     String contentType = null;
                     Map<String, List<String>> headers = null;
+                    int responseCode = HttpServletResponse.SC_OK; // OK by default, origRequestData should override it
                     if (origRequestData != null && !origRequestData.isEmpty()) {
                         redirect_url =
                             (String)origRequestData.get("AM_REDIRECT_URL");
@@ -193,6 +201,7 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                             (String)origRequestData.get("CONTENT_TYPE");
                         headers =
                             (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
+                        responseCode = (Integer) origRequestData.get("RESPONSE_CODE");
                     }
                     if (debug.messageEnabled()) {
                         debug.message("redirect_url : " + redirect_url);
@@ -212,6 +221,16 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                                 }
                             }
                         }
+                    }
+                    response.setStatus(responseCode);
+                    if (responseCode >= HttpServletResponse.SC_BAD_REQUEST) {
+                        if (debug.warningEnabled()) {
+                            debug.warning("Received " + responseCode + " response code "
+                                    + "while forwarding request, throwing CompleteRequestException");
+                        }
+                        AuthUtils.clearHostUrlCookie(response);
+                        AuthUtils.clearlbCookie(request, response);
+                        throw new CompleteRequestException();
                     }
                     if (((redirect_url != null) && !redirect_url.equals("")) &&
                         (AuthUtils.isGenericHTMLClient(clientType))
@@ -236,9 +255,9 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                         java.io.PrintWriter outP = response.getWriter();
                         outP.println(output_data);
                     }
-                   if ((redirect_url == null || (redirect_url.length() == 0))
-                           && (output_data == null || (output_data.length() 
-                           == 0))) {
+                   if ((redirect_url == null || redirect_url.length() == 0)
+                           && (output_data == null || output_data.length() 
+                           == 0) && (responseCode == 200 || responseCode == -1)) {
                        if (debug.messageEnabled()) {
                            debug.message("LoginServlet:initializeRequestContext"
                                + " No Response from original Auth server");
@@ -315,9 +334,20 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                        response.sendRedirect(refererURL);
                    } 
                 } catch (Exception e) {
-                    if (debug.messageEnabled()) {
-                        debug.message("LoginServlet error in Request Routing : "
-                            + e.toString());
+                    if (debug.warningEnabled()) {
+                        debug.warning("LoginServlet error in Request Routing : ", e);
+                    }
+                    String authCookieName = AuthUtils.getAuthCookieName();
+                    Set<String> domains = (Set<String>) AuthUtils.getCookieDomains();
+                    if (domains == null || domains.isEmpty()) {
+                        response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, null));
+                    } else {
+                        for (String domain : domains) {
+                            response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, domain));
+                            if (debug.messageEnabled()) {
+                                debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                            }
+                        }
                     }
                 }
                 throw new CompleteRequestException();

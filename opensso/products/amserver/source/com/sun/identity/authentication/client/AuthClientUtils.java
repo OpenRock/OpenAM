@@ -615,14 +615,13 @@ public class AuthClientUtils {
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
-                    Cookie cookie =
-                        createPersistentCookie(
+                    Cookie cookie = createPersistentCookie(
                             cookieName, "LOGOUT", 0, domain);
                     response.addCookie(cookie);
                 }
             } else {
                 response.addCookie(
-                    createPersistentCookie(cookieName, "LOGOUT", 0, null));
+                        createPersistentCookie(cookieName, "LOGOUT", 0, null));
             }
         }
     }          
@@ -2511,7 +2510,7 @@ public class AuthClientUtils {
                 origRequestData.put("OUTPUT_DATA",in_string);
 
             } else {
-                utilDebug.message("Response code NOT OK");
+                utilDebug.warning("Response code for proxied auth is NOT OK");
             }
 
             String client_type = conn.getHeaderField("AM_CLIENT_TYPE");
@@ -2526,11 +2525,15 @@ public class AuthClientUtils {
             if (content_type != null) {
                 origRequestData.put("CONTENT_TYPE", content_type);
             }
+            origRequestData.put("RESPONSE_CODE", conn.getResponseCode());
 
             // retrieves cookies from the response
             Map headers = conn.getHeaderFields();
             processCookies(headers, request, response);
             origRequestData.put("HTTP_HEADERS", headers);
+        } catch (IOException ioe) {
+            //the catcher will log the exception
+            origRequestData.put("EXCEPTION", ioe);
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("send exception : " , e);

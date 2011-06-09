@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -174,11 +175,19 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                         if (debug.messageEnabled()) {
                             debug.message("origRequestData : " + origRequestData);
                         }
+                        Exception fwdEx = (Exception) origRequestData.get("EXCEPTION");
+                        if (fwdEx != null) {
+                            AuthClientUtils.clearHostUrlCookie(response);
+                            AuthClientUtils.clearlbCookie(request, response);
+                            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            throw fwdEx;
+                        }
                         String redirect_url = null;
                         String clientType = null;
                         String output_data = null;
                         String contentType = null;
                         Map<String, List<String>> headers = null;
+                        int responseCode = HttpServletResponse.SC_OK; // OK by default, origRequestData should override it
                         if (origRequestData != null && !origRequestData.isEmpty()) {
                             redirect_url =
                                 (String)origRequestData.get("AM_REDIRECT_URL");
@@ -190,6 +199,7 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                                 (String)origRequestData.get("CONTENT_TYPE");
                             headers =
                                 (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
+                            responseCode = (Integer) origRequestData.get("RESPONSE_CODE");
                         } else {
                             Set domainsList = AuthClientUtils.getCookieDomains();
 
@@ -222,6 +232,16 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                                 }
                             }
                         }
+                        response.setStatus(responseCode);
+                        if (responseCode >= HttpServletResponse.SC_BAD_REQUEST) {
+                            if (debug.warningEnabled()) {
+                                debug.warning("Received " + responseCode + " response code "
+                                        + "while forwarding request, throwing CompleteRequestException");
+                            }
+                            AuthClientUtils.clearHostUrlCookie(response);
+                            AuthClientUtils.clearlbCookie(request, response);
+                            throw new CompleteRequestException();
+                        }
                         if (((redirect_url != null) && !redirect_url.equals("")) &&
                             AuthClientUtils.isGenericHTMLClient(clientType)) {
                             debug.message("Redirecting the response");
@@ -241,9 +261,8 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                             outP.println(output_data);
                         }
                     } catch (Exception ex) {
-                        if (debug.messageEnabled()) {
-                            debug.message("LoginServlet error in Request Routing : "
-                                + ex.toString());
+                        if (debug.warningEnabled()) {
+                            debug.warning("LoginServlet error in Request Routing : ", ex);
                         }
 
                         clearCookies(response);
@@ -268,7 +287,9 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
 
             while (domains.hasNext()) {
                 domain = (String) domains.next();
-                response.addCookie(AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain));
+                Cookie cookie = AuthClientUtils.createCookie(AuthClientUtils.getAuthCookieName(), "LOGOUT", domain);
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
 
                 if (debug.messageEnabled()) {
                     debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
