@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
-README file for OpenSSO Policy Agents 3.0-ER 1
+README file for OpenAM Policy Agents 3.0.3
 ------------------------------------------------------------------------------
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -27,6 +27,8 @@ README file for OpenSSO Policy Agents 3.0-ER 1
 #
 #
 #
+
+# Portions Copyrighted 2011 ForgeRock AS
 
 
 **********************************************************************************
