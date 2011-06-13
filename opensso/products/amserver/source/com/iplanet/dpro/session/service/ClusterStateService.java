@@ -93,6 +93,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
     private static String hcPath = SystemProperties.
                                     get(Constants.URLCHECKER_TARGET_URL, null);
 
+    private static boolean doRequest = true;
+    private static String  doRequestFlag = SystemProperties.
+                                    get(Constants.URLCHECKER_DOREQUEST, null);
+
     private int timeout = DEFAULT_TIMEOUT; // in milliseconds
 
     /** default ServerInfo check time 10 milliseconds */
@@ -107,6 +111,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
     private SessionService ss = null;
 
     static {
+        if (doRequestFlag != null) {
+            if (doRequestFlag.equals("false"))
+                doRequest = false;
+        }
         if (hcPath == null) {
             String deployuri = SystemProperties.get
                 (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
@@ -301,18 +309,27 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
         try {
             sock.connect(info.address, timeout);
-            out = new PrintWriter(sock.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            out.println(GET_REQUEST);
-            out.println(EMPTY_STRING);
-            out.flush();
+            /*
+             * If we need to check for a front end proxy, we need
+             * to send a request.  this is HTTP ONLY for now.
+             * FIX!!!
+             */
+            if (doRequest) {
+                out = new PrintWriter(sock.getOutputStream());
+                in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                out.println(GET_REQUEST);
+                out.println(EMPTY_STRING);
+                out.flush();
 
-            String response = in.readLine();
+                String response = in.readLine();
 
-            if (response.contains(SUCCESS_200)) {
-                result = true;
+                if (response.contains(SUCCESS_200)) {
+                    result = true;
+                } else {
+                    result = false;
+                }
             } else {
-                result = false;
+                result = true;
             }
         } catch (Exception e) {
             result = false;
