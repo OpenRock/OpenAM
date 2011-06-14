@@ -1114,4 +1114,7 @@ public interface Constants {
      */
     public static final String SITE_NAMES_LIST = 
             "openam-am-platform-site-names-list";
+
+    public static final String RUNTIME_SHUTDOWN_HOOK_ENABLED =
+            "openam.runtime.shutdown.hook.enabled";
 }

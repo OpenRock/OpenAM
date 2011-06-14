@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.common;
 
 import java.util.HashSet;
@@ -68,21 +71,26 @@ public class ShutdownManager {
         for (int i = 0; i < size; i++) {
             listeners[i] = new HashSet();
         }
-        // add the trigger for stand alone application to shutdown.
-        Runtime.getRuntime().addShutdownHook(new Thread(
-            new Runnable() {
-                public void run() {
-                    ShutdownManager shutdownMan =
-                        ShutdownManager.getInstance();
-                    if (shutdownMan.acquireValidLock()) {
-                        try {
-                            shutdown();
-                        } finally {
-                            shutdownMan.releaseLockAndNotify();
+        boolean hooksEnabled = Boolean.valueOf(System.getProperty(
+                com.sun.identity.shared.Constants.RUNTIME_SHUTDOWN_HOOK_ENABLED));
+        if (hooksEnabled) {
+            // add the trigger for stand alone application to shutdown.
+            Runtime.getRuntime().addShutdownHook(new Thread(
+                    new Runnable() {
+
+                        public void run() {
+                            ShutdownManager shutdownMan =
+                                    ShutdownManager.getInstance();
+                            if (shutdownMan.acquireValidLock()) {
+                                try {
+                                    shutdown();
+                                } finally {
+                                    shutdownMan.releaseLockAndNotify();
+                                }
+                            }
                         }
-                    }
-                }
-            }, "ShutdownThread"));
+                    }, "ShutdownThread"));
+        }
     }
 
     /**
