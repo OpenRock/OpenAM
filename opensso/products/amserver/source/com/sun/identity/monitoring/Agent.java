@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -3393,11 +3393,11 @@ public class Agent {
 
     private static String getEscapedString (String str) {
         if (str != null) {
-            if (str.indexOf(":") >= 0) {
-                str = str.replaceAll(":", "&#58;");
-            }
+            str = str.replaceAll(":", "&#58;");
+            str = str.replaceAll("=", "&#61;");
+            str = str.replaceAll("\\?", "&#63;");
         }
-        return (str);
+        return str;
     }
 
     public static String getRealmNameFromIndex (Integer index) {
