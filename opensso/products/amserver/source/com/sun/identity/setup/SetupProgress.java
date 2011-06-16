@@ -111,22 +111,19 @@ public class SetupProgress {
             out = new OutputStream() {
                 public void write(int b) throws IOException {
                     writer.write("<script>addProgressText('");
-                    writer.write(URLEncoder.encode(String.valueOf((char) b),
-                        encoding));
+                    writer.write(String.valueOf((char) b));
                     writer.write("<br>');</script>");
                     writer.flush();
                 }
                 public void write(byte[] b) throws IOException {
                     writer.write("<script>addProgressText('");
-                    writer.write(URLEncoder.encode(new String(b, encoding),
-                        encoding));
+                    writer.write(new String(b, encoding));
                     writer.write("<br>');</script>");
                     writer.flush();
                 }
                 public void write(byte[] b, int off, int len) throws IOException {
                     writer.write("<script>addProgressText('");
-                    writer.write(URLEncoder.encode(
-                        new String(b, off, len, encoding), encoding));
+                    writer.write(new String(b, off, len, encoding));
                     writer.write("<br>');</script>");
                     writer.flush();
                 }
