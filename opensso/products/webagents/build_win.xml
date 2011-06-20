@@ -1,4 +1,4 @@
-<!--
+﻿<!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
    Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -44,8 +44,10 @@
     <import file="webagents.xml" />
 
     <tstamp>
-        <format property="nightly.date" pattern="yyyyMMdd" offset="-1"
-            unit="day"/>
+        <format property="nightly.date" pattern="yyyyMMdd" offset="-1" unit="day"/>
+    </tstamp>
+    <tstamp>
+        <format property="build.date" pattern="yyyyMMdd"/>
     </tstamp>
    
     <condition property="build.debug32">
@@ -131,6 +133,7 @@
           <fileset dir="agents" includes="**/*.pdb"/>
           <fileset dir="agents" includes="**/*.idb"/>
           <fileset dir="agents" includes="**/*.exp"/>
+          <fileset dir="agents" includes="**/*.res"/> 
           <fileset dir="am" includes="**/*.obj"/>
           <fileset dir="am" includes="**/*.manifest"/>
           <fileset dir="am" includes="**/*.lib"/>
@@ -139,6 +142,7 @@
           <fileset dir="am" includes="**/*.idb"/>
           <fileset dir="am" includes="**/*.exp"/>
           <fileset dir="am" includes="**/*.exe"/>
+          <fileset dir="am" includes="**/*.res"/>
           <fileset dir="." includes="*.pdb"/>
           <fileset dir="." includes="*.idb"/>
          </delete>
@@ -151,6 +155,7 @@
         <antcall target="apache" />
         <antcall target="proxy40" />
         <antcall target="iis6" />
+        <antcall target="iis7" />
         <antcall target="domino" />
     </target>
 
@@ -256,18 +261,23 @@
         </exec>
     </target>
 
+    <exec executable="svn" output="svn.properties">
+     <arg value="info" />
+    </exec>
+    <property prefix="svn" file="svn.properties"/>
+
     <target name="fixVersion">
      <delete file="${webagents.basedir}/am/source/version.h" quiet="true"/>
      <copy file="${webagents.basedir}/am/source/version.template.win"
              tofile="${webagents.basedir}/am/source/version.h" >
         <filterchain>
            <replacetokens>
-                <token key="AGENT_VER" value="3.0"/>
-                <token key="AGENT_ER_VER" value="ER 2"/>
+                <token key="AGENT_VER" value="3.0.3"/>
+                <token key="AGENT_ER_VER" value=""/>
                 <token key="AGENT_FVB_MARKER" value=""/>
-                <token key="SVN_REVISION" value=""/>
-                <token key="BUILD_DATE" value="${nightly.date}"/>
-                <token key="BUILD_MACHINE" value="constable.internal.forgerock.com"/>
+                <token key="SVN_REVISION" value="${svn.Revision}"/>
+                <token key="BUILD_DATE" value="${build.date}"/>
+                <token key="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
             </replacetokens>
         </filterchain>
      </copy>
