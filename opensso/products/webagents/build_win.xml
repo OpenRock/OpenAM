@@ -163,6 +163,7 @@
         <echo message="Dispatch to apache"/>
         <property name="containername" value="apache"/>
         <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
             target="all" inheritRefs="true"/>
     </target>
@@ -171,6 +172,7 @@
         <echo message="Dispatch to SJSWS"/>
         <property name="containername" value="sjsws"/>
         <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
             target="all" inheritRefs="true"/>
     </target>
@@ -179,6 +181,7 @@
         <echo message="Dispatch to proxy40"/>
         <property name="containername" value="proxy40"/>
         <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
             target="all" inheritRefs="true"/>
     </target>
@@ -187,6 +190,7 @@
         <echo message="Dispatch to Apache 22"/>
         <property name="containername" value="apache22"/>
         <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
             target="all" inheritRefs="true"/>
     </target>
@@ -211,6 +215,7 @@
         <echo message="Dispatch to domino"/>
         <property name="containername" value="domino"/>
         <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
             target="all" inheritRefs="true"/>
     </target>

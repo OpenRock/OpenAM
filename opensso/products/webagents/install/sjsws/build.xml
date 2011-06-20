@@ -168,13 +168,7 @@
             </fileset>
         </delete>
         <!-- end fixme -->
-        <copy todir="${container.web_agent.bin.dir}">
-            <fileset dir="${webagents.basedir}/extlib/WINNT">
-                    <include name="opensso-installtools.jar"/>
-                    <include name="opensso-installtools-launcher.jar"/>
-            </fileset>
-        </copy>
-
+        
     </target>
 
 </project>
