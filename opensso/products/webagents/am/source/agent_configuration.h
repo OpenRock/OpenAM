@@ -169,7 +169,9 @@ public:
     PRBool doRemoteLog; //utility member to determine whether to remote log or not
     const char * clientIPHeader;
     const char * clientHostnameHeader;
-    PRBool encodeCookieSpecialChars; 
+    PRBool encodeCookieSpecialChars;
+
+    const char *notenforcedIPmode; 
     
     AgentConfiguration();
     AgentConfiguration(am_properties_t properties);
@@ -262,6 +264,7 @@ public:
         this->clientIPHeader = NULL;
         this->clientHostnameHeader = NULL;
         this->encodeCookieSpecialChars = AM_FALSE;
+        this->notenforcedIPmode = NULL;
 
     }
     

@@ -99,6 +99,22 @@
 #define TRUE	1
 #endif
 
+#if defined _MSC_VER
+#include <winsock.h>
+#include <intrin.h>
+#if !defined(snprintf)
+#define snprintf _snprintf
+#endif
+#if !defined(strtok_r)
+#define strtok_r strtok_s
+#endif
+typedef unsigned __int32 uint32_t;
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
 USING_PRIVATE_NAMESPACE
 
 /*
@@ -188,6 +204,144 @@ AgentProfileService* agentProfileService;
 /**
  *                    -------- helper functions --------
  */
+
+#define IPCOMP(addr, n) ((addr >> (24 - 8 * n)) & 0xFF)
+
+static inline int am_floor(const double x) {
+    return x < 0 ? (int) x == x ? (int) x : (int) x - 1 : (int) x;
+}
+
+static inline uint32_t max_block(uint32_t w) {
+    uint32_t res;
+#if defined(__SUNPRO_CC) && defined(sparc)
+    asm("popc %1,%0" : "=r" (res) : "r" (w & 0xffffffff));
+#else
+    res = w;
+    res -= ((res >> 1) & 0x55555555);
+    res = (((res >> 2) & 0x33333333) + (res & 0x33333333));
+    res = (((res >> 4) + res) & 0x0f0f0f0f);
+    res += (res >> 8);
+    res += (res >> 16);
+    res = res & 0x0000003f;
+#endif
+    return res;
+}
+
+static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string> *list);
+
+static boolean_t notenforced_ip_range_cidr_match(const char *ip, std::string const& str) {
+    uint32_t start, end;
+    char *st = NULL, *en = NULL, *p = NULL, *p_buf = NULL;
+    char buf[128];
+    char tbf[19];
+    std::set<std::string> all;
+    memset(buf, 0, sizeof (buf));
+    strncpy(buf, str.c_str(), sizeof (buf) - 1);
+    if ((p = strtok_r(buf, "-", &p_buf)) == NULL) {
+        return B_FALSE;
+    }
+    st = strdup(p);
+    if ((start = inet_addr(p)) == -1) {
+        free(st);
+        return B_FALSE;
+    }
+    if ((p = strtok_r(NULL, "-", &p_buf)) != NULL) {
+        en = strdup(p);
+        if ((end = inet_addr(p)) == -1) {
+            free(st);
+            free(en);
+            return B_FALSE;
+        }
+    } else {
+        free(st);
+        return B_FALSE;
+    }
+    start = ntohl(start);
+    end = ntohl(end);
+    while (end >= start) {
+        int maxsize = max_block(start);
+        double x = log(end - start + 1.0) / log(2.0);
+        int maxdiff = (char) (32 - am_floor(x));
+        if (maxsize < maxdiff) {
+            maxsize = maxdiff;
+        }
+        memset(tbf, 0, sizeof (tbf));
+        if (snprintf(tbf, sizeof (tbf), "%u.%u.%u.%u/%i", IPCOMP(start, 0), IPCOMP(start, 1), IPCOMP(start, 2), IPCOMP(start, 3), maxsize) != -1) {
+            all.insert(std::string(tbf));
+        }
+        start += ((32 - maxsize) != 0) ? 2 << ((32 - maxsize) - 1) : 1;
+    }
+    free(st);
+    free(en);
+    if (am_web_is_max_debug_on()) {
+        am_web_log_max_debug("notenforced_ip_range_cidr_match(): IP range %s is transformed to the following CIDR list:", str.c_str());
+        for (std::set<std::string>::const_iterator iplv = all.begin(); iplv != all.end(); ++iplv) {
+            std::string const& sv = *iplv;
+            am_web_log_max_debug("[%s]", sv.c_str());
+        }
+    }
+    if (notenforced_ip_cidr_match(ip, &all) == B_TRUE) {
+        return B_TRUE;
+    }
+    return B_FALSE;
+}
+
+static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string> *list) {
+    int mask;
+    uint32_t t, s, e, ipt;
+    uint32_t lx;
+    char *p = NULL, *p_buf = NULL;
+    char buf[64];
+    /*check if CIDR value list is not empty or IP address sent in is valid IP address*/
+    if (list == NULL || list->empty() || (ipt = inet_addr(ip)) == -1) {
+        return B_FALSE;
+    }
+    for (std::set<std::string>::const_iterator iplv = list->begin(); iplv != list->end(); ++iplv) {
+        std::string const& str = *iplv;
+        if (strchr(str.c_str(), '-') != NULL && strchr(str.c_str(), '/') == NULL) {
+            /* we support IP range only in a following notation
+             *           192.168.1.1-192.168.2.3
+             **/
+            if (notenforced_ip_range_cidr_match(ip, str) == B_TRUE) {
+                return B_TRUE;
+            } else {
+                continue;
+            }
+        }
+        /*clean out buffer*/
+        memset(buf, 0, sizeof (buf));
+        /*copy CIDR value from set element to buffer*/
+        strncpy(buf, str.c_str(), sizeof (buf) - 1);
+        if ((p = strtok_r(buf, "/", &p_buf)) == NULL) {
+            continue;
+        }
+        if ((lx = inet_addr(p)) == -1) {
+            continue;
+        }
+        if ((p = strtok_r(NULL, "/", &p_buf)) != NULL) {
+            mask = atoi(p);
+            if (mask < 0 || mask > 32) {
+                /* invalid mask */
+                am_web_log_error("notenforced_ip_cidr_match(): invalid mask [%d] for range [%s]", mask, str.c_str());
+                continue;
+            }
+        } else {
+            /* single IP address*/
+            mask = 32;
+        }
+        lx = htonl(lx);
+        t = htonl(ipt);
+        s = (lx & (~((1 << (32 - mask)) - 1) & 0xFFFFFFFF));
+        e = (lx | (((1 << (32 - mask)) - 1) & 0xFFFFFFFF));
+        if (t >= s && t <= e) {
+            am_web_log_debug("notenforced_ip_cidr_match(): found ip [%s] in range [%s]", ip, str.c_str());
+            return B_TRUE;
+        } else {
+            am_web_log_debug("notenforced_ip_cidr_match(): ip [%s] is not in range [%s]", ip, str.c_str());
+        }
+    }
+    return B_FALSE;
+}
 
 /* Throws std::exception's from fqdn_handler functions */
 inline am_bool_t is_valid_fqdn_access(const char *url, 
@@ -288,8 +442,6 @@ void get_string(UINT key, char *buf, size_t buflen) {
     }
     return;
 }
-/* On windows default strtok_r to strtok */
-#define strtok_r(s1, s2, p) strtok(s1, s2);
 #elif defined(HPUX) || defined(AIX)
 void get_string(const char *key, char *buf, size_t buflen) {
   strncpy(buf, key, buflen);
@@ -1523,15 +1675,21 @@ is_url_not_enforced(const char *url, const char *client_ip, std::string pInfo,
         try {
             // See if it client ip is in the not enforced client ip list.
             if ((*agentConfigPtr)->not_enforce_IPAddr != NULL) {
-                if ((*agentConfigPtr)->not_enforce_IPAddr->find(client_ip) !=
-                         (*agentConfigPtr)->not_enforce_IPAddr->end()) {
-                    inNotenforceIP = AM_TRUE;
+                if ((*agentConfigPtr)->notenforcedIPmode != NULL && strncasecmp((*agentConfigPtr)->notenforcedIPmode, "cidr", 4) == 0) {
+                    /*cidr match is enabled*/
+                    inNotenforceIP = notenforced_ip_cidr_match(client_ip, (*agentConfigPtr)->not_enforce_IPAddr) ? AM_TRUE : AM_FALSE;
+                } else {
+                    /*fall back to plain string match */
+                    inNotenforceIP = ((*agentConfigPtr)->not_enforce_IPAddr->find(client_ip) !=
+                            (*agentConfigPtr)->not_enforce_IPAddr->end()) ? AM_TRUE : AM_FALSE;
+                }  
+                if (inNotenforceIP == AM_TRUE) {
                     am_web_log_debug("%s: client_ip %s is not enforced",
-                                thisfunc, client_ip);
+                            thisfunc, client_ip);
                 } else {
                     am_web_log_debug("%s: client_ip %s not found in "
-                           "client ip not enforced list",
-                           thisfunc, client_ip);
+                            "client ip not enforced list",
+                            thisfunc, client_ip); 
                 }
             }
             // Do the not enforced list check only if the client ip check
@@ -3504,8 +3662,14 @@ am_web_is_in_not_enforced_ip_list(const char *ip,
     boolean_t retVal = B_FALSE;
     if(ip != NULL && (*agentConfigPtr)->not_enforce_IPAddr != NULL &&
        (*agentConfigPtr)->not_enforce_IPAddr->size() > 0) {
-	retVal = ((*agentConfigPtr)->not_enforce_IPAddr->find(ip) !=
-		  (*agentConfigPtr)->not_enforce_IPAddr->end())?B_TRUE:B_FALSE;
+	if ((*agentConfigPtr)->notenforcedIPmode != NULL && strncasecmp((*agentConfigPtr)->notenforcedIPmode, "cidr", 4) == 0) {
+            /*cidr match is enabled*/
+            retVal = notenforced_ip_cidr_match(ip, (*agentConfigPtr)->not_enforce_IPAddr);      
+        } else {
+            /*fall back to plain string match */
+            retVal = ((*agentConfigPtr)->not_enforce_IPAddr->find(ip) !=
+		  (*agentConfigPtr)->not_enforce_IPAddr->end()) ? B_TRUE : B_FALSE;
+        }
     }
     return retVal;
 }

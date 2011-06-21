@@ -161,7 +161,7 @@ endif
 
 ifeq ($(OS_ARCH), SunOS)
 SYSTEM_LIBS := $(LD_STATIC_FLAG) $(CXX_STD_LIBS) $(LD_SHARED_FLAG) \
-	       -lnls -lpthread -ldl -lc -lm
+	       -lnls -lpthread -ldl -lc -lm -lsocket -lnsl
 endif
 
 ifeq ($(OS_ARCH), HP-UX)

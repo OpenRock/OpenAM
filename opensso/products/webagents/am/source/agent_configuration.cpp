@@ -448,6 +448,12 @@ am_status_t AgentConfiguration::populateAgentProperties()
             this->configChangeNotificationEnable = AM_FALSE;
         }
     }
+
+    /* Get notenforced_IP handler mode*/
+    if (AM_SUCCESS == status) {
+        status = am_properties_get_with_default(this->properties, "com.forgerock.agents.config.notenforced.ip.handler", NULL, &(this->notenforcedIPmode));
+        am_web_log_max_debug("Property [com.forgerock.agents.config.notenforced.ip.handler] value set to [%s]", this->notenforcedIPmode);
+    }
  
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
