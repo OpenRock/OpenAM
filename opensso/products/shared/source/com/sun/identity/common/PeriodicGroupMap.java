@@ -250,6 +250,16 @@ public class PeriodicGroupMap extends PeriodicGroupRunnable implements Map {
     }
 
     /**
+     * Indicates whether this PeriodicRunnable is empty.
+     *
+     * @return A boolean to indicate whether this PeriodicRunnable is empty
+     */
+    
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    /**
       * Implements for TaskRunnable. Run the function of ScheduleableGroupAction
       * on the objects in thisTurn 1 by 1, and interchange thisTurn and nextTurn.
       */
