@@ -24,12 +24,17 @@
  * 
  * $Id: AuthnResponse.cs,v 1.5 2009/11/11 18:13:39 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 using System;
 using System.Collections;
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.XPath;
+using Sun.Identity.Common;
 using Sun.Identity.Properties;
 using Sun.Identity.Saml2.Exceptions;
 
@@ -65,10 +70,12 @@ namespace Sun.Identity.Saml2
                 this.xml = new XmlDocument();
                 this.xml.PreserveWhitespace = true;
                 this.xml.LoadXml(samlResponse);
+
                 this.nsMgr = new XmlNamespaceManager(this.xml.NameTable);
                 this.nsMgr.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
                 this.nsMgr.AddNamespace("saml", "urn:oasis:names:tc:SAML:2.0:assertion");
                 this.nsMgr.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+                this.nsMgr.AddNamespace("xenc", "http://www.w3.org/2001/04/xmlenc#");
             }
             catch (ArgumentNullException ane)
             {
@@ -331,7 +338,7 @@ namespace Sun.Identity.Saml2
         public Hashtable Attributes
         {
             get
-            {   
+            {
                 string xpath = "/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute";
                 XmlNode root = this.xml.DocumentElement;
                 XmlNodeList nodeList = root.SelectNodes(xpath, this.nsMgr);
@@ -360,6 +367,68 @@ namespace Sun.Identity.Saml2
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Tells whether the SAML response contains any kind of encrypted content.
+        /// </summary>
+        /// <returns><code>true</code> if the SAML response contains encrypted elements.</returns>
+        public bool IsEncrypted()
+        {
+            string xpath = "//xenc:EncryptedData";
+            XmlNode node = xml.DocumentElement;
+            return node.SelectNodes(xpath, nsMgr).Count != 0;
+        }
+
+        /// <summary>
+        /// Tells whether the SAML response contains encrypted assertion tag or not.
+        /// If the assertion is encrypted, then the decryption should be executed
+        /// before checking the digital signature.
+        /// </summary>
+        /// <returns><code>true</code> if the assertion is encrypted.</returns>
+        public bool isAssertionEncrypted()
+        {
+            string xpath = "//saml:EncryptedAssertion";
+            XmlNode node = xml.DocumentElement;
+            return node.SelectNodes(xpath, nsMgr).Count != 0;
+        }
+
+        /// <summary>
+        /// Recursively decrypts the received SAML response.
+        /// </summary>
+        /// <param name="serviceProvider">ServiceProvider instance, so we can extract
+        /// information about the SP configuration.</param>
+        public void Decrypt(ServiceProvider serviceProvider)
+        {
+            try
+            {
+                FedletEncryptedXml encXml = new FedletEncryptedXml(xml, serviceProvider);
+                encXml.DecryptDocument();
+                Normalize();
+            }
+            catch (CryptographicException ce)
+            {
+                throw new Saml2Exception(Resources.DecryptionFailed, ce);
+            }
+        }
+
+        private void Normalize()
+        {
+            ReplaceParentWithNode("//saml:EncryptedAssertion");
+            ReplaceParentWithNode("//saml:EncryptedAttribute");
+            ReplaceParentWithNode("//saml:EncryptedID");
+        }
+
+        private void ReplaceParentWithNode(string xpath)
+        {
+            XmlNodeList nodes = xml.SelectNodes(xpath, nsMgr);
+            foreach (XmlNode node in nodes)
+            {
+                foreach (XmlNode child in node.ChildNodes)
+                {
+                    node.ParentNode.AppendChild(child);
+                }
+                node.ParentNode.RemoveChild(node);
+            }
+        }
         #endregion
     }
 }

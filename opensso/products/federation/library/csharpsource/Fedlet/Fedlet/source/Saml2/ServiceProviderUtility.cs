@@ -24,6 +24,9 @@
  * 
  * $Id: ServiceProviderUtility.cs,v 1.9 2010/01/26 01:20:14 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 using System;
 using System.Collections;
@@ -32,7 +35,6 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -257,6 +259,7 @@ namespace Sun.Identity.Saml2
             }
 
             string prevAuthnRequestId = authnResponse.InResponseTo;
+
             try
             {
                 if (artifactResponse != null)
@@ -282,6 +285,12 @@ namespace Sun.Identity.Saml2
                 AuthnRequestCache.RemoveSentAuthnRequest(context, prevAuthnRequestId);
             }
 
+            // If we already decrypted the XML because of an encrypted assertion,
+            // then this method won't be executed
+            if (authnResponse.IsEncrypted())
+            {
+                authnResponse.Decrypt(ServiceProvider);
+            }
             return authnResponse;
         }
 
@@ -1241,7 +1250,16 @@ namespace Sun.Identity.Saml2
         /// <see cref="ServiceProviderUtility.Validate(AuthnResponse, ICollection)"/>
         public void ValidateForArtifact(ArtifactResponse artifactResponse, ICollection authnRequests)
         {
+            if (artifactResponse.XmlSignature == null && artifactResponse.AuthnResponse.isAssertionEncrypted())
+            {
+                artifactResponse.Decrypt(ServiceProvider);
+                artifactResponse.AuthnResponse.Decrypt(ServiceProvider);
+            }
             this.CheckSignature(artifactResponse);
+            if (artifactResponse.AuthnResponse.isAssertionEncrypted())
+            {
+                artifactResponse.AuthnResponse.Decrypt(ServiceProvider);
+            }
             this.Validate(artifactResponse.AuthnResponse, authnRequests);
         }
 
@@ -1256,7 +1274,15 @@ namespace Sun.Identity.Saml2
         /// <see cref="ServiceProviderUtility.Validate(AuthnResponse, ICollection)"/>
         public void ValidateForPost(AuthnResponse authnResponse, ICollection authnRequests)
         {
+            if (authnResponse.XmlResponseSignature == null && authnResponse.isAssertionEncrypted())
+            {
+                authnResponse.Decrypt(ServiceProvider);
+            }
             this.CheckSignature(authnResponse);
+            if (authnResponse.isAssertionEncrypted())
+            {
+                authnResponse.Decrypt(ServiceProvider);
+            }
             this.Validate(authnResponse, authnRequests);
         }
 

@@ -399,4 +399,10 @@
   <data name="MalformedRelayState" xml:space="preserve">
     <value>RelayState is not a valid URI.</value>
   </data>
+  <data name="DecryptionKeyNotFound" xml:space="preserve">
+    <value>Decryption key not found based on provided alias.</value>
+  </data>
+  <data name="DecryptionFailed" xml:space="preserve">
+    <value>Unable to decrypt the received SAML response.</value>
+  </data>
 </root>

@@ -28,8 +28,10 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.XPath;
+using Sun.Identity.Common;
 using Sun.Identity.Properties;
 using Sun.Identity.Saml2.Exceptions;
 
@@ -76,6 +78,7 @@ namespace Sun.Identity.Saml2
                 this.nsMgr.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
                 this.nsMgr.AddNamespace("saml", "urn:oasis:names:tc:SAML:2.0:assertion");
                 this.nsMgr.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+                this.nsMgr.AddNamespace("xenc", "http://www.w3.org/2001/04/xmlenc#");
 
                 string xpath = "/samlp:ArtifactResponse/samlp:Response";
                 XmlNode response = this.xml.DocumentElement.SelectSingleNode(xpath, this.nsMgr);
@@ -208,6 +211,17 @@ namespace Sun.Identity.Saml2
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Decrypts the authnResponse, then modifies the artifactresponse too.
+        /// </summary>
+        /// <param name="serviceProvider">ServiceProvider instance, so we can extract
+        /// information about the SP configuration.</param>
+        public void Decrypt(ServiceProvider serviceProvider)
+        {
+            authnResponse.Decrypt(serviceProvider);
+            XmlNode node = xml.SelectSingleNode("//samlp:Response", nsMgr).ParentNode;
+            node.InnerXml = ((XmlNode)authnResponse.XmlDom).InnerXml;
+        }
         #endregion
     }
 }
