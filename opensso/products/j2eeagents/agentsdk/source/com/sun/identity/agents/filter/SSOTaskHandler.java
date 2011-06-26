@@ -125,6 +125,34 @@ implements ISSOTaskHandler {
                 logMessage("SSOTaskHandler: SSO Validation successful for "
                            + userDN);
             }
+
+            // Invalidate the HTTP session if this session binding is enabled
+            // and the user is different between requests.
+            if (userDN != null && isSessionBindingEnabled()) {
+                // Don't create a session if one doesn't already exist.
+                HttpServletRequest request = ctx.getHttpServletRequest();
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    // If the users are different between requests then
+                    // invalidate the current session before storing the new
+                    // userDN in a new session
+                    String currentUserDN = (String)session.getAttribute(HTTPSESSION_BINDING_ATTRIBUTE);
+                    if (!userDN.equals(currentUserDN)) {
+                        if (isLogMessageEnabled()) {
+                            logMessage("SSOTaskHandler: "
+                                    + "invalidating HTTP Session because the "
+                                    + "user has changed, new "
+                                    + userDN + " old " + currentUserDN);
+                        }
+                        session.invalidate();
+                        // Force the creation of a new session
+                        session = request.getSession(true);
+                        // Record the user for next request
+                        session.setAttribute(HTTPSESSION_BINDING_ATTRIBUTE, userDN);
+                    }
+                }
+            }
+
             ctx.setSSOValidationResult(ssoValidationResult);
         }
 

@@ -718,5 +718,14 @@ public interface IFilterConfigurationConstants {
 
     public static final int MAX_PORT = 65535;
 
+    /**
+     * Used when working in HTTP Session Binding mode to store
+     * the value of the User DN in the HTTP Session to be
+     * able to test if the user has changed between requests, i.e.
+     * has logged out and the next request is from a different user.
+     */
+    public static final String HTTPSESSION_BINDING_ATTRIBUTE =
+        "httpsession.binding.attribute";
+
 }
 
