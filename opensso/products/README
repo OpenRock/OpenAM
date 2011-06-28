@@ -88,6 +88,10 @@ this, you must ensure that JDK 6.0 is present in your system path and the
 JAVA_HOME environment variable is setup correctly pointing to its location. The
 target JDK is set to 1.5.
 
+Please see this URL for the latest instructions on how to compile OpenSSO:
+https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source
+The above URL provides a convenient ZIP file of all the needed dependencies below.
+
 %% 2. Library dependencies
 
 The OpenSSO sources depend upon a few third-party libraries that are not
@@ -119,7 +123,10 @@ in this directory is automatically included in the classpath during the
 compilation phase of the build process.
 
 The following subsections briefly describe how these libraries may be 
-obtained. These instructions are provided for your convenience only and
+obtained. (Please note as mentioned earlier all needed libraries are available
+in a single download by visiting this page:
+https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source).
+These instructions are provided for your convenience only and
 are not intended to replace or invalidate the procedures/guidelines set
 by the library vendor or distributor for obtaining those libraries. Before
 you follow these instructions, you must agree to abide by any terms and
@@ -250,114 +257,45 @@ workspace. The default target that is executed is the usage target which
 displays a brief description about the other targets. Currently the main
 targets available in the workspace are:
    
-     - build      : compiles the sources
-     - doc        : creates javadocs
-     - clean      : deletes the generated files
-     - demo       : builds the demo application
-     - demo-clean : deletes generated demo files
-     - war        : builds the WAR
-     - war-clean  : deletes generated WAR
-     - usage      : displays this usage message
+     - clean          : deletes the generated files
+     - cvsdiff        : generates diffs under diffs subdirectory
+     - nightly        : performs nightly builds for all products
+     - server-war     : builds the OpenAM WAR file
+     - server-tools   : builds the OpenAM admin tools
+     - server-nightly : performs nightly builds for server products
+     - agents-nightly : performs nightly builds for agents products
+     - usage          : displays this usage message
 
-%% 3.1 build target
+%% 3.1 clean target
 
-The build target involves the following processing:
+Removes build output directories and generated files.
 
-3.1.1 Creation of build output directories such as 
-        <workspace-root>/built
-        <workspace-root>/built/classes
-        <workspace-root>/built/resources
-        <workspace-root>/built/docs
-        <workspace-root>/built/docs/api
+%% 3.2 cvsdiff target
 
-3.1.2 Compiles all the classes present in the source directory to the
-      built/classes directory. The compilation debug flag is set to
-      "-g:none" but can be changed by defining the following two properties
-      in your user level property file $HOME/.opensso:
-      
-      - build.debug: allowed values are on and off. Example: build.debug=on
+Generates diffs using the cvs command, which are suitable for creating a patch.
+Note that OpenAM uses Subversion, not CVS, for the source repository.
 
-      - build.debuglevel: one or more of lines, vars, source as a comma
-          separated list. Example: build.debuglevel=lines,source
+%% 3.3 nightly target
 
-3.1.3 Transfers the resource and xml files from the resources and xml 
-      directories to the built area under the built/resources directory.
-      The two exceptions are:
+Runs server-nightly and agents-nightly targets.
 
-      - the file sms.dtd is copied over to the classes directory under
-        the package com/sun/identity/sm as per its defined location for
-        reference by other xml files.
+%% 3.4 server-war target
 
-      - the properties files Services.properties, DSConfig.properties,
-        ums.properties, sso.properties, SMS.properties and 
-        authentication_util.properties are combined into a single
-        properties file called amSDK.properties.
+Builds OpenAM, leaving the war files in amserver/built/dist/.
 
-      The xml files are tag-swapped to change the XML_ENCODING tag with
-      the value ISO-8859-1.
+%% 3.5 server-tools target
 
-%% 3.2 doc target
+Builds the OpenAM tools, leaving the zip files in amserver/built/dist/.
 
-The doc target involves the following processing:
+%% 3.6 server-nightly target
 
-3.2.1 Creation of build output directories such as 
-        <workspace-root>/built
-        <workspace-root>/built/classes
-        <workspace-root>/built/resources
-        <workspace-root>/built/docs
-        <workspace-root>/built/docs/api
+Builds and packages servers, tools, docs, and samples in built/dist/.
 
-3.2.2 Executes the javadoc tool with output directory set to built/docs/api
-      and includes the following packages:
-        com/iplanet/sso/**
-        com/iplanet/dpro/**
-        com/sun/identity/session/**
+%% 3.7 agents-nightly target
 
-      The "**" indicate all sub-packages underneath the current package.
-
-%% 3.3 clean target
-
-The clean target removes all the build output directories.
-
-%% 3.4 demo target
-
-The demo target first invokes the build target and then delegates the
-further processing to the build.xml file present under the demo directory.
-This target cannot be executed directly unless certain configuration tasks
-are performed as described in the file demo/README. Please refer to this file
-for further details on the configuration tasks needed prior to building the
-demo.
-
-%% 3.5 demo-clean target
-
-Issues a clean to the build.xml file present under the demo directory. This
-target is useful in case you are interested in rebuilding the demo without
-rebuilding the entire OpenSSO distribution. By issuing the demo-clean target
-the build output area for the OpenSSO distribution is not changed and only
-the demo related build output area is cleaned.
-
-%% 3.6 war target
-
-The war target first invokes the build target and then delegates the
-further processing to the build.xml file present under the war directory.
-A deployable WAR file will be created under federation/openfm/built/war/dist
-directory after this target is successful executed.
-
-%% 3.7 war-clean target
-
-Issues a clean to the build.xml file present under the war directory. This
-target is useful in case you are interested in rebuilding the war without
-rebuilding the entire OpenSSO distribution. By issuing the war-clean target
-the build output area for the OpenSSO distribution is not changed and only
-the war related build output area is cleaned.
+Builds and packages Java EE policy agents in built/dist/.
 
 %% 3.8 usage target
 
-Displays a list of available targets along with a brief description of
-each available target for quick reference.
+Displays the list of targets.
 
-%% 4. Building the demo
-
-Before building the demo, please follow any instructions described in the
-file demo/README. This file also describes the necessary background 
-information regarding the demo and the details of how it works.
