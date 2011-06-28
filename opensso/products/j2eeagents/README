@@ -152,13 +152,19 @@ directory of this workspace.
 into the opensso/products/j2eeagents/extlib/appserver/v10
 directory of this workspace.
 
-2.3.2 Obtaining libraries for WebLogic 10.0 
-Follow these steps to obtain the libraries for BEA WebLogic 10.0:
-2.3.2.1 Install BEA WebLogic 10.0 server 
+2.3.2 Obtaining libraries for WebLogic 10 
+Follow these steps to obtain the libraries for BEA WebLogic 10:
+2.3.2.1 Install BEA WebLogic 10 server 
 2.3.2.2 Copy weblogic.jar and api.jar both from the lib directory of the server 
 installation(for example from /bea/wlserver_10.0/server/lib) into 
 the opensso/products/j2eeagents/extlib/weblogic/v10 directory of this workspace 
-2.3.2.3 Copy the com.bea.core.weblogic.security_2.0.0.0.jar from the 
+2.3.2.3.A If using WebLogic 10.0, then
+copy the com.bea.core.weblogic.security_2.0.0.0.jar from the 
+modules directory of the server installation(for example from /bea/modules) 
+into the opensso/products/j2eeagents/extlib/weblogic/v10 directory of this workspace.
+2.3.2.3.B If using WebLogic 10.3, then
+copy the com.bea.core.common.security.api_1.0.0.0_5-1-0-0.jar and
+com.bea.core.weblogic.security.auth_1.0.0.0.jar files from the
 modules directory of the server installation(for example from /bea/modules) 
 into the opensso/products/j2eeagents/extlib/weblogic/v10 directory of this workspace.
 
