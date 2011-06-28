@@ -65,16 +65,14 @@ Portions Copyrighted [2010-2011] [ForgeRock AS]
         %% 2.11 Obtaining jsf.jar, jsf-impl.jar
 
     %% 3. Building the workspace
-        %% 3.1 build target
-        %% 3.2 doc target
-        %% 3.3 clean target
-        %% 3.4 demo target
-        %% 3.5 demo-clean target
-        %% 3.6 war target
-        %% 3.7 war-clean target
+        %% 3.1 clean target
+        %% 3.2 cvsdiff target
+        %% 3.3 nightly target
+        %% 3.4 server-war target
+        %% 3.5 server-tools target
+        %% 3.6 server-nightly target
+        %% 3.7 agents-nightly target
         %% 3.8 usage target
-
-    %% 4. Building the demo
 
 %% 1. Build requirements
 
