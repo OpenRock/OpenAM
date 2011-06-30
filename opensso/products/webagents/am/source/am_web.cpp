@@ -211,19 +211,26 @@ static inline int am_floor(const double x) {
     return x < 0 ? (int) x == x ? (int) x : (int) x - 1 : (int) x;
 }
 
+static const uint32_t CIDR2MASK[] = {0x00000000, 0x80000000,
+    0xC0000000, 0xE0000000, 0xF0000000, 0xF8000000, 0xFC000000,
+    0xFE000000, 0xFF000000, 0xFF800000, 0xFFC00000, 0xFFE00000,
+    0xFFF00000, 0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
+    0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000, 0xFFFFF800,
+    0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00, 0xFFFFFF80, 0xFFFFFFC0,
+    0xFFFFFFE0, 0xFFFFFFF0, 0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE,
+    0xFFFFFFFF};
+
 static inline uint32_t max_block(uint32_t w) {
     uint32_t res;
-#if defined(__SUNPRO_CC) && defined(sparc)
-    asm("popc %1,%0" : "=r" (res) : "r" (w & 0xffffffff));
-#else
-    res = w;
-    res -= ((res >> 1) & 0x55555555);
-    res = (((res >> 2) & 0x33333333) + (res & 0x33333333));
-    res = (((res >> 4) + res) & 0x0f0f0f0f);
-    res += (res >> 8);
-    res += (res >> 16);
-    res = res & 0x0000003f;
-#endif
+    res = 32;
+    while (res > 0) {
+        uint32_t mask = CIDR2MASK[ res - 1 ];
+        uint32_t maskedBase = w & mask;
+        if (maskedBase != w) {
+            break;
+        }
+        res--;
+    }
     return res;
 }
 
