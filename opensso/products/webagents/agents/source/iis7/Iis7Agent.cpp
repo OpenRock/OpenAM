@@ -1766,6 +1766,10 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
 
 			ConstructReqCookieValue(tmpCookieString, value);
 
+                        if (value[value.length()-1] != ';') {
+                            value.append(";");
+                        }
+                        
 			pcHeader = (PCSTR)pHttpContext->AllocateRequestMemory(
 				(DWORD) (header.length()) + 1);
 			pcValue = (PCSTR)pHttpContext->AllocateRequestMemory(
@@ -1810,6 +1814,10 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
 		{
 			return AM_FAILURE;
 		}
+                
+                if (tmpCookieString[tmpCookieString.length()-1] != ';') {
+                    tmpCookieString.append(";");
+                }
 
 		pszCookie = pHttpRequest->GetHeader("Cookie",&cchCookie);
 		newCookie = (PCSTR) pHttpContext->
