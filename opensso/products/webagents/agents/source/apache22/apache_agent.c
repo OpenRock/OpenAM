@@ -412,7 +412,7 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
                 apr_global_mutex_unlock(scfg->notification_lock);
             }
         }
-        apr_sleep(am_watchdog_interval * 1000 * 1000);
+        apr_sleep(apr_time_from_sec(am_watchdog_interval));
     }
     am_web_log_info("Shutting down policy web agent notification listener thread for pid: %d", pid);
     deregister_process(pid, s);
@@ -427,8 +427,20 @@ static void *dsame_create_server_config(apr_pool_t *p, server_rec *s) {
                 "Policy web agent failed to locate temporary storage directory");
     }
     /*default values*/
-    ((agent_server_config *) cfg)->notification_lockfile = apr_pstrcat(p, tmpdir, "/AMNotifLock", NULL);
-    ((agent_server_config *) cfg)->postdata_lockfile = apr_pstrcat(p, tmpdir, "/AMPostLock", NULL);
+    ((agent_server_config *) cfg)->notification_lockfile = apr_pstrcat(p, tmpdir,
+#ifdef _MSC_VER
+            "\\AMNotifLock",
+#else
+            "/AMNotifLock",
+#endif
+            NULL);
+    ((agent_server_config *) cfg)->postdata_lockfile = apr_pstrcat(p, tmpdir,
+#ifdef _MSC_VER
+            "\\AMPostLock",
+#else
+            "/AMPostLock",
+#endif
+            NULL);
     ((agent_server_config *) cfg)->max_pid_count = 256;
     ((agent_server_config *) cfg)->max_pdp_count = 256;
     return (void *) cfg;
@@ -456,6 +468,11 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     am_notification_list_item_t *notification_list;
     am_post_data_list_item_t *post_data_list;
 
+#ifdef _MSC_VER
+    if (!getenv("AP_PARENT_PID")) {
+        return OK;
+    }
+#endif
     /*
      * The following checks if this routine has been called before.
      * This is necessary because the parent process gets initialized
@@ -468,11 +485,6 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         apr_pool_userdata_set((const void *) 1, data_key, apr_pool_cleanup_null, server_ptr->process->pool);
         return OK;
     }
-
-#if defined(WINNT)
-    LoadLibrary("libnspr4.dll");
-    LoadLibrary("libamapc22.dll");
-#endif
 
 #if defined(LINUX) 					
     lib_handle = dlopen("libamapc22.so", RTLD_LAZY);

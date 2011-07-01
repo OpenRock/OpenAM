@@ -220,6 +220,9 @@
                     <include name="libnspr4.dll"/>
                     <include name="libplc4.dll"/>
                     <include name="libplds4.dll"/>
+                    <include name="nspr4.dll"/>
+                    <include name="plc4.dll"/>
+                    <include name="plds4.dll"/>
             </fileset>
         </copy>
         <copy todir="${container.web_agent.lib.dir}">

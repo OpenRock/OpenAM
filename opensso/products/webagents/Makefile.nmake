@@ -49,7 +49,7 @@ DEP_INCPATH = \
    /I"extlib\WINNT\nss\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include"
 !ENDIF
 
-DEP_LIBS = libxml2.lib libnspr4.lib nss3.lib ssl3.lib libplc4.lib kernel32.lib user32.lib 
+DEP_LIBS = libxml2.lib nspr4.lib nss3.lib ssl3.lib plc4.lib kernel32.lib user32.lib 
 
 DEP_LIBPATH = \
 !IFDEF X64
