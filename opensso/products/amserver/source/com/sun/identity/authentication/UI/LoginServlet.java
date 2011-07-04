@@ -78,7 +78,6 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
      */
     protected void initializeRequestContext(RequestContext requestContext) {
         super.initializeRequestContext(requestContext);
-        Debug debug = Debug.getInstance("amLoginServlet");
         // Set a view bean manager in the request context.  This must be
         // done at the module level because the view bean manager is
         // module specifc.
@@ -146,7 +145,12 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             }
             throw new CompleteRequestException();
         }
-        
+
+        String cookieURL = AuthUtils.getCookieURLForSessionUpgrade(request);
+        if (cookieURL != null) {
+            rerouteRequest(request, response, cookieURL);
+            return;
+        }
         // Check whether this is the correct server to accept the client
         // response.
         String authCookieValue = AuthUtils.getAuthCookieValue(request);
@@ -154,13 +158,9 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
             //if cookie server does not match to this local server then
             //send Auth request to cookie (original) server
-            String cookieURL = null;
             try {
                 SessionID sessionID = new SessionID(authCookieValue);
-                URL sessionServerURL = Session.getSessionServiceURL(sessionID);
-                cookieURL = sessionServerURL.getProtocol()
-                + "://" + sessionServerURL.getHost() + ":"
-                    + Integer.toString(sessionServerURL.getPort()) + serviceURI;
+                cookieURL = AuthUtils.getCookieURL(sessionID);
             } catch (Exception e) {
                 if (debug.messageEnabled()) {
                     debug.message("LoginServlet error in Session : "
@@ -172,189 +172,188 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             }
             if ((cookieURL != null) && (cookieURL.length() != 0) &&
                 (!AuthUtils.isLocalServer(cookieURL,true))) {
-                debug.message("Routing the request to Original Auth server");
-                try {
-                    HashMap origRequestData =
-                        AuthUtils.sendAuthRequestToOrigServer(
-                        request,response,cookieURL);
-                    Exception fwdEx = (Exception) origRequestData.get("EXCEPTION");
-                    if (fwdEx != null) {
-                        AuthUtils.clearHostUrlCookie(response);
-                        AuthUtils.clearlbCookie(request, response);
-                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        throw fwdEx;
-                    }
-                    String redirect_url = null;
-                    String clientType = null;
-                    String output_data = null;
-                    String contentType = null;
-                    Map<String, List<String>> headers = null;
-                    int responseCode = HttpServletResponse.SC_OK; // OK by default, origRequestData should override it
-                    if (origRequestData != null && !origRequestData.isEmpty()) {
-                        redirect_url =
-                            (String)origRequestData.get("AM_REDIRECT_URL");
-                        output_data =
-                            (String)origRequestData.get("OUTPUT_DATA");
-                        clientType =
-                            (String)origRequestData.get("AM_CLIENT_TYPE");
-                        contentType =
-                            (String)origRequestData.get("CONTENT_TYPE");
-                        headers =
-                            (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
-                        responseCode = (Integer) origRequestData.get("RESPONSE_CODE");
-                    }
-                    if (debug.messageEnabled()) {
-                        debug.message("redirect_url : " + redirect_url);
-                        debug.message("clientType : " + clientType);
-                    }
-                    if (headers != null) {
-                        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                            String headerName = entry.getKey();
-                            if (headerName != null) {
-                                if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
-                                    List<String> headerValues = entry.getValue();
-                                    if (headerValues != null) {
-                                        for (String headerValue : headerValues) {
-                                            response.addHeader(headerName, headerValue);
-                                        }
-                                    }
+                rerouteRequest(request, response, cookieURL);
+            }
+        }
+    }
+
+    private void rerouteRequest(HttpServletRequest request, HttpServletResponse response, String cookieURL) {
+        debug.message("Routing the request to Original Auth server");
+        try {
+            HashMap origRequestData =
+                    AuthUtils.sendAuthRequestToOrigServer(
+                    request, response, cookieURL);
+            Exception fwdEx = (Exception) origRequestData.get("EXCEPTION");
+            if (fwdEx != null) {
+                AuthUtils.clearHostUrlCookie(response);
+                AuthUtils.clearlbCookie(request, response);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                throw fwdEx;
+            }
+            String redirect_url = null;
+            String clientType = null;
+            String output_data = null;
+            String contentType = null;
+            Map<String, List<String>> headers = null;
+            int responseCode = HttpServletResponse.SC_OK; // OK by default, origRequestData should override it
+            if (origRequestData != null && !origRequestData.isEmpty()) {
+                redirect_url =
+                        (String) origRequestData.get("AM_REDIRECT_URL");
+                output_data =
+                        (String) origRequestData.get("OUTPUT_DATA");
+                clientType =
+                        (String) origRequestData.get("AM_CLIENT_TYPE");
+                contentType =
+                        (String) origRequestData.get("CONTENT_TYPE");
+                headers =
+                        (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
+                responseCode = (Integer) origRequestData.get("RESPONSE_CODE");
+            }
+            if (debug.messageEnabled()) {
+                debug.message("redirect_url : " + redirect_url);
+                debug.message("clientType : " + clientType);
+            }
+            if (headers != null) {
+                for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                    String headerName = entry.getKey();
+                    if (headerName != null) {
+                        if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
+                            List<String> headerValues = entry.getValue();
+                            if (headerValues != null) {
+                                for (String headerValue : headerValues) {
+                                    response.addHeader(headerName, headerValue);
                                 }
                             }
                         }
                     }
-                    response.setStatus(responseCode);
-                    if (responseCode >= HttpServletResponse.SC_BAD_REQUEST) {
-                        if (debug.warningEnabled()) {
-                            debug.warning("Received " + responseCode + " response code "
-                                    + "while forwarding request, throwing CompleteRequestException");
-                        }
-                        AuthUtils.clearHostUrlCookie(response);
-                        AuthUtils.clearlbCookie(request, response);
-                        throw new CompleteRequestException();
+                }
+            }
+            response.setStatus(responseCode);
+            if (responseCode >= HttpServletResponse.SC_BAD_REQUEST) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Received " + responseCode + " response code "
+                            + "while forwarding request, throwing CompleteRequestException");
+                }
+                AuthUtils.clearHostUrlCookie(response);
+                AuthUtils.clearlbCookie(request, response);
+                throw new CompleteRequestException();
+            }
+            if (((redirect_url != null) && !redirect_url.equals(""))
+                    && (AuthUtils.isGenericHTMLClient(clientType))) {
+                debug.message("Redirecting the response");
+                response.sendRedirect(redirect_url);
+            }
+            if ((output_data != null) && (!output_data.equals(""))) {
+                debug.message("Printing the forwarded response");
+                if (contentType != null) {
+                    if (debug.messageEnabled()) {
+                        debug.message("Content type is " + contentType);
                     }
-                    if (((redirect_url != null) && !redirect_url.equals("")) &&
-                        (AuthUtils.isGenericHTMLClient(clientType))
-                    ) {
-                        debug.message("Redirecting the response");
-                        response.sendRedirect(redirect_url);
+                    response.setContentType(contentType);
+                } else {
+                    if (debug.messageEnabled()) {
+                        debug.message("Content type is default; " + DEFAULT_CONTENT_TYPE);
                     }
-                    if ((output_data != null) && (!output_data.equals(""))) {
-                        debug.message("Printing the forwarded response");
-                        if (contentType != null) {
-                            if (debug.messageEnabled()) {
-                                debug.message("Content type is " + contentType);
-                            }
-                            response.setContentType(contentType);
-                        } else {
-                            if (debug.messageEnabled()) {
-                                debug.message("Content type is default; " + DEFAULT_CONTENT_TYPE);
-                            }
-                            response.setContentType(DEFAULT_CONTENT_TYPE);
-                        }
+                    response.setContentType(DEFAULT_CONTENT_TYPE);
+                }
 
-                        java.io.PrintWriter outP = response.getWriter();
-                        outP.println(output_data);
+                java.io.PrintWriter outP = response.getWriter();
+                outP.println(output_data);
+            }
+            if ((redirect_url == null || redirect_url.length() == 0)
+                    && (output_data == null || output_data.length()
+                    == 0) && (responseCode == 200 || responseCode == -1)) {
+                if (debug.messageEnabled()) {
+                    debug.message("LoginServlet:initializeRequestContext"
+                            + " No Response from original Auth server");
+                }
+                String refererURL = request.getHeader("Referer");
+                String refererDomain = null;
+                if (refererURL != null && !(refererURL.length() == 0)) {
+                    URL u = new URL(refererURL);
+                    int pos = u.getHost().indexOf(".");
+                    if (pos != -1) {
+                        refererDomain = u.getHost().substring(pos);
                     }
-                   if ((redirect_url == null || redirect_url.length() == 0)
-                           && (output_data == null || output_data.length() 
-                           == 0) && (responseCode == 200 || responseCode == -1)) {
-                       if (debug.messageEnabled()) {
-                           debug.message("LoginServlet:initializeRequestContext"
-                               + " No Response from original Auth server");
-                       }
-                       String refererURL = request.getHeader("Referer");
-                       String refererDomain = null;
-                       if(refererURL!=null && !(refererURL.length() == 0)) {
-                           URL u =new URL(refererURL);
-                           int pos = u.getHost().indexOf(".");
-                           if(pos!=-1) {
-                               refererDomain= u.getHost().substring(pos);
-                           }
-                       } else {
-                           refererURL = request.getRequestURL().toString();
-                           if (request.getQueryString() != null) {
-                               refererURL = refererURL + "?" + 
-                                   request.getQueryString();
-                           }
-                       }
-                       if (debug.messageEnabled()) {
-                           debug.message("LoginServlet:initializeRequestContext"
-                               + " referer domain is " + refererDomain); 
-                       }
-                       //remove amAuthCookie and amLBCookie cookies
-                       Cookie[] cookies = request.getCookies();
-                       Set domains = AuthUtils.getCookieDomains();
-                       if (cookies != null && cookies.length > 0) {
-                           for (int i = 0; i < cookies.length; i++) {
-                               if (cookies[i].getName().equalsIgnoreCase(
-                                   AuthUtils.getAuthCookieName())
-                                   || cookies[i].getName().equalsIgnoreCase
-                                   (AuthUtils.getlbCookieName())) {
-                                   if (debug.messageEnabled()) {
-                                       debug.message("LoginServlet:" 
-                                           + "initializeRequestContext removing"
-                                           + "cookie "+ cookies[i].getName());
-                                   }
-                                   cookies[i].setValue("");
-                                   cookies[i].setMaxAge(0);
-                                   response.addCookie(cookies[i]);
-                                   if (!domains.isEmpty()) {
-                                       for (Iterator it = domains.iterator(); 
-                                           it.hasNext(); ) {
-                                           String domain = (String)it.next();
-                                           if (debug.messageEnabled()) {
-                                               debug.message("LoginServlet:" 
-                                                   + "initializeRequestContext"
-                                                   + " removing cookie "+ 
-                                                   domain);
-                                           }
-                                           Cookie cookie = AuthUtils.
-                                               createCookie(
-                                               cookies[i].getName(),"",domain);
-                                           cookie.setMaxAge(0);
-                                           response.addCookie(cookie);
-                                       } //end for
-                                   } else {
-                                       //using domain name from referer
-                                       if (refererDomain != null) {
-                                           Cookie cookie = AuthUtils.
-                                               createCookie(cookies[i].
-                                               getName(),"", refererDomain);
-                                           cookie.setMaxAge(0);
-                                           response.addCookie(cookie);
-                                       }             
-                                   }
-                               } 
-                           }
-                       }
-                       if (debug.messageEnabled()) {
-                           debug.message("LoginServlet:initializeRequestContext"
-                               + "redirecting to: " + refererURL);
-                       }
-                       response.sendRedirect(refererURL);
-                   } 
-                } catch (Exception e) {
-                    if (debug.warningEnabled()) {
-                        debug.warning("LoginServlet error in Request Routing : ", e);
+                } else {
+                    refererURL = request.getRequestURL().toString();
+                    if (request.getQueryString() != null) {
+                        refererURL = refererURL + "?"
+                                + request.getQueryString();
                     }
-                    String authCookieName = AuthUtils.getAuthCookieName();
-                    Set<String> domains = (Set<String>) AuthUtils.getCookieDomains();
-                    if (domains == null || domains.isEmpty()) {
-                        response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, null));
-                    } else {
-                        for (String domain : domains) {
-                            response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, domain));
+                }
+                if (debug.messageEnabled()) {
+                    debug.message("LoginServlet:initializeRequestContext"
+                            + " referer domain is " + refererDomain);
+                }
+                //remove amAuthCookie and amLBCookie cookies
+                Cookie[] cookies = request.getCookies();
+                Set domains = AuthUtils.getCookieDomains();
+                if (cookies != null && cookies.length > 0) {
+                    for (int i = 0; i < cookies.length; i++) {
+                        if (cookies[i].getName().equalsIgnoreCase(
+                                AuthUtils.getAuthCookieName())
+                                || cookies[i].getName().equalsIgnoreCase(AuthUtils.getlbCookieName())) {
                             if (debug.messageEnabled()) {
-                                debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                                debug.message("LoginServlet:"
+                                        + "initializeRequestContext removing"
+                                        + "cookie " + cookies[i].getName());
+                            }
+                            cookies[i].setValue("");
+                            cookies[i].setMaxAge(0);
+                            response.addCookie(cookies[i]);
+                            if (!domains.isEmpty()) {
+                                for (Iterator it = domains.iterator();
+                                        it.hasNext();) {
+                                    String domain = (String) it.next();
+                                    if (debug.messageEnabled()) {
+                                        debug.message("LoginServlet:"
+                                                + "initializeRequestContext"
+                                                + " removing cookie "
+                                                + domain);
+                                    }
+                                    Cookie cookie = AuthUtils.createCookie(
+                                            cookies[i].getName(), "", domain);
+                                    cookie.setMaxAge(0);
+                                    response.addCookie(cookie);
+                                } //end for
+                            } else {
+                                //using domain name from referer
+                                if (refererDomain != null) {
+                                    Cookie cookie = AuthUtils.createCookie(cookies[i].getName(), "", refererDomain);
+                                    cookie.setMaxAge(0);
+                                    response.addCookie(cookie);
+                                }
                             }
                         }
                     }
                 }
-                throw new CompleteRequestException();
+                if (debug.messageEnabled()) {
+                    debug.message("LoginServlet:initializeRequestContext"
+                            + "redirecting to: " + refererURL);
+                }
+                response.sendRedirect(refererURL);
+            }
+        } catch (Exception e) {
+            if (debug.warningEnabled()) {
+                debug.warning("LoginServlet error in Request Routing : ", e);
+            }
+            String authCookieName = AuthUtils.getAuthCookieName();
+            Set<String> domains = (Set<String>) AuthUtils.getCookieDomains();
+            if (domains == null || domains.isEmpty()) {
+                response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, null));
+            } else {
+                for (String domain : domains) {
+                    response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, domain));
+                    if (debug.messageEnabled()) {
+                        debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
+                    }
+                }
             }
         }
-    }    
-    
+        throw new CompleteRequestException();
+    }
+
     // Checks whether the browser supports or has enabled cookie
     // Returns "true" if browser has no cookies and need to redirect to
     // the Login URL with dummy cookie in order to detect the browser
@@ -460,7 +459,7 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
     private static final List<String> RETAINED_HTTP_HEADERS = new ArrayList<String>();
     private static final List<String> FORBIDDEN_TO_COPY_HEADERS = new ArrayList<String>();
     // the debug file
-    private Debug debug;
+    private static final Debug debug = Debug.getInstance("amLoginServlet");
     
     private static String serviceURI = SystemProperties.get(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";    

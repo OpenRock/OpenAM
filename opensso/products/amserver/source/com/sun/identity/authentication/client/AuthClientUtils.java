@@ -75,6 +75,8 @@ import com.sun.identity.session.util.SessionUtils;
 import com.iplanet.am.util.AMClientDetector;
 import com.iplanet.am.util.AMURLEncDec;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 
 import com.iplanet.services.cdm.Client;
 import com.iplanet.services.cdm.AuthClient;
@@ -972,6 +974,44 @@ public class AuthClientUtils {
         }
         return (upgrade);
     }   
+    public static String getCookieURLForSessionUpgrade(HttpServletRequest request) {
+        String cookieURL = null;
+        try {
+            SSOTokenManager tokenManager = SSOTokenManager.getInstance();
+            SSOToken token = tokenManager.createSSOToken(request);
+            Hashtable reqDataHash = parseRequestParameters(request);
+            if (tokenManager.isValidToken(token)) {
+                cookieURL = getCookieURL(new SessionID(token.getTokenID().toString()));
+                if (cookieURL != null && !isLocalServer(cookieURL, true)
+                        && (forceAuthFlagExists(reqDataHash)
+                        || checkSessionUpgrade(token, reqDataHash))) {
+                    return cookieURL;
+                }
+            }
+        } catch (SSOException ssoe) {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("SSOException occured while checking session upgrade case" + ssoe);
+            }
+        }
+
+        return null;
+    }
+
+    public static String getCookieURL(SessionID sessionID) {
+        String cookieURL = null;
+        try {
+            URL sessionServerURL = Session.getSessionServiceURL(sessionID);
+            cookieURL = sessionServerURL.getProtocol()
+                    + "://" + sessionServerURL.getHost() + ":"
+                    + Integer.toString(sessionServerURL.getPort()) + serviceURI;
+        } catch (SessionException se) {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("LoginServlet error in Session : " + se.toString());
+            }
+        }
+
+        return cookieURL;
+    }
 
     public static boolean isClientDetectionEnabled() {
         boolean clientDetectionEnabled = false;
@@ -2535,8 +2575,8 @@ public class AuthClientUtils {
             //the catcher will log the exception
             origRequestData.put("EXCEPTION", ioe);
         } catch (Exception e) {
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("send exception : " , e);
+            if (utilDebug.warningEnabled()) {
+                utilDebug.warning("send exception : " , e);
             }
         } finally {
             if (out != null) {
