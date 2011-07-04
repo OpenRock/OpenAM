@@ -170,7 +170,7 @@
         <antcall target="proxy40" />
         <antcall target="iis6" />
         <antcall target="iis7" />
-        <antcall target="domino" />
+        <!-- <antcall target="domino" /> -->
     </target>
         
     <target name="all64" depends="get-arch" unless="is64bit">
