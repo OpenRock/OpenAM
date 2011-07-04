@@ -51,39 +51,39 @@
     </tstamp>
    
     <condition property="build.debug32">
-     <and>
-        <equals arg1="${build.debug}" arg2="1"/> 
-        <not> 
-          <equals arg1="${build.type}" arg2="64"/>
-        </not> 
-     </and>
+        <and>
+            <equals arg1="${build.debug}" arg2="1"/> 
+            <not> 
+                <equals arg1="${build.type}" arg2="64"/>
+            </not> 
+        </and>
     </condition>
 
     <condition property="build.debug64">
-     <and>
-        <equals arg1="${build.debug}" arg2="1"/> 
-        <equals arg1="${build.type}" arg2="64"/> 
-     </and>
+        <and>
+            <equals arg1="${build.debug}" arg2="1"/> 
+            <equals arg1="${build.type}" arg2="64"/> 
+        </and>
     </condition>
 
     <condition property="build.nondebug32">
-     <and>
-        <not>
-          <equals arg1="${build.debug}" arg2="1"/> 
-        </not>
-        <not> 
-          <equals arg1="${build.type}" arg2="64"/>
-        </not> 
-     </and>
+        <and>
+            <not>
+                <equals arg1="${build.debug}" arg2="1"/> 
+            </not>
+            <not> 
+                <equals arg1="${build.type}" arg2="64"/>
+            </not> 
+        </and>
     </condition>
 
     <condition property="build.nondebug64">
-      <and>
-        <not>
-          <equals arg1="${build.debug}" arg2="1"/> 
-        </not>
-          <equals arg1="${build.type}" arg2="64"/>
-     </and>
+        <and>
+            <not>
+                <equals arg1="${build.debug}" arg2="1"/> 
+            </not>
+            <equals arg1="${build.type}" arg2="64"/>
+        </and>
     </condition>
 
     <condition property="build.os" value="WINNT">
@@ -110,7 +110,9 @@
         <isset property="target.jdk"/>
     </condition>
     <condition property="target.jdk.set" value="1.5">
-        <not><isset property="target.jdk"/></not>
+        <not>
+            <isset property="target.jdk"/>
+        </not>
     </condition>
 
     <!-- agent version number appended to end of agent zip file name -->
@@ -126,30 +128,42 @@
     <target name="clean">
         <echo message="Dispatch to clean"/>
         <delete>
-          <fileset dir="agents" includes="**/*.obj"/>
-          <fileset dir="agents" includes="**/*.manifest"/>
-          <fileset dir="agents" includes="**/*.lib"/>
-          <fileset dir="agents" includes="**/*.dll"/>
-          <fileset dir="agents" includes="**/*.pdb"/>
-          <fileset dir="agents" includes="**/*.idb"/>
-          <fileset dir="agents" includes="**/*.exp"/>
-          <fileset dir="agents" includes="**/*.res"/> 
-          <fileset dir="am" includes="**/*.obj"/>
-          <fileset dir="am" includes="**/*.manifest"/>
-          <fileset dir="am" includes="**/*.lib"/>
-          <fileset dir="am" includes="**/*.dll"/>
-          <fileset dir="am" includes="**/*.pdb"/>
-          <fileset dir="am" includes="**/*.idb"/>
-          <fileset dir="am" includes="**/*.exp"/>
-          <fileset dir="am" includes="**/*.exe"/>
-          <fileset dir="am" includes="**/*.res"/>
-          <fileset dir="." includes="*.pdb"/>
-          <fileset dir="." includes="*.idb"/>
-         </delete>
+            <fileset dir="agents" includes="**/*.obj"/>
+            <fileset dir="agents" includes="**/*.manifest"/>
+            <fileset dir="agents" includes="**/*.lib"/>
+            <fileset dir="agents" includes="**/*.dll"/>
+            <fileset dir="agents" includes="**/*.pdb"/>
+            <fileset dir="agents" includes="**/*.idb"/>
+            <fileset dir="agents" includes="**/*.exp"/>
+            <fileset dir="agents" includes="**/*.res"/> 
+            <fileset dir="am" includes="**/*.obj"/>
+            <fileset dir="am" includes="**/*.manifest"/>
+            <fileset dir="am" includes="**/*.lib"/>
+            <fileset dir="am" includes="**/*.dll"/>
+            <fileset dir="am" includes="**/*.pdb"/>
+            <fileset dir="am" includes="**/*.idb"/>
+            <fileset dir="am" includes="**/*.exp"/>
+            <fileset dir="am" includes="**/*.exe"/>
+            <fileset dir="am" includes="**/*.res"/>
+            <fileset dir="." includes="*.pdb"/>
+            <fileset dir="." includes="*.idb"/>
+            <fileset dir="." includes="svn.properties"/>
+        </delete>
         <delete dir="built"/>
     </target>
 
-    <target name="all">
+    <target name="get-arch">
+        <condition property="is64bit">
+            <not>
+                <equals arg1="${build.type}" arg2="64"/>
+            </not>
+        </condition>
+        <condition property="is32bit">
+            <equals arg1="${build.type}" arg2="64"/>
+        </condition>
+    </target>
+    
+    <target name="all" depends="get-arch" unless="is32bit">
         <antcall target="apache22" />
         <antcall target="sjsws" />
         <antcall target="apache" />
@@ -158,7 +172,12 @@
         <antcall target="iis7" />
         <antcall target="domino" />
     </target>
-
+        
+    <target name="all64" depends="get-arch" unless="is64bit">
+        <antcall target="iis6" />
+        <antcall target="iis7" />
+    </target>
+   
     <target name="apache" depends="preparebuild">
         <echo message="Dispatch to apache"/>
         <property name="containername" value="apache"/>
@@ -196,20 +215,20 @@
     </target>
 
     <target name="iis6" depends="preparebuild">
-         <echo message="Dispatch to iis6"/>
-         <property name="containername" value="iis6"/>
-         <antcall target="nmake" inheritRefs="true"/>
-         <ant antfile="build_agent.xml"
+        <echo message="Dispatch to iis6"/>
+        <property name="containername" value="iis6"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <ant antfile="build_agent.xml"
              target="all" inheritRefs="true"/>
-     </target>
+    </target>
 
     <target name="iis7" depends="preparebuild">
-         <echo message="Dispatch to iis7"/>
-         <property name="containername" value="iis7"/>
-         <antcall target="nmake" inheritRefs="true"/>
-         <ant antfile="${webagents.basedir}/build_agent.xml"
+        <echo message="Dispatch to iis7"/>
+        <property name="containername" value="iis7"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml"
              target="all" inheritRefs="true"/>
-     </target>
+    </target>
 
     <target name="domino" depends="preparebuild">
         <echo message="Dispatch to domino"/>
@@ -225,67 +244,67 @@
     <target name="nmake1" if="build.debug32">
         <echo message="Dispatch to compile of agent c code"/>
         <exec executable="nmake" failonerror="true">
-           <arg value="/E" />
-           <arg value="DEBUG=1" />
-           <arg value="-f" />
-           <arg value="Makefile.nmake" />
-           <arg value="${containername}" />
+            <arg value="/E" />
+            <arg value="DEBUG=1" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
         </exec>
     </target>
 
     <target name="nmake2" if="build.debug64">
         <echo message="Dispatch to compile of agent c code"/>
         <exec executable="nmake" failonerror="true">
-           <arg value="/E" />
-           <arg value="DEBUG=1" />
-           <arg value="/E" />
-           <arg value="X64=1" />
-           <arg value="-f" />
-           <arg value="Makefile.nmake" />
-           <arg value="${containername}" />
+            <arg value="/E" />
+            <arg value="DEBUG=1" />
+            <arg value="/E" />
+            <arg value="X64=1" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
         </exec>
     </target>
 
     <target name="nmake3" if="build.nondebug32">
         <echo message="Dispatch to compile of agent c code"/>
         <exec executable="nmake" failonerror="true">
-           <arg value="-f" />
-           <arg value="Makefile.nmake" />
-           <arg value="${containername}" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
         </exec>
     </target>
 
     <target name="nmake4" if="build.nondebug64">
         <echo message="Dispatch to compile of agent c code"/>
         <exec executable="nmake" failonerror="true">
-           <arg value="/E" />
-           <arg value="X64=1" />
-           <arg value="-f" />
-           <arg value="Makefile.nmake" />
-           <arg value="${containername}" />
+            <arg value="/E" />
+            <arg value="X64=1" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
         </exec>
     </target>
 
     <exec executable="svn" output="svn.properties">
-     <arg value="info" />
+        <arg value="info" />
     </exec>
     <property prefix="svn" file="svn.properties"/>
 
     <target name="fixVersion">
-     <delete file="${webagents.basedir}/am/source/version.h" quiet="true"/>
-     <copy file="${webagents.basedir}/am/source/version.template.win"
+        <delete file="${webagents.basedir}/am/source/version.h" quiet="true"/>
+        <copy file="${webagents.basedir}/am/source/version.template.win"
              tofile="${webagents.basedir}/am/source/version.h" >
-        <filterchain>
-           <replacetokens>
-                <token key="AGENT_VER" value="3.0.3"/>
-                <token key="AGENT_ER_VER" value=""/>
-                <token key="AGENT_FVB_MARKER" value=""/>
-                <token key="SVN_REVISION" value="${svn.Revision}"/>
-                <token key="BUILD_DATE" value="${build.date}"/>
-                <token key="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
-            </replacetokens>
-        </filterchain>
-     </copy>
+            <filterchain>
+                <replacetokens>
+                    <token key="AGENT_VER" value="3.0.4"/>
+                    <token key="AGENT_ER_VER" value=""/>
+                    <token key="AGENT_FVB_MARKER" value=""/>
+                    <token key="SVN_REVISION" value="${svn.Revision}"/>
+                    <token key="BUILD_DATE" value="${build.date}"/>
+                    <token key="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
     </target>
 
     <target name="nightly">
@@ -306,13 +325,10 @@
             tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
             tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/> 
         <antcall target="all" inheritRefs="true"/>
-<!--
-        <copy file="${webagents.docs.dir}/nightly.html" 
-              tofile="${webagents.dist.dir}/index.html" filtering="true" />
--->
-        <antcall target="postnightly" inheritRefs="true"/>
+        <antcall target="all64" inheritRefs="true"/>
+        <antcall target="postnightly" inheritRefs="true"/> 
     </target>
 
     <target name="prenightly" depends="preparebuild">
@@ -335,7 +351,8 @@
         <echo message=" "/>
         <echo message=" Following targets are available for Web Agents:"/>
         <echo message=" "/>
-        <echo message=" all             : builds all the Web agents"/>
+        <echo message=" all             : builds all the Web agents (32bit)"/>
+        <echo message=" all64           : builds all the Web agents (64bit), requires -Dbuild.type=64 option"/>
         <echo message=" clean           : deletes all the generated files"/>
         <echo message=" apache          : builds the Apache Web Server 2.0.x agent"/>
         <echo message=" sjsws           : builds the Sun Java System Web Server 6.1/7.0 agent"/>
@@ -347,7 +364,7 @@
         <echo message=" "/>
         <echo message=" Following build options are available:"/>
         <echo message=" "/>
-        <echo message=" -Dbuild.debug=1            : builds agent debug version"/>
+        <echo message=" -Dbuild.debug=1           : builds agent debug version"/>
         <echo message=" -Dbuild.type=64           : builds 64bit agent version"/>
         <echo message=" usage           : displays this usage message"/>
         <echo message=" "/>
