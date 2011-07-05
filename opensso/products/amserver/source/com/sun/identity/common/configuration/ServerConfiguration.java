@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.common.configuration;
 
 import com.iplanet.am.util.SystemProperties;
@@ -62,6 +63,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -327,6 +329,186 @@ public class ServerConfiguration extends ConfigurationBase {
                 //are all valid.
             }
         }
+    }
+    
+    public static String upgradeDefaults(SSOToken ssoToken, boolean dryRun) 
+    throws SSOException, SMSException, UnknownPropertyNameException {
+        StringBuilder buffer = new StringBuilder();
+        boolean bCreated = false;
+        ServiceConfig sc = getRootServerConfig(ssoToken);
+        
+        try {
+            bCreated = (sc.getSubConfig(DEFAULT_SERVER_CONFIG) != null);
+        } catch (SMSException smse) {
+            // ignore, default is not created.
+        }
+        
+        if (bCreated) {
+            ResourceBundle res = ResourceBundle.getBundle(SERVER_DEFAULTS);
+            Map<String, String> newValues = new HashMap<String, String>();
+            
+            for (Enumeration i = res.getKeys(); i.hasMoreElements(); ) {
+                String key = (String)i.nextElement();
+                String val = (String)res.getString(key);
+                
+                if (val.equals(
+                    "@" + SetupConstants.CONFIG_VAR_PLATFORM_LOCALE + "@")
+                ) {
+                    val = Locale.getDefault().toString();
+                }
+                
+                newValues.put(key, val);
+            }
+            
+            newValues.put(Constants.PROPERTY_NAME_LB_COOKIE_VALUE, DEFAULT_SERVER_ID);
+            
+            Properties prop = null;
+            
+            try {
+                prop = getServerInstance(ssoToken, DEFAULT_SERVER_CONFIG);
+            } catch (SMSException smse) {
+                
+            } catch (IOException ioe) {
+                
+            }
+            
+            Map<String, String> existingValues = new HashMap(prop);
+            Map<String, String> upgradedValues = calculateUpgradedServerDefaults(newValues, existingValues);
+            
+            if (dryRun) {
+                buffer = generateServerDefaultsUpgradeReport(newValues, existingValues);
+                return buffer.toString();
+            }
+            
+            if (!dryRun) {
+                try {
+                    upgradeServerInstance(ssoToken, DEFAULT_SERVER_CONFIG,
+                        DEFAULT_SERVER_ID, upgradedValues);
+                } catch (ConfigurationException cex) {
+                    UpgradeUtils.debug.error("Unable to upgrade", cex);
+                } catch (IOException ioe) {
+                    UpgradeUtils.debug.error("Unable to upgrade", ioe);
+                }
+            }
+            
+            return buffer.toString();
+        }
+        
+        buffer.append("no attributes to upgrade");
+        return buffer.toString();
+    }
+    
+    public static StringBuilder generateServerDefaultsUpgradeReport(
+            Map<String, String> newValues, Map<String, String> existingValues) {
+        StringBuilder buffer = new StringBuilder();
+
+        // calcuate new attributes
+        Map<String, String> addedAttrs = calculateAddedServerDefaults(newValues, existingValues);
+        
+        if (!(addedAttrs.isEmpty())) {
+            for (Map.Entry<String, String> newAttr : addedAttrs.entrySet()) {
+                buffer.append("new attribute: ").append(newAttr.getKey());
+                buffer.append(" : value: ").append(newAttr.getValue()).append("\n");
+            }
+        }
+        
+        // calculate modified attributes
+        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues);
+        
+        if (!(modifiedAttrs.isEmpty())) {
+            for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
+                buffer.append("modified attribute: ").append(modAttr.getKey());
+                buffer.append(" : old value").append(existingValues.get(modAttr.getKey()));
+                buffer.append(" : new value: ").append(modAttr.getValue()).append("\n");
+            }            
+        }
+        
+        // calculate deleted attributes
+        Set<String> deletedAttrs = calculateDeletedServerDefaults(newValues, existingValues);
+        
+        if (!(deletedAttrs.isEmpty())) {
+            for (String deletedAttr : deletedAttrs) {
+                buffer.append("deleted attribute: ").append(deletedAttr).append("\n");
+            }            
+        }
+
+        return buffer;
+    }
+           
+    public static Map<String, String> calculateUpgradedServerDefaults(
+            Map<String, String> newValues, Map<String, String> existingValues) {
+        Map<String, String> upgradedValues = new HashMap<String, String>(existingValues);
+
+        // calcuate new attributes
+        Map<String, String> addedAttrs = calculateAddedServerDefaults(newValues, existingValues);
+        
+        if (!(addedAttrs.isEmpty())) {
+            for (Map.Entry<String, String> newAttr : addedAttrs.entrySet()) {
+                upgradedValues.put(newAttr.getKey(), newAttr.getValue());
+            }
+        }
+        
+        // calculate modified attributes
+        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues);
+        
+        if (!(modifiedAttrs.isEmpty())) {
+            for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
+                upgradedValues.put(modAttr.getKey(), modAttr.getValue());
+            }            
+        }
+        
+        // calculate deleted attributes
+        Set<String> deletedAttrs = calculateDeletedServerDefaults(newValues, existingValues);
+        
+        if (!(deletedAttrs.isEmpty())) {
+            for (String deletedAttr : deletedAttrs) {
+                upgradedValues.remove(deletedAttr);
+            }            
+        }
+
+        return upgradedValues;
+    }
+    
+    protected static Map<String, String> calculateAddedServerDefaults(
+            Map<String, String> newValues, Map<String, String> existingValues) {
+        Map<String, String> addedValues = new HashMap<String, String>();
+        
+        for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
+            if (!(existingValues.containsKey(newAttr.getKey()))) {
+                addedValues.put(newAttr.getKey(), newAttr.getValue());
+            }
+                
+        }
+        
+        return addedValues;
+    }
+    
+    protected static Map<String, String> calculateModifiedServerDefaults(
+            Map<String, String> newValues, Map<String, String> existingValues) {
+        Map<String, String> modifiedValues = new HashMap<String, String>();
+        
+        for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
+            if (existingValues.containsKey(newAttr.getKey())) {
+                if (!(existingValues.get(newAttr.getKey()).equals(newAttr.getValue()))) {
+                    modifiedValues.put(newAttr.getKey(), newAttr.getValue());
+                }
+            }
+        }
+        
+        return modifiedValues;
+    }
+    
+    protected static Set<String> calculateDeletedServerDefaults(
+            Map<String, String> newValues, Map<String, String> existingValues) {
+        Set<String> deletedValues = new HashSet<String>();
+        
+        for (Map.Entry<String, String> existingAttr : existingValues.entrySet()) {
+            if (!(newValues.containsKey(existingAttr.getKey()))) {
+                deletedValues.add(existingAttr.getKey());
+            }
+        }
+        
+        return deletedValues;
     }
 
     public static Map getDefaultProperties() {
@@ -677,6 +859,43 @@ public class ServerConfiguration extends ConfigurationBase {
             updateOrganizationAlias(ssoToken, instanceName, true);
         }
         return created;
+    }
+    
+    /**
+     * Upgrades a server instance.
+     *
+     * @param ssoToken Single Sign-On Token which is used to access to the
+     *        service management datastore.
+     * @param instanceName Name of the server instance.
+     * @param instanceId Identifier of the server instance.
+     * @param upgradedValues Map of new values for the default server config
+     * @throws SMSException if errors access in the service management
+     *         datastore.
+     * @throws SSOException if the <code>ssoToken</code> is not valid.
+     * @throws UnknownPropertyNameException if property names are unknown.
+     * @throws ConfigurationException  if the property name and values are not
+     *         valid.
+     */
+    public static void upgradeServerInstance(
+        SSOToken ssoToken,
+        String instanceName,
+        String instanceId,
+        Map<String, String> upgradedValues
+    ) throws SMSException, SSOException, ConfigurationException, IOException {
+        ServiceConfig sc = getServerConfig(ssoToken, instanceName);
+        
+        if (sc != null) {
+            Map map = sc.getAttributes();
+            // remove ATTR_PARENT_SITE_ID as this should be excluded from server-default
+            map.remove(ATTR_PARENT_SITE_ID);
+            Set newSet = getPropertiesSet(upgradedValues);
+            
+            map.put(ATTR_SERVER_CONFIG, newSet);
+            sc.setAttributes(map);
+        } else {
+            throw new ConfigurationException("Unable to upgrade server " +
+                    "default properties: no properties found!");
+        }
     }
    
     /**

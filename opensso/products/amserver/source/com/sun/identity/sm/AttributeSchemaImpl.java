@@ -452,6 +452,10 @@ public class AttributeSchemaImpl {
         buf.append("\n");
         return buf.toString();
     }
+    
+    public Node getAttributeSchemaNode() {
+        return attrSchemaNode;
+    }
 
     /**
      * Updates the attribute schema object based on information in the XML node

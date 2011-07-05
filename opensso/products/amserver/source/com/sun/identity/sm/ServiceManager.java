@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.sm;
@@ -504,7 +504,118 @@ public class ServiceManager {
         }
         return sNames;
     }
+    
+    public Document parseServicesFile(InputStream xmlServiceSchema)
+    throws SMSException, SSOException {
+        return parseServicesFile(xmlServiceSchema, null);
+    }
+    
+    public Document parseServicesFile(
+        InputStream xmlServiceSchema,
+        AMEncryption decryptObj
+    ) throws SMSException, SSOException {
+        // Validate SSO Token
+        SMSEntry.validateToken(token);
+        //Set<SMSSchema> smsSchemas = new HashSet<SMSSchema>();
+        Map<String, SMSSchema> smsSchemas = new HashMap<String, SMSSchema>();
+        List serviceNodes = new ArrayList();
+        // Get the XML document and get the list of service nodes
+        Document doc = SMSSchema.getXMLDocument(xmlServiceSchema);
 
+        return doc;
+    }
+    
+    /*
+        if (!validSMSDtdDocType(doc)) {
+            throw new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+                    IUMSConstants.SMS_xml_invalid_doc_type, null);
+        }
+        
+        // Before validating service schema, we need to check
+        // for AttributeSchema having the syntax of "password"
+        // and if present, encrypt the DefaultValues if any
+        checkAndEncryptPasswordSyntax(doc, true, decryptObj);
+
+        // Create service schema
+        NodeList nodes = doc.getElementsByTagName(SMSUtils.SERVICE);
+        for (int i = 0; (nodes != null) && (i < nodes.getLength()); i++) {
+            Node serviceNode = nodes.item(i);
+            String name = XMLUtils.getNodeAttributeValue(serviceNode,
+                    SMSUtils.NAME);
+            String version = XMLUtils.getNodeAttributeValue(serviceNode,
+                    SMSUtils.VERSION);
+
+            // Obtain the SMSSchema for Schema and PluginSchema
+            SMSSchema smsSchema = new SMSSchema(name, version, doc);
+            smsSchemas.put(name, smsSchema);
+            
+        }
+
+            // Check if the schema element exists
+            /*if (XMLUtils.getChildNode(serviceNode, SMSUtils.SCHEMA) != null) {
+                validateServiceSchema(serviceNode);
+                ServiceSchemaManager.createService(token, smsSchema);
+
+                // Update the service name and version cached SMSEntry
+                if (serviceNames == null) {
+                    serviceNames = CachedSubEntries.getInstance(token,
+                            serviceDN);
+                }
+                serviceNames.add(name);
+                CachedSubEntries sVersions = (CachedSubEntries) serviceVersions
+                        .get(name);
+                if (sVersions == null) {
+                    // Not present, hence create it and add it
+                    sVersions = CachedSubEntries.getInstance(token,
+                            getServiceNameDN(name));
+                    serviceVersions.put(name, sVersions);
+                }
+                sVersions.add(version);
+                sNames.add(name);
+            }
+
+            // Check if PluginSchema nodes exists
+            for (Iterator pluginNodes = XMLUtils.getChildNodes(serviceNode,
+                    SMSUtils.PLUGIN_SCHEMA).iterator(); pluginNodes.hasNext();)
+            {
+                Node pluginNode = (Node) pluginNodes.next();
+                PluginSchema.createPluginSchema(token, pluginNode, smsSchema);
+            }
+
+            if (XMLUtils.getChildNode(serviceNode, SMSUtils.CONFIGURATION) 
+                != null) {
+                serviceNodes.add(serviceNode);
+            }
+            
+        }
+
+        if (serviceNodes.size() > 0) {
+            clearCache();
+        }
+        /*
+         * Need to do this after all the schema has been loaded
+         */
+            /*
+        for (Iterator i = serviceNodes.iterator(); i.hasNext(); ) {
+            Node svcNode = (Node)i.next();
+            String name = XMLUtils.getNodeAttributeValue(svcNode,
+                SMSUtils.NAME);
+            String version = XMLUtils.getNodeAttributeValue(svcNode,
+                SMSUtils.VERSION);
+            Node configNode = XMLUtils.getChildNode(svcNode,
+                SMSUtils.CONFIGURATION);
+            /*
+             * Store the configuration, will throw exception if
+             * the service configuration already exists
+             */
+            /*
+            CreateServiceConfig.createService(this, name, version,
+                configNode, true, decryptObj);
+        }
+        return sNames;
+        return smsSchemas;
+    }*/
+    
     private boolean validSMSDtdDocType(Document doc) {
         boolean valid = false;
         DocumentType docType = doc.getDoctype();

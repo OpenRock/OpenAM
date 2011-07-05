@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -648,7 +652,7 @@ public class ServiceSchema {
             }
         }
 
-        appendChildNode(nl);
+        appendChildNode(doc);
     }
 
     /**
@@ -764,6 +768,29 @@ public class ServiceSchema {
             throw (new SMSException(e.getMessage(), e, 
                     "sms-cannot_append_NODE"));
         }
+        ssm.replaceSchema(schemaDoc);
+    }
+    
+    void appendChildNode(Document doc)
+    throws SSOException, SMSException {
+        if (doc == null) {
+            throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+                    IUMSConstants.SMS_SMSSchema_no_schema_element, null));
+        }
+        
+        Document schemaDoc = ssm.getDocumentCopy();
+        
+        try {
+            Node schemaNode = getSchemaNode(schemaDoc);
+            Node node = XMLUtils.getRootNode(doc, SMSUtils.SUB_SCHEMA);
+            System.out.println(XMLUtils.print(node));
+            Node iNode = schemaDoc.importNode(node, true);
+            schemaNode.appendChild(iNode);
+        } catch (Exception ex) {
+            throw (new SMSException(ex.getMessage(), ex, 
+                    "sms-cannot_append_NODE"));
+        }
+       
         ssm.replaceSchema(schemaDoc);
     }
 

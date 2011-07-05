@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
  */
+
 package com.sun.identity.sm;
 
 import java.util.Collections;
@@ -42,49 +43,49 @@ import com.sun.identity.common.CaseInsensitiveHashMap;
 
 public class SMSUtils {
 
-    protected static final String SERVICE = "Service";
+    public static final String SERVICE = "Service";
 
-    protected static final String NAME = "name";
+    public static final String NAME = "name";
 
-    protected static final String VERSION = "version";
+    public static final String VERSION = "version";
 
-    protected static final String SCHEMA = "Schema";
+    public static final String SCHEMA = "Schema";
 
-    protected static final String SUB_SCHEMA = "SubSchema";
+    public static final String SUB_SCHEMA = "SubSchema";
 
-    protected static final String SUB_CONFIG = "SubConfiguration";
+    public static final String SUB_CONFIG = "SubConfiguration";
 
-    protected static final String GLOBAL_SCHEMA = "Global";
+    public static final String GLOBAL_SCHEMA = "Global";
 
-    protected static final String GLOBAL_CONFIG = "GlobalConfiguration";
+    public static final String GLOBAL_CONFIG = "GlobalConfiguration";
 
-    protected static final String ORG_SCHEMA = "Organization";
+    public static final String ORG_SCHEMA = "Organization";
 
-    protected static final String ORG_ATTRIBUTE_SCHEMA = 
+    public static final String ORG_ATTRIBUTE_SCHEMA = 
         "OrganizationAttributeSchema";
 
-    protected static final String ORG_ATTRIBUTE_VALUE_PAIR = 
+    public static final String ORG_ATTRIBUTE_VALUE_PAIR = 
         "OrganizationAttributeValuePair";
 
-    protected static final String ORG_CONFIG = "OrganizationConfiguration";
+    public static final String ORG_CONFIG = "OrganizationConfiguration";
 
-    protected static final String DYNAMIC_SCHEMA = "Dynamic";
+    public static final String DYNAMIC_SCHEMA = "Dynamic";
 
-    protected static final String USER_SCHEMA = "User";
+    public static final String USER_SCHEMA = "User";
 
-    protected static final String POLICY_SCHEMA = "Policy";
+    public static final String POLICY_SCHEMA = "Policy";
 
-    protected static final String GROUP_SCHEMA = "Group";
+    public static final String GROUP_SCHEMA = "Group";
 
-    protected static final String DOMAIN_SCHEMA = "Domain";
+    public static final String DOMAIN_SCHEMA = "Domain";
 
-    protected static final String GENERIC_SCHEMA = "Generic";
+    public static final String GENERIC_SCHEMA = "Generic";
 
-    protected static final String CONFIGURATION = "Configuration";
+    public static final String CONFIGURATION = "Configuration";
 
-    protected static final String INSTANCE = "Instance";
+    public static final String INSTANCE = "Instance";
 
-    protected static final String GROUP = "group";
+    public static final String GROUP = "group";
 
     protected static final String URI = "uri";
 
