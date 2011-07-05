@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.modules.jdbc;
 
 import com.sun.identity.shared.debug.Debug;
@@ -166,7 +168,7 @@ public class JDBC extends AMLoginModule {
                             }
                         }
 
-                        // If its a non-pooled, then get the JDBC config    
+                    // If its a non-pooled, then get the JDBC config
                     } else {
                         debug.message("Using non pooled JDBC");
                         driver = CollectionHelper.getMapAttr(options, DRIVER);
@@ -179,37 +181,37 @@ public class JDBC extends AMLoginModule {
                                 debug.message("Found config for DRIVER: " + 
                                               driver);
                         }
-                    }
 
-                    url = CollectionHelper.getMapAttr(options, URL);
-                    if (url == null) {
-                        debug.message("No URL for configuring");
-                        errorMsg ="noURL";
-                        return;
-                    } else {
-                        if (debug.messageEnabled()) { 
-                            debug.message("Found config for URL: " + url);
+                        url = CollectionHelper.getMapAttr(options, URL);
+                        if (url == null) {
+                            debug.message("No URL for configuring");
+                            errorMsg ="noURL";
+                            return;
+                        } else {
+                            if (debug.messageEnabled()) {
+                                debug.message("Found config for URL: " + url);
+                            }
+                        }
+                        dbuser = CollectionHelper.getMapAttr(options, DBUSER);
+                        if (dbuser == null) {
+                            debug.message("No DBUSER for configuring");
+                            errorMsg = "noDBUSER";
+                            return;
+                        } else  {
+                            if (debug.messageEnabled()) {
+                                debug.message("Found config for DBUSER: " +
+                                              dbuser);
+                            }
+                        }
+
+                        dbpassword = CollectionHelper.getMapAttr(
+                            options, DBPASSWORD, "");
+                        if (dbpassword == null) {
+                            debug.message("No DBPASSWORD for configuring");
+                            errorMsg = "noDBPASSWORD";
+                            return;
                         }
                     }
-                    dbuser = CollectionHelper.getMapAttr(options, DBUSER);
-                    if (dbuser == null) {
-                        debug.message("No DBUSER for configuring");
-                        errorMsg = "noDBUSER";
-                        return;
-                    } else  {
-                        if (debug.messageEnabled()) {
-                            debug.message("Found config for DBUSER: " + 
-                                          dbuser);
-                        }
-                    }
-
-                    dbpassword = CollectionHelper.getMapAttr(
-                        options, DBPASSWORD, "");
-                    if (dbpassword == null) {
-                        debug.message("No DBPASSWORD for configuring");
-                        errorMsg = "noDBPASSWORD";
-                        return;
-                    } 
                 }
                 
                 // and get the props that apply to both connection types 
