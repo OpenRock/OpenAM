@@ -819,7 +819,7 @@ public class LDAPConnectionPool {
         }
         
         public boolean removeElement(Object obj) {
-            synchronized (this) {
+            synchronized (pool) {
                 if (thisTurn > 0) {
                     thisTurn--;
                     return true;
@@ -844,7 +844,7 @@ public class LDAPConnectionPool {
         }
         
         public void run() {
-            synchronized (this) {
+            synchronized (pool) {
                 for (int i = 0; i < thisTurn; i++) {
                     pool.decreaseCurrentConnection();
                 }
