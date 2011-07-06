@@ -26,6 +26,9 @@
  *
  */
 
+/*
+* Portions Copyrighted 2011 ForgeRock AS
+*/
 package com.sun.identity.agents.appserver.v81;
 
 import com.sun.identity.agents.arch.ServiceResolver;
@@ -56,6 +59,15 @@ public class AmASAgentServiceResolver extends ServiceResolver {
      */
     public String getGlobalVerificationHandlerImpl() {        
         return GenericExternalVerificationHandler.class.getName();
+    }
+    
+
+    /*
+     * (non-Javadoc)
+     * @see com.sun.identity.agents.arch.ServiceResolver#isLifeCycleMechanismAvailable()
+     */
+    public boolean isLifeCycleMechanismAvailable() {
+        return true;
     }
 
 }

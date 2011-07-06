@@ -74,6 +74,7 @@ public class UnconfigureDomainXMLTask extends DomainXMLBase
                             serverInstanceName);
                     if (instanceConfig != null) {
                         status &= removeAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
+                        status &= removeLifecycleModule(domainXMLDoc, serverInstanceName, stateAccess);
                         status = removeAgentClasspath(instanceConfig, stateAccess);
                         domainXMLDoc.setIndentDepth(8);
                         domainXMLDoc.store();

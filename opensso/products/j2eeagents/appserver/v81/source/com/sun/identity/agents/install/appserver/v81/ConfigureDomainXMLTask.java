@@ -69,8 +69,10 @@ public class ConfigureDomainXMLTask extends DomainXMLBase implements ITask {
                     XMLDocument domainXMLDoc = new XMLDocument(serverXML);
                     XMLElement instanceConfig = getInstanceConfig(
                             domainXMLDoc, serverInstanceName);
+                    
                     if (instanceConfig != null) {
                         status &= addAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
+                        status &= addLifecycleModule(domainXMLDoc, serverInstanceName, stateAccess);
                         status = addAgentJavaConfig(domainXMLDoc, instanceConfig,
                                 stateAccess);
                         domainXMLDoc.setIndentDepth(2);
@@ -131,6 +133,7 @@ public class ConfigureDomainXMLTask extends DomainXMLBase implements ITask {
                             serverInstanceName);
                     if (instanceConfig != null) {
                         status &= removeAgentRealm(domainXMLDoc, instanceConfig, stateAccess);
+                        status &= removeLifecycleModule(domainXMLDoc, serverInstanceName, stateAccess);
                         if (!VersionChecker.isGlassFishv3(stateAccess)) {
                             status = removeAgentClasspath(instanceConfig, stateAccess);
                         }

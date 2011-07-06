@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
 package com.sun.identity.agents.install.appserver.v81;
 
 public interface IConstants {
@@ -41,6 +44,10 @@ public interface IConstants {
 
    public static final String STR_LOGIN_MODULE_CLASS_NAME = 
        "com.sun.identity.agents.appserver.v81.AmASLoginModule";
+   
+   
+   public static final String ATTR_VALUE_LIFECYCLE_CLASSNAME = 
+	   "org.forgerock.agents.appserver.v81.ASLifeCycleListener";
 
 }
 
