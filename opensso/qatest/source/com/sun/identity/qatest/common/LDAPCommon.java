@@ -443,18 +443,22 @@ public class LDAPCommon extends TestCommon {
         buff.append("dn: ou=people, @ROOT_SUFFIX@\n")
             .append("objectClass: top\n")
             .append("objectClass: organizationalUnit\n\n")
+            .append("ou: people\n\n")
 
             .append("dn: ou=agents, @ROOT_SUFFIX@\n")
             .append("objectClass: top\n")
             .append("objectClass: organizationalUnit\n\n")
+            .append("ou: agents\n\n")
 
             .append("dn: ou=groups, @ROOT_SUFFIX@\n")
             .append("objectClass: top\n")
             .append("objectClass: organizationalUnit\n\n")
+            .append("ou: groups\n\n")
 
             .append("dn: ou=dsame users, @ROOT_SUFFIX@\n")
             .append("objectClass: top\n")
             .append("objectClass: organizationalUnit\n\n")
+            .append("ou: dsame users\n\n")
 
             .append("dn: cn=dsameuser,ou=DSAME Users, @ROOT_SUFFIX@\n")
             .append("objectclass: inetuser\n")
@@ -497,7 +501,7 @@ public class LDAPCommon extends TestCommon {
                     "(targetattr=\"*\")(version 3.0; acl \"S1IS special" +
                     " ldap auth user rights\"; allow (read,search) userdn =" +
                     " \"ldap:///cn=amldapuser,ou=DSAME Users," +
-                    " @ROOT_SUFFIX@\"; );\n\n");        
+                    " @ROOT_SUFFIX@\"; )\n\n");        
 
             if (strVendor.contains("OpenDS")) {
                 buff.append("dn:@ROOT_SUFFIX@\n")
