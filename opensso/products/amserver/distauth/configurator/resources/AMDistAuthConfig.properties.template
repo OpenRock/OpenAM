@@ -284,10 +284,34 @@ openam.auth.destroy_session_after_upgrade=false
 openam.untrusted.server.http.error.code=403
 
 /**
+ * Here you can list HTTP header keys, which should be retained, when the user
+ * is internally rerouted to an another DAS instance. This usually happens
+ * when the user has an AMAuthCookie from a different DAS server. The list of
+ * headernames should be separated by a comma (',') character, for example:
+ * The headers listed here will be copied into the proxied request.
+ *
+ * openam.retained.http.request.headers=X-DSAMEVersion,AM_CLIENT_TYPE
+ */
+openam.retained.http.request.headers=X-DSAMEVersion
+
+/**
+ * Here you can list HTTP header keys, which should NOT retained, when the
+ * user is internally rerouted to an another DAS instance. You should only
+ * modify this list if you're really sure about what you're doing, since
+ * copying certain headers can cause unexpected errors in your deployment.
+ * The headers listed here will NOT be copied into the proxied request.
+ *
+ * This option is here to supply deafult values for the configuration and
+ * protect from erroneus header settings.
+ */
+openam.forbidden.to.copy.request.headers=connection
+
+/**
  * Here you can list HTTP header keys, which should be retained, when the user 
  * is internally rerouted to an another DAS instance. This usually happens 
  * when the user has an AMAuthCookie from a different DAS server. The list of 
  * headernames should be separated by a comma (',') character, for example:
+ * The headers listed here will be copied from the proxied response.
  * 
  * openam.retained.http.headers=X-DSAMEVersion,AM_CLIENT_TYPE,Cache-Control
  */
@@ -298,6 +322,7 @@ openam.retained.http.headers=X-DSAMEVersion
  * user is internally rerouted to an another DAS instance. You should only 
  * modify this list if you're really sure about what you're doing, since 
  * copying certain headers can cause unexpected errors in your deployment.
+ * The headers listed here will NOT be copied from the proxied response.
  *
  * This option is here to supply deafult values for the configuration and 
  * protect from erroneus header settings.

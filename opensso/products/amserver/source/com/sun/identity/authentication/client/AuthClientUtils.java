@@ -96,7 +96,7 @@ import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 
 import com.sun.identity.common.ResourceLookup;
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -164,7 +164,7 @@ public class AuthClientUtils {
      * gets set during the authentication process.
      */
     private static String distAuthCookieName=
-        SystemProperties.get(com.sun.identity.shared.Constants.AM_DIST_AUTH_COOKIE_NAME,
+        SystemProperties.get(Constants.AM_DIST_AUTH_COOKIE_NAME,
         ISAuthConstants.DIST_AUTH_COOKIE_NAME);
     private static String persistentCookieName=
         SystemProperties.get(Constants.AM_PCOOKIE_NAME);
@@ -177,7 +177,7 @@ public class AuthClientUtils {
         "IDtoken0", "IDtoken1", "IDtoken2", "IDButton", "AMAuthCookie", "encoded", "IDToken3"
     };
     private static boolean useCache = Boolean.getBoolean(SystemProperties.get(
-        com.sun.identity.shared.Constants.URL_CONNECTION_USE_CACHE, "false"));
+        Constants.URL_CONNECTION_USE_CACHE, "false"));
     private static boolean isSessionHijackingEnabled =
         Boolean.valueOf(SystemProperties.get(
         Constants.IS_ENABLE_UNIQUE_COOKIE, "false")).booleanValue();
@@ -188,14 +188,16 @@ public class AuthClientUtils {
         SystemProperties.get(Constants.AUTH_UNIQUE_COOKIE_DOMAIN);
 
     private static final String distAuthCluster =
-        SystemProperties.get(com.sun.identity.shared.Constants.DISTAUTH_CLUSTER, "");
+        SystemProperties.get(Constants.DISTAUTH_CLUSTER, "");
     
     private static ArrayList distAuthClusterList = new ArrayList();     
     
     private static final String distAuthSites =
-        SystemProperties.get(com.sun.identity.shared.Constants.AM_DISTAUTH_SITES, "");
+        SystemProperties.get(Constants.AM_DISTAUTH_SITES, "");
     
     private static Map<String, Set<String>> distAuthSitesMap = new HashMap();
+    private static final List<String> RETAINED_HTTP_REQUEST_HEADERS = new ArrayList<String>();
+    private static final List<String> FORBIDDEN_TO_COPY_REQUEST_HEADERS = new ArrayList<String>();
 
     static {
         // Initialzing variables
@@ -222,7 +224,7 @@ public class AuthClientUtils {
         serverURL = proto + "://" + host + ":" + port;
 
         String str = SystemProperties.get(
-                com.sun.identity.shared.Constants.SET_COOKIE_TO_ALL_DOMAINS);
+                Constants.SET_COOKIE_TO_ALL_DOMAINS);
         if (str != null && str.toLowerCase().equals("false")) {
             setCookieToAllDomains = false;
         }
@@ -317,6 +319,18 @@ public class AuthClientUtils {
                         "dist auth server to site: " + distAuthSitesMap);
             }
         }
+        String retainedHeaders = SystemProperties.get(
+                Constants.RETAINED_HTTP_REQUEST_HEADERS_LIST);
+        String forbiddenHeaders = SystemProperties.get(
+                Constants.FORBIDDEN_TO_COPY_REQUEST_HEADERS);
+        if (retainedHeaders != null) {
+            RETAINED_HTTP_REQUEST_HEADERS.addAll(Arrays.asList(retainedHeaders.toLowerCase().split(",")));
+        }
+        if (forbiddenHeaders != null) {
+            FORBIDDEN_TO_COPY_REQUEST_HEADERS.addAll(Arrays.asList(forbiddenHeaders.toLowerCase().split(",")));
+        }
+        //configuration sanity check
+        RETAINED_HTTP_REQUEST_HEADERS.removeAll(FORBIDDEN_TO_COPY_REQUEST_HEADERS);
     }
 
     /*
@@ -1323,7 +1337,7 @@ public class AuthClientUtils {
                     Constants.AM_LB_COOKIE_NAME,"amlbcookie");
         } else {
             loadBalanceCookieName = SystemProperties.get(
-                    com.sun.identity.shared.Constants.AM_DISTAUTH_LB_COOKIE_NAME);
+                    Constants.AM_DISTAUTH_LB_COOKIE_NAME);
         }
 
         if(utilDebug.messageEnabled()){
@@ -1343,7 +1357,7 @@ public class AuthClientUtils {
             }
         } else {
             return SystemProperties.get(
-                    com.sun.identity.shared.Constants.AM_DISTAUTH_LB_COOKIE_VALUE);
+                    Constants.AM_DISTAUTH_LB_COOKIE_VALUE);
         }
     }
 
@@ -2496,6 +2510,7 @@ public class AuthClientUtils {
 
                 conn.setRequestProperty(
                     "Content-Type", "application/x-www-form-urlencoded");
+                copyRequestHeaders(request, conn);
                 // merged parameter list containing both GET and POST parameters
                 Map<String, String[]> params = request.getParameterMap();
                 Map<String, Set<String>> postParams = new HashMap<String, Set<String>>();
@@ -2592,6 +2607,23 @@ public class AuthClientUtils {
         }
 
         return (origRequestData);
+    }
+
+    private static void copyRequestHeaders(HttpServletRequest request, HttpURLConnection conn) {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            if (headerName != null && RETAINED_HTTP_REQUEST_HEADERS.contains(headerName.toLowerCase())) {
+                Enumeration<String> values = request.getHeaders(headerName);
+                while (values.hasMoreElements()) {
+                    String value = values.nextElement();
+                    if (utilDebug.messageEnabled()) {
+                        utilDebug.message("Copying header for proxied request: " + headerName + ": " + value);
+                    }
+                    conn.addRequestProperty(headerName, value);
+                }
+            }
+        }
     }
 
     // Gets the request form data in the form of string
@@ -2882,7 +2914,7 @@ public class AuthClientUtils {
      */
      public static boolean persistAMCookie(Hashtable reqDataHash) {
         String globalPersistCookieString = SystemProperties.get(
-            com.sun.identity.shared.Constants.PERSIST_AM_COOKIE);
+            Constants.PERSIST_AM_COOKIE);
         boolean globalPersist =
             Boolean.valueOf(globalPersistCookieString).booleanValue();
 
@@ -2898,7 +2930,7 @@ public class AuthClientUtils {
         String persistCookieString
                 = (String)reqDataHash.get(Constants.PERSIST_AM_COOKIE);
         String allowRequestPersistString = SystemProperties.get(
-                com.sun.identity.shared.Constants.ALLOW_PERSIST_AM_COOKIE);
+                Constants.ALLOW_PERSIST_AM_COOKIE);
         boolean allowRequestPersist =
                 Boolean.valueOf(allowRequestPersistString).booleanValue();
 
@@ -2979,7 +3011,7 @@ public class AuthClientUtils {
         if (SystemProperties.isServerMode()) {
             return SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
         } else {
-            return SystemProperties.get(com.sun.identity.shared.Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
+            return SystemProperties.get(Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
         }
     }
 

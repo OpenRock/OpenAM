@@ -1097,6 +1097,12 @@ public interface Constants {
     public static final String FORBIDDEN_TO_COPY_HEADERS =
             "openam.forbidden.to.copy.headers";
 
+    public static final String RETAINED_HTTP_REQUEST_HEADERS_LIST =
+            "openam.retained.http.request.headers";
+
+    public static final String FORBIDDEN_TO_COPY_REQUEST_HEADERS =
+            "openam.forbidden.to.copy.request.headers";
+
     public static final String IGNORE_GOTO_DURING_LOGOUT =
             "openam.authentication.ignore_goto_during_logout";
 
@@ -1117,4 +1123,9 @@ public interface Constants {
 
     public static final String RUNTIME_SHUTDOWN_HOOK_ENABLED =
             "openam.runtime.shutdown.hook.enabled";
+    /**
+     * Property string for client IP address header.
+     */
+    String CLIENT_IP_ADDR_HEADER =
+        "com.sun.identity.authentication.client.ipAddressHeader";
 }
