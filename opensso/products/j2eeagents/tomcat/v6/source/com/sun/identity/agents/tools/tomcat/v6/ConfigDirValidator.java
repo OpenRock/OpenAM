@@ -84,7 +84,7 @@ public class ConfigDirValidator extends ValidatorBase implements IConstants,
                 "file path is: " + serverXmlFile);
             Debug.log(
                 "ConfigDirValidator.isConfigDirValid(): Global Web XML file " +
-                "path is: " + serverXmlFile);
+                "path is: " + webXmlFile);
 
             if (isValid(configDir) && isValid(serverXmlFile)
                     && isValid(webXmlFile)) {
