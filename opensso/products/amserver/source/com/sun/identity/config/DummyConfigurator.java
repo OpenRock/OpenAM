@@ -25,6 +25,11 @@
  * $Id: DummyConfigurator.java,v 1.3 2008/06/25 05:42:31 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config;
 
 import com.sun.identity.config.pojos.*;
@@ -36,6 +41,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
  * Just a dummy class for testing.
@@ -81,38 +87,51 @@ public class DummyConfigurator implements Configurator {
         this.page = page;
     }
 
+    @Override
     public boolean isNewInstall() {
-        //for now simulate with url param - if it doesn't exist, assume new install, if it does, assume upgrade:
-        return page.getContext().getRequest().getParameter( "upgrade" ) == null;
+        if (UpgradeUtils.isVersionNewer()) {
+            return !UpgradeUtils.canUpgrade();
+        } else {
+            return true;
+        }
     }
 
+    @Override
     public boolean isPasswordUpdateRequired() {
         return page.getContext().getSessionAttribute( PASSWORD_SET_KEY ) == null;
     }
 
+    @Override
     public void setPassword( String username, String password ) {
         //simulate call w/ back end for now:
         page.getContext().setSessionAttribute( PASSWORD_SET_KEY, "true" );
     }
 
+    @Override
     public void testHost( LDAPStore store ) {
     }
 
+    @Override
     public void testBaseDN( LDAPStore store ) {
     }
 
+    @Override
     public void testLoginId( LDAPStore store ) {
     }
 
+    @Override
     public void testLoadBalancer( String host, int port ) {
     }
 
+    @Override
     public void writeConfiguration() {
     }
 
+    @Override
     public void writeConfiguration( String newInstanceUrl, LDAPStore configStor, LDAPStore userStore, String loadBalancerHost, int loadBalancerPort ) {
     }
 
+    @Override
     public List getExistingConfigurations() {
         List existing = new ArrayList(3);
         existing.add( "http://fam.company.com:8080/fam/");
@@ -121,24 +140,31 @@ public class DummyConfigurator implements Configurator {
         return existing;
     }
 
+    @Override
     public void writeConfiguration( List configStringUrls ) {
     }
 
+    @Override
     public void testNewInstanceUrl( String url ) {
     }
 
+    @Override
     public void pushConfiguration( String instanceUrl ) {
     }
 
+    @Override
     public void upgrade() {
     }
 
+    @Override
     public void coexist() {
     }
 
+    @Override
     public void olderUpgrade() {
     }
 
+    @Override
     public List getRealms() {
         List realms = new ArrayList();
         for (int i = 0; i < 8; i++) {
@@ -150,6 +176,7 @@ public class DummyConfigurator implements Configurator {
     }
 
 
+    @Override
     public Realm getRealm(String name) {
         Realm realm = null;
         if (!name.equals("Jeff realm")) {
@@ -159,6 +186,7 @@ public class DummyConfigurator implements Configurator {
         return realm;
     }
 
+    @Override
     public List getUsers(Realm realm, String filter) {
         List users = new ArrayList();
         int maxUsers = filter.equals("*") ? 503 : 7;
@@ -172,6 +200,7 @@ public class DummyConfigurator implements Configurator {
         return users;
     }
 
+    @Override
     public List getAdministrators(Realm realm, RealmRole role) {
         List realmAdmins = new ArrayList();
 
@@ -186,48 +215,59 @@ public class DummyConfigurator implements Configurator {
         return realmAdmins;
     }
 
+    @Override
     public void assignAdministrators(Realm realm, List administrators) {
     }
 
+    @Override
     public void removeAdministrators(Realm realm, List administrators) {
     }
 
+    @Override
     public void addAuthenticationStore(AuthenticationStore authenticationStore) {
         page.getContext().setSessionAttribute("AuthenticationStore", authenticationStore);
     }
 
+    @Override
     public List getAgentGroups() {
         return agentGroups;
     }
 
+    @Override
     public void deleteAgentGroup( String group ) {
         agentGroups.remove( group );
     }
 
+    @Override
     public void createAgentGroup( String group ) {
         if ( !agentGroups.contains( group ) ) {
             agentGroups.add( group );
         }
     }
 
+    @Override
     public List getAgentProfiles() {
         return agentProfiles;
     }
 
+    @Override
     public void deleteAgentProfile( String profile ) {
         agentProfiles.remove( profile );
     }
 
+    @Override
     public void createAgentProfile( String profile ) {
         if ( !agentProfiles.contains( profile ) ) {
             agentProfiles.add( profile );
         }
     }
 
+    @Override
     public void createRole(RealmRole realmRole) {
         page.getContext().setSessionAttribute("RealmRole", realmRole);
     }
 
+    @Override
     public List getRoles() {
         List result = new ArrayList();
         for (int i = 0; i < 5; i++) {
@@ -238,6 +278,7 @@ public class DummyConfigurator implements Configurator {
         return result;
     }
 
+    @Override
     public List getAgentTypes() {
         List agentTypes = new ArrayList();
         AgentType agentType = new AgentType();
@@ -251,14 +292,17 @@ public class DummyConfigurator implements Configurator {
         return agentTypes;
     }
 
+    @Override
     public boolean checkFAMServerURL(String url) {
         return url != null;
     }
 
+    @Override
     public boolean checkCredentials(String profileName, String profilePassword) {
         return profileName != null && profilePassword != null;
     }
 
+    @Override
     public List getUrlPatterns() {
         return urlPatterns;
     }
@@ -273,17 +317,20 @@ public class DummyConfigurator implements Configurator {
         }
     }
 
+    @Override
     public void removeUrlPatterns(UrlPattern[] urlPatterns) {
         for(int idx = 0; idx < urlPatterns.length; idx++) {
             removeUrlPattern(urlPatterns[idx]);
         }
     }
 
+    @Override
     public void addUrlPattern(UrlPattern urlPattern) {
         urlPattern.setId(new Integer(urlPatterns.size() + 1));
         urlPatterns.add(urlPattern);
     }
 
+    @Override
     public List getExistentConditions() {
         return conditions;
     }
@@ -298,17 +345,20 @@ public class DummyConfigurator implements Configurator {
         }
     }
 
+    @Override
     public void removeConditions(Condition[] conditions) {
         for(int idx = 0; idx < conditions.length; idx++) {
             removeCondition(conditions[idx]);
         }
     }
 
+    @Override
     public void addCondition(Condition condition) {
         condition.setId(new Integer(conditions.size() + 1));
         conditions.add(condition);
     }
 
+    @Override
     public List getFederalProtocols() {
         List result = new ArrayList();
         result.add(new FederalProtocol("SAML 1.0"));
@@ -319,6 +369,7 @@ public class DummyConfigurator implements Configurator {
         return result;
     }
 
+    @Override
     public List getCirclesOfTrust() {
         /**
          *
@@ -335,25 +386,30 @@ public class DummyConfigurator implements Configurator {
         return circlesOfTrust;
     }
 
+    @Override
     public void createServiceProvider(ServiceProvider serviceProvider) {
         int serviceProviderId = (int) Math.random() * 100;
         serviceProvider.setServiceProviderId(serviceProviderId);
         serviceProviders.put(new Integer(serviceProviderId), serviceProvider);
     }
 
+    @Override
     public void createServiceProvider(IdentityProvider identityProvider, ServiceProvider serviceProvider) {
         identityProvider.setRemoteServiceProvider(serviceProvider);
     }
 
 
+    @Override
     public ServiceProvider getServiceProvider(int serviceProviderId){
         return (ServiceProvider)serviceProviders.get(new Integer(serviceProviderId));
     }
 
+    @Override
     public void createCircleOfTrust(CircleTrust circleTrust) {
         List circlesOfTrust = getCirclesOfTrust();
         circlesOfTrust.add(circleTrust);
     }
+    @Override
     public void deleteCircleOfTrust(String circleName){
         CircleTrust circleTrust = getCircleOfTrust(circleName);
         if (circleTrust != null){
@@ -361,6 +417,7 @@ public class DummyConfigurator implements Configurator {
         }
     }
 
+    @Override
     public CircleTrust getCircleOfTrust(String circleName){
         CircleTrust circleTrust = null;
         boolean found = false;
@@ -380,31 +437,37 @@ public class DummyConfigurator implements Configurator {
         return circleTrust;
     }
 
+    @Override
     public FederalProtocol getFederalProtocol(String protocolName){
         return  new FederalProtocol(protocolName);
     }
 
 
+    @Override
     public void createIdentityProvider(ServiceProvider serviceProvider, IdentityProvider identityProvider){
         ServiceProvider storedServiceProvider = getServiceProvider(serviceProvider.getServiceProviderId());
         storedServiceProvider.setRemoteIdentityProvider(identityProvider);
     }
 
+    @Override
     public void createIdentityProvider(IdentityProvider identityProvider){
         int providerId = (int) Math.random() * 100;
         identityProvider.setIdentityProviderId(providerId);
         identityProviders.put(new Integer(providerId), identityProvider);
     }
 
+    @Override
     public IdentityProvider getIdentityProvider(int providerId){
         return (IdentityProvider)identityProviders.get(new Integer(providerId));
     }
 
 
+    @Override
     public boolean validateHostName(String hostName) {
         return (hostName.equals("hostname"));
     }
 
+    @Override
     public boolean resolveHostName(String hostName) {
         return validateHostName(hostName);
     }

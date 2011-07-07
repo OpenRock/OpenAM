@@ -331,6 +331,17 @@ public class ServerConfiguration extends ConfigurationBase {
         }
     }
     
+    public static String getWarFileVersion() {
+        ResourceBundle res = ResourceBundle.getBundle(SERVER_DEFAULTS);
+        
+        if (res != null) {
+            return res.getString(Constants.AM_VERSION);
+        } else {
+            UpgradeUtils.debug.error("Unable to determine war file version");
+            return null;
+        }
+    }
+    
     public static String upgradeDefaults(SSOToken ssoToken, boolean dryRun) 
     throws SSOException, SMSException, UnknownPropertyNameException {
         StringBuilder buffer = new StringBuilder();

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -133,6 +133,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
  * This class is the first class to get loaded by the Servlet 
@@ -145,6 +146,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AMSetupServlet extends HttpServlet {
     private static ServletContext servletCtx = null;
     private static boolean isConfiguredFlag = false;
+    private static boolean isVersionNewer = false;
     private final static String SMS_STR = "sms";
     private static SSOToken adminToken = null;
     private final static String LEGACY_PROPERTIES = "legacy";
@@ -197,13 +199,17 @@ public class AMSetupServlet extends HttpServlet {
                      + "failed.");
             }
         }
+        
+        if (isConfiguredFlag) {
+            isVersionNewer = UpgradeUtils.isVersionNewer();
+        }
     }
 
     /*
-     * Flag indicating if Access Manager is configured
+     * Flag indicating if OpenAM is configured with the latest valid config
      */  
-    static public boolean isConfigured() {
-        return isConfiguredFlag;
+    static public boolean isCurrentConfigurationValid() {
+        return isConfiguredFlag && !isVersionNewer;
     } 
 
     static boolean isConfigured(String baseDir) {

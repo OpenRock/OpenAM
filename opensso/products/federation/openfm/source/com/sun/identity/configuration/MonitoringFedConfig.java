@@ -54,7 +54,7 @@ public class MonitoringFedConfig extends HttpServlet
 
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        if (!AMSetupServlet.isConfigured()) {  // skip if doing config
+        if (!AMSetupServlet.isCurrentConfigurationValid()) {  // skip if doing config
 //            System.err.println ("MonitoringFedConfig: server not configured");
             return;
         }

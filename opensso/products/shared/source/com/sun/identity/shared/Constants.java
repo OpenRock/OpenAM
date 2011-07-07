@@ -1126,6 +1126,9 @@ public interface Constants {
     /**
      * Property string for client IP address header.
      */
-    String CLIENT_IP_ADDR_HEADER =
+    public static final String CLIENT_IP_ADDR_HEADER =
         "com.sun.identity.authentication.client.ipAddressHeader";
+    
+    public static final String VERSION_DATE_FORMAT = 
+        "yyyy-MMMM-dd HH:mm";
 }

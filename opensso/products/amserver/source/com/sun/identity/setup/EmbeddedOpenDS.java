@@ -97,7 +97,8 @@ import org.opends.server.tools.dsreplication.ReplicationCliMain;
   * normal shutdown of the embedded <code>OpenDS</code> instance.
   */
 public class EmbeddedOpenDS {
-
+    private static final String OPENDS_1x_VER = "1.0.2-build002";
+    private static final String OPENDS_230B2_VER = "2.3.0BACKPORT2";
     private static boolean serverStarted = false;
 
     /**
@@ -1437,17 +1438,28 @@ public class EmbeddedOpenDS {
     public static boolean isOpenDSVer1Installed() {
         boolean openDSVer1x = false;
 
-        String odsRoot = AMSetupServlet.getBaseDir() +
-            AMSetupServlet.OPENDS_DIR;
-
-        File openDsDir = new File(odsRoot);
-        File instanceLoc = new File(odsRoot + "/instance.loc");
-
-        if (openDsDir.exists() && !instanceLoc.exists()) {
+        if (getOpenDSVersion().contains(OPENDS_1x_VER)) {
             openDSVer1x = true;
         }
 
         return openDSVer1x;
+    }
+    
+        /**
+      * @return true if installed OpenDS is version 2.3.0BACKPORT2
+      */
+    public static boolean isOpenDSVer230Installed() {
+        boolean openDSVer230b2 = false;
+
+        if (getOpenDSVersion().contains(OPENDS_230B2_VER)) {
+            openDSVer230b2 = true;
+        }
+
+        return openDSVer230b2;
+    }
+    
+    public static String getOpenDSVersion() {
+        return DirectoryServer.getVersionString();
     }
 
     /**

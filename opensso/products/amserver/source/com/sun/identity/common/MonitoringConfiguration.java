@@ -55,7 +55,7 @@ public class MonitoringConfiguration extends HttpServlet
 
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        if (!AMSetupServlet.isConfigured()) {  // skip if doing config
+        if (!AMSetupServlet.isCurrentConfigurationValid()) {  // skip if doing config
 //            System.err.println ("MonitoringConfigure: server not configured");
             return;
         }

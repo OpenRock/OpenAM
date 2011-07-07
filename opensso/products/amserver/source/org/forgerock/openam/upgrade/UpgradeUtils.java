@@ -89,6 +89,7 @@ import com.sun.identity.policy.Rule;
 import com.sun.identity.policy.SubjectTypeManager;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.shared.Constants;
 import java.io.FileWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -111,9 +112,11 @@ import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.shared.ldap.LDAPv3;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSUtils;
-import com.sun.identity.sm.ServiceSchemaModifications;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -234,16 +237,9 @@ public class UpgradeUtils {
     final static String DAI_LDIF = "FM_DAI_ds_remote_schema.ldif";
     final static String INSTALL_LDIF = "FM_DAI_install.ldif";
     static Hashtable propertyFileMap = new Hashtable();
+    
     static {
         bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME);
-        // TODO change this , the properties should be 
-        // read from AMConfig.properties. Currently
-        // properties from AMConfig.properties are not
-        // being picked up.
-        System.setProperty("com.iplanet.services.debug.level", "message");
-        System.setProperty("com.iplanet.am.version", "8.0");
-        System.setProperty("installTime", "true");
-        System.setProperty("donotIncludeSMSAuthModule", "true");
     }
 
     /**
@@ -260,6 +256,60 @@ public class UpgradeUtils {
         
         return ssoToken;
     }
+    
+    /**
+     * Returns true if this version can be upgraded; automatic upgrades from 9.5 
+     * onwards are supported.
+     * 
+     * @return true if this instance can be upgraded
+     */
+    public static boolean canUpgrade() {
+        return true;
+    }
+    
+    /**
+     * Returns true if the OpenAM version of the war file is newer than the one
+     * currently deployed.
+     * 
+     * @return true if the war file version is newer than the deployed version
+     */
+    public static boolean isVersionNewer() {
+        String currentVersion = stripVersionText(SystemProperties.get(Constants.AM_VERSION));
+        String warVersion = stripVersionText(ServerConfiguration.getWarFileVersion());
+        
+        SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT);
+        Date currentVersionDate = null;
+        Date warVersionDate = null;
+        
+        try {
+            currentVersionDate = versionDateFormat.parse(currentVersion);
+            warVersionDate = versionDateFormat.parse(warVersion);
+        } catch (ParseException pe) {
+            debug.error("Unable to parse date strings; current:" + currentVersion +
+                    " war version: " + warVersion, pe);
+        }
+        
+        if (currentVersionDate == null || warVersionDate == null) {
+            // stop upgrade if we cannot check
+            return false;
+        }
+        
+        if (debug.messageEnabled()) {
+            debug.message("Current version: " + currentVersionDate);
+            debug.message("War version: " + warVersionDate);
+        }
+        
+        return currentVersionDate.before(warVersionDate);
+    }
+    
+    protected static String stripVersionText(String fullVersion) {
+        if (fullVersion.indexOf('(') == -1 || fullVersion.indexOf(')') == -1) {
+            return fullVersion;
+        }
+        
+        return fullVersion.substring(fullVersion.indexOf('(') + 1, fullVersion.indexOf(')'));
+    }
+   
 
     /**
      * Creates a new service schema in the configuration store.
