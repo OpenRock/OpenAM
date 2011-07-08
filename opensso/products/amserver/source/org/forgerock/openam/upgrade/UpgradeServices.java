@@ -332,7 +332,7 @@ public class UpgradeServices {
                 serviceDefinition.append(XMLUtils.print(serviceToAdd.getValue()));
                 Object[] params = { serviceToAdd.getKey() };
                 UpgradeProgress.reportStart("upgrade.addservice", params);
-                //UpgradeUtils.createService(serviceDefinition.toString(), adminToken);
+                UpgradeUtils.createService(serviceDefinition.toString(), adminToken);
                 UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
@@ -350,7 +350,7 @@ public class UpgradeServices {
             for (Map.Entry<String, Map<String, ServiceSchemaUpgradeWrapper>> serviceToModify : serviceChanges.getServicesModified().entrySet()) {
                 Object[] params = { serviceToModify.getKey() };
                 UpgradeProgress.reportStart("upgrade.modservice", params);
-                //UpgradeUtils.modifyService(serviceToModify.getKey(), serviceToModify.getValue(), adminToken);
+                UpgradeUtils.modifyService(serviceToModify.getKey(), serviceToModify.getValue(), adminToken);
                 UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
@@ -364,7 +364,7 @@ public class UpgradeServices {
             for (Map.Entry<String, Map<String, SubSchemaUpgradeWrapper>> ssMod : serviceChanges.getSubSchemasModified().entrySet()) {
                 Object[] params = { ssMod.getKey() };
                 UpgradeProgress.reportStart("upgrade.addsubschema", params);
-                //UpgradeUtils.addNewSubSchemas(ssMod.getKey(), ssMod.getValue(), adminToken);
+                UpgradeUtils.addNewSubSchemas(ssMod.getKey(), ssMod.getValue(), adminToken);
                 UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
@@ -378,7 +378,7 @@ public class UpgradeServices {
             for (String serviceToDelete : serviceChanges.getServicesDeleted()) {
                 Object[] params = { serviceToDelete };
                 UpgradeProgress.reportStart("upgrade.delservice", params);
-                //UpgradeUtils.deleteService(serviceToDelete, adminToken);
+                UpgradeUtils.deleteService(serviceToDelete, adminToken);
                 UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
@@ -387,17 +387,17 @@ public class UpgradeServices {
             }
         }
         
-        //try {
+        try {
             UpgradeProgress.reportStart("upgrade.platformupdate", null);
-            //ServerConfiguration.upgradeDefaults(adminToken, false, false);
+            ServerConfiguration.upgradeDefaults(adminToken, false, false);
             UpgradeProgress.reportEnd("upgrade.success", null);
-        /*} catch (SSOException ssoe) {
+        } catch (SSOException ssoe) {
             debug.error("Unable to process service configuration upgrade", ssoe);
         } catch (SMSException smse) {
             debug.error("Unable to process service configuration upgrade", smse);
         } catch (UnknownPropertyNameException upne) {
             debug.error("Unable to process service configuration upgrade", upne);
-        }*/
+        }
     }
     
     protected ServiceUpgradeWrapper diffServiceVersions(Map<String, Document> serviceDefinitions, SSOToken adminToken) 
