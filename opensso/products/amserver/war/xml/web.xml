@@ -58,6 +58,10 @@
         <servlet-class>com.sun.identity.setup.SetSetupProgress</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>setUpgradeProgress</servlet-name>
+        <servlet-class>org.forgerock.openam.upgrade.SetUpgradeProgress</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>GatewayServlet</servlet-name>
         <servlet-class>com.sun.identity.policy.util.Gateway</servlet-class>
     </servlet>
@@ -176,6 +180,10 @@
         <servlet-name>setSetupProgress</servlet-name>
         <url-pattern>/setup/setSetupProgress</url-pattern>
     </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>setUpgradeProgress</servlet-name>
+        <url-pattern>/upgrade/setUpgradeProgress</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PWResetServlet</servlet-name>
         <url-pattern>/ui/*</url-pattern>

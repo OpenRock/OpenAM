@@ -63,6 +63,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.forgerock.openam.upgrade.UpgradeReport;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -342,9 +343,9 @@ public class ServerConfiguration extends ConfigurationBase {
         }
     }
     
-    public static String upgradeDefaults(SSOToken ssoToken, boolean dryRun) 
+    public static Map<String, StringBuilder> upgradeDefaults(SSOToken ssoToken, boolean dryRun, boolean shortReport) 
     throws SSOException, SMSException, UnknownPropertyNameException {
-        StringBuilder buffer = new StringBuilder();
+        Map<String, StringBuilder> result;
         boolean bCreated = false;
         ServiceConfig sc = getRootServerConfig(ssoToken);
         
@@ -387,8 +388,7 @@ public class ServerConfiguration extends ConfigurationBase {
             Map<String, String> upgradedValues = calculateUpgradedServerDefaults(newValues, existingValues);
             
             if (dryRun) {
-                buffer = generateServerDefaultsUpgradeReport(newValues, existingValues);
-                return buffer.toString();
+                return generateServerDefaultsUpgradeReport(newValues, existingValues, shortReport);
             }
             
             if (!dryRun) {
@@ -402,48 +402,117 @@ public class ServerConfiguration extends ConfigurationBase {
                 }
             }
             
-            return buffer.toString();
+            return Collections.EMPTY_MAP;
         }
         
-        buffer.append("no attributes to upgrade");
-        return buffer.toString();
+        return Collections.EMPTY_MAP;
     }
     
-    public static StringBuilder generateServerDefaultsUpgradeReport(
-            Map<String, String> newValues, Map<String, String> existingValues) {
-        StringBuilder buffer = new StringBuilder();
+    public static Map<String, StringBuilder> generateServerDefaultsUpgradeReport(
+            Map<String, String> newValues, Map<String, String> existingValues, boolean shortReport) {
+        int add = 0, mod = 0, del = 0;
+        Map<String, StringBuilder> report = new HashMap<String, StringBuilder>();
 
         // calcuate new attributes
         Map<String, String> addedAttrs = calculateAddedServerDefaults(newValues, existingValues);
         
         if (!(addedAttrs.isEmpty())) {
+            StringBuilder aBuf = new StringBuilder();
+            
             for (Map.Entry<String, String> newAttr : addedAttrs.entrySet()) {
-                buffer.append("new attribute: ").append(newAttr.getKey());
-                buffer.append(" : value: ").append(newAttr.getValue()).append("\n");
+                if (shortReport) {
+                    add++;
+                } else {
+                    aBuf.append(UpgradeReport.BULLET).append("attr name: ").append(newAttr.getKey());
+                    aBuf.append(" : value: ").append(newAttr.getValue()).append(UpgradeReport.LF);
+                }
             }
+            
+            if (!shortReport) {
+                report.put(UpgradeReport.NEW_ATTRS, aBuf);
+            }
+        } else {
+            report.put(UpgradeReport.NEW_ATTRS, new StringBuilder().append("* None"));
         }
         
         // calculate modified attributes
         Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues);
         
         if (!(modifiedAttrs.isEmpty())) {
+            StringBuilder mBuf = new StringBuilder();
+            
             for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
-                buffer.append("modified attribute: ").append(modAttr.getKey());
-                buffer.append(" : old value").append(existingValues.get(modAttr.getKey()));
-                buffer.append(" : new value: ").append(modAttr.getValue()).append("\n");
-            }            
+                if (shortReport) {
+                    mod++;
+                } else {
+                    mBuf.append(UpgradeReport.BULLET).append("attr name: ");
+                    mBuf.append(modAttr.getKey()).append(UpgradeReport.LF);
+                    mBuf.append(UpgradeReport.INDENT).append("old value: ");
+                    mBuf.append(existingValues.get(modAttr.getKey())).append(UpgradeReport.LF);
+                    mBuf.append(UpgradeReport.INDENT).append("new value: ");
+                    mBuf.append(modAttr.getValue()).append(UpgradeReport.LF);
+                }
+            }       
+            
+            if (!shortReport) {
+                report.put(UpgradeReport.MOD_ATTRS, mBuf);
+            }
+        } else {
+            report.put(UpgradeReport.MOD_ATTRS, new StringBuilder().append("* None"));
         }
         
         // calculate deleted attributes
         Set<String> deletedAttrs = calculateDeletedServerDefaults(newValues, existingValues);
         
         if (!(deletedAttrs.isEmpty())) {
+            StringBuilder dBuf = new StringBuilder();
+            
             for (String deletedAttr : deletedAttrs) {
-                buffer.append("deleted attribute: ").append(deletedAttr).append("\n");
-            }            
+                if (shortReport) {
+                    del++;
+                } else {
+                    dBuf.append(UpgradeReport.BULLET).append("attr name: ").append(deletedAttr).append(UpgradeReport.LF);
+                }
+            }        
+            
+            if (!shortReport) {
+                report.put(UpgradeReport.DEL_ATTRS, dBuf);
+            }
+        } else {
+            report.put(UpgradeReport.DEL_ATTRS, new StringBuilder().append("* None"));
+        }
+        
+        if (shortReport) {
+            StringBuilder sBuf = new StringBuilder();
+            
+            if (add > 0 || mod > 0 || del > 0) {
+                sBuf.append("Server Defaults modified: ");
+            }
+                    
+            if (add > 0) {
+                sBuf.append("Added (").append(add).append(")");
+            }
+            
+            if (mod > 0) {
+                if (add > 0) {
+                    sBuf.append(", ");
+                }
+                
+                sBuf.append("Modified (").append(mod).append(")");
+            }
+            
+            if (del > 0) {
+                if (add > 0 || mod > 0) {
+                    sBuf.append(", ");
+                }
+                
+                sBuf.append("Deleted (").append(del).append(")");
+            }
+            
+            report.put(UpgradeReport.SHORT_REPORT, sBuf);
         }
 
-        return buffer;
+        return report;
     }
            
     public static Map<String, String> calculateUpgradedServerDefaults(

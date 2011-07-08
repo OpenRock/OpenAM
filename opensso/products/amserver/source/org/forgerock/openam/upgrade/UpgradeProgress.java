@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -9,29 +9,23 @@
  * compliance with the License.
  *
  * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
+ * http://forgerock.org/license/CDDLv1.0.html
  * See the License for the specific language governing
  * permission and limitations under the License.
  *
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
+ * at http://forgerock.org/license/CDDLv1.0.html
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SetupProgress.java,v 1.10 2008/08/31 06:56:18 hengming Exp $
- *
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
+package org.forgerock.openam.upgrade;
 
-package com.sun.identity.setup;
-
+import com.sun.identity.setup.InstallLog;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -41,9 +35,13 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public class SetupProgress {
+/**
+ *
+ * @author steve
+ */
+public class UpgradeProgress {
     static private Writer writer = null;
-    static private String bundleName = "amConfigurator";
+    static private String bundleName = "amUpgrade";
 
     static private OutputStream out = null;
     static private String encoding = System.getProperty("file.encoding");
@@ -226,5 +224,5 @@ public class SetupProgress {
         } catch (IOException ex) {
             //ignore
         }
-    }
+    }    
 }

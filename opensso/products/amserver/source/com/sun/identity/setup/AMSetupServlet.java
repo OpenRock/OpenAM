@@ -211,6 +211,10 @@ public class AMSetupServlet extends HttpServlet {
     static public boolean isCurrentConfigurationValid() {
         return isConfiguredFlag && !isVersionNewer;
     } 
+    
+    static public boolean isConfigured() {
+        return isConfiguredFlag;
+    }
 
     static boolean isConfigured(String baseDir) {
         String bootstrapFile = baseDir + "/bootstrap";
@@ -1471,7 +1475,7 @@ public class AMSetupServlet extends HttpServlet {
         writeToFile(fileName, content);
     }
     
-    static void writeToFile(String fileName, String content) 
+    public static void writeToFile(String fileName, String content) 
         throws IOException {
         FileWriter fout = null;
         try {

@@ -185,7 +185,6 @@ public class UpgradeUtils {
     private static String basedir;
     private static String stagingDir;
     private static String configDir;
-    private static String rootSuffix = SMSEntry.getRootSuffix();
     public static ResourceBundle bundle;
     static Map entityDescriptors = new HashMap();
     static Map entityConfigs = new HashMap();
@@ -299,7 +298,7 @@ public class UpgradeUtils {
             debug.message("War version: " + warVersionDate);
         }
         
-        return currentVersionDate.before(warVersionDate);
+        return false; //currentVersionDate.before(warVersionDate);
     }
     
     protected static String stripVersionText(String fullVersion) {
@@ -907,72 +906,6 @@ public class UpgradeUtils {
             attrSchema.addChoiceValue(value, i18nKey);
         }
     }
-
-    /*
-     * Remove attribute values from sub realms.
-     * The existing attribute values will be updated.
-     *
-     * @param serviceName name of the service
-     * @param attributeName name of the attribute
-     * @param attrVals a set of attrubute values to be removed.
-     */
-    public static void removeAttributeValuesFromRealms(
-            String serviceName,
-            String attributeName,
-            Set attrVals) {
-        String classMethod = "UpgradeUtils:removeAttributeValuesFromRealms : ";
-        if (debug.messageEnabled()) {
-            debug.message(classMethod +
-                    "Removing attribute values from :" + attributeName);
-        }
-        try {
-            // get a list of realms - recursively.
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            Iterator i = realms.iterator();
-            while (i.hasNext()) {
-                String realm = (String) i.next();
-                ocm = new OrganizationConfigManager(ssoToken, realm);
-                ocm.removeAttributeValues(serviceName, attributeName, attrVals);
-            }
-        } catch (SMSException sme) {
-            debug.error(classMethod + "Error updating attribute values ",sme);
-        } catch (Exception e) {
-            debug.error(classMethod + "Error updating attribute values ",e);
-        }
-    }
-
-    /*
-     * Add attribute values to sub realms.
-     * The existing attribute values will be updated.
-     *
-     * @param serviceName name of the service
-     * @param attributeName name of the attribute
-     * @param attrValues a set of attrubute values to be added.
-     */
-    public static void addAttributeValuesToRealms(
-            String serviceName,
-            String attributeName,
-            Set attrValues) {
-        String classMethod = "UpgradeUtils:addAttributeValuesToRealms";
-        try {
-            // get a list of realms .
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            Iterator i = realms.iterator();
-            while (i.hasNext()) {
-                String realm = (String) i.next();
-                ocm = new OrganizationConfigManager(ssoToken, realm);
-                ocm.addAttributeValues(serviceName, attributeName, attrValues);
-            }
-        } catch (SMSException sme) {
-            debug.error(classMethod + "Error adding attributes " , sme);
-        } catch (Exception e) {
-            debug.error(classMethod + "Error adding attributes ", e);
-        }
-    }
     
     /**
      * Remove an attribute schema from an existing service.
@@ -1041,50 +974,6 @@ public class UpgradeUtils {
         } catch (SSOException ssoe) {
             debug.error(classMethod + "Invalid SSOToken : ", ssoe);
             throw new UpgradeException(ssoe.getMessage());
-        }
-    }
-
-    /*
-     * Remove attribute from sub realms.
-     *
-     * @param serviceName name of the service
-     * @param attributeName name of the attribute
-     * @throws <code>UpgradeException</code> if there is an error.
-     */
-    public static void removeAttributeFromRealms(
-            String serviceName,
-            String attributeName) throws UpgradeException {
-        String classMethod = "UpgradeUtils:removeAttributeFromRealms : ";
-        if (debug.messageEnabled()) {
-            UpgradeUtils.debug.message(classMethod + "Removing attribute :" +
-                    attributeName + "service : " + serviceName);
-        }
-        try {
-            // get a list of realms - recursively.
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            Iterator i = realms.iterator();
-            while (i.hasNext()) {
-                String realm = (String) i.next();
-                ocm = new OrganizationConfigManager(ssoToken, realm);
-                ocm.removeAttribute(serviceName, attributeName);
-            }
-        } catch (SMSException sme) {
-            throw new UpgradeException("Error removing attribute");
-        }
-    }
-
-    /**
-     * Migrates services from Legacy to Realm
-     */
-    public static void doMigration70() {
-        String classMethod = "UpgradeUtils:doMigration70";
-        try {
-            SMSMigration70.migrate63To70(ssoToken, rootSuffix);
-        } catch (Exception e) {
-            debug.error(classMethod +
-                    "Error migrating from Legacy to Realm", e);
         }
     }
 
@@ -2404,116 +2293,6 @@ public class UpgradeUtils {
     }
 
     /**
-     * Returns a list of assigned services for sub organizatons
-     * 
-     * @param orgName name of the organization to start.
-     * @param serviceName name of the service
-     * @return a map of assigned services where key is the realm name and 
-     * values are a Set of assigned services.
-     */
-    public static Map getAssignedServices(String orgName, String serviceName) {
-        String classMethod = "UpgradeUtils:getAssignedServices : ";
-        Map map = new HashMap();
-        try {
-            getSSOToken();
-            // get a list of realms - recursively.
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, orgName);
-            Set as = ocm.getAssignedServices();
-            Set serviceSet = new HashSet();
-            if (as.contains(AUTH_CONFIG_SERVICE)) {
-                serviceSet.add(getServiceDN(serviceName, orgName));
-                map.put(orgName, serviceSet);
-            }
-
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            Iterator i = realms.iterator();
-            while (i.hasNext()) {
-                String realm = (String) i.next();
-                ocm = new OrganizationConfigManager(ssoToken, realm);
-                serviceSet = new HashSet();
-                as = ocm.getAssignedServices();
-                if (as.contains(serviceName)) {
-                    serviceSet.add(getServiceDN(serviceName, realm));
-                    map.put(realm, serviceSet);
-                }
-            }
-        } catch (Exception e) {
-            debug.error(classMethod + "Error retrieving assigned services", e);
-        }
-        return map;
-    }
-
-    /**
-     * Returns the service dn
-     * @param serviceName name of the service
-     * @param orgName the organization name 
-     * @return the distinguished name of the service.
-     */
-    static String getServiceDN(String serviceName, String orgName) {
-        if (orgName.equals(rootSuffix)) {
-            return OU + EQUAL + serviceName +
-                    COMMA + SERVICE_DN + COMMA + rootSuffix;
-        } else {
-            return OU + EQUAL + serviceName + COMMA + SERVICE_DN +
-                    COMMA + ORG_NAMING_ATTR + EQUAL 
-                    + orgName + COMMA + rootSuffix;
-        }
-    }
-
-    /**
-     * Modifies the value of the attribute iplanet-am-auth-configuration
-     * 
-     * The value of module name is changed from fully qualified class name to 
-     * the module name. 
-     */
-    public static void modifyAuthConfig() {
-        String classMethod = "UpgradeUtils:modifyAuthConfig : ";
-        try {
-            String orgName = rootSuffix;
-            OrganizationConfigManager org =
-                    new OrganizationConfigManager(ssoToken, orgName);
-            ServiceConfig orgConfig = org.getServiceConfig(AUTH_CONFIG_SERVICE);
-            ServiceConfig s = orgConfig.getSubConfig(NAMED_CONFIG);
-            if (s != null) {
-                Iterator aa = s.getSubConfigNames().iterator();
-                while (aa.hasNext()) {
-                    String ss = (String) aa.next();
-                    ServiceConfig sa = s.getSubConfig(ss);
-                    Map map = sa.getAttributes();
-                    Set valSet = map.keySet();
-                    if (valSet.contains(ATTR_AUTH_CONFIG)) {
-                        String attrName = ATTR_AUTH_CONFIG;
-                        Set vals = (Set) map.get(attrName);
-                        Set newValSet = new HashSet();
-                        if (!vals.isEmpty()) {
-                            Iterator vali = vals.iterator();
-                            while (vali.hasNext()) {
-                                String xml = (String) vali.next();
-                                int idx = xml.indexOf(START_VALUE);
-                                int ydx = xml.lastIndexOf(END_VALUE);
-                                String val = xml.substring(idx + 7, ydx);
-                                idx = val.lastIndexOf(".");
-                                if (idx != -1) {
-                                    String newVal = val.substring(idx + 1);
-                                    newValSet.add(ATTR_START_VALUE +
-                                            START_VALUE + newVal +
-                                            END_VALUE + ATTR_END_VALUE);
-                                }
-                            }
-                        }
-                        map.put(attrName, newValSet);
-                    }
-                    sa.setAttributes(map);
-                }
-            }
-        } catch (Exception e) {
-            debug.error(classMethod +
-                    "Error modifying auth configuration attribute", e);
-        }
-    }
-
-    /**
      * Modifies the i18nKey of the specified attribute in the schema.
      * 
      * @param serviceName the service name where the attribute exists.
@@ -2541,152 +2320,6 @@ public class UpgradeUtils {
             throw new UpgradeException("Error setting i18N attribute");
         }
    } 
-
-    /**
-     * Migrates auth configuration defined at role level.
-     */
-    public static void migrateRoleAuthConfigs() {
-        String classMethod = "UpgradeUtils:migrateRoleAuthConfigs : ";
-        try {
-            ld = getLDAPConnection();
-            String baseDN = rootSuffix;
-            LDAPSearchResults res =
-                    ld.search(baseDN, LDAPv2.SCOPE_SUB,
-                    AUTH_CONFIG_SEARCH_FILTER, null, false);
-            Set attrSet = new HashSet();
-            Set cosDNSet = new HashSet();
-            Map dnAttrMap = new HashMap();
-            while (res.hasMoreElements()) {
-                LDAPEntry ent = res.next();
-                String dn = ent.getDN();
-                String[] myAttrs =
-                        {ATTR_AUTH_CONFIG, ATTR_AUTH_SUCCESS_URL,
-                    ATTR_AUTH_FAIL_URL, ATTR_AUTH_POST_CLASS
-                };
-                LDAPSearchResults res1 =
-                        ld.search(dn, LDAPv2.SCOPE_SUB,
-                        COS_TEMPL_FILTER, myAttrs, false);
-                while (res1.hasMoreElements()) {
-                    LDAPEntry ent1 = res1.next();
-                    String dn1 = ent1.getDN();
-                    // get attributes.
-                    cosDNSet.add(dn1);
-                    LDAPAttributeSet attrs = ent1.getAttributeSet();
-                    Enumeration attrsInSet = attrs.getAttributes();
-                    Map attrMap = new HashMap();
-                    while (attrsInSet.hasMoreElements()) {
-                        LDAPAttribute nextAttr =
-                                (LDAPAttribute) attrsInSet.nextElement();
-                        String attrName = nextAttr.getName();
-                        if (attrName.startsWith(AUTH_ATTR_PREFIX)) {
-                            Enumeration valsInAttr = nextAttr.getStringValues();
-                            attrSet = new HashSet();
-                            while (valsInAttr.hasMoreElements()) {
-                                String nextValue =
-                                        (String) valsInAttr.nextElement();
-                                attrSet.add(nextValue);
-                            }
-                            attrMap.put(attrName, attrSet);
-                        }
-                    }
-                    dnAttrMap.put(dn1, attrMap);
-                }
-            }
-            // ldapmodify
-            Iterator i = cosDNSet.iterator();
-            Map orgRoleMap = new HashMap();
-            while (i.hasNext()) {
-                String dn = (String) i.next();
-                Map attrMap1 = (HashMap) dnAttrMap.get(dn);
-                int rcn = dn.indexOf("=\"cn=");
-                int end = dn.indexOf(",");
-                String roleName = dn.substring(rcn + 5, end);
-                String remStr = dn.substring(end + 1);
-                String orgName = remStr.substring(0, remStr.indexOf("\""));
-                String rolConfigName = roleName + "-roleauthconfig";
-                Set rSet;
-                if (!orgRoleMap.containsKey(orgName)) {
-                    rSet = new HashSet();
-                } else {
-                    rSet = (HashSet) orgRoleMap.get(orgName);
-                }
-                Map roleMap = new HashMap();
-                roleMap.put(rolConfigName, attrMap1);
-                rSet.add(roleMap);
-                orgRoleMap.put(orgName, rSet);
-                Collection modifications = new ArrayList();
-                LDAPModificationSet lds = new LDAPModificationSet();
-                if (attrMap1.containsKey(ATTR_AUTH_CONFIG)) {
-                    lds.add(LDAPModification.REPLACE,
-                            new LDAPAttribute(ATTR_AUTH_CONFIG, rolConfigName));
-                }
-                if (attrMap1.containsKey(ATTR_AUTH_SUCCESS_URL)) {
-                    lds.add(LDAPModification.DELETE,
-                            new LDAPAttribute(ATTR_AUTH_SUCCESS_URL));
-                }
-                if (attrMap1.containsKey(ATTR_AUTH_FAIL_URL)) {
-                    lds.add(LDAPModification.DELETE,
-                            new LDAPAttribute(ATTR_AUTH_FAIL_URL));
-                }
-                if (attrMap1.containsKey(ATTR_AUTH_POST_CLASS)) {
-                    lds.add(LDAPModification.DELETE,
-                            new LDAPAttribute(ATTR_AUTH_POST_CLASS));
-                }
-                ld.modify(dn, lds);
-            }
-            // iterate thru orgs to create configs.
-            Set orgSet = orgRoleMap.keySet();
-            Iterator orgI = orgSet.iterator();
-            while (orgI.hasNext()) {
-                String oName = (String) orgI.next();
-                OrganizationConfigManager org =
-                        new OrganizationConfigManager(ssoToken, oName);
-                ServiceConfig s = org.getServiceConfig(AUTH_CONFIG_SERVICE);
-                ServiceConfig authConfig = s.getSubConfig(NAMED_CONFIG);
-                if (authConfig == null) {
-                    s.addSubConfig(NAMED_CONFIG, null, 0, null);
-                    authConfig = s.getSubConfig(NAMED_CONFIG);
-                }
-                Set roleMapSet = (HashSet) orgRoleMap.get(oName);
-                Iterator c = roleMapSet.iterator();
-                while (c.hasNext()) {
-                    Map rMap = (HashMap) c.next();
-                    Set keySet = rMap.keySet();
-                    String cName = (String) keySet.iterator().next();
-                    Map aMap = (HashMap) rMap.get(cName);
-                    authConfig.addSubConfig(cName, SUB_NAMED_CONFIG, 0, aMap);
-                }
-            }
-        } catch (Exception e) {
-            debug.error(classMethod + "Error migrating role auth config", e);
-            disconnectDServer();
-            ld = null;
-        }
-    }
-
-    /**
-     * Migrates Core Auth Service auth module configuration.
-     */
-    public static void migrateAuthServiceConfigs() {
-        String classMethod = "UpgradeUtils:migrateAuthServiceConfigs : ";
-        try {
-            OrganizationConfigManager org =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realms = org.getSubOrganizationNames("*", true);
-            realms.add(rootSuffix);
-
-            Iterator i = realms.iterator();
-            while (i.hasNext()) {
-                String realmName = (String) i.next();
-                createOrgAuthConfig(realmName);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            debug.error(classMethod + "Error migrating role auth config", e);
-            disconnectDServer();
-            ld = null;
-        }
-    }
 
     /**
      * Creates auth configurations for auth modules configuration in
@@ -2751,58 +2384,6 @@ public class UpgradeUtils {
                     SUB_NAMED_CONFIG, 0, aMap);
         }
     }
-
-    /**
-     * Creates Delegation Policies.
-     */
-    public static void loadSubRealmDelegationPolicies() {
-        String classMethod = "UpgradeUtils:loadSubRealmDelegationPolicies : ";
-        try {
-            // get a list of realms - recursively.
-            PolicyManager pm = new PolicyManager(ssoToken, HIDDEN_REALM);
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            Iterator i = realms.iterator();
-            while (i.hasNext()) {
-                String realm = (String) i.next();
-                String orgDN = DNMapper.orgNameToDN(realm);
-                String orgID = orgDN.replaceAll(",", "^");
-                if (debug.messageEnabled()) {
-                    System.out.println(bundle.getString("upg-org-name") 
-                    + " : " + realm);
-                    System.out.println(bundle.getString("upg-org-dn")
-                         + orgDN);
-                    System.out.println(bundle.getString("upg-org-dn") + ":" 
-                         + orgID);
-                }
-                createRealmAdminPolicy(pm, orgDN, orgID);
-                createPolicyAdminPolicy(pm, orgDN, orgID);
-                createRealmReadOnlyPolicy(pm, orgDN, orgID);
-                createDatastoresReadOnlyPolicy(pm, orgDN, orgID);
-            }
-
-        } catch (Exception e) {
-            debug.error(classMethod +
-                    "Error loading sub realm delegation polices", e);
-        }
-    }
-
-    /**
-     * Returns <code>AttributeType</code> object represent an 
-     * <code>Attribute</code> and <code>Value</code> in the IDFF meta data
-     * 
-     * @param attrElement <code>AttributeType</code> object
-     * @param attrName the attribute name.
-     * @param attrValue the attribute value.
-     * @return <code>AttributeType</code> object.
-     */
-    /*public static AttributeType getAttribute(AttributeType attrElement,
-            String attrName, String attrValue) {
-        attrElement.setName(attrName);
-        attrElement.getValue().add(attrValue);
-        return attrElement;
-    }*/
 
     /**
      * Returns value of an attribute.
@@ -3079,133 +2660,6 @@ public class UpgradeUtils {
     }
 
     /**
-     * Returns a map of attributes in a subconfig. 
-     * The key is subconfig name and the values a map of of attribute name
-     * and values.
-     */
-    public static Map getSubConfigAttributes(
-            String serviceName, String serviceVersion) {
-        String classMethod = "UpgradeUtils:getSubConfigAttributes : ";
-        Map attributesMap = new HashMap();
-        try {
-            ServiceConfigManager scm = new ServiceConfigManager(
-                    ssoToken, serviceName, serviceVersion);
-            ServiceConfig orgConfig =
-                    scm.getOrganizationConfig(rootSuffix, null);
-            Set subConfigs = orgConfig.getSubConfigNames();
-            Iterator i = subConfigs.iterator();
-            while (i.hasNext()) {
-                try {
-                    String subConfigName = (String) i.next();
-                    ServiceConfig svcConfig =
-                            orgConfig.getSubConfig(subConfigName);
-                    Map attributes = svcConfig.getAttributes();
-                    if (debug.messageEnabled()) {
-                        debug.message("subConfigName is :" + subConfigName);
-                        debug.message("attribtues are  " + attributes);
-                    }
-                    attributesMap.put(subConfigName, attributes);
-                } catch (Exception e) {
-                    debug.error(classMethod + "Error get attributes", e);
-                }
-            }
-        } catch (Exception e) {
-            debug.error(classMethod + "Error get attributes", e);
-        }
-        return attributesMap;
-    }
-
-    /**
-     * Creates organization sub configuration.
-     * @param serviceName name of the service
-     * @param serviceVersion name of the service version
-     * @param subConfigID the subconfig name
-     * @param configName the config name
-     * @param attributes Map of attribute , where key is attribute name and
-     * a <code>Set</code> of values.
-     */
-    public static void createOrgSubConfig(String serviceName,
-            String serviceVersion, String subConfigID,
-            String configName, Map attributes) {
-        String classMethod = "UpgradeUtils:createOrgSubConfig : ";
-        try {
-            ServiceConfigManager scm = new ServiceConfigManager(ssoToken,
-                    serviceName, serviceVersion);
-            ServiceConfig orgConfig =
-                    scm.getOrganizationConfig(rootSuffix, null);
-            orgConfig.addSubConfig(configName, subConfigID, 0, attributes);
-        } catch (Exception e) {
-            debug.error(classMethod + "Error creating subconfig", e);
-        }
-    }
-
-    /** 
-     * Returns subconfigs in a service sub configuration.
-     * 
-     * @param serviceName name of the service
-     * @param serviceVersion the service revision
-     * @param subConfigName the name of the subconfig
-     * 
-     * @return a set containing sub configs 
-     */
-    public static Set getProviderIds(String serviceName, String serviceVersion,
-            String subConfigName) {
-        String classMethod = "UpgradeUtils:getProviderIds : ";
-        Set providerids = new HashSet();
-        try {
-            ServiceConfigManager scm = new ServiceConfigManager(ssoToken,
-                    serviceName, serviceVersion);
-            ServiceConfig orgConfig =
-                    scm.getOrganizationConfig(rootSuffix, null);
-            ServiceConfig providerSC =
-                    orgConfig.getSubConfig(subConfigName);
-            providerids = providerSC.getSubConfigNames();
-            System.out.println(bundle.getString("upg-provider-id") + ":" 
-                + providerids);
-        } catch (Exception e) {
-            UpgradeUtils.debug.error(classMethod +
-                    "Error retrieving sub configs", e);
-        }
-        return providerids;
-    }
-
-    /**
-     * Returns the organization service config for a service
-     * @param serviceName the service name
-     * @param serviceVersion the service version 
-     * 
-     * @return <code>ServiceConfig</code> object
-     */
-    public static ServiceConfig getOrganizationServiceConfig(String serviceName,
-            String serviceVersion) {
-        ServiceConfig orgConfig = null;
-        String classMethod = "UpgradeUtils:getOrganizationServiceConfig :";
-        try {
-            ServiceConfigManager scm = new ServiceConfigManager(
-                    ssoToken, serviceName, serviceVersion);
-            orgConfig =
-                    scm.getOrganizationConfig(rootSuffix, null);
-        } catch (Exception e) {
-            UpgradeUtils.debug.error(classMethod +
-                    "Error getting org config for " + serviceName +
-                    "," + serviceVersion);
-        }
-        return orgConfig;
-    }
-
-    /**
-     * Returns <code>IDFFMetaManager</code> object
-     * 
-     * @return  <code>IDFFMetaManager</code> object.
-     */
-    /*
-    public static IDFFMetaManager getIDFFMetaManager() throws
-            IDFFMetaException {
-        IDFFMetaManager idffMetaMgr = new IDFFMetaManager(ssoToken);
-        return idffMetaMgr;
-    }*/
-
-    /**
      * Replace tags in the upgrade services xmls
      */
     static void replaceTags(File dir, Properties p) {
@@ -3274,54 +2728,6 @@ public class UpgradeUtils {
                 getFiles(fromFiles[i], fileList);
             }
         }
-    }
-
-    /**
-     * Returns the root suffix dn.
-     * 
-     * @return the root suffix string.
-     */
-    protected static String getRootSuffix() {
-        return rootSuffix;
-    }
-
-    /**
-     * Returns the Normalized Root Suffix DN.
-     * 
-     * @return the normalized root suffix.
-     */
-    public static String getNormalizedRootSuffix() {
-        return (new DN(rootSuffix)).toRFCString().toLowerCase();
-    }
-
-    /**
-     * Returns the People Container Root Suffix DN.
-     * 
-     * @return the People Containger root suffix.
-     */
-    public static String getPeopleOrgRootSuffix() {
-        String rootOrg = rootSuffix.replaceAll(",", "_");
-        return "People" + "_" + rootOrg;
-    }
-
-    /**
-     * Returns the realm/organization name from the root suffix.
-     * 
-     * @return the name of the realm/organization.
-     */
-    public static String getRsDN() {
-        String org = getNormalizedRootSuffix();
-        String rsDN = org;
-        int i = org.indexOf("=");
-        if (i != -1) {
-            int j = org.indexOf(",");
-            if (j != -1) {
-                rsDN = org.substring(i+1,j);
-            } else {
-                rsDN = org.substring(i+1);
-            }
-        }
-        return rsDN;
     }
 
     /**
@@ -3565,60 +2971,6 @@ public class UpgradeUtils {
     }
 
     /**
-     * Removes attribute default values from a service sub-configuration.
-     * 
-     * @param serviceName name of the service
-     * @param sunServiceID set of service identifiers.
-     * @param attributeName name of the attribute.
-     * @param defaultValues set of default values to be removed.
-     * @throws UpgradeException if there is an error.
-     */
-    public static void removeAttrDefaultValueSubConfig(
-            String serviceName,
-            Set sunServiceID,
-            String attributeName,
-            Set defaultValues) throws UpgradeException {
-
-        String classMethod = "UpgradeUtils:removeAttrDefaultValueSubConfig: ";
-        try {
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realmSet = new HashSet();
-            realmSet.add(rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            realms.addAll(realmSet);
-            if (debug.messageEnabled()) {
-                debug.message("realms is :" + realms);
-            }
-            Iterator oi = realms.iterator();
-            while (oi.hasNext()) {
-                String realm = (String) oi.next();
-                Set subConfigs = getOrgSubConfigs(serviceName, "1.0", realm);
-                Iterator i = subConfigs.iterator();
-                while (i.hasNext()) {
-                    String subConfigName = (String) i.next();
-                    if (debug.messageEnabled()) {
-                        debug.message(classMethod +
-                                "subconfig name is :" + subConfigName);
-                        debug.message(classMethod + 
-                                "Attribute Name : " + attributeName);
-                    }
-                    removeSubConfigAttributeDefaultValues(serviceName,
-                            sunServiceID,
-                            realm, subConfigName, attributeName, defaultValues);
-                }
-            }
-        } catch (SMSException sme) {
-            debug.error(classMethod + 
-                    "Cannot add attribute schema to : " + serviceName, sme);
-            throw new UpgradeException(sme.getMessage());
-        } catch (Exception e) {
-            debug.error(classMethod + "Error setting attribute schema : ", e);
-            throw new UpgradeException(e.getMessage());
-        }
-    }
-
-    /**
      * Returns the value of <code>sunserviceid</code> attribute of a service
      * sub-configuration. 
      * 
@@ -3705,54 +3057,6 @@ public class UpgradeUtils {
     }
 
     /**
-     * Adds default values to an attribute in a service sub-configuration.
-     * This methods iterates through all realms to update the attribute default
-     * values. 
-     * 
-     * @param serviceName name of the service
-     * @param sunServiceID set of service identifiers for the sub-configuration.
-     * @param attributeName name of the attribute to be updated.
-     * @param defaultValues set of default values to be added .
-     */
-    public static void addAttrDefaultValueSubConfig(
-            String serviceName,
-            Set sunServiceID,
-            String attributeName,
-            Set defaultValues) {
-
-        String classMethod = "UpgradeUtils:addAttrDefaultValueSubConfig : ";
-        try {
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realmSet = new HashSet();
-            realmSet.add(rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            realmSet.addAll(realms);
-            Iterator oi = realmSet.iterator();
-            while (oi.hasNext()) {
-                String realm = (String) oi.next();
-                Set subConfigs = getOrgSubConfigs(serviceName, "1.0", realm);
-                Iterator i = subConfigs.iterator();
-                while (i.hasNext()) {
-                    String subConfigName = (String) i.next();
-                    if (debug.messageEnabled()) {
-                        debug.message(classMethod
-                                + "addSubConfig : " + subConfigName);
-                    }
-                    addSubConfigAttributeDefaultValues(serviceName,
-                            sunServiceID,
-                            realm, subConfigName, attributeName, defaultValues);
-                }
-            }
-        } catch (SMSException sme) {
-            debug.error(classMethod 
-                    + "Cannot add attribute schema to : " + serviceName, sme);
-        } catch (Exception e) {
-            debug.error(classMethod + "Error setting attribute schema : ", e);
-        }
-    }
-
-    /**
      * Adds defaults values to service sub-configuration
      * 
      * @param serviceName the service name
@@ -3788,46 +3092,6 @@ public class UpgradeUtils {
             debug.error(classMethod + "Invalid SSOToken", ssoe);
         } catch (SMSException sme) {
             debug.error(classMethod + "Error adding values ", sme);
-        }
-    }
-
-    /**
-     * Removes attributes from a service sub-configuration.
-     * Iterates through all realms and modifies all sub configuration instances.
-     * 
-     * @param serviceName the service name.
-     * @param sunServiceID set of service identifiers for the sub-configuration.
-     * @param attributeList list of attributes to be removed.
-     * @throws UpgradeException if there is an error.
-     */
-    public static void removeAttrFromSubConfig(
-            String serviceName,
-            Set sunServiceID,
-            List attributeList)
-            throws UpgradeException {
-        String classMethod = "UpgradeUtils:removeAttrFromSubConfig : ";
-        try {
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realmSet = new HashSet();
-            realmSet.add(rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            realmSet.addAll(realms);
-            Iterator oi = realmSet.iterator();
-            while (oi.hasNext()) {
-                String realm = (String) oi.next();
-                Set subConfigs = getOrgSubConfigs(serviceName, "1.0", realm);
-                Iterator i = subConfigs.iterator();
-                while (i.hasNext()) {
-                    String subConfigName = (String) i.next();
-                    removeSubConfigAttribute(serviceName, sunServiceID,
-                            realm, subConfigName, attributeList);
-                }
-            }
-        } catch (SMSException sme) {
-            debug.error(classMethod +
-                    "Cannot add attribute schema to : " + serviceName, sme);
-            throw new UpgradeException(sme.getMessage());
         }
     }
 
@@ -3932,56 +3196,6 @@ public class UpgradeUtils {
             debug.error(classMethod + "Error removing default values ", sme);
         } catch (SSOException ssoe) {
             debug.error(classMethod + "Invalid SSO Token", ssoe);
-        }
-    }
-
-
-    /**
-     * Replaces attribute default values in a service sub-configuration.
-     * Iterates through all realms to update all sub-configuration instances.
-     * 
-     * @param serviceName the service name
-     * @param sunServiceID set of service identifiers
-     * @param attributeName the attribute name.
-     * @param oldValues set of values to be replaced.
-     * @param newValues set of values to add.
-     * @throws UpgradeException if there is an error
-     */
-    public static void replaceAttrDefaultValueSubConfig(
-            String serviceName,
-            Set sunServiceID,
-            String attributeName,
-            Set oldValues, 
-            Set newValues) 
-            throws UpgradeException {
-        String classMethod = "UpgradeUtils:removeAttrDefaultValueSubConfig : ";
-        try {
-            OrganizationConfigManager ocm =
-                    new OrganizationConfigManager(ssoToken, rootSuffix);
-            Set realmSet = new HashSet();
-            realmSet.add(rootSuffix);
-            Set realms = ocm.getSubOrganizationNames("*", true);
-            realmSet.addAll(realms);
-            Iterator oi = realmSet.iterator();
-            while (oi.hasNext()) {
-                String realm = (String) oi.next();
-                Set subConfigs = getOrgSubConfigs(serviceName, "1.0", realm);
-                Iterator i = subConfigs.iterator();
-                while (i.hasNext()) {
-                    String subConfigName = (String) i.next();
-                    replaceSubConfigAttributeDefaultValues(
-                            serviceName, sunServiceID,
-                            realm, subConfigName, attributeName, 
-                            oldValues, newValues);
-                }
-            }
-        } catch (SMSException sme) {
-            debug.error(classMethod 
-                    + "Cannot add attribute schema to : " + serviceName, sme);
-            throw new UpgradeException(sme.getMessage());
-        } catch (Exception e) {
-            debug.error(classMethod + "Error setting attribute schema : ", e);
-            throw new UpgradeException(e.getMessage());
         }
     }
 
@@ -4155,93 +3369,7 @@ public class UpgradeUtils {
         }
         return (instanceType != null && instanceType.equalsIgnoreCase("FM"));
    }
-    
-    /**
-     * Loads new services schemas , ldifs and modifies/removes
-     * certain services on a FM instance.
-     * This method is invoked when the instance is
-     * FM. 
-     */
-    public static void createServicesForFM() {
-        String fileName = null;
-        getSSOToken();
-        String classMethod = "UpgradeUtils:createServicesForFM : ";
-        try {
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + " Deleting LDAP Entry for idrepo");
-            }
-            delete("ou=sunIdentityRepositoryService,ou=services," 
-                    + rootSuffix, getLDAPConnection(), true);
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + "Removing sunAMDelegation Service");
-            }
-            //load ldif file
-            String ldifFileName = new StringBuffer(basedir)
-                    .append(File.separator).append(DIR_UPGRADE)
-                    .append(File.separator).append(DIR_CONFIG)
-                    .append(File.separator)
-                    .append(DAI_LDIF).toString();
-            if (debug.messageEnabled()) {
-                debug.message("ldif filename is :" + ldifFileName);
-            }
-            loadLdif(ldifFileName);
-            ldifFileName = new StringBuffer().append(basedir)
-                    .append(File.separator).append(DIR_UPGRADE)
-                    .append(File.separator).append(DIR_CONFIG)
-                    .append(File.separator)
-                    .append(INSTALL_LDIF).toString();
-            UpgradeUtils.loadLdif(ldifFileName);
-            fileName = getNewServiceNamePath(UMS_XML);
-            createService(fileName);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        try {
-            fileName = getNewServiceNamePath(REPO_XML);
-            if (debug.messageEnabled()) {
-                debug.message(classMethod + "loading :" + fileName);
-            }
-            createService(fileName);
-            Map m = new HashMap();
-            createOrgSubConfig(IDREPO_SERVICE, "1.0", "amSDK", "amSDK1", m);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        try {
-            fileName = getNewServiceNamePath(UNIX_XML);
-            createService(fileName);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        try {
-            fileName = getNewServiceNamePath(USER_XML);
-            createService(fileName);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        try {
-            fileName = getNewServiceNamePath(POLICY_XML);
-            createService(fileName);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        try {
-            fileName = getNewServiceNamePath(POLICY_CONFIG_XML);
-            createService(fileName);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        try {
-            fileName = getNewServiceNamePath(PASSWORD_RESET_XML);
-            createService(fileName);
-        } catch (Exception e) {
-            debug.error("UpgradeUtils:createServicesFM: " + fileName, e);
-        }
-        removeService(DELEGATION_SERVICE);
-        removeService(APPLICATION_SERVICE);
-    }
-
-
+   
     /**
      * Removes service schema from the config store.
      * 
@@ -4373,42 +3501,6 @@ public class UpgradeUtils {
             }
         } catch (Exception me) {
             // do nothing
-        }
-    }
-
-    /**
-     * Creates Delegation Policies.
-     */
-    public static void addDelegationRule(String policyName,
-            Map ruleMap) {
-        String classMethod = "UpgradeUtils:addDelegationRule: ";
-        try {
-            // get a list of realms - recursively.
-            PolicyManager pm = new PolicyManager(ssoToken, HIDDEN_REALM);
-            Policy policy = pm.getPolicy(policyName);
-            Map actionsMap = new HashMap();
-            Set values = new HashSet();
-            values.add("allow");
-            actionsMap.put("READ", values);
-
-            Set rSet = ruleMap.keySet();
-            Iterator i = rSet.iterator();
-            while (i.hasNext()) {
-                String ruleName = (String) i.next();
-                String resourceNameSuffix = (String) ruleMap.get(ruleName);
-                String resourceName =
-                        new StringBuffer()
-                        .append("sms://").append(rootSuffix)
-                        .append(resourceNameSuffix).toString();
-                Rule rule =
-                        getRule(ruleName, DELEGATION_SERVICE,
-                        resourceName, actionsMap);
-                policy.addRule(rule);
-            }
-            pm.replacePolicy(policy);
-        } catch (Exception e) {
-            debug.error(classMethod +
-                    "Error loading sub realm delegation polices", e);
         }
     }
 

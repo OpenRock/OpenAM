@@ -34,6 +34,7 @@ package com.sun.identity.config;
 
 import com.sun.identity.config.pojos.*;
 import com.sun.identity.config.pojos.condition.Condition;
+import com.sun.identity.setup.AMSetupServlet;
 import net.sf.click.Page;
 
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class DummyConfigurator implements Configurator {
 
     @Override
     public boolean isNewInstall() {
-        if (UpgradeUtils.isVersionNewer()) {
+        if (AMSetupServlet.isConfigured() && UpgradeUtils.isVersionNewer()) {
             return !UpgradeUtils.canUpgrade();
         } else {
             return true;

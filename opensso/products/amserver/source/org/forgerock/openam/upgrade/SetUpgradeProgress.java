@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -9,39 +9,35 @@
  * compliance with the License.
  *
  * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
+ * http://forgerock.org/license/CDDLv1.0.html
  * See the License for the specific language governing
  * permission and limitations under the License.
  *
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
+ * at http://forgerock.org/license/CDDLv1.0.html
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SetSetupProgress.java,v 1.5 2008/08/31 06:56:18 hengming Exp $
- *
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
-
-package com.sun.identity.setup;
+package org.forgerock.openam.upgrade;
 
 import com.sun.identity.config.SetupWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class SetSetupProgress extends HttpServlet 
-{
+/**
+ *
+ * @author steve
+ */
+public class SetUpgradeProgress extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse response) 
         throws ServletException, IOException
@@ -74,13 +70,15 @@ public class SetSetupProgress extends HttpServlet
             out.flush();
         }
         SetupWriter writer = new SetupWriter(out);
-        SetupProgress.setTextMode(isTextMode);
-        SetupProgress.setWriter(writer);
+        UpgradeProgress.setTextMode(isTextMode);
+        UpgradeProgress.setWriter(writer);
         writer.realFlush();
+        
         if (!isTextMode) {
             out.println("</body>\n");
             out.println("</html>\n");
         }
+        
         out.flush();
-    }
+    }    
 }

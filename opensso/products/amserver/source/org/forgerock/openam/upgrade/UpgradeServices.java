@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,6 +24,10 @@
  */
 package org.forgerock.openam.upgrade;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.util.AMEncryption;
+import com.iplanet.services.util.ConfigurableKey;
+import com.iplanet.services.util.JCEEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -32,18 +36,23 @@ import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.AttributeSchemaImpl;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchemaModifications;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,7 +72,7 @@ public class UpgradeServices {
     protected static Debug debug = Debug.getInstance("amUpgrade");
     protected String fileName = null;
     protected static final List<String> serviceNames = new ArrayList<String>();
-    private static final String umEmbeddedDS;
+    private final static String BACKUP_PASSWORD = "fjdksljfdklszjfhiekahfjkdshafkjds";
         
     static {
         ResourceBundle rb = ResourceBundle.getBundle(
@@ -74,70 +83,51 @@ public class UpgradeServices {
         while (st.hasMoreTokens()) {
             serviceNames.add(st.nextToken());
         }
-        
-        umEmbeddedDS = rb.getString("umEmbeddedDS");
     }
     
-    /**
-     * Determines the services that will be upgraded.
-     *
-     * @param adminToken Administrator Single Sign On token.
-     * @param bUseExtUMDS <code>true</code> to use external DS as
-     *         user management datastore.
-     * @throws IOException if file operation errors occur.
-     * @throws SMSException if services cannot be registered.
-     * @throws SSOException if single sign on token is not valid.
-     */
-    /*public void upgrade(SSOToken adminToken, boolean bUseExtUMDS)
-    throws IOException, SMSException, SSOException {
-        Map map = ServicesDefaultValues.getDefaultValues();
-        String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
-        String dirXML = basedir + "/config/xml";
-        
-        File xmlDirs = new File(dirXML);
-        
-        if (!xmlDirs.exists() || !xmlDirs.isDirectory()) {
-            xmlDirs.mkdirs();
-        }
-
-        for (String serviceFileName : serviceNames) {
-            boolean tagswap = true;
+    public ServiceUpgradeWrapper preUpgrade(SSOToken adminToken) 
+    throws UpgradeException {
+        createUpgradeDirectories();
+        return preUpgradeProcessing(adminToken);
+    }
+    
+    protected void createUpgradeDirectories() 
+    throws UpgradeException {
+            String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
+            String upgradeDir = baseDir + "/upgrade/";
+            String backupDir = baseDir + "/backups/";
             
-            if (serviceFileName.startsWith("*")) {
-                serviceFileName = serviceFileName.substring(1);
-                tagswap = false;
-            }
-
-            Object[] params = { serviceFileName };
-            SetupProgress.reportStart("emb.registerservice", params);
-            String strXML = getResourceContent(serviceFileName);
-            // This string 'content' is to avoid plain text password
-            // in the files copied to the config/xml directory.
-            String content = strXML;
-            if (tagswap) {
-                content = StringUtils.strReplaceAll(content,
-                    "@UM_DS_DIRMGRPASSWD@", "********");
-                content =
-                    ServicesDefaultValues.tagSwap(content, true);
-            }
-            if (tagswap) {
-                strXML = ServicesDefaultValues.tagSwap(strXML, true);
-            }
-
-            // Write to file without visible password values.
-            AMSetupServlet.writeToFile(dirXML + "/" + serviceFileName,
-                content);
-
-            // Write to directory server with original password 
-            // values.
-            upgradeService(strXML, adminToken);
-            SetupProgress.reportEnd("emb.success", null);
+            createDirectory(backupDir);
+            createDirectory(upgradeDir);
+    }
+    
+    protected void createDirectory(String dirName) 
+    throws UpgradeException {
+        File d = new File(dirName);
+            
+        if (!d.exists() && d.isFile()) {
+            throw new UpgradeException("Directory: " + dirName + 
+                    " cannot be created as file of the same name already exists");
         }
-        
-        if (!bUseExtUMDS) {
-            addSubConfigForEmbeddedDS(adminToken);
+
+        if (!d.exists()) {
+            if (UpgradeUtils.debug.messageEnabled()) {
+                UpgradeUtils.debug.message("Created directory: " + dirName);
+            }
+
+            d.mkdir();
+        } else if (!d.canWrite()) {
+            // make bootstrap writable if it is not
+            d.setWritable(true);
+            
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ie) {
+                UpgradeUtils.debug.error("Unexpected thread exception", ie);
+                throw new UpgradeException("Unexpected thread exception: " + ie.getMessage());
+            }
         }
-    }*/
+    }
     
     /**
      * Kick off the upgrade process
@@ -145,161 +135,110 @@ public class UpgradeServices {
      * @param adminToken A valid admin SSOToken
      * @throws UpgradeException 
      */
-    public void upgrade(SSOToken adminToken) 
+    public void upgrade(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges) 
     throws UpgradeException {            
         if (debug.messageEnabled()) {
             debug.message("Upgrade startup.");
         }
-                
-        ServiceUpgradeWrapper serviceChanges = preUpgradeProcessing(adminToken);
+        
+        UpgradeProgress.reportStart("upgrade.writingbackup", null);
+        writeBackup(adminToken);
+        UpgradeProgress.reportEnd("upgrade.success", null);
         
         if (serviceChanges != null) {
-            generateUpgradeReport(adminToken, serviceChanges);
-            processUpgrade(adminToken, serviceChanges);
+            try {
+                processUpgrade(adminToken, serviceChanges);
+            } catch (UpgradeException ue) {
+                UpgradeProgress.reportEnd("upgrade.failed", null);
+                throw ue;
+            }
         }
+        
+        UpgradeProgress.reportStart("upgrade.writinglog", null);
+        generateDetailedUpgradeReport(adminToken, serviceChanges, false);
+        UpgradeProgress.reportEnd("upgrade.success", null);
         
         if (debug.messageEnabled()) {
             debug.message("Upgrade complete.");
         }
     }
             
-    protected void generateUpgradeReport(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges) {
-        StringBuilder buffer = new StringBuilder();
-        
-        if (serviceChanges.getServicesAdded() != null && 
-                !serviceChanges.getServicesAdded().isEmpty()) {
-            for (Map.Entry<String, Document> added : serviceChanges.getServicesAdded().entrySet()) {
-                buffer.append("add service name: ").append(UpgradeUtils.getServiceName(added.getValue())).append("\n\n");
-            }
-        }
-
-        if (serviceChanges.getServicesModified() != null &&
-                !serviceChanges.getServicesModified().isEmpty()) {
-            for (Map.Entry<String, Map<String, ServiceSchemaUpgradeWrapper>> mod : serviceChanges.getServicesModified().entrySet()) {
-                buffer.append("mod service name:").append(mod.getKey()).append("\n");
-                buffer.append("mod service details:\n");
-
-                for (Map.Entry<String,ServiceSchemaUpgradeWrapper> serviceType : mod.getValue().entrySet()) {
-                    buffer.append("service attr type: ").append(serviceType.getKey()).append("\n");
-
-                    ServiceSchemaUpgradeWrapper sUpdate = serviceType.getValue(); 
-
-                    if (sUpdate != null) {
-                        if (sUpdate.getAttributesAdded() != null &&
-                                sUpdate.getAttributesAdded().hasBeenModified()) {
-                            buffer.append("attr added:\n");
-                            buffer.append(calculateAttrModifications(sUpdate.getAttributesAdded()));
-
-                        }
-
-                        if (sUpdate.getAttributesModified() != null &&
-                                sUpdate.getAttributesModified().hasBeenModified()) {
-                            buffer.append("attr modified:\n");
-                            buffer.append(calculateAttrModifications(sUpdate.getAttributesModified()));
-                        }
-
-                        if (sUpdate.getAttributesDeleted() != null &&
-                                sUpdate.getAttributesDeleted().hasBeenModified()) {
-                            buffer.append("attr deleted:\n");
-                            buffer.append(calculateAttrModifications(sUpdate.getAttributesDeleted()));
-                        }
-                        
-                        buffer.append("\n");
-                    }
-                }
-            }
-        }
-        
-        if (serviceChanges.getSubSchemasModified() != null &&
-                !serviceChanges.getSubSchemasModified().isEmpty()) {
-            for (Map.Entry<String, Map<String, SubSchemaUpgradeWrapper>> ssMod : serviceChanges.getSubSchemasModified().entrySet()) {
-                buffer.append("mod service name: ").append(ssMod.getKey()).append("\n");
-                buffer.append("new sub schema details:\n");
+    public String generateDetailedUpgradeReport(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges, boolean html) 
+    throws UpgradeException {
+        UpgradeReport report = null;
                 
-                for (Map.Entry<String,SubSchemaUpgradeWrapper> serviceType : ssMod.getValue().entrySet()) {
-                    buffer.append("service attr type: ").append(serviceType.getKey()).append("\n");
-                    
-                    SubSchemaUpgradeWrapper ssUpdate = serviceType.getValue();
-                    
-                    if (ssUpdate != null) {
-                        if (ssUpdate.getSubSchemasAdded() != null &&
-                                ssUpdate.getSubSchemasAdded().subSchemaChanged()) {
-                            buffer.append("sub schema added:\n");
-                            buffer.append(calculateSubSchemaAdditions(ssUpdate.getSubSchemasAdded()));
-                        }
-                    }
-                    
-                    buffer.append("\n");
-                }
-            }
+        try {
+            report = new UpgradeReport(adminToken, serviceChanges, html);
+            report.writeReport();
+        } catch (UpgradeException ue) {
+            UpgradeUtils.debug.error("Unable to generate detailed upgrade report", ue);
+            throw ue;
         }
-
-        if (serviceChanges.getServicesDeleted() != null &&
-                !serviceChanges.getServicesDeleted().isEmpty()) {
-            buffer.append("services deleted:\n");
-
-            for (String serviceName : serviceChanges.getServicesDeleted()) {
-                buffer.append(serviceName).append("\n");
-            }
+        
+        return report.getDetailedReport();
+    }
+    
+    public String generateShortUpgradeReport(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges, boolean html) 
+    throws UpgradeException{
+        UpgradeReport report = null;
+        
+        try {
+            report = new UpgradeReport(adminToken, serviceChanges, html);
+        } catch (UpgradeException ue) {
+            UpgradeUtils.debug.error("Unable to generate short upgrade report", ue);
+            throw ue;           
+        }
+        
+        return report.getShortReport();
+    }
+    
+    protected void writeBackup(SSOToken adminToken)
+    throws UpgradeException {
+        FileOutputStream fout = null;
+        String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
+        String backupDir = baseDir + "/backups/";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        File backupFile = new File(backupDir + "servicebackup." + dateFormat.format(new Date()));
+        
+        if (backupFile.exists()) {
+            debug.error("Upgrade cannot continue as backup file exists! " + backupFile.getName());
+            throw new UpgradeException("Upgrade cannot continue as backup file exists");
         }
         
         try {
-            buffer.append(ServerConfiguration.upgradeDefaults(adminToken, true));
+            fout = new FileOutputStream(backupFile);
+            ServiceManager sm = new ServiceManager(adminToken);
+            AMEncryption encryptObj = new JCEEncryption();
+            ((ConfigurableKey)encryptObj).setPassword(BACKUP_PASSWORD);
+
+            String resultXML = sm.toXML(encryptObj);
+            resultXML += "<!-- " + Hash.hash(BACKUP_PASSWORD) + " -->";
+        
+            fout.write(resultXML.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException uee) {
+            debug.error("Unable to write backup: ", uee);
+            throw new UpgradeException("Unable to write backup: "+ uee.getMessage());
+        } catch (IOException ioe) {
+            debug.error("Unable to write backup: ", ioe);
+            throw new UpgradeException("Unable to write backup: " + ioe.getMessage());
         } catch (SSOException ssoe) {
-            
+            debug.error("Unable to write backup: ", ssoe);
+            throw new UpgradeException("Unable to write backup: " + ssoe.getMessage());
         } catch (SMSException smse) {
-            
-        } catch (UnknownPropertyNameException upne) {
-            
-        }
-
-        System.out.println(buffer.toString());
-    }
-    
-    protected String calculateAttrModifications(ServiceSchemaModificationWrapper schemaMods) {
-        StringBuilder buffer = new StringBuilder();
-        
-        if (!(schemaMods.getAttributes().isEmpty())) {
-            for (AttributeSchemaImpl attrs : schemaMods.getAttributes()) {
-                buffer.append(attrs.getName()).append("\n");
-            }
-        }
-      
-        if (schemaMods.hasSubSchema()) {
-            for (Map.Entry<String, ServiceSchemaModificationWrapper> schema : schemaMods.getSubSchemas().entrySet()) {
-                buffer.append("schema name: ").append(schema.getKey()).append("\n");
-
-                if (!(schema.getValue().getAttributes().isEmpty())) {
-                    for(AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
-                        buffer.append(attrs.getName()).append("\n");
-                    }
+            debug.error("Unable to write backup: ", smse);
+            throw new UpgradeException("Unable to write backup: " + smse.getMessage());
+        } catch (Exception ex) {
+            debug.error("Unable to write backup: ", ex);
+            throw new UpgradeException("Unable to write backup: " + ex.getMessage());
+        } finally {
+            if (fout != null) {
+                try {
+                    fout.close();
+                } catch (IOException ioe) {
+                    //ignored
                 }
-
-                if (schema.getValue().hasSubSchema()) {
-                    buffer.append(calculateAttrModifications(schema.getValue()));
-                }            
             }
         }
-        
-        return buffer.toString();
-    }
-    
-    protected String calculateSubSchemaAdditions(SubSchemaModificationWrapper subSchemaMods) {
-        StringBuilder buffer = new StringBuilder();
-        
-        if (subSchemaMods.hasNewSubSchema()) {
-            for (Map.Entry<String, NewSubSchemaWrapper> newSubSchema : subSchemaMods.entrySet()) {
-                buffer.append("new subschema type: ").append(newSubSchema.getKey()).append("\n");
-                buffer.append("new subschema name: ").append(newSubSchema.getValue().getSubSchemaName()).append("\n");
-                buffer.append("new subschema value: ").append(XMLUtils.print(newSubSchema.getValue().getSubSchemaNode()));
-            }
-        }
-        
-        if (subSchemaMods.hasSubSchema()) {
-            buffer.append(calculateSubSchemaAdditions(subSchemaMods.getSubSchema()));
-        }
-        
-        return buffer.toString();
     }
     
     /*
@@ -372,6 +311,9 @@ public class UpgradeServices {
     
     protected void processUpgrade(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges) 
     throws UpgradeException {
+        UpgradeProgress.reportStart("upgrade.upgradeservices", null);
+        UpgradeProgress.reportEnd("upgrade.blank", null);
+        
         if (serviceChanges.getServicesAdded() != null && 
             !serviceChanges.getServicesAdded().isEmpty()) {
 
@@ -388,7 +330,10 @@ public class UpgradeServices {
                 serviceDefinition.append("PUBLIC \"=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN\"\n");
                 serviceDefinition.append("\"jar://com/sun/identity/sm/sms.dtd\">\n");
                 serviceDefinition.append(XMLUtils.print(serviceToAdd.getValue()));
-                UpgradeUtils.createService(serviceDefinition.toString(), adminToken);
+                Object[] params = { serviceToAdd.getKey() };
+                UpgradeProgress.reportStart("upgrade.addservice", params);
+                //UpgradeUtils.createService(serviceDefinition.toString(), adminToken);
+                UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
                     buffer.append(serviceToAdd.getKey()).append(": ");
@@ -403,7 +348,10 @@ public class UpgradeServices {
         if (serviceChanges.getServicesModified() != null &&
             !serviceChanges.getServicesModified().isEmpty()) {
             for (Map.Entry<String, Map<String, ServiceSchemaUpgradeWrapper>> serviceToModify : serviceChanges.getServicesModified().entrySet()) {
-                UpgradeUtils.modifyService(serviceToModify.getKey(), serviceToModify.getValue(), adminToken);
+                Object[] params = { serviceToModify.getKey() };
+                UpgradeProgress.reportStart("upgrade.modservice", params);
+                //UpgradeUtils.modifyService(serviceToModify.getKey(), serviceToModify.getValue(), adminToken);
+                UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
                     debug.message("modified service: " + serviceToModify.getKey());
@@ -413,8 +361,11 @@ public class UpgradeServices {
         
         if (serviceChanges.getSubSchemasModified() != null &&
             !serviceChanges.getSubSchemasModified().isEmpty()) {
-            for (Map.Entry<String, Map<String, SubSchemaUpgradeWrapper>> ssMod : serviceChanges.getSubSchemasModified().entrySet()) { 
-                UpgradeUtils.addNewSubSchemas(ssMod.getKey(), ssMod.getValue(), adminToken);
+            for (Map.Entry<String, Map<String, SubSchemaUpgradeWrapper>> ssMod : serviceChanges.getSubSchemasModified().entrySet()) {
+                Object[] params = { ssMod.getKey() };
+                UpgradeProgress.reportStart("upgrade.addsubschema", params);
+                //UpgradeUtils.addNewSubSchemas(ssMod.getKey(), ssMod.getValue(), adminToken);
+                UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
                     debug.message("modified sub schema: " + ssMod.getKey());
@@ -425,7 +376,10 @@ public class UpgradeServices {
         if (serviceChanges.getServicesDeleted() != null &&
             !serviceChanges.getServicesDeleted().isEmpty()) {
             for (String serviceToDelete : serviceChanges.getServicesDeleted()) {
-                UpgradeUtils.deleteService(serviceToDelete, adminToken);
+                Object[] params = { serviceToDelete };
+                UpgradeProgress.reportStart("upgrade.delservice", params);
+                //UpgradeUtils.deleteService(serviceToDelete, adminToken);
+                UpgradeProgress.reportEnd("upgrade.success", null);
                 
                 if (debug.messageEnabled()) {
                     debug.message("deleted service: " + serviceToDelete);
@@ -433,15 +387,17 @@ public class UpgradeServices {
             }
         }
         
-        try {
-            ServerConfiguration.upgradeDefaults(adminToken, false);
-        } catch (SSOException ssoe) {
+        //try {
+            UpgradeProgress.reportStart("upgrade.platformupdate", null);
+            //ServerConfiguration.upgradeDefaults(adminToken, false, false);
+            UpgradeProgress.reportEnd("upgrade.success", null);
+        /*} catch (SSOException ssoe) {
             debug.error("Unable to process service configuration upgrade", ssoe);
         } catch (SMSException smse) {
             debug.error("Unable to process service configuration upgrade", smse);
         } catch (UnknownPropertyNameException upne) {
             debug.error("Unable to process service configuration upgrade", upne);
-        }
+        }*/
     }
     
     protected ServiceUpgradeWrapper diffServiceVersions(Map<String, Document> serviceDefinitions, SSOToken adminToken) 
