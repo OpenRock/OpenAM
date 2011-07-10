@@ -273,8 +273,8 @@ public class UpgradeUtils {
      * @return true if the war file version is newer than the deployed version
      */
     public static boolean isVersionNewer() {
-        String currentVersion = stripVersionText(SystemProperties.get(Constants.AM_VERSION));
-        String warVersion = stripVersionText(ServerConfiguration.getWarFileVersion());
+        String currentVersion = stripVersionText(getCurrentVersion());
+        String warVersion = stripVersionText(getWarFileVersion());
         
         SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT);
         Date currentVersionDate = null;
@@ -298,7 +298,15 @@ public class UpgradeUtils {
             debug.message("War version: " + warVersionDate);
         }
         
-        return false; //currentVersionDate.before(warVersionDate);
+            return false; //currentVersionDate.before(warVersionDate);
+    }
+    
+    public static String getCurrentVersion() {
+        return SystemProperties.get(Constants.AM_VERSION);
+    }
+    
+    public static String getWarFileVersion() {
+        return ServerConfiguration.getWarFileVersion();
     }
     
     protected static String stripVersionText(String fullVersion) {

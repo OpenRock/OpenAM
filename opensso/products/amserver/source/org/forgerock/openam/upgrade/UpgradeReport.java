@@ -177,8 +177,8 @@ public class UpgradeReport {
         Map<String, StringBuilder> reportContents = new HashMap<String, StringBuilder>();
         
         reportContents.put(CREATED_DATE, new StringBuilder().append(createdDate));
-        reportContents.put(EXISTING_VERSION, new StringBuilder().append(SystemProperties.get(Constants.AM_VERSION)));
-        reportContents.put(NEW_VERSION, new StringBuilder().append(ServerConfiguration.getWarFileVersion()));
+        reportContents.put(EXISTING_VERSION, new StringBuilder().append(UpgradeUtils.getCurrentVersion()));
+        reportContents.put(NEW_VERSION, new StringBuilder().append(UpgradeUtils.getWarFileVersion()));
         reportContents.put(LF, new StringBuilder().append(delimiter));
         
         if (serviceChanges.getServicesAdded() != null && 
