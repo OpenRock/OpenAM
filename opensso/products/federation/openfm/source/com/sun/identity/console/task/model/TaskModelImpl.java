@@ -25,6 +25,11 @@
  * $Id: TaskModelImpl.java,v 1.15 2009/07/28 17:46:24 babysunil Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.console.task.model;
 
 import com.sun.identity.cot.COTException;
@@ -214,7 +219,8 @@ public class TaskModelImpl
             for (Iterator i = entities.iterator(); i.hasNext();) {
                 String entityId = (String) i.next();
                 EntityConfigElement elm = mgr.getEntityConfig(realm, entityId);
-                if (elm.isHosted() == hosted) {
+                // elm could be null due to OPENAM-269
+                if (elm != null && elm.isHosted() == hosted) {
                     EntityDescriptorElement desc = mgr.getEntityDescriptor(
                             realm, entityId);
 

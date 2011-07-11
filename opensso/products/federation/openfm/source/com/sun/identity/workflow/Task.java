@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.workflow;
@@ -36,6 +36,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -69,17 +70,31 @@ public abstract class Task
     static String REQ_OBJ = "_request_";
     private static Debug debug = Debug.getInstance("workflow");
 
+    /**
+     * Return a trimmed String that represents the value from the
+     * passed in params Map for the given key
+     * @param params The Map that holds a String value or a Set containing
+     * a String value for the given key
+     * @param key The key to use to look up the String value in params Map
+     * @return A trimmed String for the given key from the params Map.
+     */
     protected String getString(Map params, String key) {
+        
+        String result = null;
         Object values = params.get(key);
-        if (values == null) {
-            return null;
+        
+        if (values != null) {
+            if (values instanceof Set) {
+                // Returns a trimmed String from the Set
+                result = CollectionHelper.getMapAttr(params, key);
+            } else {
+                if (values != null) {
+                    result = ((String)values).trim();
+                }
+            }
         }
-        if (values instanceof Set) {
-            Set set = (Set)values;
-            return (!set.isEmpty()) ? (String)set.iterator().next() : null;
-        } else {
-            return (String)values;
-        }
+        
+        return result;
     }
 
     protected static ResourceBundle getResourceBundle(Locale locale) {

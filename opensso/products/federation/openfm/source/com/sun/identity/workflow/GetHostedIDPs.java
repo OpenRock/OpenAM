@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.workflow;
 
 import com.sun.identity.cot.COTConstants;
@@ -63,7 +67,8 @@ public class GetHostedIDPs
             for (Iterator i = entities.iterator(); i.hasNext();) {
                 String entityId = (String) i.next();
                 EntityConfigElement elm = mgr.getEntityConfig(realm, entityId);
-                if (elm.isHosted()) {
+                // elm could be null due to OPENAM-269
+                if (elm != null && elm.isHosted()) {
                     EntityDescriptorElement desc = mgr.getEntityDescriptor(
                         realm, entityId);
                     if (SAML2MetaUtils.getIDPSSODescriptor(desc) != null) {
