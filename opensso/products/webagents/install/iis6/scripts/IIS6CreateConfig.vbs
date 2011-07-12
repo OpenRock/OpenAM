@@ -260,8 +260,8 @@ Function GetAccessManagerDetails(oFSO, dict, WshShell)
   '// Encrypt the password
   encryptFile = configInstallDir + "\encryptPasswd"
   setPasswdKey = GetRandomString(10)
-  WshShell.Run "cmd /c cd " + configInstallDir + "\bin" + "& cryptit.exe " + setUserPassword + " "+ setPasswdKey + " > " + encryptFile, 0, true
-
+  WshShell.Run "cmd /c cd " + chr(34) + configInstallDir + chr(34) + "\bin" + "& cryptit.exe " + setUserPassword + " "+ setPasswdKey + " > " + chr(34) + encryptFile + chr(34), 0, true
+  
   Set encrypt = oFSO.OpenTextFile(encryptFile,ForReading,True)
   encryptedPasswd = encrypt.ReadLine
   encrypt.Close
