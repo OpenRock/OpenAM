@@ -145,7 +145,10 @@
        
        <includes>*/OpenAM-*.xml</includes>
        <xincludeSupported>true</xincludeSupported>
-  
+       
+       <sectionAutolabel>true</sectionAutolabel>
+       <sectionLabelIncludesComponentLabel>true</sectionLabelIncludesComponentLabel>
+       
        <!-- EPUB, HTML -->
        <chunkedOutput>false</chunkedOutput>
        <htmlCustomization>${dbstyle-dir}/html/coredoc.xsl</htmlCustomization>
