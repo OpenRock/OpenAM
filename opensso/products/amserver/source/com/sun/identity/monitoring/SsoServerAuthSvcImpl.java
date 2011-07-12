@@ -114,7 +114,7 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
     }
 
     protected void updateSsoServerAuthenticationFailureRate() {
-        long li = AuthenticationFailureCount.longValue();
+        long li = AuthenticationFailureRate.longValue();
 
         if (lastCheckpoint + frequency > System.currentTimeMillis()) {
             if (!historicFailureRecords.offerLast(li)) {
@@ -132,11 +132,11 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
              average = (li - historicCount.longValue()) / interval;
         }
 
-        AuthenticationFailureCount = Long.valueOf(average);
+        AuthenticationFailureRate = Long.valueOf(average);
     }
 
     protected void updateSsoServerAuthenticationSuccessRate() {
-        long li = AuthenticationSuccessCount.longValue();
+        long li = AuthenticationSuccessRate.longValue();
 
         if (lastCheckpoint + frequency < System.currentTimeMillis()) {
             if (!historicSuccessRecords.offerLast(li)) {
