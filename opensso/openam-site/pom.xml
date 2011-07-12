@@ -110,12 +110,13 @@
   <dbstyle-dir>${basedir}/src/main/docbkx-stylesheets</dbstyle-dir>
   <docbkx-out>${basedir}/target/docbkx</docbkx-out>
   <site-out>${basedir}/target/site</site-out>
+  <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
  </properties>
  <distributionManagement>
   <site>
-   <id>openam.forgerock.org</id>
+   <id>forgerock.org</id>
    <name>OpenAM Project</name>
-   <url>scp://openam.forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</url>
+   <url>${siteDistributionURL}</url>
   </site>
  </distributionManagement>
  <build>
