@@ -570,6 +570,9 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
         ap_log_error(__FILE__, __LINE__, APLOG_NOTICE, 0, server_ptr,
                 "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d], max_pdp_count[%d]",
                 shm_size, pd_shm_size, scfg->max_pid_count, scfg->max_pdp_count);
+    } else {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to initialize policy web agent");
+        ret = HTTP_INTERNAL_SERVER_ERROR;
     }
     return ret;
 }
@@ -1410,8 +1413,8 @@ int dsame_check_access(request_rec *r) {
         if (agentInitialized != B_TRUE) {
             (void) init_at_request();
             if (agentInitialized != B_TRUE) {
-                ret = do_deny(r, status);
                 status = AM_FAILURE;
+                ret = do_deny(r, status);
             }
         }
         apr_thread_mutex_unlock(init_mutex);
@@ -1421,17 +1424,17 @@ int dsame_check_access(request_rec *r) {
         agent_config = am_web_get_agent_configuration();
         // Check request
         if (r == NULL) {
-            am_web_log_error("%s: Request to http server is NULL!", thisfunc);
+            am_web_log_error("%s: Request to http server is NULL", thisfunc);
             status = AM_FAILURE;
         }
     }
     am_web_log_info("%s: starting...", thisfunc);
 
-    // Check arguments
-    if (r == NULL) {
-        am_web_log_error("%s: Request to http server is NULL.", thisfunc);
+    if (agent_config == NULL || agentInitialized != B_TRUE) {
         status = AM_FAILURE;
+        ret = do_deny(r, status);
     }
+
     if (status == AM_SUCCESS) {
         if (r->connection == NULL) {
             am_web_log_error("%s: Request connection is NULL.", thisfunc);

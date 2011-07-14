@@ -6088,31 +6088,21 @@ process_request(am_web_request_params_t *req_params,
                 args[0] = req_func;
                 am_web_log_debug("%s: %s, will redirect (post data: %s)", thisfunc, (sts==AM_INVALID_SESSION ? "AM_INVALID_SESSION" : "AM_ACCESS_DENIED"), post_data);
                 if (sts == AM_INVALID_SESSION) {
-                    // reset the CDSSO cookie first
+                    // reset ldap cookies on invalid session
+                    am_web_do_cookies_reset(add_cookie_in_response, args, agent_config);
+                    // reset CDSSO cookie 
                     if (cdsso_enabled == B_TRUE) {
-                        am_status_t cdStatus = am_web_do_cookie_domain_set(add_cookie_in_response, 
-                                               args, 
-                                               EMPTY_STRING, 
-                                               agent_config);
-                        if(cdStatus != AM_SUCCESS) {
-                            am_web_log_error("process_request : CDSSO reset cookie failed");
+                        if (am_web_do_cookie_domain_set(add_cookie_in_response, args, EMPTY_STRING, agent_config) != AM_SUCCESS) {
+                            am_web_log_error("process_request (AM_INVALID_SESSION): CDSSO reset cookie failed");
                         }
-                    }
-                    // reset cookies on invalid session.
-                    local_sts = am_web_do_cookies_reset(add_cookie_in_response,
-                                                    args, agent_config);
-                    if (local_sts != AM_SUCCESS) {
-                        am_web_log_warning("%s: all_cookies_reset after "
-                                "access to url [%s] returned "
-                                "invalid session returned %s.",
-                                thisfunc, req_params->url,
-                                am_status_to_string(local_sts));
                     }
                 }
                 if (sts == AM_ACCESS_DENIED) {
                     if (cdsso_enabled == B_TRUE) {
-                        am_web_do_cookies_reset(add_cookie_in_response,
-                                                    args, agent_config);                        
+                        am_web_do_cookies_reset(add_cookie_in_response, args, agent_config);
+                        if (am_web_do_cookie_domain_set(add_cookie_in_response, args, EMPTY_STRING, agent_config) != AM_SUCCESS) {
+                            am_web_log_error("process_request (AM_ACCESS_DENIED): CDSSO reset cookie failed");
+                        }
                     }
                 }
                 if (req_params->method == AM_WEB_REQUEST_POST &&
