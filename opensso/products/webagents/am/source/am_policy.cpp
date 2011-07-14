@@ -443,6 +443,22 @@ am_policy_compare_urls(const am_resource_traits_t *rsrcTraits,
     Log::ModuleId logID = Log::addModule(AM_POLICY_SERVICE);
     am_resource_match_t ret = AM_NO_MATCH;
     try {
+        std::string urls(policyResourceName);
+        if (urls.find("*", 0) != std::string::npos) {
+            if (urls == "*" || urls.find(" *", 0) != std::string::npos || urls.find("* ", 0) != std::string::npos) {
+                /**
+                 * current pattern matching algorithm forbids:
+                 * - wildcard only (i.e. "all allowed")
+                 * - white-space before/after wildcard, though this is unlikely to be matched, because url list 
+                 *   is passed down to an agent as space separated value object
+                 */
+                Log::log(logID, Log::LOG_MAX_DEBUG,
+                        "%s: Comparison of \"%s\" and \"%s\" returned AM_NO_MATCH (invalid matching pattern)",
+                        thisfunc, resourceName,
+                        policyResourceName);
+                return AM_NO_MATCH;
+            }
+        }
         ret = Utils::compare(policyResourceName, resourceName,
 			     rsrcTraits,
 			     true, usePatterns==B_TRUE);
