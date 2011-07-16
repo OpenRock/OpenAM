@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.forgerock.openam</groupId>
     <artifactId>AMSessionDB</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>AMSessionDB</name>
 
@@ -70,34 +70,24 @@
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.simple</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.crypto</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>2.2</version>
             </dependency>
-            <dependency>
-                <groupId>com.orientechnologies</groupId>
-                <artifactId>orientdb-core</artifactId>
-                <version>${orientdb.version}</version>
-            </dependency> 
             <dependency> 
-                <groupId>com.orientechnologies</groupId> 
-                <artifactId>orient-commons</artifactId> 
-                <version>${orientdb.version}</version>
-            </dependency>
-            <dependency> 
-                <groupId>com.orientechnologies</groupId> 
-                <artifactId>orientdb-server</artifactId> 
-                <version>${orientdb.version}</version>
-            </dependency>
-            <dependency> 
-                <groupId>com.orientechnologies</groupId> 
-                <artifactId>orientdb-enterprise</artifactId> 
-                <version>${orientdb.version}</version>
-            </dependency>
-            <dependency> 
-                <groupId>com.orientechnologies</groupId> 
-                <artifactId>orientdb-client</artifactId> 
-                <version>${orientdb.version}</version>
+                <groupId>org.forgerock.opendj</groupId> 
+                <artifactId>opendj-server</artifactId>
+                <version>2.4.3-SNAPSHOT</version> 
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -151,16 +141,6 @@
             <id>forgerock</id>
             <name>ForgeRock OpenAM Repo</name>
             <url>http://repo.forgerock.org</url>
-        </repository>
-        <!-- OrientDB -->
-        <repository> 
-            <id>orientechnologies-repository</id> 
-            <name>Orient Technologies Maven2 Repository</name> 
-            <url>http://www.orientechnologies.com/listing/m2</url> 
-            <snapshots> 
-                <enabled>true</enabled> 
-                <updatePolicy>daily</updatePolicy> 
-            </snapshots> 
         </repository>
         <repository>  
             <id>maven-restlet</id>  

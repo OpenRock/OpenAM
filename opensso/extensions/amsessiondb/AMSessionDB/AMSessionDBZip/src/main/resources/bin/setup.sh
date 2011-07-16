@@ -1,4 +1,5 @@
-#
+#!/bin/sh
+
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
 # Copyright (c) 2011 ForgeRock AS. All Rights Reserved
@@ -22,19 +23,10 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 
-#amsessiondb.amrecordpersister=org.forgerock.openam.amsessionstore.db.memory.MemoryPersistentStore
-amsessiondb.amrecordpersister=org.forgerock.openam.amsessionstore.db.opendj.OpenDJPersistentStore
-amsessiondb.statistics.enabled=true
-amsessiondb.opendj.admin.port=5444
-amsessiondb.opendj.ldap.port=60389
-amsessiondb.opendj.jmx.port=2689
-amsessiondb.opendj.suffix=dc=amsessiondb,dc=com
-amsessiondb.min.threads=128
-amsessiondb.max.threads=512
-amsessiondb.opendj.root=../opendj
-amsessiondb.auth.username=amsessiondb
-amsessiondb.auth.password=password
-amsessiondb.opendj.ds_mgr_dn=cn=Directory Manager
-amsessiondb.opendj.ds_mgr_passwd=password
-#amsessiondb.exising.server.url=http://server1.forgerock.com/amsessiondb/config
+AMSESSION_DB=`pwd`
+CONFIG_DIR=$AMSESSION_DB/../config
+LIB_DIR=$AMSESSION_DB/../lib
+DEBUG_OPT=-agentlib:jdwp=transport=dt_socket,address=9000,server=y,suspend=n
+
+java -Djava.util.logging.config.file="$CONFIG_DIR/amsessiondblog.properties" -cp $LIB_DIR/AMSessionStore-0.2-SNAPSHOT.jar:$LIB_DIR/AMSessionStoreCommon-0.2-SNAPSHOT.jar:$LIB_DIR/org.restlet-2.0.6.jar:$LIB_DIR/commons-net-2.2.jar:$LIB_DIR/jackson-core-asl-1.4.3.jar:$LIB_DIR/jackson-mapper-asl-1.4.3.jar:$LIB_DIR/org.osgi.core-4.0.0.jar:$LIB_DIR/org.restlet.ext.jackson-2.0.6.jar:$LIB_DIR/org.restlet.ext.json-2.0.6.jar:$LIB_DIR/org.restlet.lib.org.json-2.0.jar:$LIB_DIR/opendj-server-2.4.3-SNAPSHOT.jar:$LIB_DIR/mail.jar:$LIB_DIR/je.jar:$LIB_DIR/activation.jar:../config:../locale $DEBUG_OPT org.forgerock.openam.amsessionstore.db.opendj.setup.SetupOpenDJ
 

@@ -43,8 +43,14 @@ import org.restlet.resource.ServerResource;
  */
 public class GetRecordCountResourceImpl extends ServerResource implements GetRecordCountResource {
     @Get
+    @Override
     public Map<String, Long> getRecordCount(String uuid) {
         Map<String, Long> sessions = null;
+        long startTime = 0;
+        
+        if (Statistics.isEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
         
         try {
             sessions = PersistentStoreFactory.getPersistentStore().getRecordCount(uuid);
@@ -54,7 +60,11 @@ public class GetRecordCountResourceImpl extends ServerResource implements GetRec
         }
         
         if (Statistics.isEnabled()) {
-            Statistics.getInstance().incrementsTotalReadSessionCount();
+            Statistics.getInstance().incrementTotalReadRecordCount();
+            
+            if (startTime != 0) {
+                Statistics.getInstance().updateReadRecordCountTime(System.currentTimeMillis() - startTime);   
+            }
         }
         
         return sessions;

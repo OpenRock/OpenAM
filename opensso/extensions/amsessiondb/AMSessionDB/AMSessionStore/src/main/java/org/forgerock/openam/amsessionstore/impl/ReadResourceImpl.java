@@ -45,8 +45,14 @@ import org.restlet.resource.ServerResource;
 
 public class ReadResourceImpl extends ServerResource implements ReadResource {
     @Get
+    @Override
     public AMRecord read(String id) {
         AMRecord record = null;
+        long startTime = 0;
+        
+        if (Statistics.isEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
         
         try {
             record = PersistentStoreFactory.getPersistentStore().read(id);
@@ -63,6 +69,10 @@ public class ReadResourceImpl extends ServerResource implements ReadResource {
         
         if (Statistics.isEnabled()) {
             Statistics.getInstance().incrementTotalReads();
+            
+            if (startTime != 0) {
+                Statistics.getInstance().updateReadTime(System.currentTimeMillis() - startTime);    
+            }
         }
         
         return record;

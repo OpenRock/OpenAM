@@ -38,9 +38,10 @@ import java.io.Serializable;
  * @author steve
  */
 public class Statistics implements Serializable {
+    private static final long serialVersionUID = 42L;
     private static boolean enabled = true;
     private static Statistics instance = null;
-    
+      
     static {
         initialize();
     }
@@ -53,8 +54,23 @@ public class Statistics implements Serializable {
     private int totalReads;
     private int totalWrites;
     private int totalDeletes;
-    private int totalReadSessionCount;
-    
+    private int totalReadRecordCount;
+    private long writeTimeMin;
+    private long writeTimeMax;
+    private long writeTimeAverage;
+    private long writeCumulativeCount;
+    private long readTimeMin;
+    private long readTimeMax;
+    private long readTimeAverage;
+    private long readCumulativeCount;
+    private long deleteTimeMin;
+    private long deleteTimeMax;
+    private long deleteTimeAverage;
+    private long deleteCumulativeCount;
+    private long readRecordTimeMin;
+    private long readRecordTimeMax;
+    private long readRecordTimeAverage;
+    private long readRecordCumulativeCount;
     
     public Statistics() {
         // do nothing
@@ -100,6 +116,51 @@ public class Statistics implements Serializable {
     }
     
     /**
+     * Update the read request time count
+     * 
+     * @param time The time in ms of the last read request
+     */
+    public void updateReadTime(long time) {
+        if (time > 0 && time < readTimeMin) {
+            readTimeMin = time;
+        }
+        
+        if (time > readTimeMax) {
+            readTimeMax = time;
+        }
+        
+        readCumulativeCount += time;
+        readTimeAverage = readCumulativeCount / totalReads;
+    }
+    
+    /**
+     * Returns the read request minimum time
+     * 
+     * @return the minimum read request time in ms
+     */
+    public long getReadRequestTimeMinimum() {
+        return readTimeMin;
+    }
+    
+    /**
+     * Returns the read request maximum time
+     * 
+     * @return the maximum read request time in ms 
+     */
+    public long getReadRequestTimeMaximum() {
+        return readTimeMax;
+    }
+    
+    /**
+     * Returns the read request average time
+     * 
+     * @return the average read request time in ms
+     */
+    public long getReadRequestAverageTime() {
+        return readTimeAverage;
+    }
+    
+    /**
      * Get the total number of writes
      * 
      * @return The total number of writes
@@ -114,6 +175,51 @@ public class Statistics implements Serializable {
     public void incrementTotalWrites() {
         totalWrites++;
         totalRequests++;
+    }
+    
+    /**
+     * Update the write request time count
+     * 
+     * @param time The time in ms of the last write request
+     */
+    public void updateWriteTime(long time) {
+        if (time > 0 && time < writeTimeMin) {
+            writeTimeMin = time;
+        }
+        
+        if (time > writeTimeMax) {
+            writeTimeMax = time;
+        }
+        
+        writeCumulativeCount += time;
+        writeTimeAverage = writeCumulativeCount / totalWrites;
+    }
+    
+    /**
+     * Returns the write request minimum time
+     * 
+     * @return the minimum write request time in ms
+     */
+    public long getWriteRequestTimeMinimum() {
+        return writeTimeMin;
+    }
+    
+    /**
+     * Returns the write request maximum time
+     * 
+     * @return the maximum write request time in ms 
+     */
+    public long getWriteRequestTimeMaximum() {
+        return writeTimeMax;
+    }
+    
+    /**
+     * Returns the write request average time
+     * 
+     * @return the average write request time in ms
+     */
+    public long getWriteRequestAverageTime() {
+        return writeTimeAverage;
     }
     
     /**
@@ -134,20 +240,110 @@ public class Statistics implements Serializable {
     }
     
     /**
-     * Get the total number of reads session count
+     * Update the delete request time count
      * 
-     * @return 
+     * @param time The time in ms of the last delete request
      */
-    public int getTotalReadSessionCount() {
-        return totalReadSessionCount;
+    public void updateDeleteTime(long time) {
+        if (time > 0 && time < deleteTimeMin) {
+            deleteTimeMin = time;
+        }
+        
+        if (time > deleteTimeMax) {
+            deleteTimeMax = time;
+        }
+        
+        deleteCumulativeCount += time;
+        deleteTimeAverage = deleteCumulativeCount / totalDeletes;
     }
     
     /**
-     * Increment the total read session count total
+     * Returns the delete request minimum time
+     * 
+     * @return the minimum delete request time in ms
      */
-    public void incrementsTotalReadSessionCount() {
-        totalReadSessionCount++;
+    public long getDeleteRequestTimeMinimum() {
+        return deleteTimeMin;
+    }
+    
+    /**
+     * Returns the delete request maximum time
+     * 
+     * @return the maximum delete request time in ms 
+     */
+    public long getDeleteRequestTimeMaximum() {
+        return deleteTimeMax;
+    }
+    
+    /**
+     * Returns the delete request average time
+     * 
+     * @return the average delete request time in ms
+     */
+    public long getDeleteRequestAverageTime() {
+        return deleteTimeAverage;
+    }
+    
+    /**
+     * Get the total number of reads record count
+     * 
+     * @return 
+     */
+    public int getTotalReadRecordCount() {
+        return totalReadRecordCount;
+    }
+    
+    /**
+     * Increment the total read record count total
+     */
+    public void incrementTotalReadRecordCount() {
+        totalReadRecordCount++;
         totalRequests++;
+    }
+    
+    /**
+     * Update the read record count request time count
+     * 
+     * @param time The time in ms of the last read record count request
+     */
+    public void updateReadRecordCountTime(long time) {
+        if (time > 0 && time < readRecordTimeMin) {
+            readRecordTimeMin = time;
+        }
+        
+        if (time > readRecordTimeMax) {
+            readRecordTimeMax = time;
+        }
+        
+        readRecordCumulativeCount += time;
+        readRecordTimeAverage = readRecordCumulativeCount / totalReadRecordCount;
+    }
+    
+    /**
+     * Returns the read record count request minimum time
+     * 
+     * @return the minimum read record count request time in ms
+     */
+    public long getReadRecordRequestTimeMinimum() {
+        return readRecordTimeMin;
+    }
+    
+    /**
+     * Returns the read record count request maximum time
+     * 
+     * @return the maximum read record count request time in ms 
+     */
+    public long getReadRecordRequestTimeMaximum() {
+        return readRecordTimeMax;
+    }
+    
+    /**
+     * Returns the read record count request average time
+     * 
+     * @return the average read record count request time in ms
+     */
+    public long getReadRecordRequestAverageTime() {
+        return readRecordTimeAverage;
     }
     
     /**
@@ -158,7 +354,23 @@ public class Statistics implements Serializable {
         totalReads = 0;
         totalWrites = 0;
         totalDeletes = 0;
-        totalReadSessionCount = 0;
+        totalReadRecordCount = 0;
+        writeTimeMin = 0;
+        writeTimeMax = 0;
+        writeTimeAverage = 0;
+        writeCumulativeCount = 0;
+        readTimeMin = 0;
+        readTimeMax = 0;
+        readTimeAverage = 0;
+        readCumulativeCount = 0;
+        deleteTimeMin = 0;
+        deleteTimeMax = 0;
+        deleteTimeAverage = 0;
+        deleteCumulativeCount = 0;
+        readRecordTimeMin = 0;
+        readRecordTimeMax = 0;
+        readRecordTimeAverage = 0;
+        readRecordCumulativeCount = 0;
     }
     
     /** 

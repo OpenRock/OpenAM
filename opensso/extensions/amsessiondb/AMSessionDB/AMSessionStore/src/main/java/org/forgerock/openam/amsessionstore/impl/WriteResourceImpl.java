@@ -43,8 +43,15 @@ import org.restlet.resource.ServerResource;
  */
 public class WriteResourceImpl extends ServerResource implements WriteResource {
     @Put
+    @Override
     public void write(AMRecord record) 
     throws Exception {
+        long startTime = 0;
+        
+        if (Statistics.isEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
+        
         try {
             PersistentStoreFactory.getPersistentStore().write(record);
         } catch (Exception ex) {
@@ -54,6 +61,10 @@ public class WriteResourceImpl extends ServerResource implements WriteResource {
         
         if (Statistics.isEnabled()) {
             Statistics.getInstance().incrementTotalWrites();
+            
+            if (startTime != 0) {
+                Statistics.getInstance().updateWriteTime(System.currentTimeMillis() - startTime);
+            }
         }
     }
 }

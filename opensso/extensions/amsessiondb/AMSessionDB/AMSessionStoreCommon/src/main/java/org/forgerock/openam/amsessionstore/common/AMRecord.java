@@ -107,6 +107,10 @@ public class AMRecord implements Serializable {
        extraByteAttrs.put(key, bytes);
     }
     
+    public void setExtraByteAttrs(Map<String, String> map) {   
+       extraByteAttrs = map;
+    }
+    
     public Map<String, String> getExtraByteAttributes() {
         return extraByteAttrs; 
     }
@@ -117,6 +121,13 @@ public class AMRecord implements Serializable {
     
     public void setExtraStringAttrs(Map<String, String> map) {
         extraStringAttrs = map; 
+    }
+    
+    public void setExtraStringAttrs(String key, String value) {
+       if (extraStringAttrs == null) {
+           extraStringAttrs = new HashMap<String, String>();
+       }    
+       extraStringAttrs.put(key, value); 
     }
     
     public void setData(String blob) {

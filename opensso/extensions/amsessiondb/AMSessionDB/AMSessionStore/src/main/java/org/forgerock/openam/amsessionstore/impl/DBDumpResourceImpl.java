@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.forgerock.openam.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.amsessionstore.db.orientdb.OrientDBPersistentStore;
 import org.forgerock.openam.amsessionstore.resources.DBDumpResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -46,11 +45,6 @@ public class DBDumpResourceImpl extends ServerResource implements DBDumpResource
     throws Exception {
         Set results = new HashSet();
         PersistentStore store = PersistentStoreFactory.getPersistentStore();
-        
-        if (store instanceof OrientDBPersistentStore) {
-            OrientDBPersistentStore pStore = (OrientDBPersistentStore) store;
-            results.add(pStore.getDBOverview());
-        }
         
         return results;
     }

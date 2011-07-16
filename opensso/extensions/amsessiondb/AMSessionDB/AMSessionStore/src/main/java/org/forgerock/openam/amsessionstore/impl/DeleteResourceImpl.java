@@ -44,7 +44,14 @@ import org.restlet.resource.ServerResource;
  */
 public class DeleteResourceImpl extends ServerResource implements DeleteResource {
     @Delete
+    @Override
     public void remove(String id) {
+        long startTime = 0;
+        
+        if (Statistics.isEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
+        
         try {
             PersistentStoreFactory.getPersistentStore().delete(id);
         } catch (StoreException sex) {
@@ -60,6 +67,10 @@ public class DeleteResourceImpl extends ServerResource implements DeleteResource
         
         if (Statistics.isEnabled()) {
             Statistics.getInstance().incrementTotalDeletes();
+            
+            if (startTime != 0) {
+                Statistics.getInstance().updateDeleteTime(System.currentTimeMillis() - startTime);          
+            }
         }
     }
 }

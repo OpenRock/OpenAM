@@ -39,9 +39,10 @@ import org.restlet.resource.ServerResource;
  */
 public class StatsResourceImpl extends ServerResource implements StatsResource {
     @Get
+    @Override
     public Set stats()
     throws Exception {
-        Set results = new HashSet();
+        Set<Object> results = new HashSet<Object>();
         results.add(Statistics.getInstance());
         results.add(PersistentStoreFactory.getPersistentStore().getDBStatistics());
         

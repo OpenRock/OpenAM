@@ -43,15 +43,46 @@ public final class Constants {
     
     public static final String URI = "amsessiondb.uri";
     
-    public static final String DB_URL = "amsessiondb.db.url";
+    public static final String MIN_THREADS = "amsessiondb.min.threads";
     
-    public static final String DB_ADMIN = "amsessiondb.db.admin";
-    
-    public static final String DB_PASSWORD = "amsessiondb.db.password";
-    
-    public static final String DB_POOL_MIN = "amsessiondb.db.poolMinSize";
-    
-    public static final String DB_POOL_MAX = "amsessiondb.db.poolMaxSize";
+    public static final String MAX_THREADS = "amsessiondb.max.threads";
     
     public static final String LOCAL = "local";
+    
+    public static final String OPENDJ_ROOT = "amsessiondb.opendj.root";
+    
+    public static final String OPENDJ_ADMIN_PORT = "amsessiondb.opendj.admin.port";
+            
+    public static final String OPENDJ_LDAP_PORT = "amsessiondb.opendj.ldap.port";
+    
+    public static final String OPENDJ_JMX_PORT = "amsessiondb.opendj.jmx.port";
+
+    public static final String OPENDJ_SUFFIX = "amsessiondb.opendj.suffix";
+    
+    public static final String OPENDJ_SUFFIX_TAG = "AMSESSIONDB_BASEDN";
+    
+    public static final String OPENDJ_RDN_TAG = "AMSESSIONDB_RDN";
+    
+    public static final String OPENDJ_DATASTORE = "opendj";
+    
+    public static final String OPENDJ_DS_MGR_DN = "amsessiondb.opendj.ds_mgr_dn";
+    
+    public static final String OPENDJ_DS_MGR_PASSWD = "amsessiondb.opendj.ds_mgr_passwd";
+    
+    public static final String USERNAME = "amsessiondb.auth.username";
+    
+    public static final String PASSWORD = "amsessiondb.auth.password";
+    
+    public static final String EXISTING_SERVER_URL = "amsessiondb.exising.server.url";
+    
+    public static final String BASE_DN = "ou=famrecords";
+    
+    public static final String COMMA = ",";
+    
+    public static final String EQUALS = "=";
+    
+    // exit codes
+    public static final int EXIT_INVALID_URL = 1;
+    
+    public static final int EXIT_INSTALL_FAILED = 2;
 }
