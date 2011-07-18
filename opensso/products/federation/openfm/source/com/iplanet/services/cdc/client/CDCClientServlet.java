@@ -118,6 +118,7 @@ extends HttpServlet {
     	adviceParams.add("user");
     	adviceParams.add("realm");
     	adviceParams.add("org");
+        adviceParams.add("resource");
     	adviceParams.add("sunamcompositeadvice");
         String invalidStrings = SystemPropertiesManager.get(
             Constants.INVALID_GOTO_STRINGS);
