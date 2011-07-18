@@ -25,8 +25,6 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -38,7 +36,6 @@ import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import org.forgerock.openam.amsessionstore.db.DBStatistics;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.amsessionstore.db.PersistentStore;
@@ -62,11 +59,8 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     private Thread storeThread;
     private int sleepInterval = 60 * 1000;
     private final static String ID = "OpenDJPersistentStore"; 
-    private static String sessionDBSuffix;
-    private static String odjRoot;
-    private static URL existingServerUrl;
     private static InternalClientConnection icConn;
-    private static Map<String, String> openDJSetupMap; 
+    
     private final static String PKEY_FILTER_PRE = "(pKey=";
     private final static String PKEY_FILTER_POST = ")";
     private final static String SKEY_FILTER_PRE = "(sKey=";
@@ -75,46 +69,11 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     private final static String EXPDATE_FILTER_POST = ")";
     private static LinkedHashSet<String> returnAttrs;
     
-    private final static String DEFAULT_OPENDJ_ROOT = "../opendj"; 
-    private final static String DEFAULT_SUFFIX = "dc=amsessiondb,dc=com";
-    private final static String DEFAULT_OPENDJ_ADMIN_PORT = "4444";
-    private final static String DEFAULT_OPENDJ_LDAP_PORT =" 60389";
-    private final static String DEFAULT_OPENDJ_JMX_PORT = "2689";
-    private final static String DEFAULT_OPENDJ_DS_MGR_DN = "cn=Directory Manager";
-    private final static String DEFAULT_OPENDJ_DS_MGR_PASSWD = "password";
-    
     static {
         initialize();
     }
     
     private static void initialize() {
-        odjRoot = SystemProperties.get(Constants.OPENDJ_ROOT, DEFAULT_OPENDJ_ROOT);
-        sessionDBSuffix = SystemProperties.get(Constants.OPENDJ_SUFFIX, DEFAULT_SUFFIX);
-        
-        openDJSetupMap = new HashMap<String, String>();
-        openDJSetupMap.put(Constants.OPENDJ_ADMIN_PORT, 
-                SystemProperties.get(Constants.OPENDJ_ADMIN_PORT, DEFAULT_OPENDJ_ADMIN_PORT));
-        openDJSetupMap.put(Constants.OPENDJ_LDAP_PORT, 
-                SystemProperties.get(Constants.OPENDJ_LDAP_PORT, DEFAULT_OPENDJ_LDAP_PORT));
-        openDJSetupMap.put(Constants.OPENDJ_JMX_PORT, 
-                SystemProperties.get(Constants.OPENDJ_JMX_PORT, DEFAULT_OPENDJ_JMX_PORT));
-        openDJSetupMap.put(Constants.OPENDJ_DS_MGR_DN, 
-                SystemProperties.get(Constants.OPENDJ_DS_MGR_DN, DEFAULT_OPENDJ_DS_MGR_DN));
-        openDJSetupMap.put(Constants.OPENDJ_DS_MGR_PASSWD, 
-                SystemProperties.get(Constants.OPENDJ_DS_MGR_PASSWD, DEFAULT_OPENDJ_DS_MGR_PASSWD));
-        
-        String url = SystemProperties.get(Constants.EXISTING_SERVER_URL);
-        
-        if (url != null && url.length() > 0) {
-            try {
-                existingServerUrl = new URL(SystemProperties.get(Constants.EXISTING_SERVER_URL));
-            } catch (MalformedURLException mue) {
-                System.err.println(Constants.EXISTING_SERVER_URL + " URL in amsessiondb.properties " +
-                        SystemProperties.get(Constants.EXISTING_SERVER_URL) + " is invalid, exiting.");
-                System.exit(Constants.EXIT_INVALID_URL);
-            }
-        }
-        
         returnAttrs = new LinkedHashSet<String>();
         returnAttrs.add("dn");
         returnAttrs.add(AMRecordDataEntry.PRI_KEY);
@@ -144,30 +103,26 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         storeThread.start();
         initializeOpenDJ();
         
+        // Syncup embedded opends replication with current 
+        // server instances.
+        if (syncServerInfoWithRelication() == false) {
+            Log.logger.log(Level.FINE, "embedded replication sync failed.");
+        }
+        
         icConn = InternalClientConnection.getRootConnection();
         Log.logger.log(Level.FINE, "OpenDJPersistentStore created successfully.");
     }
     
-    public static Map<String, String> getOpenDJSetupMap() {
-        return openDJSetupMap;
+    private boolean syncServerInfoWithRelication() {
+        return true;
     }
     
-    public static String getOdjRoot() {
-        return odjRoot;
-    }
-    
-    public static String getSessionDBSuffix() {
-        return sessionDBSuffix;
-    }
-    
-    public static URL getExistingServerUrl() {
-        return existingServerUrl;
-    }
+
     
     private void initializeOpenDJ() 
     throws StoreException {
         try {
-            EmbeddedOpenDJ.startServer(odjRoot);
+            EmbeddedOpenDJ.startServer(OpenDJConfig.getOdjRoot());
         } catch (Exception ex) {
             Log.logger.log(Level.SEVERE, "Unable to start embedded OpenDJ server.", ex);
             throw new StoreException("Unable to start embedded OpenDJ server.", ex);
@@ -198,7 +153,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         StringBuilder dn = new StringBuilder();
         dn.append(AMRecordDataEntry.PRI_KEY).append(Constants.EQUALS).append(record.getPrimaryKey());
         dn.append(Constants.COMMA).append(Constants.BASE_DN);
-        dn.append(Constants.COMMA).append(OpenDJPersistentStore.getSessionDBSuffix());
+        dn.append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
         attrList.addAll(AMRecordDataEntry.getObjectClasses());
         AddOperation ao = icConn.processAdd(dn.toString(), attrList);
         ResultCode resultCode = ao.getResultCode();
@@ -227,7 +182,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(PKEY_FILTER_PRE).append(id).append(PKEY_FILTER_POST);
-            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(sessionDBSuffix);
+            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                 SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                 0, 0, false, filter.toString() , returnAttrs);
@@ -249,16 +204,16 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + sessionDBSuffix);
+                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
                 
                 return null;
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix + 
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
                        ", error code = " + resultCode);
-                throw new StoreException("Unable to access entry DN" + sessionDBSuffix);
+                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix, dex);
+            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
             throw new StoreException("Unable to read record from store", dex);
         }
     }
@@ -270,7 +225,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(SKEY_FILTER_PRE).append(id).append(SKEY_FILTER_POST);
-            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(sessionDBSuffix);
+            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                 SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                 0, 0, false, filter.toString() , returnAttrs);
@@ -301,16 +256,16 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + sessionDBSuffix);
+                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
                 
                 return null;
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix + 
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
                        ", error code = " + resultCode);
-                throw new StoreException("Unable to access entry DN" + sessionDBSuffix);
+                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix, dex);
+            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
             throw new StoreException("Unable to read record from store", dex);
         }
     }
@@ -321,7 +276,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         StringBuilder dn = new StringBuilder();
         dn.append(AMRecordDataEntry.PRI_KEY).append(Constants.EQUALS).append(id);
         dn.append(Constants.COMMA).append(Constants.BASE_DN);
-        dn.append(Constants.COMMA).append(OpenDJPersistentStore.getSessionDBSuffix());
+        dn.append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
         DeleteOperation dop = icConn.processDelete(dn.toString());
         ResultCode resultCode = dop.getResultCode();
         
@@ -337,7 +292,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(EXPDATE_FILTER_PRE).append(expDate).append(EXPDATE_FILTER_POST);
-            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(sessionDBSuffix);
+            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                 SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                 0, 0, false, filter.toString() , returnAttrs);
@@ -367,14 +322,14 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     }
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + sessionDBSuffix);
+                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix + 
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
                        ", error code = " + resultCode);
-                throw new StoreException("Unable to access entry DN" + sessionDBSuffix);
+                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix, dex);
+            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
             throw new StoreException("Unable to read record from store", dex);
         }        
     }
@@ -386,7 +341,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(SKEY_FILTER_PRE).append(id).append(SKEY_FILTER_POST);
-            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(sessionDBSuffix);
+            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                 SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                 0, 0, false, filter.toString() , returnAttrs);
@@ -430,16 +385,16 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + sessionDBSuffix);
+                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
                 
                 return null;
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix + 
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
                        ", error code = " + resultCode);
-                throw new StoreException("Unable to access entry DN" + sessionDBSuffix);
+                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + sessionDBSuffix, dex);
+            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
             throw new StoreException("Unable to read record from store", dex);
         }
     }

@@ -55,9 +55,6 @@ public class AMRecordDataEntry {
     public final static String PRI_KEY = "pKey";
     public final static String EXP_DATE = "expirationDate";
     public final static String STATE = "state";
-    public final static String OBJECTCLASS = "objectClass";
-    public final static String TOP = "top";
-    public final static String FR_FAMRECORD = "frFamRecord";
     
     public static List<LDAPAttribute> objectClasses;
     
@@ -67,9 +64,9 @@ public class AMRecordDataEntry {
     
     private static void initialize() {
         List<String> valueList = new ArrayList<String>();
-        valueList.add(TOP);
-        valueList.add(FR_FAMRECORD);
-        LDAPAttribute ldapAttr= new LDAPAttribute(OBJECTCLASS, valueList);
+        valueList.add(Constants.TOP);
+        valueList.add(Constants.FR_FAMRECORD);
+        LDAPAttribute ldapAttr= new LDAPAttribute(Constants.OBJECTCLASS, valueList);
         objectClasses = new ArrayList<LDAPAttribute>();
         objectClasses.add(ldapAttr);
     }

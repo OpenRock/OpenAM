@@ -28,7 +28,7 @@ package org.forgerock.openam.amsessionstore.db.opendj.setup;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import org.forgerock.openam.amsessionstore.db.opendj.OpenDJPersistentStore;
+import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
 
 /**
  *
@@ -52,7 +52,7 @@ public class SetupLog {
     
     public synchronized void close() {
         try {
-            String baseDir = OpenDJPersistentStore.getOdjRoot();
+            String baseDir = OpenDJConfig.getOdjRoot();
             FileWriter fout = null;
             
             try {

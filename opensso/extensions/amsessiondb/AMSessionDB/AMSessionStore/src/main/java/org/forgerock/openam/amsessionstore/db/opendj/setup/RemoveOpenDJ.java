@@ -25,9 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj.setup;
 
-import java.io.OutputStreamWriter;
 import org.forgerock.openam.amsessionstore.common.Constants;
-import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import org.forgerock.openam.amsessionstore.db.opendj.EmbeddedOpenDJ;
 import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
 
@@ -35,30 +33,23 @@ import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
  *
  * @author steve
  */
-public class SetupOpenDJ {
+public class RemoveOpenDJ {
     public static void main(String[] argv) {
         if (EmbeddedOpenDJ.isInstalled()) {
-            System.out.println("amsessiondb is already installed and configured on this node\n");
-            System.out.println("to reinstall, try removing the opendj directory and re-run this command\n");
-        } else {
+            System.out.println("amsessiondb is configured on this node\n");
+            System.out.println("removing this node from the amsessiondb\n");
+            
             try {
-                SetupProgress.setWriter(new OutputStreamWriter(System.out));
-                EmbeddedOpenDJ.setup(OpenDJConfig.getOdjRoot());                
-
-                // Determine if we are a secondary install
-                if (EmbeddedOpenDJ.isMultiNode()) {
-                    EmbeddedOpenDJ.setupReplication(OpenDJConfig.getOpenDJSetupMap(), 
-                            ExistingServerConfig.getOpenDJSetupMap(OpenDJConfig.getExistingServerUrl(), 
-                                                                   SystemProperties.get(Constants.USERNAME),
-                                                                   SystemProperties.get(Constants.PASSWORD)));
-                    EmbeddedOpenDJ.registerServer(OpenDJConfig.getHostUrl());
-                }
-                
+                EmbeddedOpenDJ.unregisterServer(OpenDJConfig.getHostUrl());
+                //EmbeddedOpenDJ.syncReplicationServers();
                 EmbeddedOpenDJ.shutdownServer();
             } catch (Exception ex) {
                 System.err.println("Unable to setup amsessiondb: " + ex.getMessage());
                 System.exit(Constants.EXIT_INSTALL_FAILED);
             }
+        } else {
+            System.out.println("amsessiondb is not configured on this host \n");
+            System.out.println("removal of this node is not possible.\n");
         }
-    }
+    }    
 }

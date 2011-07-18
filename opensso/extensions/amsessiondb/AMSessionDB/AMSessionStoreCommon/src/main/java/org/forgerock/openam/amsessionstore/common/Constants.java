@@ -59,6 +59,8 @@ public final class Constants {
 
     public static final String OPENDJ_SUFFIX = "amsessiondb.opendj.suffix";
     
+    public static final String OPENDJ_REPL_PORT = "amsessiondb.opendj.repl.port";
+    
     public static final String OPENDJ_SUFFIX_TAG = "AMSESSIONDB_BASEDN";
     
     public static final String OPENDJ_RDN_TAG = "AMSESSIONDB_RDN";
@@ -75,7 +77,29 @@ public final class Constants {
     
     public static final String EXISTING_SERVER_URL = "amsessiondb.exising.server.url";
     
+    public static final String HOST_URL = "amsessiondb.host.url";
+    
+    public static final String HOST_PROTOCOL = "amsessiondb.host.protocol";
+    
+    public static final String HOST_FQDN = "amsessiondb.host.fqdn";
+    
+    public static final String HOST_PORT = "amsessiondb.host.port";
+    
+    public static final String HOST_URI = "amsessiondb.host.uri";
+    
     public static final String BASE_DN = "ou=famrecords";
+    
+    public static final String HOSTS_BASE_DN = "ou=amsessiondb";
+    
+    public static final String HOST_NAMING_ATTR = "cn";
+    
+    public final static String TOP = "top";
+        
+    public final static String FR_FAMRECORD = "frFamRecord";
+    
+    public final static String OBJECTCLASS = "objectClass";
+    
+    public final static String FR_AMSESSIONDB = "frAmSessionDb";
     
     public static final String COMMA = ",";
     

@@ -31,6 +31,7 @@ import org.forgerock.openam.amsessionstore.impl.DeleteResourceImpl;
 import org.forgerock.openam.amsessionstore.impl.GetRecordCountResourceImpl;
 import org.forgerock.openam.amsessionstore.impl.ReadResourceImpl;
 import org.forgerock.openam.amsessionstore.impl.ReadWithSecKeyResourceImpl;
+import org.forgerock.openam.amsessionstore.impl.ReplicationResourceImpl;
 import org.forgerock.openam.amsessionstore.impl.ShutdownResourceImpl;
 import org.forgerock.openam.amsessionstore.impl.StatsResourceImpl;
 import org.forgerock.openam.amsessionstore.impl.WriteResourceImpl;
@@ -41,6 +42,7 @@ import org.forgerock.openam.amsessionstore.resources.DeleteResource;
 import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
 import org.forgerock.openam.amsessionstore.resources.ReadResource;
 import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
+import org.forgerock.openam.amsessionstore.resources.ReplicationResource;
 import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
 import org.forgerock.openam.amsessionstore.resources.StatsResource;
 import org.forgerock.openam.amsessionstore.resources.WriteResource;
@@ -72,6 +74,7 @@ public class AmSessionDbApplication extends Application {
         router.attach(GetRecordCountResource.URI, GetRecordCountResourceImpl.class);
         router.attach(StatsResource.URI, StatsResourceImpl.class);
         router.attach(ConfigResource.URI, ConfigResourceImpl.class);
+        router.attach(ReplicationResource.URI, ReplicationResourceImpl.class);
         // TODO remove as this is debugging code
         router.attach(DBDumpResource.URI, DBDumpResourceImpl.class);
 

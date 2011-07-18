@@ -8,3 +8,7 @@ dn: ou=famrecords,@AMSESSIONDB_BASEDN@
 ou: famrecords
 objectClass: organizationalUnit
 
+dn: ou=amsessiondb,@AMSESSIONDB_BASEDN@
+ou: amsessiondb
+objectClass: organizationalUnit
+
