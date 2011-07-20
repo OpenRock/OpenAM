@@ -214,6 +214,8 @@ SUNW_2.1.2 {
 SUNW_2.2 {
 	global:
 		am_web_build_advice_response;
+                am_web_build_advice_redirect_url;
+		am_web_use_redirect_for_advice;
 		am_web_get_request_url;
 		am_web_get_all_request_urls;
 		am_web_get_agent_configuration;

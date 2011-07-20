@@ -454,7 +454,16 @@ am_status_t AgentConfiguration::populateAgentProperties()
         status = am_properties_get_with_default(this->properties, "com.forgerock.agents.config.notenforced.ip.handler", NULL, &(this->notenforcedIPmode));
         am_web_log_max_debug("Property [com.forgerock.agents.config.notenforced.ip.handler] value set to [%s]", this->notenforcedIPmode);
     }
- 
+
+    /* Get the redirect composite advice param */
+    if (AM_SUCCESS == status) {
+        parameter = "com.sun.am.use_redirect_for_advice";
+        status = am_properties_get_boolean_with_default(this->properties,
+                parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->use_redirect_for_advice));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->use_redirect_for_advice ? "TRUE" : "FALSE"));
+    }
+
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
         status = am_properties_get_boolean_with_default(this->properties,

@@ -2027,167 +2027,184 @@ REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
 }
 
 /*
-* Invoked when redireting the response to either server login page
-* or 403, 500 responses.
-*
-* */
+ * Invoked when redireting the response to either server login page
+ * or 403, 500 responses.
+ *
+ * */
 static am_status_t do_redirect(IHttpContext* pHttpContext,
-							   am_status_t policy_status,
-							   am_policy_result_t *policy_result,
-							   const char *original_url,
-							   const char *method,
-							   void** args,
-							   void* agent_config)
-{
-	const char *thisfunc = "do_redirect()";
-	am_status_t status = AM_SUCCESS;
-	size_t redirect_hdr_len = 0;
-	char *redirect_url = NULL;
-	DWORD redirect_url_len = 0;
-	size_t advice_headers_len = 0;
-	char *advice_headers = NULL;
-	const char advice_headers_template[] = {
-		"Content-Length: %d\r\n"
-		"Content-Type: text/html\r\n"
-		"\r\n"
-	};
-	const am_map_t advice_map = policy_result->advice_map;
-	HRESULT hr;
+        am_status_t policy_status,
+        am_policy_result_t *policy_result,
+        const char *original_url,
+        const char *method,
+        void** args,
+        void* agent_config) {
+    const char *thisfunc = "do_redirect()";
+    am_status_t status = AM_SUCCESS;
+    size_t redirect_hdr_len = 0;
+    char *redirect_url = NULL;
+    DWORD redirect_url_len = 0;
+    size_t advice_headers_len = 0;
+    char *advice_headers = NULL;
+    const char advice_headers_template[] = {
+        "Content-Length: %d\r\n"
+        "Content-Type: text/html\r\n"
+        "\r\n"
+    };
+    const am_map_t advice_map = policy_result->advice_map;
+    HRESULT hr;
 
-	IHttpResponse * pHttpResponse = pHttpContext->GetResponse();
-	if(pHttpResponse == NULL) {
-		am_web_log_error("%s: pHttpResponse is NULL.", thisfunc);
-		return AM_FAILURE;
-	}
-	status = am_web_get_url_to_redirect(policy_status, advice_map, original_url,
-		method, AM_RESERVED,&redirect_url, agent_config);
+    IHttpResponse * pHttpResponse = pHttpContext->GetResponse();
+    if (pHttpResponse == NULL) {
+        am_web_log_error("%s: pHttpResponse is NULL.", thisfunc);
+        return AM_FAILURE;
+    }
+    status = am_web_get_url_to_redirect(policy_status, advice_map, original_url,
+            method, AM_RESERVED, &redirect_url, agent_config);
 
-	// Compute the length of the redirect response.  Using the size of
-	// the format string overallocates by a couple of bytes, but that is
-	// not a significant issue given the short life span of the allocation.
+    // Compute the length of the redirect response.  Using the size of
+    // the format string overallocates by a couple of bytes, but that is
+    // not a significant issue given the short life span of the allocation.
 
 
-	switch(policy_status) {
-		case AM_ACCESS_DENIED:
-		case AM_INVALID_SESSION:
-		case AM_INVALID_FQDN_ACCESS:
+    switch (policy_status) {
+        case AM_ACCESS_DENIED:
+        case AM_INVALID_SESSION:
+        case AM_INVALID_FQDN_ACCESS:
 
-			//if advice string is present, send it as POST data, sending it as query string
-			//is removed in Agents 3.0
-			if ((status == AM_SUCCESS) && (redirect_url != NULL) && 
-				(policy_result->advice_string != NULL)) 
-			{
-				char *advice_txt = NULL;
-				status = am_web_build_advice_response(policy_result, redirect_url, 
-					&advice_txt);
-				am_web_log_debug("%s: policy status=%s, response[%s]", 
-					thisfunc, am_status_to_string(policy_status),
-					advice_txt);
-				if(status == AM_SUCCESS) {
-					size_t data_length = (advice_txt != NULL)?strlen(advice_txt):0;
-					if(data_length > 0) {
-						char buff[256];
-						itoa(data_length,buff,10);
-						advice_headers_len = strlen(advice_headers_template) + 3;
-						advice_headers = (char *) malloc(advice_headers_len);
-                                                pHttpResponse->Clear();
-						hr = pHttpResponse->SetStatus(200,"Status OK",0, S_OK);
-						hr = pHttpResponse->SetHeader("Content-Type","text/html",
-							(USHORT)strlen("text/html"),TRUE);
-						hr = pHttpResponse->SetHeader("Content-Length",buff, 
-							(USHORT)strlen(buff),TRUE);
-                                                CHAR* set_cookies_list = *((CHAR**) args[2]);
-                                                if(set_cookies_list != NULL) {
-                                                    set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
-                                                }
-						if (FAILED(hr)) {
-							am_web_log_error("%s: SetHeader failed.", thisfunc);
-							status = AM_FAILURE;
-						}
-						DWORD cbSent;
-						PCSTR pszBuffer = advice_txt;
-						HTTP_DATA_CHUNK dataChunk;
-						dataChunk.DataChunkType = HttpDataChunkFromMemory;
-						dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
-						dataChunk.FromMemory.BufferLength = (USHORT) data_length;
-						hr = pHttpResponse->WriteEntityChunks(&dataChunk,1,
-							FALSE,TRUE,&cbSent);
-					}
-				} else {
-					am_web_log_error("%s: Error while building " 
-						"advice response body:%s",
-						thisfunc, am_status_to_string(status));
-				}
-			} else {
-				// redirection to OpenSSO Login page.
-				// because policy advice string is null.
-				if (status == AM_SUCCESS && redirect_url != NULL) {
-					CHAR* set_cookies_list = *((CHAR**) args[2]);
-					am_web_log_debug("%s: policy status = %s, " 
-						"redirection URL is %s", thisfunc, 
-						am_status_to_string(policy_status), 
-						redirect_url);
-					if(set_cookies_list != NULL) {
-						set_headers_in_context(pHttpContext, set_cookies_list, 
-							FALSE);
-					}
-					am_web_log_debug("Generated Redirect");
-					pHttpResponse->Redirect(redirect_url, true, false);
-					if (FAILED(hr)) {
-						am_web_log_error("%s: SetHeader failed.", thisfunc);
-						status = AM_FAILURE;
-					}
-				} else {
-					//redirect url might be null or status is not success
-					//redirect to 403 Forbidden or 500 Internal Server error page.
-					pHttpResponse->Clear();
-					PCSTR pszBuffer;
-					//if status is access denied, send 403.
-					//for every other error, send 500.
-					if(policy_status == AM_ACCESS_DENIED) {
-						pszBuffer = "403 Forbidden";
-						hr = pHttpResponse->SetStatus(403,"Forbidden",0, S_OK, NULL);
-						hr = pHttpResponse->SetHeader("Content-Length","13",
-							(USHORT)strlen("13"),TRUE);
-						hr = pHttpResponse->SetHeader("Content-Type","text/plain",
-							(USHORT)strlen("text/plain"), TRUE);
-					} else {
-						pszBuffer = "500 Internal Server Error";
-						hr = pHttpResponse->SetStatus(500,"Internal Server Error",
-							0, S_OK);
-						hr = pHttpResponse->SetHeader("Content-Length","25",
-							(USHORT)strlen("25"),TRUE);
-						hr = pHttpResponse->SetHeader("Content-Type","text/html",
-							(USHORT)strlen("text/html"), TRUE);
-					}
-					HTTP_DATA_CHUNK dataChunk;
-					dataChunk.DataChunkType = HttpDataChunkFromMemory;
-					DWORD cbSent;
-					dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
-					dataChunk.FromMemory.BufferLength = (USHORT) strlen(pszBuffer);
-					hr = pHttpResponse->WriteEntityChunks(&dataChunk,1,FALSE,
-						TRUE,&cbSent);
-					if (FAILED(hr)) {
-						am_web_log_error("%s: Error while calling "
-							"am_web_get_redirect_url(): status = %s",
-							thisfunc, am_status_to_string(status));
-						status = AM_FAILURE;
-					}
-				}
-			}
-			if (redirect_url) {
-				am_web_free_memory(redirect_url);
-			}
-			if (advice_headers) {
-				free(advice_headers);
-			}
-			break;
+            //Check whether policy advices exist. If exists send
+            //the advice back to client
+            if ((status == AM_SUCCESS) && (redirect_url != NULL) &&
+                    (B_FALSE == am_web_use_redirect_for_advice(agent_config)) &&
+                    (policy_result->advice_string != NULL)) {
+                char *advice_txt = NULL;
+                status = am_web_build_advice_response(policy_result, redirect_url,
+                        &advice_txt);
+                am_web_log_debug("%s: policy status=%s, response[%s]",
+                        thisfunc, am_status_to_string(policy_status),
+                        advice_txt);
+                if (status == AM_SUCCESS) {
+                    size_t data_length = (advice_txt != NULL) ? strlen(advice_txt) : 0;
+                    if (data_length > 0) {
+                        char buff[256];
+                        itoa(data_length, buff, 10);
+                        advice_headers_len = strlen(advice_headers_template) + 3;
+                        advice_headers = (char *) malloc(advice_headers_len);
+                        pHttpResponse->Clear();
+                        hr = pHttpResponse->SetStatus(200, "Status OK", 0, S_OK);
+                        hr = pHttpResponse->SetHeader("Content-Type", "text/html",
+                                (USHORT) strlen("text/html"), TRUE);
+                        hr = pHttpResponse->SetHeader("Content-Length", buff,
+                                (USHORT) strlen(buff), TRUE);
+                        CHAR* set_cookies_list = *((CHAR**) args[2]);
+                        if (set_cookies_list != NULL) {
+                            set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
+                        }
+                        if (FAILED(hr)) {
+                            am_web_log_error("%s: SetHeader failed.", thisfunc);
+                            status = AM_FAILURE;
+                        }
+                        DWORD cbSent;
+                        PCSTR pszBuffer = advice_txt;
+                        HTTP_DATA_CHUNK dataChunk;
+                        dataChunk.DataChunkType = HttpDataChunkFromMemory;
+                        dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
+                        dataChunk.FromMemory.BufferLength = (USHORT) data_length;
+                        hr = pHttpResponse->WriteEntityChunks(&dataChunk, 1,
+                                FALSE, TRUE, &cbSent);
+                    }
+                } else {
+                    am_web_log_error("%s: Error while building "
+                            "advice response body:%s",
+                            thisfunc, am_status_to_string(status));
+                }
+            } else {
+                // No composite advice or composite advice is redirected.
+                // If there is a composite advice 
+                // we need to modify the redirect_url with the policy advice
+                if ((B_TRUE == am_web_use_redirect_for_advice(agent_config)) &&
+                        (policy_result->advice_string != NULL)) {
+                    char *redirect_url_with_advice = NULL;
+                    status = am_web_build_advice_redirect_url(policy_result,
+                            redirect_url, &redirect_url_with_advice);
+                    am_web_log_debug("%s: policy status=%s, "
+                            "redirect url with advice [%s]",
+                            thisfunc, am_status_to_string(status),
+                            redirect_url_with_advice);
+                    if (status == AM_SUCCESS) {
+                        redirect_url = redirect_url_with_advice;
+                    } else {
+                        am_web_log_error("%s: Error while building "
+                                "advice response body:%s",
+                                thisfunc, am_status_to_string(status));
+                    }
+                }
+                if (status == AM_SUCCESS && redirect_url != NULL) {
+                    CHAR* set_cookies_list = *((CHAR**) args[2]);
+                    am_web_log_debug("%s: policy status = %s, "
+                            "redirection URL is %s", thisfunc,
+                            am_status_to_string(policy_status),
+                            redirect_url);
+                    if (set_cookies_list != NULL) {
+                        set_headers_in_context(pHttpContext, set_cookies_list,
+                                FALSE);
+                    }
+                    am_web_log_debug("Generated Redirect");
+                    pHttpResponse->Redirect(redirect_url, true, false);
+                    if (FAILED(hr)) {
+                        am_web_log_error("%s: SetHeader failed.", thisfunc);
+                        status = AM_FAILURE;
+                    }
+                } else {
+                    //redirect url might be null or status is not success
+                    //redirect to 403 Forbidden or 500 Internal Server error page.
+                    pHttpResponse->Clear();
+                    PCSTR pszBuffer;
+                    //if status is access denied, send 403.
+                    //for every other error, send 500.
+                    if (policy_status == AM_ACCESS_DENIED) {
+                        pszBuffer = "403 Forbidden";
+                        hr = pHttpResponse->SetStatus(403, "Forbidden", 0, S_OK, NULL);
+                        hr = pHttpResponse->SetHeader("Content-Length", "13",
+                                (USHORT) strlen("13"), TRUE);
+                        hr = pHttpResponse->SetHeader("Content-Type", "text/plain",
+                                (USHORT) strlen("text/plain"), TRUE);
+                    } else {
+                        pszBuffer = "500 Internal Server Error";
+                        hr = pHttpResponse->SetStatus(500, "Internal Server Error",
+                                0, S_OK);
+                        hr = pHttpResponse->SetHeader("Content-Length", "25",
+                                (USHORT) strlen("25"), TRUE);
+                        hr = pHttpResponse->SetHeader("Content-Type", "text/html",
+                                (USHORT) strlen("text/html"), TRUE);
+                    }
+                    HTTP_DATA_CHUNK dataChunk;
+                    dataChunk.DataChunkType = HttpDataChunkFromMemory;
+                    DWORD cbSent;
+                    dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
+                    dataChunk.FromMemory.BufferLength = (USHORT) strlen(pszBuffer);
+                    hr = pHttpResponse->WriteEntityChunks(&dataChunk, 1, FALSE,
+                            TRUE, &cbSent);
+                    if (FAILED(hr)) {
+                        am_web_log_error("%s: Error while calling "
+                                "am_web_get_redirect_url(): status = %s",
+                                thisfunc, am_status_to_string(status));
+                        status = AM_FAILURE;
+                    }
+                }
+            }
+            if (redirect_url) {
+                am_web_free_memory(redirect_url);
+            }
+            if (advice_headers) {
+                free(advice_headers);
+            }
+            break;
 
-		default:
-			// All the default values are set to send 500 code.
-			break;
-	}
-	return status;
+        default:
+            // All the default values are set to send 500 code.
+            break;
+    }
+    return status;
 }
 
 

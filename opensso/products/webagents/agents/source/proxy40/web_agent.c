@@ -143,44 +143,64 @@ am_status_t get_header_value(pblock *pb, const char *header_name,
     }
     return status;
 }
-
 /*
  * this function redirects the user to the auth login url 
  */
 
 static int do_redirect(Session *sn, Request *rq, am_status_t status,
-                am_policy_result_t *policy_result,
-                const char *original_url, const char* method,
-                void* agent_config) {
+        am_policy_result_t *policy_result,
+        const char *original_url, const char* method,
+        void* agent_config) {
     int retVal = REQ_ABORTED;
     char *redirect_url = NULL;
     const am_map_t advice_map = policy_result->advice_map;
     am_status_t ret = AM_SUCCESS;
 
     ret = am_web_get_url_to_redirect(status, advice_map,
-                        original_url, method,
-                        AM_RESERVED, &redirect_url, agent_config);
+            original_url, method,
+            AM_RESERVED, &redirect_url, agent_config);
 
-    if(ret == AM_SUCCESS && redirect_url != NULL) {
+    if (ret == AM_SUCCESS && redirect_url != NULL) {
         char *advice_txt = NULL;
-        if (policy_result->advice_string != NULL) {
+        if (B_FALSE == am_web_use_redirect_for_advice(agent_config) && policy_result->advice_string != NULL) {
+            // Composite advice is sent as a POST
             ret = am_web_build_advice_response(policy_result, redirect_url,
-                                               &advice_txt);
+                    &advice_txt);
             am_web_log_debug("do_redirect(): policy status=%s,",
-                             "response[%s]", am_status_to_string(status),
-                             advice_txt);
-            if(ret == AM_SUCCESS) {
+                    "response[%s]", am_status_to_string(status),
+                    advice_txt);
+            if (ret == AM_SUCCESS) {
                 retVal = send_data(advice_txt, sn, rq);
             } else {
                 am_web_log_error("do_redirect(): Error while building "
-                                 "advice response body:%s",
-                                 am_status_to_string(ret));
+                        "advice response body:%s",
+                        am_status_to_string(ret));
                 retVal = REQ_EXIT;
             }
         } else {
+            // No composite advice or composite advice is redirected
             am_web_log_debug("do_redirect() policy status = %s, ",
-                             "redirection URL is %s",
-                              am_status_to_string(status), redirect_url);
+                    "redirection URL is %s",
+                    am_status_to_string(status), redirect_url);
+
+            // we need to modify the redirect_url with the policy advice
+            if (B_TRUE == am_web_use_redirect_for_advice(agent_config) &&
+                    policy_result->advice_string != NULL) {
+                char *redirect_url_with_advice = NULL;
+                ret = am_web_build_advice_redirect_url(policy_result,
+                        redirect_url, &redirect_url_with_advice);
+                if (ret == AM_SUCCESS) {
+                    redirect_url = redirect_url_with_advice;
+                    am_web_log_debug("%s: policy status=%s, "
+                            "redirect url with advice [%s]",
+                            thisfunc, am_status_to_string(status),
+                            redirect_url);
+                } else {
+                    am_web_log_error("%s: Error while building "
+                            "the redirect url with advice:%s",
+                            thisfunc, am_status_to_string(ret));
+                }
+            }
 
             /* redirection is enabled by the PathCheck directive */
             /* Set the return code to 302 Redirect */
@@ -196,16 +216,16 @@ static int do_redirect(Session *sn, Request *rq, am_status_t status,
 
             am_web_free_memory(redirect_url);
         }
-    } else if(ret == AM_NO_MEMORY) {
+    } else if (ret == AM_NO_MEMORY) {
         /* Set the return code 500 Internal Server Error. */
         protocol_status(sn, rq, PROTOCOL_SERVER_ERROR, NULL);
         am_web_log_error("do_redirect() Status code= %s.",
-                          am_status_to_string(status));
+                am_status_to_string(status));
     } else {
         /* Set the return code 403 Forbidden */
         protocol_status(sn, rq, PROTOCOL_FORBIDDEN, NULL);
         am_web_log_info("do_redirect() Status code= %s.",
-                        am_status_to_string(status));
+                am_status_to_string(status));
     }
 
     return retVal;

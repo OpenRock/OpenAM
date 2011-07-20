@@ -205,6 +205,8 @@ EXPORTS
 	am_web_set_cookie;
 
 	am_web_build_advice_response;
+        am_web_build_advice_redirect_url;
+        am_web_use_redirect_for_advice;
 	am_web_get_request_url;
 	am_web_get_all_request_urls;
 

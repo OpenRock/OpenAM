@@ -171,7 +171,8 @@ public:
     const char * clientHostnameHeader;
     PRBool encodeCookieSpecialChars;
 
-    const char *notenforcedIPmode; 
+    const char *notenforcedIPmode;
+    PRBool use_redirect_for_advice;	// use redirect instead of POST for advice
     
     AgentConfiguration();
     AgentConfiguration(am_properties_t properties);
@@ -265,6 +266,7 @@ public:
         this->clientHostnameHeader = NULL;
         this->encodeCookieSpecialChars = AM_FALSE;
         this->notenforcedIPmode = NULL;
+        this->use_redirect_for_advice = AM_FALSE;
 
     }
     

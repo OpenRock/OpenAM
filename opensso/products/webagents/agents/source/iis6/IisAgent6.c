@@ -936,13 +936,12 @@ DWORD process_original_url(EXTENSION_CONTROL_BLOCK *pECB,
 }
 
 static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
-             am_status_t status,
-             am_policy_result_t *policy_result,
-             const char *original_url,
-             const char *method,
-             void** args,
-             void* agent_config)
-{
+        am_status_t status,
+        am_policy_result_t *policy_result,
+        const char *original_url,
+        const char *method,
+        void** args,
+        void* agent_config) {
     const char *thisfunc = "do_redirect()";
     char *redirect_header = NULL;
     size_t redirect_hdr_len = 0;
@@ -953,40 +952,41 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
     size_t advice_headers_len = 0;
     char *advice_headers = NULL;
     const char advice_headers_template[] = {
-             "Content-Length: %d\r\n"
-             "Content-Type: text/html\r\n"
-             "\r\n"
+        "Content-Length: %d\r\n"
+        "Content-Type: text/html\r\n"
+        "\r\n"
     };
 
     am_status_t ret = AM_SUCCESS;
     const am_map_t advice_map = policy_result->advice_map;
 
     ret = am_web_get_url_to_redirect(status, advice_map, original_url,
-				      method, AM_RESERVED,&redirect_url, agent_config);
+            method, AM_RESERVED, &redirect_url, agent_config);
 
     // Compute the length of the redirect response.  Using the size of
     // the format string overallocates by a couple of bytes, but that is
     // not a significant issue given the short life span of the allocation.
-    switch(status) {
+    switch (status) {
         case AM_ACCESS_DENIED:
         case AM_INVALID_SESSION:
         case AM_INVALID_FQDN_ACCESS:
 
-        //Check whether policy advices exist. If exists send
-        //the advice back to client
-            if ((ret == AM_SUCCESS)  && (redirect_url != NULL) &&
-                (policy_result->advice_string != NULL)) {
-                
+            //Check whether policy advices exist. If exists send
+            //the advice back to client
+            if ((ret == AM_SUCCESS) && (redirect_url != NULL) &&
+                    (B_FALSE == am_web_use_redirect_for_advice(agent_config)) &&
+                    (policy_result->advice_string != NULL)) {
+
                 // Composite advice is sent as a POST
                 char *advice_txt = NULL;
                 ret = am_web_build_advice_response(policy_result, redirect_url,
-                         &advice_txt);
-                am_web_log_debug("%s: policy status=%s, response[%s]", 
-                           thisfunc, am_status_to_string(status), advice_txt);
+                        &advice_txt);
+                am_web_log_debug("%s: policy status=%s, response[%s]",
+                        thisfunc, am_status_to_string(status), advice_txt);
 
-                if(ret == AM_SUCCESS) {
-                    size_t data_length = (advice_txt != NULL)?strlen(advice_txt):0;
-                    if(data_length > 0) {
+                if (ret == AM_SUCCESS) {
+                    size_t data_length = (advice_txt != NULL) ? strlen(advice_txt) : 0;
+                    if (data_length > 0) {
                         //Send the headers
                         advice_headers_len = strlen(advice_headers_template) + 3;
                         advice_headers = (char *) malloc(advice_headers_len);
@@ -1000,41 +1000,60 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                             sendHdr.fKeepConn = FALSE;
                             pECB->dwHttpStatusCode = http200;
                             pECB->ServerSupportFunction(pECB->ConnID,
-                                HSE_REQ_SEND_RESPONSE_HEADER_EX,
-                                &sendHdr,
-                                NULL,
-                                NULL);
+                                    HSE_REQ_SEND_RESPONSE_HEADER_EX,
+                                    &sendHdr,
+                                    NULL,
+                                    NULL);
                             //Send the advice
-                            if ((pECB->WriteClient( pECB->ConnID, (LPVOID)advice_txt,
-                                    (LPDWORD)&data_length, (DWORD)0))==FALSE) {
+                            if ((pECB->WriteClient(pECB->ConnID, (LPVOID) advice_txt,
+                                    (LPDWORD) & data_length, (DWORD) 0)) == FALSE) {
                                 am_web_log_error("%s: WriteClient did not "
-                                      "succeed sending policy advice: "
-                                      "Attempted message = %s ", thisfunc, advice_txt);
+                                        "succeed sending policy advice: "
+                                        "Attempted message = %s ", thisfunc, advice_txt);
                             }
                         } else {
-                             am_web_log_error("%s: Not enough memory 0x%x bytes.",
-                             thisfunc, advice_headers_len);
+                            am_web_log_error("%s: Not enough memory 0x%x bytes.",
+                                    thisfunc, advice_headers_len);
                         }
                     }
 
                 } else {
                     am_web_log_error("%s: Error while building "
-                                     "advice response body:%s",
-                                     thisfunc, am_status_to_string(ret));
+                            "advice response body:%s",
+                            thisfunc, am_status_to_string(ret));
                 }
-                //no policy advices exist. proceed normally.
+            } else {
+                // No composite advice or composite advice is redirected.
+                // If there is a composite advice 
+                // we need to modify the redirect_url with the policy advice
+                if ((B_TRUE == am_web_use_redirect_for_advice(agent_config)) && 
+                          (policy_result->advice_string != NULL)) {
+                    char *redirect_url_with_advice = NULL;
+                    ret = am_web_build_advice_redirect_url(policy_result, 
+                            redirect_url, &redirect_url_with_advice);
+                    am_web_log_debug("%s: policy status=%s, "
+                                     "redirect url with advice [%s]", 
+                                     thisfunc, am_status_to_string(status),
+                                     redirect_url_with_advice);
+                    if(ret == AM_SUCCESS) {
+                        redirect_url = redirect_url_with_advice;
                     } else {
+                        am_web_log_error("%s: Error while building "
+                                        "advice response body:%s",
+                                        thisfunc, am_status_to_string(ret));
+                    }
+                }
                 if (ret == AM_SUCCESS && redirect_url != NULL) {
                     CHAR* set_cookies_list = *((CHAR**) args[2]);
                     am_web_log_debug("%s: policy status = %s, "
-                           "redirection URL is %s",
-                           thisfunc, am_status_to_string(status),
-                           redirect_url);
+                            "redirection URL is %s",
+                            thisfunc, am_status_to_string(status),
+                            redirect_url);
                     if (set_cookies_list == NULL) {
-                        redirect_hdr_len = sizeof(REDIRECT_TEMPLATE) +
-                                                strlen(redirect_url);
+                        redirect_hdr_len = sizeof (REDIRECT_TEMPLATE) +
+                                strlen(redirect_url);
                     } else {
-                        redirect_hdr_len = sizeof(REDIRECT_COOKIE_TEMPLATE) +
+                        redirect_hdr_len = sizeof (REDIRECT_COOKIE_TEMPLATE) +
                                 strlen(redirect_url) +
                                 strlen(set_cookies_list);
                     }
@@ -1044,29 +1063,29 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                         redirect_status = httpRedirect;
                         if (set_cookies_list == NULL) {
                             _snprintf(redirect_header, redirect_hdr_len,
-                                   REDIRECT_TEMPLATE, redirect_url);
+                                    REDIRECT_TEMPLATE, redirect_url);
                         } else {
                             _snprintf(redirect_header, redirect_hdr_len,
-                                 REDIRECT_COOKIE_TEMPLATE, redirect_url,
-                                 set_cookies_list);
+                                    REDIRECT_COOKIE_TEMPLATE, redirect_url,
+                                    set_cookies_list);
                             free(set_cookies_list);
                             set_cookies_list = NULL;
                         }
                         am_web_log_info("%s: redirect_header = %s",
-                                        thisfunc, redirect_header);
+                                thisfunc, redirect_header);
                     } else {
                         am_web_log_error("%s: unable to allocate "
                                 "%u bytes", thisfunc, redirect_hdr_len);
                     }
                 } else {
-                    if(status == AM_ACCESS_DENIED) {
+                    if (status == AM_ACCESS_DENIED) {
                         // Only reason why we should be sending 403 forbidden.
                         // All other cases are non-deterministic.
                         redirect_status = httpForbidden;
                     }
                     am_web_log_error("%s: Error while calling "
-                                "am_web_get_redirect_url(): status = %s",
-                                thisfunc, am_status_to_string(ret));
+                            "am_web_get_redirect_url(): status = %s",
+                            thisfunc, am_status_to_string(ret));
                 }
 
                 if (redirect_status == httpRedirect) {
@@ -1077,22 +1096,22 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                     sendHdr.fKeepConn = FALSE;
                     pECB->dwHttpStatusCode = http302;
                     pECB->ServerSupportFunction(pECB->ConnID,
-                                        HSE_REQ_SEND_RESPONSE_HEADER_EX,
-                                        &sendHdr,
-                                        NULL,
-                                        NULL);
+                            HSE_REQ_SEND_RESPONSE_HEADER_EX,
+                            &sendHdr,
+                            NULL,
+                            NULL);
                 } else {
-                    size_t data_len = sizeof(FORBIDDEN_MSG) - 1;
+                    size_t data_len = sizeof (FORBIDDEN_MSG) - 1;
                     const char *data = FORBIDDEN_MSG;
                     if (redirect_status == httpServerError) {
                         data = INTERNAL_SERVER_ERROR_MSG;
-                        data_len = sizeof(INTERNAL_SERVER_ERROR_MSG) - 1;
+                        data_len = sizeof (INTERNAL_SERVER_ERROR_MSG) - 1;
                         pECB->dwHttpStatusCode = http500;
                     }
-                    if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
-                                (LPDWORD)&data_len, (DWORD) 0))==FALSE) {
+                    if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
+                            (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
                         am_web_log_error("do_redirect() WriteClient did not "
-                                 "succeed: Attempted message = %s ", data);
+                                "succeed: Attempted message = %s ", data);
                     }
                 }
                 free(redirect_header);
@@ -1827,8 +1846,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                             break;
                         }
                     }
-                    if (cookieValue != NULL) {
-                        cookieValue = strchr(cookieValue ,'=');
+                    if (cookieValue != NULL && (cookieValue = strchr(cookieValue ,'=')) != NULL) {
                         cookieValue = &cookieValue[1]; // 1 vs 0 skips over '='
                         // find the end of the cookie
                         length = 0;

@@ -1318,6 +1318,17 @@ am_web_get_all_request_urls(const char *host_hdr,
                        char **orig_request_url);
 
 /*
+ * Method to determine if the composite advice should be
+ * redirect rather than POST
+ */
+AM_WEB_EXPORT boolean_t am_web_use_redirect_for_advice(void* agent_config);
+
+AM_WEB_EXPORT am_status_t
+am_web_build_advice_redirect_url(const am_policy_result_t *policy_result,
+                             const char *redirect_url,
+                             char **redirect_url_with_advice);
+
+/*
  * Method to determine if the override_host_port is set
  * for the Proxy agent
  */

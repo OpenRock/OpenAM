@@ -5831,60 +5831,79 @@ process_access_success(char *url,
 
 static am_web_result_t
 process_access_redirect(char *url,
-                   am_web_req_method_t method,
-                   am_status_t access_check_status,
-                   am_policy_result_t policy_result,
-                   am_web_request_func_t *req_func,
-                   char **redirect_url,
-                   char **advice_response,
-                   void* agent_config)
-{
+        am_web_req_method_t method,
+        am_status_t access_check_status,
+        am_policy_result_t policy_result,
+        am_web_request_func_t *req_func,
+        char **redirect_url,
+        char **advice_response,
+        void* agent_config) {
     const char *thisfunc = "process_access_redirect()";
     am_status_t sts = AM_SUCCESS;
     am_web_result_t result = AM_WEB_RESULT_REDIRECT;
 
     // Get the redirect url.
-    if(access_check_status == AM_REDIRECT_LOGOUT) {
+    if (access_check_status == AM_REDIRECT_LOGOUT) {
         sts = am_web_get_logout_url(redirect_url, agent_config);
-        if(sts == AM_SUCCESS) {
+        if (sts == AM_SUCCESS) {
             result = AM_WEB_RESULT_REDIRECT;
         } else {
             result = AM_WEB_RESULT_ERROR;
             am_web_log_debug("process_access_redirect(): "
-                                "am_web_get_logout_url failed. ");
+                    "am_web_get_logout_url failed. ");
         }
     } else if (result != AM_WEB_RESULT_ERROR) {
         sts = am_web_get_url_to_redirect(access_check_status,
-                      policy_result.advice_map,
-                      url,
-                      am_web_method_num_to_str(method),
-                      NULL,
-                      redirect_url,
-                      agent_config);
+                policy_result.advice_map,
+                url,
+                am_web_method_num_to_str(method),
+                NULL,
+                redirect_url,
+                agent_config);
         am_web_log_debug("%s: get redirect url returned %s, redirect url [%s].",
-                          thisfunc, am_status_to_name(sts),
-                          *redirect_url == NULL ? "NULL" : *redirect_url);
-        if ((policy_result.advice_string != NULL) && 
-                    (advice_response != NULL)) {
-            char* advice_res = (char *) malloc(2048 * sizeof(char));
-            if (advice_res) {
-                am_status_t ret = am_web_build_advice_response(
-                                           &policy_result, 
-                                           *redirect_url,
-                                           &advice_res);
-                am_web_log_debug("%s: policy status=%s, advice response[%s]", 
-                                 thisfunc, am_status_to_string(ret),
-                                 *advice_response);
-                if(ret != AM_SUCCESS) {
-                    am_web_log_error("%s: Error while building "
-                               "advice response body:%s",
-                               thisfunc, am_status_to_string(ret));
+                thisfunc, am_status_to_name(sts),
+                *redirect_url == NULL ? "NULL" : *redirect_url);
+        if (policy_result.advice_string != NULL) {
+            if (B_FALSE == am_web_use_redirect_for_advice(agent_config) && advice_response != NULL) {
+                // Composite advice is sent as a POST
+                char* advice_res = (char *) malloc(2048 * sizeof (char));
+                if (advice_res) {
+                    am_status_t ret = am_web_build_advice_response(
+                            &policy_result,
+                            *redirect_url,
+                            &advice_res);
+                    am_web_log_debug("%s: policy status=%s, advice response[%s]",
+                            thisfunc, am_status_to_string(ret),
+                            *advice_response);
+                    if (ret != AM_SUCCESS) {
+                        am_web_log_error("%s: Error while building "
+                                "advice response body:%s",
+                                thisfunc, am_status_to_string(ret));
+                    } else {
+                        result = AM_WEB_RESULT_OK_DONE;
+                        *advice_response = advice_res;
+                    }
                 } else {
-                    result = AM_WEB_RESULT_OK_DONE;
-                    *advice_response = advice_res;
+                    sts = AM_NO_MEMORY;
                 }
-            } else {
-                sts = AM_NO_MEMORY;
+            } else if (B_TRUE == am_web_use_redirect_for_advice(agent_config)) {
+                // Composite advice is redirected
+                am_web_log_debug("%s: policy status = %s, redirection URL is %s",
+                        thisfunc, am_status_to_string(sts), *redirect_url);
+                char *redirect_url_with_advice = NULL;
+                sts = am_web_build_advice_redirect_url(&policy_result,
+                        *redirect_url, &redirect_url_with_advice);
+                if (sts == AM_SUCCESS) {
+                    *redirect_url = redirect_url_with_advice;
+                    am_web_log_debug("%s: policy status=%s, "
+                            "redirect url with advice [%s]",
+                            thisfunc, am_status_to_string(sts),
+                            *redirect_url);
+                } else {
+                    am_web_log_error("%s: Error while building "
+                            "the redirect url with advice:%s",
+                            thisfunc, am_status_to_string(sts));
+                }
             }
         }
         switch (sts) {
@@ -5903,7 +5922,7 @@ process_access_redirect(char *url,
         }
     }
     am_web_log_debug("%s: returning web result %s.",
-                thisfunc, am_web_result_num_to_str(result));
+            thisfunc, am_web_result_num_to_str(result));
     return result;
 }
 
@@ -6454,36 +6473,74 @@ am_web_clear_attributes_map(am_policy_result_t *result)
     }
 }
 
-
 extern "C" AM_WEB_EXPORT am_status_t
 am_web_build_advice_response(const am_policy_result_t *policy_result,
-			     const char *redirect_url,
-			     char **advice_response) {
+        const char *redirect_url,
+        char **advice_response) {
     am_status_t retVal = AM_SUCCESS;
-    if(policy_result != NULL && advice_response != NULL &&
-       redirect_url != NULL) {
-	std::string msg = sector_one;
-	msg.append(redirect_url);
-	msg.append(sector_two);
-	msg.append(sector_three);
-	msg.append(COMPOSITE_ADVICE_KEY);
-	msg.append(sector_four);
-	std::string encoded_msg = Http::encode(policy_result->advice_string);
-	msg.append(encoded_msg);
-	msg.append(sector_two);
-	msg.append(sector_five);
-	*advice_response = (char *)malloc(msg.size() + 1);
-	if(*advice_response != NULL) {
-	    strcpy(*advice_response, msg.c_str());
-	} else {
-	    retVal = AM_NO_MEMORY;
-	}
+    if (policy_result != NULL && advice_response != NULL &&
+            redirect_url != NULL) {
+        std::string msg = sector_one;
+        msg.append(redirect_url);
+        msg.append(sector_two);
+        msg.append(sector_three);
+        msg.append(COMPOSITE_ADVICE_KEY);
+        msg.append(sector_four);
+        std::string encoded_msg = Http::encode(policy_result->advice_string);
+        msg.append(encoded_msg);
+        msg.append(sector_two);
+        msg.append(sector_five);
+        *advice_response = (char *) malloc(msg.size() + 1);
+        if (*advice_response != NULL) {
+            strcpy(*advice_response, msg.c_str());
+        } else {
+            retVal = AM_NO_MEMORY;
+        }
     } else {
-	am_web_log_error("am_web_build_advice_response(): "
-			 "Invalid parameters.");
-	retVal = AM_INVALID_ARGUMENT;
+        am_web_log_error("am_web_build_advice_response(): "
+                "Invalid parameters.");
+        retVal = AM_INVALID_ARGUMENT;
     }
     return retVal;
+}
+
+extern "C" AM_WEB_EXPORT am_status_t
+am_web_build_advice_redirect_url(const am_policy_result_t *policy_result,
+        const char *redirect_url, char **redirect_url_with_advice) {
+    const char *thisfunc = "am_web_build_advice_redirect_url()";
+    am_status_t retVal = AM_SUCCESS;
+
+    if (policy_result != NULL && redirect_url != NULL &&
+            redirect_url_with_advice != NULL) {
+        std::string msg(redirect_url);
+        msg.append("&");
+        msg.append(COMPOSITE_ADVICE_KEY);
+        msg.append("=");
+        std::string encoded_msg = Http::encode(Http::encode(policy_result->advice_string));
+        msg.append(encoded_msg);
+        *redirect_url_with_advice = (char *) malloc(msg.size() + 1);
+        if (*redirect_url_with_advice != NULL) {
+            strcpy(*redirect_url_with_advice, msg.c_str());
+        } else {
+            am_web_log_error("%s: Not enough memory", thisfunc);
+            retVal = AM_NO_MEMORY;
+        }
+    } else {
+        am_web_log_error("%s: Invalid Parameters", thisfunc);
+        retVal = AM_INVALID_ARGUMENT;
+    }
+    return retVal;
+}
+
+/*
+ * Method to determine if the composite advice should be
+ * redirect rather than POST
+ */
+extern "C" AM_WEB_EXPORT boolean_t
+am_web_use_redirect_for_advice(void* agent_config) {
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    return ((*agentConfigPtr)->use_redirect_for_advice ? B_TRUE : B_FALSE);
 }
 
 /*authtype
