@@ -34,6 +34,7 @@ import java.util.Set;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.opends.server.protocols.ldap.LDAPAttribute;
+import org.opends.server.types.RawAttribute;
 
 /**
  * This class encapsulates a distinguished name and its attribute values.
@@ -248,8 +249,8 @@ public class AMRecordDataEntry {
     }
     
     private void parseAttributeValues(Map<String, Set<String>> raw) {
-        parseAttributeValues((Set) raw.get(EXTRA_BYTE_ATTR));
-        parseAttributeValues((Set) raw.get(EXTRA_STRING_ATTR));
+        parseAttributeValues(raw.get(EXTRA_BYTE_ATTR));
+        parseAttributeValues(raw.get(EXTRA_STRING_ATTR));
     }
 
     private void parseAttributeValues(Set<String> raw) {
@@ -264,10 +265,10 @@ public class AMRecordDataEntry {
                 String name = s.substring(0, idx);
                 String value = s.substring(idx+1);
 
-                Set set = (Set) attributeValues.get(name);
+                Set<String> set = attributeValues.get(name);
                 
                 if (set == null) {
-                    set = new HashSet();
+                    set = new HashSet<String>();
                     attributeValues.put(name, set);
                 }
                 
@@ -281,18 +282,17 @@ public class AMRecordDataEntry {
     }
 
     public Set<String> getAttributeValues(String attributeName) {
-        return (Set<String>) attributeValues.get(attributeName);
+        return attributeValues.get(attributeName);
     }
 
     public String getAttributeValue(String attributeName) {
-        Set<String> val = (Set<String>) attributeValues.get(attributeName);
+        Set<String> val = attributeValues.get(attributeName);
         
-        return ((val != null) && !val.isEmpty()) ?
-            (String) val.iterator().next() : null;
+        return ((val != null) && !val.isEmpty()) ? val.iterator().next() : null;
     }
     
-    public List<LDAPAttribute> getAttrList() {
-        List<LDAPAttribute> attrList = new ArrayList<LDAPAttribute>(attributeValues.size());
+    public List<RawAttribute> getAttrList() {
+        List<RawAttribute> attrList = new ArrayList<RawAttribute>(attributeValues.size());
         
         for (Map.Entry<String, Set<String>> entry : attributeValues.entrySet()) {
             Set<String> values = entry.getValue();

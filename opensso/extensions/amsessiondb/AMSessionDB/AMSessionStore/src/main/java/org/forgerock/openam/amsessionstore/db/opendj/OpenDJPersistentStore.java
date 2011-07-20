@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.Log;
+import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import org.forgerock.openam.amsessionstore.db.DBStatistics;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.amsessionstore.db.PersistentStore;
@@ -44,8 +45,10 @@ import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
 import org.opends.server.protocols.internal.InternalClientConnection;
 import org.opends.server.protocols.internal.InternalSearchOperation;
+import org.opends.server.types.Attribute;
 import org.opends.server.types.DereferencePolicy;
 import org.opends.server.types.DirectoryException;
+import org.opends.server.types.RawAttribute;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
@@ -105,7 +108,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         
         // Syncup embedded opends replication with current 
         // server instances.
-        if (syncServerInfoWithRelication() == false) {
+        if (syncServerInfoWithReplication() == false) {
             Log.logger.log(Level.FINE, "embedded replication sync failed.");
         }
         
@@ -113,11 +116,57 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         Log.logger.log(Level.FINE, "OpenDJPersistentStore created successfully.");
     }
     
-    private boolean syncServerInfoWithRelication() {
-        return true;
+    private boolean syncServerInfoWithReplication() {
+        try {
+            if (!replicationEnabled()) {
+                return false;
+            }
+            
+            // Get list of amsessiondb servers
+            Set<AMSessionDBOpenDJServer> serverSet = EmbeddedOpenDJ.getServers();
+            if (serverSet == null) { 
+                return true;
+            }
+
+            String openDJAdminPort = SystemProperties.get(Constants.OPENDJ_ADMIN_PORT);
+            String openDJPasswd = SystemProperties.get(Constants.OPENDJ_DS_MGR_PASSWD);
+
+            Set<String> currServerSet = new HashSet<String>();
+            Set<String> currServerDSSet = new HashSet<String>();
+            Set<String> currServerDSAdminPortsSet = new HashSet<String>();
+
+            for (AMSessionDBOpenDJServer server : serverSet) {
+                String hostName = server.getHostName();
+                String replPort = server.getReplPort();
+                currServerSet.add(hostName + ":" + replPort);
+
+                currServerDSAdminPortsSet.add(hostName + ":" + server.getAdminPort());
+            }
+ 
+            boolean stats = EmbeddedOpenDJ.syncReplicatedServers(
+                  currServerSet, openDJAdminPort, openDJPasswd);
+            boolean statd = EmbeddedOpenDJ.syncReplicatedDomains(
+                  currServerSet, openDJAdminPort, openDJPasswd);
+            boolean statl = EmbeddedOpenDJ.syncReplicatedServerList(
+                  currServerDSAdminPortsSet, openDJPasswd, openDJPasswd);
+            return stats || statd || statl;
+        } catch (Exception ex) {
+            Log.logger.log(Level.SEVERE, "Could not sync servers with embedded replication:", ex);
+            return false;
+        }
     }
     
-
+    private boolean replicationEnabled() {
+        boolean multipleServers = false;
+        
+        try {
+            multipleServers = EmbeddedOpenDJ.getServers().size() > 1;
+        } catch (StoreException se) {
+            Log.logger.log(Level.SEVERE, "Unable to determine server count", se);
+        }
+        
+        return multipleServers;
+    }
     
     private void initializeOpenDJ() 
     throws StoreException {
@@ -149,7 +198,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     public void write(AMRecord record) 
     throws StoreException {
         AMRecordDataEntry entry = new AMRecordDataEntry(record);
-        List attrList = entry.getAttrList();
+        List<RawAttribute> attrList = entry.getAttrList();
         StringBuilder dn = new StringBuilder();
         dn.append(AMRecordDataEntry.PRI_KEY).append(Constants.EQUALS).append(record.getPrimaryKey());
         dn.append(Constants.COMMA).append(Constants.BASE_DN);
@@ -159,13 +208,15 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         ResultCode resultCode = ao.getResultCode();
         
         if (resultCode == ResultCode.SUCCESS) {
-            Log.logger.log(Level.FINE, "Successfully created" +" entry: " + dn);
+            Object[] params = { dn };
+            Log.logger.log(Level.FINE, "Successfully created entry: {0}", params);
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
+            Object[] params = { dn };
             Log.logger.log(Level.WARNING, " unable to create: Entry " +
-                        "Already Exists Error for DN" + dn);
+                        "Already Exists Error for DN {0}", params);
         } else {
-            Log.logger.log(Level.WARNING, "Error creating entry: "+
-                dn + ", error code = " + resultCode);
+            Object[] params = { dn, resultCode };
+            Log.logger.log(Level.WARNING, "Error creating entry: {0}, error code = {1}", params);
             throw new StoreException("Unable to create entry: " + dn);
         }
     }
@@ -194,7 +245,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                 if (!searchResult.isEmpty()) {
                     SearchResultEntry entry =
                         (SearchResultEntry) searchResult.get(0);
-                    List attributes = entry.getAttributes();
+                    List<Attribute> attributes = entry.getAttributes();
 
                     Map<String, Set<String>> results = 
                             EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
@@ -204,12 +255,13 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
+                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
+                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
                 
                 return null;
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
-                       ", error code = " + resultCode);
+                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
                 throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
@@ -238,7 +290,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     Set<String> result = new HashSet<String>();
                     
                     for (SearchResultEntry entry : searchResult) {
-                        List attributes = entry.getAttributes();
+                        List<Attribute> attributes = entry.getAttributes();
                         Map<String, Set<String>> results = 
                             EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
                         
@@ -256,12 +308,13 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
+                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
+                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
                 
                 return null;
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
-                       ", error code = " + resultCode);
+                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
                 throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
@@ -281,7 +334,8 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         ResultCode resultCode = dop.getResultCode();
         
         if (resultCode != ResultCode.SUCCESS) {
-            Log.logger.log(Level.WARNING, "Unable to delete entry:" + dn);
+            Object[] params = { dn };
+            Log.logger.log(Level.WARNING, "Unable to delete entry: {0}", params);
         }
     }
     
@@ -303,7 +357,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                 
                 if (!searchResult.isEmpty()) {
                     for (SearchResultEntry entry : searchResult) {
-                         List attributes = entry.getAttributes();
+                        List<Attribute> attributes = entry.getAttributes();
 
                         Map<String, Set<String>> results = 
                             EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
@@ -315,17 +369,19 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                                 try {
                                     delete(v);
                                 } catch (NotFoundException nfe) {
-                                    Log.logger.log(Level.WARNING, "Unable to delete " + v + " not found");
+                                    Object[] params = { v };
+                                    Log.logger.log(Level.WARNING, "Unable to delete {0} not found", params);
                                 }
                             }
                         }
                     }
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
-            } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
-                       ", error code = " + resultCode);
+                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
+                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+            } else { 
+                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}" + params);
                 throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
@@ -354,7 +410,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     Map<String, Long> result = new HashMap<String, Long>();
                     
                     for (SearchResultEntry entry : searchResult) {
-                        List attributes = entry.getAttributes();
+                        List<Attribute> attributes = entry.getAttributes();
                         Map<String, Set<String>> results = 
                             EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
                         
@@ -385,12 +441,13 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Log.logger.log(Level.FINE,"Entry not present:" + OpenDJConfig.getSessionDBSuffix());
+                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
+                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
                 
                 return null;
             } else {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix() + 
-                       ", error code = " + resultCode);
+                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}" + params);
                 throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {

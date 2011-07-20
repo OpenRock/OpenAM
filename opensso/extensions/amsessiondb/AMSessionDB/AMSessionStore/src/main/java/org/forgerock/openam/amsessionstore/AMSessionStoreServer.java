@@ -31,15 +31,10 @@ import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import org.forgerock.openam.amsessionstore.db.DBStatistics;
 import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.restlet.Component;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
 import org.restlet.Server;
-import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.security.MapVerifier;
 import org.restlet.ext.crypto.DigestAuthenticator;
-import org.restlet.representation.StringRepresentation;
 
 /**
  * This is the main class of the amsessiondb server. Starts the RESTlet server

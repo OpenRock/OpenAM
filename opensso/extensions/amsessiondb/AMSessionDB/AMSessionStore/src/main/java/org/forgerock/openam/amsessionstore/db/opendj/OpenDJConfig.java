@@ -173,7 +173,7 @@ public class OpenDJConfig {
     }
     
     enum AmSessionDbAttr {
-        ADMIN_PORT("adminPort"), LDAP_PORT("ldapPort"), JMX_PORT("jmxPort");
+        ADMIN_PORT("adminPort"), LDAP_PORT("ldapPort"), JMX_PORT("jmxPort"), REPL_PORT("replPort");
         
         private final String text;
         
