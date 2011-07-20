@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -43,12 +44,16 @@ import org.forgerock.openam.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.amsessionstore.db.StoreException;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
+import org.opends.server.core.ModifyOperation;
 import org.opends.server.protocols.internal.InternalClientConnection;
 import org.opends.server.protocols.internal.InternalSearchOperation;
+import org.opends.server.protocols.ldap.LDAPModification;
 import org.opends.server.types.Attribute;
 import org.opends.server.types.DereferencePolicy;
 import org.opends.server.types.DirectoryException;
+import org.opends.server.types.ModificationType;
 import org.opends.server.types.RawAttribute;
+import org.opends.server.types.RawModification;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
@@ -197,6 +202,44 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     @Override
     public void write(AMRecord record) 
     throws StoreException {
+        boolean found = false;
+        StringBuilder baseDN = new StringBuilder();
+        baseDN.append(Constants.AMRECORD_NAMING_ATTR).append(Constants.EQUALS);
+        baseDN.append(record.getPrimaryKey()).append(Constants.COMMA);
+        baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
+        
+        try {
+            InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
+                SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
+                0, 0, false, Constants.FAMRECORD_FILTER , returnAttrs);
+            ResultCode resultCode = iso.getResultCode();
+
+            if (resultCode == ResultCode.SUCCESS) {
+                Object[] params = { baseDN };
+                Log.logger.log(Level.FINE,"Entry present: {0}", params);
+                found = true;
+            } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
+                Object[] params = { baseDN };
+                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+            } else {
+                Object[] params = { baseDN, resultCode };
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
+                throw new StoreException("Unable to access entry DN" + baseDN);
+            }
+        } catch (DirectoryException dex) {
+            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + baseDN, dex);
+            throw new StoreException("Unable to read record from store", dex);
+        }
+        
+        if (found) {
+            update(record);
+        } else {
+            store(record);
+        }
+    }
+   
+    public void store(AMRecord record) 
+    throws StoreException {
         AMRecordDataEntry entry = new AMRecordDataEntry(record);
         List<RawAttribute> attrList = entry.getAttrList();
         StringBuilder dn = new StringBuilder();
@@ -221,16 +264,45 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         }
     }
     
-    protected void store(AMRecord record)
+    protected void update(AMRecord record)
     throws StoreException {
-            
+        List<RawModification> modList = createModificationList(record);
+        StringBuilder dn = new StringBuilder();
+        dn.append(AMRecordDataEntry.PRI_KEY).append(Constants.EQUALS).append(record.getPrimaryKey());
+        dn.append(Constants.COMMA).append(Constants.BASE_DN);
+        dn.append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
+        
+        ModifyOperation mo = icConn.processModify(dn.toString(), modList);
+        ResultCode resultCode = mo.getResultCode();
+        
+        if (resultCode == ResultCode.SUCCESS) {
+            Log.logger.log(Level.FINE, "Successfully modified entry: {0}" + dn);
+        } else {
+            Object[] params = { dn, resultCode };
+            Log.logger.log(Level.WARNING, "Error modifying entry {0}, error code = {1}", params);
+            throw new StoreException("Unable to modify entry: " + dn);
+        }
+    }
+    
+    private List<RawModification> createModificationList(AMRecord record) {
+        List<RawModification> mods = new ArrayList<RawModification>();
+        AMRecordDataEntry entry = new AMRecordDataEntry(record);
+        List<RawAttribute> attrList = entry.getAttrList();
+        
+        for (RawAttribute attr : attrList) {
+            RawModification mod = new LDAPModification(ModificationType.REPLACE, attr);
+            mods.add(mod);
+        }
+                
+        return mods;
     }
     
     @Override
     public AMRecord read(String id) 
-    throws NotFoundException, StoreException {        
+    throws NotFoundException, StoreException { 
+        StringBuilder baseDN = new StringBuilder();
+        
         try {
-            StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(PKEY_FILTER_PRE).append(id).append(PKEY_FILTER_POST);
             baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
@@ -255,17 +327,17 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
+                Object[] params = { baseDN };
                 Log.logger.log(Level.FINE,"Entry not present: {0}", params);
                 
                 return null;
             } else {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
+                Object[] params = { baseDN, resultCode };
                 Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
-                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
+                throw new StoreException("Unable to access entry DN" + baseDN);
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
+            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + baseDN, dex);
             throw new StoreException("Unable to read record from store", dex);
         }
     }

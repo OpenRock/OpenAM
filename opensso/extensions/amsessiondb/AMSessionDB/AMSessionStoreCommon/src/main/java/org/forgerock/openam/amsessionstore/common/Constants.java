@@ -93,6 +93,8 @@ public final class Constants {
     
     public static final String HOST_NAMING_ATTR = "cn";
     
+    public static final String AMRECORD_NAMING_ATTR = "pKey";
+    
     public final static String TOP = "top";
         
     public final static String FR_FAMRECORD = "frFamRecord";
@@ -100,6 +102,8 @@ public final class Constants {
     public final static String OBJECTCLASS = "objectClass";
     
     public final static String FR_AMSESSIONDB = "frAmSessionDb";
+    
+    public final static String FAMRECORD_FILTER = "(objectclass=" + FR_FAMRECORD + ")";
     
     public static final String COMMA = ",";
     

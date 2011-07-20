@@ -399,9 +399,10 @@ public class AMSessionDBClient {
         
         public void run() {
             write();
+            write();
             getRecordCount();
             sleep();
-            delete();
+            //delete();
         }
         
         protected void write() {
