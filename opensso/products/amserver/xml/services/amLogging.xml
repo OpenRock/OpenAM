@@ -27,7 +27,9 @@
     $Id: amLogging.xml,v 1.11 2008/10/10 22:14:25 bigfatrat Exp $
 
 -->
-
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
@@ -61,6 +63,31 @@
                     i18nKey="a103">
                     <DefaultValues>
                         <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-prefix"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1031">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-suffix"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1032">
+                    <DefaultValues>
+                        <Value>-MM.dd.yy-kk.mm</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-rotation"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="-1" rangeEnd="2147483647"
+                    i18nKey="a1033">
+                    <DefaultValues>
+                        <Value>-1</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-logging-location"

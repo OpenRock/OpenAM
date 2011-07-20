@@ -26,14 +26,13 @@
  *
  */
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.log.handlers;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,6 +59,8 @@ import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
+import java.io.FileNotFoundException;
+import java.util.Calendar;
 
 /**
  * This <tt> FileHandler </tt> is very much similar to the
@@ -98,6 +99,15 @@ public class FileHandler extends java.util.logging.Handler {
     private static String headerString = null;
     private SsoServerLoggingSvcImpl logServiceImplForMonitoring = null;
     private SsoServerLoggingHdlrEntryImpl fileLogHandlerForMonitoring = null;
+
+    private int rotationInterval = -1;
+    private long lastRotation;
+    /**
+     * By default the size based rotation is enabled
+     */
+    private boolean rotatingBySize = true;
+
+    private static final String DEFAULT_LOG_SUFFIX_FORMAT = "-MM.dd.yy-kk.mm";
 
     private class MeteredStream extends OutputStream {
 
@@ -282,29 +292,49 @@ public class FileHandler extends java.util.logging.Handler {
             throw new FormatterInitException(
                     "Unable to initialize Formatter Class" + e);
         }
+
+        String rotation = lmanager.getProperty(LogConstants.LOGFILE_ROTATION);
+        try {
+            if (rotation != null) {
+                rotationInterval = Integer.parseInt(rotation);
+            }
+        } catch (NumberFormatException nfe) {
+            //if we cannot parse it, then we use the size based rotation
+            rotationInterval = -1;
+        }
+        if (rotationInterval > 0) {
+            lastRotation = System.currentTimeMillis();
+            rotatingBySize = false;
+        }
     }
 
     private void openFiles(String fileName) throws IOException {
-        // making sure that we have correct count and maxFileSize
-        if (count < 0) {
-            Debug.error(fileName +
-                    ":FileHandler: no. of history files negative " + count);
-            count = 0;
-        }
-        if (maxFileSize < 0) {
-            Debug.error(fileName +
-                    ":FileHandler: maxFileSize cannot be negative");
-            maxFileSize = 0;
-        }
-        files = new File[count + 1]; // count is the number of history files
-        for (int i = 0; i < count + 1; i++) {
-            if (i != 0) {
-                files[i] = new File(fileName + "-" + i);
-            } else {
-                files[0] = new File(fileName);
+        if (rotatingBySize) {
+            // making sure that we have correct count and maxFileSize
+            if (count < 0) {
+                Debug.error(fileName
+                        + ":FileHandler: no. of history files negative " + count);
+                count = 0;
             }
+            if (maxFileSize < 0) {
+                Debug.error(fileName
+                        + ":FileHandler: maxFileSize cannot be negative");
+                maxFileSize = 0;
+            }
+            files = new File[count + 1]; // count is the number of history files
+            for (int i = 0; i < count + 1; i++) {
+                if (i != 0) {
+                    files[i] = new File(fileName + "-" + i);
+                } else {
+                    files[0] = new File(fileName);
+                }
+            }
+            open(files[0], true);
+        } else {
+            files = new File[1];
+            files[0] = new File(fileName);
+            open(files[0], true);
         }
-        open(files[0], true);
     }
 
     /** 
@@ -343,6 +373,9 @@ public class FileHandler extends java.util.logging.Handler {
             Debug.error(fileName +
                     ":FileHandler: could not instantiate Formatter", fie);
         }
+        if (!rotatingBySize) {
+            fileName = wrapFilename(fileName);
+        }
         fileName = location + fileName;
         Logger logger = (Logger) Logger.getLogger(this.fileName);
         if (logger.getLevel() != Level.OFF) {
@@ -368,6 +401,39 @@ public class FileHandler extends java.util.logging.Handler {
                 logServiceImplForMonitoring.getHandler(
                     SsoServerLoggingSvcImpl.FILE_HANDLER_NAME);
         }
+    }
+
+    private String wrapFilename(String fileName) {
+        String prefix = lmanager.getProperty(LogConstants.LOGFILE_PREFIX);
+        String suffixFormat = lmanager.getProperty(LogConstants.LOGFILE_SUFFIX);
+
+        StringBuilder newFileName = new StringBuilder();
+
+        if (prefix != null) {
+            newFileName.append(prefix);
+        }
+
+        newFileName.append(fileName);
+
+        SimpleDateFormat suffixDateFormat = null;
+        if (suffixFormat != null && suffixFormat.trim().length() > 0) {
+            try {
+                suffixDateFormat = new SimpleDateFormat(suffixFormat);
+            } catch (IllegalArgumentException iae) {
+                Debug.error("Date format invalid; " + suffixFormat, iae);
+            }
+
+            if (suffixDateFormat != null) {
+                newFileName.append(suffixDateFormat.format(new Date()));
+            }
+        }
+        if (rotationInterval > 0 && suffixDateFormat == null) {
+            //fallback to a default dateformat, so the logfilenames will differ
+            suffixDateFormat = new SimpleDateFormat(DEFAULT_LOG_SUFFIX_FORMAT);
+        }
+
+        return newFileName.toString();
+
     }
 
     private void cleanup() {
@@ -482,9 +548,7 @@ public class FileHandler extends java.util.logging.Handler {
             }
             for (Iterator iter = recordBuffer.iterator(); iter.hasNext();) {
                 String message = (String) iter.next();
-                if ((message.length() > 0) &&
-                    ((meteredStream.written + message.length()) >=
-                    maxFileSize)) {
+                if (needsRotation(message)) {
                     rotate();
                 }
                 try {
@@ -505,8 +569,27 @@ public class FileHandler extends java.util.logging.Handler {
         }        
     }
 
+    private boolean needsRotation(String message) {
+        if (rotatingBySize) {
+            if (message.length() > 0 &&
+                    meteredStream.written + message.length() >= maxFileSize) {
+                return true;
+            }
+        } else {
+            Calendar now = Calendar.getInstance();
+            Calendar then = Calendar.getInstance();
+            then.setTimeInMillis(lastRotation);
+
+            then.add(Calendar.MINUTE, rotationInterval);
+            if (now.after(then)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void rotate() {
-        if (writer != null) {
+       if (writer != null) {
             try {
                 writer.flush();
                 writer.close();
@@ -515,36 +598,64 @@ public class FileHandler extends java.util.logging.Handler {
                         "Error closing writer", ex);
             }
         }
-        //
-        //  delete file<n>; file<n-1> becomes file<n>; and so on.
-        //
-        for (int i = count - 2; i >= 0; i--) {
-            File f1 = files[i];
-            File f2 = files[i + 1];
-            if (f1.exists()) {
-                if (f2.exists()) {
-                    try {
-                        f2.delete();
-                    } catch (SecurityException secex) {
-                        Debug.error(fileName +
-                                ":FileHandler: could not delete file. msg = " +
-                                secex.getMessage());
+        if (rotatingBySize) {
+            //
+            //  delete file<n>; file<n-1> becomes file<n>; and so on.
+            //
+            for (int i = count - 2; i >= 0; i--) {
+                File f1 = files[i];
+                File f2 = files[i + 1];
+                if (f1.exists()) {
+                    if (f2.exists()) {
+                        try {
+                            f2.delete();
+                        } catch (SecurityException secex) {
+                            Debug.error(fileName
+                                    + ":FileHandler: could not delete file. msg = "
+                                    + secex.getMessage());
+                        }
+                    }
+
+                    boolean renameSuccess = f1.renameTo(f2);
+
+                    // In case renaming fails, copy the contents of source file
+                    // to destination file.
+                    if (!renameSuccess) {
+                        copyFile(f1.toString(), f2.toString());
                     }
                 }
-                
-                boolean renameSuccess = f1.renameTo(f2);
-                
-                // In case renaming fails, copy the contents of source file
-                // to destination file.
-                if (!renameSuccess) {
-                    copyFile(f1.toString(), f2.toString());
+            }
+            try {
+                open(files[0], false);
+            } catch (IOException ix) {
+                Debug.error(fileName + ":FileHandler: error opening file" + ix);
+            }
+        } else {
+            String oldFileName = wrapFilename(this.fileName);
+            String newFileName = location + oldFileName;
+            File f1 = new File(newFileName);
+
+            if (f1.exists()) {
+                Debug.error(fileName
+                        + ":FileHandler: could not rotate file. msg = "
+                        + "file already exists!");
+            } else {
+                // swap across to the new file
+                files[0] = f1;
+
+                try {
+                    open(files[0], false);
+                } catch (IOException ix) {
+                    Debug.error(fileName + ":FileHandler: error opening file" + ix);
+                }
+
+                // remember when we rotated last
+                lastRotation = System.currentTimeMillis();
+                if (Debug.messageEnabled()) {
+                    Debug.message(fileName
+                            + ":FileHandler: rotate to file " + f1.getName());
                 }
             }
-        }
-        try {
-            open(files[0], false);
-        } catch (IOException ix) {
-            Debug.error(fileName + ":FileHandler: error opening file" + ix);
         }
     }
 
@@ -643,13 +754,7 @@ public class FileHandler extends java.util.logging.Handler {
             }
             for (Iterator iter = buffer.iterator(); iter.hasNext();) {
                 String message = (String) iter.next();
-                if ((message.length() > 0) &&
-                    ((meteredStream.written + message.length()) >=
-                    maxFileSize)) {
-                    if (Debug.messageEnabled()) {
-                        Debug.message(fileName +
-                            ":FileHandler: Rotation condition reached");
-                    }
+                if (needsRotation(message)) {
                     rotate();
                 }
                 try {

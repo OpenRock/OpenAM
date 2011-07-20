@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.log.s1is;
@@ -310,6 +310,45 @@ public class LogConfigReader implements ServiceListener{
             }
         }   catch (Exception e) {
             debug.error("LogConfigReader: Could not read maxfilesize ", e);
+        }
+        // log filename prefix
+        try {
+            key = LogConstants.LOGFILE_PREFIX;
+            value = CollectionHelper.getMapAttr(logAttributes, key);
+            if (value == null || value.length() == 0) {
+                debug.warning("LogConfigReader: Logfile prefix string is null");
+            } else {
+                sbuffer.append(key).append('=')
+                        .append(value).append(LogConstants.CRLF);
+            }
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read logfile prefix ", e);
+        }
+        // log filename suffix
+        try {
+            key = LogConstants.LOGFILE_SUFFIX;
+            value = CollectionHelper.getMapAttr(logAttributes, key);
+            if (value == null || value.length() == 0) {
+                debug.warning("LogConfigReader: Logfile suffix string is null");
+            } else {
+                sbuffer.append(key).append('=')
+                        .append(value).append(LogConstants.CRLF);
+            }
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read logfile suffix ", e);
+        }
+        // log filename rotation interval
+        try {
+            key = LogConstants.LOGFILE_ROTATION;
+            value = CollectionHelper.getMapAttr(logAttributes, key);
+            if (value == null || value.length() == 0) {
+                debug.warning("LogConfigReader: Logfile rotation interval is null");
+            } else {
+                sbuffer.append(key).append('=')
+                        .append(value).append(LogConstants.CRLF);
+            }
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read logfile rotation interval ", e);
         }
         // number of history files
         try {

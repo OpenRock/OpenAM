@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.log;
 
 import java.util.logging.Level;
@@ -563,4 +566,17 @@ public class LogConstants {
      * System properties which specifies the log directory.
      */
     public static final String SYS_PROP_LOG_DIR = "com.sun.identity.log.dir";
+    /**
+     * Attribute defining the prefix for the logfiles
+     */
+    public static final String LOGFILE_PREFIX = "openam-logging-file-prefix";
+    /**
+     * Attribute defining the suffix for the logfiles. This should be a valid
+     * dateformat string.
+     */
+    public static final String LOGFILE_SUFFIX = "openam-logging-file-suffix";
+    /**
+     * Attribute defining the rotation interval in minutes.
+     */
+    public static final String LOGFILE_ROTATION = "openam-logging-file-rotation";
 }
