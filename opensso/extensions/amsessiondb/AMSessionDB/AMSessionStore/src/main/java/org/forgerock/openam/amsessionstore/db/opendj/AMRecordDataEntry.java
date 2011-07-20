@@ -25,14 +25,21 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
+import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Constants;
+import org.forgerock.openam.amsessionstore.common.Log;
+import org.forgerock.openam.amsessionstore.db.StoreException;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 
@@ -57,6 +64,7 @@ public class AMRecordDataEntry {
     public final static String EXP_DATE = "expirationDate";
     public final static String STATE = "state";
     
+    private static SimpleDateFormat formatter = null;
     public static List<LDAPAttribute> objectClasses;
     
     static {
@@ -70,6 +78,9 @@ public class AMRecordDataEntry {
         LDAPAttribute ldapAttr= new LDAPAttribute(Constants.OBJECTCLASS, valueList);
         objectClasses = new ArrayList<LDAPAttribute>();
         objectClasses.add(ldapAttr);
+        
+        formatter = new SimpleDateFormat("yyyyMMddHHmmss'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     /**
@@ -78,7 +89,8 @@ public class AMRecordDataEntry {
      * @param dn Distinguished name.
      * @param attributeValues attribute values.
      */
-    public AMRecordDataEntry(String dn, Map<String, Set<String>> attributeValues) {
+    public AMRecordDataEntry(String dn, Map<String, Set<String>> attributeValues) 
+    throws StoreException {
         this.dn = dn;
         this.attributeValues = attributeValues;
         parseAttributeValues(attributeValues);
@@ -108,7 +120,7 @@ public class AMRecordDataEntry {
         if (attributeValues.get(EXP_DATE) != null) {
             Set<String> values = attributeValues.get(EXP_DATE);
             for (String value : values) {
-                record.setExpDate(Long.parseLong(value));
+                record.setExpDate(toAMDateFormat(value));
             }
         }
         
@@ -175,7 +187,8 @@ public class AMRecordDataEntry {
         }
     }
     
-    public AMRecordDataEntry(AMRecord record) {
+    public AMRecordDataEntry(AMRecord record) 
+    throws StoreException {
         this.record = record;
         this.attributeValues = new HashMap<String, Set<String>>();
         Set<String> set = new HashSet<String>();
@@ -198,7 +211,7 @@ public class AMRecordDataEntry {
         }
         
         set = new HashSet<String>();
-        set.add(Long.toString(record.getExpDate()));
+        set.add(toDJDateFormat(record.getExpDate()));
         attributeValues.put(EXP_DATE, set);
         
         if (record.getService() != null) {
@@ -309,6 +322,34 @@ public class AMRecordDataEntry {
     
     public static List<LDAPAttribute> getObjectClasses() {
          return objectClasses;
+    }
+    
+    /**
+     * OpenDJ generalizedtime format is yyyyMMddHHmmss'Z'
+     * OpenAM session failover format is in seconds and uses the same epoch 
+     * start as System.currentTimeMillis() / 1000 + the session time in seconds
+     * 
+     * @param time
+     * @return 
+     */
+    public static Long toAMDateFormat(String date) 
+    throws StoreException {
+        Date expDate = null;
+        
+        try {
+            expDate = formatter.parse(date);
+        } catch (ParseException pe) {
+            Object[] params = { date };
+            Log.logger.log(Level.SEVERE, "Unable to parse date {0} ", params);
+            throw new StoreException("Unable to parse date " + date);
+        }
+        
+        return expDate.getTime() / 1000;
+    }
+    
+    public static String toDJDateFormat(Long date) {
+        Date expDate = new Date(date.longValue() * 1000L);
+        return formatter.format(expDate);
     }
 }
 

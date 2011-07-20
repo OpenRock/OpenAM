@@ -31,7 +31,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.CaseInsensitiveHashMap;
+import org.forgerock.openam.amsessionstore.common.Log;
+import org.forgerock.openam.amsessionstore.db.StoreException;
 import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;
 import org.opends.server.types.SearchResultEntry;
@@ -78,8 +81,12 @@ public class EmbeddedSearchResultIterator {
             }
         }
 
-        current = (entry == null) ? null :  new AMRecordDataEntry(dn,
-            convertLDAPAttributeSetToMap(entry.getAttributes()));
+        try {
+            current = (entry == null) ? null : new AMRecordDataEntry(dn,
+                convertLDAPAttributeSetToMap(entry.getAttributes()));
+        } catch (StoreException se) {
+            Log.logger.log(Level.WARNING,"Unable to create AMRecordDataEntry ", se);
+        }
             
         return (current != null);
     }

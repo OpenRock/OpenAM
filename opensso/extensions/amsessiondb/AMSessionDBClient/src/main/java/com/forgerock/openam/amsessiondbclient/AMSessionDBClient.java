@@ -457,6 +457,7 @@ public class AMSessionDBClient {
 
             try {
                 writeResource.write(record);
+                System.out.println("Write complete: " + record.getPrimaryKey());
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
             }
@@ -497,7 +498,7 @@ public class AMSessionDBClient {
             
             try {
                 Map<String, Long> sessions = getRecordCountResource.getRecordCount(taskConfig.get(SEC_KEY));
-                System.out.println(sessions);
+                System.out.println("Sessions are: " + sessions);
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
             }

@@ -73,7 +73,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     private final static String PKEY_FILTER_POST = ")";
     private final static String SKEY_FILTER_PRE = "(sKey=";
     private final static String SKEY_FILTER_POST = ")";
-    private final static String EXPDATE_FILTER_PRE = "(expirationDate<";
+    private final static String EXPDATE_FILTER_PRE = "(expirationDate<=";
     private final static String EXPDATE_FILTER_POST = ")";
     private static LinkedHashSet<String> returnAttrs;
     
@@ -284,7 +284,8 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         }
     }
     
-    private List<RawModification> createModificationList(AMRecord record) {
+    private List<RawModification> createModificationList(AMRecord record)
+    throws StoreException {
         List<RawModification> mods = new ArrayList<RawModification>();
         AMRecordDataEntry entry = new AMRecordDataEntry(record);
         List<RawAttribute> attrList = entry.getAttrList();
@@ -501,7 +502,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                         
                         if (value != null && !value.isEmpty()) {
                             for (String v : value) {
-                                expDate = Long.parseLong(v);
+                                expDate = AMRecordDataEntry.toAMDateFormat(v);
                             }
                         }  
                         
