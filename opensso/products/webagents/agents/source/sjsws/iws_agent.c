@@ -193,14 +193,14 @@ static int do_redirect(Session *sn, Request *rq, am_status_t status,
                         redirect_url, &redirect_url_with_advice);
                 if (ret == AM_SUCCESS) {
                     redirect_url = redirect_url_with_advice;
-                    am_web_log_debug("%s: policy status=%s, "
+                    am_web_log_debug("do_redirect(): policy status=%s, "
                             "redirect url with advice [%s]",
-                            thisfunc, am_status_to_string(status),
+                            am_status_to_string(status),
                             redirect_url);
                 } else {
-                    am_web_log_error("%s: Error while building "
+                    am_web_log_error("do_redirect(): Error while building "
                             "the redirect url with advice:%s",
-                            thisfunc, am_status_to_string(ret));
+                            am_status_to_string(ret));
                 }
             }
 
