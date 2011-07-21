@@ -38,7 +38,6 @@
     <indexitem target="service.scserviceprofile.iplanetamauthservice" text="Principal"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
     <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
-    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="SSO de Windows Desktop"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>

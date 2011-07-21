@@ -1021,17 +1021,6 @@
             <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="連接埠號" expand="false"></tocitem>
             <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="逾時" expand="false"></tocitem>
             <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="認證級別" expand="false"></tocitem></tocitem>
-        <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord" expand="false">
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="伺服器" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="伺服器驗證檔案目錄" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="啟用記錄" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="記錄層級" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="記錄檔" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="認證連線逾時" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="用戶端類型" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="EASSP 版本" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="最小認證程式強度" expand="false"></tocitem>
-            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="認證級別" expand="false"></tocitem></tocitem>
         <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE" expand="false">
             <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="認證級別" expand="false"></tocitem></tocitem>
         <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID " expand="false">

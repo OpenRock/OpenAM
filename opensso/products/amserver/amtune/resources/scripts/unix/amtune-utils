@@ -25,6 +25,7 @@
 #
 # $Id: amtune-utils,v 1.6 2008/08/19 19:08:32 veiming Exp $
 #
+# Portions Copyrighted 2011 ForgeRock AS
 #
 
 #===============================================================================
@@ -1103,7 +1104,6 @@ check_root_user() {
            exit 1
       fi
    fi
-  create_safeword_config_dir
 }
 
 #----------------------------------------------------------------
@@ -1240,19 +1240,6 @@ getBaseDir()
     PKG_DIR=`swlist -l product -a location $pkgname | grep -v "^#" | awk '{print $2}'`
   fi
   echo $PKG_DIR
-}
-
-#----------------------------------------------------------------
-# This function validate safeword directory.  This function is 
-# called by check_root_user
-#----------------------------------------------------------------
-create_safeword_config_dir() {
-    safeworddir=$VAR_SUBDIR/auth/safeword
-    if [ ! -d $safeworddir ]
-    then
-        $MKDIR -p $safeworddir > /dev/null 2>&1
-    fi
-    chmod 700 $safeworddir
 }
 
 getModeEntry() {

@@ -167,7 +167,6 @@
     <indexitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
     <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
-    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows Desktop SSO"></indexitem>

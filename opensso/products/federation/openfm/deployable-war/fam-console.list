@@ -236,15 +236,6 @@
 ./WEB-INF/classes/amAuthRadius_ko.properties
 ./WEB-INF/classes/amAuthRadius_zh.properties
 ./WEB-INF/classes/amAuthRadius_zh_TW.properties
-./WEB-INF/classes/amAuthSafeWord.properties
-./WEB-INF/classes/amAuthSafeWord_de.properties
-./WEB-INF/classes/amAuthSafeWord_en.properties
-./WEB-INF/classes/amAuthSafeWord_es.properties
-./WEB-INF/classes/amAuthSafeWord_fr.properties
-./WEB-INF/classes/amAuthSafeWord_ja.properties
-./WEB-INF/classes/amAuthSafeWord_ko.properties
-./WEB-INF/classes/amAuthSafeWord_zh.properties
-./WEB-INF/classes/amAuthSafeWord_zh_TW.properties
 ./WEB-INF/classes/amAuthSecurID.properties
 ./WEB-INF/classes/amAuthSecurID_de.properties
 ./WEB-INF/classes/amAuthSecurID_en.properties
@@ -2155,7 +2146,6 @@
 ./html/de/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/de/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/de/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/de/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/de/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/de/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/de/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -2472,7 +2462,6 @@
 ./html/en/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/en/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/en/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/en/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/en/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/en/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/en/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -2812,7 +2801,6 @@
 ./html/es/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/es/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/es/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/es/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/es/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/es/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/es/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -3162,7 +3150,6 @@
 ./html/fr/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/fr/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/fr/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/fr/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/fr/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/fr/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/fr/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -3512,7 +3499,6 @@
 ./html/ja/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/ja/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/ja/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/ja/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/ja/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/ja/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/ja/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -3862,7 +3848,6 @@
 ./html/ko/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/ko/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/ko/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/ko/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/ko/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/ko/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/ko/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -4212,7 +4197,6 @@
 ./html/zh_CN/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/zh_CN/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/zh_CN/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/zh_CN/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/zh_CN/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/zh_CN/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/zh_CN/help/service.scserviceprofile.iplanetamauthunixservice.html
@@ -4560,7 +4544,6 @@
 ./html/zh_TW/help/service.scserviceprofile.iplanetamauthmembershipservice.html
 ./html/zh_TW/help/service.scserviceprofile.iplanetamauthntservice.html
 ./html/zh_TW/help/service.scserviceprofile.iplanetamauthradiusservice.html
-./html/zh_TW/help/service.scserviceprofile.iplanetamauthsafewordservice.html
 ./html/zh_TW/help/service.scserviceprofile.iplanetamauthsecuridservice.html
 ./html/zh_TW/help/service.scserviceprofile.iplanetamauthservice.html
 ./html/zh_TW/help/service.scserviceprofile.iplanetamauthunixservice.html

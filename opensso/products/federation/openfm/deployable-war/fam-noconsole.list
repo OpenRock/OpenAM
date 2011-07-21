@@ -269,16 +269,6 @@
 ./WEB-INF/classes/amAuthRadius_ko.properties
 ./WEB-INF/classes/amAuthRadius_zh.properties
 ./WEB-INF/classes/amAuthRadius_zh_TW.properties
-./WEB-INF/classes/amAuthSafeWord.properties
-./WEB-INF/classes/amAuthSafeWord.xml
-./WEB-INF/classes/amAuthSafeWord_de.properties
-./WEB-INF/classes/amAuthSafeWord_en.properties
-./WEB-INF/classes/amAuthSafeWord_es.properties
-./WEB-INF/classes/amAuthSafeWord_fr.properties
-./WEB-INF/classes/amAuthSafeWord_ja.properties
-./WEB-INF/classes/amAuthSafeWord_ko.properties
-./WEB-INF/classes/amAuthSafeWord_zh.properties
-./WEB-INF/classes/amAuthSafeWord_zh_TW.properties
 ./WEB-INF/classes/amAuthSecurID.properties
 ./WEB-INF/classes/amAuthSecurID.xml
 ./WEB-INF/classes/amAuthSecurID_de.properties
@@ -1318,7 +1308,6 @@
 ./WEB-INF/lib/relaxngDatatype.jar
 ./WEB-INF/lib/rome-1.0.jar
 ./WEB-INF/lib/scn_stprs_util.jar
-./WEB-INF/lib/swec.jar
 ./WEB-INF/lib/unittest.jar
 ./WEB-INF/lib/webservices-api.jar
 ./WEB-INF/lib/webservices-extra-api.jar
@@ -1932,7 +1921,6 @@
 ./config/auth/default/RADIUS.xml
 ./config/auth/default/Redirect.jsp
 ./config/auth/default/SAE.xml
-./config/auth/default/SafeWord.xml
 ./config/auth/default/SecurID.xml
 ./config/auth/default/Unix.xml
 ./config/auth/default/WindowsDesktopSSO.xml
@@ -1985,7 +1973,6 @@
 ./config/auth/default_de/NT.xml
 ./config/auth/default_de/RADIUS.xml
 ./config/auth/default_de/SAE.xml
-./config/auth/default_de/SafeWord.xml
 ./config/auth/default_de/SecurID.xml
 ./config/auth/default_de/Unix.xml
 ./config/auth/default_de/WindowsDesktopSSO.xml
@@ -2004,7 +1991,6 @@
 ./config/auth/default_en/NT.xml
 ./config/auth/default_en/RADIUS.xml
 ./config/auth/default_en/SAE.xml
-./config/auth/default_en/SafeWord.xml
 ./config/auth/default_en/SecurID.xml
 ./config/auth/default_en/Unix.xml
 ./config/auth/default_en/WindowsDesktopSSO.xml
@@ -2023,7 +2009,6 @@
 ./config/auth/default_es/NT.xml
 ./config/auth/default_es/RADIUS.xml
 ./config/auth/default_es/SAE.xml
-./config/auth/default_es/SafeWord.xml
 ./config/auth/default_es/SecurID.xml
 ./config/auth/default_es/Unix.xml
 ./config/auth/default_es/WindowsDesktopSSO.xml
@@ -2042,7 +2027,6 @@
 ./config/auth/default_fr/NT.xml
 ./config/auth/default_fr/RADIUS.xml
 ./config/auth/default_fr/SAE.xml
-./config/auth/default_fr/SafeWord.xml
 ./config/auth/default_fr/SecurID.xml
 ./config/auth/default_fr/Unix.xml
 ./config/auth/default_fr/WindowsDesktopSSO.xml
@@ -2061,7 +2045,6 @@
 ./config/auth/default_ja/NT.xml
 ./config/auth/default_ja/RADIUS.xml
 ./config/auth/default_ja/SAE.xml
-./config/auth/default_ja/SafeWord.xml
 ./config/auth/default_ja/SecurID.xml
 ./config/auth/default_ja/Unix.xml
 ./config/auth/default_ja/WindowsDesktopSSO.xml
@@ -2080,7 +2063,6 @@
 ./config/auth/default_ko/NT.xml
 ./config/auth/default_ko/RADIUS.xml
 ./config/auth/default_ko/SAE.xml
-./config/auth/default_ko/SafeWord.xml
 ./config/auth/default_ko/SecurID.xml
 ./config/auth/default_ko/Unix.xml
 ./config/auth/default_ko/WindowsDesktopSSO.xml
@@ -2099,7 +2081,6 @@
 ./config/auth/default_zh/NT.xml
 ./config/auth/default_zh/RADIUS.xml
 ./config/auth/default_zh/SAE.xml
-./config/auth/default_zh/SafeWord.xml
 ./config/auth/default_zh/SecurID.xml
 ./config/auth/default_zh/Unix.xml
 ./config/auth/default_zh/WindowsDesktopSSO.xml
@@ -2118,7 +2099,6 @@
 ./config/auth/default_zh_CN/NT.xml
 ./config/auth/default_zh_CN/RADIUS.xml
 ./config/auth/default_zh_CN/SAE.xml
-./config/auth/default_zh_CN/SafeWord.xml
 ./config/auth/default_zh_CN/SecurID.xml
 ./config/auth/default_zh_CN/Unix.xml
 ./config/auth/default_zh_CN/WindowsDesktopSSO.xml
@@ -2135,7 +2115,6 @@
 ./config/auth/default_zh_TW/Membership.xml
 ./config/auth/default_zh_TW/NT.xml
 ./config/auth/default_zh_TW/RADIUS.xml
-./config/auth/default_zh_TW/SafeWord.xml
 ./config/auth/default_zh_TW/SecurID.xml
 ./config/auth/default_zh_TW/Unix.xml
 ./config/auth/default_zh_TW/WindowsDesktopSSO.xml

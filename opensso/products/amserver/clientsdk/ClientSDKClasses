@@ -292,7 +292,6 @@ com/sun/identity/authentication/modules/jdbc/JDBCPrincipal.class
 com/sun/identity/authentication/modules/membership/MembershipPrincipal.class
 com/sun/identity/authentication/modules/msisdn/MSISDNPrincipal.class
 com/sun/identity/authentication/modules/radius/RADIUSPrincipal.class
-com/sun/identity/authentication/modules/safeword/SafeWordPrincipal.class
 com/sun/identity/authentication/modules/saml/SAMLPrincipal.class
 com/sun/identity/authentication/modules/windowsdesktopsso/WindowsDesktopSSOPrincipal.class
 com/sun/identity/authentication/modules/ldap/LDAPUtilException.class

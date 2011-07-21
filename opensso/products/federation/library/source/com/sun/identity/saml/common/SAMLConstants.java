@@ -52,7 +52,6 @@ public final class SAMLConstants
         passwordAuthMethods.add("unix");
         passwordAuthMethods.add("anonymous");
         tokenAuthMethods = new HashSet();
-        tokenAuthMethods.add("safeword");
         tokenAuthMethods.add("radius");
     }
 

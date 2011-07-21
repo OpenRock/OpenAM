@@ -180,7 +180,6 @@
 	<mapID target="service.scserviceprofile.iplanetamauthmembershipservice" url="service.scserviceprofile.iplanetamauthmembershipservice.html"/>
 	<mapID target="service.scserviceprofile.sunamauthmsisdnservice" url="service.scserviceprofile.sunamauthmsisdnservice.html"/>
 	<mapID target="service.scserviceprofile.iplanetamauthradiusservice" url="service.scserviceprofile.iplanetamauthradiusservice.html"/>
-	<mapID target="service.scserviceprofile.iplanetamauthsafewordservice" url="service.scserviceprofile.iplanetamauthsafewordservice.html"/>
 	<mapID target="service.scserviceprofile.sunamauthsaeservice" url="service.scserviceprofile.sunamauthsaeservice.html"/>
 	<mapID target="service.scserviceprofile.iplanetamauthsecuridservice" url="service.scserviceprofile.iplanetamauthsecuridservice.html"/>
 	<mapID target="service.scserviceprofile.iplanetamauthunixservice" url="service.scserviceprofile.iplanetamauthunixservice.html"/>

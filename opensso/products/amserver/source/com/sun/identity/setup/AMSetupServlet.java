@@ -783,8 +783,6 @@ public class AMSetupServlet extends HttpServlet {
                 SetupConstants.CONFIG_VAR_SERVER_URI);
             // do this here since initializeConfigProperties needs the dir
             setupSecurIDDirs(basedir,deployuri);
-            // do this here just because the SecurID dirs are done here
-            setupSafeWordDirs(basedir, deployuri);
 
             SetupProgress.reportStart("configurator.progress.reinit.system", null);
             Map mapFileNameToConfig = initializeConfigProperties();
@@ -2378,24 +2376,6 @@ public class AMSetupServlet extends HttpServlet {
         } catch (IOException ioex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                 "AMSetupServlet.copyAuthSecurIDFiles:", ioex);
-        }
-    }
-
-    private static void setupSafeWordDirs(String basedir, String deployuri)
-    {
-        /*
-         *  make sure the
-         *  basedir + "/" + deployuri + "/auth/safeword/serverVerification" 
-         *  directory exists.
-         */
-
-        String safewordDir = basedir + "/" + deployuri +
-            "/auth/safeword/serverVerification";
-        File safewordFDir = new File(safewordDir);
-        if (!safewordFDir.mkdirs()) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "AMSetupServlet.setupSafeWordDirs: " +
-                "failed to create SafeWord verification directory");
         }
     }
 

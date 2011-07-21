@@ -26,7 +26,6 @@
     <indexitem target="service.scserviceprofile.iplanetamauthservice" text="Noyau"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
     <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
-    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="SSO Bureau Windows"></indexitem>
     <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
