@@ -2554,6 +2554,61 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.postdata.preserve.enable"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a261">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.postdata.preserve.cache.noentry.url"
+                        type="list"
+                        syntax="string"
+                        uitype="unorderedlist"
+                        validator="ListValueValidator"
+                        i18nKey="a262">
+                        <DefaultValues>
+                            <Value>[0]=</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.postdata.preserve.cache.entry.ttl"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a263">
+                        <DefaultValues>
+                            <Value>300000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.postdata.preserve.stickysession.mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a264">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a265">URL</ChoiceValue>
+                            <ChoiceValue i18nKey="a266">Cookie</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>URL</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.postdata.preserve.stickysession.value"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a267">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                    <!--
                     <AttributeSchema
                         name="com.sun.identity.agents.config.xss.code.elements"
