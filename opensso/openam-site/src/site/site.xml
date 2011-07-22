@@ -47,7 +47,7 @@
    <item name="Welcome" href="index.html" />
    <item name="News" href="news.html" />
    <item name="Join" href="https://idp.forgerock.org/openam/UI/Login?service=register" />
-   <item name="Downloads" href="http://forgerock.com/downloads.html" />
+   <item name="Downloads" href="http://forgerock.org/openam.html" />
    <item name="FAQ" href="faq.html" />
    <item name="Mailing Lists" href="mail-lists.html" />
    <item name="Support" href="http://forgerock.com/subscriptions.html" />
