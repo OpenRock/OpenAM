@@ -26,7 +26,7 @@
 
 -->
 <!--
-   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+   Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
 <project name="Open Federation" default="usage">
@@ -91,7 +91,8 @@
             <arg value="${openfm.res.i18n.dir}"/>
             <arg value="com.sun.identity.federation.cli.definition.FederationManager"/>
         </java>
-        <ant antfile="${unittest.dir}/build.xml" inheritRefs="true"/>
+        <!-- Uncomment this if you want to build unittests -->
+        <!-- <ant antfile="${unittest.dir}/build.xml" inheritRefs="true"/> -->
     </target>
 
     <target name="clihelper" depends="preparebuild">

@@ -25,6 +25,9 @@
    $Id: build-war.xml,v 1.57 2010/01/20 17:58:48 huacui Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <project name="openfed-war" default="all">
                 
@@ -468,7 +471,8 @@
             <fileset dir="${openfm.web.dir}" excludes="**/CVS" />
         </copy>
 
-        <antcall target="unittest" />
+        <!-- Uncomment the following line to include the unittest files in the WAR -->
+        <!-- <antcall target="unittest" /> -->
 
         <war destfile="${fm.dist.dir}/opensso.war" webxml="${war.packageweb.dir}/web.xml">
             <manifest>
