@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.tools.bundles;
 
 import com.iplanet.am.util.SystemProperties;
@@ -68,11 +67,13 @@ public class Main implements SetupConstants{
             String configPath = System.getProperty(AMCONFIG_PATH);
             debugPath = System.getProperty(DEBUG_PATH);
             logPath = System.getProperty(LOG_PATH);
+            String currentDir = System.getProperty("user.dir");
 
             try {
                 if ((configPath == null) || (configPath.length() == 0)) {
                     configPath = SetupUtils.getUserInput(bundle.getString(
-                        currentOS + QUESTION));
+                        currentOS + QUESTION), System.getProperty("user.home")
+                            + File.separator + "openam");
                     if (!(new File(configPath).isAbsolute())) {
                         System.out.println(bundle.getString(
                             "message.error.dir.absolute"));
@@ -81,7 +82,8 @@ public class Main implements SetupConstants{
 
                     if ((debugPath == null) || (debugPath.length() == 0)) {
                         debugPath = SetupUtils.getUserInput(bundle.getString(
-                            currentOS + ".debug.dir"));
+                            currentOS + ".debug.dir"), currentDir
+                                + File.separator + "debug");
                     }
                     if (!(new File(debugPath).isAbsolute())) {
                         System.out.println(bundle.getString(
@@ -96,7 +98,8 @@ public class Main implements SetupConstants{
 
                     if ((logPath == null) || (logPath.length() == 0)) {
                         logPath = SetupUtils.getUserInput(bundle.getString(
-                            currentOS + ".log.dir"));
+                            currentOS + ".log.dir"), currentDir
+                                + File.separator + "log");
                     }
                     if (!(new File(logPath).isAbsolute())) {
                         System.out.println(bundle.getString(

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.tools.bundles;
 
@@ -38,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -87,6 +88,12 @@ public class SetupUtils implements SetupConstants{
         System.out.print(message);
         userInput = in.readLine();
         return userInput;
+    }
+
+    public static String getUserInput(String message, String def)
+        throws IOException {
+        String ret = getUserInput(MessageFormat.format(message, def));
+        return (ret.trim().length() > 0 ? ret : def);
     }
 
     /**
