@@ -40,6 +40,7 @@ public class DeleteTask extends AbstractTask {
         this.resourceURL = resourceURL;
     }
 
+    @Override
     public void doTask() 
     throws Exception {
         ClientResource resource = new ClientResource(resourceURL + DeleteResource.URI);

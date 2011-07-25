@@ -87,7 +87,7 @@
             <dependency> 
                 <groupId>org.forgerock.opendj</groupId> 
                 <artifactId>opendj-server</artifactId>
-                <version>2.4.3-SNAPSHOT</version> 
+                <version>2.4.4-SNAPSHOT</version> 
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -141,6 +141,11 @@
             <id>forgerock</id>
             <name>ForgeRock OpenAM Repo</name>
             <url>http://repo.forgerock.org</url>
+        </repository>
+        <repository>
+            <id>forgerock-maven</id>
+            <name>ForgeRock OpenDJ Repo</name>
+            <url>http://maven.forgerock.org/repo/repo</url>
         </repository>
         <repository>  
             <id>maven-restlet</id>  

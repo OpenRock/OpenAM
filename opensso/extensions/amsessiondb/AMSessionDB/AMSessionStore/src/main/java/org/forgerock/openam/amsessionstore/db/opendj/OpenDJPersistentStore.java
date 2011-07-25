@@ -304,12 +304,12 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         StringBuilder baseDN = new StringBuilder();
         
         try {
-            StringBuilder filter = new StringBuilder();
-            filter.append(PKEY_FILTER_PRE).append(id).append(PKEY_FILTER_POST);
-            baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
+            baseDN.append(Constants.AMRECORD_NAMING_ATTR).append(Constants.EQUALS);
+            baseDN.append(id).append(Constants.COMMA).append(Constants.BASE_DN);
+            baseDN.append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                 SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, filter.toString() , returnAttrs);
+                0, 0, false, Constants.FAMRECORD_FILTER , returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {

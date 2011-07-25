@@ -103,7 +103,7 @@ public final class Constants {
     
     public final static String FR_AMSESSIONDB = "frAmSessionDb";
     
-    public final static String FAMRECORD_FILTER = "(objectclass=" + FR_FAMRECORD + ")";
+    public final static String FAMRECORD_FILTER = "(objectclass=*)";
     
     public static final String COMMA = ",";
     
