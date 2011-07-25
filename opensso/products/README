@@ -63,6 +63,8 @@ Portions Copyrighted [2010-2011] [ForgeRock AS]
         %% 2.9 Obtaining jsr311-api-1.1.jar
         %% 2.10 Obtaining jstl.jar
         %% 2.11 Obtaining jsf.jar, jsf-impl.jar
+        %% 2.12 Obtaining opends.zip
+        %% 2.13 Obtaining log4j-1.2.8.jar
 
     %% 3. Building the workspace
         %% 3.1 clean target
@@ -231,6 +233,7 @@ libraries/native to opensso/products/extlib.
 %% 2.10 Obtaining jstl.jar
 2.10.1 Download from
        http://mirrors.ibiblio.org/pub/mirrors/maven2/jstl/jstl/1.1.2/jstl-1.1.2.jar
+
 %% 2.11 Obtaining jsf.jar, jsf-impl.jar
 2.11.1 Download 
        https://javaserverfaces.dev.java.net/files/documents/1866/138058/mojarra-1.2_13-binary.zip
@@ -246,6 +249,10 @@ libraries/native to opensso/products/extlib.
 2.12.5 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
     	./create_opends_zip.sh OpenDS-2.3.0
 2.12.6 Copy the opends.zip into the products/extlib directory
+
+%% 2.13 Obtaining log4j-1.2.8.jar
+2.13.1 Download from
+       http://search.maven.org/remotecontent?filepath=log4j/log4j/1.2.8/log4j-1.2.8.jar
 
 %% 3. Building the workspace
 
