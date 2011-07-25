@@ -25,8 +25,19 @@
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <outputDirectory>/amsessiondb</outputDirectory>
+            <excludes>
+                <exclude>opendj</exclude>
+                <exclude>opendj/**/*</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>${project.build.directory}/${project.build.finalName}-dj.zip</source>
+            <destName>opendj.zip</destName>
+            <outputDirectory>/amsessiondb/install</outputDirectory>
+        </file>
+    </files>
     <dependencySets>
         <dependencySet>
             <excludes>

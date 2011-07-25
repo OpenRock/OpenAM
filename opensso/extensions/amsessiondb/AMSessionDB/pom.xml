@@ -87,7 +87,7 @@
             <dependency> 
                 <groupId>org.forgerock.opendj</groupId> 
                 <artifactId>opendj-server</artifactId>
-                <version>2.4.4-SNAPSHOT</version> 
+                <version>${opendj.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -131,6 +131,8 @@
 
     <properties>
         <openam.version>snapshot952</openam.version>
+        <opendj.stable.version>2.4.4</opendj.stable.version>
+        <opendj.version>${opendj.stable.version}-SNAPSHOT</opendj.version>
         <orientdb.version>1.0rc1-SNAPSHOT</orientdb.version>
         <restlet.version>2.0.6</restlet.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
