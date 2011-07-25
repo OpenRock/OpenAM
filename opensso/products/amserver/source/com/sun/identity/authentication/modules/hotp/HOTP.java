@@ -94,6 +94,7 @@ public class HOTP extends AMLoginModule {
             "sunAMAuthHOTPPasswordValidityDuration";
     private static String CODELENGTH = "sunAMAuthHOTPPasswordLength";
     private static String CODEDELIVERY = "sunAMAuthHOTPasswordDelivery";
+    private static final String FROM_ADDRESS = "sunAMAuthHOTPSMTPFromAddress";
     String gatewaySMSImplClass = null;
     String codeValidityDuration = null;
     String codeLength = null;
@@ -394,7 +395,7 @@ public class HOTP extends AMLoginModule {
             }
 
             if (phone != null || mail != null) {
-                String from = bundle.getString("messageFrom");
+                String from = CollectionHelper.getMapAttr(currentConfig, FROM_ADDRESS);
                 String subject = bundle.getString("messageSubject");
                 String message = bundle.getString("messageContent");
                 SMSGateway gateway = (SMSGateway)

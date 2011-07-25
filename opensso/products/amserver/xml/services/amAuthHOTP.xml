@@ -102,6 +102,14 @@
                         <Value>SSL</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPFromAddress"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a5061">
+                    <DefaultValues>
+                        <Value>no-reply@openam.org</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <AttributeSchema name="sunAMAuthHOTPPasswordValidityDuration"
                     type="single"
@@ -196,6 +204,14 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>SSL</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPFromAddress"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a5061">
+                        <DefaultValues>
+                            <Value>no-reply@openam.org</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="sunAMAuthHOTPPasswordValidityDuration"
