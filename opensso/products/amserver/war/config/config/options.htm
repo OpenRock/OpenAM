@@ -16,8 +16,7 @@
         document.location = "$context/UI/Login";
     }
 
-    /* #if ( $upgrade )
-     */
+    #if ( $upgrade )
 
     function downloadInstructions() {
         /* TODO - enable download - where does this file reside? */
@@ -31,28 +30,6 @@
     function upgradeOlder() {
         YAHOO.sun.identity.config.options.upgrading.show();
         AjaxUtils.call( "$context$path?actionLink=olderUpgradeLink", onUpgradeOlderResponse );
-    }
-
-    function onCoexistResponse( response ) {
-        if ( response.responseText == "true" ) {
-            //operation was successful, hide the writing dialog, show the confComplete:
-
-            //in actuality, this usually happens very fast, so put a delay when removing the testUrlPanel.
-            //if we don't do this, the window blinks and looks unsightly, so we actually impose an unnecessary
-            //gui delay for a slightly cleaner 'expected' UI experience:
-            setTimeout("YAHOO.sun.identity.config.options.upgrading.hide()", 1500);
-            setTimeout("YAHOO.sun.identity.config.options.upgradePartiallyComplete.show()", 1500);
-        } else {
-            //TODO - show a specific (nice looking) error message dialog that explains why the upgrade failed.
-            //for now, just alert:
-            alert( "Unexpected error: [" + response.responseText + "].  Please contact your System " +
-                   "Administrator.  If you are the System Administrator, please direct your questions to the " +
-                   "OpenAM user's mailing list for help.");
-        }
-    }
-    function coexist() {
-        YAHOO.sun.identity.config.options.upgrading.show();
-        AjaxUtils.call( "$context$path?actionLink=coexistLink", onCoexistResponse );
     }
 
     function onUpgradeResponse( response ) {
@@ -74,18 +51,21 @@
 
     }
     function upgrade() {
-        YAHOO.sun.identity.config.options.confirmUpgrade.hide();
         YAHOO.sun.identity.config.options.upgrading.show();
         AjaxUtils.call( "$context$path?actionLink=upgradeLink", onUpgradeResponse );
     }
-    function showConfirmUpgradePanel() {
-        YAHOO.sun.identity.config.options.confirmUpgrade.show();
+    
+    function renderUpgradePanel() {
+        YAHOO.sun.identity.config.options.upgrade = new YAHOO.widget.Panel("upgrade", { fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.upgrade.render();
+        YAHOO.sun.identity.config.options.upgrade.center();
     }
-    function cancelUpgrade() {
-        YAHOO.sun.identity.config.options.confirmUpgrade.hide();
+
+    function showUpgradePanel() {
+        YAHOO.sun.identity.config.options.upgrade.show();
     }
-    /* #else
-     */
+
+    #else
     var passwordUpdateRequired = $passwordUpdateRequired;
     var configOption = 0;
 
@@ -189,11 +169,10 @@
         }
     }    
     
-    /* #end
-     */
+    #end
      
     function writeConfigResponse(response) {
-        if (response.responseText == "true") {              
+        if (response.responseText === "true") {              
             YAHOO.sun.identity.config.options.inProgress.hide();
             YAHOO.sun.identity.config.options.confComplete.show();
         } else {
@@ -225,14 +204,9 @@
         YAHOO.sun.identity.config.options.confComplete = new YAHOO.widget.Panel("confComplete", { fixedcenter: false, modal:true, close: false, visible:false, constraintoviewport:true });
         YAHOO.sun.identity.config.options.confComplete.render();
         YAHOO.sun.identity.config.options.confComplete.center();
-        /* #if ( $upgrade )
-         */
-        YAHOO.sun.identity.config.options.confirmUpgrade = new YAHOO.widget.Panel("confirmUpgrade", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
-        YAHOO.sun.identity.config.options.confirmUpgrade.render();
 
-        YAHOO.sun.identity.config.options.upgradePartiallyComplete = new YAHOO.widget.Panel("upgradePartiallyComplete", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
-        YAHOO.sun.identity.config.options.upgradePartiallyComplete.render();
-
+        #if ( $upgrade )
+        AjaxUtils.load('upgradeContainer', "$context/config/upgrade/upgrade.htm?" + getLocale(), renderUpgradePanel);
         YAHOO.sun.identity.config.options.upgradeComplete = new YAHOO.widget.Panel("upgradeComplete", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
         YAHOO.sun.identity.config.options.upgradeComplete.render();
 
@@ -241,24 +215,13 @@
         YAHOO.sun.identity.config.options.upgrading.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
         YAHOO.sun.identity.config.options.upgrading.render(document.body);
 
-        YAHOO.util.Event.addListener("upgradeLink", "click", showConfirmUpgradePanel );
+        YAHOO.util.Event.addListener("upgradeLink", "click", showUpgradePanel );
         YAHOO.util.Event.addListener("confirmUpgradeLink", "click", upgrade );
-        YAHOO.util.Event.addListener("cancelUpgradeLink", "click", cancelUpgrade );
 
-        YAHOO.util.Event.addListener("coexistLink", "click", coexist );
-        YAHOO.util.Event.addListener("upgradeOlderLink", "click", upgradeOlder );
-
-        YAHOO.util.Event.addListener("downloadInstructionsLink", "click", downloadInstructions );
-
-        YAHOO.util.Event.addListener("launchConsoleLink1", "click", launchConsole );
-        YAHOO.util.Event.addListener("launchConsoleLink2", "click", launchConsole );
-
-        /* #else 
-        */
+        #else 
         AjaxUtils.load('defaultSummaryContainer', "$context/config/defaultSummary.htm?" + getLocale(), renderDefaultSummary);
         AjaxUtils.load('wizardContainer', "$context/config/wizard/wizard.htm?" + getLocale(), renderWizard);
-        /* #end
-        */
+        #end
 
         #if ( $isOpenDS1x )
             YAHOO.sun.identity.config.options.cannotContinue = new YAHOO.widget.Panel("cannotContinue", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
@@ -314,20 +277,6 @@
             </p>
             #end
         </div>
-        <!--
-        <div>
-            #if( $upgrade )
-            <h3>$page.getLocalizedString("upgrade.older.title")</h3>
-	    $page.getLocalizedString("upgrade.older.description")
-            <a id="upgradeOlderLink" class="blue pointer">$page.getLocalizedString("upgrade.older.link")</a>
-            #else
-            <h3>$page.getLocalizedString("configuration.options.option3.title")</h3>
-            $page.getLocalizedString("configuration.options.option3.description");
-            <a id="ExistingConfiguration" class="blue pointer" onclick="setOption(3);">$page.getLocalizedString("configuration.options.option3.link")</a>
-            #end
-        </div>
-	-->
-        
     </div>
 </div>
 #if ( $upgrade )
@@ -339,31 +288,7 @@
 		text-align:left;
 	}
 </style>
-<div id="confirmUpgrade" align="center" style="width:600px;visibility:hidden">
-    <div class="header">$page.getLocalizedString("upgrade.confirm.header")</div>
-    <div class="bd" style="background-color: white; height: 150px">
-	<h2>$page.getLocalizedString("upgrade.confirm.body")</h2>
-        <div class="colum">
-            <p>$page.getLocalizedString("upgrade.confirm.yes")</p>
-	    <a id="confirmUpgradeLink" class="blueSmall pointer">$page.getLocalizedString("upgrade.confirm.yes.link")</a>
-	</div>
-	<div class="colum">
-            <p>$page.getLocalizedString("upgrade.confirm.no")</p>
-            <a id="cancelUpgradeLink" class="blueSmall pointer">$page.getLocalizedString("upgrade.confirm.no.link")</a>
-        </div>
-    </div>
-</div>
-<div id="upgradePartiallyComplete" style="width:400px;visibility:hidden">
-    <div class="header">Upgrade Complete!</div>
-    <div class="bd" style="background-color: white">
-	    <h2>$page.getLocalizedString("upgrade.option.complete.title")</h2>
-	    $page.getLocalizedString("upgrade.option.complete.description")
-	    <p align="center" class="blue">
-            <a id="downloadInstructionsLink" class="blueSmall pointer">$page.getLocalizedString("download.instructions.link")</a> |
-            <a id="launchConsoleLink1" class="blueSmall pointer">$page.getLocalizedString("launch.console.link")</a>
-        </p>
-    </div>
-</div>
+<div id="upgradeContainer"></div>
 <div id="upgradeComplete" style="width:400px;visibility:hidden">
     <div class="header">$page.getLocalizedString("upgrade.option.complete.title")</div>
     <div class="bd" style="background-color: white; text-align: center">
@@ -375,13 +300,18 @@
     <div id="passwordDialogContainer"></div>
     <div id="defaultSummaryContainer"></div>
     <div id="wizardContainer"></div>
-    
+#end
+
     <div id="inProgress" style="visibility:hidden">
         <div class="header"> </div>
         <div class="bd">
             <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
                 <br/>
+                #if ($upgrade)
+                <h2>$page.getLocalizedString("upgrade.progress")</h2>
+                #else
                 <h2>$page.getLocalizedString("configurator.progress")</h2>
+                #end
                 <img src="$context/assets/images/rel_interstitial_loading.gif" />
 
  <br>
@@ -404,19 +334,27 @@
     </div>
     
     <div id="confComplete" style="visibility:hidden">
-        <div class="header">$page.getLocalizedString("configuration.option1.complete.header")</div>
-        <div class="bd">
-            <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+        #if ($upgrade)
+            <div class="header">$page.getLocalizedString("upgrade.complete.header")</div>
+            <div class="bd">
+                <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
 
-                <br>
-                <h1>$page.getLocalizedString("configuration.option1.complete.message")</h1>
-                <br/>
-                <p align="center" class="blueSmall">
-                    <a href="#" onclick="launchConsole(); return false">$page.getLocalizedString("go.to.login.screen")</a>
-                </div>
-        </div>
+                    <br>
+                    <h1>$page.getLocalizedString("upgrade.complete.message")</h1>
+        #else
+            <div class="header">$page.getLocalizedString("configuration.option1.complete.header")</div>
+            <div class="bd">
+                <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+
+                    <br>
+                    <h1>$page.getLocalizedString("configuration.option1.complete.message")</h1>
+        #end
+                    <br/>
+                    <p align="center" class="blueSmall">
+                        <a href="#" onclick="launchConsole(); return false">$page.getLocalizedString("go.to.login.screen")</a>
+                    </div>
+             </div>
     </div>
-#end
 
 #if ( $isOpenDS1x )
 <style type="text/css">

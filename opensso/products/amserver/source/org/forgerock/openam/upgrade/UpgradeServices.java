@@ -32,6 +32,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.StringUtils;
@@ -161,6 +162,9 @@ public class UpgradeServices {
         if (debug.messageEnabled()) {
             debug.message("Upgrade complete.");
         }
+        
+        // reset the version is newer flag
+        AMSetupServlet.isVersionNewer();
     }
             
     public String generateDetailedUpgradeReport(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges, boolean html) 

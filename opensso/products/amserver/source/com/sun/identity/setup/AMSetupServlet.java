@@ -200,9 +200,7 @@ public class AMSetupServlet extends HttpServlet {
             }
         }
         
-        if (isConfiguredFlag) {
-            isVersionNewer = UpgradeUtils.isVersionNewer();
-        }
+        isVersionNewer();
     }
 
     /*
@@ -233,6 +231,15 @@ public class AMSetupServlet extends HttpServlet {
         } else {
             return false;
         }
+    }
+    
+    /**
+     * Used this method to check if the version is newer; called post upgrade
+     */
+    public static void isVersionNewer() {
+        if (isConfiguredFlag) {
+            isVersionNewer = UpgradeUtils.isVersionNewer();
+        }       
     }
 
     /**

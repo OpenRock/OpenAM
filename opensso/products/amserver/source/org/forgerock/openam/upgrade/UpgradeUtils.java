@@ -298,7 +298,7 @@ public class UpgradeUtils {
             debug.message("War version: " + warVersionDate);
         }
         
-            return false; //currentVersionDate.before(warVersionDate);
+        return currentVersionDate.before(warVersionDate);
     }
     
     public static String getCurrentVersion() {

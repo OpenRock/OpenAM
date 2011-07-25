@@ -58,7 +58,8 @@ public final class AMSetupFilter implements Filter {
     private static final String NOWRITE_PERMISSION = "/nowritewarning.jsp";
 
     private static String[] fList = { 
-        ".htm", ".css", ".js", ".jpg", ".gif", ".png",".JPG", "SMSObjectIF" , "setSetupProgress"
+        ".htm", ".css", ".js", ".jpg", ".gif", ".png",".JPG", "SMSObjectIF" , "setSetupProgress",
+        "setUpgradeProgress"
     }; 
 
     /**
