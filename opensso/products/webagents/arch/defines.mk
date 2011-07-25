@@ -44,7 +44,7 @@ DEFINES_INCLUDED := true
 AGENT_MAJOR_VER := 3
 AGENT_MINOR_VER := 0
 # Patch version, ex: AGENT_PATCH_VER := -01 (empty for RTM release)
-AGENT_PATCH_VER := -03
+AGENT_PATCH_VER := -04
 AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER)$(AGENT_PATCH_VER)
 
 # Set RELEASE_TYPE to one of the following:
