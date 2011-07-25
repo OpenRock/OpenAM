@@ -30,6 +30,14 @@
                 <exclude>opendj/**/*</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/opendj-zip/OpenDJ-${opendj.stable.version}</directory>
+            <outputDirectory>/amsessiondb</outputDirectory>
+            <includes>
+                <include>lib/je.jar</include>
+                <include>lib/mail.jar</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <files>
         <file>
