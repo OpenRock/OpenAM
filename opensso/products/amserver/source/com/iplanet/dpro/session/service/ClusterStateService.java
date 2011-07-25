@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.iplanet.dpro.session.service;
@@ -66,6 +66,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
         boolean isUp;
 
+        @Override
         public int compareTo(Object o) {
             return id.compareTo(((ServerInfo) o).id);
         }
@@ -230,6 +231,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * 
      * @return The run period of the task.
      */
+    @Override
     public long getRunPeriod() {
         return period;
     }
@@ -239,6 +241,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      *
      * @return false since this class will not be used as container.
      */
+    @Override
     public boolean addElement(Object obj) {
         return false;
     }
@@ -248,6 +251,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      *
      * @return false since this class will not be used as container.
      */
+    @Override
     public boolean removeElement(Object obj) {
         return false;
     }
@@ -257,6 +261,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      *
      * @return true since this class will not be used as container.
      */
+    @Override
     public boolean isEmpty() {
         return true;
     }
@@ -264,11 +269,11 @@ public class ClusterStateService extends GeneralTaskRunnable {
     /**
      * Monitoring logic used by background thread
      */
+    @Override
     public void run() {
         try {
             boolean cleanRemoteSessions = false;
             synchronized (servers) {
-
                 Iterator i = servers.values().iterator();
                 while (i.hasNext()) {
                     ServerInfo info = (ServerInfo) i.next();
