@@ -41,6 +41,7 @@ public class Options extends TemplatedPage {
     protected boolean passwordUpdateRequired = true;
     protected boolean upgrade = false;
     protected boolean isOpenDS1x = false;
+    protected boolean debugOn = false;
     
     private java.util.Locale configLocale = null;
     
@@ -60,6 +61,12 @@ public class Options extends TemplatedPage {
 
         if (isOpenDS1x) {
             addModel("odsdir", AMSetupServlet.getBaseDir());
+        }
+        
+        debugOn = getContext().getRequest().getParameter( "debug" ) != null;
+        
+        if (debugOn) {
+            AMSetupServlet.enableDebug();
         }
     }
 

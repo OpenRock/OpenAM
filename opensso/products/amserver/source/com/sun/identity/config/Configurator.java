@@ -25,6 +25,7 @@
  * $Id: Configurator.java,v 1.5 2008/08/19 19:09:02 veiming Exp $
  *
  */
+
 package com.sun.identity.config;
 
 import com.sun.identity.config.pojos.*;

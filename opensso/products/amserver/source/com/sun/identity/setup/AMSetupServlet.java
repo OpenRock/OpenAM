@@ -120,6 +120,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.AccessController;
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.ServiceLoader;
 import javax.naming.NamingException;
@@ -158,6 +159,7 @@ public class AMSetupServlet extends HttpServlet {
 
     private static String errorMessage = null;
     private static java.util.Locale configLocale;
+    private static boolean debugEnabled = false;
 
     private static Set passwordParams = new HashSet();
 
@@ -240,6 +242,26 @@ public class AMSetupServlet extends HttpServlet {
         if (isConfiguredFlag) {
             isVersionNewer = UpgradeUtils.isVersionNewer();
         }       
+    }
+    
+    public static void enableDebug() {
+        Collection<Debug> debugInstances = Debug.getInstances();
+        
+        for (Debug d : debugInstances) {
+            d.setDebug(Debug.MESSAGE);
+        }
+        
+        debugEnabled = true;
+    }
+    
+    public static void disableDebug() {
+        if (debugEnabled) {
+            Collection<Debug> debugInstances = Debug.getInstances();
+
+            for (Debug d : debugInstances) {
+                d.setDebug(Debug.ERROR);
+            }
+        }
     }
 
     /**
