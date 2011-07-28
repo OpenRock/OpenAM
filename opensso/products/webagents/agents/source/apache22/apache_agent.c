@@ -50,6 +50,7 @@
 #include <apr_general.h>
 #include <apr_shm.h>
 #include <apr_global_mutex.h>
+#include <apr_version.h>
 #ifdef _MSC_VER
 #include <process.h>
 #include <windows.h>
@@ -57,6 +58,9 @@
 #else
 #include <unistd.h>
 #endif
+#ifdef AP_NEED_SET_MUTEX_PERMS
+#include <unixd.h>
+#endif 
 
 #include "am_web.h"
 
@@ -467,6 +471,14 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     agent_server_config *scfg;
     am_notification_list_item_t *notification_list;
     am_post_data_list_item_t *post_data_list;
+    apr_version_t version;
+    apr_version(&version);
+
+    if (!(version.major >= 1 && version.minor >= 3 && version.patch >= 0)) {
+        ap_log_error(APLOG_MARK, APLOG_CRIT, 0, server_ptr,
+                "Policy web agent initialization failed (need APR library version 1.3.0 or newer)");
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
 
 #ifdef _MSC_VER
     if (!getenv("AP_PARENT_PID")) {
@@ -527,6 +539,15 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
+#ifdef AP_NEED_SET_MUTEX_PERMS
+        rv = unixd_set_global_mutex_perms(scfg->notification_lock);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr,
+                    "Policy web agent could not set permissions "
+                    "on notifications global lock; check User and Group directives");
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+#endif 
         rv = apr_global_mutex_create(&(scfg->pdp_lock), scfg->postdata_lockfile, APR_LOCK_DEFAULT, pconf);
         if (rv != APR_SUCCESS) {
             ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to create "
@@ -535,6 +556,15 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
+#ifdef AP_NEED_SET_MUTEX_PERMS
+        rv = unixd_set_global_mutex_perms(scfg->pdp_lock);
+        if (rv != APR_SUCCESS) {
+            ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr,
+                    "Policy web agent could not set permissions "
+                    "on PDP global lock; check User and Group directives");
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+#endif 
         shm_size = APR_ALIGN_DEFAULT(sizeof (am_notification_list_item_t) * scfg->max_pid_count);
         pd_shm_size = APR_ALIGN_DEFAULT(sizeof (am_post_data_list_item_t) * scfg->max_pdp_count);
 
@@ -571,7 +601,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
                 "Policy web agent shared memory configuration: notif_shm_size[%d], pdp_shm_size[%d], max_pid_count[%d], max_pdp_count[%d]",
                 shm_size, pd_shm_size, scfg->max_pid_count, scfg->max_pdp_count);
     } else {
-        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, server_ptr, "Failed to initialize policy web agent");
+        ap_log_error(APLOG_MARK, APLOG_CRIT, 0, server_ptr, "Failed to initialize policy web agent");
         ret = HTTP_INTERNAL_SERVER_ERROR;
     }
     return ret;

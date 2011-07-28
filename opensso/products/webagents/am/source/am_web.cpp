@@ -6136,7 +6136,7 @@ process_request(am_web_request_params_t *req_params,
                     am_status_t pds = AM_SUCCESS;
                     post_urls_t *pu = NULL;
                     if (post_data == NULL) {
-                        am_web_log_debug("%s: post_data is empty, trying to read it here...");
+                        am_web_log_debug("%s: post_data is empty, trying to read it here...", thisfunc);
                         pds = req_func->get_post_data.func(req_func->get_post_data.args, &post_data);
                         am_web_log_debug("%s: post data: %s", thisfunc, post_data);
                     }
