@@ -74,6 +74,7 @@ import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPEntry;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPModification;
+import java.io.FilenameFilter;
 
 import org.opends.messages.Message;
 import org.opends.server.core.DirectoryServer;
@@ -97,8 +98,10 @@ import org.opends.server.tools.dsreplication.ReplicationCliMain;
   * normal shutdown of the embedded <code>OpenDS</code> instance.
   */
 public class EmbeddedOpenDS {
-    private static final String OPENDS_1x_VER = "1.0.2-build002";
-    private static final String OPENDS_230B2_VER = "2.3.0BACKPORT2";
+    private static final String OPENDS_1x_VER = "5097";
+    private static final String OPENDS_230B2_VER = "6500";
+    private static final String OPENDS_UPGRADE_DIR = "/config/upgrade/";
+    private static final String OPENDS_CONFIG_LDIF = "config.ldif";
     private static boolean serverStarted = false;
 
     /**
@@ -1438,20 +1441,20 @@ public class EmbeddedOpenDS {
     public static boolean isOpenDSVer1Installed() {
         boolean openDSVer1x = false;
 
-        if (getOpenDSVersion().contains(OPENDS_1x_VER)) {
+        if (getOpenDSVersion().equals(OPENDS_1x_VER)) {
             openDSVer1x = true;
         }
 
         return openDSVer1x;
     }
     
-        /**
+    /**
       * @return true if installed OpenDS is version 2.3.0BACKPORT2
       */
     public static boolean isOpenDSVer230Installed() {
         boolean openDSVer230b2 = false;
 
-        if (getOpenDSVersion().contains(OPENDS_230B2_VER)) {
+        if (getOpenDSVersion().equals(OPENDS_230B2_VER)) {
             openDSVer230b2 = true;
         }
 
@@ -1459,7 +1462,34 @@ public class EmbeddedOpenDS {
     }
     
     public static String getOpenDSVersion() {
-        return DirectoryServer.getVersionString();
+        Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
+        String odsRoot = AMSetupServlet.getBaseDir() + "/" + SetupConstants.SMS_OPENDS_DATASTORE;
+        String version = null;
+        
+        File configLdif = new File(odsRoot + OPENDS_UPGRADE_DIR);
+        
+        if (configLdif.exists() && configLdif.isDirectory()) {
+            String[] configFile = configLdif.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.startsWith(OPENDS_CONFIG_LDIF);
+                }
+            });
+            
+            if (configFile.length != 0) {
+                version = configFile[0].substring(configFile[0].lastIndexOf('.') + 1);
+            } else {
+                debug.error("Unable to determine OpenDS version");
+            }
+        } else {
+            debug.error("Unable to determine OpenDS version");
+        }
+        
+        if (debug.messageEnabled()) {
+            debug.message("Found OpenDS version: " + version);
+        }
+  
+        return version;
     }
 
     /**
