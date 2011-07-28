@@ -199,7 +199,7 @@ stop_am() {
 wait_jmq () {
 	_repeat=true
 	while [ $_repeat ]; do
-		EXIST=`netstat -an |grep 7777|grep LISTEN|wc -l`
+		EXIST=`netstat -an |grep $BROKER_PORT|grep LISTEN|wc -l`
 		if [ $EXIST -ge 1 ]; then
 			_repeat=
 		else
