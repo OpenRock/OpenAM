@@ -762,21 +762,13 @@ The scripts are properly setup under directory: /path/to/session/tools/scripts
    <step>
     <para>Unpack the <filename>opensso.war</filename> file into a temporary
     directory.</para>
-    <screen>$ mkdir tmp-das ; cd tmp-das
+    <screen>$ mkdir -p /tmp/das ; cd /tmp/das
 $ jar xf /path/to/OpenAM/deployable-war/opensso.war</screen>
    </step>
    <step>
-    <para>Pack files in <filename>fam-distauth.list</filename> into a
-    <filename>das.war</filename> file.</para>
-    <screen>$ jar cf /path/to/OpenAM/deployable-war/das.war
- @/path/to/OpenAM/deployable-war/fam-distauth.list</screen>
-   </step>
-   <step>
-    <para>Include files from
-    <filename>/path/to/OpenAM/deployable-war/distauth</filename> in
-    <filename>das.war</filename>.</para>
-    <screen>$ cd /path/to/OpenAM/deployable-war/distauth/
-$ jar uf /path/to/OpenAM/deployable-war/das.war *</screen>
+    <para>Create the <filename>das.war</filename> file.</para>
+    <screen>$ cd /path/to/OpenAM/deployable-war
+$ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
    </step>
   </procedure>
   
