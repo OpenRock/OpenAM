@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.authentication.modules.hotp;
 
@@ -234,7 +234,13 @@ public class HOTP extends AMLoginModule {
                         }
 
                     } else { // Send HOTP Code
-                        sentHOTPCode = sendHOTPCode(callbacks);
+                        try {
+                            sentHOTPCode = sendHOTPCode();
+                            substituteHeader(ISAuthConstants.LOGIN_START, bundle.getString("send.success"));
+                        } catch (AuthLoginException ale) {
+                            //it's already logged so we just handle the exception
+                            substituteHeader(ISAuthConstants.LOGIN_START, bundle.getString("send.failure"));
+                        }
                         return ISAuthConstants.LOGIN_START;
                     }
                 } else {
@@ -291,8 +297,7 @@ public class HOTP extends AMLoginModule {
         enteredHOTPCode = null;
     }
 
-    private String sendHOTPCode(Callback[] callbacks)
-            throws AuthLoginException {
+    private String sendHOTPCode() throws AuthLoginException {
 
         // The HOTP module can not be called alone. It has to be called after
         // one module that has set the userName.
@@ -313,12 +318,7 @@ public class HOTP extends AMLoginModule {
         } catch (InvalidKeyException e) {
             debug.error("HOTP.sendHOTPCode() : " + "invalid key",e);
             throw new AuthLoginException("amAuth", "invalidKey", null);
-
-        } catch (SSOException e) {
-            debug.error("HOTP.sendHOTPCode() : " + "invlaid SSO token", e);
-            throw new AuthLoginException("amAuth", "invalidSSOToken", null);
         }
-
     }
 
     private byte[] getSharedSecret() {
@@ -334,8 +334,7 @@ public class HOTP extends AMLoginModule {
      * Sends out the SMS message and E-mail with the HOTP code 
      * based on the HOTP module configurtion
      */
-    private void sendSMS(String code)
-            throws SSOException {
+    private void sendSMS(String code) throws AuthLoginException {
         AMIdentityRepository amIdRepo = getAMIdentityRepository(
                 getRequestOrg());
 
@@ -345,6 +344,7 @@ public class HOTP extends AMLoginModule {
         idsc.setAllReturnAttributes(true);
         // search for the identity
         Set results = Collections.EMPTY_SET;
+        Exception cause = null;
         try {
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
@@ -384,25 +384,45 @@ public class HOTP extends AMLoginModule {
                 itor = emails.iterator();
                 mail = (String) itor.next();
                 if (debug.messageEnabled()) {
-                    debug.message("HOTP.sendSMS() : " + "IdRepoException : email number found "
+                    debug.message("HOTP.sendSMS() : IdRepo: email address found "
                             + mail + " with username : " + userName);
                 }
             } else {
                 if (debug.messageEnabled()) {
-                    debug.message("HOTP.sendSMS() : " + "IdRepoException : no email found " +
+                    debug.message("HOTP.sendSMS() : IdRepo: no email found " +
                             " with username : " + userName);
                 }
             }
 
+            boolean delivered = false;
             if (phone != null || mail != null) {
                 String from = CollectionHelper.getMapAttr(currentConfig, FROM_ADDRESS);
                 String subject = bundle.getString("messageSubject");
                 String message = bundle.getString("messageContent");
-                SMSGateway gateway = (SMSGateway)
-                        Class.forName(gatewaySMSImplClass).newInstance();
+                SMSGateway gateway = Class.forName(gatewaySMSImplClass).
+                        asSubclass(SMSGateway.class).newInstance();
                 if (codeDelivery.equals("SMS and E-mail")) {
-                    gateway.sendSMSMessage(from, phone, subject, message, code, currentConfig);
-                    gateway.sendEmail(from, mail, subject, message, code, currentConfig);
+                    try {
+                        if (phone != null) {
+                            gateway.sendSMSMessage(from, phone, subject, message, code, currentConfig);
+                            delivered = true;
+                        }
+                    } catch (AuthLoginException ale) {
+                        debug.error("Error while sending HOTP code to user via SMS", ale);
+                        cause = ale;
+                    }
+                    try {
+                        if (mail != null) {
+                            gateway.sendEmail(from, mail, subject, message, code, currentConfig);
+                            delivered = true;
+                        }
+                    } catch (AuthLoginException ale) {
+                        debug.error("Error while sending HOTP code to user via e-mail", ale);
+                        cause = ale;
+                    }
+                    if (!delivered && cause != null) {
+                        throw cause;
+                    }
                 } else if (codeDelivery.equals("SMS")) {
                     gateway.sendSMSMessage(from, phone, subject, message, code, currentConfig);
                 } else if (codeDelivery.equals("E-mail")) {
@@ -410,23 +430,29 @@ public class HOTP extends AMLoginModule {
                 }
             } else {
                 if (debug.messageEnabled()) {
-                    debug.message("HOTP.sendSMS() : " + "IdRepoException : no phone or email found " +
+                    debug.message("HOTP.sendSMS() : IdRepo: no phone or email found " +
                             " with username : " + userName);
                 }
+                throw new AuthLoginException("No phone or e-mail found for user: " + userName);
             }
-
         } catch (ClassNotFoundException ee) {
             debug.error("HOTP.sendSMS() : " + "class not found " +
                         "SMSGateway class", ee);
+            cause = ee;
         } catch (InstantiationException ie) {
             debug.error("HOTP.sendSMS() : " + "can not instantiate " +
                         "SMSGateway class", ie);
+            cause = ie;
         } catch (IdRepoException e) {
             debug.error("HOTP.sendSMS() : " + "error searching " +
                         " Identities with username : " + userName, e);
+            cause = e;
         } catch (Exception e) {
             debug.error("HOTP.sendSMS() : " +  "HOTP module exception : ", e);
+            cause = e;
         }
-
+        if (cause != null) {
+            throw new AuthLoginException("HOTP.sendSMS() : Unable to send OTP code", cause);
+        }
     }
 }

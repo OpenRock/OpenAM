@@ -25,12 +25,16 @@
  * $Id: DefaultSMSGatewayImpl.java,v 1.3 2009/07/30 17:38:00 qcheng Exp $
  *
  */
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.modules.hotp;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.iplanet.am.util.AMSendMail;
+import com.sun.identity.authentication.spi.AuthLoginException;
 
 public class DefaultSMSGatewayImpl implements SMSGateway {
 
@@ -53,19 +57,10 @@ public class DefaultSMSGatewayImpl implements SMSGateway {
     }
 
     /**
-     * Sends a SMS message to the phone with the code
-     * <p>
-     *
-     * @param from The address that sends the SMS message
-     * @param to The address that the SMS message is sent
-     * @param subject The SMS subject
-     * @param message The content contained in the SMS message
-     * @param code The code in the SMS message
-     * @param options The SMS gateway options defined in the HOTP authentication
-     * module
+     * {@inheritDoc}
      */
     public void sendSMSMessage(String from, String to, String subject,
-        String message, String code, Map options) {
+        String message, String code, Map options) throws AuthLoginException {
         if (to == null) {
             return;
         }
@@ -99,24 +94,16 @@ public class DefaultSMSGatewayImpl implements SMSGateway {
         } catch (Exception e) {
             debug.error("DefaultSMSGatewayImpl.sendSMSMessage() : " +
                 "Exception in sending HOTP code : " , e);
+            throw new AuthLoginException("Failed to send OTP code to " + to, e);
         }
 
     }
 
-   /**
-    * Sends an email  message to the mail with the code
-    * <p>
-    *
-    * @param from The address that sends the E-mail message
-    * @param to The address that the E-mail message is sent
-    * @param subject The E-mail subject
-    * @param message The content contained in the E-mail message
-    * @param code The code in the E-mail message
-    * @param options The SMS gateway options defined in the HOTP authentication
-    * module
-    */
+    /**
+     * {@inheritDoc}
+     */
     public void sendEmail(String from, String to, String subject, 
-        String message, String code, Map options) {
+        String message, String code, Map options) throws AuthLoginException {
         sendSMSMessage(from, to, subject, message, code, options);
     }
 

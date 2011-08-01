@@ -25,8 +25,12 @@
  * $Id: SMSGateway.java,v 1.2 2009/06/03 20:46:51 veiming Exp $
  *
  */
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.modules.hotp;
 
+import com.sun.identity.authentication.spi.AuthLoginException;
 import java.util.Map;
 
 public interface SMSGateway {
@@ -42,9 +46,10 @@ public interface SMSGateway {
      * @param code The code in the SMS message
      * @param options The SMS gateway options defined in the HOTP authentication
      * module
+     * @throws AuthLoginException In case the module was unable to send the SMS
      */
     void sendSMSMessage(String from, String to, String subject,
-        String message, String code, Map options);
+        String message, String code, Map options) throws AuthLoginException;
 
     /**
      * Sends an email  message to the mail with the code
@@ -57,8 +62,9 @@ public interface SMSGateway {
      * @param code The code in the E-mail message
      * @param options The SMS gateway options defined in the HOTP authentication
      * module
+     * @throws AuthLoginException In case the module was unable to send the e-mail
      */
     void sendEmail(String from, String to, String subject,
-        String message, String code, Map options);
+        String message, String code, Map options) throws AuthLoginException;
 }
 
