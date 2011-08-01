@@ -115,9 +115,10 @@ esac
     <para>A supported identity repository for user identity data</para>
      <!-- TODO: Add olink when the machinery is available. -->
     <para>See the <citetitle>Release Notes</citetitle> for a list. If you
-    plan to use OpenAM for evaluation or testing, you can use the embedded
-    identity repository. ForgeRock does not recommend using the embedded
-    identity repository for production deployments, however.</para>
+    plan to use OpenAM for evaluation or testing, definitely use the embedded
+    identity repository. ForgeRock also recommends using the embedded identity
+    repository when you have four or fewer instances of OpenAM in
+    production.</para>
     
     <para>Examples here use OpenDJ as the identity repository. OpenDJ
     is installed on <literal>openam.example.com</literal>, and listens
