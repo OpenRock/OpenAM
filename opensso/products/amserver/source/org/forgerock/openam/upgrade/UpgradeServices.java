@@ -134,6 +134,7 @@ public class UpgradeServices {
      * Kick off the upgrade process
      * 
      * @param adminToken A valid admin SSOToken
+     * @param serviceChanges changes to be upgraded
      * @throws UpgradeException 
      */
     public void upgrade(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges) 
