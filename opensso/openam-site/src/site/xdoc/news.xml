@@ -32,10 +32,12 @@
   <author email="openam-dev@forgerock.org">ForgeRock AS</author>
  </properties>
  <body>
-  <section name="New Site">
-   <p>Welcome to the new OpenAM community site!</p>
-  </section>
   <section name="New Releases">
+   <p>August 1, 2011. OpenAM 9.5.3 has been released. Get it from the OpenAM
+   <a href="http://forgerock.org/openam.html">download page</a>.</p>
+   <p>July 31, 2011. OpenAM Web Policy Agents version 3.0.4 are available.
+   Find them under Download Stable Web Policy Agents 3.0.4 on the <a
+   href="http://forgerock.org/openam.html">download page</a>.</p>
    <p>March 3, 2011. OpenAM 9.5.2 is out! Come get 9.52 from the <a
    href="http://forgerock.org/openam.html">download page</a>.</p>
   </section>
