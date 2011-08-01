@@ -30,7 +30,6 @@ package com.sun.identity.shared.debug.impl;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.IDebug;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import java.io.File;
 import java.io.FileWriter;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -60,10 +60,25 @@ public class DebugImpl implements IDebug {
         "debug.out";
     private static final String CONFIG_DEBUG_FILEMAP =
         "/debugfiles.properties";
+    private static final String CONFIG_DEBUG_PROPERTIES =
+            "/debugconfig.properties";
+    private static final String CONFIG_DEBUG_LOGFILE_PREFIX =
+            "org.forgerock.openam.debug.prefix";
+    private static final String CONFIG_DEBUG_LOGFILE_SUFFIX =
+            "org.forgerock.openam.debug.suffix";
+    private static final String CONFIG_DEBUG_LOGFILE_ROTATION =
+            "org.forgerock.openam.debug.rotation";
+    private static final String DEFAULT_DEBUG_SUFFIX_FORMAT = "-MM.dd.yyyy-kk.mm";
 
-    private static HashMap mergedWriters  = new HashMap();
+    private static HashMap mergedWriters = new HashMap();
 
     private static Properties debugFileNames = null;
+
+    private static String debugPrefix;
+
+    private static String debugSuffix;
+
+    private static int rotationInterval = -1;
 
     private String debugName;
 
@@ -78,7 +93,34 @@ public class DebugImpl implements IDebug {
 
     private String debugFilePath;
 
+    private String resolvedName;
+
     static private boolean mergeAllMode = false;
+
+    private long lastRotation;
+
+    static {
+        InputStream is = null;
+        try {
+            is = DebugImpl.class.getResourceAsStream(CONFIG_DEBUG_PROPERTIES);
+            Properties rotationConfig = new Properties();
+            rotationConfig.load(is);
+
+            debugPrefix = rotationConfig.getProperty(CONFIG_DEBUG_LOGFILE_PREFIX);
+            debugSuffix = rotationConfig.getProperty(CONFIG_DEBUG_LOGFILE_SUFFIX);
+            String rotation = rotationConfig.getProperty(CONFIG_DEBUG_LOGFILE_ROTATION);
+            rotationInterval = Integer.parseInt(rotation);
+        } catch (Exception ex) {
+            //it's possible, that we don't have the config file
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception ex) {
+                }
+            }
+        }
+    }
 
     /**
      * Creates an instance of <code>DebugImpl</code>.
@@ -92,11 +134,44 @@ public class DebugImpl implements IDebug {
         String mf = SystemPropertiesManager.get(CONFIG_DEBUG_MERGEALL);
 
         mergeAllMode = (mf != null && mf.equals("on"));
+
+        lastRotation = System.currentTimeMillis();
+    }
+
+    private String wrapFilename(String fileName) {
+        StringBuilder newFileName = new StringBuilder();
+
+        if (debugPrefix != null) {
+            newFileName.append(debugPrefix);
+        }
+
+        newFileName.append(fileName);
+
+        SimpleDateFormat suffixDateFormat = null;
+        if (debugSuffix != null && debugSuffix.trim().length() > 0) {
+            try {
+                suffixDateFormat = new SimpleDateFormat(debugSuffix);
+            } catch (IllegalArgumentException iae) {
+                // cannot debug as we are debug
+                System.err.println("Date format invalid; " + debugSuffix);
+            }
+        }
+
+        if (rotationInterval > 0 && suffixDateFormat == null) {
+            //fallback to a default dateformat, so the debug filenames will differ
+            suffixDateFormat = new SimpleDateFormat(DEFAULT_DEBUG_SUFFIX_FORMAT);
+        }
+
+        if (suffixDateFormat != null) {
+            newFileName.append(suffixDateFormat.format(new Date()));
+        }
+
+        return newFileName.toString();
     }
 
     private synchronized void initialize() {
         if(this.debugWriter == null) {
-            String debugDirectory = 
+            String debugDirectory =
                 SystemPropertiesManager.get(CONFIG_DEBUG_DIRECTORY);
             boolean directoryAvailable = false;
             if (debugDirectory != null &&
@@ -126,15 +201,15 @@ public class DebugImpl implements IDebug {
             String prefix = debugName+":"+this.dateFormat.format(new Date())
                 + ": " + Thread.currentThread().toString();
 
-            this.debugWriter = (PrintWriter) 
-                               mergedWriters.get(this.debugFilePath);
+            this.debugWriter = (PrintWriter)
+                               mergedWriters.get(resolvedName);
             try {
                 if (this.debugWriter == null) {
                     synchronized(mergedWriters) {
                         if (this.debugWriter == null) {
                             this.debugWriter = new PrintWriter(
                                 new FileWriter(this.debugFilePath, true), true);
-                            mergedWriters.put(this.debugFilePath, 
+                            mergedWriters.put(resolvedName,
                                               this.debugWriter);
                         }
                     }
@@ -158,6 +233,21 @@ public class DebugImpl implements IDebug {
                 }
             }
         }
+    }
+
+    private boolean needsRotate() {
+        if (rotationInterval > 0) {
+            Calendar now = Calendar.getInstance();
+            Calendar then = Calendar.getInstance();
+            then.setTimeInMillis(lastRotation);
+
+            then.add(Calendar.MINUTE, rotationInterval);
+            if (now.after(then)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -296,9 +386,33 @@ public class DebugImpl implements IDebug {
     }
 
     private void record(String msg, Throwable th) {
-        String prefix = debugName+":"+this.dateFormat.format(new Date())
-                        + ": " + Thread.currentThread().toString();
+        String prefix = debugName + ":" + this.dateFormat.format(new Date())
+                + ": " + Thread.currentThread().toString();
+
+        if (needsRotate()) {
+            rotate();
+        }
+
         writeIt(prefix, msg, th);
+    }
+
+    private void rotate() {
+        if (this.debugWriter != null) {
+            try {
+                this.debugWriter.flush();
+                this.debugWriter.close();
+            } catch (Exception ex) {
+                // No handling required
+            }
+        }
+
+        this.debugWriter = null;
+        mergedWriters.remove(resolvedName);
+
+        // remember when we rotated last
+        lastRotation = System.currentTimeMillis();
+
+        initialize();
     }
 
     private void writeIt(String prefix, String msg, Throwable th) {
@@ -342,10 +456,6 @@ public class DebugImpl implements IDebug {
         this.debugName = debugName;
     }
 
-    private PrintWriter getStdoutWriter() {
-        return this.stdoutWriter;
-    }
-
     protected void finalize() throws Throwable {
         if (this.debugWriter != null) {
             try {
@@ -356,10 +466,12 @@ public class DebugImpl implements IDebug {
             }
         }
     }
+
     private void resolveDebugFile(String debugDirectory) {
         if (mergeAllMode) {
-            this.debugFilePath = debugDirectory + 
+            debugFilePath = debugDirectory +
                                  File.separator + CONFIG_DEBUG_MERGEALL_FILE;
+            resolvedName = CONFIG_DEBUG_MERGEALL_FILE;
         } else {
             // Find the bucket this debug belongs to
             if (debugFileNames == null) {
@@ -367,26 +479,34 @@ public class DebugImpl implements IDebug {
                     if (debugFileNames == null) {
                         debugFileNames = new Properties();
                         // Load properties : debugmap.properties
+                        InputStream is = null;
                         try {
-                            InputStream is = 
-                                this.getClass().getResourceAsStream(
+                            is = getClass().getResourceAsStream(
                                                     CONFIG_DEBUG_FILEMAP);
                             debugFileNames.load(is);
                         } catch(Exception ex) {
+                        } finally {
+                            if (is != null) {
+                                try {
+                                    is.close();
+                                } catch (Exception ex) {
+                                }
+                            }
                         }
                     }
                 }
             }
             String nm = (String) debugFileNames.getProperty(debugName);
             if (nm != null ) {
-                this.debugFilePath = debugDirectory + 
-                                 File.separator + nm;
+                debugFilePath = debugDirectory + File.separator +
+                        wrapFilename(nm);
+                resolvedName = nm;
             } else {
                 // Default to debugName if no mapping is found
-                this.debugFilePath = debugDirectory + 
-                                 File.separator + debugName;
+                debugFilePath = debugDirectory + File.separator +
+                        wrapFilename(debugName);
+                resolvedName = debugName;
             }
         }
     }
-
 }

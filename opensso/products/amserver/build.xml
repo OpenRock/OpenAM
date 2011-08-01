@@ -307,6 +307,8 @@
         <mkdir dir="${amserver.built.publicapidocs.dir}"/>
         <copy file="${amserver.config.res.dir}/serverAttributeMap.properties"
               toFile="${amserver.classes.dir}/serverAttributeMap.properties" />
+        <copy file="${amserver.config.res.dir}/debugconfig.properties"
+              toFile="${amserver.classes.dir}/debugconfig.properties" />
     </target>
     
     <target name="clean" depends="nightly-clean,war-clean,jars-clean,clientsdk-clean,samples-clean,distauth-clean,amtune-clean">

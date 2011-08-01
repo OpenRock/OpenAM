@@ -420,6 +420,7 @@ com/sun/identity/jaxrpc/SOAPClient$SOAPContentHandler.class
 com/sun/identity/jaxrpc/SOAPClient$SOAPErrorHandler.class
 com/sun/identity/common/DateUtils.class
 
+debugconfig.properties
 serverAttributeMap.properties
 com/sun/identity/common/AttributeStruct.class
 com/sun/identity/common/PropertiesFinder.class
