@@ -120,6 +120,9 @@ import javax.servlet.http.HttpSession;
 
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.SsoServerSessSvcImpl;
+import java.util.ArrayList;
+import java.util.List;
+import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
 /**  
  * This class represents a Session Service
@@ -265,6 +268,7 @@ public class SessionService {
     private static boolean isPropertyNotificationEnabled = false;
 
     protected static Set notificationProperties;
+    protected static Set<String> timeoutHandlers;
 
     /*
      * This token is used to satisfy the admin interfaces
@@ -2098,6 +2102,8 @@ public class SessionService {
                 notificationProperties = (Set) attrs
                         .get(Constants.NOTIFICATION_PROPERTY_LIST);
             }
+
+            timeoutHandlers = (Set<String>) attrs.get(Constants.TIMEOUT_HANDLER_LIST);
             
             String trimSessionStr = CollectionHelper.getMapAttr(
                 attrs, Constants.ENABLE_TRIM_SESSION, "NO");
@@ -2224,6 +2230,58 @@ public class SessionService {
         } catch (Exception ex) {
             sessionDebug.error("SessionService.postInit():+"
                     + "Unable to get Session Schema Information", ex);
+        }
+    }
+
+    /**
+     * This method will execute all the globally setted session timeout handlers
+     * with the corresponding timeout event simultaniously.
+     *
+     * @param sessionId The timed out sessions ID
+     * @param changeType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
+     */
+    static void execSessionTimeoutHandlers(final SessionID sessionId, final int changeType) {
+        if (timeoutHandlers != null && !timeoutHandlers.isEmpty()) {
+            try {
+                final SSOToken token = ssoManager.createSSOToken(sessionId.toString());
+                List<Thread> threads = new ArrayList<Thread>();
+                for (final String clazz : timeoutHandlers) {
+                    Thread thread = new Thread() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                SessionTimeoutHandler handler =
+                                        Class.forName(clazz).asSubclass(
+                                        SessionTimeoutHandler.class).newInstance();
+                                switch (changeType) {
+                                    case SessionEvent.IDLE_TIMEOUT:
+                                        handler.onIdleTimeout(token);
+                                        break;
+                                    case SessionEvent.MAX_TIMEOUT:
+                                        handler.onMaxTimeout(token);
+                                        break;
+                                }
+                            } catch (Exception ex) {
+                                sessionDebug.error("Error while handling session timeout in " + clazz, ex);
+                            }
+                        }
+                    };
+                    thread.start();
+                    threads.add(thread);
+                }
+                for (Thread thread : threads) {
+                    try {
+                        thread.join(500);
+                        thread.interrupt();
+                    } catch (InterruptedException ex) {
+                        sessionDebug.warning("Error while stopping custom timeouthandlers");
+                    }
+
+                }
+            } catch (SSOException ssoe) {
+                sessionDebug.warning("Unable to construct SSOToken for executing timeout handlers", ssoe);
+            }
         }
     }
 
@@ -3564,6 +3622,13 @@ public class SessionService {
         notificationProperties = prop;
     }
 
+    protected static Set<String> getTimeoutHandlers() {
+        return timeoutHandlers;
+    }
+
+    protected static void setTimeoutHandlers(Set<String> handlers) {
+        timeoutHandlers = handlers;
+    }
     // TODO check if restructuring of interface between Auth and Session
     // can eliminate the need for this utility class
 

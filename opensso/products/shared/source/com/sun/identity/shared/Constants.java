@@ -565,6 +565,9 @@ public interface Constants {
     String NOTIFICATION_PROPERTY_LIST =
         "iplanet-am-session-notification-property-list";
 
+    String TIMEOUT_HANDLER_LIST =
+            "openam-session-timeout-handler-list";
+
     /**
      * The session property name of the universal identifier used for IDRepo.
      */

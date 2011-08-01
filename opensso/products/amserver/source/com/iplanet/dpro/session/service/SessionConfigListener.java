@@ -138,6 +138,10 @@ public class SessionConfigListener implements ServiceListener {
                 SessionService.setPropertyNotificationEnabled(false);
             }
 
+            Set<String> timeoutHandlers = (Set<String>) attrs
+                    .get(Constants.TIMEOUT_HANDLER_LIST);
+            SessionService.setTimeoutHandlers(timeoutHandlers);
+
             String enableSessionTrimmingStr = CollectionHelper.getMapAttr(
                     attrs, Constants.ENABLE_TRIM_SESSION, "NO");
             if (enableSessionTrimmingStr.equalsIgnoreCase("YES")) {

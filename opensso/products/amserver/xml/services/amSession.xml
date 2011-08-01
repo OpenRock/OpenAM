@@ -164,6 +164,11 @@
                        <Value>false</Value>
                    </DefaultValues>
                 </AttributeSchema>                
+                <AttributeSchema name="openam-session-timeout-handler-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a123">
+                </AttributeSchema>
                 <SubSchema name="Site" inheritance="multiple" i18nKey="site">
                 <AttributeSchema name="iplanet-am-session-store-username"
                    type="single"
