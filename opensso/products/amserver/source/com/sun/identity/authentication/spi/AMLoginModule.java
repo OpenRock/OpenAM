@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.authentication.spi;
@@ -923,6 +923,10 @@ public abstract class AMLoginModule implements LoginModule {
             } else {
                 throw new AuthLoginException(e);
             }
+        } catch (RuntimeException re) {
+            setFailureModuleName(moduleName);
+            //rethrow the exception
+            throw re;
         }
     }
     
