@@ -1464,7 +1464,7 @@ public class EmbeddedOpenDS {
     public static String getOpenDSVersion() {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         String odsRoot = AMSetupServlet.getBaseDir() + "/" + SetupConstants.SMS_OPENDS_DATASTORE;
-        String version = null;
+        String version = "unknown";
         
         File configLdif = new File(odsRoot + OPENDS_UPGRADE_DIR);
         
