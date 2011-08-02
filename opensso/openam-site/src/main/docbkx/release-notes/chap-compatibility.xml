@@ -38,7 +38,29 @@
   <title>Major Changes to Existing Functionality</title>
   
   <para>TODO</para>
- </section>
+  
+  <itemizedlist>
+   <listitem>
+    <!-- Fix for OpenAM-694. -->
+    <para>Since OpenAM 9.5.3, application shutdown hooks are no longer
+    registered by default. This change only has an effect on standalone and
+    web applications that use the OpenAM Client SDK. The changes do not affect
+    OpenAM, distributed authentication services, or the Java EE policy
+    agents.</para>
+    <para>For Java EE applications, ensure the OpenAM client SDK
+    shuts down successfully by including the following context listener in
+    your application's <filename>web.xml</filename> file.</para>
+    <programlisting language="xml">&lt;listener&gt;
+ &lt;listener-class&gt;
+  com.sun.identity.common.ShutdownServletContextListener
+ &lt;/listener-class&gt;
+&lt;/listener&gt;</programlisting>
+    <para>For standalone applications, set the following JVM property.</para>
+    <literallayout>-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
+   </listitem>
+  </itemizedlist>
+  
+   </section>
 
  <section>
   <title>Deprecated Functionality</title>
