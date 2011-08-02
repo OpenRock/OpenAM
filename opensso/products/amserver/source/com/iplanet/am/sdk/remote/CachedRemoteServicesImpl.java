@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.iplanet.am.sdk.remote;
 
@@ -567,14 +567,10 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         // The method below will throw an AMException if the entry does not
         // exist in the directory. If it exists, then create a cache entry for
         // this DN
+        objectType = super.getObjectType(adminToken, entryDN);
         if (cb == null) {
-            objectType = super.getObjectType(adminToken, entryDN);
             cb = new CacheBlock(entryDN, true);
             sdkCache.put(entryDN, cb);
-        } else {
-            objectType = super
-                    .getObjectType(adminToken, entryDN, cb.getAttributes(
-                            MiscUtils.getPrincipalDN(adminToken), false));
         }
         cb.setObjectType(objectType);
         if (objectType == AMObject.ORGANIZATION
