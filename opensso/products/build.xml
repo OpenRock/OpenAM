@@ -86,7 +86,6 @@
             target="build" />
         <copy todir="${fm.base.dir}/extlib">
             <fileset file="${amserver.dist.dir}/amserver.jar" />
-            <fileset file="${amserver.dist.dir}/opensso-register.jar" />
             <fileset file="${sharedlib.dist.dir}/opensso-sharedlib.jar" />
             <fileset file="${amserver.dist.dir}/amAdminTools.zip" />
             <fileset file="${amserver.dist.dir}/amSessionTools.zip" />
@@ -112,7 +111,6 @@
         <copy todir="${fm.base.dir}/extlib">
             <fileset file="${amserver.dist.dir}/console.jar" />
             <fileset file="${amserver.dist.dir}/amserver.jar" />
-            <fileset file="${amserver.dist.dir}/opensso-register.jar" />
             <fileset file="${amserver.dist.dir}/opensso_server_samples.war" />
             <fileset file="${sharedlib.dist.dir}/opensso-sharedlib.jar" />
             <fileset file="${oauth.dist.dir}/oauthservice.jar" />
@@ -171,8 +169,6 @@
         <copy file="${amserver.tools.dir}/ssopatch.jar"
             todir="${prd.nightly.dist.dir}/openfm"  />            
         <copy file="${amserver.tools.dir}/amserver.jar"
-            todir="${openfm.extlib.dir}"  />
-        <copy file="${amserver.dist.dir}/opensso-register.jar"
             todir="${openfm.extlib.dir}"  />
         <copy file="${amserver.dist.dir}/console.jar"
             todir="${openfm.extlib.dir}"  />
@@ -264,7 +260,7 @@
         <tstamp>
             <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm"/>
         </tstamp>       
-        <property name="version.set" value=""/>    
+        <property name="version.set" value="${opensso.version}"/>    
             
         <filter token="DATESTAMP" value="${war.time.stamp}"/>        
         <filter token="VERSION" value="${version.set}" />

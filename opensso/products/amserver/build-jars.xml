@@ -25,6 +25,9 @@
    $Id: build-jars.xml,v 1.11 2009/10/21 01:11:03 veiming Exp $
 
 -->
+<!--
+	Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <project name="opensso-jars" default="all">
     <description>Open Web Single Sign-On: Jars Creation</description>
@@ -38,7 +41,7 @@
         </condition>
     </fail>
 
-    <target name="all" depends="preparebuild,amserverjar,openssoregjar">
+    <target name="all" depends="preparebuild,amserverjar">
     </target>
 
     <target name="amserverjar" depends="preparebuild">
@@ -76,20 +79,6 @@
         <jar destfile="${amserver.dist.dir}/amserver.jar" update="true">
             <zipfileset dir="${legacy.built.dir}/classes" />
         </jar>
-    </target>
-
-    <target name="openssoregjar" depends="preparebuild">
-        <jar destfile="${amserver.dist.dir}/opensso-register.jar">
-            <manifest>
-                <attribute name="Version" value="${version}"/>
-                <attribute name="Create-On" value="${touch.time}"/>
-            </manifest>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
-            <zipfileset dir="${amserver.built.dir}/classes"
-                includes="com/sun/identity/servicetag/**" />
-        </jar>
-        <checksum file="${amserver.dist.dir}/opensso-register.jar" 
-            algorithm="SHA" fileext=".sha" />
     </target>
 
     <target name="preparebuild">

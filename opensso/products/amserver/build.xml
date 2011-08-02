@@ -26,7 +26,7 @@
 
 -->
 <!--
-   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+   "Portions Copyrighted 2010-2011 ForgeRock AS"
 -->
 
 <project name="opensso" default="usage">
@@ -180,8 +180,6 @@
             <fileset dir="${amserver.authmodule.xml.dir}" includes="*.xml" />
             <fileset dir="${amserver.dtd.xml.dir}"
                 includes="**/*.dtd" excludes="dtd/sms.dtd"/>
-            <fileset dir="${amserver.productregistry.xml.dir}"
-                includes="*.xml" />
         </copy>
 
         <concat destfile="${amserver.built.res.dir}/amSDK.properties">
@@ -335,7 +333,6 @@
     
     <target name="war" depends="build,prep.xml">
         <ant antfile="${amserver.base.dir}/build-jars.xml" target="amserverjar" inheritRefs="true"/>
-        <ant antfile="${amserver.base.dir}/build-jars.xml" target="openssoregjar" inheritRefs="true"/>
         <ant antfile="${amserver.warbase.dir}/build.xml" target="war"
              inheritRefs="true"/>
     </target>
@@ -344,7 +341,6 @@
         <copy todir="${amserver.built.war.dir}/xml/services">
             <fileset dir="${amserver.services.xml.dir}" includes="*.xml" />
             <fileset dir="${amserver.xml.dir}" includes="AccessManagerCLI.xml" />
-            <fileset dir="${amserver.productregistry.xml.dir}" includes="*.xml" />
         </copy>
         <copy todir="${amserver.built.war.dir}/xml">
             <fileset dir="${amserver.xml.dir}" includes="serverconfig.xml" />

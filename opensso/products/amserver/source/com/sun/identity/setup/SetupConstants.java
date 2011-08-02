@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -623,16 +623,6 @@ public interface SetupConstants {
      * <code>rsa_api.properties</code> file name.
      */
     String SECURID_PROPERTIES = "rsa_api.properties";
-
-    /**
-     * <code>servicetag-registry*.xml</code> file name.
-     */
-    String SERVICETAGREG = "servicetag-registry";
-
-    /**
-     * <code>.../lib/registration/servicetag-registry.xml</code> filepath.
-     */
-    String SERVICETAGREG_FILE = "/lib/registration/servicetag-registry.xml";
 
     /**
      * <code>VERSION</code> property in serviceDefaultValues.properties.

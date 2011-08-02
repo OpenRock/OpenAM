@@ -184,6 +184,7 @@
                 <include name="Debug.jsp" />
                 <include name="encode.jsp" />
                 <include name="showServerConfig.jsp" />
+                <include name="test.jsp" />
             </zipfileset>
             <zipfileset dir="${war.www.dir}">
                 <exclude name="server" />

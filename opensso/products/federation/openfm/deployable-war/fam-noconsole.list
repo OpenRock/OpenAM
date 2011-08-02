@@ -1201,9 +1201,6 @@
 ./WEB-INF/classes/serverdefaults.properties
 ./WEB-INF/classes/serviceDefaultValues.properties
 ./WEB-INF/classes/serviceNames.properties
-./WEB-INF/classes/servicetag-registry-ent.xml
-./WEB-INF/classes/servicetag-registry-exp.xml
-./WEB-INF/classes/servicetag-registry.xml
 ./WEB-INF/classes/ssoPatch.properties
 ./WEB-INF/classes/ssoPatch_en.properties
 ./WEB-INF/classes/sso_de.properties

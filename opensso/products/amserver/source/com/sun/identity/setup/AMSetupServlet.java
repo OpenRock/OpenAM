@@ -68,7 +68,6 @@ import com.sun.identity.policy.PolicyException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
-import com.sun.identity.servicetag.registration.StartRegister;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
@@ -927,8 +926,6 @@ public class AMSetupServlet extends HttpServlet {
             String aceDataDir = basedir + "/" + deployuri + "/auth/ace/data";
             copyAuthSecurIDFiles(aceDataDir);
 
-            startRegistrationProcess(basedir, deployuri);
-
             createMonitoringAuthFile(basedir, deployuri);
 
             isConfiguredFlag = true;
@@ -1425,32 +1422,6 @@ public class AMSetupServlet extends HttpServlet {
             {
                 writeToFile(basedir + deployuri + "/auth/ace/data/" + absFile,
                     swapped);
-            } else if (absFile.startsWith(SetupConstants.SERVICETAGREG)) {
-                /*
-                 * tagswap servicetag-registry-{ent,exp}.xml and
-                 * store it in
-                 * <configdir>/<uri>/lib/registration/servicetag-registry.xml
-                 * enterprise version swaps servicetag-registry-ent.xml;
-                 * express/nightly swaps servicetag-registry-ext.xml.
-                 */
-                if ((isEnterprise && absFile.contains("-ent")) ||
-                    (!isEnterprise && absFile.contains("-exp")))
-                {
-                    /*
-                     *  make the <configdir>/<uri>/lib/registration dir,
-                     *  then write the servicetag-registry.xml file there
-                     */
-                    if (reglibDir.mkdirs()) {
-                        writeToFile(basedir + deployuri +
-                            SetupConstants.SERVICETAGREG_FILE, swapped);
-                    } else {
-                        Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                            "AMSetupServlet.initializeConfigProperties: " +
-                            "failed to write servicetag-registry.xml to " +
-                            reglibDir.getPath());
-                        SetupProgress.reportEnd("emb.failed", null);
-                    }
-                }
             } else {
                 writeToFile(basedir + "/" + absFile, swapped);
             }
@@ -2289,38 +2260,6 @@ public class AMSetupServlet extends HttpServlet {
         }
     }
 
-    private static void startRegistrationProcess(String basedir,
-        String deployuri)
-    {
-        SetupProgress.reportStart("configurator.progress.setup.registration",
-            null);
-        /*
-         *  make sure the basedir + "/" + deployuri + "/lib/registration"
-         *  directory exists, and then put the registration jar and xml
-         *  files there, before starting the registration process.
-         */
-        String libRegDir = basedir + "/" + deployuri + "/lib/registration";
-        File reglibDir = new File(libRegDir);
-        if (reglibDir.exists()) {
-            if (copyRegFiles(libRegDir)) {
-                StartRegister sr = new StartRegister();
-                sr.servicetagTransfer();
-                SetupProgress.reportEnd("emb.done", null);
-            } else {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "AMSetupServlet.startRegistrationProcess: " +
-                    "failed to copy registration files to " +
-                    reglibDir.getPath());
-                SetupProgress.reportEnd("emb.failed", null);
-            }
-        } else {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "AMSetupServlet.startRegistrationProcess:" +
-                "failed to create registration lib directory");
-            SetupProgress.reportEnd("emb.failed", null);
-        }
-    }
-
     private static void createMonitoringAuthFile(String basedir,
         String deployuri)
     {
@@ -2352,24 +2291,6 @@ public class AMSetupServlet extends HttpServlet {
             SetupProgress.reportEnd("emb.failed", null);
         }
     }
-
-    private static boolean copyRegFiles(String destDir) {
-        String [] jarFiles = {"scn_stprs_util.jar",
-                              "commons-codec-1.3.jar",
-                              "opensso-register.jar"};
-
-        try {
-            for (int i = 0; i < jarFiles.length; i++) {
-                copyCtxFile ("/WEB-INF/lib", jarFiles[i], destDir);
-            }
-        } catch (IOException ioex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "AMSetupServlet.copyRegFiles:", ioex);
-            return false;
-        }
-        return true;
-    }
-
 
     private static void setupSecurIDDirs(String basedir, String deployuri) {
         /*
