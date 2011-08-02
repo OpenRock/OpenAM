@@ -829,6 +829,40 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
      </imageobject>
      <caption><para>Configure access to OpenAM.</para></caption>
     </mediaobject>
+    <para>Most DAS configuration choices require no clarification. Hints for
+    equivocal parameters follow.</para>
+    <variablelist>
+     <varlistentry>
+      <term>Debug Level</term>
+      <listitem>
+       <para>Default is <literal>error</literal>. Other options include
+       <literal>error</literal>, <literal>warning</literal>,
+       <literal>message</literal>, and <literal>off</literal>.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Encryption Key</term>
+      <listitem>
+       <para>Do not change the password encryption key.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Application User Name</term>
+      <listitem>
+       <para>The DAS uses this identity to authenticate internally to OpenAM.
+       If you configured a 2.2 agent identity for the DAS in OpenAM, then this
+       is the user name of the agent you created.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Application User Password</term>
+      <listitem>
+       <para>The DAS uses this password to authenticate internally to OpenAM.
+       If you configured a 2.2 agent identity for the DAS in OpenAM, then this
+       is the password of the agent you created.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
    </step>
    <step>
     <para>Login through the DAS to access OpenAM services.</para>
@@ -904,6 +938,13 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
      <caption><para>The DAS UI redirects the user to the URL you
      configured for the realm.</para></caption>
     </mediaobject>
+   </step>
+   <step>
+    <para>Restrict permissions to the configuration for the DAS under the
+    <filename>$HOME/FAMDistAuth</filename> directory of the user who runs the
+    web container where you deployed the service.</para>
+    <para>The configuration file name ends in
+    <filename>AMDistAuthConfig.properties</filename>.</para>
    </step>
   </procedure>
  </section>
