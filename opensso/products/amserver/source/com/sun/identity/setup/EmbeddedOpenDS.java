@@ -1482,7 +1482,9 @@ public class EmbeddedOpenDS {
                 debug.error("Unable to determine OpenDS version");
             }
         } else {
-            debug.error("Unable to determine OpenDS version");
+            if (debug.warningEnabled()) {
+                debug.warning("Unable to determine OpenDS version; could be pre-config");
+            }
         }
         
         if (debug.messageEnabled()) {
