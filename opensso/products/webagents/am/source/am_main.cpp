@@ -30,7 +30,7 @@
  * Portions Copyrighted [2010] [ForgeRock AS]
  */
 
-#include <string>
+#include <cstring>
 
 #include <prinit.h>
 
@@ -169,47 +169,39 @@ am_status_t am_shutdown_nss(void)
 }
 
 extern "C"
-am_status_t am_cleanup(void)
-{
+am_status_t am_cleanup(void) {
     Log::ModuleId logID = Log::addModule("am_cleanup()");
     am_status_t status = AM_SUCCESS;
 
     if (initialized) {
-	initialized = false;
+        initialized = false;
 
-	try {
-	    /**
-	     * Call private interfaces to cleanup
-	     * static instances of services in the
-	     * respective files.
-	     */
-	    policy_cleanup();
-	    sso_cleanup();
-	    auth_cleanup();
+        try {
+            /**
+             * Call private interfaces to cleanup
+             * static instances of services in the
+             * respective files.
+             */
+            policy_cleanup();
+            sso_cleanup();
+            auth_cleanup();
 
-	    status = Connection::shutdown();
+            status = Connection::shutdown_in_child_process();
 
-	    XMLTree::shutdown();
+            XMLTree::shutdown();
 
-#if	defined(USE_STATIC_NSPR)
-	    PRStatus pr_status = PR_Cleanup();
-	    if (PR_SUCCESS == pr_status) {
-	    } else {
-		status = AM_NSPR_ERROR;
-	    }
-#endif
-	} catch (const NSPRException& exc) {
-	    Log::log(logID, Log::LOG_ERROR, exc);
-	    status = AM_NSPR_ERROR;
-	} catch (const std::exception& exc) {
-	    Log::log(logID, Log::LOG_ERROR, exc);
-	    status = AM_FAILURE;
-	} catch (...) {
-	    Log::log(logID, Log::LOG_ERROR,
-			"am_cleanup(): Unknown exception encountered");
-	    status = AM_FAILURE;
-	}
-	Log::shutdown();
+        } catch (const NSPRException& exc) {
+            Log::log(logID, Log::LOG_ERROR, exc);
+            status = AM_NSPR_ERROR;
+        } catch (const std::exception& exc) {
+            Log::log(logID, Log::LOG_ERROR, exc);
+            status = AM_FAILURE;
+        } catch (...) {
+            Log::log(logID, Log::LOG_ERROR,
+                    "am_cleanup(): Unknown exception encountered");
+            status = AM_FAILURE;
+        }
+        Log::shutdown();
     }
     return status;
 }

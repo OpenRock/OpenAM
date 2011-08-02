@@ -41,7 +41,7 @@
 #include "nspr_exception.h"
 #include "scope_lock.h"
 #include "xml_tree.h"
-
+#include <cstring>
 
 USING_PRIVATE_NAMESPACE
 

@@ -43,6 +43,9 @@
 #include "sso_token_service.h"
 #endif
 #include "service.h"
+#if !defined(_MSC_VER)
+#include <limits.h>
+#endif
 
 #if (defined(WINNT) || defined(_AMD64_))
 #if defined(_AMD64_)
@@ -203,40 +206,44 @@ void
 PolicyEngine::policy_notify(am_policy_t policy_handle, 
                             const char *data,
                             size_t len,
-                            bool configChangeNotificationEnabled) 
-{
+        bool configChangeNotificationEnabled) {
 
     Service *serviceEntry = getService(policy_handle);
-    
-    XMLTree tree(false, data, len);
-    XMLElement element = tree.getRootElement();
-    if(element.isNamed(NOTIFICATION_SET)) {
-	std::string version;
-	std::string notifID;
+    try {
+        XMLTree tree(false, data, len);
+        XMLElement element = tree.getRootElement();
+        if (element.isNamed(NOTIFICATION_SET)) {
+            std::string version;
+            std::string notifID;
 
-	    if(element.getAttributeValue(VERSION, version) &&
-	   std::strcmp(version.c_str(), NOTIFICATION_SET_VERSION) == 0) {
+            if (element.getAttributeValue(VERSION, version) &&
+                    std::strcmp(version.c_str(), NOTIFICATION_SET_VERSION) == 0) {
 
-	    std::string notificationData;
+                std::string notificationData;
 
-	    for(element = element.getFirstSubElement();
-		element.isNamed(NOTIFICATION); element.nextSibling()) {
-		if(element.getValue(notificationData)) {
-		    log(Log::LOG_DEBUG,
-			"PolicyEngine::policy_notify :"
-			"Handling notification.");
-		    policy_notification_handler(serviceEntry,
-						notificationData,
-                                                configChangeNotificationEnabled);
+                for (element = element.getFirstSubElement();
+                        element.isNamed(NOTIFICATION); element.nextSibling()) {
+                    if (element.getValue(notificationData)) {
+                        log(Log::LOG_DEBUG,
+                                "PolicyEngine::policy_notify :"
+                                "Handling notification.");
+                        policy_notification_handler(serviceEntry,
+                                notificationData,
+                                configChangeNotificationEnabled);
 
-		} else {
-		    log(Log::LOG_WARNING,
-			"PolicyEngine::policy_notify : "
-			"Cannot get the value of the Notification "
-			"element.");
-		}
-	    }
-	}
+                    } else {
+                        log(Log::LOG_WARNING,
+                                "PolicyEngine::policy_notify : "
+                                "Cannot get the value of the Notification "
+                                "element.");
+                    }
+                }
+            }
+        }
+    } catch (XMLTree::ParseException &ex) {
+        throw InternalException("PolicyEngine::policy_notify",
+                ex.getMessage(),
+                AM_INVALID_ARGUMENT);
     }
     return;
 }

@@ -101,7 +101,8 @@ OBJS := action_decision.o \
 	utils.o \
 	xml_attribute.o \
 	xml_element.o \
-	xml_tree.o
+	xml_tree.o \
+	sdk.o
 
 ifeq ($(OS_ARCH), WINNT)
 OBJS += am_web.res
@@ -200,8 +201,8 @@ endif
 
 $(TEST_LIB)_LDLIBS := $($(STD_LIB)_LDLIBS)
 ifeq ($(OS_ARCH), SunOS)
-
-$(STD_LIB)_LDFLAGS := -z defs
+CXXFLAGS += -library=no%Cstd -library=Crun 
+$(STD_LIB)_LDFLAGS := -z defs -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/lib -lstdcxx
 LD_STATIC_FLAGS += -xar
 endif
 

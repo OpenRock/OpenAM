@@ -190,6 +190,7 @@ public:
     // NOTE: This function is called automatically by am_init.
     //
     static am_status_t initialize(const Properties& properties);
+    static am_status_t initialize_in_child_process(const Properties& properties);
 
     //
     // Cleans up the underlying libraries.
@@ -204,6 +205,7 @@ public:
     // NOTE: This function is called automatically by am_cleanup.
     //
     static am_status_t shutdown(void);
+    static am_status_t shutdown_in_child_process(void);
 
     //
     // Performs SSL handshake on a TCP socket

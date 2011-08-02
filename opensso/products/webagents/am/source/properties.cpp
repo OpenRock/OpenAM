@@ -37,6 +37,7 @@
 #include "internal_macros.h"
 #include "properties.h"
 #include "am_web.h"
+#include <cstring>
 
 USING_PRIVATE_NAMESPACE
 

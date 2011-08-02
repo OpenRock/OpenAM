@@ -43,6 +43,8 @@ extern "C" {
 #include <ssl.h>
 #include <sslproto.h>
 #include <string>
+#include <secmod.h>
+#include <secerr.h>
 
 #include "am.h"
 
@@ -145,6 +147,8 @@ am_status_t Connection::initialize(const Properties& properties)
 		Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
 		   "Socket option TCP_NODELAY is enabled");
 	}
+        
+        PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
 
         if (certDir.length() != 0) {
             Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize() "
@@ -165,6 +169,14 @@ am_status_t Connection::initialize(const Properties& properties)
 	    nssMethodName = "NSS_SetDomesticPolicy";
 	    secStatus = NSS_SetDomesticPolicy();
 	}
+        
+        PK11_ConfigurePKCS11(NULL, NULL, NULL, "internal                         ", NULL, NULL, NULL, NULL, 8, 1);
+        SSL_ShutdownServerSessionIDCache();
+
+        SSL_ConfigMPServerSIDCache(NULL, 100, 86400L, NULL);
+        SSL_ConfigServerSessionIDCache(NULL, 100, 86400L, NULL);
+        SSL_ClearSessionCache();
+        
 	if (SECSuccess == secStatus) {
 	    nssMethodName = "PK11_SetPasswordFunc";
 	    PK11_SetPasswordFunc(getPasswordFromArg);
@@ -183,18 +195,71 @@ am_status_t Connection::initialize(const Properties& properties)
     return status;
 }
 
-am_status_t Connection::shutdown(void)
-{
-    //
-    // NOTE: This may not always be the right thing to do, as somebody may
-    // have initialized NSS before we did and expect it to keep working
-    // after we are done.
-    //
-    if (initialized) {
-	NSS_Shutdown();
-	initialized = false;
+am_status_t Connection::initialize_in_child_process(const Properties& properties) {
+    am_status_t status = AM_SUCCESS;
+    PRErrorCode errcode = 1;
+    SECStatus secStatus;
+
+    Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize_in_child_process() "
+            "Restarting PKCS #11 module");
+
+    SSL_InheritMPServerSIDCache(NULL);
+    
+#if NSS_VMAJOR >= 3 && NSS_VMINOR >= 12 && NSS_VPATCH >= 9
+    if (SECFailure == (secStatus = SECMOD_RestartModules(PR_FALSE))) {
+        errcode = PORT_GetError();
+        if (errcode != SEC_ERROR_NOT_INITIALIZED) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Could not restart TLS security modules: %d:%s",
+                    errcode, PR_ErrorToString(errcode, PR_LANGUAGE_I_DEFAULT));
+            status = AM_NSPR_ERROR;
+        }
+    }
+#endif
+
+    std::string certDir = properties.get(AM_COMMON_SSL_CERT_DIR_PROPERTY, "");
+    std::string dbPrefix = properties.get(AM_COMMON_CERT_DB_PREFIX_PROPERTY, "");
+    unsigned long timeout = properties.getUnsigned(AM_COMMON_RECEIVE_TIMEOUT_PROPERTY, 0);
+    if (timeout > 0) {
+        receive_timeout = PR_MillisecondsToInterval(static_cast<PRInt32> (timeout));
+    }
+    unsigned long socket_timeout = properties.getUnsigned(AM_COMMON_CONNECT_TIMEOUT_PROPERTY, 0);
+    if (socket_timeout > 0) {
+        connect_timeout = PR_MillisecondsToInterval(static_cast<PRInt32> (socket_timeout));
+    } else {
+        connect_timeout = PR_INTERVAL_NO_TIMEOUT;
+    }
+    tcp_nodelay_is_enabled = properties.getBool(AM_COMMON_TCP_NODELAY_ENABLE_PROPERTY, false);
+
+    if (certDir.length() != 0) {
+        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize_in_child_process() "
+                "calling NSS_Initialize() with directory = \"%s\" and "
+                "prefix = \"%s\"", certDir.c_str(), dbPrefix.c_str());
+        secStatus = NSS_Initialize(certDir.c_str(), dbPrefix.c_str(),
+                dbPrefix.c_str(), "secmod.db",
+                NSS_INIT_READONLY | NSS_INIT_FORCEOPEN);
+    } else {
+        Log::log(Log::ALL_MODULES, Log::LOG_DEBUG, "Connection::initialize_in_child_process() "
+                "CertDir and dbPrefix EMPTY -- Calling NSS_NoDB_Init");
+        secStatus = NSS_NoDB_Init(NULL);
     }
 
+    if (SECSuccess == secStatus) {
+        secStatus = NSS_SetDomesticPolicy();
+    }
+    return status;
+}
+
+am_status_t Connection::shutdown(void) {
+    SSL_ShutdownServerSessionIDCache();
+    NSS_Shutdown();
+    PR_Cleanup();
+    return AM_SUCCESS;
+}
+
+am_status_t Connection::shutdown_in_child_process(void) {
+    SSL_ClearSessionCache();
+    NSS_Shutdown();
     return AM_SUCCESS;
 }
 

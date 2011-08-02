@@ -31,6 +31,10 @@
 #include "internal_macros.h"
 #include "key_value_map.h"
 
+#ifdef __sun
+#include <strings.h>
+#endif
+
 #define MIN_URL "ftp://a"
 #define MIN_URL_LEN	(sizeof(MIN_URL) - 1)
 

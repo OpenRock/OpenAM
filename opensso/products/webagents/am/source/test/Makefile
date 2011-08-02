@@ -93,10 +93,10 @@ utils_test_OBJS := utils_test.o
 ifneq ($(CYGWIN_ARCH), WOW64)
 PROGRAM_NAMES := \
 	map_test \
-	naming_test \
+#	naming_test \
 	policy_test \
 	properties_test \
-	properties_cpp_test \
+#	properties_cpp_test \
 	xml_test \
 	url_test \
 	http_test \

@@ -296,7 +296,7 @@
              tofile="${webagents.basedir}/am/source/version.h" >
             <filterchain>
                 <replacetokens>
-                    <token key="AGENT_VER" value="3.0.4"/>
+                    <token key="AGENT_VER" value="3.0.5"/>
                     <token key="AGENT_ER_VER" value=""/>
                     <token key="AGENT_FVB_MARKER" value=""/>
                     <token key="SVN_REVISION" value="${svn.Revision}"/>

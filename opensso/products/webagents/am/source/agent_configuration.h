@@ -173,6 +173,7 @@ public:
 
     const char *notenforcedIPmode;
     PRBool use_redirect_for_advice;	// use redirect instead of POST for advice
+    am_status_t error;
     
     AgentConfiguration();
     AgentConfiguration(am_properties_t properties);
@@ -267,6 +268,7 @@ public:
         this->encodeCookieSpecialChars = AM_FALSE;
         this->notenforcedIPmode = NULL;
         this->use_redirect_for_advice = AM_FALSE;
+        this->error = AM_SUCCESS;
 
     }
     

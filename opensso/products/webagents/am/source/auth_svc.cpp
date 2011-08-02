@@ -42,6 +42,7 @@
 #include "utils.h"
 #include "auth_svc.h"
 #include "url.h"
+#include <cstring>
 
 USING_PRIVATE_NAMESPACE
 

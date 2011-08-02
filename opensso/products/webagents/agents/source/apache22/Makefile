@@ -103,7 +103,12 @@ LDLIBS += -Bdynamic -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) -L$(NSS_LIB_DIR) -lc -
 
 else
 
+ifeq ($(OS_ARCH), SunOS)
+SYSTEM_LIBS := 
+else
 SYSTEM_LIBS := -lpthread -ldl -lc -lm
+endif
+
 LDFLAGS += $(LD_COMMON_ORIGIN_FLAG) $(LD_ORIGIN_FLAG)
 LDFLAGS += -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR)
 $(STD_LIB)_LDLIBS := $(NSS_LIBS) $(NSPR_LIBS)
@@ -132,10 +137,10 @@ endif
 
 ifeq ($(OS_ARCH), SunOS)
 LDFLAGS += -L$(DEST_LIB_DIR)
-LDLIBS += $(LD_SHARED_FLAG) $(CXX_STD_LIBS) -lc -lm
-endif
-
+LDLIBS += $(LD_SHARED_FLAG) $(CXX_STD_LIBS) -lamsdk
+else
 LDLIBS += -Bstatic -lamsdk
+endif
 
 $(APACHE22_LIB_NAME).o: apache_agent.c
 	$(COMPILE.c) $(APACHE22_CFLAGS) $< $(OUTPUT_OPTION)

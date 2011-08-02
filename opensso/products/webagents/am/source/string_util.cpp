@@ -28,6 +28,7 @@
 
 #include <new>
 #include <stdexcept>
+#include <string>
 
 #include "string_util.h"
 
@@ -75,7 +76,7 @@ char *CopyString(const char *src, std::size_t len)
 	std::memcpy(dest, src, len);
 	dest[len] = '\0';
     } else if (len > 0) {
-	throw std::invalid_argument("src == NULL and len > 0");
+	throw std::invalid_argument(std::string("src == NULL and len > 0"));
     } else {
 	dest = static_cast<char *>(NULL);
     }

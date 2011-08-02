@@ -37,7 +37,9 @@
 #include "am_properties.h"
 #include "internal_exception.h"
 #include "http.h"
-
+#if !defined(_MSC_VER)
+#include <limits.h>
+#endif
 
 BEGIN_PRIVATE_NAMESPACE
 static SSOTokenService *SSOTokenSvc = NULL;

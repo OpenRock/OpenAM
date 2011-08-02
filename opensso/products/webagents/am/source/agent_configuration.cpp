@@ -87,7 +87,7 @@ AgentConfiguration::AgentConfiguration(am_properties_t props)
     initAgentServerURLList();
     
     setProperties(props);
-    populateAgentProperties();
+    error = populateAgentProperties();
     
 } // constructor
 
@@ -948,13 +948,15 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 AUDIT_DISPOSITION_REMOTE, &this->auditLogDisposition);
     }
 
-    // set whether doing remote logging ok or not
-    if (((strcasecmp(this->authLogType_param, LOG_TYPE_ALLOW) == 0) || 
-         (strcasecmp(this->authLogType_param, LOG_TYPE_DENY) == 0) || 
-         (strcasecmp(this->authLogType_param, LOG_TYPE_BOTH) == 0)) &&
-        ((strcasecmp(this->auditLogDisposition, AUDIT_DISPOSITION_REMOTE) == 0) ||
-         (strcasecmp(this->auditLogDisposition, AUDIT_DISPOSITION_ALL) == 0))) {
-        this->doRemoteLog = AM_TRUE;
+    if (AM_SUCCESS == status) {
+        // set whether doing remote logging ok or not
+        if (((strcasecmp(this->authLogType_param, LOG_TYPE_ALLOW) == 0) ||
+                (strcasecmp(this->authLogType_param, LOG_TYPE_DENY) == 0) ||
+                (strcasecmp(this->authLogType_param, LOG_TYPE_BOTH) == 0)) &&
+                ((strcasecmp(this->auditLogDisposition, AUDIT_DISPOSITION_REMOTE) == 0) ||
+                (strcasecmp(this->auditLogDisposition, AUDIT_DISPOSITION_ALL) == 0))) {
+            this->doRemoteLog = AM_TRUE;
+        }
     }
 
     // get client ip header 
@@ -1342,19 +1344,25 @@ void AgentConfiguration::cleanup_properties()
     Utils::cleanup_cookie_info_list(&this->cookie_list);
     this->cookie_reset_default_domain = NULL;
 
-    if (this->agent_server_url.url != NULL) {
-        free(this->agent_server_url.url);
-        this->agent_server_url.url = NULL;
-    }
-    if (this->agent_server_url.host != NULL) {
-        free(this->agent_server_url.host);
-        this->agent_server_url.host = NULL;
+    if (this->agent_server_url.url_len > 0) {
+        if (this->agent_server_url.url != NULL) {
+            free((void*) this->agent_server_url.url);
+            this->agent_server_url.url = NULL;
+        }
+        if (this->agent_server_url.host != NULL) {
+            free((void*) this->agent_server_url.host);
+            this->agent_server_url.host = NULL;
+        }
+        if (this->agent_server_url.protocol != NULL) {
+            free((void*) this->agent_server_url.protocol);
+            this->agent_server_url.protocol = NULL;
+        }
     }
 
-        if (this->notification_url) {
-                free((void *)this->notification_url);
-                this->notification_url = NULL;
-        }
+    if (this->notification_url) {
+        free((void *) this->notification_url);
+        this->notification_url = NULL;
+    }
 
     this->iis6_replaypasswd_key = NULL;
     this->owa_enable_session_timeout_url = NULL;
@@ -1363,10 +1371,12 @@ void AgentConfiguration::cleanup_properties()
     this->clientHostnameHeader = NULL;
 
     if (this->postdatapreserve_enable) {
-        if(this->postcache_handle != NULL){
+        if (this->postcache_handle != NULL) {
             delete this->postcache_handle;
         }
     }
+    
+    this->notenforcedIPmode = NULL;
 
     try {
         unload_fqdn_handler();

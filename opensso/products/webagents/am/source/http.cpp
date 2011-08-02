@@ -32,6 +32,7 @@
 
 #include "http.h"
 #include "nspr_exception.h"
+#include <cstring>
 
 USING_PRIVATE_NAMESPACE
 

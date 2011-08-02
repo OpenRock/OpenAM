@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <cstdarg>
 #include <math.h>
+#include <string.h>
 
 #define	PRIVATE_NAMESPACE_NAME	smi
 #define	BEGIN_PRIVATE_NAMESPACE	namespace PRIVATE_NAMESPACE_NAME {

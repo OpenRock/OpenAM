@@ -44,7 +44,7 @@ NM := nm -p
 # C/C++ Compiler related symbols
 #
 CC := cc
-CXX := CC
+CXX := CC  -I$(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/include
 
 CFLAGS += -DSOLARIS -mt
 CXXFLAGS += -DSOLARIS -mt
@@ -54,10 +54,10 @@ CFLAGS += -KPIC -fast -xarch=generic64
 CXXFLAGS += -fast -xarch=generic64 -DSOLARIS_64
 endif
 
-CXX_STD_LIBS := -lCstd -lCrun
-LDFLAGS += -mt -R /usr/lib/mps 
-LD_ORIGIN_FLAG := '-R$$ORIGIN'
-LD_COMMON_ORIGIN_FLAG := '-R/opt/SUNWam/lib:/usr/lib/mps'
+CXX_STD_LIBS := -library=no%Cstd -library=Crun
+LD_ORIGIN_FLAG := '-R$$ORIGIN' '-R$$ORIGIN/../lib'
+LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/lib -lstdcxx
+LD_COMMON_ORIGIN_FLAG := 
 # NOTE: '-z defs' should probably be added to the following definition.
 LD_FILTER_SYMS_FLAG = -M$(filter %.mapfile, $^)
 LD_MAKE_SHARED_LIB_FLAG := -G -znodelete

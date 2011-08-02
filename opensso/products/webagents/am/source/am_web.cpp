@@ -115,6 +115,8 @@ typedef unsigned __int32 uint32_t;
 #include <arpa/inet.h>
 #endif
 
+#include "sdk.hpp"
+
 USING_PRIVATE_NAMESPACE
 
 /*
@@ -760,6 +762,36 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
 	parameter = AM_COMMON_NAMING_URL_PROPERTY;
 	status = am_properties_get(boot_ptr->properties, parameter,
 				   &property_str);
+        
+        /* Extended url validation, 
+         * including naming url, 
+         * agent name, password and 
+         * ability to do a successful login to OpenAM
+         */
+        int vrv = 0;
+        std::list<std::string> nurl;
+        std::string prpty(property_str);
+        sdk::utils::stringtokenize(prpty, " ", &nurl);
+        for (std::list<std::string>::const_iterator ur = nurl.begin(); ur != nurl.end(); ++ur) {
+            std::string const& str = *ur;
+            am_web_log_always("Validating naming URL [%s]...", str.c_str());
+            sdk::utils::url u(str);
+            am_web_log_always("URL values:\n protocol: %s\n host: %s\n port %d\n path: %s\n query: %s\n URL: %s", 
+                    u.protocol().c_str(),
+                    u.host().c_str(),
+                    u.port(),
+                    u.path().c_str(),
+                    u.query().c_str(),
+                    u.URL().c_str());
+            if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1)) != 1) {
+                status = AM_FAILURE;
+                am_web_log_error("URL [%s] validation failed with error [%d]", str.c_str(), vrv);
+                break;
+            } else {
+                am_web_log_always("URL [%s] validation succeeded", str.c_str());
+            }
+        }
+        
 	if (AM_SUCCESS == status) {
 	    status = Utils::parse_url_list(property_str, ' ',
 				    &boot_ptr->naming_url_list, AM_TRUE);
@@ -869,8 +901,6 @@ am_agent_init(boolean_t* pAgentInitialized)
 {
     const char *thisfunc = "am_agent_init";
     am_status_t status = AM_SUCCESS;
-//    const Properties *properties = NULL;
-    //change the below member to boolean
     int agentAuthenticated = AM_FALSE;
     SSOToken ssoToken;
     AgentConfigurationRefCntPtr* agentConfigPtr;
@@ -879,9 +909,8 @@ am_agent_init(boolean_t* pAgentInitialized)
     string passwd(boot_info.agent_passwd);
     const Properties& propPtr =
         *reinterpret_cast<Properties *>(boot_info.properties);
-//    const char * agentConfigFile = boot_info.agent_config_file;
-    // call this to ensure NSS is initialised in the child process
-    status = Connection::initialize(propPtr);
+
+    status = Connection::initialize_in_child_process(propPtr);
     
     if (AM_SUCCESS == status) {
         if (agentProfileService == NULL) {
@@ -897,9 +926,12 @@ am_agent_init(boolean_t* pAgentInitialized)
         agentAuthenticated = AM_TRUE;
         agentProfileService->fetchAndUpdateAgentConfigCache();
         agent_config = am_web_get_agent_configuration();
-        agentConfigPtr = 
-             (AgentConfigurationRefCntPtr*) agent_config;
+        agentConfigPtr =
+                (AgentConfigurationRefCntPtr*) agent_config;
         if ((*agentConfigPtr) == NULL) {
+            status = AM_FAILURE;
+        }
+        if ((*agentConfigPtr) != NULL && (*agentConfigPtr)->error == AM_FAILURE) {
             status = AM_FAILURE;
         }
     }
@@ -940,30 +972,35 @@ am_agent_init(boolean_t* pAgentInitialized)
 	    if (AM_SUCCESS == status) {
 		initialized = AM_TRUE;
 	    } else {
+                status = AM_FAILURE;
+                *pAgentInitialized = B_FALSE;
 		am_web_log_error("%s unable to "
-				    "initialize the agent's policy object",
-				    thisfunc);
-	    }
-	} else {
-	    am_web_log_error("%s unable to initialize "
-				"the AM SDK, status = %s (%d)",
-				thisfunc,
-				am_status_to_string(status), status);
-	}
+                        "initialize the agent's policy object",
+                        thisfunc);
+            }
+        } else {
+            status = AM_FAILURE;
+            *pAgentInitialized = B_FALSE;
+            am_web_log_error("%s unable to initialize "
+                    "the AM SDK, status = %s (%d)",
+                    thisfunc,
+                    am_status_to_string(status), status);
+        }
 
-	status = am_log_add_module("RemoteLog", &(*agentConfigPtr)->remote_LogID);
-	if (AM_SUCCESS != status) {
-	    (*agentConfigPtr)->remote_LogID = AM_LOG_ALL_MODULES;
-	    status = AM_SUCCESS;
-	}
-
+        if (AM_SUCCESS == status) {
+            status = am_log_add_module("RemoteLog", &(*agentConfigPtr)->remote_LogID);
+            if (AM_SUCCESS != status) {
+                (*agentConfigPtr)->remote_LogID = AM_LOG_ALL_MODULES;
+                status = AM_SUCCESS;
+            }
+        }
     }
 
     if (AM_SUCCESS == status) {
         *pAgentInitialized = B_TRUE;
     } else {
-        if(agentAuthenticated == AM_TRUE) {
-            agentProfileService->agentLogout(propPtr); 
+        if (agentAuthenticated == AM_TRUE) {
+            agentProfileService->agentLogout(propPtr);
         }
     }
     return status;
@@ -974,40 +1011,42 @@ am_agent_init(boolean_t* pAgentInitialized)
  */
 extern "C" AM_WEB_EXPORT am_status_t
 am_web_init(const char *agent_bootstrap_file,
-                const char *agent_config_file)
-{
+        const char *agent_config_file) {
     const char *thisfunc = "am_web_init";
     am_status_t status = AM_SUCCESS;
-//    am_status_t authStatus = AM_FAILURE;
-//    const Properties *properties = NULL;
-//    am_properties_t tempprop ;
 
-    if (! initialized) {
-	// initialize log here so any error before properties file is
-	// loaded will go to stderr. After it's loaded will go to log file.
-	status = Log::initialize();
-	if (AM_SUCCESS == status) {
-	    try {
-		status = load_bootstrap_properties(&boot_info, 
-                                                   agent_bootstrap_file, 
-                                                   agent_config_file, 
-                                                   B_TRUE);
-            } catch(InternalException& ex) {
+    if (!initialized) {
+        // initialize log here so any error before properties file is
+        // loaded will go to stderr. After it's loaded will go to log file.
+        status = Log::initialize();
+        if (AM_SUCCESS == status) {
+            try {
+                status = load_bootstrap_properties(&boot_info,
+                        agent_bootstrap_file,
+                        agent_config_file,
+                        B_TRUE);
+            } catch (InternalException& ex) {
                 am_web_log_error("%s: Exception encountered while loading "
-                    "agent bootstrap properties: %s: %s",
-                    thisfunc, ex.what(), ex.getMessage());
+                        "agent bootstrap properties: %s: %s",
+                        thisfunc, ex.what(), ex.getMessage());
                 status = ex.getStatusCode();
-            } catch(std::bad_alloc& exb) {
-		status = AM_NO_MEMORY;
-            } catch(std::exception& exs) {
+            } catch (std::bad_alloc& exb) {
+                status = AM_NO_MEMORY;
+            } catch (std::exception& exs) {
                 am_web_log_error("%s: Exception encountered while loading "
-                     "agent bootstrap properties: %s",
-                thisfunc, exs.what());
+                        "agent bootstrap properties: %s",
+                        thisfunc, exs.what());
                 status = AM_FAILURE;
-            } catch(...) {
+            } catch (...) {
                 am_web_log_error("%s: Unknown exception encountered "
-                    "while loading bootstrap properties.", thisfunc);
+                        "while loading bootstrap properties.", thisfunc);
                 status = AM_FAILURE;
+            }
+
+            if (AM_SUCCESS == status) {
+                const Properties& propPtr = *reinterpret_cast<Properties *> (boot_info.properties);
+                // initialize NSS/NSPR here
+                status = Connection::initialize(propPtr);
             }
         }
     }

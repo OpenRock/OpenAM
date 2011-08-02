@@ -29,6 +29,7 @@
 #include "session_service.h"
 #include "xml_tree.h"
 #include "agent_profile_service.h"
+#include <cstring>
 
 
 USING_PRIVATE_NAMESPACE

@@ -132,6 +132,8 @@
                     <include name="libamapc22.so"/>
             </fileset>
         </copy>
+        <copy file="${webagents.am.src.dir}/libamsdk.so.3"
+            tofile="${container.web_agent.lib.dir}/libamsdk.so.3"/>
     </target>
 
     <target name="copy-SunOS_x86-library">
@@ -140,6 +142,8 @@
                     <include name="libamapc22.so"/>
             </fileset>
         </copy>
+        <copy file="${webagents.am.src.dir}/libamsdk.so.3"
+            tofile="${container.web_agent.lib.dir}/libamsdk.so.3"/>
     </target>
 
     <target name="copy-HP-UX-library">

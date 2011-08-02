@@ -33,6 +33,7 @@
 #include <climits>
 #include <cstdarg>
 #include <stdexcept>
+#include <cstring>
 
 #include <libxml/parser.h>
 
