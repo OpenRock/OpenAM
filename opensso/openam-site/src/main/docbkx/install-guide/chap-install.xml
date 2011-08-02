@@ -832,15 +832,19 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
    </step>
    <step>
     <para>Login through the DAS to access OpenAM services.</para>
-    <para>The first time you test this in your lab or on your laptop, you
-    can set up sample authentication data, and a sample realm that gives
-    you a landing page after successful login. Otherwise the default
-    result of successful login is a redirect to the default success
+    <para>From the first time you test with either separate physical or virtual
+    host systems housing OpenAM and the DAS, you must at least redirect the
+    browser after successful login to a page that exists. One way to do this
+    is to use the <literal>goto</literal> parameter in the URL.</para>
+    <literallayout>https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
+    <para>As an alternative add sample authentication data, and a sample
+    realm that gives you a landing page after successful login. Otherwise the
+    default result of successful login is a redirect to the default success
     login URL, which is <literal>/openam/console</literal>, resulting in
-    a successful login, but an error in the browser. Indeed,
-    <literal>/openam/console</literal> is a URL you probably do not want to
-    expose outside the firewall. Instead, follow these steps to see the DAS
-    at work.</para>
+    a successful login, but an error in the browser, since the DAS does not
+    include the console. Indeed, <literal>/openam/console</literal> is a URL
+    you probably do not want to expose outside the firewall. Instead,
+    follow these steps to see the DAS at work.</para>
     <substeps>
      <step>
       <para>When setting up OpenAM, use OpenDJ with the sample data mentioned
