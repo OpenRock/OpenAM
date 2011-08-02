@@ -34,6 +34,7 @@ package com.sun.identity.idsvcs.rest;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.client.AuthClientUtils;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,6 +79,8 @@ public class IdentityServicesHandler extends HttpServlet {
     // Fields
     // =======================================================================
     private IdentityServicesFactory factory;
+    private String lbCookieName;
+    private String lbCookieValue;
 
     // =======================================================================
     // Initialize/Destroy
@@ -98,6 +102,9 @@ public class IdentityServicesHandler extends HttpServlet {
             // wrap in a servlet exception as to not scare the natives..
             throw new ServletException(e);
         }
+        
+        lbCookieName = AuthClientUtils.getlbCookieName();
+        lbCookieValue = AuthClientUtils.getlbCookieValue();
     }
 
     // =======================================================================
@@ -114,6 +121,9 @@ public class IdentityServicesHandler extends HttpServlet {
         HttpServletResponse response) throws ServletException, IOException {
         IdentityServicesImpl security = this.factory.newInstance();
         SecurityMethod.execute(security, request, response);
+        
+        // check/set LB cookie
+        setLbCookie(request, response);
     }
 
     // =======================================================================
@@ -134,6 +144,27 @@ public class IdentityServicesHandler extends HttpServlet {
     {
         return (val == null) ? true :
             ((val.trim().length() == 0) ? true : false);
+    }
+    
+    private void setLbCookie(HttpServletRequest request, HttpServletResponse response) {
+        if (lbCookieName == null || lbCookieValue == null) {
+            return;
+        }
+
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (int c = 0; c < cookies.length; c++) {
+                cookies[c].getName().equals(lbCookieName);
+                return;
+            }
+        }
+        
+        try {
+            AuthClientUtils.setlbCookie(request, response);
+        } catch (Exception ex) {
+            // unable to set lb cookie
+        }
     }
     
     /**
