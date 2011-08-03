@@ -25,6 +25,10 @@
  * $Id $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.admin.handler;
 
 import java.io.Serializable;
@@ -40,8 +44,7 @@ import com.sun.identity.admin.Resources;
 import com.sun.identity.admin.model.EditableSelectOneBean;
 import com.sun.identity.admin.model.MessageBean;
 import com.sun.identity.admin.model.MessagesBean;
-
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 
 public class EditableSelectOneHandler implements Serializable
 {
