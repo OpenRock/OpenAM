@@ -79,6 +79,9 @@
         <copy file="${war.xml.dir}/template/sms/serverdefaults.properties"
             tofile="${amserver.built.res.dir}/serverdefaults.properties"
             filtering="true"/>
+	<copy file="${war.xml.dir}/template/sms/serverupgrade.properties"
+            tofile="${amserver.built.res.dir}/serverupgrade.properties"
+            filtering="true"/>
         <copy file="${war.xml.dir}/template/sms/legacy.properties"
             tofile="${amserver.built.res.dir}/legacy.properties" />
         <war destfile="${amserver.dist.dir}/opensso-amserver.war" webxml="${amserver.dist.dir}/web.xml">
