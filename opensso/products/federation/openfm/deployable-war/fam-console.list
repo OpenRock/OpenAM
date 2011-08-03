@@ -1207,7 +1207,7 @@
 ./WEB-INF/lib/cc_zh_CN.jar
 ./WEB-INF/lib/cc_zh_HK.jar
 ./WEB-INF/lib/cc_zh_TW.jar
-./WEB-INF/lib/commons-codec-1.3.jar
+./WEB-INF/lib/commons-codec-1.4.jar
 ./WEB-INF/lib/console.jar
 ./WEB-INF/lib/jdmkrt.jar
 ./WEB-INF/lib/jdmktk.jar
