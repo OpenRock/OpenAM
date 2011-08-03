@@ -46,7 +46,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
                je.jar, mfwk_instrum_tk-2.0.jar, xercesImpl.jar, jss4.jar,
                esapiport.jar, jdmkrt.jar, je.jar, json.jar, asm-3.1.jar,
                commons-logging-api-1.1.jar, rome-1.0.jar,jdom.jar,
-               commons-collections-3.2.1.jar, commons-fileupload-1.2.jar,
+               commons-collections-3.2.1.jar, commons-fileupload-1.2.1.jar,
                commons-beanutils-1.6.jar,
                icefaces.jar, icefaces-comps.jar, commons-logging-1.1.1.jar,
                commons-digester-1.8.jar, icefaces-facelets.jar,
