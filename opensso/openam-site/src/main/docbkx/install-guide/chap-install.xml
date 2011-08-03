@@ -272,8 +272,8 @@ esac
      <imageobject>
       <imagedata fileref="images/openam-start.png" format="PNG" />
      </imageobject>
-     <caption><para>Port is 8080, but 12380 here because the port is
-     redirected to a virtual machine.</para></caption>
+     <textobject><para>Port is 8080, but 12380 here because the port is
+     redirected to a virtual machine.</para></textobject>
     </mediaobject>
    </step>
   </procedure>
@@ -724,7 +724,145 @@ The scripts are properly setup under directory: /path/to/session/tools/scripts
   <!-- TODO: see http://resources.apexidentity.com/projects/docs/wiki/Federation -->
   <para>TODO</para>
  </section>
-
+ 
+ <section xml:id="deploy-console-only">
+  <title>Deploying OpenAM Console Only</title>
+  <para>You can deploy OpenAM administration console alone, configuring the
+  console-only application to point to an instance of OpenAM core services
+  elsewhere.</para>
+  
+  <procedure xml:id="create-console-only-file">
+   <title>To Create the Console <filename>.war</filename> File</title>
+   
+   <step>
+    <para>Unpack the <filename>opensso.war</filename> file into a temporary
+    directory.</para>
+    <screen>$ mkdir -p /tmp/console ; cd /tmp/console
+$ jar xf /path/to/OpenAM/deployable-war/opensso.war</screen>
+   </step>
+   <step>
+    <para>Create the <filename>console.war</filename> file.</para>
+    <screen>$ cd /path/to/OpenAM/deployable-war
+$ sh createwar.sh --staging /tmp/console --type console --warfile console.war</screen>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="deploy-console-only-on-tomcat">
+   <title>To Deploy the Console On Tomcat</title>
+   
+   <step>
+    <para>Put the <filename>console.war</filename> you created in the Tomcat
+    <filename>webapps/</filename> directory.</para>
+    <screen>$ mv console.war /path/to/tomcat/webapps/</screen>
+   </step>
+   <step>
+    <para>Browse to the console application, for example
+    <literal>http://host.example.com:8080/console</literal>, and configure
+    the console to access an OpenAM instance using the following hints.</para>
+    <variablelist>
+     <varlistentry>
+      <term>Server Protocol</term>
+      <listitem>
+       <para><literal>http</literal>, <literal>https</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server Host</term>
+      <listitem>
+       <para>FQDN for OpenAM, such as
+       <literal>openam.example.com</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server Port</term>
+      <listitem>
+       <para>Port on which OpenAM listens for connections, such as 80, 443, or
+       8080</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server Deployment URI</term>
+      <listitem>
+       <para>Absolute path on the host web container where OpenAM is deployed
+       such as <literal>/openam</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Encryption Key</term>
+      <listitem>
+       <para>Key for decrypting passwords stored in the Service Management
+       System configuration on the <literal>am.encryption.pwd</literal>
+       property.</para>
+       <para>If the OpenAM instance already has a console, then go to the
+       Configuration &gt; Servers and Sites tab page, and click the server
+       to view its configuration.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <!-- TODO: Understand and explain what's behind this authentication. -->
+      <term>Application User Name</term>
+      <listitem>
+       <para>Name of the principal to connect through to OpenAM.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Application User Password</term>
+      <listitem>
+       <para>Password of the principal to connect through to OpenAM.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Administration Console Protocol</term>
+      <listitem>
+       <para><literal>http</literal>, <literal>https</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Administration Console Host</term>
+      <listitem>
+       <para>FQDN for the console, such as
+       <literal>console.example.com</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Administration Console Port</term>
+      <listitem>
+       <para>Port on which the console listens for connections, such as 80,
+       443, or 8080</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Administration Console Deployment URI</term>
+      <listitem>
+       <para>Absolute path on the host web container where the console is
+       deployed such as <literal>/console</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Administration Console Debug Directory</term>
+      <listitem>
+       <para>The console logs to flat files in this directory.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>Restrict permissions to the
+    <filename>$HOME/AMConfig.properties</filename> configuration file, where
+    $HOME corresponds to the user who runs the web container where the console
+    is deployed.</para>
+   </step>
+  </procedure>
+ </section>
+ 
+ <section xml:id="deploy-headless">
+  <title>Deploying Core Services Without a Console</title>
+  
+  <para>You can deploy OpenAM core services without including the console.
+  TODO.</para>
+  
+ </section>
+ 
  <section xml:id="deploy-distributed-auth">
   <title>Deploying Distributed Authentication Across a DMZ</title>
   
@@ -733,7 +871,7 @@ The scripts are properly setup under directory: /path/to/session/tools/scripts
   authentication service (DAS) in your DMZ, leaving OpenAM core services behind
   the firewall that end users cannot access.</para>
   
-  <para>You complete the following stages in deployment the DAS web
+  <para>You complete the following stages in deploying the DAS web
   service.</para>
   <orderedlist>
    <listitem>
@@ -789,8 +927,8 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
      <imageobject>
       <imagedata fileref="images/das-initial-screen.png" format="PNG" />
      </imageobject>
-     <caption><para>The first time you access the DAS, you must configure
-     access to OpenAM.</para></caption>
+     <textobject><para>The first time you access the DAS, you must configure
+     access to OpenAM.</para></textobject>
     </mediaobject>
    </step>
   </procedure>
@@ -827,7 +965,7 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
      <imageobject>
       <imagedata fileref="images/das-complete-config.png" format="PNG" />
      </imageobject>
-     <caption><para>Configure access to OpenAM.</para></caption>
+     <textobject><para>Configure access to OpenAM.</para></textobject>
     </mediaobject>
     <para>Most DAS configuration choices require no clarification. Hints for
     equivocal parameters follow.</para>
@@ -926,7 +1064,7 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
       <imageobject>
        <imagedata fileref="images/das-login-page.png" format="PNG" />
       </imageobject>
-      <caption><para>The DAS UI handles access to OpenAM.</para></caption>
+      <textobject><para>The DAS UI handles access to OpenAM.</para></textobject>
      </mediaobject>
      </step>
     </substeps>
@@ -935,8 +1073,8 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
      <imageobject>
       <imagedata fileref="images/das-login-success.png" format="PNG" />
      </imageobject>
-     <caption><para>The DAS UI redirects the user to the URL you
-     configured for the realm.</para></caption>
+     <textobject><para>The DAS UI redirects the user to the URL you
+     configured for the realm.</para></textobject>
     </mediaobject>
    </step>
    <step>
@@ -951,8 +1089,173 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
  
   <section xml:id="deploy-idp-discovery">
   <title>Deploying the Identity Provider Discovery Service</title>
-  <!-- TODO -->
-  <para>TODO</para>
+  <para>When you deploy OpenAM for federation and your require a service that
+  discovers which identity provider corresponds to a request, you can deploy
+  the identity provider discovery service (IPDS) as a separate
+  application.</para>
+  
+  <para>You complete the following stages in deploying the IPDS web
+  service.</para>
+  <orderedlist>
+   <listitem>
+    <para>Create the .war file for the IPDS using OpenAM software.</para>
+   </listitem>
+   <listitem>
+    <para>Deploy the IPDS .war file into your web application container.</para>
+    <para>How you deploy the IPDS .war file depends on your web application
+    container. The procedure in this section shows how to deploy on
+    Apache Tomcat.</para>
+   </listitem>
+   <listitem>
+    <para>Configure the IPDS you deployed.</para>
+   </listitem>
+   <listitem>
+    <para>Configure a circle of trust to include the IPDS and the service
+    provider.</para>
+   </listitem>
+   <listitem>
+    <para>Share metadata between the IPDS you deployed and the service
+    provider.</para>
+   </listitem>
+  </orderedlist>
+  
+  <procedure xml:id="create-idpdisco-file">
+   <title>To Create the IPDS <filename>.war</filename> File</title>
+   
+   <step>
+    <para>Unpack the <filename>opensso.war</filename> file into a temporary
+    directory.</para>
+    <screen>$ mkdir /tmp/ipds; cd /tmp/ipds
+$ jar xf /path/to/OpenAM/deployable-war/opensso.war</screen>
+   </step>
+   <step>
+    <para>Create the <filename>ipds.war</filename> file.</para>
+    <screen>$ cd /path/to/OpenAM/deployable-war
+$ sh createwar.sh --staging /tmp/ipds --type idpdiscovery --warfile ipds.war
+
+WAR file was created.</screen>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="deploy-idpdisco-on-tomcat">
+   <title>To Deploy the IPDS on Tomcat</title>
+   
+   <step>
+    <para>Put the <filename>ipds.war</filename> you created in the Tomcat
+    <filename>webapps/</filename> directory.</para>
+    <screen>$ mv ipds.war /path/to/tomcat/webapps/</screen>
+   </step>
+   <step>
+    <para>Access the IPDS configuration screen through your browser.</para>
+    <para>In this example, Apache Tomcat listens for HTTP requests on
+    <literal>lb.example.com:8081</literal>, and Tomcat has unpacked the IPDS
+    under <literal>/ipds</literal>, so the URL is
+    <literal>http://lb.example.com:8081/ipds</literal>, which redirects to
+    <filename>Configurator.jsp</filename>.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="configure-idpdisco-deployed">
+   <title>To Configure the IPDS You Deployed</title>
+   
+   <step>
+    <para>Configure the identity provider discovery service.</para>
+    <mediaobject>
+     <alt>Completed IDPS configuration screen</alt>
+     <imageobject>
+      <imagedata fileref="images/ipds-complete-config.png" format="PNG" />
+     </imageobject>
+     <textobject><para>Configure the identity provider
+     discovery service.</para></textobject>
+    </mediaobject>
+    <para>Hints for the IPDS configuration parameters follow.</para>
+    <variablelist>
+     <varlistentry>
+      <term>Debug Directory</term>
+      <listitem>
+       <para>The IPDS logs to flat files in this directory.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Debug Level</term>
+      <listitem>
+       <para>Default is <literal>error</literal>. Other options include
+       <literal>error</literal>, <literal>warning</literal>,
+       <literal>message</literal>, and <literal>off</literal>.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Cookie Type</term>
+      <listitem>
+       <para>The cookie type depends on TODO.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Cookie Domain</term>
+      <listitem>
+       <para>The cookie domain depends on TODO.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Secure Cookie</term>
+      <listitem>
+       <para>Set this to true if clients should only return cookies when
+       a secure connection is used.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Encode Cookie</term>
+      <listitem>
+       <para>Leave this true unless your OpenAM installation requires that you
+       do not encode cookies. Normally cookies are encoded such that cookies
+       remain valid in HTTP.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>HTTP-Only Cookie</term>
+      <listitem>
+       <para>Set to true to use HTTPOnly cookies if needed to help prevent
+       third-party programs and scripts from accessing the cookies.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>Restrict permissions to the configuration file for the IPDS in
+    <filename>$HOME/libIDPDiscoveryConfig.properties</filename>, where $HOME
+    corresponds to the user who runs the web container where you deployed the
+    service.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="configure-idpdisco-circle-of-trust">
+   <title>To Configure a Circle of Trust Including the IPDS</title>
+   <para>The examples in this procedure expect you have a circle of trust
+   configured with at least a service provider and an identity provider.</para>
+   <step>
+    <para>Login as OpenAM Administrator to the console on the service provider,
+    and then click the Federation tab.</para>
+   </step>
+   <step>
+    <para>Under Circle of Trust Configuration section, edit the circle of trust
+    to add URLs for the IPDS for the SAMLv2 writer and reader services.</para>
+    <para>In this example, the writer URL is
+    <literal>http://lb.example.com:8081/ipds/saml2writer</literal>, and the
+    reader URL is
+    <literal>http://lb.example.com:8081/ipds/saml2reader</literal>.</para>
+   </step>
+   <step>
+    <para>TODO, including exchange of metatdata.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="share-idpdisco-sp-metadata">
+   <title>To Share IPDS &amp; Service Provider Metadata</title>
+   
+   <step>
+    <para>TODO</para>
+   </step>
+  </procedure>
  </section>
 
  <!-- TODO -->
