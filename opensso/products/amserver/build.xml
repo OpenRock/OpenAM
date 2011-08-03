@@ -409,16 +409,10 @@
     <target name="am-mib" unless="amserver.mib.done">
         <mkdir dir="${amserver.built.dir}/mib" />
         <mkdir dir="${amserver.built.dir}/jdmk" />
-        <unzip src="${extlib.dir}/jdmk51_02-allplatforms.zip"
-            dest="${amserver.built.dir}/jdmk" />
-        <unzip src="${amserver.built.dir}/jdmk/sun-jdmk-sdk-5.1-b34.2.zip"
-            dest="${amserver.built.dir}/jdmk" />
-        <unzip src="${amserver.built.dir}/jdmk/sun-jdmk-runtime-5.1-b34.2.zip"
-            dest="${amserver.built.dir}/jdmk" />
-        <unzip src="${amserver.built.dir}/jdmk/sun-jdmk-runtime-jmx-5.1-b34.2.zip"
+	<unzip src="${extlib.dir}/opendmk.zip"
             dest="${amserver.built.dir}/jdmk" />
         <java classname="com.sun.jdmk.tools.MibGen" fork="true"
-            classpath="${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jmx.jar:${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jdmkrt.jar:${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jdmktk.jar">
+            classpath="${amserver.built.dir}/jdmk/lib/jdmkrt.jar:${amserver.built.dir}/jdmk/lib/jdmktk.jar">
             <arg line="-d &quot;${amserver.built.dir}/mib&quot; -tp com.sun.identity.monitoring &quot;${amserver.base.dir}/resources/mib/SUN-OPENSSO-SERVER.mib&quot;"/>
         </java>
 	<delete file="${amserver.built.dir}/mib/SUN_OPENSSO_SERVER_MIB.java" />
