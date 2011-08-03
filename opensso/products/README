@@ -57,7 +57,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
         %% 2.3 Obtaining testng-5.9-jdk15.jar
         %% 2.4 Obtaining fmsae.dll, fmsae64.dll and agent-csdk
         %% 2.5 Obtaining Open Message Queue binaries, imq.jar and jms.jar
-        %% 2.6 Obtaining click.jar and click-extras.jar
+        %% 2.6 Obtaining click-nodeps-2.3.0.jar.jar and click-extras-2.3.0.jar
         %% 2.7 Obtaining ant-contrib-1.0b3.jar
         %% 2.8 Obtaining commons-codec-1.4.jar
         %% 2.9 Obtaining jsr311-api-1.1.jar
@@ -198,16 +198,15 @@ libraries/native to opensso/products/extlib.
 2.5.3 Extract the downloaded file as necessary to get the 
       imq.jar and jms.jar under /imq/lib directory
 
-%% 2.6 Obtaining click.jar and click-extras.jar
-2.6.1 Visit http://click.sourceforge.net/, click on the Download hyperlink
-      (under the Click tree) on the left panel
-      You will be brought to sourceforge.net with the list of click binaries.
-2.6.2 Download click-1.4.2.zip
-2.6.3 Unzip this zip file in a temporary directory
-2.6.4 copy <temporary directory>/click.1.4.2/dist/click-1.4.2.jar to
-      <your workspace>/opensso/products/extlib/click.jar
-2.6.5 copy <temporary directory>/click.1.4.2/dist/click-extras-1.4.2.jar to
-      <your workspace>/opensso/products/extlib/click-extras.jar
+%% 2.6 Obtaining click-nodeps-2.3.0.jar.jar and click-extras-2.3.0.jar
+2.6.1 Visit http://click.apache.org/, navigate to the maven repository
+      http://repo1.maven.org/maven2/org/apache/click/
+2.6.2 Download click-nodeps-2.3.0.jar from click-nodeps/2.3.0/
+2.6.3 Download click-extras-2.3.0.jar from click-extras/2.3.0/
+2.6.4 copy click-nodeps-2.3.0.jar to
+      <your workspace>/opensso/products/extlib/
+2.6.5 copy click-extras-2.3.0.jar to
+      <your workspace>/opensso/products/extlib/
 
 %% 2.7 Obtaining ant-contrib-1.0b3.jar
 2.7.1 Visit http://sourceforge.net/project/showfiles.php?group_id=36177
@@ -253,6 +252,22 @@ libraries/native to opensso/products/extlib.
 %% 2.13 Obtaining log4j-1.2.8.jar
 2.13.1 Download from
        http://search.maven.org/remotecontent?filepath=log4j/log4j/1.2.8/log4j-1.2.8.jar
+
+%% 2.14 Obtaining velocity-1.7.jar
+2.14.1 Download from
+       http://velocity.apache.org/download.cgi
+
+%% 2.15 Obtaining commons-io 2.0.1
+2.15.1 Download from
+       http://commons.apache.org/io/download_io.cgi
+
+%% 2.16 Obtaining commons-lang 2.5
+2.16.1 Download from
+       http://commons.apache.org/lang/download_lang.cgi
+
+%% 2.17 Obtaining ognl 2.6.9
+2.17.1 Download from
+       http://repo.fusesource.com/nexus/content/groups/public/ognl/ognl/2.6.9/
 
 %% 3. Building the workspace
 

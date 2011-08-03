@@ -25,9 +25,11 @@
  * $Id: AjaxPage.java,v 1.24 2010/01/04 19:15:16 veiming Exp $
  *
  */
+
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.config.util;
 
 import com.sun.identity.config.Configurator;
@@ -44,8 +46,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import net.sf.click.control.ActionLink;
-import net.sf.click.Page;
+import org.apache.click.control.ActionLink;
+import org.apache.click.Page;
 
 
 public abstract class AjaxPage extends Page {

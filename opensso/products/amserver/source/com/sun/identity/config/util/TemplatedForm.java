@@ -25,10 +25,15 @@
  * $Id: TemplatedForm.java,v 1.4 2008/06/25 05:42:41 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.util;
 
-import net.sf.click.control.Field;
-import net.sf.click.control.Form;
+import org.apache.click.control.Field;
+import org.apache.click.control.Form;
 
 import java.util.Iterator;
 

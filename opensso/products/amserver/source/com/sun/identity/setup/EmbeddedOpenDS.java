@@ -231,7 +231,6 @@ public class EmbeddedOpenDS {
         String[] opendsJarFiles = {
             "OpenDS.jar",
             "je.jar",
-            "activation.jar",
             "mail.jar"
         };
 

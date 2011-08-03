@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -42,7 +42,7 @@ import com.sun.identity.setup.SetupConstants;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 public class Wizard extends AjaxPage {
 

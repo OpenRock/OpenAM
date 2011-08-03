@@ -25,6 +25,11 @@
  * $Id: Step2.java,v 1.15 2010/01/04 19:08:36 veiming Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
@@ -32,7 +37,7 @@ import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import java.io.File;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 public class Step2 extends AjaxPage {
     public ActionLink validateConfigDirLink = 

@@ -25,13 +25,18 @@
  * $Id: Deploy.java,v 1.3 2008/06/25 05:42:32 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.agent;
 
 import com.sun.identity.config.util.AjaxPage;
 
 import java.util.List;
 
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 /**
  * @author Les Hazlewood

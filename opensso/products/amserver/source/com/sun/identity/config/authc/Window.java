@@ -25,11 +25,16 @@
  * $Id: Window.java,v 1.5 2008/06/25 05:42:33 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS 
+ */
+
 package com.sun.identity.config.authc;
 
 import com.sun.identity.config.pojos.WindowStore;
 import com.sun.identity.config.util.AjaxPage;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 /**
  * @author Jeffrey Bermudez

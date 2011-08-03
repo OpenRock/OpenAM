@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted [2010] [ForgeRock AS]
  */
+
 package com.sun.identity.config;
 
 import com.sun.identity.config.util.AjaxPage;
@@ -37,7 +38,7 @@ import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
 import javax.servlet.http.HttpServletRequest;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 public class DefaultSummary extends AjaxPage {
     

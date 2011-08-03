@@ -25,12 +25,17 @@
  * $Id: Options.java,v 1.7 2009/01/05 23:17:09 veiming Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config;
 
 import com.sun.identity.config.util.TemplatedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 public class Options extends TemplatedPage {
 

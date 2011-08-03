@@ -1265,8 +1265,8 @@
 ./WEB-INF/lib/cc_zh_CN.jar
 ./WEB-INF/lib/cc_zh_HK.jar
 ./WEB-INF/lib/cc_zh_TW.jar
-./WEB-INF/lib/click-extras.jar
-./WEB-INF/lib/click.jar
+./WEB-INF/lib/click-extras-2.3.0.jar
+./WEB-INF/lib/click-nodeps-2.3.0.jar
 ./WEB-INF/lib/commons-codec-1.4.jar
 ./WEB-INF/lib/crimsondeb.jar
 ./WEB-INF/lib/esapiport.jar

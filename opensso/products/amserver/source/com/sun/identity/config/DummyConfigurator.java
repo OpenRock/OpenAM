@@ -35,7 +35,7 @@ package com.sun.identity.config;
 import com.sun.identity.config.pojos.*;
 import com.sun.identity.config.pojos.condition.Condition;
 import com.sun.identity.setup.AMSetupServlet;
-import net.sf.click.Page;
+import org.apache.click.Page;
 
 import java.util.ArrayList;
 import java.util.List;

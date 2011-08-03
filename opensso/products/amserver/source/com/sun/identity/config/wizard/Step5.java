@@ -25,12 +25,17 @@
  * $Id: Step5.java,v 1.9 2009/01/05 23:17:10 veiming Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.SetupConstants;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 import java.net.URL;
 import java.net.MalformedURLException;
 

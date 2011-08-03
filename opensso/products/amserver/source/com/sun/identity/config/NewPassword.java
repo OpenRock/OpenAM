@@ -25,13 +25,18 @@
  * $Id: NewPassword.java,v 1.4 2008/06/25 05:42:32 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config;
 
 import com.sun.identity.config.util.AjaxPage;
-import net.sf.click.control.Form;
-import net.sf.click.control.HiddenField;
-import net.sf.click.control.PasswordField;
-import net.sf.click.control.Submit;
+import org.apache.click.control.Form;
+import org.apache.click.control.HiddenField;
+import org.apache.click.control.PasswordField;
+import org.apache.click.control.Submit;
 
 /**
  * @author Les Hazlewood

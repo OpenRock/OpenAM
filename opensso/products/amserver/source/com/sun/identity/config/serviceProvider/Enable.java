@@ -25,9 +25,14 @@
  * $Id: Enable.java,v 1.3 2008/06/25 05:42:41 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.serviceProvider;
 
-import net.sf.click.Page;
+import org.apache.click.Page;
 
 /**
  * @author Les Hazlewood

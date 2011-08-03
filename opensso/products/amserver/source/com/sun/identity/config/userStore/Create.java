@@ -25,12 +25,17 @@
  * $Id: Create.java,v 1.3 2008/06/25 05:42:41 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.userStore;
 
 import com.sun.identity.config.pojos.LDAPStore;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.config.util.LDAPStoreValidator;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 /**
  * @author Les Hazlewood

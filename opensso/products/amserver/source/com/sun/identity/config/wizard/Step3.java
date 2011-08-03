@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted [2010] [ForgeRock AS]
  */
+
 package com.sun.identity.config.wizard;
 
 import com.iplanet.am.util.SSLSocketFactoryManager;
@@ -43,8 +44,8 @@ import java.util.Map;
 import java.net.InetAddress;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import net.sf.click.control.ActionLink;
-import net.sf.click.Context;
+import org.apache.click.control.ActionLink;
+import org.apache.click.Context;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.util.DN;

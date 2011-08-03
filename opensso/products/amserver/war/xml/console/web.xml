@@ -229,7 +229,7 @@
     </servlet>
     <servlet>
         <servlet-name>click-servlet</servlet-name>
-        <servlet-class>net.sf.click.ClickServlet</servlet-class>
+        <servlet-class>org.apache.click.ClickServlet</servlet-class>
     </servlet>
 
     <servlet>

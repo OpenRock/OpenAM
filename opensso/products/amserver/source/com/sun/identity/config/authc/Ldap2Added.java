@@ -25,9 +25,14 @@
  * $Id: Ldap2Added.java,v 1.3 2008/06/25 05:42:33 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.authc;
 
-import net.sf.click.Page;
+import org.apache.click.Page;
 
 /**
  * @author Laureen Gutierrez

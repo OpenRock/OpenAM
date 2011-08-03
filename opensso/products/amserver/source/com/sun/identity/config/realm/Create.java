@@ -25,6 +25,11 @@
  * $Id: Create.java,v 1.4 2008/06/25 05:42:38 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.realm;
 
 import com.sun.identity.config.util.AjaxPage;
@@ -32,7 +37,7 @@ import com.sun.identity.config.util.LDAPStoreValidator;
 import com.sun.identity.config.pojos.Realm;
 import com.sun.identity.config.pojos.RealmRole;
 import com.sun.identity.config.pojos.RealmUser;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 import java.util.List;
 import java.util.ArrayList;

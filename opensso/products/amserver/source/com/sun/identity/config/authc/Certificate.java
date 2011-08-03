@@ -25,12 +25,17 @@
  * $Id: Certificate.java,v 1.4 2008/06/25 05:42:32 qcheng Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.config.authc;
 
 import com.sun.identity.config.pojos.CertificateStore;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.config.util.LDAPStoreValidator;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 
 /**
  * @author Jeffrey Bermudez

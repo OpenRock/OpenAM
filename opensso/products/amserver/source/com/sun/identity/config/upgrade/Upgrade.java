@@ -32,7 +32,7 @@ import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponseWrapper;
-import net.sf.click.control.ActionLink;
+import org.apache.click.control.ActionLink;
 import org.forgerock.openam.upgrade.ServiceUpgradeWrapper;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeServices;

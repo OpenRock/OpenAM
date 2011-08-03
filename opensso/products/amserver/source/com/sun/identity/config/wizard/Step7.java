@@ -27,14 +27,14 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.SetupConstants;
-import net.sf.click.Context;
+import org.apache.click.Context;
 
 /**
  * This is the summary page for the values entered during the configuration
