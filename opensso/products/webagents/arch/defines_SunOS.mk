@@ -44,28 +44,54 @@ NM := nm -p
 # C/C++ Compiler related symbols
 #
 CC := cc
+
+ifeq ($(MC_ARCH), i86pc)
+ifeq ($(BUILD_TYPE), 64)
+CXX := CC  -I$(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx_64/include
+else 
 CXX := CC  -I$(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/include
+endif
+else
+ifeq ($(BUILD_TYPE), 64)
+CXX := CC  -I$(USERX_ROOT)/extlib/SunOS/stdcxx_64/include
+else
+CXX := CC  -I$(USERX_ROOT)/extlib/SunOS/stdcxx/include
+endif
+endif 
 
 CFLAGS += -DSOLARIS -mt
 CXXFLAGS += -DSOLARIS -mt
 
 ifeq ($(BUILD_TYPE), 64)
-CFLAGS += -KPIC -fast -xarch=generic64
-CXXFLAGS += -fast -xarch=generic64 -DSOLARIS_64
+CFLAGS += -KPIC -m64
+CXXFLAGS += -KPIC -m64 -DSOLARIS_64 
 endif
 
 CXX_STD_LIBS := -library=no%Cstd -library=Crun
 LD_ORIGIN_FLAG := '-R$$ORIGIN' '-R$$ORIGIN/../lib'
-LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/lib -lstdcxx
-LD_COMMON_ORIGIN_FLAG := 
-# NOTE: '-z defs' should probably be added to the following definition.
-LD_FILTER_SYMS_FLAG = -M$(filter %.mapfile, $^)
-LD_MAKE_SHARED_LIB_FLAG := -G -znodelete
+	
+ifeq ($(MC_ARCH), i86pc)
 ifeq ($(BUILD_TYPE), 64)
-LD_MAKE_SHARED_LIB_FLAG += -fast -xarch=generic64
+LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx_64/lib -lstdcxx
+else 
+LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/lib -lstdcxx
+endif
+else
+ifeq ($(BUILD_TYPE), 64)
+LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS/stdcxx_64/lib -lstdcxx
+else
+LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS/stdcxx/lib -lstdcxx
+endif
+endif 
+
+LD_COMMON_ORIGIN_FLAG := 
+LD_FILTER_SYMS_FLAG = -M$(filter %.mapfile, $^)
+LD_MAKE_SHARED_LIB_FLAG := -G -z nodelete -z ignore -z lazyload -z combreloc -norunpath
+ifeq ($(BUILD_TYPE), 64)
+LD_MAKE_SHARED_LIB_FLAG += -m64
 endif
 LD_SHARED_FLAG := -Bdynamic
-LD_STATIC_FLAG := -Bstatic
+LD_STATIC_FLAG :=
 LD_VERSION_LIB_FLAG = -h$@
 PIC_FLAG := -KPIC
 

@@ -104,7 +104,7 @@ LDLIBS += -Bdynamic -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) -L$(NSS_LIB_DIR) -lc -
 else
 
 ifeq ($(OS_ARCH), SunOS)
-SYSTEM_LIBS := 
+SYSTEM_LIBS := -lc 
 else
 SYSTEM_LIBS := -lpthread -ldl -lc -lm
 endif

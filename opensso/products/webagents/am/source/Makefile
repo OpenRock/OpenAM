@@ -202,7 +202,7 @@ endif
 $(TEST_LIB)_LDLIBS := $($(STD_LIB)_LDLIBS)
 ifeq ($(OS_ARCH), SunOS)
 CXXFLAGS += -library=no%Cstd -library=Crun 
-$(STD_LIB)_LDFLAGS := -z defs -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/lib -lstdcxx
+$(STD_LIB)_LDFLAGS := -KPIC -z defs
 LD_STATIC_FLAGS += -xar
 endif
 
