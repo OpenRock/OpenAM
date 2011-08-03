@@ -178,7 +178,7 @@
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/openfm/source</package-root>
-                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/backport-util-concurrent-2.2.jar:extlib/commons-collections-3.2.jar:extlib/esapiport.jar:extlib/icefaces-comps.jar:extlib/icefaces.jar:extlib/j2ee.jar:extlib/jdom.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/rome-1.0.jar:extlib/saaj-api.jar:extlib/scn_stprs_util.jar:extlib/webservices-rt.jar</classpath>
+                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/commons-collections-3.2.jar:extlib/esapiport.jar:extlib/icefaces-comps.jar:extlib/icefaces.jar:extlib/j2ee.jar:extlib/jdom.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/rome-1.0.jar:extlib/saaj-api.jar:extlib/scn_stprs_util.jar:extlib/webservices-rt.jar</classpath>
                 <built-to>federation/openfm/built/classes</built-to>
                 <built-to>federation/openfm/built/dist/opensso.jar</built-to>
                 <source-level>1.5</source-level>

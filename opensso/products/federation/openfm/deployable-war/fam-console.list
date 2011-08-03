@@ -1239,7 +1239,6 @@
 ./WEB-INF/lib/jsf-impl.jar
 ./WEB-INF/lib/commons-collections-3.2.jar
 ./WEB-INF/lib/commons-fileupload-1.2.jar
-./WEB-INF/lib/backport-util-concurrent-2.2.jar
 ./WEB-INF/lib/commons-beanutils-1.6.jar
 ./WEB-INF/lib/icefaces.jar
 ./WEB-INF/lib/icefaces-comps.jar
