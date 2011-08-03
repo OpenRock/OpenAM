@@ -60,9 +60,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeReport;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.w3c.dom.Document;
@@ -77,8 +79,10 @@ public class ServerConfiguration extends ConfigurationBase {
     private static final String ATTR_PARENT_SITE_ID = "parentsiteid";
     private static final String ATTR_SERVER_CONFIG = "serverconfig";
     private static final String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
+    private static final String ATTR_DEFAULT_UPGRADE = "defaults.to.upgrade";
 
     public static final String SERVER_DEFAULTS = "serverdefaults";
+    public static final String SERVER_UPGRADE = "serverupgrade";
     private static final String DEFAULT_SERVER_ID = "00";
 
     /**
@@ -384,11 +388,21 @@ public class ServerConfiguration extends ConfigurationBase {
                 
             }
             
+            Set<String> attrsToUpgrade = null;
+        
+            try {
+                attrsToUpgrade = getAttrsToUpgrade();
+            } catch (UpgradeException ue) {
+                if (UpgradeUtils.debug.warningEnabled()) {
+                    UpgradeUtils.debug.warning("Unable to fetch server defaults to upgrade", ue);
+                }
+            }
+            
             Map<String, String> existingValues = new HashMap(prop);
-            Map<String, String> upgradedValues = calculateUpgradedServerDefaults(newValues, existingValues);
+            Map<String, String> upgradedValues = calculateUpgradedServerDefaults(newValues, existingValues, attrsToUpgrade);
             
             if (dryRun) {
-                return generateServerDefaultsUpgradeReport(newValues, existingValues, shortReport);
+                return generateServerDefaultsUpgradeReport(newValues, existingValues, shortReport, attrsToUpgrade);
             }
             
             if (!dryRun) {
@@ -409,7 +423,7 @@ public class ServerConfiguration extends ConfigurationBase {
     }
     
     public static Map<String, StringBuilder> generateServerDefaultsUpgradeReport(
-            Map<String, String> newValues, Map<String, String> existingValues, boolean shortReport) {
+            Map<String, String> newValues, Map<String, String> existingValues, boolean shortReport, Set<String> attrsToUpgrade) {
         int add = 0, mod = 0, del = 0;
         Map<String, StringBuilder> report = new HashMap<String, StringBuilder>();
 
@@ -436,7 +450,7 @@ public class ServerConfiguration extends ConfigurationBase {
         }
         
         // calculate modified attributes
-        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues);
+        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues, attrsToUpgrade);
         
         if (!(modifiedAttrs.isEmpty())) {
             StringBuilder mBuf = new StringBuilder();
@@ -516,7 +530,7 @@ public class ServerConfiguration extends ConfigurationBase {
     }
            
     public static Map<String, String> calculateUpgradedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues) {
+            Map<String, String> newValues, Map<String, String> existingValues, Set<String> attrsToUpgrade) {
         Map<String, String> upgradedValues = new HashMap<String, String>(existingValues);
 
         // calcuate new attributes
@@ -529,7 +543,7 @@ public class ServerConfiguration extends ConfigurationBase {
         }
         
         // calculate modified attributes
-        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues);
+        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues, attrsToUpgrade);
         
         if (!(modifiedAttrs.isEmpty())) {
             for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
@@ -563,14 +577,25 @@ public class ServerConfiguration extends ConfigurationBase {
         return addedValues;
     }
     
+    /**
+     * Only include in the list of modified attributes those that are listed
+     * in the serverupgrade.properites file; otherwise existing properties
+     * that have been locally modified will be over-written.
+     * 
+     * @param newValues
+     * @param existingValues
+     * @return 
+     */
     protected static Map<String, String> calculateModifiedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues) {
+            Map<String, String> newValues, Map<String, String> existingValues, Set<String> attrToModify) {
         Map<String, String> modifiedValues = new HashMap<String, String>();
         
         for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
-            if (existingValues.containsKey(newAttr.getKey())) {
-                if (!(existingValues.get(newAttr.getKey()).equals(newAttr.getValue()))) {
-                    modifiedValues.put(newAttr.getKey(), newAttr.getValue());
+            if (attrToModify.contains(newAttr.getKey())) {
+                if (existingValues.containsKey(newAttr.getKey())) {
+                    if (!(existingValues.get(newAttr.getKey()).equals(newAttr.getValue()))) {
+                        modifiedValues.put(newAttr.getKey(), newAttr.getValue());
+                    }
                 }
             }
         }
@@ -1453,5 +1478,27 @@ public class ServerConfiguration extends ConfigurationBase {
                 updateOrganizationAlias(ssoToken, serverName, true);
             }
         }
+    }
+    
+    private static Set<String> getAttrsToUpgrade() 
+    throws UpgradeException {
+        ResourceBundle res = ResourceBundle.getBundle(SERVER_UPGRADE);
+        Set<String> values = new HashSet<String>();
+            
+        if (!res.containsKey(ATTR_DEFAULT_UPGRADE)) {
+            throw new UpgradeException("Unable to find " + ATTR_DEFAULT_UPGRADE + " in " + SERVER_UPGRADE);
+        }
+        
+        String attrValues = res.getString(ATTR_DEFAULT_UPGRADE);
+        
+        if (attrValues != null) {
+            StringTokenizer st = new StringTokenizer(attrValues, ",");
+            
+            while (st.hasMoreTokens()) {
+                values.add(st.nextToken());
+            }
+        }
+        
+        return values;
     }
 }
