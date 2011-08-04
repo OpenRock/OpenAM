@@ -208,6 +208,7 @@ public class AMSetupServlet extends HttpServlet {
      * Flag indicating if OpenAM is configured with the latest valid config
      */  
     static public boolean isCurrentConfigurationValid() {
+        isVersionNewer = UpgradeUtils.isVersionNewer();
         return isConfiguredFlag && !isVersionNewer;
     } 
     
