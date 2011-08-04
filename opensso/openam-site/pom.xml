@@ -96,8 +96,8 @@
    <name>CDDL-1.0</name>
    <url>http://www.opensource.org/licenses/cddl1.php</url>
    <comments>Common Development and Distribution License (CDDL) 1.0.
-   This license applies to OpenIDM source code as indicated in the
-   source code.</comments>
+   This license applies to OpenAM source code as indicated in the
+   sources themselves.</comments>
    <distribution>repo</distribution>
   </license>
   <license>
