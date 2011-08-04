@@ -148,6 +148,13 @@ public class SessionCount {
         default:
             break;
         }
+        
+        if (sessions == null) {
+            sessions = Collections.EMPTY_MAP;
+            debug.error("Error: Unable to determine session count for user: " + uuid + 
+                    " returning empty map");
+        }
+        
         return sessions;
     }
 
