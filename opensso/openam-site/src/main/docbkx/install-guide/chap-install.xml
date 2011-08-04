@@ -534,6 +534,12 @@ Using CLASSPATH:
      Administrator, <literal>amadmin</literal></para></textobject>
     </mediaobject>
    </step>
+   <step>
+    <para>Restrict permissions to the
+    <filename>$HOME/openam</filename> configuration directory, where
+    $HOME corresponds to the user who runs the web container.</para>
+   </step>
+   
   </procedure>
  </section>
 
@@ -858,9 +864,44 @@ $ sh createwar.sh --staging /tmp/console --type console --warfile console.war</s
  <section xml:id="deploy-headless">
   <title>Deploying Core Services Without a Console</title>
   
-  <para>You can deploy OpenAM core services without including the console.
-  TODO.</para>
+  <para>You can deploy OpenAM core services without including the console if
+  you install the console elsewhere, or if you plan to perform all
+  configuration using <command>ssoadm</command> for example.</para>
   
+  <procedure xml:id="create-headless-file">
+   <title>To Create the Core Services <filename>.war</filename> File</title>
+   
+   <step>
+    <para>Unpack the <filename>opensso.war</filename> file into a temporary
+    directory.</para>
+    <screen>$ mkdir -p /tmp/headless ; cd /tmp/headless
+$ jar xf /path/to/OpenAM/deployable-war/opensso.war</screen>
+   </step>
+   <step>
+    <para>Create the <filename>headless.war</filename> file.</para>
+    <screen>$ cd /path/to/OpenAM/deployable-war
+$ sh createwar.sh -s /tmp/headless --type noconsole -w headless.war</screen>
+   </step>
+  </procedure>
+  <procedure xml:id="deploy-headless-on-tomcat">
+   <title>To Deploy the Core Services On Tomcat</title>
+   
+   <step>
+    <para>Put the <filename>headless.war</filename> you created in the Tomcat
+    <filename>webapps/</filename> directory.</para>
+    <screen>$ mv headless.war /path/to/tomcat/webapps/</screen>
+   </step>
+   <step>
+    <para>Browse to the console application, for example
+    <literal>http://host.example.com:8080/headless/</literal>, and configure
+    OpenAM core services as if you were deploying with a full version.</para>
+   </step>
+   <step>
+    <para>Restrict permissions to the
+    <filename>$HOME/headless</filename> configuration directory, where
+    $HOME corresponds to the user who runs the web container.</para>
+   </step>
+  </procedure>
  </section>
  
  <section xml:id="deploy-distributed-auth">
