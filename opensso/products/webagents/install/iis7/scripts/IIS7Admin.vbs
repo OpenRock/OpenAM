@@ -270,15 +270,72 @@ Function AgentConfigure(WshShell, FSO, responseFile, objWebRoot, dict1)
 End Function
 
 Function ConfigureDll()
-    Dim oExec, strCmd
-    strCmd = "%systemroot%\system32\inetsrv\appcmd install module /name:" + agentName + " /image:" + modulePath
-    Set oExec = WshShell.Exec(strCmd)
+    Dim oExecInst, strCmdInst, oExecAdd, strCmdAdd, siteName, siteId, xmlElm
+    Set xmlDoc = CreateObject("Microsoft.XMLDOM")
+    xmlDoc.async = false
+    xmlDoc.resolveExternals = false
+    xmlDoc.validateOnParse = false
+    strCmd = "%systemroot%\system32\inetsrv\appcmd list sites /xml" 
+    Set objExecObject = WshShell.Exec(strCmd)
+    xmlDoc.loadXML(objExecObject.StdOut.ReadAll)
+    Set objNodeList = xmlDoc.getElementsByTagName("SITE")
+    If objNodeList.length > 0 then
+     For each xmlElm in objNodeList
+      siteId = xmlElm.getAttribute("SITE.ID")
+      If siteId = identifier then
+       siteName = xmlElm.getAttribute("SITE.NAME")
+       Exit For
+      End If
+     Next
+    Else
+     WScript.Echo "Error fetching SITE name."
+    End If
+    If siteName <> "" then  
+     strCmdInst = "%systemroot%\system32\inetsrv\appcmd install module /name:" + agentName + " /image:" + modulePath + " /add:false"
+     Set oExecInst = WshShell.Exec(strCmdInst)
+     WScript.Echo "Installing policy web agent module in IIS (status: " & oExecInst.Status & ")"
+     WScript.Sleep(1000)
+     strCmdAdd = "%systemroot%\system32\inetsrv\appcmd add module /name:" + agentName + " /app.name:" + chr(34) + siteName + "/" + chr(34)
+     Set oExecAdd = WshShell.Exec(strCmdAdd)
+     WScript.Echo "Adding policy web agent module to " & chr(34) & siteName & chr(34) & " (status: " & oExecAdd.Status & ")"
+    Else
+     WScript.Echo "Policy web agent module installation failed."
+     WScript.Quit(0)
+    End If
 End Function
 
 Function UnconfigureDll()
-    Dim  oExec, strCmd
-    strCmd = "%systemroot%\system32\inetsrv\appcmd uninstall module " + agentName
-    Set oExec = WshShell.Exec(strCmd)
+    Dim  oExec, oExecDel, strCmd, strCmdDel, siteName, siteId, xmlElm
+    Set xmlDoc = CreateObject("Microsoft.XMLDOM")
+    xmlDoc.async = false
+    xmlDoc.resolveExternals = false
+    xmlDoc.validateOnParse = false
+    strCmd = "%systemroot%\system32\inetsrv\appcmd list sites /xml" 
+    Set objExecObject = WshShell.Exec(strCmd)
+    xmlDoc.loadXML(objExecObject.StdOut.ReadAll)
+    Set objNodeList = xmlDoc.getElementsByTagName("SITE")
+    If objNodeList.length > 0 then
+     For each xmlElm in objNodeList
+      siteId = xmlElm.getAttribute("SITE.ID")
+      If siteId = identifier then
+       siteName = xmlElm.getAttribute("SITE.NAME")
+       Exit For
+      End If
+     Next
+    Else
+     WScript.Echo "Error fetching SITE name."
+    End If
+    If siteName <> "" then
+     strCmdDel = "%systemroot%\system32\inetsrv\appcmd delete module " + agentName + " /app.name:" + chr(34) + siteName + "/" + chr(34)
+     Set oExecDel = WshShell.Exec(strCmdDel)
+     WScript.Echo "Removing policy web agent module from " & chr(34) & siteName & chr(34) & " (status: " & oExecDel.Status & ")"
+     strCmd = "%systemroot%\system32\inetsrv\appcmd uninstall module " + agentName
+     Set oExec = WshShell.Exec(strCmd)
+     WScript.Echo "Uninstalling policy web agent module from IIS (status: " & oExec.Status & ")"
+    Else
+     WScript.Echo "Policy web agent module uninstallation failed."
+     WScript.Quit(0)
+    End If
 End Function
 
 '----------------------------------------------------------------------------
