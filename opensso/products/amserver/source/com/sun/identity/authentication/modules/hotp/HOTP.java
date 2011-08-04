@@ -25,9 +25,11 @@
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
  */
-/**
+
+/*
  * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.authentication.modules.hotp;
 
 import com.iplanet.dpro.session.service.InternalSession;
