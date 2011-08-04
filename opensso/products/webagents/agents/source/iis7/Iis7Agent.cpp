@@ -776,6 +776,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 			} else {
 				status = do_redirect(pHttpContext, status, &OphResources.result,
 					requestURL.c_str(), requestMethod, args, agent_config);
+                                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
 			}
 			{
 				HRESULT hr;
@@ -814,6 +815,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 				status = do_redirect(pHttpContext, status, &OphResources.result,
 					requestURL.c_str(), requestMethod, 
 					args, agent_config);
+                                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
 			}
                         {
 				HRESULT hr;
@@ -830,6 +832,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 			status = do_redirect(pHttpContext, status, &OphResources.result,
 				requestURL.c_str(), requestMethod, 
 				args, agent_config);
+                        retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
 			break;
 
 		case AM_REDIRECT_LOGOUT:
@@ -848,6 +851,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 					}
 				}
 				res->Redirect(logout_url, true, false);
+                                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
 			} else {
 				am_web_log_debug("%s: am_web_get_logout_url failed. ");
 				retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
