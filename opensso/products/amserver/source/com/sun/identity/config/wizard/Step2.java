@@ -36,18 +36,31 @@ import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.apache.click.control.ActionLink;
+import org.publicsuffix.PSS;
 
 public class Step2 extends AjaxPage {
     public ActionLink validateConfigDirLink = 
         new ActionLink("validateConfigDir", this, "validateConfigDir");
     public ActionLink validateCookieDomainLink = 
         new ActionLink("validateCookieDomain", this, "validateCookieDomain");
+    private PSS publicSuffixies = null;
     
     public Step2() {
+        try {
+            publicSuffixies = new PSS();
+        } catch (IOException ioe) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                    "Unable to load public suffix database");
+        }   
     }
     
+    @Override
     public void onInit() {
         String val = (String)getContext().getSessionAttribute(
             SessionAttributeNames.SERVER_URL);
@@ -88,14 +101,33 @@ public class Step2 extends AjaxPage {
             baseDir = presetDir;
         }
 
-        if (hasWritePermission(baseDir)) {
-            add("canWriteDir", "");
+        if (!hasWritePermission(baseDir)) {
+            String deployURI = getContext().getServletContext().getContextPath();
+            add("initialCheck", "<small><img class=\"pointer\" src=\"" + deployURI + 
+                    "/assets/images/error.jpg\">" +
+                    getLocalizedString("configuration.wizard.step2.no.write.permission.to.basedir") + 
+                    "</small>");
+        } else if (alreadyHasContent(baseDir)) {
+            String deployURI = getContext().getServletContext().getContextPath();
+            add("initialCheck", "<small><img class=\"pointer\" src=\"" + deployURI +
+                    "/assets/images/error.jpg\">" +
+                    getLocalizedString(
+                "configuration.wizard.step2.basedir.already.has.content") + "</small>");
         } else {
-            add("canWriteDir", getLocalizedString(
-                "configuration.wizard.step2.no.write.permission.to.basedir"));
+            add("initialCheck", "");
         }
         
         super.onInit();
+    }
+    
+    private static boolean alreadyHasContent(String dirName) {
+        File f = new File(dirName); 
+        
+        if (f.exists() && f.isDirectory()) {
+            return (f.list().length > 0);
+        }
+        
+        return false;
     }
 
     private static boolean hasWritePermission(String dirName) {
@@ -114,6 +146,9 @@ public class Step2 extends AjaxPage {
         } else if (!hasWritePermission(configDir)) {
             writeToResponse(getLocalizedString(
                 "configuration.wizard.step2.no.write.permission.to.basedir"));
+        } else if (alreadyHasContent(configDir)) {
+            writeToResponse(getLocalizedString(
+                "configuration.wizard.step2.basedir.already.has.content"));
         } else {
             getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_DIR, configDir);
@@ -124,6 +159,7 @@ public class Step2 extends AjaxPage {
     }
 
     public boolean validateCookieDomain() {
+        String serverUrl = toString("serverurl");
         String domain = toString("domain");
         
         if (domain == null) {
@@ -131,6 +167,12 @@ public class Step2 extends AjaxPage {
         } else if (domain.indexOf(':') != -1) {
             writeToResponse(getLocalizedString(
                 "configuration.wizard.step2.invalid.cookie.domain"));
+        } else if (invalidCookieDomain(serverUrl, domain)) {
+             writeToResponse("warning" + getLocalizedString( 
+                "configuration.wizard.step2.invalid.tld"));   
+        } else if (mismatchedCookieDomain(serverUrl, domain)) {
+             writeToResponse("warning" + getLocalizedString(
+                "configuration.wizard.step2.mismatched.cookie.domain"));            
         } else {
             getContext().setSessionAttribute(
                 SessionAttributeNames.COOKIE_DOMAIN, domain);
@@ -138,6 +180,51 @@ public class Step2 extends AjaxPage {
         }
         setPath(null);
         return false;
+    }
+    
+    private boolean mismatchedCookieDomain(String serverUrl, String domain) {
+        if (serverUrl == null || domain == null) {
+            return false;
+        }
+        
+        return !serverUrl.contains(domain);
+    }
+    
+    private boolean invalidCookieDomain(String serverUrl, String domain) {
+        if (publicSuffixies == null) {
+            return false;
+        }
+        
+        if (serverUrl == null || domain == null) {
+            return false;
+        }
+        
+        URL url = null;
+        
+        try {
+            url = new URL(serverUrl);
+        } catch (MalformedURLException mue) {
+            return false;
+        }
+        
+        if (url != null) {
+            String tld = getTLDFromFQDN(url.getHost());
+            
+            if (domain.equals(tld)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private String getTLDFromFQDN(String fqdn) {        
+        if (publicSuffixies == null) {
+            return null;
+        }
+        
+        int tldLength = publicSuffixies.getEffectiveTLDLength(fqdn);
+        return fqdn.substring(tldLength); 
     }
 
     private String getServerURL() {        

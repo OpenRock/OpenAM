@@ -28,6 +28,11 @@
         if (response.responseText == "true") { 
             eval(field + "Valid = true;" );
             $(field + 'Status').innerHTML = okString;
+        } else if (response.responseText.search("warning") == 0) {
+            eval(field + "Valid = true;" );
+            $(field + 'Status').innerHTML = warningImage + 
+                '<small>' + response.responseText.substring(7) + '</small>';;
+            
         } else {
             eval(field + "Valid = false;" );
             $(field + 'Status').innerHTML = errorImage +
@@ -58,8 +63,9 @@
 
     function validateCookieDomain() {
 	field = "cookieDomain";
+        field2 = "serverURL";
         var callUrl = "$context$path?actionLink=validateCookieDomain&domain=" +
-            escape($(field).value);
+            escape($(field).value) + "&serverurl=" + escape($(field2).value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, serverFieldValidated);
@@ -82,10 +88,10 @@
                     <td><label for="serverURL"><em>*&nbsp;</em>$page.getLocalizedString("step2.server.url")</label></td>
                     <td>
                         <input id="serverURL" name="serverURL" type="text" 
-                            class="text" style="width:200px" 
+                            class="text" size="40" 
                             value="$serverURL" 
-                            onkeyup="APP.callDelayed(this, validateServerURL)"
-                            onchange="APP.callDelayed(this, validateServerURL)"/>
+                            onkeyup="APP.callDelayed(this, validateServerURL); APP.callDelayed(this, validateCookieDomain)"
+                            onchange="APP.callDelayed(this, validateServerURL); APP.callDelayed(this, validateCookieDomain)"/>
                             <span id="serverURLStatus"></span>
                     </td>
                 </tr>
@@ -114,7 +120,7 @@
                         <input id="configDirectory" name="configDirectory" 
                         type="text" class="text" size="40" 
                         value="$configDirectory" $fixDir />
-                        <span id="configDirectoryStatus">$canWriteDir</span>
+                        <span id="configDirectoryStatus">$initialCheck</span>
                     </td>
                 </tr> 
             </table>
