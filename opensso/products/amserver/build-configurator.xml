@@ -28,8 +28,12 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
+
 <project name="configurator" default="createZipFile" basedir=".">
-    <description>OpenSSO: amConfigurator.zip Creation</description>
+    <description>OpenAM: amConfigurator.zip Creation</description>
     <fail message="*** nightly build may be built from top level only ***">
       <condition>
             <or>
@@ -46,7 +50,7 @@
         <mkdir dir="${configurator.dir}"/>
     </target>
 
-    <target name="makeJar" depends="prepareBuild">
+    <target name="makeConfigJar" depends="prepareBuild">
         <jar destfile="${configurator.dir}/configurator.jar">
             <manifest>
                 <attribute name="Main-Class"
@@ -72,13 +76,32 @@
                 includes="OpenSSOConfigurator_zh_TW.properties"/>
         </jar>
     </target>
+    
+    <target name="makeUpgradeJar" depends="prepareBuild">
+        <jar destfile="${configurator.dir}/upgrade.jar">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="org.forgerock.openam.setup.OpenAMUpgrade"/>
+            </manifest>
+            <zipfileset dir="${amserver.built.dir}/classes"
+                includes="org/forgerock/openam/setup/OpenAMUpgrade*" />
+            <fileset dir="${amserver.res.dir}/locale"
+                includes="OpenAMUpgrade.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/de_DE"
+                includes="OpenAMUpgrade_de.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/es_ES"
+                includes="OpenAMUpgrade_es.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/fr_FR"
+                includes="OpenAMUpgrade_fr.properties"/>
+        </jar>
+    </target>
 
-    <target name="copyNeededFiles" depends="makeJar">
+    <target name="copyNeededFiles" depends="makeConfigJar, makeUpgradeJar">
         <copy todir="${configurator.dir}" overwrite="yes" flatten="yes"
             encoding="UTF-8">
             <fileset dir="${products.basedir}" includes="license.txt"/>
             <fileset dir="${configurator.scripts.dir}"
-                includes="configurator.jar, sampleconfiguration, README.setup"/>
+                includes="configurator.jar, sampleconfiguration, sampleupgrade, README.setup"/>
         </copy>
     </target>
 
@@ -87,7 +110,9 @@
             whenempty="create">
             <zipfileset dir="${configurator.dir}" filemode="755">
                 <include name="configurator.jar"/>
+                <include name="upgrade.jar"/>
                 <include name="sampleconfiguration"/>
+                <include name="sampleupgrade"/>
                 <include name="license.txt"/>
                 <include name="README.setup"/>
             </zipfileset>

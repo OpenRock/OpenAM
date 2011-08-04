@@ -25,12 +25,16 @@
    $Id: README.setup,v 1.1 2008/08/31 06:54:54 hengming Exp $
 
 -->
+
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
                                                                                
-Sun Java System OpenSSO: ssoConfiguratorTools.zip 
+OpenAM: ssoConfiguratorTools.zip 
 ====================================================
 
 This file contains information on installing and using ssoConfiguratorTools.zip.
-It is assumed that OpenSSO Server has been deployed.
+It is assumed that OpenAM Server has been deployed.
 
 Table of contents:
 -----------------
@@ -54,8 +58,15 @@ Step 1: Unzip ssoConfiguratorTools.zip to the desired directory.
 
 Step 2: Go to the directory which has the ssoConfiguratorTools.zip unzipped.
 
-Step 3: After step 2 is performed, run the following command:
+Step 3: After step 2 is performed, if you want to setup OpenAM then goto step 4
+        or if you want to upgrade OpenAM goto step 5.
+
+Step 4: To seutp OpenAM run the following command:
         ${JAVA_HOME}/bin/java -jar configurator.jar -f <configuration file>
+
+Step 5: If you have already deployed OpenAM and want to upgrade
+        run the following command:
+        ${JAVA_HOME}/bin/java -jar upgrade.jar -f <upgrade file>
         
 3. What does this package contain?
 ----------------------------------
@@ -63,11 +74,15 @@ Step 3: After step 2 is performed, run the following command:
 |
 |----README.setup (this file)
 |
-|----configurator.jar (binaries needed for this tool)
+|----configurator.jar (binaries needed for the configuration tool)
+|
+|----upgrade.jar (binaries needed for the upgrade tool)
 |
 |----license.txt (license file)
 |
 |----sampleconfiguration (a sample configuration file)
+|
+|----sampleupgrade (a sample upgrade file)
 
 
 

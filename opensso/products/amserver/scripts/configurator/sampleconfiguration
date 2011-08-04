@@ -1,19 +1,19 @@
 ##############################################################################
 ###
-### SERVER_URL is the URL of the web container on which OpenSSO Server is
+### SERVER_URL is the URL of the web container on which OpenAM Server is
 ### deployed.
 ###
-### DEPLOYMENT_URI is the OpenSSO Server deployment URI.
+### DEPLOYMENT_URI is the OpenAM Server deployment URI.
 ###
 ### BASE_DIR is the configuration directory
 ###
 ### locale is the user locale.
 ###
-### PLATFORM_LOCALE is is the locale of OpenSSO Server.
+### PLATFORM_LOCALE is is the locale of OpenAM Server.
 ###
 ### AM_ENC_KEY is the password encryption key.  In a multiserver installation,
 ### this parameter must have the same value as the other servers.  By default,
-### AM_ENC_KEY is set to "" which means that OpenSSO Server will generate a 
+### AM_ENC_KEY is set to "" which means that OpenAM Server will generate a 
 ### random password encryption key.
 ###
 ### ADMIN_PWD is the password for the default user, amAdmin. The password must
@@ -26,13 +26,13 @@
 ### will be part of an existing deployment, the password you enter must match
 ### that of the original deployment.
 ###
-### COOKIE_DOMAIN is the name of the trusted DNS domain that OpenSSO Server
+### COOKIE_DOMAIN is the name of the trusted DNS domain that OpenAM Server
 ### returns to a browser when it grants a session ID to a user.
 ###
 #############################################################################
 SERVER_URL=http://server1.example.com:8080
-DEPLOYMENT_URI=/opensso
-BASE_DIR=/opensso
+DEPLOYMENT_URI=/openam
+BASE_DIR=/openam
 locale=en_US
 PLATFORM_LOCALE=en_US
 AM_ENC_KEY=
@@ -99,24 +99,24 @@ DS_DIRMGRPASSWD=11111111
 ### DS_EMB_REPL_REPLPORT1 is replication port of the configuration data store
 ### of the new OpenSSO Server.
 ###
-### DS_EMB_REPL_HOST2 is the host name of the existing OpenSSO Server.
+### DS_EMB_REPL_HOST2 is the host name of the existing OpenAM Server.
 ###
 ### DS_EMB_REPL_PORT2 is no longer used as of OpenAM Snapshot 9.5
 ###
 ### DS_EMB_REPL_ADMINPORT2 is the listening admin port of the configuration
-### data store of the existing OpenSSO Server.
+### data store of the existing OpenAM Server.
 ###
 ### DS_EMB_REPL_REPLPORT2 is replication port of the configuration 
-### data store of the existing OpenSSO Server
+### data store of the existing OpenAM Server
 ###
-### 'existingserverid' is the URL of the existing OpenSSO Server.
+### 'existingserverid' is the URL of the existing OpenAM Server.
 ### 'existingserverid' property should only be added to the
 ###    second instance of the multi server setup.
 ### 'existingserverid' should have the value of this format;
-### http://FQDN of existing OpenSSO Server:port of existing 
-###    OpenSSO Server/<DEPLOYMENT_URI>
+### http://FQDN of existing OpenAM Server:port of existing 
+###    OpenAM Server/<DEPLOYMENT_URI>
 ### eg.,
-### http://server2.example.com:8080/opensso
+### http://server2.example.com:8080/openam
 ###
 ##############################################################################
 #DS_EMB_REPL_FLAG=embReplFlag
@@ -124,7 +124,7 @@ DS_DIRMGRPASSWD=11111111
 #DS_EMB_REPL_HOST2=server2.example.com
 #DS_EMB_REPL_ADMINPORT2=4444
 #DS_EMB_REPL_REPLPORT2=50889
-#existingserverid=http://server1.example.com:8080/opensso
+#existingserverid=http://server1.example.com:8080/openam
 
 
 ##############################################################################
@@ -196,4 +196,4 @@ DS_DIRMGRPASSWD=11111111
 ###
 ##############################################################################
 #LB_SITE_NAME=lb
-#LB_PRIMARY_URL=http://lb.example.com:80/opensso
+#LB_PRIMARY_URL=http://lb.example.com:80/openam
