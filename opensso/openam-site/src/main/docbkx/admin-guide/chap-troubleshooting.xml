@@ -62,6 +62,19 @@ mark      1739     1  0 14:47...</screen>
      <filename>/etc/passwd</filename> to locate the home directory.
      The user running the web container where you install OpenAM must
      be able to read from and write in this directory.</para>
+     <para>If you cannot change the permissions to the user's home directory,
+     you can, as a workaround, unpack <filename>opensso.war</filename>, set the
+     <literal>configuration.dir</literal> property in the
+     <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
+     with appropriate permissions, and repack <filename>opensso.war</filename>
+     with the adjusted file before deploying that.</para>
+     <screen>$ cd /path/to/OpenAM/deployable-war/
+$ mkdir unpacked ; cd unpacked
+$ jar xf ../opensso.war
+$ vi WEB-INF/classes/bootstrap.properties 
+$ grep ^config WEB-INF/classes/bootstrap.properties 
+configuration.dir=/my/readwrite/config/dir
+$ jar cf ../openam.war *</screen>
     </answer>
    </qandaentry>
    <qandaentry>
