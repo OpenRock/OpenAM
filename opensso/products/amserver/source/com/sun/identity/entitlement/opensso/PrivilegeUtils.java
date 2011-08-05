@@ -495,6 +495,25 @@ public class PrivilegeUtils {
         }
         return null;
     }
+    
+    private static Set<ResourceAttribute> mapGenericResponseProvider(
+            String responseProviderName, ResponseProvider rp) {
+        if (rp instanceof ResponseProvider) {
+            Set<ResourceAttribute> results = new HashSet<ResourceAttribute>();
+            
+            Map<String, Set<String>> props = rp.getProperties();
+            
+            for (Map.Entry<String, Set<String>> property : props.entrySet()) {
+                String className = rp.getClass().getName();
+                results.add(new PolicyResponseProvider(responseProviderName, className, 
+                                property.getKey(), property.getValue()));
+            }
+            
+            return results;
+        }
+        
+        return null;
+    }
 
     private static EntitlementCondition mapGenericCondition(
         Object[] nCondition) {
@@ -706,9 +725,12 @@ public class PrivilegeUtils {
                 Object[] nrpa = (Object[]) nrpObj;
                 String nrpName = (String) nrpa[0];
                 ResponseProvider rp = (ResponseProvider) nrpa[1];
+                
                 if (rp instanceof IDRepoResponseProvider) {
                     resourceAttributesSet.addAll(nrpsToResourceAttributes(
                         (IDRepoResponseProvider) rp, nrpName));
+                } else if (rp instanceof ResponseProvider) {
+                    resourceAttributesSet.addAll(mapGenericResponseProvider(nrpName, rp));
                 }
             }
         }
