@@ -166,7 +166,7 @@ esac
 </programlisting>
     <para>The Example.com sample data loaded into OpenDJ are taken from
     the file, <link xlink:href="http://mcraig.org/ldif/Example.ldif"
-    >Example.ldif</link> that you can download.</para>
+    >Example.ldif</link>, that you can download.</para>
     <para>See the <citetitle>OpenDJ Installation Guide</citetitle> for
     detailed installation instructions.</para>
    </listitem>
@@ -538,6 +538,46 @@ Using CLASSPATH:
     <para>Restrict permissions to the
     <filename>$HOME/openam</filename> configuration directory, where
     $HOME corresponds to the user who runs the web container.</para>
+   </step>
+   <step>
+    <indexterm><primary>Activate ssoadm.jsp</primary></indexterm>
+    <para>Enable extended configuration capabilities if necessary.</para>
+    <para>You can use the <command>ssoadm.jsp</command> page for extended
+    configuration capabilites similar to <command>ssoadm</command> on the
+    command line. Yet, <command>ssoadm.jsp</command> is disabled by default
+    to prevent potential misuse. To enable <command>ssoadm.jsp</command>,
+    follow these steps.</para>
+    <substeps>
+     <step>
+      <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
+     </step>
+     <step>
+      <para>Click Configuration &gt; Servers and Sites tabs, then in the
+      Servers list, click the link to configure your server.</para>
+     </step>
+     <step>
+      <para>Click the Advanced tab to display the Advanced Properties table,
+      and then click Add to include the property that enables
+      <command>ssoadm.jsp</command> before saving your change.</para>
+      <variablelist>
+       <varlistentry>
+        <term>Property Name</term>
+        <listitem><para>ssoadm.disabled</para></listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>Property Value</term>
+        <listitem><para>false</para></listitem>
+       </varlistentry>
+      </variablelist>
+     </step>
+     <step>
+      <para>Browse to <command>ssoadm.jsp</command> to check that it is
+      enabled.</para>
+      <para>The URL is something like
+      <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>,
+      depending on your installation.</para>
+     </step>
+    </substeps>
    </step>
    
   </procedure>
