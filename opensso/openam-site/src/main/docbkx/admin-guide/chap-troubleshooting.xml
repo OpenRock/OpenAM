@@ -35,6 +35,81 @@
  <para>This chapter covers how to get debugging information and troubleshoot
  issues in OpenAM deployments.</para>
  
+ <qandaset xml:id="solutions-to-common-issues">
+  <title>Solutions to Common Issues</title>
+  
+  <para>This section offers solutions to common problems when working with
+  OpenAM.</para>
+  
+  <qandadiv xml:id="troubleshooting-openam-installation">
+   <title>OpenAM Installation</title>
+   <qandaentry>
+    <question>
+     <para>OpenAM configuration could not write to the configuration directory.
+     Where must I change permissions, and what permissions are required?</para>
+    </question>
+    <answer>
+     <para>If the user running the web container has a $HOME directory, then
+     the configuration directory is stored there, and you probably do not have
+     this problem. If you do not know the user running the web container, use
+     the <command>ps</command> command to check. In the following example, the
+     user is <literal>mark</literal>, the web container
+     <literal>tomcat</literal>.</para>
+     <screen>$ ps -ef | grep tomcat
+mark      1739     1  0 14:47...</screen>
+     <para>For a container installed from native packages with a dedicated
+     user, $HOME may not be where you think it is. Look at the user's entry in
+     <filename>/etc/passwd</filename> to locate the home directory.
+     The user running the web container where you install OpenAM must
+     be able to read from and write in this directory.</para>
+    </answer>
+   </qandaentry>
+   <qandaentry>
+    <question>
+     <para>Deployment failed due to lack of memory. What do I do?</para>
+    </question>
+    <answer>
+     <para>OpenAM requires at least a maximum heap size of 1024 MB, with a 256
+     MB maximum permanent generation heap size. For the Sun JVM, ensure the
+     container starts with <literal>-Xmx1024m -XX:MaxPermSize=256m</literal>
+     for these settings.</para>
+     <para>If you do not know the settings used when the web container was
+     started, use the <command>ps</command> command to check. In the following
+     example, the web container is <literal>tomcat</literal>.</para>
+     <screen>$ ps -ef | grep tomcat | grep Xm
+... -Xmx1024m -XX:MaxPermSize=256m ...</screen>
+     <para>You can also look for memory errors in OpenAM by searching the
+     <filename><replaceable>config-dir</replaceable>/openam/debug/*</filename>
+     files for <literal>java.lang.OutOfMemoryError</literal>.</para>
+     <para>Make sure you have at least 2 GB of RAM on the system where you
+     run OpenAM to avoid running out of memory.</para>
+    </answer>
+   </qandaentry>
+   <qandaentry>
+    <question>
+     <para>Deployment failed due to invalid hostname configuration. What do
+     I do?</para>
+    </question>
+    <answer>
+     <para>OpenAM requires that you use a fully qualified domain name (FQDN)
+     that the host can resolve.</para>
+     <screen>$ ping openam-ter.example.com
+PING openam-ter (192.168.56.2) 56(84) bytes of data.
+64 bytes from openam (192.168.56.2): icmp_seq=1 ttl=64 time=0.025 ms
+64 bytes from openam (192.168.56.2): icmp_seq=2 ttl=64 time=0.032 ms
+64 bytes from openam (192.168.56.2): icmp_seq=3 ttl=64 time=0.030 ms</screen>
+     <para>For a test deployment (at home, on a laptop), you can use fake FQDNs
+     in <filename>/etc/hosts</filename>, depending on how your network is
+     configured.</para>
+     <screen>$ cat /etc/hosts | grep openam
+192.168.56.2 openam openam.example.com
+192.168.56.3 openam-bis openam-bis.example.com
+192.168.56.5 openam-ter openam-ter.example.com</screen>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+ </qandaset>
+ 
  <!-- TODO: see also http://resources.apexidentity.com/projects/docs/wiki/Troubleshooting -->
 
 </chapter>
