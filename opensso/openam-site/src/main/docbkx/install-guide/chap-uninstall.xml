@@ -36,5 +36,64 @@
  the <citetitle>Policy Agent Installation Guide</citetitle> for instructions
  on removing OpenAM agents.</para>
 
+ <procedure xml:id="uninstall-OpenAM-core">
+  <title>To Remove OpenAM Core Software</title>
+  
+  <para>After you have deployed and configured OpenAM core services, you have
+  at least two, perhaps three or four, locations where OpenAM files are stored
+  on your system.</para>
+  
+  <para>You remove the internal OpenAM configuration store when you follow
+  the procedure below. If you used an external configuration store, you can
+  remove OpenAM configuration data after removing all the software.</para>
+  
+  <step>
+   <para>Shut down the web application container in which you deployed
+   OpenAM.</para>
+   <screen>$ /etc/init.d/tomcat stop
+Password:
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk1.6/jre
+Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
+ /path/to/tomcat/bin/tomcat-juli.jar</screen>
+  </step>
+  <step>
+   <para>Unconfigure OpenAM by removing configuration files found in the $HOME
+   directory of the user running the web application container.</para>
+   <para>For a full install of OpenAM core services, configuration files
+   include the configuration directory, <filename>$HOME/openam</filename>, and
+   the hidden file that points to the configuration directory such as
+   <filename>$HOME/.openssocfg/AMConfig_path_to_tomcat_webapps_openam_</filename>.</para>
+   <screen>$ rm -rf $HOME/openam $HOME/.openssocfg</screen>
+   <note>
+    <para>At this point, you can restart the web container and configure
+    OpenAM anew if you only want to start over with a clean configuration
+    rather than removing OpenAM completely.</para>
+   </note>
+  </step>
+  <step>
+   <para>Remove the OpenAM web application by removing the .war file and
+   expanded web application from the container.</para>
+   <screen>$ cd /path/to/tomcat/webapps/
+$ rm -rf openam.war openam/</screen>
+  </step>
+  <step>
+   <para>If you have stored a download or unpacked version of OpenAM software
+   on your system, you can now remove the files.</para>
+   <para>If you cannot find the original .zip, search for files named
+   <filename>openam_*.zip</filename>.</para>
+   <screen>$ find . -name "openam_*.zip"
+./Downloads/openam_nightly_20110808.zip
+$ rm ./Downloads/openam_nightly_20110808.zip</screen>
+   <para>If you cannot find the unpacked version, you might search for the
+   directory named <filename>deployable-war</filename>.</para>
+   <screen>$ locate deployable-war/
+/path/to/OpenAM/deployable-war/README
+...
+$ rm -rf /path/to/OpenAM</screen>
+  </step>
+ </procedure>
 </chapter>
 
