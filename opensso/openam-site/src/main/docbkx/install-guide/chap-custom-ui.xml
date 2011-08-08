@@ -31,9 +31,100 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing the OpenAM End User Pages</title>
-
- <para>This chapter address what to customize in the OpenAM end user pages
- for your organization and for your supported locales.</para>
-
+ 
+ <para>When you deploy OpenAM to protect your web-based applications, users
+ can be redirected to OpenAM pages for login and logout. ForgeRock provides
+ pages localized for English, French, German, Spanish, Japanese, Korean,
+ Simplified Chinese, and Traditional Chinese, but you might require additional
+ language support for your organization.</para>
+ 
+ <para>This chapter address how to get started customizing OpenAM end user
+ pages for your supported locales.</para>
+ 
+ <para>First you copy the pages to customize to the proper location, then
+ you customize the files themselves.</para>
+ 
+ <para>Images in this example are located in
+ <filename>/path/to/tomcat/webapps/openam/images/</filename>, and CSS in
+ <filename>/path/to/tomcat/webapps/openam/css/</filename>. If you choose
+ to modify images for your deployment, you can maintain the sizes to avoid
+ having to customize page layout extensively.</para>
+ 
+ <procedure xml:id="copy-ui-to-customize">
+  <title>To Copy the Pages to Customize</title>
+  <para>Rather than change the default pages, customize your own copy.</para>
+  <step>
+   <para>Change to the <filename>config/auth</filename> directory where
+   you deployed OpenAM.</para>
+   <screen>$ cd /path/to/tomcat/webapps/openam/config/auth</screen>
+  </step>
+  <step>
+   <para>Depending on which locale you want to customize, and whether you
+   are customizing files for the Top-Level Realm (/) or a sub-realm, copy the
+   files to the correct location.</para>
+   <stepalternatives>
+    <step>
+     <para>For the Top-Level Realm, copy the default files and optionally the
+     localized files to
+     <filename>openam[_<replaceable>locale</replaceable>]/html</filename>,
+     where the optional <replaceable>locale</replaceable> is, for example,
+     <literal>jp</literal> for Japanese, or <literal>zh_CN</literal> for
+     Simplified Chinese.
+     </para>
+    </step>
+    <step>
+     <para>For a sub-realm of the Top-Level Realm, <literal>realm</literal>,
+     copy the default files and optionally the localized files to
+     <filename>openam[_<replaceable>locale</replaceable
+     >]/services/realm/html</filename>.</para>
+    </step>
+   </stepalternatives>
+   <para>The following example copies the files for the Top-Level Realm for a
+   custom French locale location.</para>
+   <screen>$ mkdir -p openam/html
+$ cp -r default/* openam/html
+$ mkdir -p openam_fr/html
+$ cp -r default_fr/* openam_fr/html</screen>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="customize-ui-copy">
+  <title>To Customize Files You Copied</title>
+  <para>The .jsp files from the <filename>default/</filename> directory
+  reference the images used in the OpenAM pages, and retrieve localized text
+  from the .xml files. Thus you customize appearance through the .jsp files,
+  being careful not to change the functionality itself. You customize the
+  localized text through the .xml files.</para>
+  <step>
+   <para>Modify appearance if you must by editing the .jsp, image, and
+   CSS files without changing any of the JSP tags that govern how the pages
+   work.</para>
+  </step>
+  <step>
+   <para>Modify the localized text, using UTF-8 without escaped characters, by
+   changing only the original text strings in the .xml files.</para>
+   <para>For example, to change the text in the default OpenAM login screen in
+   the French locale, edit
+   <filename>openam_fr/html/DataStore.xml</filename>.</para>
+  </step>
+  <step>
+   <para>If necessary, restart OpenAM or the web container to test the changes
+   you have made.</para>
+   <para>The following screen shot shows a customized French login page
+   where the string <literal>Nom d'utilisateur</literal> has been replaced
+   with the string <literal>Votre identifiant</literal>, and the string
+   <literal>Mot de passe</literal> has been replaced with the string
+   <literal>Votre mot de passe</literal> in
+   <filename>openam_fr/html/DataStore.xml</filename>.</para>
+   <mediaobject>
+    <alt>Example customized OpenAM login page</alt>
+    <imageobject>
+     <imagedata fileref="images/modified-fr-login.png" format="PNG" />
+    </imageobject>
+    <textobject><para>This shows the customized page login described
+    above.</para></textobject>
+   </mediaobject>
+  </step>
+ </procedure>
 </chapter>
 
