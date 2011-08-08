@@ -25,6 +25,10 @@
  * $Id: EntitlementService.java,v 1.13 2010/01/08 23:59:32 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -94,6 +98,8 @@ public class EntitlementService extends EntitlementConfiguration {
     private static final String SCHEMA_OPENSSO_SUBJECT_ATTRIBUTES_COLLECTOR =
         "OpenSSOSubjectAttributesCollector";
     private static final String USE_NEW_CONSOLE = "usenewconsole";
+    private static final String NETWORK_MONITOR_ENABLED = 
+        "network-monitor-enabled";
     private static final String MIGRATED_TO_ENTITLEMENT_SERVICES =
         "migratedtoentitlementservice";
     private static final String XACML_PRIVILEGE_ENABLED =
@@ -1416,6 +1422,24 @@ public class EntitlementService extends EntitlementConfiguration {
             values.add(Boolean.toString(flag));
             setConfiguration(adminToken, USE_NEW_CONSOLE, values);
         }
+    }
+    
+    public boolean networkMonitorEnabled() {
+        if (!hasEntitlementDITs()) {
+            return false;
+        }
+
+        Set<String> setMigrated = getConfiguration(NETWORK_MONITOR_ENABLED);
+        String migrated = ((setMigrated != null) && !setMigrated.isEmpty()) ?
+            setMigrated.iterator().next() : null;
+        
+        return (migrated != null) ? Boolean.parseBoolean(migrated) : false;     
+    }
+    
+    public void setNetworkMonitorEnabled(boolean enabled) {
+        Set<String> values = new HashSet<String>();
+        values.add(Boolean.toString(enabled));
+        setConfiguration(adminToken, NETWORK_MONITOR_ENABLED, values);
     }
 
     public static boolean canSwitchToNewConsole() {

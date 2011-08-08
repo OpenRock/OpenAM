@@ -25,8 +25,14 @@
  * $Id: NetworkMonitor.java,v 1.2 2009/12/17 18:03:51 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement.util;
 
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -45,7 +51,6 @@ import javax.servlet.http.HttpServletResponse;
 public class NetworkMonitor extends HttpServlet {
 
     // Static variables
-    private static boolean collectStats = false;
     private static HashMap<String, NetworkMonitor> stats = new HashMap();
 
     // Instance variables
@@ -60,14 +65,20 @@ public class NetworkMonitor extends HttpServlet {
      * @return the collectStats
      */
     public static boolean isCollectStats() {
-        return collectStats;
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+                        SubjectUtils.createSuperAdminSubject(), "/");
+        
+        return ec.networkMonitorEnabled();
     }
 
     /**
      * @param aCollectStats the collectStats to set
      */
     public static void setCollectStats(boolean aCollectStats) {
-        collectStats = aCollectStats;
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+                SubjectUtils.createSuperAdminSubject(), "/");
+        
+        ec.setNetworkMonitorEnabled(aCollectStats);
     }
     
     public static Set<String> getInstanceNames() {

@@ -25,6 +25,10 @@
  * $Id: EntitlementConfiguration.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.util.SearchFilter;
@@ -245,6 +249,22 @@ public abstract class EntitlementConfiguration {
      * entitlement services.
      */
     public abstract boolean migratedToEntitlementService();
+    
+    /**
+     * Returns <code>true</code> if the network monitoring for entitlements
+     * is enabled
+     *
+     * @return <code>true</code> if the network monitoring for entitlements
+     * is enabled.
+     */
+    public abstract boolean networkMonitorEnabled();
+    
+    /**
+     * Allows the network monitoring to be enabled/disabled
+     * 
+     * @param enabled Is the network monitoring enabled
+     */
+    public abstract void setNetworkMonitorEnabled(boolean enabled);
 
     protected Subject getAdminSubject() {
         return adminSubject;
