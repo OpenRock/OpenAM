@@ -26,8 +26,8 @@
  *
  */
 
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2010 ForgeRock AS
  */
 
 package com.sun.identity.console.federation.model;
@@ -151,6 +151,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         // ECP
         extendedMetaIdpMap.put(ATTR_IDP_ECP_SESSION_MAPPER,
                 Collections.EMPTY_SET);
+        
+        // IDP Adapter 
+        extendedMetaIdpMap.put(ATTR_IDP_ADAPTER, Collections.EMPTY_SET); 
         
         //SAE
         extendedMetaIdpMap.put(ATTR_SAE_IDP_APP_SECRET_LIST,
@@ -285,6 +288,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     static {
         extendedAdMetaIdpMap.put(ATTR_IDP_ECP_SESSION_MAPPER,
                 Collections.EMPTY_SET);
+        extendedAdMetaIdpMap.put(ATTR_IDP_ADAPTER, 
+                Collections.EMPTY_SET); 
         extendedAdMetaIdpMap.put(ATTR_SAE_IDP_APP_SECRET_LIST,
                 Collections.EMPTY_SET);
         extendedAdMetaIdpMap.put(ATTR_SAE_IDP_URL,

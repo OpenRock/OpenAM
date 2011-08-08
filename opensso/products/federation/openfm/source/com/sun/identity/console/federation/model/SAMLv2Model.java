@@ -26,8 +26,8 @@
  *
  */
 
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.console.federation.model;
@@ -327,6 +327,9 @@ public interface SAMLv2Model
     public static final String ATTR_WANT_ASSERTION_ENCRYPTED =
         "wantAssertionEncrypted";
     public static final String ATTR_COTLIST = "cotlist";
+    
+    // SAMLv2 IDP Adapter feature 
+    public static final String ATTR_IDP_ADAPTER = "idpAdapter"; 
     
     /**
      * Returns a map with standard identity provider attributes and values.

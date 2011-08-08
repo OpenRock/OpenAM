@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010 ForgeRock AS
+    Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -143,5 +143,16 @@
                 </ccgroup>                
             </property>
         </subsection>                
+    </section>
+    <section name="IDPAdapter" defaultValue="samlv2idp.attribute.label.idpadapter"> 
+        <property> 
+            <label name="lblIDPAdapter" defaultValue="samlv2idp.attribute.label.idpadapter.IDPAdapterClass" labelFor="idpAdapter" /> 
+            <cc name="idpAdapter" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"> 
+                <attribute name="size" value="75" /> 
+                <attribute name="autoSubmit" value="false" /> 
+                <attribute name="localizeDisplayFieldValue" value="false" /> 
+            </cc> 
+            <fieldhelp name="helpIDPAdapter" defaultValue="samlv2idp.attribute.help.IdpIDPAdapter" /> 
+        </property> 
     </section>
 </propertysheet>
