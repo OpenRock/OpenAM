@@ -32,7 +32,7 @@
 package com.sun.identity.entitlement.util;
 
 import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.entitlement.PrivilegeManager;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -66,7 +66,7 @@ public class NetworkMonitor extends HttpServlet {
      */
     public static boolean isCollectStats() {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                        SubjectUtils.createSuperAdminSubject(), "/");
+                        PrivilegeManager.superAdminSubject, "/");
         
         return ec.networkMonitorEnabled();
     }
@@ -76,7 +76,7 @@ public class NetworkMonitor extends HttpServlet {
      */
     public static void setCollectStats(boolean aCollectStats) {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                SubjectUtils.createSuperAdminSubject(), "/");
+                PrivilegeManager.superAdminSubject, "/");
         
         ec.setNetworkMonitorEnabled(aCollectStats);
     }
