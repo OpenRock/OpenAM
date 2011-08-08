@@ -272,8 +272,8 @@ esac
      <imageobject>
       <imagedata fileref="images/openam-start.png" format="PNG" />
      </imageobject>
-     <textobject><para>Port is 8080, but 12380 here because the port is
-     redirected to a virtual machine.</para></textobject>
+     <textobject><para>The initial configuration screen lets you choose a
+     default or custom configuration path.</para></textobject>
     </mediaobject>
    </step>
   </procedure>
