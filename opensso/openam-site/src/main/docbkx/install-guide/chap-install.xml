@@ -333,6 +333,13 @@ Using CLASSPATH:
     <para>Delete OpenAM configuration files, by default in
     <filename>$HOME/openam</filename>.</para>
     <screen>$ rm -rf $HOME/openam</screen>
+    <note>
+     <para>When using the internal OpenAM configuration store, this step
+     deletes the running directory server listening on the port you configured
+     when setting up OpenAM, by default <literal>50389</literal>. The port
+     might therefore be seen as occupied if you try to use it right away
+     when reconfiguring OpenAM.</para>
+    </note>
    </step>
    <step>
     <para>Restart the OpenAM web application.</para>
