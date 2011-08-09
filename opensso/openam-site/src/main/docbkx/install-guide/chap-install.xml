@@ -190,7 +190,8 @@ esac
    <para>After you unzip the archive of the entire package, you get an
    <filename>opensso</filename> directory including a README, a set of license
    files, and the following directories.</para>
-   <!-- TODO: As of nightly from 17 May 2011, where is the universal gateway? -->
+   <!-- TODO: Replace with olink when the machinery is available:
+              ref/chap-file-layout -->
    <varlistentry>
     <term><filename>deployable-war</filename></term>
     <listitem><para>The deployable .war file as well as the tools and files
