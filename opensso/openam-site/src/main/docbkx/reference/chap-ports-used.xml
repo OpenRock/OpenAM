@@ -31,16 +31,75 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Ports Used</title>
-
+ 
+ <indexterm><primary>Ports used</primary></indexterm>
+ <indexterm><primary>Default ports</primary></indexterm>
  <para>OpenAM software uses the following TCP/IP ports by default.</para>
  
  <!-- Protocol, port number, description (what for), on by default? -->
  <variablelist>
   <varlistentry>
-   <term>PROTOCOL: PORTNUMBER</term>
+   <term>HTTP: 80, 8080, etc.</term>
    <listitem>
-    <para>Description.</para>
-    <para>PROTOCOL is|is not enabled by default.</para>
+    <para>Web application container port number for HTTP. Port number depends
+    on the container configuration.</para>
+    <para>HTTP is enabled when you configure OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>HTTPS: 443, 8443, etc.</term>
+   <listitem>
+    <para>Web application container port number for HTTPS. Port number depends
+    on the container configuration.</para>
+    <para>HTTPS is enabled when you configure OpenAM, and is the recommended
+    protocol for production deployments.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>LDAP: 389, 1389, 50389, etc.</term>
+   <listitem>
+    <para>Lightweight Directory Access Protocol for use with LDAP configuration
+    and identity data stores. OpenAM can connect to the LDAP port using
+    Start TLS to secure the connection. The port number for external
+    LDAP directories depends on your deployment. When you use the embedded
+    LDAP configuration or data store, the default port number is
+    50389.</para>
+    <para>LDAP is enabled when you configure OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>LDAPS: 636, 1636, 50636, etc.</term>
+   <listitem>
+    <para>LDAP over SSL for use with configuration and identity data stores.
+    The LDAPS port number for external LDAP directories depends on your
+    deployment. When you connect to the embedded LDAP configuration or data
+    store over SSL, the default port number is 50636.</para>
+    <para>LDAPS is enabled when you configure OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Embedded configuration store, JMX: 1689</term>
+   <listitem>
+    <para>The embedded LDAP directory server listens for Java Management
+    eXtension traffic on port 1689 by default. JMX is enabled when you
+    configure OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Embedded configuration store, administrative connections: 5444</term>
+   <listitem>
+    <para>The embedded LDAP directory server listens for administrative traffic
+    on port 5444 by default. The administration connector is enabled when you
+    configure OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Embedded configuration store, data replication: 8989</term>
+   <listitem>
+    <para>The embedded LDAP directory server replicates data with other
+    embedded configuration stores on port 8989 by default. Replication is
+    enabled when you configure OpenAM as part of a site, pointing to an
+    existing server to share configuration data.</para>
    </listitem>
   </varlistentry>
  </variablelist>
