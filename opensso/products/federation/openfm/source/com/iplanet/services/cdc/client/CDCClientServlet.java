@@ -192,6 +192,7 @@ extends HttpServlet {
      *                             the servlet handles the GET request
      * @exception IOException if the request for the GET could not be handled
      */
+    @Override
     public void doGet(HttpServletRequest  request, HttpServletResponse response)
     throws ServletException, IOException {
         doGetPost(request, response);
@@ -208,6 +209,7 @@ extends HttpServlet {
      *                             the servlet handles the GET request
      * @exception IOException if the request for the GET could not be handled
      */
+    @Override
     public void doPost(HttpServletRequest  request, HttpServletResponse 
         response) throws ServletException, IOException 
     {
@@ -323,7 +325,7 @@ extends HttpServlet {
         int serviceNameIndex = sessionServiceURLString.lastIndexOf("/", 
             sessionServiceURLString.length() - 2); // avoiding trailing "/" 
                                                    // if any
-        StringBuffer buffer = new StringBuffer(150);
+        StringBuilder buffer = new StringBuilder(150);
         buffer.append(sessionServiceURLString.substring(0,serviceNameIndex))
            .append(CDCURI)
            .append(QUESTION_MARK)
@@ -353,7 +355,7 @@ extends HttpServlet {
             }
             // dont wish to follow redirect to agent, since
             // the response needs to go via the CDCClientServlet.
-            connection.setFollowRedirects(false);
+            HttpURLConnection.setFollowRedirects(false);
 
             // Receiving input from CDCServlet on the AM server instance
             if (debug.messageEnabled()) {
@@ -376,7 +378,7 @@ extends HttpServlet {
                  * authn response, which needs to be posted back to the
                  * dest url (agent).
                  */
-                StringBuffer inBuf  = new StringBuffer();
+                StringBuilder inBuf  = new StringBuilder();
                 BufferedReader in = new BufferedReader(
                 new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 int len;
@@ -460,13 +462,13 @@ extends HttpServlet {
      *                request parameters
      */
     private String[] parseRequestParams(HttpServletRequest request) {
-	StringBuffer adviceList = null;
-        StringBuffer parameterString = new StringBuffer(100);
+	StringBuilder adviceList = null;
+        StringBuilder parameterString = new StringBuilder(100);
 	for (Enumeration e = request.getParameterNames(); e.hasMoreElements();){
              String paramName = (String)e.nextElement();
              if (adviceParams.contains(paramName.toLowerCase())) {
                  if (adviceList == null)  {
-                     adviceList = new StringBuffer();
+                     adviceList = new StringBuilder();
                  } else {
                      adviceList.append(AMPERSAND);
                  }
@@ -526,8 +528,8 @@ extends HttpServlet {
             debug.message("CDCClientServlet.redirectForAuthentication: "
                 +"requestURL="+request.getRequestURL());
         }
-        StringBuffer redirectURL = new StringBuffer(100);
-        StringBuffer gotoURL = new StringBuffer(100);
+        StringBuilder redirectURL = new StringBuilder(100);
+        StringBuilder gotoURL = new StringBuilder(100);
 
         // Check if user has authenticated to another OpenSSO
         // instance
@@ -586,7 +588,11 @@ extends HttpServlet {
                         "set to= " + cdcUrl);
                 }
                            
-                redirectURL.append(cdcUrl).append(QUESTION_MARK);
+                if (cdcUrl.indexOf(QUESTION_MARK) == -1) {
+                    redirectURL.append(cdcUrl).append(QUESTION_MARK);
+                } else {
+                    redirectURL.append(cdcUrl).append(AMPERSAND);
+                }
 
                 if (policyAdviceList != null) {
                      redirectURL.append(policyAdviceList).append(AMPERSAND);
