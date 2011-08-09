@@ -31,15 +31,113 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Upgrading OpenAM Core Services</title>
-
+ 
  <para>This chapter shows you how to patch and to upgrade OpenAM core services.
  See the <citetitle>Policy Agent Installation Guide</citetitle> for instructions
  on upgrading OpenAM agents.</para>
  
- <!-- TODO: Should we document the traditional way of doing things? Or only
- the new, improved upgrade mechanism. -->
+ <note>
+  <para>For complex and legacy deployments, ForgeRock can assist you through
+  the upgrade process. Send mail to
+  <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link> for
+  more information.</para>
+ </note>
  
- <!-- Note: No Gateway upgrades for this version. Okay? -->
-
+ <procedure xml:id="upgrade-from-openam">
+  <title>To Upgrade From OpenAM 9.5 Or Later</title>
+  
+  <para>ForgeRock has considerably simplified OpenAM core services upgrade
+  with respect to earlier versions. If you have already moved to OpenAM 9.5
+  or later, follow these steps.</para>
+  
+  <step performance="optional">
+   <para>If you have customized end user OpenAM files for your deployment,
+   build a new .war with the new version of OpenAM that includes your
+   customizations.</para>
+  </step>
+  <step>
+   <para>Stop the container where OpenAM is running.</para>
+   <screen>$ /etc/init.d/tomcat stop
+Password: 
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk1.6/jre
+Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
+ /path/to/tomcat/bin/tomcat-juli.jar</screen>
+  </step>
+  <step>
+   <para>Move the current OpenAM web application aside.</para>
+   <screen>$ cd /path/to/tomcat/webapps
+$ mv openam openam-old ; mv openam.war openam-old.war</screen>
+  </step>
+  <step>
+   <para>Deploy the new OpenAM in place of the old.</para>
+   <screen>$ cp /path/to/new/OpenAM/deployable-war/opensso.war openam.war</screen>
+  </step>
+  <step>
+   <para>Start the container to run the new OpenAM.</para>
+   <screen>$ /etc/init.d/tomcat start
+Password: 
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk1.6/jre
+Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
+ /path/to/tomcat/bin/tomcat-juli.jar</screen>
+  </step>
+  <step>
+   <para>In your browser, visit the location where OpenAM is deployed, such
+   as <literal>http://openam.example.com:8080/openam</literal>, and then
+   click Upgrade to OpenAM <?eval ${project.version}?>.</para>
+   <mediaobject>
+    <alt>Initial OpenAM upgrade screen</alt>
+    <imageobject>
+     <imagedata fileref="images/upgrade-initial-screen.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The initial upgrade screen lets you choose to upgrade
+    or to restore the configuration.</para></textobject>
+   </mediaobject>
+  </step>
+  <step>
+   <para>In the Upgrading OpenAM screen, click Save Report to download an
+   OpenAM Upgrade Report listing necessary configuration changes, and
+   then click Upgrade.</para>
+   <mediaobject>
+    <alt>OpenAM upgrade report screen</alt>
+    <imageobject>
+     <imagedata fileref="images/upgrade-report.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The upgrade report screen lets you keep an upgrade
+    report listing configuration changes in case of error.</para></textobject>
+   </mediaobject>
+  </step>
+  <step>
+   <para>When upgrade completes, click Proceed to Login to login to the
+   OpenAM console and continue your work.</para>
+   <mediaobject>
+    <alt>OpenAM upgrade complete screen</alt>
+    <imageobject>
+     <imagedata fileref="images/upgrade-complete.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The upgrade complete screen tells you the new version
+    of OpenAM is ready to use.</para></textobject>
+   </mediaobject>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="upgrade-from-earlier-products">
+  <title>Upgrading From OpenAM 9.0 &amp; Earlier</title>
+  
+  <para>Upgrade from earlier products is briefly described alongside the
+  scripts you may require.</para>
+  
+  <step>
+   <para>Unpack the full OpenAM download.</para>
+  </step>
+  <step>
+   <para>Start planning the process by first reading the README on upgrade,
+   <filename>/path/to/new/OpenAM/upgrade/README/README</filename>.</para>
+  </step>
+ </procedure>
 </chapter>
-
