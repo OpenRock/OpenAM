@@ -42,6 +42,8 @@ import com.sun.identity.shared.locale.Locale;
 import java.io.IOException;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
@@ -81,6 +83,7 @@ public abstract class AjaxPage extends Page {
     public AjaxPage() {
     }
 
+    @Override
     public void onInit() {
         super.onInit();
         initializeResourceBundle();
@@ -215,8 +218,32 @@ public abstract class AjaxPage extends Page {
     public String getHostName() { 
         if (hostName == null) {
             hostName = getContext().getRequest().getServerName();
-        }
+        }        
         return hostName;
+    }
+    
+    public String getHostName(String serverUrl, String defaultHostName) {
+        URL url = null;
+        
+        try {
+            url = new URL(serverUrl);
+        } catch (MalformedURLException mue) {
+            return defaultHostName;
+        }
+        
+        return url.getHost();
+    }
+    
+    public int getServerPort(String serverUrl, int defaultPort) {
+        URL url = null;
+        
+        try {
+            url = new URL(serverUrl);
+        } catch (MalformedURLException mue) {
+            return defaultPort;
+        }
+        
+        return url.getPort();        
     }
     
     public String getBaseDir(HttpServletRequest req) {

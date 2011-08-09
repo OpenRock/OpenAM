@@ -230,16 +230,29 @@ public class Wizard extends AjaxPage {
         }
 
         // server properties
+        String serverUrl = (String) getContext().getSessionAttribute(
+            SessionAttributeNames.SERVER_URL);
+        String serverHost;
+        int serverPort;
+        
+        if (serverUrl == null) {
+            serverUrl = req.getRequestURL().toString();
+            serverHost = getHostName();
+            serverPort = req.getServerPort();
+        } else {
+            serverHost = getHostName(serverUrl, getHostName());
+            serverPort = getServerPort(serverUrl, req.getServerPort());
+        }
+        
         request.addParameter(
-            SetupConstants.CONFIG_VAR_SERVER_HOST, getHostName());
+            SetupConstants.CONFIG_VAR_SERVER_HOST, serverHost);
         request.addParameter(
-            SetupConstants.CONFIG_VAR_SERVER_PORT, 
-            Integer.toString(req.getServerPort()));
+            SetupConstants.CONFIG_VAR_SERVER_PORT, serverPort);
         request.addParameter(
-            SetupConstants.CONFIG_VAR_SERVER_URI, req.getRequestURI());
+            SetupConstants.CONFIG_VAR_SERVER_URI, req.getRequestURL().toString());
         request.addParameter(
             SetupConstants.CONFIG_VAR_SERVER_URL, 
-            getAttribute("serverURL", req.getRequestURL().toString()));        
+            getAttribute("serverURL", serverUrl));        
 
         tmp = (String)getContext().getSessionAttribute(
             SessionAttributeNames.ENCRYPTION_KEY);
