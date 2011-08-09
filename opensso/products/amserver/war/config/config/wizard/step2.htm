@@ -45,6 +45,7 @@
     function validateServerURL() {
 	field = "serverURL";
         validateServerFields();
+        validateCookieDomain();
     }
 
     function validateLocale() {
@@ -90,8 +91,8 @@
                         <input id="serverURL" name="serverURL" type="text" 
                             class="text" size="40" 
                             value="$serverURL" 
-                            onkeyup="APP.callDelayed(this, validateServerURL); APP.callDelayed(this, validateCookieDomain)"
-                            onchange="APP.callDelayed(this, validateServerURL); APP.callDelayed(this, validateCookieDomain)"/>
+                            onkeyup="APP.callDelayed(this, validateServerURL)"
+                            onchange="APP.callDelayed(this, validateServerURL)"/>
                             <span id="serverURLStatus"></span>
                     </td>
                 </tr>
