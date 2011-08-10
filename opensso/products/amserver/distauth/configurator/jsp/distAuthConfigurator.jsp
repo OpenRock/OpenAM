@@ -26,7 +26,9 @@
 
 --%>
 
-
+<%--
+   Portions Copyrighted 2011 ForgeRock AS
+--%>
 <html>
 <head>
 <title>Configure DistAuth</title>
@@ -68,6 +70,9 @@ java.util.Properties"
     String distAuthPort = String.valueOf(request.getServerPort());
     String distAuthDeploymenturi = request.getContextPath();
     String distAuthCookieName = "AMDistAuthCookie";
+    String lbCookieName = "amlbcookie";
+    String distAuthLBCookieName = "DistAuthLBCookieName";
+    String distAuthLBCookieValue = "DistAuthLBCookieValue";
     String appUser = null;
     String appPassword = null;
     String confirmAppPassword = null;
@@ -96,6 +101,9 @@ java.util.Properties"
             distAuthPort = request.getParameter("distAuthPort");
             distAuthDeploymenturi = request.getParameter("distAuthDeploymenturi");
             distAuthCookieName = request.getParameter("distAuthCookieName");
+            lbCookieName = request.getParameter("lbCookieName");
+            distAuthLBCookieName = request.getParameter("distAuthLBCookieName");
+            distAuthLBCookieValue = request.getParameter("distAuthLBCookieValue");
             debugDir = request.getParameter("debugDir");
             debugLevel = request.getParameter("debugLevel");
             encryptionKey = request.getParameter("encryptionKey");
@@ -112,6 +120,9 @@ java.util.Properties"
                 (distAuthPort != null) && !distAuthPort.trim().equals("") &&  
                 (distAuthDeploymenturi != null) && !distAuthDeploymenturi.trim().equals("") &&
                 (distAuthCookieName != null) && !distAuthCookieName.trim().equals("") && 
+                (lbCookieName != null) && !lbCookieName.trim().equals("") &&
+                distAuthLBCookieName != null && !distAuthLBCookieName.trim().equals("") &&
+                distAuthLBCookieName != null && !distAuthLBCookieValue.trim().equals("") &&
                 (debugLevel != null) && !debugLevel.trim().equals("") &&  
                 (debugDir != null) && !debugDir.trim().equals("") &&
                 (encryptionKey != null) && !encryptionKey.trim().equals("") &&                  
@@ -130,7 +141,10 @@ java.util.Properties"
                 props.setProperty("DISTAUTH_SERVER_HOST", distAuthHost.trim());
                 props.setProperty("DISTAUTH_SERVER_PORT", distAuthPort.trim());
                 props.setProperty("DISTAUTH_DEPLOY_URI", distAuthDeploymenturi.trim());
-                props.setProperty("DISTAUTH_COOKIE_NAME", distAuthCookieName.trim());                
+                props.setProperty("DISTAUTH_COOKIE_NAME", distAuthCookieName.trim());
+                props.setProperty("LB_COOKIE_NAME", lbCookieName.trim());
+                props.setProperty("DISTAUTH_LB_COOKIE_NAME", distAuthLBCookieName.trim());
+                props.setProperty("DISTAUTH_LB_COOKIE_VALUE", distAuthLBCookieValue.trim());
                 props.setProperty("DEBUG_DIR", debugDir.trim());
                 props.setProperty("DEBUG_LEVEL", debugLevel.trim());
                 props.setProperty("ENCRYPTION_KEY", encryptionKey.trim());
@@ -256,6 +270,18 @@ java.util.Properties"
     <td>DistAuth Cookie Name:</td>
     <td><input name="distAuthCookieName" type="text" size="30" value="<%= distAuthCookieName == null ? "" : distAuthCookieName %>" /></td>
     </tr>            
+    <tr>
+    <td>OpenAM LB Cookie Name:</td>
+    <td><input name="lbCookieName" type="text" size="30" value="<%= lbCookieName == null ? "" : lbCookieName %>" /></td>
+    </tr>
+    <tr>
+    <td>DistAuth LB Cookie Name:</td>
+    <td><input name="distAuthLBCookieName" type="text" size="30" value="<%= distAuthLBCookieName == null ? "" : distAuthLBCookieName %>" /></td>
+    </tr>
+    <tr>
+    <td>DistAuth LB Cookie Value:</td>
+    <td><input name="distAuthLBCookieValue" type="text" size="30" value="<%= distAuthLBCookieValue == null ? "" : distAuthLBCookieValue %>" /></td>
+    </tr>
     <tr>
     <td>Debug directory</td>
     <td><input name="debugDir" type="text" size="30" value="<%= debugDir == null ? "" : debugDir %>" /></td>

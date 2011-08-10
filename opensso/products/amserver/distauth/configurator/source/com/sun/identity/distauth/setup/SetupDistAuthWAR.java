@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.distauth.setup;
 
 import com.iplanet.am.util.SystemProperties;
@@ -92,7 +95,7 @@ public class SetupDistAuthWAR {
                 (String)properties.get(tag));
         }        
 
-        StringBuffer sbDistAuthConfig = new StringBuffer();
+        StringBuilder sbDistAuthConfig = new StringBuilder();
         
         sbDistAuthConfig.append("/*************************************");
         sbDistAuthConfig.append("*************************\n");
@@ -128,18 +131,18 @@ public class SetupDistAuthWAR {
         sbDistAuthConfig.append(" * distributed authentication web ");
         sbDistAuthConfig.append("application servers behind Load Balancer\n");      
         sbDistAuthConfig.append(" */\n");
-        sbDistAuthConfig.append("#openam.auth.distauth.lb_cookie_name=");
-        sbDistAuthConfig.append("DistAuthLBCookieName");
+        sbDistAuthConfig.append("openam.auth.distauth.lb_cookie_name=");
+        sbDistAuthConfig.append(properties.getProperty("DISTAUTH_LB_COOKIE_NAME"));
         sbDistAuthConfig.append("\n");
-        sbDistAuthConfig.append("#openam.auth.distauth.lb_cookie_value=");
-        sbDistAuthConfig.append("DistAuthLBCookieValue");
+        sbDistAuthConfig.append("openam.auth.distauth.lb_cookie_value=");
+        sbDistAuthConfig.append(properties.getProperty("DISTAUTH_LB_COOKIE_VALUE"));
         sbDistAuthConfig.append("\n/*\n");
         sbDistAuthConfig.append(" * Load Balancer cookie name and value ");
         sbDistAuthConfig.append("to be used when there are multiple\n");
         sbDistAuthConfig.append(" * OpenAM server instances behind Load Balancer\n");
         sbDistAuthConfig.append(" */\n");
-        sbDistAuthConfig.append("#com.iplanet.am.lbcookie.name=");
-        sbDistAuthConfig.append("amlbcookie");
+        sbDistAuthConfig.append("com.iplanet.am.lbcookie.name=");
+        sbDistAuthConfig.append(properties.getProperty("LB_COOKIE_NAME"));
         sbDistAuthConfig.append("\n");
         sbDistAuthConfig.append("\n/*\n");
         sbDistAuthConfig.append(" * DistAuth cookie name\n ");
@@ -172,7 +175,7 @@ public class SetupDistAuthWAR {
             throw new IOException("Unable to open " + fileName);
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         String line = reader.readLine();
 
         while (line != null) {
