@@ -1645,6 +1645,25 @@ public class AccessManager {
     private String update_auth_cfg_entr;
 
     @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.authentication.UpdateAuthConfigProperties",
+        description="Set authentication configuration properties",
+        webSupport="true",
+        mandatoryOptions={
+            "realm|e|s|Name of realm.",
+            "name|m|s|Name of authentication configuration."},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={
+            "attributevalues|a|m|authentication configuration properties, valid configuration keys are: iplanet-am-auth-login-failure-url, iplanet-am-auth-login-success-url and iplanet-am-auth-post-login-process-class.",
+            "datafile|D|s|Name of file that contains authentication configuration properties."},
+        resourceStrings={
+            "authentication-set-auth-config-props-succeeded=Authentication Configuration properties were updated",
+            "authentication-set-auth-config-props-invalid-key=Invalid configuration property key provided: {0}",
+            "authentication-set-auth-config-props-missing-data=Entries and datafile were missing."}
+    )
+    private String update_auth_cfg_props;
+
+    @SubCommandInfo(
         implClassName="com.sun.identity.cli.datastore.ListDataStoreTypes",
         description="List the supported data store types",
         webSupport="true",
