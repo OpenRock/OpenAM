@@ -2483,14 +2483,21 @@ public class LoginState {
                 if (amIdentityRole != null) {
                     // role based auth. the specified role takes preference.
                     debug.message("retrieving session service from role");
-                    serviceAttrs = amIdentityRole.getServiceAttributes(
-                    ISAuthConstants.SESSION_SERVICE_NAME);
+                    if (amIdentityRole != null) {
+                        //Fix for OPENAM-612 - this request is cached most of the time
+                        if (amIdentityRole.getAttribute("objectclass").contains("iplanet-am-session-service")) {
+                            serviceAttrs = amIdentityRole.getServiceAttributes(
+                                    ISAuthConstants.SESSION_SERVICE_NAME);
+                        }
+                    }
                 } else if (idt.equals(IdType.USER)) {
                     debug.message("retrieving session service from user");
-                    serviceAttrs = amIdentityUser.getServiceAttributes(
-                    ISAuthConstants.SESSION_SERVICE_NAME);
+                    //Fix for OPENAM-612 - this request is cached most of the time
+                    if (amIdentityUser.getAttribute("objectclass").contains("iplanet-am-session-service")) {
+                        serviceAttrs = amIdentityUser.getServiceAttributes(
+                                ISAuthConstants.SESSION_SERVICE_NAME);
+                    }
                 }
-                
                 if (serviceAttrs != null && !serviceAttrs.isEmpty()) {
                     basicAttrs.putAll(serviceAttrs);
                 }
