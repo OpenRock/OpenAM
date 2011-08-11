@@ -28,6 +28,10 @@
   
 -->
 
+<!--
+  Portions Copyrighted 2011 ForgeRock AS 
+-->
+
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -311,6 +315,33 @@
                 </AttributeSchema>
             </Dynamic>
             <User>
+		<AttributeSchema name="iplanet-am-session-max-session-time"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-idle-time"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a102">
+                    <DefaultValues>
+                        <Value>30</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-caching-time"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>	
                 <AttributeSchema name="iplanet-am-session-quota-limit"
                     type="single"
                     syntax="number_range"
