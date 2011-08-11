@@ -127,6 +127,9 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -155,6 +158,7 @@ public class AMSetupServlet extends HttpServlet {
     final static String BOOTSTRAP_FILE_LOC = "bootstrap.file";
     final static String OPENDS_DIR = "/opends";
     private static final String COLON = ":";
+    private static final String HTTPS = "https";
 
     private static String errorMessage = null;
     private static java.util.Locale configLocale;
@@ -1628,8 +1632,19 @@ public class AMSetupServlet extends HttpServlet {
             String data = "IDToken1=" + URLEncoder.encode(userid, "UTF-8")+
                           "&IDToken2="+ URLEncoder.encode(pwd, "UTF-8");
             // Send data
-            URL url = new URL(server+"/getServerInfo.jsp");
+            URL url = new URL(server + "/getServerInfo.jsp");
+            
             conn = (HttpURLConnection) url.openConnection();
+            
+            if (url.getProtocol().equals(HTTPS)) {
+                HttpsURLConnection sslConn = (HttpsURLConnection) conn;
+                sslConn.setHostnameVerifier(new HostnameVerifier() {
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                });
+            }
+            
             conn.setDoOutput(true);
             OutputStreamWriter wr = 
                        new OutputStreamWriter(conn.getOutputStream());
