@@ -61,7 +61,7 @@ public class SetSetupProgress extends HttpServlet
                     "function addProgressText(str)\n"+ 
                     "{\n"+ 
                        "var obj = document.getElementById(\"progressText\");\n"+ 
-                       "obj.innerHTML += str;\n"+
+                       "obj.innerHTML += unescape(str);\n"+
                        "var obj = document.getElementById(\"progressP\");\n"+
                        "obj.scrollTop = obj.scrollHeight;\n"+ 
                      "}\n"+

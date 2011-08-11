@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.upgrade;
 
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.setup.InstallLog;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -88,26 +89,14 @@ public class UpgradeProgress {
         }
         if (isTextMode) {
             out = new OutputStream() {
+
                 @Override
                 public void write(int b) throws IOException {
                     writer.write(URLEncoder.encode(String.valueOf((char) b),
                         encoding));
                     writer.flush();
                 }
-                @Override
-                public void write(byte[] b) throws IOException {
-                    writer.write(URLEncoder.encode(new String(b, encoding),
-                        encoding));
-                    writer.flush();
-                }
-                @Override
-                public void write(byte[] b, int off, int len)
-                    throws IOException {
 
-                    writer.write(URLEncoder.encode(
-                        new String(b, off, len, encoding), encoding));
-                    writer.flush();
-                }
                 @Override
                 public void flush() throws IOException {
                     writer.flush();
@@ -118,21 +107,22 @@ public class UpgradeProgress {
                 @Override
                 public void write(int b) throws IOException {
                     writer.write("<script>addProgressText('");
-                    writer.write(String.valueOf((char) b));
+                    writer.write(URLEncDec.encodeLDAPUrl(String.valueOf((char) b).trim()));
                     writer.write("<br>');</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b) throws IOException {
                     writer.write("<script>addProgressText('");
-                    writer.write(new String(b, encoding));
+                    writer.write(URLEncDec.encodeLDAPUrl(new String(b, encoding).trim()));
                     writer.write("<br>');</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b, int off, int len) throws IOException {
                     writer.write("<script>addProgressText('");
-                    writer.write(new String(b, off, len, encoding));
+                    writer.write(URLEncDec.encodeLDAPUrl(
+                            new String(b, off, len, encoding).trim()));
                     writer.write("<br>');</script>");
                     writer.flush();
                 }
