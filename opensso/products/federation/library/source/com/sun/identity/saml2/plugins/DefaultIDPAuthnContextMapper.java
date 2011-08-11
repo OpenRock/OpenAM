@@ -171,7 +171,7 @@ public class DefaultIDPAuthnContextMapper
             authTypeAndValues = (Set) classRefSchemesMap.get(DEFAULT);
             classRef = (String) IDPCache.defaultClassRefHash.get(
                 idpEntityID + "|" + realm);
-            authnLevel = 0;
+            authnLevel = (Integer)classRefLevelMap.get(classRef);
             if (classRef == null) {
                 classRef = SAML2Constants.CLASSREF_PASSWORD_PROTECTED_TRANSPORT;
             }
