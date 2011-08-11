@@ -15,23 +15,35 @@
              cookieDomainValid);
     }
 
-    function validateServerFields() {
+    function validateInput(field, handler) {
         var callUrl = "$context$path?actionLink=validateInput";
         var key = "&key=" + field;
         var value = "&value=" + $(field).value;
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
-        AjaxUtils.call(callUrl+key+value, serverFieldValidated);
+        if (handler != null) {
+            AjaxUtils.call(callUrl+key+value, handler);
+        } else {
+            AjaxUtils.call(callUrl+key+value, serverFieldValidated);
+        }
+    }
+
+    function serverURLFieldValidated(response) {
+        validated(response, "serverURL");
     }
 
     function serverFieldValidated(response) {
+        validated(response, field);
+    }
+
+    function validated(response, field) {
         if (response.responseText == "true") { 
             eval(field + "Valid = true;" );
             $(field + 'Status').innerHTML = okString;
         } else if (response.responseText.search("warning") == 0) {
             eval(field + "Valid = true;" );
             $(field + 'Status').innerHTML = warningImage + 
-                '<small>' + response.responseText.substring(7) + '</small>';;
+                '<small>' + response.responseText.substring(7) + '</small>';
             
         } else {
             eval(field + "Valid = false;" );
@@ -40,17 +52,16 @@
         }                
         serverFieldsValid();
         field = "";
-    }  
-    
+    }
+
     function validateServerURL() {
-	field = "serverURL";
-        validateServerFields();
+        validateInput("serverURL", serverURLFieldValidated);
         validateCookieDomain();
     }
 
     function validateLocale() {
 	field = "platformLocale";
-        validateServerFields();
+        validateInput(field, null);
     } 
 
     function validateConfigDir() {
@@ -64,9 +75,8 @@
 
     function validateCookieDomain() {
 	field = "cookieDomain";
-        field2 = "serverURL";
         var callUrl = "$context$path?actionLink=validateCookieDomain&domain=" +
-            escape($(field).value) + "&serverurl=" + escape($(field2).value);
+            escape($(field).value) + "&serverurl=" + escape($("serverURL").value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, serverFieldValidated);
