@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -457,7 +457,8 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                                     ResourceMatch.EXACT_MATCH) ||
                                     match.equals(ResourceMatch.WILDCARD_MATCH) ||
                                     match.equals(
-                                    ResourceMatch.SUB_RESOURCE_MATCH);
+                                    ResourceMatch.SUB_RESOURCE_MATCH) ||
+                                    match.equals(ResourceMatch.SUPER_RESOURCE_MATCH);
                             } else {
                                 applicable = !match.equals(
                                     ResourceMatch.NO_MATCH);
