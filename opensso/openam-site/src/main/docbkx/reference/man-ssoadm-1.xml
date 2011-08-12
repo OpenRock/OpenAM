@@ -35,27 +35,60 @@
  </refmeta>
  <refnamediv>
   <refname>ssoadm</refname>
-  <refpurpose>TODO one-line description</refpurpose>
+  <refpurpose>configure OpenAM core services</refpurpose>
  </refnamediv>
  <refsynopsisdiv>
   <cmdsynopsis>
    <command>ssoadm</command>
-   <command><replaceable>subcommand</replaceable></command>
-   <arg choice="opt">--options</arg>
+   <arg choice="opt"><replaceable>subcommand</replaceable></arg>
+   <arg choice="opt">options</arg>
   </cmdsynopsis>
  </refsynopsisdiv>
  <refsect1>
   <title>Description</title>
-  <para>TODO description.</para>
+  <para>The <command>ssoadm</command> command provides a rich command-line
+  interface for configuring OpenAM core services.</para>
  </refsect1>
  <refsect1>
   <title>Global Options</title>
   <para>The following global options are supported.</para>
   <variablelist>
    <varlistentry>
-    <term><option>TODO</option></term>
+    <term><option>--debug, -d</option></term>
     <listitem>
-     <para>TODO Description.</para>
+     <para>Run in debug mode. Results sent to the debug file.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--help, -?</option></term>
+    <listitem>
+     <para>Print usage.</para>
+     <para>This command can also be used with subcommands as in <command>ssoadm
+     <replaceable>subcommand</replaceable> --help</command>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--information, -O</option></term>
+    <listitem>
+     <para>Print basic information about the tool.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--locale, -l</option></term>
+    <listitem>
+     <para>Name of the locale to display the results.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--verbose, -v</option></term>
+    <listitem>
+     <para>Run in verbose mode. Results sent to standard output.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--version, -V</option></term>
+    <listitem>
+     <para>Print the version of this tool.</para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -63,38 +96,1087 @@
  <refsect1>
   <title>Subcommands</title>
   <para>The following subcommands are supported.</para>
-  <refsect2>
-   <para>TODO Description.</para>
-   <cmdsynopsis>
-    <command>ssoadm</command>
-    <command>TODO</command>
-    <arg choice="opt">--options</arg>
-   </cmdsynopsis>
+  <para>See <command>ssoadm <replaceable>subcommand</replaceable>
+  --help</command> for detailed options.</para>
    <variablelist>
     <varlistentry>
-     <term><option>TODO</option></term>
+     <term><command>add-agent-to-grp</command></term>
      <listitem>
-      <para>TODO description.</para>
+      <para>Add agents to a agent group.</para>
      </listitem>
     </varlistentry>
-   </variablelist>
-  </refsect2>
- </refsect1>
- <refsect1>
-  <title>Files</title>
-  <para>TODO if command has configuration file.</para>
- </refsect1>
- <refsect1>
-  <title>Environment</title>
-  <para>TODO if command reads environment variables.</para>
- </refsect1>
- <refsect1>
-  <title>Exit Codes</title>
-   <variablelist>
     <varlistentry>
-     <term>TODO exit code</term>
+     <term><command>add-amsdk-idrepo-plugin</command></term>
      <listitem>
-      <para>TODO description.</para>
+      <para>Create AMSDK IdRepo Plug-in.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-app-priv</command></term>
+     <listitem>
+      <para>Add an application privilege to delegate resources of a given application.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-attr-defs</command></term>
+     <listitem>
+      <para>Add default attribute values in schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-attrs</command></term>
+     <listitem>
+      <para>Add attribute schema to an existing service.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-auth-cfg-entr</command></term>
+     <listitem>
+      <para>Add authentication configuration entry.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-cot-member</command></term>
+     <listitem>
+      <para>Add a member to a circle of trust.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-member</command></term>
+     <listitem>
+      <para>Add an identity as member of another identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-plugin-interface</command></term>
+     <listitem>
+      <para>Add Plug-in interface to service.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-plugin-schema</command></term>
+     <listitem>
+      <para>Add Plug-in schema to service.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-privileges</command></term>
+     <listitem>
+      <para>Add privileges to an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-res-bundle</command></term>
+     <listitem>
+      <para>Add resource bundle to data store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-site-members</command></term>
+     <listitem>
+      <para>Add members to a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-site-sec-urls</command></term>
+     <listitem>
+      <para>Add Site Secondary URLs.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-sub-schema</command></term>
+     <listitem>
+      <para>Add sub schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-svc-attrs</command></term>
+     <listitem>
+      <para>Add service attribute values in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-svc-identity</command></term>
+     <listitem>
+      <para>Add Service to an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>add-svc-realm</command></term>
+     <listitem>
+      <para>Add service to a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>agent-remove-props</command></term>
+     <listitem>
+      <para>Remove agent's properties.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>clone-server</command></term>
+     <listitem>
+      <para>Clone a server instance.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-agent</command></term>
+     <listitem>
+      <para>Create a new agent configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-agent-grp</command></term>
+     <listitem>
+      <para>Create a new agent group.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-appl</command></term>
+     <listitem>
+      <para>Create application.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-auth-cfg</command></term>
+     <listitem>
+      <para>Create authentication configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-auth-instance</command></term>
+     <listitem>
+      <para>Create authentication instance.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-cot</command></term>
+     <listitem>
+      <para>Create circle of trust.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-datastore</command></term>
+     <listitem>
+      <para>Create data store under a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-identity</command></term>
+     <listitem>
+      <para>Create identity in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-metadata-templ</command></term>
+     <listitem>
+      <para>Create new metadata template.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-policies</command></term>
+     <listitem>
+      <para>Create policies in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-realm</command></term>
+     <listitem>
+      <para>Create realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-server</command></term>
+     <listitem>
+      <para>Create a server instance.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-site</command></term>
+     <listitem>
+      <para>Create a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-sub-cfg</command></term>
+     <listitem>
+      <para>Create a new sub configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-svc</command></term>
+     <listitem>
+      <para>Create a new service in server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-svrcfg-xml</command></term>
+     <listitem>
+      <para>Create serverconfig.xml file. No options are required for flat file configuration data store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>create-xacml</command></term>
+     <listitem>
+      <para>Create policies in a realm with XACML input.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-agent-grps</command></term>
+     <listitem>
+      <para>Delete agent groups.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-agents</command></term>
+     <listitem>
+      <para>Delete agent configurations.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-appls</command></term>
+     <listitem>
+      <para>Delete applications.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-attr</command></term>
+     <listitem>
+      <para>Delete attribute schemas from a service.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-attr-def-values</command></term>
+     <listitem>
+      <para>Delete attribute schema default values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-auth-cfgs</command></term>
+     <listitem>
+      <para>Delete authentication configurations.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-auth-instances</command></term>
+     <listitem>
+      <para>Delete authentication instances.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-cot</command></term>
+     <listitem>
+      <para>Delete circle of trust.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-datastores</command></term>
+     <listitem>
+      <para>Delete data stores under a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-entity</command></term>
+     <listitem>
+      <para>Delete entity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-identities</command></term>
+     <listitem>
+      <para>Delete identities in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-policies</command></term>
+     <listitem>
+      <para>Delete policies from a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-realm</command></term>
+     <listitem>
+      <para>Delete realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-realm-attr</command></term>
+     <listitem>
+      <para>Delete attribute from a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-server</command></term>
+     <listitem>
+      <para>Delete a server instance.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-site</command></term>
+     <listitem>
+      <para>Delete a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-sub-cfg</command></term>
+     <listitem>
+      <para>Remove Sub Configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-svc</command></term>
+     <listitem>
+      <para>Delete service from the server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>delete-xacml</command></term>
+     <listitem>
+      <para>Delete XACML policies from a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>do-batch</command></term>
+     <listitem>
+      <para>Do multiple requests in one command.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>do-bulk-federation</command></term>
+     <listitem>
+      <para>Perform bulk federation.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>do-migration70</command></term>
+     <listitem>
+      <para>Migrate organization to realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>embedded-status</command></term>
+     <listitem>
+      <para>Status of embedded store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>export-entity</command></term>
+     <listitem>
+      <para>Export entity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>export-server</command></term>
+     <listitem>
+      <para>Export a server instance.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>export-svc-cfg</command></term>
+     <listitem>
+      <para>Export service configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-attr-defs</command></term>
+     <listitem>
+      <para>Get default attribute values in schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-auth-cfg-entr</command></term>
+     <listitem>
+      <para>Get authentication configuration entries.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-auth-instance</command></term>
+     <listitem>
+      <para>Get authentication instance values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-identity</command></term>
+     <listitem>
+      <para>Get identity property values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-identity-svcs</command></term>
+     <listitem>
+      <para>Get the service in an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-realm</command></term>
+     <listitem>
+      <para>Get realm property values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-realm-svc-attrs</command></term>
+     <listitem>
+      <para>Get realm's service attribute values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-revision-number</command></term>
+     <listitem>
+      <para>Get service schema revision number.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>get-svrcfg-xml</command></term>
+     <listitem>
+      <para>Get server configuration XML from centralized data store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>import-bulk-fed-data</command></term>
+     <listitem>
+      <para>Import bulk federation data which is generated by 'do-bulk-federation' subcommand.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>import-entity</command></term>
+     <listitem>
+      <para>Import entity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>import-server</command></term>
+     <listitem>
+      <para>Import a server instance.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>import-svc-cfg</command></term>
+     <listitem>
+      <para>Import service configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-agent-grp-members</command></term>
+     <listitem>
+      <para>List agents in agent group.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-agent-grps</command></term>
+     <listitem>
+      <para>List agent groups.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-agents</command></term>
+     <listitem>
+      <para>List agent configurations.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-app-privs</command></term>
+     <listitem>
+      <para>List application privileges in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-appl-types</command></term>
+     <listitem>
+      <para>List application types.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-appls</command></term>
+     <listitem>
+      <para>List applications in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-auth-cfgs</command></term>
+     <listitem>
+      <para>List authentication configurations.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-auth-instances</command></term>
+     <listitem>
+      <para>List authentication instances.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-cot-members</command></term>
+     <listitem>
+      <para>List the members in a circle of trust.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-cots</command></term>
+     <listitem>
+      <para>List circles of trust.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-datastore-types</command></term>
+     <listitem>
+      <para>List the supported data store types.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-datastores</command></term>
+     <listitem>
+      <para>List data stores under a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-entities</command></term>
+     <listitem>
+      <para>List entities under a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-identities</command></term>
+     <listitem>
+      <para>List identities in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-identity-assignable-svcs</command></term>
+     <listitem>
+      <para>List the assignable service to an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-policies</command></term>
+     <listitem>
+      <para>List policy definitions in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-realm-assignable-svcs</command></term>
+     <listitem>
+      <para>List the assignable services to a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-realms</command></term>
+     <listitem>
+      <para>List realms by name.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-res-bundle</command></term>
+     <listitem>
+      <para>List resource bundle in data store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-server-cfg</command></term>
+     <listitem>
+      <para>List server configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-servers</command></term>
+     <listitem>
+      <para>List all server instances.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-sessions</command></term>
+     <listitem>
+      <para>List Sessions.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-sites</command></term>
+     <listitem>
+      <para>List all sites.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>list-xacml</command></term>
+     <listitem>
+      <para>export policies in realm as XACML.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>register-auth-module</command></term>
+     <listitem>
+      <para>Registers authentication module.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-agent-from-grp</command></term>
+     <listitem>
+      <para>Remove agents from a agent group.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-app-priv-resources</command></term>
+     <listitem>
+      <para>Remove application privilege resources.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-app-priv-subjects</command></term>
+     <listitem>
+      <para>Remove application privilege subjects.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-app-privs</command></term>
+     <listitem>
+      <para>Remove an application privileges.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-attr-choicevals</command></term>
+     <listitem>
+      <para>Remove choice values from attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-attr-defs</command></term>
+     <listitem>
+      <para>Remove default attribute values in schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-cot-member</command></term>
+     <listitem>
+      <para>Remove a member from a circle of trust.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-member</command></term>
+     <listitem>
+      <para>Remove membership of identity from another identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-plugin-schema</command></term>
+     <listitem>
+      <para>Add Plug-in interface to service.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-privileges</command></term>
+     <listitem>
+      <para>Remove privileges from an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-res-bundle</command></term>
+     <listitem>
+      <para>Remove resource bundle from data store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-server-cfg</command></term>
+     <listitem>
+      <para>Remove server configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-site-members</command></term>
+     <listitem>
+      <para>Remove members from a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-site-sec-urls</command></term>
+     <listitem>
+      <para>Remove Site Secondary URLs.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-sub-schema</command></term>
+     <listitem>
+      <para>Remove sub schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-svc-attrs</command></term>
+     <listitem>
+      <para>Remove service attribute values in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-svc-identity</command></term>
+     <listitem>
+      <para>Remove Service from an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>remove-svc-realm</command></term>
+     <listitem>
+      <para>Remove service from a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-appl</command></term>
+     <listitem>
+      <para>Set application attributes.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-any</command></term>
+     <listitem>
+      <para>Set any member of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-bool-values</command></term>
+     <listitem>
+      <para>Set boolean values of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-choicevals</command></term>
+     <listitem>
+      <para>Set choice values of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-defs</command></term>
+     <listitem>
+      <para>Set default attribute values in schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-end-range</command></term>
+     <listitem>
+      <para>Set attribute schema end range.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-i18n-key</command></term>
+     <listitem>
+      <para>Set i18nKey member of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-start-range</command></term>
+     <listitem>
+      <para>Set attribute schema start range.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-syntax</command></term>
+     <listitem>
+      <para>Set syntax member of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-type</command></term>
+     <listitem>
+      <para>Set type member of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-ui-type</command></term>
+     <listitem>
+      <para>Set UI type member of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-validator</command></term>
+     <listitem>
+      <para>Set attribute schema validator.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-attr-view-bean-url</command></term>
+     <listitem>
+      <para>Set properties view bean URL member of attribute schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-entitlement-conf</command></term>
+     <listitem>
+      <para>Set entitlements service configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-identity-attrs</command></term>
+     <listitem>
+      <para>Set attribute values of an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-identity-svc-attrs</command></term>
+     <listitem>
+      <para>Set service attribute values of an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-inheritance</command></term>
+     <listitem>
+      <para>Set Inheritance value of Sub Schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-plugin-viewbean-url</command></term>
+     <listitem>
+      <para>Set properties view bean URL of plug-in schema.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-realm-attrs</command></term>
+     <listitem>
+      <para>Set attribute values of a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-realm-svc-attrs</command></term>
+     <listitem>
+      <para>Set attribute values of a service that is assigned to a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-revision-number</command></term>
+     <listitem>
+      <para>Set service schema revision number.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-site-id</command></term>
+     <listitem>
+      <para>Set the ID of a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-site-pri-url</command></term>
+     <listitem>
+      <para>Set the primary URL of a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-site-sec-urls</command></term>
+     <listitem>
+      <para>Set Site Secondary URLs.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-sub-cfg</command></term>
+     <listitem>
+      <para>Set sub configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-svc-attrs</command></term>
+     <listitem>
+      <para>Set service attribute values in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-svc-i18n-key</command></term>
+     <listitem>
+      <para>Set service schema i18n key.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-svc-view-bean-url</command></term>
+     <listitem>
+      <para>Set service schema properties view bean URL.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>set-svrcfg-xml</command></term>
+     <listitem>
+      <para>Set server configuration XML to centralized data store.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-agent</command></term>
+     <listitem>
+      <para>Show agent profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-agent-grp</command></term>
+     <listitem>
+      <para>Show agent group profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-agent-membership</command></term>
+     <listitem>
+      <para>List agent's membership.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-agent-types</command></term>
+     <listitem>
+      <para>Show agent types.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-app-priv</command></term>
+     <listitem>
+      <para>Show application privilege.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-appl</command></term>
+     <listitem>
+      <para>Show application attributes.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-auth-modules</command></term>
+     <listitem>
+      <para>Show the supported authentication modules in the system.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-data-types</command></term>
+     <listitem>
+      <para>Show the supported data type in the system.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-datastore</command></term>
+     <listitem>
+      <para>Show data store profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-entitlement-conf</command></term>
+     <listitem>
+      <para>Display entitlements service configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-identity-ops</command></term>
+     <listitem>
+      <para>Show the allowed operations of an identity a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-identity-svc-attrs</command></term>
+     <listitem>
+      <para>Show the service attribute values of an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-identity-types</command></term>
+     <listitem>
+      <para>Show the supported identity type in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-members</command></term>
+     <listitem>
+      <para>Show the members of an identity. For example show the members of a role.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-memberships</command></term>
+     <listitem>
+      <para>Show the memberships of an identity. For sample show the memberships of an user.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-privileges</command></term>
+     <listitem>
+      <para>Show privileges assigned to an identity.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-realm-svcs</command></term>
+     <listitem>
+      <para>Show services in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-site</command></term>
+     <listitem>
+      <para>Show site profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>show-site-members</command></term>
+     <listitem>
+      <para>Display members of a site.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>unregister-auth-module</command></term>
+     <listitem>
+      <para>Unregisters authentication module.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-agent</command></term>
+     <listitem>
+      <para>Update agent configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-agent-grp</command></term>
+     <listitem>
+      <para>Update agent group configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-app-priv</command></term>
+     <listitem>
+      <para>Update an application privilege.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-app-priv-resources</command></term>
+     <listitem>
+      <para>Set application privilege resources.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-app-priv-subjects</command></term>
+     <listitem>
+      <para>Set application privilege subjects.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-auth-cfg-entr</command></term>
+     <listitem>
+      <para>Set authentication configuration entries.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-auth-instance</command></term>
+     <listitem>
+      <para>Update authentication instance values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-datastore</command></term>
+     <listitem>
+      <para>Update data store profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-entity-keyinfo</command></term>
+     <listitem>
+      <para>Update XML signing and encryption key information in hosted entity metadata.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-policies</command></term>
+     <listitem>
+      <para>Update policies in a realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-server-cfg</command></term>
+     <listitem>
+      <para>Update server configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><command>update-svc</command></term>
+     <listitem>
+      <para>Update service.</para>
      </listitem>
     </varlistentry>
    </variablelist>

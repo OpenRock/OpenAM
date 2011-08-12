@@ -66,16 +66,10 @@
  <reference>
   <title>OpenAM Command Line Tools</title>
   
-  <xinclude:include href='man-amadmin-1.xml' />
   <xinclude:include href='man-ampassword-1.xml' />
+  <xinclude:include href='man-amtune-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-ssoadm-1.xml' />
- </reference>
- 
- <reference>
-  <title>OpenAM Configuration Files</title>
-  <!--  TODO: Are config files deprecated? -->
-  <xinclude:include href='man-AMConfig.properties-5.xml' />
  </reference>
  
  <xinclude:include href='chap-log-formats.xml' />

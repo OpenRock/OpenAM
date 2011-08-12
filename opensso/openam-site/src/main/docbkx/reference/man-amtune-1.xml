@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<refentry xml:id='amtune-1'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <refmeta>
+  <refentrytitle>amtune</refentrytitle><manvolnum>1</manvolnum>
+ </refmeta>
+ <refnamediv>
+  <refname>amtune</refname>
+  <refpurpose>tune OpenAM, container, and operating system</refpurpose>
+ </refnamediv>
+ <refsynopsisdiv>
+  <cmdsynopsis>
+   <command>amtune</command>
+   <arg choice="req">options</arg>
+  </cmdsynopsis>
+ </refsynopsisdiv>
+ <refsect1>
+  <title>Description</title>
+  <para>This command helps you tune OpenAM parameters such as session/SDK
+  cache entries, logging buffers, notification thread pool/queue and LDAP
+  connection pool sizes for service management, global authentication services,
+  and the user data stores. The <command>amtune</command> command also helps
+  you tune JVM heap and JVM per-thread stack sizes, JVM garbage collection
+  algorithms, container worker/acceptor threads and queue sizes on Sun Web
+  Server and Glassfish, and helps you tune Solaris and Linux system
+  parameters.</para>
+ </refsect1>
+ <refsect1>
+  <title>Run Modes</title>
+  <para>This command can be run in REVIEW mode to gather tuning information,
+  or in CHANGE mode to make changes. To change modes, edit the value of
+  <literal>AMTUNE_MODE</literal> in <filename>amtune-env.properties</filename>
+  located in the same directory as <command>amtune</command>.</para>
+  <programlisting>AMTUNE_MODE=REVIEW</programlisting>
+  <para>Login as super user to run the command.</para>
+ </refsect1>
+ <refsect1>
+  <title>Files</title>
+  <para>The <command>amtune</command> command uses the configuration file,
+  <filename>amtune-env.properties</filename> located in the same directory as
+  the command. Read the comments in the file to determine what properties to
+  set before running the command.</para>
+  <para>To connect to servers to tune, <command>amtune</command> requires
+  as read-only password file, based on the template,
+  <filename>amtune-samplepasswordfile</filename> located in the same directory
+  as the command.</para>
+ </refsect1>
+ <refsect1>
+  <title>Examples</title>
+  <para>The following example runs the command in REVIEW mode.</para>
+  <screen># su
+Password:
+# echo DIRMGR_PASSWORD=password > pwd.file
+# echo SSOADM_PASSWORD=password >> pwd.file
+# chmod 400 /tmp/pwd.file
+# vi amtune-env.properties
+# grep -E "^[A-Z_]*=.+" amtune-env.properties 
+AMTUNE_MODE=REVIEW
+AMTUNE_LOG_LEVEL=TERM
+AMTUNE_TUNE_OS=true
+AMTUNE_TUNE_DS=false
+AMTUNE_TUNE_WEB_CONTAINER=false
+AMTUNE_TUNE_OPENSSO=true
+AMTUNE_WEB_CONTAINER_JAVA_POLICY=false
+SSOADM_LOCATION=/home/mark/tools/admin/openam/bin/amtune
+OPENSSOADMIN_USER=amadmin
+OPENSSOSERVER_URL=http://openam.example.com:8080/openam
+REALM_NAME=/
+AMTUNE_PCT_MEMORY_TO_USE=75
+AMTUNE_MEM_MAX_HEAP_SIZE_RATIO=7/8
+AMTUNE_MEM_MIN_HEAP_SIZE_RATIO=1/2
+AMTUNE_PER_THREAD_STACK_SIZE_IN_KB=128
+AMTUNE_MIN_MEMORY_TO_USE_IN_MB=512
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS=3584
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_DEFAULT=1536
+# TODO pending OPENAM-787</screen>
+ </refsect1>
+</refentry>

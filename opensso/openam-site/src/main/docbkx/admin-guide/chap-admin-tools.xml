@@ -29,11 +29,116 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Administration Interfaces and Tools</title>
+ <title>Administration Interfaces &amp; Tools</title>
 
- <para>This chapter provides an overview of the web-based GUI for
- OpenAM administration. It also lists and describes each CLI administration
- tool.</para>
-
+ <para>This chapter provides a brief introduction to the web-based OpenAM
+ console. It also lists and describes each CLI administration tool.</para>
+ 
+ <section xml:id="openam-console-overview">
+  <title>OpenAM Web-Based Console</title>
+  
+  <para>After you install OpenAM, login to the web-based console as OpenAM
+  Administrator, <literal>amadmin</literal> with the password you set during
+  installation. The URL to visit in your browser is something like
+  <literal>http://openam.example.com:8080/openam</literal>, depending on the
+  protocol (HTTP or HTTPS), host name (in this case
+  <literal>openam.example.com</literal>), port number on which the web
+  containers listens (in this case 8080), and deployment URI (in this case
+  <literal>/openam</literal>).</para>
+  
+  <mediaobject>
+   <alt>How the console looks to amadmin</alt>
+   <imageobject>
+    <imagedata fileref="images/console-as-amadmin.png" format="PNG" />
+   </imageobject>
+   <textobject><para>The OpenAM Administrator sees all capabilities of the
+   console.</para></textobject>
+  </mediaobject>
+  
+  <para>The OpenAM Administrator has access rights to perform all
+  administrative operations. Therefore, when you login as
+  <literal>amadmin</literal>, you see the complete OpenAM console. In the
+  background, OpenAM has set a cookie in your browser that lasts until the
+  session expires, you logout, or you close your browser<footnote>
+  <para>Technically speaking, persistent cookies can remain valid when you
+  close your browser. This section reflects OpenAM default behavior before
+  you configure additional functionality.</para></footnote>.</para>
+  
+  <para>When you login to the OpenAM console as an end user, a user without
+  any access to perform administrative operations, then instead of the OpenAM
+  console, you see a page to view and update your account information.</para>
+  
+  <mediaobject>
+   <alt>How the console looks to an end user</alt>
+   <imageobject>
+    <imagedata fileref="images/console-as-bjensen.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM console directs an end user to a page where she
+   can view and update her account information.</para></textobject>
+  </mediaobject>
+  
+  <para>If you configure OpenAM to grant administrative capabilities to
+  another user, then that user also sees the console after login. For
+  instance, the OpenAM Administrator granted Kirsten Vaughan privileges to
+  administer the OpenAM Top Level Realm. (This can be done through the console
+  under Access Control &gt; / (Top Level Realm) &gt; Privileges. Kirsten
+  has authorization to read and write policy properties and configured
+  policy agent properties.) When Kirsten logs in, she sees only part of the
+  console capabilities.</para>
+  
+  <mediaobject>
+   <alt>How the console looks to an an administrator</alt>
+   <imageobject>
+    <imagedata fileref="images/console-as-kvaughan.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM console appears differently to an administrator
+   with limited rights.</para></textobject>
+  </mediaobject>
+ </section>
+ 
+ <section xml:id="openam-cli-overview">
+  <title>OpenAM Command-Line Tools</title>
+  
+  <variablelist>
+   <para>You can install the following OpenAM command-line tools.</para>
+   <varlistentry>
+    <term><command>ampassword</command></term>
+    <listitem>
+     <para>This tool lets you change OpenAM Administrator passwords, and
+     display encrypted password values.</para>
+     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>amtune</command></term>
+    <listitem>
+     <para>This tools helps you tune OpenAM, as well as some operating systems
+     and web containers to improve OpenAM performance.</para>
+     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>amverifyarchive</command></term>
+    <listitem>
+     <para>This tool checks log archives for tampering.</para>
+     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>ssoadm</command></term>
+    <listitem>
+     <para>This tool provides a rich command-line interface for configuration
+     of OpenAM core services.</para>
+     <para>In a test environment you can active <filename>ssoadm.jsp</filename>
+     to access the same functionality in your browser. To access the
+     functionality of the <command>ssoadm</command> command through the OpenAM
+     console, visit the <filename>ssoadm.jsp</filename> page in your browser
+     after activating it when you installed OpenAM, for example
+     <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
+     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
 </chapter>
 
