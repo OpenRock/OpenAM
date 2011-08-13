@@ -26,8 +26,8 @@
  *
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.iplanet.services.ldap;
 
@@ -44,6 +44,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
+import java.util.List;
 
 public class ServerGroup implements ParseOutput {
     /**
@@ -79,9 +80,9 @@ public class ServerGroup implements ParseOutput {
                             DSConfigMgr.debugger
                                     .message("Initializing servers list.");
                         }
-                        servers = new ArrayList();
+                        servers = new ArrayList<Server>();
                     }
-                    servers.add(obj);
+                    servers.add((Server) obj);
                 } else if (obj instanceof LDAPUser) {
                     if (users == null) {
                         users = new ArrayList();
@@ -169,7 +170,7 @@ public class ServerGroup implements ParseOutput {
     public ServerInstance getServerInstance(LDAPUser.Type authType) {
         Server serv = null;
         for (int i = 0; i < servers.size(); i++) {
-            serv = (Server) servers.get(i);
+            serv = servers.get(i);
             if (serv != null && serv.getActiveStatus() == true) {
                 break;
             }
@@ -228,9 +229,9 @@ public class ServerGroup implements ParseOutput {
 
     int minConnPool = -1;
 
-    ArrayList servers = null;
+    List<Server> servers = null;
 
-    ArrayList users = null;
+    List users = null;
 
     HashMap miscConfig = null;
 

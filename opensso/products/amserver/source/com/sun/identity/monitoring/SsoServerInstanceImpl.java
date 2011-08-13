@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
-import java.util.StringTokenizer;
 import javax.management.MBeanServer;
 
 /**
@@ -38,20 +40,17 @@ import javax.management.MBeanServer;
  */
 public class SsoServerInstanceImpl extends SsoServerInstance {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerInstanceImpl (SnmpMib myMib) {
         super (myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerInstanceImpl (SnmpMib myMib, MBeanServer server) {
         super (myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -66,7 +65,6 @@ public class SsoServerInstanceImpl extends SsoServerInstance {
          *  this instance's attributes prior to this instance
          *  being created.
          */
-        
         SSOServerInfo svrinfo = Agent.getAgentSvrInfo();
         if (Agent.getSFOStatus()) {
             SsoServerSFOStatus = "on";
@@ -92,57 +90,6 @@ public class SsoServerInstanceImpl extends SsoServerInstance {
         SsoServerId = svrinfo.serverID;
 
         // svrinfo.startDate is a String of form "YYYY-MM-DD HH:MM:SS"
-        String stdt = svrinfo.startDate;
-        StringTokenizer st = new StringTokenizer(stdt);
-        String sdate = st.nextToken();
-        String stime = st.nextToken();
-
-        st = new StringTokenizer(sdate, "-");
-        String year = st.nextToken();
-        int iyear = 0;
-        try {
-            iyear = Integer.parseInt(year);
-        } catch (NumberFormatException ex) {
-            debug.error(classMethod + "year = " + year + " not parsable");
-        }
-        byte yrlow = (byte)(iyear & 0xff);
-        byte yrhigh = (byte)(((iyear & 0xff00) >> 8) & 0xff);
-        String month = st.nextToken();
-        String day = st.nextToken();
-
-        st = new StringTokenizer(stime, ":");
-        String hour = st.nextToken();
-        String min = st.nextToken();
-        String sec = st.nextToken();
-
-        Byte bz = new Byte((byte)0);
-        Byte byrhi = bz;
-        Byte byrlo = bz;
-        Byte bmo = bz;
-        Byte bdy = bz;
-        Byte bhr = bz;
-        Byte bmn = bz;
-        Byte bsc = bz;
-        try {
-            byrhi = new Byte(yrhigh);
-            byrlo = new Byte(yrlow);
-            bmo = new Byte(month);
-            bdy = new Byte(day);
-            bhr = new Byte(hour);
-            bmn = new Byte(min);
-            bsc = new Byte(sec);
-        } catch (NumberFormatException ex) {
-            debug.error(classMethod + "error converting start date/time" +
-                ", date = " + sdate + ", time = " + stime);
-        }
-        SsoServerStartDate = new Byte[8];
-        SsoServerStartDate [0] = byrhi;
-        SsoServerStartDate [1] = byrlo;
-        SsoServerStartDate [2] = bmo;
-        SsoServerStartDate [3] = bdy;
-        SsoServerStartDate [4] = bhr;
-        SsoServerStartDate [5] = bmn;
-        SsoServerStartDate [6] = bsc;
-        SsoServerStartDate [7] = bz;
+        SsoServerStartDate = MonitoringUtil.convertDate(svrinfo.startDate);
     }
 }

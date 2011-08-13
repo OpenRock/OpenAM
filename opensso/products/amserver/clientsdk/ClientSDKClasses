@@ -461,8 +461,8 @@ com/iplanet/am/util/JSSPasswordCallback.class
 com/iplanet/am/util/JSSSecureRandomFactoryImpl.class
 
 com/sun/identity/protocol/AMURLStreamHandlerFactory.class
-com/sun/identity/monitoring/Agent.class
 com/sun/identity/monitoring/SsoServerIdRepoSvcImpl.class
+com/sun/identity/monitoring/MonitoringUtil.class
 
 org/forgerock/openam/authentication/service/protocol/*.class
 org/forgerock/openam/services/cdm/BasicClientTypesManager.class

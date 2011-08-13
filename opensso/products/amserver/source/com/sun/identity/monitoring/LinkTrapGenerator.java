@@ -27,10 +27,11 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
+import com.sun.identity.shared.debug.Debug;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -51,36 +52,33 @@ public class LinkTrapGenerator extends Thread
     private int interval = 2000; /* 2 seconds */
     private int successes = 0;
     private int errors = 0;
+    private static Debug debug = Debug.getInstance("amMonitoring");
 
     /**
      * Constructors.
      */
     public LinkTrapGenerator(int nbTraps) {
-
-        super();
         this.nbTraps = nbTraps;
-        java.lang.System.out.println("LinkTrapGenerator() called");
-        java.lang.System.out.println("LinkTrapGenerator() returned\n");
+        debug.message("LinkTrapGenerator() called");
+        debug.message("LinkTrapGenerator() returned\n");
     }
 
     public LinkTrapGenerator(int ifIndex, int nbTraps) {
-
-        java.lang.System.out.println("LinkTrapGenerator(int ifIndex) called");
+        debug.message("LinkTrapGenerator(int ifIndex) called");
 
         this.ifIndex = ifIndex;
         this.nbTraps = nbTraps;
 
-        java.lang.System.out.println("LinkTrapGenerator(int ifIndex) " +
-                                     "returned\n");
+        debug.message("LinkTrapGenerator(int ifIndex) returned\n");
     }
     
     /**
      * MBean registration interface implementation.
      */
     public ObjectName preRegister(MBeanServer server, ObjectName name) 
-        throws java.lang.Exception {
+        throws Exception {
         
-        java.lang.System.out.println("LinkTrapGenerator.preRegister() called");
+        debug.message("LinkTrapGenerator.preRegister() called");
 
         // Create an object name if it was not given.
         //
@@ -93,13 +91,13 @@ public class LinkTrapGenerator extends Thread
         // Extract the value of ifIndex from the object name.
         //
         try {
-            ifIndex=(new Integer(name.getKeyProperty("ifIndex"))).intValue();
-        } catch (Exception e){
+            ifIndex = Integer.valueOf(name.getKeyProperty("ifIndex")).intValue();
+        } catch (NumberFormatException nfe){
             ifIndex = 1;
-            java.lang.System.out.println("Use default ifIndex = " + ifIndex);
+            debug.warning("Use default ifIndex = " + ifIndex);
         }
         
-        java.lang.System.out.println("LinkTrapGenerator.preRegister() " +
+        debug.message("LinkTrapGenerator.preRegister() " +
                                      "returned\n");
         return name;
     }
@@ -107,17 +105,16 @@ public class LinkTrapGenerator extends Thread
     public void postRegister (Boolean registrationDone) {
     } 
 
-    public void preDeregister() throws java.lang.Exception {
-        
+    public void preDeregister() throws Exception {
         // Stop the thread.
         //
-        this.interrupt();
+        interrupt();
         try {
             // Wait until the thread die.
             //
-            this.join();
-        } catch (InterruptedException e) {
-            // Ignore...
+            join();
+        } catch (InterruptedException ie) {
+            debug.warning("Thread sleep interrupted", ie);
         }
     }
 
@@ -125,7 +122,7 @@ public class LinkTrapGenerator extends Thread
     }
     
     public Integer getIfIndex() {
-        return new Integer(ifIndex);
+        return Integer.valueOf(ifIndex);
     }
 
     public void setIfIndex(Integer x) {
@@ -133,23 +130,23 @@ public class LinkTrapGenerator extends Thread
     }
 
     public Integer getSuccesses() {
-        return new Integer(successes);
+        return Integer.valueOf(successes);
     }
 
     public Integer getErrors() {
-        return new Integer(errors);
+        return Integer.valueOf(errors);
     }
 
     public Integer getInterval() {
-        return new Integer(interval);
+        return Integer.valueOf(interval);
     }
 
     public void setInterval(Integer val) {
         interval = val.intValue();
     }
 
+    @Override
     public void run() {
-        
         // If nbTraps = -1, the link trap generator will trigger traps 
         // continuously.
         // Otherwise, the link trap generator will trigger traps nbTraps
@@ -159,8 +156,8 @@ public class LinkTrapGenerator extends Thread
         while ((nbTraps == -1) || (remainingTraps > 0)) {
             try {
                 sleep(interval);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (InterruptedException ie) {
+                debug.warning("Thread sleep interrupted", ie);
             }
             triggerTrap();
             remainingTraps--;

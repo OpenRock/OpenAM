@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
-import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
 import javax.management.MBeanServer;
 
@@ -36,39 +38,25 @@ import javax.management.MBeanServer;
  * This class extends the "SsoServerIDFFSvc" class.
  */
 public class SsoServerIDFFSvcImpl extends SsoServerIDFFSvc {
-    private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructors
      */
     public SsoServerIDFFSvcImpl(SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerIDFFSvcImpl(SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
     private void init(SnmpMib myMib, MBeanServer server) {
-        IDFFIdLocalSessToken = new Long(0);
-        IDFFIdAuthnRqt = new Long(0);
-        IDFFUserIDSessionList = new Long(0);
-        IDFFArtifacts = new Long(0);
-        IDFFAssertions = new Long(0);
-        IDFFStatus = new String("dormant");
-        IDFFRelayState = new Long(0);
-        IDFFIdDestn = new Long(0);
     }
 
     public void incIdLocalSessToken() {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         long li = IDFFIdLocalSessToken.longValue();
         li++;
         IDFFIdLocalSessToken = Long.valueOf(li);
@@ -81,25 +69,19 @@ public class SsoServerIDFFSvcImpl extends SsoServerIDFFSvc {
     }
 
     public void setIdLocalSessToken(long count) {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         IDFFIdLocalSessToken = Long.valueOf(count);
     }
 
     public void incIdAuthnRqt() {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         long li = IDFFIdAuthnRqt.longValue();
         li++;
         IDFFIdAuthnRqt = Long.valueOf(li);
     }
 
     public void incUserIDSessionList() {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         long li = IDFFUserIDSessionList.longValue();
         li++;
         IDFFUserIDSessionList = Long.valueOf(li);
@@ -112,16 +94,12 @@ public class SsoServerIDFFSvcImpl extends SsoServerIDFFSvc {
     }
 
     public void setUserIDSessionList(long count) {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         IDFFUserIDSessionList = Long.valueOf(count);
     }
 
     public void incArtifacts() {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         long li = IDFFArtifacts.longValue();
         li++;
         IDFFArtifacts = Long.valueOf(li);
@@ -134,16 +112,12 @@ public class SsoServerIDFFSvcImpl extends SsoServerIDFFSvc {
     }
 
     public void setArtifacts(long count) {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         IDFFArtifacts = Long.valueOf(count);
     }
 
     public void incAssertions() {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         long li = IDFFAssertions.longValue();
         li++;
         IDFFAssertions = Long.valueOf(li);
@@ -156,25 +130,19 @@ public class SsoServerIDFFSvcImpl extends SsoServerIDFFSvc {
     }
 
     public void setAssertions(long count) {
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         IDFFAssertions = Long.valueOf(count);
     }
 
     public void setRelayState(long state) {
         // might need to change this attribute's type
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         IDFFRelayState = Long.valueOf(state);
     }
 
     public void incIdDestn() {
         // is this a counter?
-        if (IDFFStatus.equals("dormant")) {
-            IDFFStatus = "operational";
-        }
+        setStatus();
         long li = IDFFIdDestn.longValue();
         li++;
         IDFFIdDestn = Long.valueOf(li);
@@ -187,9 +155,13 @@ public class SsoServerIDFFSvcImpl extends SsoServerIDFFSvc {
     }
 
     public void setIdDestn(long count) {
+        setStatus();
+        IDFFIdDestn = Long.valueOf(count);
+    }
+
+    private void setStatus() {
         if (IDFFStatus.equals("dormant")) {
             IDFFStatus = "operational";
         }
-        IDFFIdDestn = Long.valueOf(count);
     }
 }

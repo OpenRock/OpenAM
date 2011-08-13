@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.log;
 
@@ -49,6 +49,7 @@ import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.log.s1is.LogConfigReader;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 
 /**
@@ -143,10 +144,10 @@ public class LogManager extends java.util.logging.LogManager {
                 }
             }
             loggerCount = lcnt;
-            if (SystemProperties.isServerMode() && Agent.isRunning()) {
+            if (SystemProperties.isServerMode() && MonitoringUtil.isRunning()) {
                 if (logServiceImplForMonitoring == null) {
                     logServiceImplForMonitoring =
-                        (SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                        Agent.getLoggingSvcMBean();
                 }
                 if (logServiceImplForMonitoring != null) {
                     logServiceImplForMonitoring.setSsoServerLoggingLoggers(
@@ -641,10 +642,10 @@ public class LogManager extends java.util.logging.LogManager {
          * if haven't gotten the logging service monitoring handle
          * yet, see if it's setup now
          */
-        if (SystemProperties.isServerMode() && Agent.isRunning()) {
+        if (SystemProperties.isServerMode() && MonitoringUtil.isRunning()) {
             if (logServiceImplForMonitoring == null) {
                 logServiceImplForMonitoring =
-                    (SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                    Agent.getLoggingSvcMBean();
             }
             if (logServiceImplForMonitoring == null) {
                 return;

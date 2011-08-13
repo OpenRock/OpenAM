@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.idm.server;
 
@@ -61,6 +61,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.Cache;
+import com.sun.identity.monitoring.MonitoringUtil;
 
 /*
  * Class which provides caching on top of available IdRepoLDAPServices.
@@ -123,8 +124,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         stats = Stats.getInstance(getClass().getName());
         cacheStats = new IdCacheStats(IdConstants.IDREPO_CACHESTAT);
         stats.addStatsListener(cacheStats);
-        if (Agent.isRunning()) {
-            monIdRepo = (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean();
+        if (MonitoringUtil.isRunning()) {
+            monIdRepo = Agent.getIdrepoSvcMBean();
         }
     }
 
@@ -350,8 +351,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
             return getAttributes(token, type, name, amOrgName, amsdkDN);
         }
         cacheStats.incrementGetRequestCount(getSize());
-        if (Agent.isRunning() && 
-            ((monIdRepo = (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean()) !=
+        if (MonitoringUtil.isRunning() &&
+            ((monIdRepo = Agent.getIdrepoSvcMBean()) !=
 	    null))
 	{
             long li = (long)getSize();
@@ -428,9 +429,9 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
                         false, !isStringValues);
             } else { // All attributes found in cache
                 cacheStats.updateGetHitCount(getSize());
-                if (Agent.isRunning() && 
+                if (MonitoringUtil.isRunning() &&
                     ((monIdRepo =
-		     (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean()) !=
+		     Agent.getIdrepoSvcMBean()) !=
 	             null))
 	        {
                     long li = (long)getSize();
@@ -451,8 +452,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         throws IdRepoException, SSOException {
         
         cacheStats.incrementGetRequestCount(getSize());
-        if (Agent.isRunning() && 
-            ((monIdRepo = (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean()) !=
+        if (MonitoringUtil.isRunning() &&
+            ((monIdRepo = Agent.getIdrepoSvcMBean()) !=
 	    null))
 	{
             long li = (long)getSize();
@@ -471,9 +472,9 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         AMHashMap attributes;
         if ((cb != null) && cb.hasCompleteSet(principalDN)) {
             cacheStats.updateGetHitCount(getSize());
-            if (Agent.isRunning() && 
+            if (MonitoringUtil.isRunning() &&
                 ((monIdRepo =
-		 (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean()) !=
+		 Agent.getIdrepoSvcMBean()) !=
 	         null))
 	    {
                 long li = (long)getSize();
@@ -575,8 +576,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         throws IdRepoException, SSOException {
         IdSearchResults answer = new IdSearchResults(type, orgName);
         cacheStats.incrementSearchRequestCount(getSize());
-        if (Agent.isRunning() && 
-            ((monIdRepo = (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean()) !=
+        if (MonitoringUtil.isRunning() &&
+            ((monIdRepo = Agent.getIdrepoSvcMBean()) !=
 	    null))
 	{
             long li = (long)getSize();
@@ -603,9 +604,9 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
                 Map attributes;
                 try {
                     cacheStats.updateSearchHitCount(getSize());
-                    if (Agent.isRunning() && 
+                    if (MonitoringUtil.isRunning() &&
                         ((monIdRepo =
-			 (SsoServerIdRepoSvcImpl)Agent.getIdrepoSvcMBean()) !=
+			 Agent.getIdrepoSvcMBean()) !=
 	                 null))
 	            {
                         long li = (long)getSize();

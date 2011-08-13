@@ -25,6 +25,8 @@
 :: $Id: ssodtool.bat,v 1.4 2009/08/18 01:03:25 ak138937 Exp $
 ::
 
+:: Portions Copyrighted 2011 ForgeRock AS
+
 set _JAVA_CMD=java
 set _TRIMMED_JAVA_HOME=%JAVA_HOME%
 for /f "useback tokens=*" %%a in ('%_TRIMMED_JAVA_HOME%') do set _TRIMMED_JAVA_HOME=%%~a
@@ -74,7 +76,7 @@ goto exit
 
 SET DEBUG_FLAGS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8888,server=y,suspend=n"
 
-"%_TRIMMED_JAVA_HOME%\bin\java" -cp .;config;lib\locale.jar;lib\opensso-sharedlib.jar;lib\amserver.jar;lib\OpenDS.jar;lib\jaxb-impl.jar;lib\jaxb-api.jar;lib\xsdlib.jar;lib\toolbase.jar;lib\jdmkrt.jar;lib\webservices-rt.jar com.sun.identity.diagnostic.base.core.DiagnosticToolMain %*
+"%_TRIMMED_JAVA_HOME%\bin\java" -cp .;config;lib\locale.jar;lib\opensso-sharedlib.jar;lib\amserver.jar;lib\OpenDS.jar;lib\jaxb-impl.jar;lib\jaxb-api.jar;lib\xsdlib.jar;lib\toolbase.jar;lib\webservices-rt.jar com.sun.identity.diagnostic.base.core.DiagnosticToolMain %*
 ENDLOCAL
 
 :exit

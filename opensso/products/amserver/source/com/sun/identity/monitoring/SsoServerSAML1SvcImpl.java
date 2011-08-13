@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -37,7 +40,6 @@ import javax.management.MBeanServer;
  */
 public class SsoServerSAML1SvcImpl extends SsoServerSAML1Svc {
     private static Debug debug = null;
-    private static String myMibName;
 
     protected SsoServerSAML1CacheEntryImpl assertCache = null;
     protected SsoServerSAML1CacheEntryImpl artifactCache = null;
@@ -64,13 +66,11 @@ public class SsoServerSAML1SvcImpl extends SsoServerSAML1Svc {
      */
     public SsoServerSAML1SvcImpl(SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerSAML1SvcImpl(SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -135,10 +135,6 @@ public class SsoServerSAML1SvcImpl extends SsoServerSAML1Svc {
     public void incSAML1EndPoint(String endPoint, String rType) {
         String classModule = "SsoServerSAML1SvcImpl.incSAML1EndPoint:";
 
-        if (!Agent.isRunning()) {
-            return;
-        }
-
         SsoServerSAML1EndPointEntryImpl ee = null;
         if (endPoint.equals(SOAPRCVR)) {
             ee = soapEP;
@@ -177,10 +173,6 @@ public class SsoServerSAML1SvcImpl extends SsoServerSAML1Svc {
     public void setSAML1EndPointOperational(String endPoint) {
         String classModule =
             "SsoServerSAML1SvcImpl.setSAML1EndPointOperational:";
-
-        if (!Agent.isRunning()) {
-            return;
-        }
 
         SsoServerSAML1EndPointEntryImpl ee = null;
         if (endPoint.equals(SOAPRCVR)) {

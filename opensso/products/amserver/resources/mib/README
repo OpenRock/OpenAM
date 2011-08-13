@@ -12,17 +12,8 @@ SUN_OPENSSO_SERVER_MIB.java file, where the generated file has been
 modified.
 
 The "am-mib" target in opensso/products/build.xml does the following:
-  1. unzips extlib/jdmk51_02-allplatforms.zip to ${amserver.built.dir}/mib
-  2. unzips ${amserver.built.dir}/mib/sun-jdmk-sdk-5.1-b34.2.zip to
-     ${amserver.built.dir}/mib
-  3. unzips ${amserver.built.dir}/mib/sun-jdmk-runtime-5.1-b34.2.zip
-      to ${amserver.built.dir}/mib
-  4. unzips ${amserver.built.dir}/mib/sun-jdmk-runtime-jmx-5.1-b34.2.zip
-     to ${amserver.built.dir}/mib
-  5. invokes com.sun.jdmk.tools.MibGen on SUN_OPENSSO_SERVER_MIB.mib,
-     directing sources to ${amserver.built.dir}/mib
-  6. copies ${amserver.built.dir}/mib/*.java to
-     amserver/com/sun/identity/monitoring, except for
-     SUN_OPENSSO_SERVER_MIB.java.
-
+  1. invokes com.sun.jdmk.tools.MibGen on SUN_OPENSSO_SERVER_MIB.mib,
+      directing sources to ${amserver.built.dir}/mib
+  2. copies ${amserver.built.dir}/mib/*.java to
+     amserver/com/sun/identity/monitoring
 

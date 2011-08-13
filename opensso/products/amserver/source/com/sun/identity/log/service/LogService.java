@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.log.service;
 
 import java.io.ByteArrayInputStream;
@@ -48,6 +49,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import com.sun.identity.session.util.RestrictedTokenHelper;
@@ -172,9 +174,9 @@ public class LogService implements RequestHandler {
                         Debug.error("LogService::process():",e);
                     // FORMAT ERROR RESPONSE HERE
                     res = new Response("ERROR");
-                    if (Agent.isRunning()) {
+                    if (MonitoringUtil.isRunning()) {
                         SsoServerLoggingSvcImpl slsi =
-                            (SsoServerLoggingSvcImpl)Agent.getLoggingSvcMBean();
+                            Agent.getLoggingSvcMBean();
                         SsoServerLoggingHdlrEntryImpl slei =
                             slsi.getHandler(
                                 SsoServerLoggingSvcImpl.REMOTE_HANDLER_NAME);

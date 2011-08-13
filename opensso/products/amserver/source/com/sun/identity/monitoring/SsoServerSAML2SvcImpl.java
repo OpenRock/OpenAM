@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -40,7 +40,6 @@ import javax.management.MBeanServer;
  */
 public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
     private static Debug debug = null;
-    private static String myMibName;
 
     public static final String IDP_ARTIF_CACHE = "idpArtifCache";
     public static final String IDP_ARTIF_ISSUED = "idpArtifIssued";
@@ -57,13 +56,11 @@ public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
      */
     public SsoServerSAML2SvcImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerSAML2SvcImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -72,35 +69,24 @@ public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        SAML2HostedIDPCount = new Long(0);
-        SAML2RemoteIDPCount = new Long(0);
-        SAML2FedSessionCount = new Long(0);
-        SAML2IDPSessionCount = new Long(0);
-        SAML2Status = "dormant";
     }
 
     public void incHostedIDPCount() {
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         long li = SAML2HostedIDPCount.longValue();
         li++;
         SAML2HostedIDPCount = Long.valueOf(li);
     }
 
     public void incRemoteIDPCount() {
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         long li = SAML2RemoteIDPCount.longValue();
         li++;
         SAML2RemoteIDPCount = Long.valueOf(li);
     }
 
     public void incFedSessionCount() {
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         long li = SAML2FedSessionCount.longValue();
         li++;
         SAML2FedSessionCount = Long.valueOf(li);
@@ -113,16 +99,12 @@ public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
     }
 
     public void setFedSessionCount(long count) {
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         SAML2FedSessionCount = Long.valueOf(count);
     }
 
     public void incIdpSessionCount() {
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         long li = SAML2IDPSessionCount.longValue();
         li++;
         SAML2IDPSessionCount = Long.valueOf(li);
@@ -135,18 +117,14 @@ public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
     }
 
     public void setIdpSessionCount(long count) {
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         SAML2IDPSessionCount = Long.valueOf(count);
     }
 
     public void incIDPCounter (String realm, String idpName, String counter) {
         String classMethod = "SsoServerSAML2SvcImpl.incIDPCounter:";
 
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
         /*
          *  given the realm's and IDP's name, get the corresponding
          *  entry in the SAML2IDP table.
@@ -238,9 +216,7 @@ public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
         if (entName.indexOf(":") >= 0) {
             entName = entName.replaceAll(":", "&#58;");
         }
-        if (SAML2Status.equals("dormant")) {
-            SAML2Status = "operational";
-        }
+        setStatus();
 
         entName = realm + "|" + entName;
 
@@ -258,6 +234,12 @@ public class SsoServerSAML2SvcImpl extends SsoServerSAML2Svc {
             ssei.incSAML2SPRqtsSent();
         } else if (counter.equals(SsoServerSAML2SvcImpl.SP_INVAL_ARTIFS_RCVD)){
             ssei.incSAML2SPInvalArtifsRcvd();
+        }
+    }
+
+    private void setStatus() {
+        if (SAML2Status.equals("dormant")) {
+            SAML2Status = "operational";
         }
     }
 }

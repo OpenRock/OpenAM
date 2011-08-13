@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.log;
 
@@ -52,6 +52,7 @@ import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.log.spi.Authorizer;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.shared.Constants;
@@ -679,14 +680,15 @@ public class Logger extends java.util.logging.Logger {
 
     /*
      *  increment the logging service LoggingRecsRejected attribute and
-     *  the logging handler's (File, DB, and Secure only) LoggingHdlrFailureCt.      *  this is for the count of rejections due to unauthorized userid trying
+     *  the logging handler's (File, DB, and Secure only) LoggingHdlrFailureCt.
+     *  this is for the count of rejections due to unauthorized userid trying
      *  to write to the log.
      */
     private void incMonReject() {
-        if (LogManager.isLocal && Agent.isRunning()) {
+        if (LogManager.isLocal && MonitoringUtil.isRunning()) {
             // logging service stat
             SsoServerLoggingSvcImpl logSvcMon =
-                (SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                Agent.getLoggingSvcMBean();
             if (logSvcMon != null) {
                  logSvcMon.incSsoServerLoggingRecsRejected();
             }

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -90,36 +93,18 @@ public class SsoServerSAML2SPEntryImpl extends SsoServerSAML2SPEntry {
     }
 
     public void incSAML2SPInvalArtifsRcvd() {
-        String classModule =
-            "SsoServerSAML2SPEntryImpl.incSAML2SPInvalArtifsRcvd:";
-        
-        if (!Agent.isRunning()) {
-            return;
-        }
         long li = SAML2SPInvalidArtifactsRcvd.longValue();
         li++;
         SAML2SPInvalidArtifactsRcvd = Long.valueOf(li);
     }
 
     public void incSAML2SPValidAssertsRcvd() {
-        String classModule =
-            "SsoServerSAML2SPEntryImpl.incSAML2SPValidAssertsRcvd:";
-        
-        if (!Agent.isRunning()) {
-            return;
-        }
         long li = SAML2SPValidAssertionsRcvd.longValue();
         li++;
         SAML2SPValidAssertionsRcvd = Long.valueOf(li);
     }
 
     public void incSAML2SPRqtsSent() {
-        String classModule =
-            "SsoServerSAML2SPEntryImpl.incSAML2SPRqtsSent:";
-        
-        if (!Agent.isRunning()) {
-            return;
-        }
         long li = SAML2SPRqtsSent.longValue();
         li++;
         SAML2SPRqtsSent = Long.valueOf(li);

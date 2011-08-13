@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  */
-
 package com.sun.identity.monitoring;
 
 import com.iplanet.am.util.SystemProperties;
@@ -45,7 +44,6 @@ import javax.management.MBeanServer;
  */
 public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
     private static Debug debug = null;
-    private static String myMibName;
     
     /*
      * This is the interval over which the authehticate rate will be averaged
@@ -65,7 +63,6 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
      */
     public SsoServerAuthSvcImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
@@ -74,7 +71,6 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
      */
     public SsoServerAuthSvcImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -82,10 +78,6 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        AuthenticationFailureRate = new Long(0);
-        AuthenticationSuccessRate = new Long(0);
-        AuthenticationFailureCount = new Long(0);
-        AuthenticationSuccessCount = new Long(0);
 
         String intervalValue =
             SystemProperties.get(Constants.AUTH_RATE_MONITORING_INTERVAL);
@@ -93,7 +85,7 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         try {
             interval = Long.parseLong(intervalValue);
         } catch (NumberFormatException nfe) {
-            debug.error("SsoServerAuthSvcImpl::init interval value is not " +
+            debug.message("SsoServerAuthSvcImpl::init interval value is not " +
                     " a number " + intervalValue + " set to default of " +
                     DEFAULT_INTERVAL);
             interval = DEFAULT_INTERVAL;
@@ -109,8 +101,8 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
             debug.message("Monitoring interval set to " + interval + "ms.");
         }
 
-        historicSuccessRecords = new LinkedBlockingDeque(AVERAGE_RECORD_COUNT);
-        historicFailureRecords = new LinkedBlockingDeque(AVERAGE_RECORD_COUNT);
+        historicSuccessRecords = new LinkedBlockingDeque<Long>(AVERAGE_RECORD_COUNT);
+        historicFailureRecords = new LinkedBlockingDeque<Long>(AVERAGE_RECORD_COUNT);
     }
 
     protected void updateSsoServerAuthenticationFailureRate() {
@@ -165,10 +157,6 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
      *  these need to be updated to take/figure out a realm index
      */
     public void incSsoServerAuthenticationFailureCount() {
-        if (!Agent.isRunning()) {
-            return;
-        }
-
         long li = AuthenticationFailureCount.longValue();
         li++;
         AuthenticationFailureCount = Long.valueOf(li);
@@ -177,9 +165,6 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
     }
 
     public void incSsoServerAuthenticationSuccessCount() {
-        if (!Agent.isRunning()) {
-            return;
-        }
         long li = AuthenticationSuccessCount.longValue();
         li++;
         AuthenticationSuccessCount = Long.valueOf(li);
@@ -209,32 +194,15 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
 
         if (debug.messageEnabled()) {
             debug.message(classMethod + "\n" +
-                "    AgentIsRunning = " + Agent.isRunning() + "\n" +
                 "    moduleName = " + moduleName + "\n" +
                 "    realmName = " + rName + "\n" +
                 "    success = " + success + "\n" +
                 "    orgDN = " + orgDN);
-        }
-        if (debug.warningEnabled()) {
-            debug.warning(classMethod + "\n" +
-                "    AgentIsRunning = " + Agent.isRunning() + "\n" +
-                "    moduleName = " + moduleName + "\n" +
-                "    realmName = " + rName + "\n" +
-                "    success = " + success + "\n" +
-                "    orgDN = " + orgDN);
-        }
-
-        if (!Agent.isRunning()) {
-            return;
         }
 
         if (rName == null) {
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "no realm configuration for org " +
-                    orgDN + " set up yet.");
-            }
-            if (debug.warningEnabled()) {
-                debug.warning(classMethod + "no realm configuration for org " +
                     orgDN + " set up yet.");
             }
             return;
@@ -251,12 +219,9 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
                         " in realm " + rName);
                 }
                 return;
-            } else if (debug.messageEnabled()) {
-                debug.message(classMethod + "got auth module instance for " +
-                    rlmAuthInst);
             }
-            if (debug.warningEnabled()) {
-                debug.warning(classMethod + "got auth module instance for " +
+            if (debug.messageEnabled()) {
+                debug.message(classMethod + "got auth module instance for " +
                     rlmAuthInst);
             }
 

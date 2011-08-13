@@ -25,6 +25,8 @@
 # $Id: ssodtool.sh,v 1.3 2009/08/18 01:02:53 ak138937 Exp $
 #
 
+# Portions Copyrighted 2011 ForgeRock AS
+
 if [ -z "${JAVA_HOME}" ]; then
   echo "Please define JAVA_HOME environment variable before running this program"
   exit 1
@@ -55,4 +57,4 @@ TOOLS_HOME="`dirname ${HOME}`"
 
 DEBUG_FLAGS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8888,server=y,suspend=n"
 
-${JAVA_HOME}/bin/java -cp ${TOOLS_HOME}:${TOOLS_HOME}/config:${TOOLS_HOME}/lib/locale.jar:${TOOLS_HOME}/lib/opensso-sharedlib.jar:${TOOLS_HOME}/lib/amserver.jar:${TOOLS_HOME}/lib/OpenDS.jar:${TOOLS_HOME}/lib/jaxb-impl.jar:${TOOLS_HOME}/lib/jaxb-api.jar:${TOOLS_HOME}/lib/xsdlib.jar:${TOOLS_HOME}/lib/jdmkrt.jar:${TOOLS_HOME}/lib/toolbase.jar:${TOOLS_HOME}/lib/webservices-rt.jar com.sun.identity.diagnostic.base.core.DiagnosticToolMain "$@"
+${JAVA_HOME}/bin/java -cp ${TOOLS_HOME}:${TOOLS_HOME}/config:${TOOLS_HOME}/lib/locale.jar:${TOOLS_HOME}/lib/opensso-sharedlib.jar:${TOOLS_HOME}/lib/amserver.jar:${TOOLS_HOME}/lib/OpenDS.jar:${TOOLS_HOME}/lib/jaxb-impl.jar:${TOOLS_HOME}/lib/jaxb-api.jar:${TOOLS_HOME}/lib/xsdlib.jar:${TOOLS_HOME}/lib/toolbase.jar:${TOOLS_HOME}/lib/webservices-rt.jar com.sun.identity.diagnostic.base.core.DiagnosticToolMain "$@"

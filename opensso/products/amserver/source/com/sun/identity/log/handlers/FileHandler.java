@@ -57,6 +57,7 @@ import com.sun.identity.log.LogManagerUtil;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import java.io.FileNotFoundException;
@@ -394,9 +395,9 @@ public class FileHandler extends java.util.logging.Handler {
             startTimeBufferingThread();
         }
 
-        if (Agent.isRunning()) {
+        if (MonitoringUtil.isRunning()) {
             logServiceImplForMonitoring =
-                (SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                Agent.getLoggingSvcMBean();
             fileLogHandlerForMonitoring =
                 logServiceImplForMonitoring.getHandler(
                     SsoServerLoggingSvcImpl.FILE_HANDLER_NAME);
@@ -473,7 +474,7 @@ public class FileHandler extends java.util.logging.Handler {
      * @param lrecord the log record to be published.
      */
     public void publish(LogRecord lrecord) {
-        if (Agent.isRunning() && fileLogHandlerForMonitoring != null) {
+        if (MonitoringUtil.isRunning() && fileLogHandlerForMonitoring != null) {
             fileLogHandlerForMonitoring.incHandlerRequestCount(1);
         }
 
@@ -538,7 +539,7 @@ public class FileHandler extends java.util.logging.Handler {
             }
             if (writer == null) {
                 int recordsToBeDropped = recordBuffer.size();
-                if (Agent.isRunning() && fileLogHandlerForMonitoring !=
+                if (MonitoringUtil.isRunning() && fileLogHandlerForMonitoring !=
                     null) {
                     fileLogHandlerForMonitoring.incHandlerDroppedCount(
                         recordsToBeDropped);
@@ -557,7 +558,7 @@ public class FileHandler extends java.util.logging.Handler {
                         headerWritten = true;
                     }
                     writer.write(message);
-                    if (Agent.isRunning() &&
+                    if (MonitoringUtil.isRunning() &&
                         fileLogHandlerForMonitoring != null) {
                         fileLogHandlerForMonitoring.incHandlerSuccessCount(1);
                     }
@@ -739,7 +740,7 @@ public class FileHandler extends java.util.logging.Handler {
             if (writer == null) {
                 Debug.error(fileName + ":FileHandler: Writer is null");
                 int recordsToBeDropped = buffer.size();
-                if (Agent.isRunning() && fileLogHandlerForMonitoring !=
+                if (MonitoringUtil.isRunning() && fileLogHandlerForMonitoring !=
                     null) {
                     fileLogHandlerForMonitoring.incHandlerDroppedCount(
                         recordsToBeDropped);
@@ -763,7 +764,7 @@ public class FileHandler extends java.util.logging.Handler {
                         headerWritten = true;
                     }
                     writer.write(message);
-                    if (Agent.isRunning() &&
+                    if (MonitoringUtil.isRunning() &&
                         fileLogHandlerForMonitoring != null) {
                         fileLogHandlerForMonitoring.incHandlerSuccessCount(1);
                     }

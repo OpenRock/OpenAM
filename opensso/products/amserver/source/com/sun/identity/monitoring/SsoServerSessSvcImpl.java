@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -39,20 +42,17 @@ import com.sun.management.snmp.SnmpStatusException;
  */
 public class SsoServerSessSvcImpl extends SsoServerSessSvc {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerSessSvcImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerSessSvcImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -60,23 +60,12 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        SessionAveSessSize = new Integer(0);
-        SessionNotifListnrCount = new Long(0);
-        SessionNotifCount = new Long(0);
-        SessionValidationsCount = new Long(0);
-        SessionCreatedCount = new Long(0);
-        SessionActiveCount = new Long(0);
-        SessionSFOBroker = "N/A";
     }
 
     /*
      * increment the active session counter
      */
     public void incSessionActiveCount() {
-        if (!Agent.isRunning()) {
-            return;
-        }
-
         if (debug.messageEnabled()) {
             debug.message("SsoServerSessSvcImpl.incSessionActiveCount");
         }
@@ -90,10 +79,6 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
      * decrement the active session counter
      */
     public void decSessionActiveCount() {
-        if (!Agent.isRunning()) {
-            return;
-        }
-
         if (debug.messageEnabled()) {
             debug.message("SsoServerSessSvcImpl.decSessionActiveCount");
         }
@@ -101,7 +86,7 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
         long li = SessionActiveCount.longValue();
         li--;
         if (li < 0) {
-            SessionActiveCount = new Long(0);
+            SessionActiveCount = 0L;
         } else {
             SessionActiveCount = Long.valueOf(li);
         }
@@ -114,10 +99,6 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
      *  or is this counter just count sessions created?
      */
     public void incCreatedSessionCount() {
-        if (!Agent.isRunning()) {
-            return;
-        }
-
         long li = SessionCreatedCount.longValue();
         li++;
         SessionCreatedCount = Long.valueOf(li);
@@ -127,7 +108,7 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
      * Getter for the "SessionNotifCount" variable.
      */
     public Long getSessionNotifCount() throws SnmpStatusException {
-        return new Long(SessionService.getNotificationQueueSize());
+        return Long.valueOf(SessionService.getNotificationQueueSize());
     }
 
 }

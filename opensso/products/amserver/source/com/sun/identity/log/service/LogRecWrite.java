@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.log.service;
 
 import java.util.Hashtable;
@@ -48,6 +49,7 @@ import com.sun.identity.log.Logger;
 import com.sun.identity.log.s1is.LogSSOTokenDetails;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 
@@ -70,8 +72,8 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         Response res = new Response("OK");
         SsoServerLoggingSvcImpl slsi = null;
         SsoServerLoggingHdlrEntryImpl slei = null;
-        if (Agent.isRunning()) {
-            slsi = (SsoServerLoggingSvcImpl)Agent.getLoggingSvcMBean();
+        if (MonitoringUtil.isRunning()) {
+            slsi = Agent.getLoggingSvcMBean();
             slei = slsi.getHandler(SsoServerLoggingSvcImpl.REMOTE_HANDLER_NAME);
         }
         
@@ -163,12 +165,12 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         } catch (SSOException ssoe) {
             Debug.error("LogRecWrite: exec:SSOException: ", ssoe);
         }
-        if (Agent.isRunning()) {
+        if (MonitoringUtil.isRunning()) {
             slei.incHandlerRequestCount(1);
         }
         logger.log(rec, loggedByToken);
         // Log file record write okay and return OK
-        if (Agent.isRunning()) {
+        if (MonitoringUtil.isRunning()) {
             slei.incHandlerSuccessCount(1);
         }
         return res;

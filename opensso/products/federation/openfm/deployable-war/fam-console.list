@@ -1210,7 +1210,6 @@
 ./WEB-INF/lib/commons-codec-1.4.jar
 ./WEB-INF/lib/console.jar
 ./WEB-INF/lib/jdmkrt.jar
-./WEB-INF/lib/jdmktk.jar
 ./WEB-INF/lib/idpdiscovery.jar
 ./WEB-INF/lib/jato.jar
 ./WEB-INF/lib/jhall.jar

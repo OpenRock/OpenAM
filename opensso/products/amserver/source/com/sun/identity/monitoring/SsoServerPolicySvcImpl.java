@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -37,20 +40,17 @@ import javax.management.MBeanServer;
  */
 public class SsoServerPolicySvcImpl extends SsoServerPolicySvc {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerPolicySvcImpl(SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerPolicySvcImpl(SnmpMib myMib, MBeanServer server) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -58,19 +58,13 @@ public class SsoServerPolicySvcImpl extends SsoServerPolicySvc {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        PolicyEvalsOut = new Long(0);
-        PolicyEvalsIn = new Long(0);
-        PolicyStatus = "dormant";
     }
 
     /*
      *  set the Policy service's status to "operational"
      */
     public void setPolicyStatusOperational() {
-        if (!Agent.isRunning()) {
-            return;
-        }
-        PolicyStatus = new String("operational");
+        PolicyStatus = "operational";
     }
 
     /*
@@ -78,19 +72,13 @@ public class SsoServerPolicySvcImpl extends SsoServerPolicySvc {
      *  likely won't happen.
      */
     public void setPolicyStatusDormant() {
-        if (!Agent.isRunning()) {
-            return;
-        }
-        PolicyStatus = new String("dormant");
+        PolicyStatus = "dormant";
     }
 
     /*
      *  increment the number of evaluation requests received
      */
     public void incPolicyEvalsIn() {
-        if (!Agent.isRunning()) {
-            return;
-        }
         if (PolicyStatus.equals("dormant")) {
             setPolicyStatusOperational();
         }
@@ -103,9 +91,6 @@ public class SsoServerPolicySvcImpl extends SsoServerPolicySvc {
      *  increment the number of evaluation requests processed
      */
     public void incPolicyEvalsOut() {
-        if (!Agent.isRunning()) {
-            return;
-        }
         long li = PolicyEvalsOut.longValue();
         li++;
         PolicyEvalsOut = Long.valueOf(li);

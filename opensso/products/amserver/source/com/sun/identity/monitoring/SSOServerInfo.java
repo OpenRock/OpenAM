@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import java.util.Hashtable;
@@ -38,9 +41,9 @@ public class SSOServerInfo {
     String serverURI;
     String serverPort;
     boolean isEmbeddedDS;
-    Hashtable siteIDTable;
-    Hashtable serverIDTable;
-    Hashtable namingTable;
+    Hashtable<String, String> siteIDTable;
+    Hashtable<String, String> serverIDTable;
+    Hashtable<String, String> namingTable;
     String startDate;
 
     public SSOServerInfo() {
@@ -68,9 +71,9 @@ public class SSOServerInfo {
         String serverURI;
         String serverPort;
         boolean isEmbeddedDS;
-        Hashtable siteIDTable;
-        Hashtable serverIDTable;
-        Hashtable namingTable;
+        Hashtable<String, String> siteIDTable;
+        Hashtable<String, String> serverIDTable;
+        Hashtable<String, String> namingTable;
         String startDate;
 
         public SSOServerInfoBuilder(String svrId, String siteId) {
@@ -103,17 +106,17 @@ public class SSOServerInfo {
             return this;
         }
 
-        public SSOServerInfoBuilder siteIdTable (Hashtable siteIdTab) {
+        public SSOServerInfoBuilder siteIdTable (Hashtable<String, String> siteIdTab) {
             siteIDTable = siteIdTab;
             return this;
         }
 
-        public SSOServerInfoBuilder svrIdTable (Hashtable svrIdTab) {
+        public SSOServerInfoBuilder svrIdTable (Hashtable<String, String> svrIdTab) {
             serverIDTable = svrIdTab;
             return this;
         }
 
-        public SSOServerInfoBuilder namingTable (Hashtable namingTab) {
+        public SSOServerInfoBuilder namingTable (Hashtable<String, String> namingTab) {
             namingTable = namingTab;
             return this;
         }

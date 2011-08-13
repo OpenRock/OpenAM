@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -119,6 +118,7 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpSession;
 
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import java.util.ArrayList;
 import java.util.List;
@@ -654,9 +654,9 @@ public class SessionService {
         session.setHttpSession(httpSession);
         sessionTable.put(sid, session);
         if (SystemProperties.isServerMode()) {
-            if (Agent.isRunning()) {
+            if (MonitoringUtil.isRunning()) {
                 SsoServerSessSvcImpl sessImpl =
-                    (SsoServerSessSvcImpl)Agent.getSessSvcMBean();
+                    Agent.getSessSvcMBean();
                 sessImpl.incCreatedSessionCount();
             }
         }
@@ -1138,9 +1138,9 @@ public class SessionService {
         // can't go below zero any more in case of erroneus behavior..
         if (numberOfActiveSessions > 0) {
             numberOfActiveSessions--;
-            if (SystemProperties.isServerMode() && Agent.isRunning()) {
+            if (SystemProperties.isServerMode() && MonitoringUtil.isRunning()) {
                 SsoServerSessSvcImpl sessImpl =
-                    (SsoServerSessSvcImpl)Agent.getSessSvcMBean();
+                    Agent.getSessSvcMBean();
                 sessImpl.decSessionActiveCount();
             }
         }
@@ -1152,9 +1152,9 @@ public class SessionService {
     public static synchronized void incrementActiveSessions() {
         numberOfActiveSessions++;
         if (SystemProperties.isServerMode()) {
-            if (Agent.isRunning()) {
+            if (MonitoringUtil.isRunning()) {
                 SsoServerSessSvcImpl sessImpl =
-                    (SsoServerSessSvcImpl)Agent.getSessSvcMBean();
+                    Agent.getSessSvcMBean();
                 sessImpl.incSessionActiveCount();
             }
         }

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -37,20 +40,17 @@ import javax.management.MBeanServer;
  */
 public class SsoServerWSSAgentsImpl extends SsoServerWSSAgents {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerWSSAgentsImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerWSSAgentsImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 

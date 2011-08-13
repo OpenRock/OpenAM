@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.authentication.service;
 
@@ -65,6 +65,7 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
 
 /**
@@ -151,8 +152,8 @@ public class AMLoginContext {
                 + e.getMessage());
         }
 
-        if (Agent.isRunning()) {
-            authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+        if (MonitoringUtil.isRunning()) {
+            authImpl = Agent.getAuthSvcMBean();
         }
     }
 
@@ -306,9 +307,9 @@ public class AMLoginContext {
                 return;
             }
         } catch (AuthLoginException le) {
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -317,9 +318,9 @@ public class AMLoginContext {
             debug.message("Error  : " ,le);
             throw le;
         } catch (Exception e) {
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -342,9 +343,9 @@ public class AMLoginContext {
             internalAuthError = true;
             st.setStatus(LoginStatus.AUTH_FAILED);
             loginState.logFailed(bundle.getString("noConfig"),"NOCONFIG");
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -414,9 +415,9 @@ public class AMLoginContext {
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
             internalAuthError=true;
             st.setStatus(LoginStatus.AUTH_FAILED);
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -433,9 +434,9 @@ public class AMLoginContext {
             setErrorMsgAndTemplate();
             st.setStatus(LoginStatus.AUTH_FAILED);
             internalAuthError=true;
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -453,9 +454,9 @@ public class AMLoginContext {
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
             internalAuthError=true;
             st.setStatus(LoginStatus.AUTH_FAILED);
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -469,9 +470,9 @@ public class AMLoginContext {
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
             internalAuthError=true;
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -505,9 +506,9 @@ public class AMLoginContext {
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
             internalAuthError=true;
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -742,9 +743,9 @@ public class AMLoginContext {
         }
         debug.message("Came to before if Failed loop");
         if (isFailed) {
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationFailureCount();
@@ -775,9 +776,9 @@ public class AMLoginContext {
 		debug.message("AMLoginContext.runLogin:" +
 		    "calling incSsoServerAuthenticationSuccessCount");
 	    }
-	    if (Agent.isRunning()) {
+	    if (MonitoringUtil.isRunning()) {
 		if (authImpl == null) {
-		    authImpl = (SsoServerAuthSvcImpl)Agent.getAuthSvcMBean();
+		    authImpl = Agent.getAuthSvcMBean();
 		}
 		if (authImpl != null) {
 	            authImpl.incSsoServerAuthenticationSuccessCount();

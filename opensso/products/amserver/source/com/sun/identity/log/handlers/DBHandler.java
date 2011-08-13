@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.log.handlers;
 
@@ -58,6 +58,7 @@ import com.sun.identity.log.LogManager;
 import com.sun.identity.log.LogManagerUtil;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 
@@ -231,10 +232,10 @@ public class DBHandler extends Handler {
         throws ConnectionException, DriverLoadException 
     {
         //Monit start
-        if (Agent.isRunning()) {
+        if (MonitoringUtil.isRunning()) {
             if (dbLogHandlerForMonitoring == null) {
                 logServiceImplForMonitoring =
-                    (SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                    Agent.getLoggingSvcMBean();
                 dbLogHandlerForMonitoring =
                     logServiceImplForMonitoring.getHandler(
                         SsoServerLoggingSvcImpl.DB_HANDLER_NAME);
@@ -252,7 +253,7 @@ public class DBHandler extends Handler {
             Debug.error(tableName +
                 ":DBHandler: ClassNotFoundException " + e.getMessage());
             //Monit start
-            if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+            if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                 dbLogHandlerForMonitoring.incHandlerConnectionsFailed(1);
             }
             //Monit end
@@ -269,7 +270,7 @@ public class DBHandler extends Handler {
                 ":DBHandler: ConnectionException (" + sqle.getErrorCode() +
                 "): " + sqle.getMessage());
             //Monit start
-            if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+            if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                 dbLogHandlerForMonitoring.incHandlerConnectionsFailed(1);
             }
             //Monit end
@@ -277,7 +278,7 @@ public class DBHandler extends Handler {
         }
 
         //Monit start
-        if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+        if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
             dbLogHandlerForMonitoring.incHandlerConnectionsMade(1);
         }
         //Monit end
@@ -292,7 +293,7 @@ public class DBHandler extends Handler {
         throws ConnectionException, DriverLoadException 
     {
         //Monit start
-        if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+        if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
             dbLogHandlerForMonitoring.incHandlerConnectionRequests(1);
         }
         //Monit end
@@ -303,7 +304,7 @@ public class DBHandler extends Handler {
                 userName, password);
         } catch (ClassNotFoundException e) {
             //Monit start
-            if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+            if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                 dbLogHandlerForMonitoring.incHandlerConnectionsFailed(1);
             }
             //Monit end
@@ -313,7 +314,7 @@ public class DBHandler extends Handler {
                 ":DBHandler:reconnect (" + sqle.getErrorCode() + "): " +
                 sqle.getMessage());
             //Monit start
-            if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+            if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                 dbLogHandlerForMonitoring.incHandlerConnectionsFailed(1);
             }
             //Monit end
@@ -321,7 +322,7 @@ public class DBHandler extends Handler {
         }
 
         //Monit start
-        if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+        if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
             dbLogHandlerForMonitoring.incHandlerConnectionsMade(1);
         }
         //Monit end
@@ -387,9 +388,9 @@ public class DBHandler extends Handler {
             startTimeBufferingThread();
         }
 
-        if (Agent.isRunning()) {
+        if (MonitoringUtil.isRunning()) {
             logServiceImplForMonitoring =
-                (SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                Agent.getLoggingSvcMBean();
             dbLogHandlerForMonitoring = logServiceImplForMonitoring.getHandler(
                 SsoServerLoggingSvcImpl.DB_HANDLER_NAME);
         }
@@ -416,7 +417,7 @@ public class DBHandler extends Handler {
      */
     public void publish(java.util.logging.LogRecord logRecord) {
         //Monit start
-        if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+        if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
             dbLogHandlerForMonitoring.incHandlerRequestCount(1);
         }
         //Monit end
@@ -480,7 +481,7 @@ public class DBHandler extends Handler {
                 int recordsToBeDropped = recordBuffer.size();
                 recordBuffer.clear();
                 //Monit start
-                if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+                if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                     dbLogHandlerForMonitoring.incHandlerDroppedCount(
                     recordsToBeDropped);
                 }
@@ -515,7 +516,7 @@ public class DBHandler extends Handler {
                 int recordsToBeDropped = recordBuffer.size();
                 recordBuffer.clear();
                 //Monit start
-                if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+                if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                     dbLogHandlerForMonitoring.incHandlerDroppedCount(
                     recordsToBeDropped);
                 }
@@ -659,7 +660,7 @@ public class DBHandler extends Handler {
                 try {
                     stmt.executeUpdate(insertStr);
                     //Monit start
-                    if (Agent.isRunning() && dbLogHandlerForMonitoring !=
+                    if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring !=
                         null){
                         dbLogHandlerForMonitoring.incHandlerSuccessCount(1);
                     }
@@ -755,7 +756,7 @@ public class DBHandler extends Handler {
                             stmt = conn.createStatement();
                             stmt.executeUpdate(insertStr);
                             //Monit start
-                            if (Agent.isRunning() &&
+                            if (MonitoringUtil.isRunning() &&
                                 dbLogHandlerForMonitoring != null)
                             {
                                 dbLogHandlerForMonitoring.
@@ -859,7 +860,7 @@ public class DBHandler extends Handler {
                     }
                 }
                 //Monit start
-                if (Agent.isRunning() && dbLogHandlerForMonitoring != null) {
+                if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring != null) {
                     dbLogHandlerForMonitoring.incHandlerDroppedCount(
                         removeCount);
                 }
@@ -1331,7 +1332,7 @@ public class DBHandler extends Handler {
                 try {
                     stmt.executeUpdate(insertStr);
                     //Monit start
-                    if (Agent.isRunning() && dbLogHandlerForMonitoring !=
+                    if (MonitoringUtil.isRunning() && dbLogHandlerForMonitoring !=
                         null){
                         dbLogHandlerForMonitoring.incHandlerSuccessCount(1);
                     }
@@ -1465,7 +1466,7 @@ public class DBHandler extends Handler {
                             stmt = conn.createStatement();
                             stmt.executeUpdate(insertStr);
                             //Monit start
-                            if (Agent.isRunning() &&
+                            if (MonitoringUtil.isRunning() &&
                                 dbLogHandlerForMonitoring != null)
                             {
                                 dbLogHandlerForMonitoring.

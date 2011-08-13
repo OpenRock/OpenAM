@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.idm.remote;
 
@@ -57,6 +57,8 @@ import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 
 /*
  * Class which provides caching on top of available IdRepoLDAPServices.
@@ -94,10 +96,10 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         cacheStats = new IdCacheStats(IdConstants.IDREPO_CACHESTAT);
         stats.addStatsListener(cacheStats);
         if (SystemProperties.isServerMode() &&
-            com.sun.identity.monitoring.Agent.isRunning())
+            MonitoringUtil.isRunning())
         {
-            monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean();
+            monIdRepo =
+                Agent.getIdrepoSvcMBean();
         }
     }
     
@@ -352,9 +354,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         
         cacheStats.incrementGetRequestCount(getSize());
         if (SystemProperties.isServerMode() &&
-            com.sun.identity.monitoring.Agent.isRunning() && 
-            ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) != null))
+            MonitoringUtil.isRunning() &&
+            ((monIdRepo = Agent.getIdrepoSvcMBean()) != null))
         {
             long li = (long)getSize();
             monIdRepo.incGetRqts(li);
@@ -431,11 +432,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             } else { // All attributes found in cache
                 cacheStats.updateGetHitCount(getSize());
                 if (SystemProperties.isServerMode() &&
-                    com.sun.identity.monitoring.Agent.isRunning() && 
-                    ((monIdRepo = 
-                        (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                        com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) !=
-                           null))
+                    MonitoringUtil.isRunning() &&
+                    ((monIdRepo = Agent.getIdrepoSvcMBean()) != null))
                 {
                     long li = (long)getSize();
                     monIdRepo.incCacheHits(li);
@@ -457,9 +455,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         
         cacheStats.incrementGetRequestCount(getSize());
         if (SystemProperties.isServerMode() &&
-            com.sun.identity.monitoring.Agent.isRunning() && 
-            ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) != null))
+            MonitoringUtil.isRunning() &&
+            ((monIdRepo = Agent.getIdrepoSvcMBean()) != null))
         {
             long li = (long)getSize();
             monIdRepo.incGetRqts(li);
@@ -477,10 +474,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         if ((cb != null) && cb.hasCompleteSet(principalDN)) {
             cacheStats.updateGetHitCount(getSize());
             if (SystemProperties.isServerMode() &&
-                com.sun.identity.monitoring.Agent.isRunning() && 
-                ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                    com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) !=
-                        null))
+                MonitoringUtil.isRunning() &&
+                ((monIdRepo = Agent.getIdrepoSvcMBean()) != null))
             {
                 long li = (long)getSize();
                 monIdRepo.incCacheHits(li);
@@ -592,10 +587,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         // otherwise unix and anonymous login will fail.
         
         cacheStats.incrementSearchRequestCount(getSize());
-        if (SystemProperties.isServerMode() &&
-            com.sun.identity.monitoring.Agent.isRunning() && 
-            ((monIdRepo = (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) != null))
+        if (SystemProperties.isServerMode() && MonitoringUtil.isRunning() &&
+            ((monIdRepo = Agent.getIdrepoSvcMBean()) != null))
         {
             long li = (long)getSize();
             monIdRepo.incSearchRqts(li);
@@ -618,10 +611,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 try {
                     cacheStats.updateSearchHitCount(getSize());
                     if (SystemProperties.isServerMode() &&
-                        com.sun.identity.monitoring.Agent.isRunning() && 
-                        ((monIdRepo =
-                        (com.sun.identity.monitoring.SsoServerIdRepoSvcImpl)
-                        com.sun.identity.monitoring.Agent.getIdrepoSvcMBean()) !=
+                        MonitoringUtil.isRunning() && ((monIdRepo = Agent.getIdrepoSvcMBean()) !=
                              null))
                     {
                         long li = (long)getSize();

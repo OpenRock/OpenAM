@@ -27,18 +27,15 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
-import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.Map;
 
 public class SSOServerRealmInfo {
     String realmName;
-    HashMap authModules;
-    Hashtable serverIDTable;
-    Hashtable namingTable;
+    Map<String, String> authModules;
 
     public SSOServerRealmInfo() {
     }
@@ -46,38 +43,18 @@ public class SSOServerRealmInfo {
     private SSOServerRealmInfo (SSOServerRealmInfoBuilder asib) {
         realmName = asib.realmName;
         authModules = asib.authModules;
-        serverIDTable = asib.serverIDTable;
-        namingTable = asib.namingTable;
     }
 
     public static class SSOServerRealmInfoBuilder {
         String realmName;
-        HashMap authModules;
-        Hashtable siteIDTable;
-        Hashtable serverIDTable;
-        Hashtable namingTable;
+        Map<String, String> authModules;
 
         public SSOServerRealmInfoBuilder(String rlm) {
             realmName = rlm;
         }
 
-        public SSOServerRealmInfoBuilder authModules (HashMap authMods) {
+        public SSOServerRealmInfoBuilder authModules (Map<String, String> authMods) {
             authModules = authMods;
-            return this;
-        }
-
-        public SSOServerRealmInfoBuilder siteIdTable (Hashtable siteIdTab) {
-            siteIDTable = siteIdTab;
-            return this;
-        }
-
-        public SSOServerRealmInfoBuilder svrIdTable (Hashtable svrIdTab) {
-            serverIDTable = svrIdTab;
-            return this;
-        }
-
-        public SSOServerRealmInfoBuilder namingTable (Hashtable namingTab) {
-            namingTable = namingTab;
             return this;
         }
 

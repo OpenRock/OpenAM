@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -42,20 +42,17 @@ import javax.management.MBeanServer;
  */
 public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerEntitlementSvcImpl(SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerEntitlementSvcImpl(SnmpMib myMib, MBeanServer server) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -63,17 +60,13 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        NumReferrals = new Integer(0);
-        NumCachedReferrals = new Integer(0);
-        NumPolicies = new Integer(0);
-        NumCachedPolicies = new Integer(0);
     }
 
     public Integer getNumReferrals() throws SnmpStatusException {
         String classMethod = "SsoServerEntitlementSvcImpl.getNumReferrals: ";
 
         int i = DataStore.getNumberOfReferrals();
-        NumReferrals = new Integer(i);
+        NumReferrals = Integer.valueOf(i);
         if (debug.messageEnabled()) {
             StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
@@ -86,7 +79,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
         String classMethod = "SsoServerEntitlementSvcImpl.getNumPolicies: ";
 
         int i = DataStore.getNumberOfPolicies();
-        NumPolicies = new Integer(i);
+        NumPolicies = Integer.valueOf(i);
         if (debug.messageEnabled()) {
             StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
@@ -100,7 +93,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
             "SsoServerEntitlementSvcImpl.getNumCachedPolicies: ";
 
         int i = OpenSSOIndexStore.getNumCachedPolicies();
-        NumCachedPolicies = new Integer(i);
+        NumCachedPolicies = Integer.valueOf(i);
         if (debug.messageEnabled()) {
             StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);
@@ -114,7 +107,7 @@ public class SsoServerEntitlementSvcImpl extends SsoServerEntitlementSvc {
             "SsoServerEntitlementSvcImpl.getNumCachedReferrals: ";
 
         int i = OpenSSOIndexStore.getNumCachedReferrals();
-        NumCachedReferrals = new Integer(i);
+        NumCachedReferrals = Integer.valueOf(i);
         if (debug.messageEnabled()) {
             StringBuilder sb = new StringBuilder(classMethod);
             sb.append(i);

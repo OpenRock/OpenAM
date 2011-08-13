@@ -42,23 +42,13 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.RuntimeOperationsException;
-import javax.management.remote.*;
-
 import com.sun.jdmk.comm.AuthInfo;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 import com.sun.management.comm.SnmpAdaptorServer;
 import com.sun.management.snmp.SnmpStatusException;
-
-//import java.rmi.registry.Registry;
-//import java.rmi.registry.LocateRegistry;
-//import java.rmi.RemoteException;
-//import java.rmi.server.UnicastRemoteObject;
-
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.Server;
@@ -77,6 +66,12 @@ import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 
 /**
@@ -96,13 +91,11 @@ import com.sun.identity.sm.DNMapper;
  * traps are sent to the port 8086, i.e. non standard ports for SNMP.
  * As such you do not need to be root to start the agent.
  */
-
 public class Agent {
 
-    static SnmpAdaptorServer snmpAdaptor = null;
-    static HtmlAdaptorServer htmlAdaptor = null;
+    private static SnmpAdaptorServer snmpAdaptor = null;
+    private static HtmlAdaptorServer htmlAdaptor = null;
     private static Debug debug;
-    private static OpenSSOMonitoringUtil omu;
     
     /**
      * This variable defines the number of traps this agent has to send.
@@ -111,13 +104,10 @@ public class Agent {
      */
     private static int nbTraps = -1;
     private static boolean agentStarted;
-    private static boolean webtopConfig;
-    private static boolean monitoringConfig;
     private static MBeanServer server;
     private static ObjectName htmlObjName;
     private static ObjectName snmpObjName;
     private static ObjectName mibObjName;
-    private static ObjectName trapGeneratorObjName;
     private static int monHtmlPort;
     private static int monSnmpPort;
     private static int monRmiPort;
@@ -129,24 +119,26 @@ public class Agent {
     private static String ssoSiteID;
     private static String ssoServerID;
     private static boolean dsIsEmbedded;
-    private static boolean siteIsEnabled;
-    private static Hashtable siteIdTable;
-    private static Hashtable serverIDTable;
-    private static Hashtable namingTable;
-    private static HashMap siteToURL;
-    private static HashMap URLToSite;
+    private static Hashtable<String, String> siteIdTable;
+    private static Hashtable<String, String> serverIDTable;
+    private static Hashtable<String, String> namingTable;
+    private static Map<String, String> siteToURL;
+    private static Map<String, String> URLToSite;
     private static String startDate;
     private static JMXConnectorServer cs;
 
-    static SUN_OPENSSO_SERVER_MIB mib2;
+    static SUN_OPENSSO_SERVER_MIBImpl mib2;
     private static SSOServerInfo agentSvrInfo;
-    private static Map realm2Index = new HashMap();  // realm name to index map
-    private static Map index2Realm = new HashMap();  // index to realm name map
-    private static Map realm2DN = new HashMap();  // realm name to DN map
-    private static Map DN2Realm = new HashMap();  // DN to realm name map
-    private static Map realmAuthInst = new HashMap(); // realm|authname entries
-    private static Map realmSAML2IDPs = new HashMap(); // realm|idp entries
-    private static Map realmSAML2SPs = new HashMap(); // realm|sp entries
+    private static Map<String, Integer> realm2Index = new HashMap<String, Integer>();  // realm name to index map
+    private static Map<Integer, String> index2Realm = new HashMap<Integer, String>();  // index to realm name map
+    private static Map<String, String> realm2DN = new HashMap<String, String>();  // realm name to DN map
+    private static Map<String, String> DN2Realm = new HashMap();  // DN to realm name map
+    private static Map<String, SsoServerAuthModulesEntryImpl> realmAuthInst =
+            new HashMap<String, SsoServerAuthModulesEntryImpl>(); // realm|authname entries
+    private static Map<String, SsoServerSAML2IDPEntryImpl> realmSAML2IDPs =
+            new HashMap<String, SsoServerSAML2IDPEntryImpl>(); // realm|idp entries
+    private static Map<String, SsoServerSAML2SPEntryImpl> realmSAML2SPs =
+            new HashMap<String, SsoServerSAML2SPEntryImpl>(); // realm|sp entries
 
     private static boolean monitoringEnabled;
     private static boolean monHtmlPortEnabled;
@@ -165,19 +157,18 @@ public class Agent {
 
     static final String NotAvail = "NotAvailable";
     static final String None = "NONE";
+    private static Registry registry = null;
 
 
     static {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        omu = new OpenSSOMonitoringUtil();
     }
 
-    /*
+    /**
      * Agent constructor
      */
-
     private Agent() {
     }
 
@@ -202,6 +193,9 @@ public class Agent {
             }
             try {
                 cs.stop();
+                if (registry != null) {
+                    UnicastRemoteObject.unexportObject(registry, true);
+                }
                 debug.warning("Agent.stopRMI:rmi adaptor stopped.");
             } catch (Exception ex) {
                 debug.error("Agent.stopRMI: error stopping monitoring " +
@@ -226,24 +220,43 @@ public class Agent {
      *  WebtopNaming.  Information is saved and the corresponding
      *  Monitoring MBeans are created after the Agent ports are started.
      */
-    public static int siteAndServerInfo (SSOServerInfo svrInfo) {
+    public static void siteAndServerInfo(SSOServerInfo svrInfo) {
         agentSvrInfo = svrInfo;
-        return 0;
     }
 
-    public static int startMonitoringAgent (SSOServerInfo svrInfo) {
+    /**
+     *  This method starts up the monitoring agent.  Returns either
+     *  zero (0) if intialization has completed successfully, or one (1)
+     *  if not.
+     *  @param OpenSSOServerID The OpenSSO server's ID in the site
+     *  @param svrProtocol OpenSSO server's protocol (http/https)
+     *  @param svrName OpenSSO server's hostname
+     *  @param svrPort OpenSSO server's port
+     *  @param svrURI OpenSSO server's URI
+     *  @param siteID OpenSSO server's Site ID
+     *  @param openSSOServerID OpenSSO server's ID
+     *  @param isEmbeddedDS Whether the OpenSSO server is using an embedded DS
+     *  @param siteIdTbl the Site ID table for this installation
+     *  @param serverIdTbl the Server ID table for this installation
+     *  @param namingTbl the Naming table for this installation
+     *  @param stDate start date/time for this OpenSSO server
+     *  @return Success (0) or Failure (1)
+     */
+    private static void startMonitoringAgent(SSOServerInfo svrInfo) {
         agentSvrInfo = svrInfo;
-        String serverID = svrInfo.serverID;
-        String siteID = svrInfo.siteID;
-        String serverProtocol = svrInfo.serverProtocol;
-        String serverName = svrInfo.serverName;
-        String serverURI = svrInfo.serverURI;
-        String serverPort = svrInfo.serverPort;
-        boolean isEmbeddedDS = svrInfo.isEmbeddedDS;
-        Hashtable siteIDTable = svrInfo.siteIDTable;
-        Hashtable serverIDTable = svrInfo.serverIDTable;
-        Hashtable namingTable = svrInfo.namingTable;
-        String startDate = svrInfo.startDate;
+        ssoServerID = svrInfo.serverID;
+        ssoSiteID = svrInfo.siteID;
+        ssoProtocol = svrInfo.serverProtocol;
+        ssoName = svrInfo.serverName;
+        ssoURI = svrInfo.serverURI;
+        ssoPort = svrInfo.serverPort;
+        dsIsEmbedded = svrInfo.isEmbeddedDS;
+        siteIdTable = svrInfo.siteIDTable;
+        serverIDTable = svrInfo.serverIDTable;
+        namingTable = svrInfo.namingTable;
+        startDate = svrInfo.startDate;
+
+        String classMethod = "Agent.startMonitoringAgent:";
 
         /*
          *  ServerIDTable has form:
@@ -254,214 +267,91 @@ public class Agent {
         if (debug.messageEnabled()) {
             StringBuilder sb =
                 new StringBuilder("Agent.startMonitoringAgent:ServerInfo:\n");
-            sb.append("  ServerID = ").append(serverID).append("\n").
-            append("  SiteID = ").append(siteID).append("\n").
-            append("  ServerProtocol = ").append(serverProtocol).
+            sb.append("  ServerID = ").append(ssoServerID).append("\n").
+            append("  SiteID = ").append(ssoSiteID).append("\n").
+            append("  ServerProtocol = ").append(ssoProtocol).
                 append("\n").
-            append("  ServerName = ").append(serverName).append("\n").
-            append("  ServerURI = ").append(serverURI).append("\n").
-            append("  IsEmbeddedDS = ").append(isEmbeddedDS).append("\n").
+            append("  ServerName = ").append(ssoName).append("\n").
+            append("  ServerURI = ").append(ssoURI).append("\n").
+            append("  IsEmbeddedDS = ").append(dsIsEmbedded).append("\n").
             append("\n");
-
-            /*
-             *  this server's siteID is "siteID"
-             */
-            Hashtable tht = siteIDTable;
-            Set keySet = tht.keySet();
-            sb.append("  SiteID Table:\n");
-            for (Iterator it = keySet.iterator(); it.hasNext(); ) {
-                String key = (String)it.next();
-                String value = (String)tht.get(key);
-                sb.append("    key = ").append(key).
-                    append(", value = ").append(value).append("\n");
-            }
 
             /*
              *  can get this server's URL from the naming table, using
              *  its serverID.  get the site's URL with siteID
              */
-            String svrURL = (String)namingTable.get(serverID);
+            String svrURL = namingTable.get(ssoServerID);
             sb.append("  Naming table entry for serverID ").
-                append(serverID).append(" is ");
+                append(ssoServerID).append(" is ");
             if ((svrURL != null) && (svrURL.length() > 0)) {
                 sb.append(svrURL).append("\n");
             } else {
                 sb.append("NULL!\n");
             }
-            svrURL = (String)namingTable.get(siteID);
+            svrURL = namingTable.get(ssoSiteID);
             sb.append("  Naming table entry for siteID ").
-                append(siteID).append(" is ");
+                append(ssoSiteID).append(" is ");
             if ((svrURL != null) && (svrURL.length() > 0)) {
                 sb.append(svrURL).append("\n");
             } else {
                 sb.append("NULL!\n");
+            }
+            sb.append("    start date/time = ").append(startDate);
+            debug.message(sb.toString());
+
+            /*
+             * if there's a site configured, then siteIdTable will contain
+             * the serverIDs
+             */
+            sb = new StringBuilder(classMethod);
+            if ((siteIdTable != null) && !siteIdTable.isEmpty()) {
+                sb.append("Site ID Table:\n");
+                for (Map.Entry<String, String> entry : siteIdTable.entrySet()) {
+                    String siteid = entry.getKey();
+                    String svrid = siteIdTable.get(siteid);
+                    String sURL = namingTable.get(siteid);
+                    sb.append("  ").append(siteid).append('(').
+                        append(sURL).append(')').append(" = ").
+                        append(svrid).append('\n');
+                }
+            } else {
+                sb.append("siteIdTable is null or empty");
             }
             debug.message(sb.toString());
-        }
-
-
-        return startMonitoringAgent (serverID, serverProtocol, serverName,
-            serverPort, serverURI, siteID, isEmbeddedDS,
-            siteIDTable, serverIDTable, namingTable, startDate);
-    }
-
-    /*
-     *  This method starts up the monitoring agent.  Returns either
-     *  zero (0) if intialization has completed successfully, or one (1)
-     *  if not.
-     *  @param OpenSSOServerID The OpenSSO server's ID in the site
-     *  @param svrProtocol OpenSSO server's protocol (http/https)
-     *  @param svrName OpenSSO server's hostname
-     *  @param svrPort OpenSSO server's port
-     *  @param svrURI OpenSSO server's URI
-     *  @param siteID OpenSSO server's Site ID
-     *  @param serverID OpenSSO server's ID
-     *  @param isEmbeddedDS Whether the OpenSSO server is using an embedded DS
-     *  @param siteIdTbl the Site ID table for this installation
-     *  @param serverIdTbl the Server ID table for this installation
-     *  @param namingTbl the Naming table for this installation
-     *  @param stDate start date/time for this OpenSSO server
-     *  @return Success (0) or Failure (1)
-     */
-
-    public static int startMonitoringAgent (
-        String openSSOServerID,
-        String svrProtocol,
-        String svrName,
-        String svrPort,
-        String svrURI,
-        String siteID,
-        boolean isEmbeddedDS,
-        Hashtable siteIdTbl,
-        Hashtable serverIdTbl,
-        Hashtable namingTbl,
-        String stDate)
-    {
-        String classMethod = "Agent.startMonitoringAgent:";
-
-        ssoServerID = openSSOServerID;
-        ssoProtocol = svrProtocol;
-        ssoName = svrName;
-        ssoPort = svrPort;
-        ssoURI = svrURI;
-        ssoSiteID = siteID;
-        dsIsEmbedded = isEmbeddedDS;
-        siteIsEnabled = !ssoServerID.equals(siteID);
-        siteIdTable = siteIdTbl;
-        serverIDTable = serverIdTbl;
-        namingTable = namingTbl;
-        startDate = stDate;
-
-        if (debug.messageEnabled()) {
-            String svrURL = (String)namingTable.get(ssoServerID);
-            StringBuilder sb2 =
-                new StringBuilder( "    Naming table entry for serverID ");
-            sb2.append(ssoServerID).append(": ");
-            if ((svrURL != null) && (svrURL.length() > 0)) {
-                sb2.append(svrURL).append("\n");
-            } else {
-                sb2.append("NULL!\n");
-            }
-            svrURL = (String)namingTable.get(siteID);
-            sb2.append("    Naming table entry for siteID ").
-                append(siteID).append(": ");
-            if ((svrURL != null) && (svrURL.length() > 0)) {
-                sb2.append(svrURL).append("\n");
-            } else {
-                sb2.append("NULL!\n");
-            }
-
-            debug.message(classMethod + "parameters are:\n" +
-                "    serverID = " + openSSOServerID + "\n" +
-                "    protocol = " + svrProtocol + "\n" +
-                "    svrName = " + svrName + "\n" +
-                "    port = " + svrPort + "\n" +
-                "    siteID = " + siteID + "\n" +
-                "    isEmbeddedDS = " + isEmbeddedDS + "\n" +
-                "    siteIsEnabled = " + siteIsEnabled + "\n" +
-                sb2.toString() + "\n" +
-                "    start date/time = " + stDate);
-        }
-
-        /*
-         *  start date/time, stDate, format is "YYYY-MM-DD HH:MM:SS"
-         *  SsoServerStartDate should be an 8-Byte array, where
-         *    bytes 0-1: year
-         *    byte    2: month
-         *    byte    3: day
-         *    byte    4: hours
-         *    byte    5: minutes
-         *    byte    6: seconds
-         *    byte    7: deci-seconds (will be 0)
-         *
-         *  however, need to wait for the SUN_OPENSSO_SERVER_MIB
-         *  instantiation, so that there's an SsoServerInstanceImpl
-         *  instance around to update.
-         *
-         *  or could have the SsoServerInstanceImpl.init() do it...
-         */
-
-        /*
-         * if there's a site configured, then siteIdTable will contain
-         * the serverIDs
-         */
-
-        if (debug.messageEnabled()) {
-            if ((siteIdTable != null) && !siteIdTable.isEmpty()) {
-                debug.message(classMethod + "siteIdTable -> " +
-                    siteIdTable.toString());
-
-                Set ks = siteIdTable.keySet();
-                StringBuffer sb = new StringBuffer("Site ID Table:\n");
-                for (Iterator it = ks.iterator(); it.hasNext(); ) {
-                    String siteid = (String)it.next();
-                    String svrid = (String)siteIdTable.get(siteid);
-                    String sURL = (String)namingTable.get(siteid);
-                    sb.append("  ").append(siteid).append("(").
-                        append(sURL).append(")").append(" = ").
-                        append(svrid).append("\n");
-                }
-                debug.message(classMethod + sb.toString());
-            } else {
-                debug.message (classMethod + "siteIdTable is null or empty");
-            }
 
             /*
              *  print out the serverIDTable
              */
+            sb = new StringBuilder(classMethod);
             if ((serverIDTable != null) && !serverIDTable.isEmpty()) {
-                Set ks = serverIDTable.keySet();
-                StringBuilder sb = new StringBuilder("Server ID Table:\n");
-                for (Iterator it = ks.iterator(); it.hasNext(); ) {
-                    String svr = (String)it.next();
-                    String svrid = (String)serverIDTable.get(svr);
-                    sb.append("  server ").append(svr).append(" ==> svrid ").
-                        append(svrid).append("\n");
+                sb.append("Server ID Table:\n");
+                for (Map.Entry<String, String> entry : serverIDTable.entrySet()) {
+                    sb.append("  server ").append(entry.getKey()).append(" ==> svrid ").
+                        append(entry.getValue()).append("\n");
                 }
-                debug.message (classMethod + sb.toString());
             } else {
-                debug.message (classMethod + "ServerIdTable is null or empty");
+                sb.append("ServerIdTable is null or empty");
             }
+            debug.message(sb.toString());
 
             /*
              *  print out the namingTable
              */
+            sb = new StringBuilder(classMethod);
             if ((namingTable != null) && !namingTable.isEmpty()) {
                 Set ks = namingTable.keySet();
-                StringBuilder sb = new StringBuilder("Naming Table:\n");
+                sb.append("Naming Table:\n");
                 for (Iterator it = ks.iterator(); it.hasNext(); ) {
                     String svr = (String)it.next();
                     String svrid = (String)namingTable.get(svr);
                     sb.append("  key ").append(svr).append(" ==> value ").
                         append(svrid).append("\n");
                 }
-                debug.message (classMethod + sb.toString());
             } else {
-                debug.message (classMethod + "NamingTable is null or empty");
+                sb.append("NamingTable is null or empty");
             }
+            debug.message(sb.toString());
         }
-
-        return (0);
     }
 
 
@@ -583,7 +473,7 @@ public class Agent {
          *  will the findMBeanServer(null) "find" those?  if so,
          *  is using the first one the right thing to do?
          */
-        ArrayList servers = null;
+        List<MBeanServer> servers = null;
         try {
             servers = MBeanServerFactory.findMBeanServer(null);
         } catch (SecurityException ex) {
@@ -604,7 +494,7 @@ public class Agent {
         }
 
         if ((servers != null) && !servers.isEmpty()) {
-            server = (MBeanServer)servers.get(0);
+            server = servers.get(0);
         } else {
             try {
                 server = MBeanServerFactory.createMBeanServer();
@@ -640,7 +530,6 @@ public class Agent {
 
         String domain = server.getDefaultDomain();  // throws no exception
 
-
         // Create the MIB II (RFC 1213), add to the MBean server.
         try {
             mibObjName =
@@ -662,7 +551,7 @@ public class Agent {
 
         // Create an instance of the customized MIB
         try {
-            mib2 = new SUN_OPENSSO_SERVER_MIB();
+            mib2 = new SUN_OPENSSO_SERVER_MIBImpl();
         } catch (RuntimeException ex) {
             debug.error (classMethod + "Runtime error instantiating MIB", ex);
             return MON_CREATEMIB_PROBLEM;
@@ -729,12 +618,13 @@ public class Agent {
                         "HTML adaptor is bound on TCP port " + monHtmlPort);
                 }
 
-                String[][] users = omu.getMonAuthList(monAuthFilePath);
+                Map<String, String> users = MonitoringUtil.getMonAuthList(monAuthFilePath);
                 if (users != null) {
-                    int sz = Array.getLength(users);
-                    AuthInfo authInfo[] = new AuthInfo[sz];
-                    for (int i = 0; i < sz; i++) {
-                        authInfo[i] = new AuthInfo(users[i][0], users[i][1]);
+                    AuthInfo authInfo[] = new AuthInfo[users.size()];
+                    int i = 0;
+                    for (Map.Entry<String, String> entry : users.entrySet()) {
+                        authInfo[i] = new AuthInfo(entry.getKey(), entry.getValue());
+                        i++;
                     }
                     htmlAdaptor = new HtmlAdaptorServer(monHtmlPort, authInfo);
                 } else {
@@ -860,85 +750,28 @@ public class Agent {
 
                     monSNMPStarted = true;
                 }
-            } catch (MalformedObjectNameException ex) {
-                // from ObjectName
+            } catch (Exception ex) {
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error getting ObjectName for SNMP adaptor: " +
+                        "Error while setting up SNMP adaptor " +
                         ex.getMessage());
                 }
-            } catch (NullPointerException ex) {
-                // from ObjectName
-                if (debug.warningEnabled()) {
-                    debug.warning(classMethod +
-                        "NPE getting ObjectName for SNMP adaptor: " +
-                        ex.getMessage());
+                if (ex instanceof IOException || ex instanceof SnmpStatusException) {
+                     // should be from the snmpV1Trap call, which
+                     //*shouldn't* affect the rest of snmp operations...
+                    monSNMPStarted = true;
                 }
-            } catch (InstanceAlreadyExistsException ex) {
-                // from registerMBean
-                if (debug.warningEnabled()) {
-                    debug.warning(classMethod +
-                        "Error registering SNMP adaptor MBean: " +
-                        ex.getMessage());
-                }
-            } catch (MBeanRegistrationException ex) {
-                // from registerMBean
-                if (debug.warningEnabled()) {
-                    debug.warning(classMethod +
-                        "Error registering SNMP adaptor MBean: " +
-                        ex.getMessage());
-                }
-            } catch (NotCompliantMBeanException ex) {
-                // from registerMBean
-                if (debug.warningEnabled()) {
-                    debug.warning(classMethod +
-                        "Error registering SNMP adaptor MBean: " +
-                        ex.getMessage());
-                }
-            } catch (IOException ex) {
-                /*
-                 * should be from the snmpV1Trap call, which
-                 * *shouldn't* affect the rest of snmp operations...
-                 */
-                if (debug.warningEnabled()) {
-                    debug.warning(classMethod +
-                        "IO Error from SNMP snmpV1Trap: " +
-                        ex.getMessage());
-                }
-                monSNMPStarted = true;
-            } catch (SnmpStatusException ex) {
-                /*
-                 * also should be from the snmpV1Trap call, which
-                 * *shouldn't* affect the rest of snmp operations...
-                 */
-                if (debug.warningEnabled()) {
-                    debug.warning(classMethod +
-                        "Status error from SNMP snmpV1Trap: " +
-                        ex.getMessage());
-                }
-                monSNMPStarted = true;
             }
         } else {
             debug.warning(classMethod +
                 "Monitoring SNMP port not enabled.");
         }
 
-//        /*
-//         *  adding the create registry for "our" port?
-//         */
-//        try {
-//            XXX xyz = new XXX();
-//            xxx stub = (XXX)UnicastRemoteObject.exportObject(xyz,
-//                monRmiPort);
-//            Registry registry = LocateRegistry.getRegistry();
-//            registry.bind("what?", stub);
-//        } catch (Exception e) {
-//        }
-
         // RMI port adaptor
         if (monRmiPortEnabled) {
             // Create an RMI connector and start it
             try {
+                registry = LocateRegistry.createRegistry(monRmiPort);
                 JMXServiceURL url = new JMXServiceURL(
                     "service:jmx:rmi:///jndi/rmi://localhost:" +
                     monRmiPort + "/server");
@@ -1028,289 +861,211 @@ public class Agent {
         } else {
             agentStarted = true;  // if all/enough has gone well
             startMonitoringAgent(agentSvrInfo);
-            return (0);
+            return 0;
         }
-    }
-
-    public static void setWebtopConfig(boolean state) {
-        webtopConfig = state;
-    }
-
-    public static void setMonitoringConfig(boolean state) {
-        monitoringConfig = state;
     }
 
     /**
-     *  Return whether agent is "running" or not
+     * Return whether agent is "running" or not
+     * Monitoring implementations should not call this method directly, but
+     * instead, they should call {@link MonitoringUtil#isRunning()}.
      */
-    public static boolean isRunning() {
+    protected static boolean isRunning() {
         return agentStarted;
     }
 
-    /*
+    /**
      *  Return the pointer to the authentication service mbean
      */
-    public static Object getAuthSvcMBean() {
-        if (mib2 != null) {
-            return mib2.getAuthSvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerAuthSvcImpl getAuthSvcMBean() {
+        return mib2 == null ? null : mib2.getAuthSvcGroup();
     }
 
-    /*
+    public static SsoServerConnPoolSvcImpl getConnPoolSvcMBean() {
+        return mib2 == null ? null : mib2.getConnPoolGroup();
+    }
+
+    /**
      *  Return the pointer to the session service mbean
      */
-    public static Object getSessSvcMBean() {
-        if (mib2 != null) {
-            return mib2.getSessSvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerSessSvcImpl getSessSvcMBean() {
+        return mib2 == null ? null : mib2.getSessSvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the logging service mbean
      */
-    public static Object getLoggingSvcMBean() {
-        if (mib2 != null) {
-            return mib2.getLoggingSvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerLoggingSvcImpl getLoggingSvcMBean() {
+        return mib2 == null ? null : mib2.getLoggingSvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the policy service mbean
      */
-    public static Object getPolicySvcMBean() {
-        if (mib2 != null) {
-            return mib2.getPolicySvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerPolicySvcImpl getPolicySvcMBean() {
+        return mib2 == null ? null : mib2.getPolicySvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the IdRepo service mbean
      */
-    public static Object getIdrepoSvcMBean() {
-        if (mib2 != null) {
-            return mib2.getIdrepoSvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerIdRepoSvcImpl getIdrepoSvcMBean() {
+        return mib2 == null ? null : mib2.getIdrepoSvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the service service mbean
      */
-    public static Object getSmSvcMBean() {
-        if (mib2 != null) {
-            return mib2.getSmSvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerSvcMgmtSvcImpl getSmSvcMBean() {
+        return mib2 == null ? null : mib2.getSmSvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the SAML1 service mbean
      */
-    public static Object getSaml1SvcMBean() {
-        if (mib2 != null) {
-            return mib2.getSaml1SvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerSAML1SvcImpl getSaml1SvcMBean() {
+        return mib2 == null ? null : mib2.getSaml1SvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the SAML2 service mbean
      */
-    public static Object getSaml2SvcMBean() {
-        if (mib2 != null) {
-            return mib2.getSaml2SvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerSAML2SvcImpl getSaml2SvcMBean() {
+        return mib2 == null ? null : mib2.getSaml2SvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the IDFF service mbean
      */
-    public static Object getIdffSvcMBean() {
-        if (mib2 != null) {
-            return mib2.getIdffSvcGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerIDFFSvcImpl getIdffSvcMBean() {
+        return mib2 == null ? null : mib2.getIdffSvcGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the Topology mbean
      */
-    public static Object getTopologyMBean() {
-        if (mib2 != null) {
-            return mib2.getTopologyGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerTopologyImpl getTopologyMBean() {
+        return mib2 == null ? null : mib2.getTopologyGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the Server Instance mbean
      */
-    public static Object getSvrInstanceMBean() {
-        if (mib2 != null) {
-            return mib2.getSvrInstanceGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerInstanceImpl getSvrInstanceMBean() {
+        return mib2 == null ? null : mib2.getSvrInstanceGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the Fed COTs mbean
      */
-    public static Object getFedCOTsMBean() {
-        if (mib2 != null) {
-            return mib2.getFedCotsGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerFedCOTsImpl getFedCOTsMBean() {
+        return mib2 == null ? null : mib2.getFedCotsGroup();
     }
 
-    /*
+    /**
      *  Return the pointer to the Federation Entities mbean
      */
-    public static Object getFedEntsMBean() {
-        if (mib2 != null) {
-            return mib2.getFedEntitiesGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerFedEntitiesImpl getFedEntsMBean() {
+        return mib2 == null ? null : mib2.getFedEntitiesGroup();
     }
 
-    /*
-     *  Return the pointer to the SAML2 Service mbean
-     */
-    public static Object getSAML2SvcGroup() {
-        if (mib2 != null) {
-            return mib2.getSaml2SvcGroup();
-        } else {
-            return null;
-        }
-    }
-
-    /*
+    /**
      *  Return the pointer to the Entitlements Service mbean
      */
-    public static Object getEntitlementsGroup() {
-        if (mib2 != null) {
-            return mib2.getEntitlementsGroup();
-        } else {
-            return null;
-        }
+    public static SsoServerEntitlementSvcImpl getEntitlementsGroup() {
+        return mib2 == null ? null : mib2.getEntitlementsGroup();
     }
 
     public static String getSsoProtocol() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.serverProtocol);
+            return agentSvrInfo.serverProtocol;
         } else {
             return null;
         }
     }
     public static String getSsoName() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.serverName);
+            return agentSvrInfo.serverName;
         } else {
             return null;
         }
     }
     public static String getSsoPort() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.serverPort);
+            return agentSvrInfo.serverPort;
         } else {
             return null;
         }
     }
     public static String getSsoURI() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.serverURI);
+            return agentSvrInfo.serverURI;
         } else {
             return null;
         }
     }
     public static String getSsoSvrID() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.serverID);
+            return agentSvrInfo.serverID;
         } else {
             return null;
         }
     }
 
-    public static Hashtable getSiteIdTable() {
+    public static Hashtable<String, String> getSiteIdTable() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.siteIDTable);
+            return agentSvrInfo.siteIDTable;
         } else {
             return null;
         }
     }
 
-    public static Hashtable getServerIdTable() {
+    public static Hashtable<String, String> getServerIdTable() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.serverIDTable);
+            return agentSvrInfo.serverIDTable;
         } else {
             return null;
         }
     }
 
-    public static Hashtable getNamingTable() {
+    public static Hashtable<String, String> getNamingTable() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.namingTable);
+            return agentSvrInfo.namingTable;
         } else {
             return null;
         }
     }
 
-    public static HashMap getSiteToURLTable() {
-        return (siteToURL);
+    public static Map<String, String> getSiteToURLTable() {
+        return siteToURL;
     }
 
-    public static HashMap getURLToSiteTable() {
-        return (URLToSite);
+    public static Map<String, String> getURLToSiteTable() {
+        return URLToSite;
     }
 
     public static boolean getDsIsEmbedded() {
-        return (dsIsEmbedded);
+        return dsIsEmbedded;
     }
 
     public static String getStartDate() {
-        return (startDate);
+        return startDate;
     }
 
     public static String getSiteId() {
         if (agentSvrInfo != null) {
-            return (agentSvrInfo.siteID);
+            return agentSvrInfo.siteID;
         } else {
             return null;
         }
     }
 
-    public static boolean getWebtopConfig() {
-        return (webtopConfig);
-    }
-
-    public static boolean getMonitoringConfig() {
-        return (monitoringConfig);
-    }
-
-    /*
-     *  receive Set of site names
-     *
-     *  sNames... site name -> primary URL
-     *  urlSites is opposite... primary URL -> site name
+    /**
+     * receive Set of site names
+     * @param sNames site name -> primary URL
+     * @param urlSites is opposite... primary URL -> site name
      */
-    public static void siteNames (HashMap sNames, HashMap urlSites) {
+    public static void siteNames (Map<String, String> sNames, Map<String, String> urlSites) {
         String classMethod = "Agent.siteNames:";
         if (sNames.isEmpty()) {
             if (debug.messageEnabled()) {
@@ -1323,14 +1078,12 @@ public class Agent {
         URLToSite = urlSites;
 
         if (debug.messageEnabled()) {
-            Set kset = sNames.keySet();
             StringBuilder sb = new StringBuilder("Site Names and URLs:\n");
-            for (Iterator it = kset.iterator(); it.hasNext(); ) {
-                String stName = (String)it.next();
-                String stURL = (String)sNames.get(stName);
 
-                sb.append("    siteName = ").append(stName).
-                    append(", primary URL = ").append(stURL).append("\n");
+            for (Map.Entry<String, String> entry : sNames.entrySet()) {
+                sb.append("    siteName = ").append(entry.getKey()).
+                    append(", primary URL = ").append(entry.getValue()).append("\n");
+
             }
             debug.message(classMethod + sb.toString());
         }
@@ -1342,22 +1095,20 @@ public class Agent {
          *
          *  where the key!=value, then do the sitemap entries
          */
-        Set sidKeys = siteIdTable.keySet();
         int i = 1;
-        for (Iterator it = sidKeys.iterator(); it.hasNext(); ) {
-            String svrId = (String)it.next();
-            String siteId = (String)siteIdTable.get(svrId);
-            String svrURL = (String)namingTable.get(siteId);
-            String siteName = (String)urlSites.get(svrURL);
+
+        for (Map.Entry<String, String> entry : siteIdTable.entrySet()) {
+            String svrId = entry.getKey();
+            String siteId = entry.getValue();
+            String svrURL = namingTable.get(siteId);
+            String siteName = urlSites.get(svrURL);
             String escSiteName = getEscapedString(siteName);
-            SsoServerTopologyImpl tg =
-                (SsoServerTopologyImpl)mib2.getTopologyGroup();
+            SsoServerTopologyImpl tg = mib2.getTopologyGroup();
             if (siteId.equals(svrId)) { // is a site
-                SsoServerSitesEntryImpl ssse =
-                    new SsoServerSitesEntryImpl(mib2);
-                Integer sid = new Integer(0);
+                SsoServerSitesEntryImpl ssse = new SsoServerSitesEntryImpl(mib2);
+                Integer sid = Integer.valueOf(0);
                 try {
-                    sid = new Integer(siteId);
+                    sid = Integer.valueOf(siteId);
                 } catch (NumberFormatException nfe) {
                     debug.error(classMethod + "invalid siteid (" +
                         siteId + "): " + nfe.getMessage(), nfe);
@@ -1391,11 +1142,11 @@ public class Agent {
             } else { // is a server
                 SsoServerSiteMapEntryImpl ssse =
                     new SsoServerSiteMapEntryImpl(mib2);
-                ssse.MapServerURL = (String)namingTable.get(svrId);
+                ssse.MapServerURL = namingTable.get(svrId);
                 ssse.MapSiteName = escSiteName;
                 ssse.MapId = siteId;
                 try {
-                    ssse.SiteMapId = new Integer(svrId);
+                    ssse.SiteMapId = Integer.valueOf(svrId);
                 } catch (NumberFormatException nfe) {
                     debug.error(classMethod + "invalid serverID (" +
                         svrId + "): " + nfe.getMessage(), nfe);
@@ -1439,10 +1190,10 @@ public class Agent {
         }
     }
  
-    /*
+    /**
      *  receive ordered list of realms
      */
-    public static int realmsConfig (ArrayList realmList) {
+    public static int realmsConfig (List<String> realmList) {
         String classMethod = "Agent.realmsConfig:";
 
         /*
@@ -1453,22 +1204,21 @@ public class Agent {
         StringBuilder sb =
             new StringBuilder("receiving list of realms (size = ");
         sb.append(realmList.size()).append("):\n");
-        SsoServerInstanceImpl sig =
-            (SsoServerInstanceImpl)mib2.getSvrInstanceGroup();
+        SsoServerInstanceImpl sig = mib2.getSvrInstanceGroup();
         TableSsoServerRealmTable rtab = null;
         if (sig != null) {
             try {
                 rtab = sig.accessSsoServerRealmTable();
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod + "getting realm table: ", ex);
-                return (-1);
+                return -1;
             } 
         }
         int realmsAdded = 0;
         for (int i = 0; i < realmList.size(); i++) {
-            String ss = (String)realmList.get(i);
+            String ss = realmList.get(i);
             SsoServerRealmEntryImpl rei = new SsoServerRealmEntryImpl(mib2);
-            rei.SsoServerRealmIndex = new Integer(i+1);
+            rei.SsoServerRealmIndex = Integer.valueOf(i+1);
             String ss2 = ss;
             ss2 = getEscapedString(ss2);
             rei.SsoServerRealmName = ss2;
@@ -1522,14 +1272,13 @@ public class Agent {
         /*
          * create the Entitlements MBeans for this realm as specified by Ii.
          * the Network Monitors are not per-real.  the set list is in
-         * OpenSSOMonitoringUtil.java (getNetworkMonitorNames()).
+         * MonitoringUtil.java (getNetworkMonitorNames()).
          * the Policy Stats are realm-based.
          */
-        String[] nms = omu.getNetworkMonitorNames();
+        String[] nms = MonitoringUtil.getNetworkMonitorNames();
 
         if ((nms != null) && (nms.length > 0)) {
-            SsoServerEntitlementSvc esi =
-                (SsoServerEntitlementSvc)mib2.getEntitlementsGroup();
+            SsoServerEntitlementSvc esi = mib2.getEntitlementsGroup();
             if (esi != null) {
                 try {
                     TableSsoServerEntitlementExecStatsTable etab =
@@ -1540,9 +1289,9 @@ public class Agent {
                         SsoServerEntitlementExecStatsEntryImpl ssi =
                             new SsoServerEntitlementExecStatsEntryImpl(mib2);
                         ssi.EntitlementNetworkMonitorName = str;
-                        ssi.EntitlementMonitorThruPut = new Long(0);
-                        ssi.EntitlementMonitorTotalTime = new Long(0);
-                        ssi.EntitlementNetworkMonitorIndex = new Integer(i+1);
+                        ssi.EntitlementMonitorThruPut = 0L;
+                        ssi.EntitlementMonitorTotalTime = 0L;
+                        ssi.EntitlementNetworkMonitorIndex = Integer.valueOf(i+1);
 
                         ObjectName sname =
                             ssi.
@@ -1583,13 +1332,13 @@ public class Agent {
                     TableSsoServerEntitlementPolicyStatsTable ptab =
                         esi.accessSsoServerEntitlementPolicyStatsTable();
                     for (int i = 0; i < realmList.size(); i++) {
-                        String ss = (String)realmList.get(i);
-                        Integer Ii = new Integer(i+1);
+                        String ss = realmList.get(i);
+                        Integer Ii = Integer.valueOf(i+1);
                         SsoServerEntitlementPolicyStatsEntryImpl ssi =
                             new SsoServerEntitlementPolicyStatsEntryImpl(mib2);
-                        ssi.EntitlementPolicyCaches = new Integer(0);
-                        ssi.EntitlementReferralCaches = new Integer(0);
-                        ssi.EntitlementPolicyStatsIndex = new Integer(i+1);
+                        ssi.EntitlementPolicyCaches = 0;
+                        ssi.EntitlementReferralCaches = 0;
+                        ssi.EntitlementPolicyStatsIndex = Integer.valueOf(i+1);
                         ssi.SsoServerRealmIndex = Ii;
                         ObjectName sname =
                           ssi.
@@ -1638,22 +1387,21 @@ public class Agent {
         return 0;
     }
 
-    /*
+    /**
      *  process configuration for a realm
      */
     public static int realmConfigMonitoringAgent (SSOServerRealmInfo rlmInfo) {
         String classMethod = "Agent.realmConfigMonitoringAgent:";
         String realm = rlmInfo.realmName;
-        HashMap authMods = rlmInfo.authModules;
+        Map<String, String> authMods = rlmInfo.authModules;
 
-        Integer realmIndex = (Integer)realm2Index.get(realm);
+        Integer realmIndex = realm2Index.get(realm);
         if (realmIndex == null) {
             debug.error(classMethod + "could not find realm " + realm +
                 " in realm2Index map");
-            return (-1);
+            return -1;
         }
-        SsoServerAuthSvcImpl sig =
-            (SsoServerAuthSvcImpl)mib2.getAuthSvcGroup();
+        SsoServerAuthSvcImpl sig = mib2.getAuthSvcGroup();
         TableSsoServerAuthModulesTable atab = null;
         if (sig != null) {
             try {
@@ -1675,10 +1423,9 @@ public class Agent {
          *  auth module table entries have realm index, and auth module index
          */
         int i = 1;
-        Set authMKeys = authMods.keySet();
-        for (Iterator it = authMKeys.iterator(); it.hasNext(); ) {
-            String modInst = (String)it.next();
-            String modType = (String)authMods.get(modInst);
+        for (Map.Entry<String, String> entry : authMods.entrySet()) {
+            String modInst = entry.getKey();
+            String modType = entry.getValue();
 
             if (debug.messageEnabled()) {
                 sb.append("    instance = ").append(modInst).
@@ -1690,8 +1437,8 @@ public class Agent {
             aei.AuthModuleIndex = new Integer(i++);
             aei.AuthModuleName = modInst;
             aei.AuthModuleType = getEscapedString(modType);
-            aei.AuthModuleSuccessCount = new Long(0);
-            aei.AuthModuleFailureCount = new Long(0);
+            aei.AuthModuleSuccessCount = 0L;
+            aei.AuthModuleFailureCount = 0L;
             ObjectName aname =
                 aei.createSsoServerAuthModulesEntryObjectName(server);
 
@@ -1727,10 +1474,10 @@ public class Agent {
             debug.message(classMethod + sb.toString());
         }
 
-        return (0);
+        return 0;
     }
 
-    /*
+    /**
      *  process realm's Agents (only)
      *
      *  the HashMap of attributes/values:
@@ -1766,7 +1513,7 @@ public class Agent {
      *    2.2_Agent should have:
      *      "groupmembership"
      */
-    public static void configAgentsOnly (String realm, Map agtAttrs) {
+    public static void configAgentsOnly (String realm, Map<String, Map<String, String>> agtAttrs) {
         String classMethod = "Agent.configAgentsOnly:";
         if ((agtAttrs == null) || agtAttrs.isEmpty()) {
             if (debug.messageEnabled()) {
@@ -1776,13 +1523,11 @@ public class Agent {
             return;
         }
 
-        SsoServerPolicyAgents sss =
-            (SsoServerPolicyAgentsImpl)mib2.getPolicyAgentsGroup();
+        SsoServerPolicyAgents sss = mib2.getPolicyAgentsGroup();
         TableSsoServerPolicy22AgentTable t22tab = null;
         TableSsoServerPolicyJ2EEAgentTable j2eetab = null;
         TableSsoServerPolicyWebAgentTable watab = null;
-        SsoServerWSSAgents ssa =
-            (SsoServerWSSAgentsImpl)mib2.getWssAgentsGroup();
+        SsoServerWSSAgents ssa = mib2.getWssAgentsGroup();
         TableSsoServerWSSAgentsSTSAgentTable ststab = null;
         TableSsoServerWSSAgentsWSPAgentTable wsptab = null;
         TableSsoServerWSSAgentsWSCAgentTable wsctab = null;
@@ -1824,7 +1569,6 @@ public class Agent {
                 append(agtAttrs.size()).append("\n");
         }
 
-        Set ks = agtAttrs.keySet();  // the agent names
         int wai = 1;  // index for web agents
         int j2eei = 1; // index for j2ee agents
         int t22i = 1;  // index for 2.2_agents
@@ -1844,11 +1588,11 @@ public class Agent {
             return;
         }
 
-        for (Iterator it = ks.iterator(); it.hasNext(); ) {
-            String agtname = (String)it.next();
-            HashMap hm = (HashMap)agtAttrs.get(agtname);
-            String atype = (String)hm.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
-            String grpmem = (String)hm.get("groupmembership");
+        for (Map.Entry<String, Map<String, String>> entry : agtAttrs.entrySet()) {
+            String agtname = entry.getKey();
+            Map<String, String> hm = entry.getValue();;
+            String atype = hm.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
+            String grpmem = hm.get("groupmembership");
 
             //  group and agent name can't have ":" in it, or jdmk gags
             if (grpmem == null) {
@@ -1865,11 +1609,9 @@ public class Agent {
             }
         
             if (atype.equals("WebAgent")) {
-                String aurl =
-                    (String)hm.get(
+                String aurl = hm.get(
                         "com.sun.identity.agents.config.agenturi.prefix");
-                String lurl =
-                    (String)hm.get("com.sun.identity.agents.config.login.url");
+                String lurl = hm.get("com.sun.identity.agents.config.login.url");
                 SsoServerPolicyWebAgentEntryImpl aei =
                     new SsoServerPolicyWebAgentEntryImpl(mib2);
                 aei.SsoServerRealmIndex = ri;
@@ -1929,12 +1671,12 @@ public class Agent {
                 SsoServerPolicyJ2EEAgentEntryImpl aei =
                     new SsoServerPolicyJ2EEAgentEntryImpl(mib2);
                 String aurl =
-                    (String)hm.get("com.sun.identity.client.notification.url");
+                    hm.get("com.sun.identity.client.notification.url");
                 if (aurl == null) {
                     aurl = None;
                 }
                 String lurl =
-                    (String)hm.get("com.sun.identity.agents.config.login.url");
+                    hm.get("com.sun.identity.agents.config.login.url");
                 aei.PolicyJ2EEAgentGroup = grpmem;
                 aei.PolicyJ2EEAgentAgentURL = aurl;
                 aei.PolicyJ2EEAgentServerURL = lurl;
@@ -1964,15 +1706,15 @@ public class Agent {
             } else if (atype.equals("WSPAgent")) {
                 SsoServerWSSAgentsWSPAgentEntryImpl aei =
                     new SsoServerWSSAgentsWSPAgentEntryImpl(mib2);
-                String wep = (String)hm.get("wsendpoint");
+                String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = NotAvail;
                 }
-                String wpep = (String)hm.get("wspproxyendpoint");
+                String wpep = hm.get("wspproxyendpoint");
                 if (wpep == null) {
                     wpep = NotAvail;
                 }
-                String mgrp = (String)hm.get("groupmembership");
+                String mgrp = hm.get("groupmembership");
                 if (mgrp == null) {
                     mgrp = None;
                 }
@@ -2012,15 +1754,15 @@ public class Agent {
             } else if (atype.equals("WSCAgent")) {
                 SsoServerWSSAgentsWSCAgentEntryImpl aei =
                     new SsoServerWSSAgentsWSCAgentEntryImpl(mib2);
-                String wep = (String)hm.get("wsendpoint");
+                String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = None;
                 }
-                String wpep = (String)hm.get("wspproxyendpoint");
+                String wpep = hm.get("wspproxyendpoint");
                 if (wpep == null) {
                     wpep = None;
                 }
-                String mgrp = (String)hm.get("groupmembership");
+                String mgrp = hm.get("groupmembership");
                 if (mgrp == null) {
                     mgrp = None;
                 }
@@ -2053,7 +1795,7 @@ public class Agent {
             } else if (atype.equals("STSAgent")) {
                 SsoServerWSSAgentsSTSAgentEntryImpl aei =
                     new SsoServerWSSAgentsSTSAgentEntryImpl(mib2);
-                String sep = (String)hm.get("stsendpoint");
+                String sep = hm.get("stsendpoint");
                 aei.WssAgentsSTSAgentName = agtname;
                 aei.WssAgentsSTSAgentSvcTokenEndPoint = sep;
                 aei.WssAgentsSTSAgentIndex = new Integer(stsi++);
@@ -2084,11 +1826,11 @@ public class Agent {
             } else if (atype.equals("DiscoveryAgent")) {
                 SsoServerWSSAgentsDSCAgentEntryImpl aei =
                     new SsoServerWSSAgentsDSCAgentEntryImpl(mib2);
-                String dep = (String)hm.get("discoveryendpoint");
+                String dep = hm.get("discoveryendpoint");
                 if (dep == null) {
                     dep = NotAvail;
                 }
-                String aep = (String)hm.get("authnserviceendpoint");
+                String aep = hm.get("authnserviceendpoint");
                 if (aep == null) {
                     aep = NotAvail;
                 }
@@ -2130,7 +1872,7 @@ public class Agent {
         }
     }
 
-    /*
+    /**
      *  process realm's Agent Groups
      *
      *  the HashMap of attributes/values:
@@ -2159,7 +1901,7 @@ public class Agent {
      *    2.2_Agent
      *      no groups
      */
-    public static void configAgentGroups (String realm, Map agtAttrs) {
+    public static void configAgentGroups (String realm, Map<String, Map<String, String>> agtAttrs) {
         String classMethod = "Agent.configAgentGroups:";
         if ((agtAttrs == null) || agtAttrs.isEmpty()) {
             if (debug.messageEnabled()) {
@@ -2173,12 +1915,10 @@ public class Agent {
          *  only doing the J2EEAgent and WebAgent Groups
          *  for now.
          */
-        SsoServerPolicyAgents sss =
-            (SsoServerPolicyAgentsImpl)mib2.getPolicyAgentsGroup();
+        SsoServerPolicyAgents sss = mib2.getPolicyAgentsGroup();
         TableSsoServerPolicyJ2EEGroupTable j2eetab = null;
         TableSsoServerPolicyWebGroupTable wgtab = null;
-        SsoServerWSSAgents ssa =
-            (SsoServerWSSAgentsImpl)mib2.getWssAgentsGroup();
+        SsoServerWSSAgents ssa = mib2.getWssAgentsGroup();
         TableSsoServerWSSAgentsSTSAgtGrpTable ststab = null;
         TableSsoServerWSSAgentsWSPAgtGrpTable wsptab = null;
         TableSsoServerWSSAgentsWSCAgtGrpTable wsctab = null;
@@ -2213,7 +1953,6 @@ public class Agent {
                 append(agtAttrs.size()).append("\n");
         }
 
-        Set ks = agtAttrs.keySet();  // the agent group names
         int wai = 1;  // index for web agent groups
         int j2eei = 1; // index for j2ee agent groups
         int stsi = 1;  // index for STS agent groups
@@ -2232,10 +1971,10 @@ public class Agent {
             return;
         }
 
-        for (Iterator it = ks.iterator(); it.hasNext(); ) {
-            String agtname = (String)it.next();
-            HashMap hm = (HashMap)agtAttrs.get(agtname);
-            String atype = (String)hm.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
+        for (Map.Entry<String, Map<String, String>> entry : agtAttrs.entrySet()) {
+            String agtname = entry.getKey();
+            Map<String, String> hm = entry.getValue();
+            String atype = hm.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
 
             if (debug.messageEnabled()) {
                 sb.append("  agent group name = ").append(agtname).
@@ -2249,7 +1988,7 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 String lurl =
-                    (String)hm.get("com.sun.identity.agents.config.login.url");
+                    hm.get("com.sun.identity.agents.config.login.url");
                 SsoServerPolicyWebGroupEntryImpl aei =
                     new SsoServerPolicyWebGroupEntryImpl(mib2);
                 aei.SsoServerRealmIndex = ri;
@@ -2283,7 +2022,7 @@ public class Agent {
                 SsoServerPolicyJ2EEGroupEntryImpl aei =
                     new SsoServerPolicyJ2EEGroupEntryImpl(mib2);
                 String lurl =
-                    (String)hm.get("com.sun.identity.agents.config.login.url");
+                    hm.get("com.sun.identity.agents.config.login.url");
                 aei.PolicyJ2EEGroupServerURL = lurl;
                 aei.PolicyJ2EEGroupName = agtname;
                 aei.PolicyJ2EEGroupIndex = new Integer(j2eei++);
@@ -2314,11 +2053,11 @@ public class Agent {
                 }
                 SsoServerWSSAgentsWSPAgtGrpEntryImpl aei =
                     new SsoServerWSSAgentsWSPAgtGrpEntryImpl(mib2);
-                String wep = (String)hm.get("wsendpoint");
+                String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = NotAvail;
                 }
-                String wpep = (String)hm.get("wspproxyendpoint");
+                String wpep = hm.get("wspproxyendpoint");
                 if (wpep == null) {
                     wpep = NotAvail;
                 }
@@ -2354,11 +2093,11 @@ public class Agent {
                 }
                 SsoServerWSSAgentsWSCAgtGrpEntryImpl aei =
                     new SsoServerWSSAgentsWSCAgtGrpEntryImpl(mib2);
-                String wep = (String)hm.get("wsendpoint");
+                String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = NotAvail;
                 }
-                String wpep = (String)hm.get("wspproxyendpoint");
+                String wpep = hm.get("wspproxyendpoint");
                 if (wpep == null) {
                     wpep = NotAvail;
                 }
@@ -2394,7 +2133,7 @@ public class Agent {
                 }
                 SsoServerWSSAgentsSTSAgtGrpEntryImpl aei =
                     new SsoServerWSSAgentsSTSAgtGrpEntryImpl(mib2);
-                String sep = (String)hm.get("stsendpoint");
+                String sep = hm.get("stsendpoint");
                 if (sep == null) {
                     sep = NotAvail;
                 }
@@ -2431,11 +2170,11 @@ public class Agent {
                 }
                 SsoServerWSSAgentsDSCAgtGrpEntryImpl aei =
                     new SsoServerWSSAgentsDSCAgtGrpEntryImpl(mib2);
-                String dep = (String)hm.get("discoveryendpoint");
+                String dep = hm.get("discoveryendpoint");
                 if (dep == null) {
                     dep = NotAvail;
                 }
-                String aep = (String)hm.get("authnserviceendpoint");
+                String aep = hm.get("authnserviceendpoint");
                 if (aep == null) {
                     aep = NotAvail;
                 }
@@ -2477,10 +2216,10 @@ public class Agent {
         }
     }
 
-    /*
+    /**
      *  process saml1.x trusted partners (global)
      */
-    public static int saml1TPConfig (List s1TPInfo) {
+    public static int saml1TPConfig (List<String> s1TPInfo) {
         String classMethod = "Agent.saml1TPConfig:";
         StringBuilder sb = new StringBuilder(classMethod);
         int sz = s1TPInfo.size();
@@ -2498,7 +2237,7 @@ public class Agent {
         }
 
         for (int i = 0; i < sz; i++) {
-            String pName = (String)s1TPInfo.get(i);
+            String pName = s1TPInfo.get(i);
 
             if (debug.messageEnabled()) {
                 sb.append("    ").append(pName).append("\n");
@@ -2561,15 +2300,14 @@ public class Agent {
         // assertions
         SsoServerSAML1CacheEntryImpl ssce =
                 new SsoServerSAML1CacheEntryImpl(mib2);
-        ssce.SAML1CacheIndex = new Integer(1);
+        ssce.SAML1CacheIndex = Integer.valueOf(1);
         ssce.SAML1CacheName = "Assertion_Cache";
-        ssce.SAML1CacheMisses = new Long(0);
-        ssce.SAML1CacheHits = new Long(0);
-        ssce.SAML1CacheWrites = new Long(0);
-        ssce.SAML1CacheReads = new Long(0);
+        ssce.SAML1CacheMisses = 0L;
+        ssce.SAML1CacheHits = 0L;
+        ssce.SAML1CacheWrites = 0L;
+        ssce.SAML1CacheReads = 0L;
 
-        SsoServerSAML1SvcImpl sss =
-            (SsoServerSAML1SvcImpl)mib2.getSaml1SvcGroup();
+        SsoServerSAML1SvcImpl sss = mib2.getSaml1SvcGroup();
         TableSsoServerSAML1CacheTable tptab = null;
 
         if (sss != null) {
@@ -2605,12 +2343,12 @@ public class Agent {
 
             // artifacts
             ssce = new SsoServerSAML1CacheEntryImpl(mib2);
-            ssce.SAML1CacheIndex = new Integer(2);
+            ssce.SAML1CacheIndex = Integer.valueOf(2);
             ssce.SAML1CacheName = "Artifact_Cache";
-            ssce.SAML1CacheMisses = new Long(0);
-            ssce.SAML1CacheHits = new Long(0);
-            ssce.SAML1CacheWrites = new Long(0);
-            ssce.SAML1CacheReads = new Long(0);
+            ssce.SAML1CacheMisses = 0L;
+            ssce.SAML1CacheHits = 0L;
+            ssce.SAML1CacheWrites = 0L;
+            ssce.SAML1CacheReads = 0L;
 
             aname = ssce.createSsoServerSAML1CacheEntryObjectName(server);
             if (aname == null) {
@@ -2637,12 +2375,12 @@ public class Agent {
         if (!skipSAML1EndPoints) {
         SsoServerSAML1EndPointEntryImpl ssee =
                 new SsoServerSAML1EndPointEntryImpl(mib2);
-        ssee.SAML1EndPointIndex = new Integer(1);
+        ssee.SAML1EndPointIndex = Integer.valueOf(1);
         ssee.SAML1EndPointName = "SOAPReceiver_EndPoint";
-        ssee.SAML1EndPointRqtFailed = new Long(0);
-        ssee.SAML1EndPointRqtOut = new Long(0);
-        ssee.SAML1EndPointRqtIn = new Long(0);
-        ssee.SAML1EndPointRqtAborted = new Long(0);
+        ssee.SAML1EndPointRqtFailed = 0L;
+        ssee.SAML1EndPointRqtOut = 0L;
+        ssee.SAML1EndPointRqtIn = 0L;
+        ssee.SAML1EndPointRqtAborted = 0L;
         ssee.SAML1EndPointStatus = "operational";
 
         TableSsoServerSAML1EndPointTable tetab = null;
@@ -2681,12 +2419,12 @@ public class Agent {
 
             // POSTProfile table
             ssee = new SsoServerSAML1EndPointEntryImpl(mib2);
-            ssee.SAML1EndPointIndex = new Integer(2);
+            ssee.SAML1EndPointIndex = Integer.valueOf(2);
             ssee.SAML1EndPointName = "POSTProfile_EndPoint";
-            ssee.SAML1EndPointRqtFailed = new Long(0);
-            ssee.SAML1EndPointRqtOut = new Long(0);
-            ssee.SAML1EndPointRqtIn = new Long(0);
-            ssee.SAML1EndPointRqtAborted = new Long(0);
+            ssee.SAML1EndPointRqtFailed = 0L;
+            ssee.SAML1EndPointRqtOut = 0L;
+            ssee.SAML1EndPointRqtIn = 0L;
+            ssee.SAML1EndPointRqtAborted = 0L;
             ssee.SAML1EndPointStatus = "operational";
 
             aname = ssee.createSsoServerSAML1EndPointEntryObjectName(server);
@@ -2714,12 +2452,12 @@ public class Agent {
 
             // SAMLAware/ArtifactProfile table
             ssee = new SsoServerSAML1EndPointEntryImpl(mib2);
-            ssee.SAML1EndPointIndex = new Integer(3);
+            ssee.SAML1EndPointIndex = Integer.valueOf(3);
             ssee.SAML1EndPointName = "SAMLAware_EndPoint";
-            ssee.SAML1EndPointRqtFailed = new Long(0);
-            ssee.SAML1EndPointRqtOut = new Long(0);
-            ssee.SAML1EndPointRqtIn = new Long(0);
-            ssee.SAML1EndPointRqtAborted = new Long(0);
+            ssee.SAML1EndPointRqtFailed = 0L;
+            ssee.SAML1EndPointRqtOut = 0L;
+            ssee.SAML1EndPointRqtIn = 0L;
+            ssee.SAML1EndPointRqtAborted = 0L;
             ssee.SAML1EndPointStatus = "operational";
 
             aname = ssee.createSsoServerSAML1EndPointEntryObjectName(server);
@@ -2755,7 +2493,7 @@ public class Agent {
                 stDate + "\n      End Time = " + endDate);
         }
 
-        return (0);
+        return 0;
     }
 
     public static int federationConfig (SSOServerRealmFedInfo srfi)
@@ -2765,11 +2503,11 @@ public class Agent {
         Date startDate = new Date();
         String realm = srfi.realmName;
         Integer ri = getRealmIndexFromName(realm);
-        Set cots = srfi.cots;
-        Map saml2Ents = srfi.samlv2Ents;
-        Map wsEnts = srfi.wsEnts;
-        Map idffEnts = srfi.idffEnts;
-        Map cotMembs = srfi.membEnts;
+        Set<String> cots = srfi.cots;
+        Map<String, Map<String, String>> saml2Ents = srfi.samlv2Ents;
+        Map<String, Map<String, String>> wsEnts = srfi.wsEnts;
+        Map<String, Map<String, String>> idffEnts = srfi.idffEnts;
+        Map<String, Map<String, Set<String>>> cotMembs = srfi.membEnts;
 
         StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
@@ -2782,7 +2520,7 @@ public class Agent {
             return -1;
         }
 
-        SsoServerFedCOTs ssfc = (SsoServerFedCOTs)getFedCOTsMBean();
+        SsoServerFedCOTs ssfc = getFedCOTsMBean();
 
         if ((cots != null) && (cots.size() > 0)) {
             if (debug.messageEnabled()) {
@@ -2797,8 +2535,7 @@ public class Agent {
             }
             if (ftab != null) {
                 int i = 1;
-                for (Iterator it = cots.iterator(); it.hasNext(); ) {
-                    String ss = (String)it.next();
+                for (String ss : cots) {
                     ss = getEscapedString(ss);
 
                     if (debug.messageEnabled()) {
@@ -2843,7 +2580,7 @@ public class Agent {
          *  SsoServerFedEntitiesTable
          */
         
-        SsoServerFedEntities ssfe = (SsoServerFedEntities)getFedEntsMBean();
+        SsoServerFedEntities ssfe = getFedEntsMBean();
         TableSsoServerFedEntitiesTable ftab = null;
         try {
             ftab = ssfe.accessSsoServerFedEntitiesTable();
@@ -2869,8 +2606,7 @@ public class Agent {
             if ((saml2Ents != null) && (saml2Ents.size() > 0)) {
                 TableSsoServerSAML2IDPTable iTab = null;
                 TableSsoServerSAML2SPTable sTab = null;
-                SsoServerSAML2SvcImpl ss2s =
-                    (SsoServerSAML2SvcImpl)getSAML2SvcGroup();
+                SsoServerSAML2SvcImpl ss2s = getSaml2SvcMBean();
                 try {
                     iTab = ss2s.accessSsoServerSAML2IDPTable();
                     sTab = ss2s.accessSsoServerSAML2SPTable();
@@ -2887,11 +2623,11 @@ public class Agent {
                 Set ks = saml2Ents.keySet();
                 int idpi = 1;
                 int spi = 1;
-                for (Iterator it = ks.iterator(); it.hasNext(); ) {
-                    String entname = (String)it.next();
-                    HashMap hm = (HashMap)saml2Ents.get(entname);
-                    String loc = (String)hm.get("location");
-                    String roles = (String)hm.get("roles");
+                for (Map.Entry<String, Map<String, String>> entry : saml2Ents.entrySet()) {
+                    String entname = entry.getKey();
+                    Map<String, String> hm = entry.getValue();
+                    String loc = hm.get("location");
+                    String roles = hm.get("roles");
 
                     SsoServerFedEntitiesEntryImpl cei =
                         new SsoServerFedEntitiesEntryImpl(mib2);
@@ -2939,12 +2675,12 @@ public class Agent {
 
                         SsoServerSAML2IDPEntryImpl sei =
                             new SsoServerSAML2IDPEntryImpl(mib2);
-                        sei.SAML2IDPArtifactsIssued = new Long(0);
-                        sei.SAML2IDPAssertionsIssued = new Long(0);
-                        sei.SAML2IDPInvalRqtsRcvd = new Long(0);
-                        sei.SAML2IDPRqtsRcvd = new Long(0);
-                        sei.SAML2IDPArtifactsInCache = new Long(0);
-                        sei.SAML2IDPAssertionsInCache = new Long(0);
+                        sei.SAML2IDPArtifactsIssued = 0L;
+                        sei.SAML2IDPAssertionsIssued = 0L;
+                        sei.SAML2IDPInvalRqtsRcvd = 0L;
+                        sei.SAML2IDPRqtsRcvd = 0L;
+                        sei.SAML2IDPArtifactsInCache = 0L;
+                        sei.SAML2IDPAssertionsInCache = 0L;
                         sei.SAML2IDPIndex = new Integer(idpi++);
                         sei.SAML2IDPName = getEscapedString(entname);
                         sei.SsoServerRealmIndex = ri;
@@ -2986,9 +2722,9 @@ public class Agent {
                         }
                         SsoServerSAML2SPEntryImpl sei =
                             new SsoServerSAML2SPEntryImpl(mib2);
-                        sei.SAML2SPInvalidArtifactsRcvd = new Long(0);
-                        sei.SAML2SPValidAssertionsRcvd = new Long(0);
-                        sei.SAML2SPRqtsSent = new Long(0);
+                        sei.SAML2SPInvalidArtifactsRcvd = 0L;
+                        sei.SAML2SPValidAssertionsRcvd = 0L;
+                        sei.SAML2SPRqtsSent = 0L;
                         sei.SAML2SPName = getEscapedString(entname);
                         sei.SsoServerRealmIndex = ri;
                         sei.SAML2SPIndex = new Integer(spi++);
@@ -3042,12 +2778,11 @@ public class Agent {
                     sb.append(wsEnts.size()).append(" entries:\n");
                 }
 
-                Set ks = wsEnts.keySet();
-                for (Iterator it = ks.iterator(); it.hasNext(); ) {
-                    String entname = (String)it.next();
-                    HashMap hm = (HashMap)wsEnts.get(entname);
-                    String loc = (String)hm.get("location");
-                    String roles = (String)hm.get("roles");
+                for (Map.Entry<String, Map<String, String>> entry : wsEnts.entrySet()) {
+                    String entname = entry.getKey();
+                    Map<String, String> hm = entry.getValue();
+                    String loc = hm.get("location");
+                    String roles = hm.get("roles");
 
                     SsoServerFedEntitiesEntryImpl cei =
                         new SsoServerFedEntitiesEntryImpl(mib2);
@@ -3105,13 +2840,12 @@ public class Agent {
                     sb.append(idffEnts.size()).append(" entries:\n");
                 }
 
-                Set ks = idffEnts.keySet();
-                for (Iterator it = ks.iterator(); it.hasNext(); ) {
-                    String entname = (String)it.next();
-                    HashMap hm = (HashMap)idffEnts.get(entname);
+                for (Map.Entry<String, Map<String, String>> entry : idffEnts.entrySet()) {
+                    String entname = entry.getKey();
+                    Map<String, String> hm = entry.getValue();
 
-                    String loc = (String)hm.get("location");
-                    String roles = (String)hm.get("roles");
+                    String loc = hm.get("location");
+                    String roles = hm.get("roles");
 
                     SsoServerFedEntitiesEntryImpl cei =
                         new SsoServerFedEntitiesEntryImpl(mib2);
@@ -3175,7 +2909,6 @@ public class Agent {
             if (debug.messageEnabled()) {
                 sb.append(cotMembs.size()).append(" entries:\n");
             }
-            Set ks = cotMembs.keySet();
             int coti = 1;
             TableSsoServerFedCOTMemberTable mtab = null;
             try {
@@ -3184,9 +2917,9 @@ public class Agent {
                 debug.error(classMethod +
                     "getting fed COT members table: ", ex);
             }
-            for (Iterator it = ks.iterator(); it.hasNext(); ) {
-                String cotname = (String)it.next();
-                HashMap hm = (HashMap)cotMembs.get(cotname);
+            for (Map.Entry<String, Map<String, Set<String>>> entry : cotMembs.entrySet()) {
+                String cotname = entry.getKey();
+                Map<String, Set<String>> hm = entry.getValue();
                 cotname = getEscapedString(cotname);
 
                 if (debug.messageEnabled()) {
@@ -3194,13 +2927,11 @@ public class Agent {
                         append(", SAML members = ");
                 }
 
-                Set fset = (Set)hm.get("SAML");
+                Set<String> fset = hm.get("SAML");
                 int mi = 1;
                 Integer cotI = new Integer(coti++);
                 if ((fset != null) && fset.size() > 0) {
-                    for (Iterator its = fset.iterator(); its.hasNext(); ) {
-                        String mbm = (String)its.next();
-
+                    for (String mbm : fset) {
                         if (debug.messageEnabled()) {
                             sb.append("    ").append(mbm).append("\n");
                         }
@@ -3239,14 +2970,12 @@ public class Agent {
                     }
                 }
 
-                fset = (Set)hm.get("IDFF");
+                fset = hm.get("IDFF");
                 if (debug.messageEnabled()) {
                     sb.append("    IDFF members = ");
                 }
                 if ((fset != null) && fset.size() > 0) {
-                    for (Iterator its = fset.iterator(); its.hasNext(); ) {
-                        String mbm = (String)its.next();
-
+                    for (String mbm : fset) {
                         if (debug.messageEnabled()) {
                             sb.append("    ").append(mbm).append("\n");
                         }
@@ -3284,15 +3013,14 @@ public class Agent {
                     }
                 }
 
-                fset = (Set)hm.get("WSFed");
+                fset = hm.get("WSFed");
 
                 if (debug.messageEnabled()) {
                     sb.append("    WSFed members = ");
                 }
 
                 if ((fset != null) && fset.size() > 0) {
-                    for (Iterator its = fset.iterator(); its.hasNext(); ) {
-                        String mbm = (String)its.next();
+                    for (String mbm : fset) {
                         if (debug.messageEnabled()) {
                             sb.append("    ").append(mbm).append("\n");
                         }
@@ -3338,15 +3066,13 @@ public class Agent {
         /*
          *  have to do it here?
          */
-        
         if (debug.messageEnabled()) {
             try {
                 DSConfigMgr dscm = DSConfigMgr.getDSConfigMgr();
                 ServerGroup sgrp = dscm.getServerGroup("sms");
-                Collection slist = sgrp.getServersList();
+                Collection<Server> slist = sgrp.getServersList();
                 StringBuilder sbp1 = new StringBuilder("DSConfigMgr:\n");
-                for (Iterator it = slist.iterator(); it.hasNext(); ) {
-                    Server sobj = (Server)it.next();
+                for (Server sobj : slist) {
                     String svr = sobj.getServerName();
                     int port = sobj.getPort();
                     sbp1.append("  svrname = ").append(svr).
@@ -3359,11 +3085,11 @@ public class Agent {
             }
 
             Properties props = SystemProperties.getProperties();
-            Set kset = props.keySet();
+
             StringBuilder sbp = new StringBuilder("SYSPROPS:\n");
-            for (Iterator it = kset.iterator(); it.hasNext(); ) {
-                String entname = (String)it.next();
-                String val = (String)props.get(entname);
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                String entname = (String) entry.getKey();
+                String val = (String) entry.getValue();
 
                 sbp.append("  key = ").append(entname).append(", val = ").
                     append(val).append("\n");
@@ -3374,9 +3100,8 @@ public class Agent {
             String dirPort = SystemProperties.get(Constants.AM_DIRECTORY_PORT);
             String drSSL =
                 SystemProperties.get(Constants.AM_DIRECTORY_SSL_ENABLED);
-            boolean dirSSL = Boolean.valueOf(
-                SystemProperties.get(
-                    Constants.AM_DIRECTORY_SSL_ENABLED)).booleanValue();
+            boolean dirSSL = SystemProperties.getAsBoolean(
+                    Constants.AM_DIRECTORY_SSL_ENABLED);
 
             debug.message(classMethod + "SMS CONFIG:\n    host = " + dirHost +
                 "\n    port = " + dirPort + "\n    ssl = " + drSSL +
@@ -3401,43 +3126,42 @@ public class Agent {
     }
 
     public static String getRealmNameFromIndex (Integer index) {
-        return ((String)index2Realm.get(index));
+        return index2Realm.get(index);
     }
 
     public static String getEscRealmNameFromIndex (Integer index) {
-        String ss = (String)index2Realm.get(index);
-        return (getEscapedString(ss));
+        String ss = index2Realm.get(index);
+        return getEscapedString(ss);
     }
 
     public static Integer getRealmIndexFromName (String name) {
-        return ((Integer)realm2Index.get(name));
+        return realm2Index.get(name) ;
     }
 
     public static String getRealmNameFromDN(String rlmDN) {
-        return (String)DN2Realm.get(rlmDN);
+        return DN2Realm.get(rlmDN);
     }
 
     public static SsoServerAuthModulesEntryImpl getAuthModuleEntry (
         String rlmAuthInst)
     {
-        return (
-            (SsoServerAuthModulesEntryImpl)realmAuthInst.get(rlmAuthInst));
+        return realmAuthInst.get(rlmAuthInst);
     }
 
     public static SSOServerInfo getAgentSvrInfo() {
-        return (agentSvrInfo);
+        return agentSvrInfo;
     }
 
     public static SsoServerSAML2IDPEntryImpl getSAML2IDPEntry (
         String rlmSAMLIDP)
     {
-        return ((SsoServerSAML2IDPEntryImpl)realmSAML2IDPs.get(rlmSAMLIDP));
+        return realmSAML2IDPs.get(rlmSAMLIDP);
     }
 
     public static SsoServerSAML2SPEntryImpl getSAML2SPEntry (
         String rlmSAMLSP)
     {
-        return ((SsoServerSAML2SPEntryImpl)realmSAML2SPs.get(rlmSAMLSP));
+        return realmSAML2SPs.get(rlmSAMLSP);
     }
 
     public static void setSFOStatus (boolean sfoStatus) {
@@ -3479,18 +3203,18 @@ public class Agent {
                 nbTraps = (new Integer(args[0])).intValue();
                 if (nbTraps < 0) {
                     usage();
-                    java.lang.System.exit(1);
+                    System.exit(1);
                 }
             } catch (java.lang.NumberFormatException e) {
                 usage();
-                java.lang.System.exit(1);
+                System.exit(1);
             }
         }
     
         try {
-            ArrayList servers = MBeanServerFactory.findMBeanServer(null);
+            List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
             if ((servers != null) && !servers.isEmpty()) {
-                server = (MBeanServer)servers.get(0);
+                server = servers.get(0);
             } else {
                 server = MBeanServerFactory.createMBeanServer();
             }
@@ -3546,7 +3270,7 @@ public class Agent {
                         url, null, server);
                 cs.start();
             } catch (Exception ex) {
-                System.out.println(
+                println(
                     "Error starting RMI : execute rmiregistry 9999; ex="+ex);
             }
       
@@ -3573,7 +3297,6 @@ public class Agent {
             // Create a LinkTrapGenerator.
             // Specify the ifIndex to use in the object name.
             //
-            String trapGeneratorClass = "LinkTrapGenerator";
             int ifIndex = 1;
             trapGeneratorObjName = new ObjectName("trapGenerator" + 
                               ":class=LinkTrapGenerator,ifIndex=" + ifIndex);
@@ -3585,7 +3308,7 @@ public class Agent {
             println("\n>> Press <Enter> if you want to start sending traps.");
             println("   -or-");
             println(">> Press <Ctrl-C> if you want to stop this agent.");
-            java.lang.System.in.read();
+            System.in.read();
             
             trapGenerator.start();
             
@@ -3617,9 +3340,9 @@ public class Agent {
      * print/println stuff...
      */
     private final static void println(String msg) {
-        java.lang.System.out.println(msg);
+        System.out.println(msg);
     }
     private final static void print(String msg) {
-        java.lang.System.out.print(msg);
+        System.out.print(msg);
     }
 }

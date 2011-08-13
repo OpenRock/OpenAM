@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import java.util.Map;
@@ -33,11 +36,11 @@ import java.util.Set;
 
 public class SSOServerRealmFedInfo {
     String realmName;
-    Set cots;
-    Map samlv2Ents;
-    Map wsEnts;
-    Map idffEnts;
-    Map membEnts;
+    Set<String> cots;
+    Map<String, Map<String, String>> samlv2Ents;
+    Map<String, Map<String, String>> wsEnts;
+    Map<String, Map<String, String>> idffEnts;
+    Map<String, Map<String, Set<String>>> membEnts;
 
     public SSOServerRealmFedInfo() {
     }
@@ -53,37 +56,37 @@ public class SSOServerRealmFedInfo {
 
     public static class SSOServerRealmFedInfoBuilder {
         String realmName;
-        Set COTs;
-        Map samlv2Ents;
-        Map wsEnts;
-        Map idffEnts;
-        Map membEnts;
+        Set<String> COTs;
+        Map<String, Map<String, String>> samlv2Ents;
+        Map<String, Map<String, String>> wsEnts;
+        Map<String, Map<String, String>> idffEnts;
+        Map<String, Map<String, Set<String>>> membEnts;
 
         public SSOServerRealmFedInfoBuilder(String rlm) {
             realmName = rlm;
         }
 
-        public SSOServerRealmFedInfoBuilder cots (Set cots) {
+        public SSOServerRealmFedInfoBuilder cots (Set<String> cots) {
             COTs = cots;
             return this;
         }
 
-        public SSOServerRealmFedInfoBuilder samlv2Entities (Map samlv2ents) {
+        public SSOServerRealmFedInfoBuilder samlv2Entities (Map<String, Map<String, String>> samlv2ents) {
             samlv2Ents = samlv2ents;
             return this;
         }
 
-        public SSOServerRealmFedInfoBuilder wsEntities (Map wsents) {
+        public SSOServerRealmFedInfoBuilder wsEntities (Map<String, Map<String, String>> wsents) {
             wsEnts = wsents;
             return this;
         }
 
-        public SSOServerRealmFedInfoBuilder idffEntities (Map idffents) {
+        public SSOServerRealmFedInfoBuilder idffEntities (Map<String, Map<String, String>> idffents) {
             idffEnts = idffents;
             return this;
         }
 
-        public SSOServerRealmFedInfoBuilder membEntities (Map membents) {
+        public SSOServerRealmFedInfoBuilder membEntities (Map<String, Map<String, Set<String>>> membents) {
             membEnts = membents;
             return this;
         }

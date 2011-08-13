@@ -29,7 +29,7 @@
 -->
 
 <!--
-   "Portions Copyrighted [2011] [ForgeRock AS]"
+   Portions Copyrighted 2011 ForgeRock AS
 -->
 <project name="diagnostic" default="createZipFile" basedir=".">
     <description>OpenWebSingle Sign-On: Diagnostic Tool</description>
@@ -353,7 +353,7 @@
         <copy todir="${odt.lib.dir}"
               overwrite="yes" flatten="yes" encoding="UTF-8">
             <fileset dir="${extlib.dir}"
-                     includes="xsdlib.jar, jaxb-api.jar, jaxb-impl.jar, webservices-rt.jar, jdmkrt.jar, OpenDS.jar"/>
+                     includes="xsdlib.jar, jaxb-api.jar, jaxb-impl.jar, webservices-rt.jar, OpenDS.jar"/>
             <fileset dir="${sharedlib.dist.dir}"
                      includes="opensso-sharedlib.jar"/>
             <fileset dir="${amserver.dist.dir}"

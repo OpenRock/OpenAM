@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.common;
 
@@ -40,10 +40,17 @@ import java.util.StringTokenizer;
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
+import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.monitoring.SsoServerConnPoolSvcImpl;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchConstraints;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Class to maintain a pool of individual connections to the
@@ -86,12 +93,55 @@ import com.sun.identity.shared.ldap.LDAPSearchConstraints;
  **/
 public class LDAPConnectionPool {
 
-    private ArrayList hostArrList = new ArrayList();
+    private String name;          // name of connection pool;
+    private int minSize;          // Min pool size
+    private int maxSize;          // Max pool size
+    private String host;          // LDAP host
+    private int port;             // Port to connect at
+    private String authdn;        // Identity of connections
+    private String authpw;        // Password for authdn
+    // Following default LDAPConnection options are sent by
+    // DataLayer/SMDataLayer thru constructor and are in the HashMap
+    // 'connOptions'.
+    // searchConstraints,LDAPConnection.MAXBACKLOG,LDAPConnection.REFERRALS
+    //TODO: This variable is never setted, what to do with this?
+    private Map connOptions;
+    private LDAPConnection ldc = null;          // Connection to clone
+    private LDAPConnection[] pool;
+
+    private long idleTime;        // idle time in milli seconds
+    private boolean defunct;      // becomes true after calling destroy
+    private CleanupTask cleaner;  // cleaner object
+    private int busyConnectionCount;
+    private int currentConnectionCount;
+    private int waitCount;
+    private boolean reinitInProgress;
+    private Set<LDAPConnection> deprecatedPool;
+    private Set<LDAPConnection> backupPool;
+    private Set<LDAPConnection> currentPool;
+    private ThreadLocalConnection localConn;
+    static FallBackManager fMgr;
+    private List<String> hostArrList = new ArrayList<String>();
     private static Debug debug;  // Debug object
-    private static HashSet retryErrorCodes = new HashSet();
+    private static Set<String> retryErrorCodes = new HashSet<String>();
     private static final String LDAP_CONNECTION_ERROR_CODES =
         "com.iplanet.am.ldap.connection.ldap.error.codes.retries";
- 
+
+    static {
+        debug = Debug.getInstance("LDAPConnectionPool");
+        String retryErrs = SystemProperties.get(LDAP_CONNECTION_ERROR_CODES);
+        if (retryErrs != null) {
+            StringTokenizer stz = new StringTokenizer(retryErrs, ",");
+            while(stz.hasMoreTokens()) {
+                retryErrorCodes.add(stz.nextToken().trim());
+            }
+        }
+        if (debug.messageEnabled()) {
+            debug.message("LDAPConnectionPool: retry error codes = " +
+                             retryErrorCodes);
+        }
+    }
+
     /**
      * Constructor for specifying all parameters
      *
@@ -204,7 +254,7 @@ public class LDAPConnectionPool {
             null);
     }
 
-    /* 
+    /**
      * Constructor for using an existing connection to clone
      * from
      * 
@@ -234,7 +284,7 @@ public class LDAPConnectionPool {
              authdn, authpw, ldc, getIdleTime(name), connOptions);
     }
 
-    private static final int getIdleTime(String poolName) {
+    private static int getIdleTime(String poolName) {
         String idleStr =
             SystemProperties.get(Constants.LDAP_CONN_IDLE_TIME_IN_SECS);
         int idleTimeInSecs = 0;
@@ -317,7 +367,8 @@ public class LDAPConnectionPool {
                         }
                     }
                 }
-                currentConnectionCount = busyConnectionCount = 0;
+                adjustBusyConnections(-busyConnectionCount);
+                adjustCurrentConnections(-currentConnectionCount);
                 pool = null;
             }
             if ((ldc != null) && (ldc.isConnected())) {
@@ -377,11 +428,13 @@ public class LDAPConnectionPool {
                  */
                     if ((busyConnectionCount == maxSize) || (waitCount > 0)) {
                         waitCount++;
+                        long now = System.currentTimeMillis();
                         if (timeout > 0) {
                             this.wait(timeout);
                         } else {
                             this.wait();
                         }
+                        monitorWaitingTime(now);
                         waitCount--;
                     }
                     if (!defunct) {
@@ -413,8 +466,8 @@ public class LDAPConnectionPool {
             try {
                 con = createConnection(LDAPConnPoolUtils.connectionPoolsStatus);
                 backupPool.add(con);
-                currentConnectionCount++;
-                busyConnectionCount++;
+                adjustCurrentConnections(+1);
+                adjustBusyConnections(1);
             } catch(Exception ex) {
                 debug.error("LDAPConnection pool:" + name +
                     ":Error while adding a connection.", ex);
@@ -423,7 +476,7 @@ public class LDAPConnectionPool {
             if (currentConnectionCount > busyConnectionCount) {
                 con = pool[currentConnectionCount - busyConnectionCount - 1];
                 pool[currentConnectionCount - busyConnectionCount - 1] = null;
-                busyConnectionCount++;
+                adjustBusyConnections(1);
                 currentPool.remove(con);
                 if ((cleaner != null) && 
                     ((currentConnectionCount - busyConnectionCount) >=
@@ -484,7 +537,8 @@ public class LDAPConnectionPool {
                         }
                         if (backupPool.contains(ld) && currentPool.add(ld)) {
                             localConn.returnsLocalConnection();
-                            busyConnectionCount--;
+                            incReleasedConns();
+                            adjustBusyConnections(-1);
                             // return connections from the end of array                    
                             pool[currentConnectionCount - busyConnectionCount -
                                 1] = ld;
@@ -566,14 +620,14 @@ public class LDAPConnectionPool {
 
         // To avoid resizing we set the size to twice the max pool size.
         pool = new LDAPConnection[maxSize];
-        backupPool = new HashSet();
-        currentPool = new HashSet();
+        backupPool = new HashSet<LDAPConnection>();
+        currentPool = new HashSet<LDAPConnection>();
         for (int i = 0; i < minSize; i++) {
             pool[i] = createConnection(LDAPConnPoolUtils.connectionPoolsStatus);
             backupPool.add(pool[i]);
             currentPool.add(pool[i]);
         }
-        currentConnectionCount = minSize;
+        adjustCurrentConnections(minSize);
         busyConnectionCount = 0;
         waitCount = 0;
     }
@@ -673,25 +727,10 @@ public class LDAPConnectionPool {
         }
     }
     
-    static {
-        debug = Debug.getInstance("LDAPConnectionPool");
-        String retryErrs = SystemProperties.get(LDAP_CONNECTION_ERROR_CODES);
-        if (retryErrs != null) {
-            StringTokenizer stz = new StringTokenizer(retryErrs, ",");
-            while(stz.hasMoreTokens()) {
-                retryErrorCodes.add(stz.nextToken().trim());
-            }
-        }
-        if (debug.messageEnabled()) {
-            debug.message("LDAPConnectionPool: retry error codes = " +
-                             retryErrorCodes);
-        }
-    }
-    
     private void createHostList(String hostNameFromConfig, LDAPConnection ldc) {
         StringTokenizer st = new StringTokenizer(hostNameFromConfig);
         while(st.hasMoreElements()) {
-            String str = (String)st.nextToken();
+            String str = st.nextToken();
             if (str != null && str.length() != 0) {
                 str += ":";
                 if (ldc.getSocketFactory() != null) {
@@ -707,10 +746,10 @@ public class LDAPConnectionPool {
                 hostArrList.add(str);
             }
         }
-        String hpName = (String) hostArrList.get(0);
+        String hpName = hostArrList.get(0);
         StringTokenizer stn = new StringTokenizer(hpName,":");
-        this.host = (String)stn.nextToken();
-        this.port = (Integer.valueOf((String)stn.nextToken())).intValue();
+        this.host = stn.nextToken();
+        this.port = Integer.valueOf(stn.nextToken()).intValue();
     }
 
     /**
@@ -775,7 +814,7 @@ public class LDAPConnectionPool {
                     ":Error during disconnect.", e);
             }
             pool[currentConnectionCount - busyConnectionCount - 1] = null;
-            currentConnectionCount--;
+            adjustCurrentConnections(-1);
         }
     }
     
@@ -921,11 +960,11 @@ public class LDAPConnectionPool {
             int sze = hostArrList.size();
 
             for (int i = 0; i < sze; i++) {
-                String hpName = (String) hostArrList.get(i);
+                String hpName = hostArrList.get(i);
                 StringTokenizer stn = new StringTokenizer(hpName,":");
-                String upHost = (String)stn.nextToken();
-                String upPort = (String)stn.nextToken();
-                String type = (String)stn.nextToken();
+                String upHost = stn.nextToken();
+                String upPort = stn.nextToken();
+                String type = stn.nextToken();
 
                 if (type.equals(DSConfigMgr.VAL_STYPE_SSL)) {
                     try {
@@ -1001,11 +1040,11 @@ public class LDAPConnectionPool {
         }
 
         for (int i = 0; i < size; i++) {
-            String hpName = (String) hostArrList.get(i);
+            String hpName = hostArrList.get(i);
             StringTokenizer stn = new StringTokenizer(hpName,":");
-            String upHost = (String)stn.nextToken();
-            String upPort = (String)stn.nextToken();
-            String type = (String)stn.nextToken();
+            String upHost = stn.nextToken();
+            String upPort = stn.nextToken();
+            String type = stn.nextToken();
 
             if (type.equals(DSConfigMgr.VAL_STYPE_SSL)) {
                 try {
@@ -1038,7 +1077,7 @@ public class LDAPConnectionPool {
             if ((upHost != null) && (upHost.length() != 0)
                 && (upPort != null) && (upPort.length() != 0)
                 && (ld.getHost() !=null)) {
-                int thisPort = (Integer.valueOf((String)upPort)).intValue();
+                int thisPort = (Integer.valueOf(upPort)).intValue();
 
                 if ((ld.getHost().equalsIgnoreCase(upHost)) &&
                     (ld.getPort() != thisPort)) {
@@ -1154,10 +1193,10 @@ public class LDAPConnectionPool {
 
     private boolean isPrimaryUP() {
         boolean retVal = false;
-        String hpName = (String) hostArrList.get(0);
+        String hpName = hostArrList.get(0);
         StringTokenizer stn = new StringTokenizer(hpName,":");
-        String upHost = (String)stn.nextToken();
-        String upPort = (String)stn.nextToken();
+        String upHost = stn.nextToken();
+        String upPort = stn.nextToken();
         if ( (upHost != null) && (upHost.length() != 0)
             && (upPort != null) && (upPort.length() != 0) ) {
             String upKey = name + ":" + upHost + ":" +upPort + ":" + authdn;
@@ -1211,53 +1250,57 @@ public class LDAPConnectionPool {
         }
     }
 
-    private String name;          // name of connection pool;
-    private int minSize;          // Min pool size
-    private int maxSize;          // Max pool size
-    private String host;          // LDAP host
-    private int port;             // Port to connect at
-    private String authdn;        // Identity of connections
-    private String authpw;        // Password for authdn
-    // Following default LDAPConnection options are sent by
-    // DataLayer/SMDataLayer thru constructor and are in the HashMap
-    // 'connOptions'.
-    // searchConstraints,LDAPConnection.MAXBACKLOG,LDAPConnection.REFERRALS
-    private HashMap connOptions;
-    private LDAPConnection ldc = null;          // Connection to clone
-    private LDAPConnection[] pool;
-    
-    private long idleTime;        // idle time in milli seconds
-    private boolean defunct;      // becomes true after calling destroy
-    private CleanupTask cleaner;  // cleaner object
-    private int busyConnectionCount;
-    private int currentConnectionCount;
-    private int waitCount;
-    private boolean reinitInProgress;
-    private HashSet deprecatedPool;
-    private HashSet backupPool;
-    private HashSet currentPool;
-    private ThreadLocalConnection localConn;
-    static FallBackManager fMgr;
+    private void monitorWaitingTime(long then) {
+        if (MonitoringUtil.isRunning()) {
+            long now = System.currentTimeMillis();
+            SsoServerConnPoolSvcImpl monitor =
+                    Agent.getConnPoolSvcMBean();
+            monitor.updateWaitingTime(then, now);
+        }
+    }
+
+    private void adjustBusyConnections(int diff) {
+        busyConnectionCount += diff;
+        if (MonitoringUtil.isRunning()) {
+            SsoServerConnPoolSvcImpl monitor = Agent.getConnPoolSvcMBean();
+            monitor.adjustBusyConnections(diff);
+        }
+    }
+
+    private void adjustCurrentConnections(int diff) {
+        currentConnectionCount += diff;
+        if (MonitoringUtil.isRunning()) {
+            SsoServerConnPoolSvcImpl monitor = Agent.getConnPoolSvcMBean();
+            monitor.adjustCurrentConnections(diff);
+        }
+    }
+
+    private void incReleasedConns() {
+        if (MonitoringUtil.isRunning()) {
+            SsoServerConnPoolSvcImpl monitor = Agent.getConnPoolSvcMBean();
+            monitor.incReleasedConns();
+        }
+    }
 
     class ThreadLocalConnection {
 
-        private ThreadLocal localConnection = new ThreadLocal() {
-            protected Object initialValue() {
+        private ThreadLocal<LDAPConnection> localConnection = new ThreadLocal<LDAPConnection>() {
+            protected LDAPConnection initialValue() {
                 return null;
             }
         };
 
-        private ThreadLocal localCounter = new ThreadLocal() {
-            protected Object initialValue() {
-                return new Integer(0);
+        private ThreadLocal<Integer> localCounter = new ThreadLocal<Integer>() {
+            protected Integer initialValue() {
+                return Integer.valueOf(0);
             }
         };
 
         public LDAPConnection getLocalConnection() {
-            int count = ((Integer)localCounter.get()).intValue();
+            int count = localCounter.get().intValue();
             if (count > 0) {
                 localCounter.set(new Integer(count++));
-                return (LDAPConnection) localConnection.get();
+                return localConnection.get();
             } else {
                 return null;
             }
@@ -1265,11 +1308,11 @@ public class LDAPConnectionPool {
 
         public void setLocalConnection(LDAPConnection conn) {
             localConnection.set(conn);
-            localCounter.set(new Integer(1));
+            localCounter.set(Integer.valueOf(1));
         }
 
         public boolean shouldReturnsLocalConnection() {
-            int count = ((Integer)localCounter.get()).intValue();
+            int count = localCounter.get().intValue();
             if (count > 1) {
                 localCounter.set(new Integer(count--));
                 return false;
@@ -1279,9 +1322,8 @@ public class LDAPConnectionPool {
         }
 
         public void returnsLocalConnection() {
-            localCounter.set(new Integer(0));
+            localCounter.set(Integer.valueOf(0));
             localConnection.set(null);
         }
     }
 }
-

@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.security;
 
 import java.security.PrivilegedAction;
@@ -74,7 +73,7 @@ import com.sun.identity.shared.debug.Debug;
  * 
  * @supported.all.api
  */
-public class AdminTokenAction implements PrivilegedAction {
+public class AdminTokenAction implements PrivilegedAction<SSOToken> {
     
     private static SSOTokenManager tokenManager;
     
@@ -112,14 +111,13 @@ public class AdminTokenAction implements PrivilegedAction {
 	if (instance == null) {
 	    instance = new AdminTokenAction();
 	}
-	return (instance);
+	return instance;
     }
 
     /**
      * Default constructor
      */
     public AdminTokenAction() {
-        super();
 	if (tokenManager == null) {
 	    try {
 		tokenManager = SSOTokenManager.getInstance();
@@ -190,7 +188,7 @@ public class AdminTokenAction implements PrivilegedAction {
     /* (non-Javadoc)
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public SSOToken run() {
 	// Check if we have a valid cached SSOToken
 	if ((appSSOToken != null) && tokenManager.isValidToken(appSSOToken)) {
 	    return (appSSOToken);

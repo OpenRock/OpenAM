@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.plugin.monitoring.impl;
 
 import com.sun.identity.monitoring.Agent;
@@ -44,7 +47,7 @@ public class FedMonIDFFSvcProvider implements FedMonIDFFSvc {
     }
 
     public void init() {
-        sIDFFSvc = (SsoServerIDFFSvcImpl)Agent.getIdffSvcMBean();
+        sIDFFSvc = Agent.getIdffSvcMBean();
     }
 
     public void incIdLocalSessToken() {

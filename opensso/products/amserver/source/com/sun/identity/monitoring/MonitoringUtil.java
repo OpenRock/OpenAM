@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -36,7 +36,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -51,15 +50,18 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.util.Map;
 
-public class OpenSSOMonitoringUtil {
+public class MonitoringUtil {
 
-    private String [] networkMonitors = {
+    private static boolean initialized = false;
+    private static boolean isMonAvailable = true;
+    private static String [] networkMonitors = {
         "dbLookupPrivileges",
         "dbLookupReferrals",
         "privilegeSingleLevelEvaluation",
         "privilegeSubTreeEvaluation",
-        "hasEntitltmentMonitor",
+        "hasEntitlementMonitor",
         "evalSingleLevelMonitor",
         "evalSubTreeMonitor",
         "PrivilegeEvaluatorMonitorInit",
@@ -71,15 +73,15 @@ public class OpenSSOMonitoringUtil {
         "PrivilegeEvaluatorMonitorCombineResults"
         };
 
-    public String HTTP_AUTH_FILE = "opensso_mon_auth";
+    public static String HTTP_AUTH_FILE = "opensso_mon_auth";
 
-    Debug debug = Debug.getInstance("amMonitoring");
+    private static Debug debug = Debug.getInstance("amMonitoring");
 
     // constructor
-    public OpenSSOMonitoringUtil () {
+    private MonitoringUtil () {
     }
 
-    public String[] getNetworkMonitorNames() {
+    public static String[] getNetworkMonitorNames() {
         return networkMonitors;
     }
 
@@ -87,7 +89,7 @@ public class OpenSSOMonitoringUtil {
      * return whether the specified network monitor
      * has been instantiated in the entitlements service yet
      */
-    protected boolean networkMonitorExist(String nwMonName) {
+    protected static boolean networkMonitorExist(String nwMonName) {
         String classMethod = "OpenSSOMonitoringUtil.networkMonitorExist: ";
 
         if (debug.messageEnabled()) {
@@ -114,7 +116,7 @@ public class OpenSSOMonitoringUtil {
      *  Useful mostly for the MBean names, as jdmk really doesn't
      *  like them.
      */
-    public String escapeColonInString(String str) {
+    public static String escapeColonInString(String str) {
         if (str != null) {
             if (str.indexOf(":") >= 0) {
                 str = str.replaceAll(":", "&#58;");
@@ -123,12 +125,11 @@ public class OpenSSOMonitoringUtil {
         return str;
     }
 
-    protected SSOToken getSSOToken() throws SSOException {
-        return (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
+    protected static SSOToken getSSOToken() throws SSOException {
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
-    protected String getRealmDNForRealm(String realm) {
+    protected static String getRealmDNForRealm(String realm) {
         String classMethod = "OpenSSOMonitoringUtil.getRealmDNForRealm:";
         String realmDN = "/";
         try {
@@ -148,93 +149,25 @@ public class OpenSSOMonitoringUtil {
         return realmDN;
     }
 
-    protected String[][] getMonAuthList() {
-        String classMethod = "OpenSSOMonitoringUtil.getMonAuthList";
-        String ossoUri =
-            SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-        ossoUri = ossoUri.replace('\\','/');
-        String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
-        baseDir = baseDir.replace('\\','/');
-        if (ossoUri.startsWith("/")) {
-            byte[] btmp = ossoUri.getBytes();
-            ossoUri = new String(btmp, 1, (btmp.length - 1));
-        }
-        if (!ossoUri.endsWith("/")) {
-            ossoUri += "/";
-        }
-        if (!baseDir.endsWith("/")) {
-            baseDir += "/";
-        }
-        String filePath = baseDir + ossoUri + HTTP_AUTH_FILE;
-
-        HashMap hm = new HashMap();
-        try {
-            BufferedReader frdr = new BufferedReader(new FileReader(filePath));
-            String fbuff = null;
-            while ((fbuff = frdr.readLine()) != null) {
-                if (fbuff.trim().length() > 0)  {
-                    StringTokenizer st = new StringTokenizer(fbuff);
-                    // assume first is userid, second is password, ignore rest
-                    if (st.countTokens() > 1) {
-                        String userid = st.nextToken();
-                        String passwd = st.nextToken();
-                        String decpswd =
-                            (String)AccessController.doPrivileged(
-                                new DecodeAction(passwd));
-                        hm.put(userid, decpswd);
-                    }
-                }
-            }
-            if (!hm.isEmpty()) {
-                int len = hm.size();
-                String ents[][] = new String[len][2];
-                Set hs = hm.keySet();
-                int i = 0;
-                for (Iterator it = hs.iterator(); it.hasNext(); ) {
-                    String userid = (String)it.next();
-                    ents[i][0] = userid;
-                    ents[i++][1] = (String)hm.get(userid);
-                }
-                return(ents);
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            debug.error(classMethod + "IOex on file " + filePath + ": " +
-                e.getMessage());
-        } catch (RuntimeException e) {
-            debug.error(classMethod +
-                "RuntimeEx on file " + filePath + ": ", e);
-        } catch (Exception e) {
-            debug.error(classMethod +
-                "Exception on file " + filePath + ": ", e);
-        }
-        return null;
-    }
-
-    protected String[][] getMonAuthList(String authFilePath) {
+    protected static Map<String, String> getMonAuthList(String authFilePath) {
         String classMethod = "OpenSSOMonitoringUtil.getMonAuthList: ";
 
-        if ((authFilePath == null) || (!(authFilePath.trim().length() > 0))) {
+        if ((authFilePath == null) || ((authFilePath.trim().length() == 0))) {
             debug.error(classMethod + "No authentication file specified.");
             return null;
         }
-
-        String filePath = authFilePath;
 
         // prep for the "%BASE_DIR%/%SERVER_URI%/" style filepath
         if (authFilePath.contains("%BASE_DIR%") ||
             (authFilePath.contains("%SERVER_URI%")))
         {
-            String ossoUri =
-                SystemProperties.get(
+            String ossoUri = SystemProperties.get(
                     Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
             ossoUri = ossoUri.replace('\\','/');
             String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
             baseDir = baseDir.replace('\\','/');
             if (ossoUri.startsWith("/")) {
-                byte[] btmp = ossoUri.getBytes();
-                ossoUri = new String(btmp, 1, (btmp.length - 1));
+                ossoUri = ossoUri.substring(1);
             }
             if (!ossoUri.endsWith("/")) {
                 ossoUri += "/";
@@ -243,13 +176,13 @@ public class OpenSSOMonitoringUtil {
                 baseDir += "/";
             }
 
-            filePath = filePath.replaceAll("%BASE_DIR%", baseDir);
-            filePath = filePath.replaceAll("%SERVER_URI%", ossoUri);
+            authFilePath = authFilePath.replaceAll("%BASE_DIR%", baseDir);
+            authFilePath = authFilePath.replaceAll("%SERVER_URI%", ossoUri);
         }
 
-        HashMap hm = new HashMap();
+        Map<String, String> hm = new HashMap<String, String>();
         try {
-            BufferedReader frdr = new BufferedReader(new FileReader(filePath));
+            BufferedReader frdr = new BufferedReader(new FileReader(authFilePath));
             String fbuff = null;
             while ((fbuff = frdr.readLine()) != null) {
                 if (fbuff.trim().length() > 0)  {
@@ -258,37 +191,114 @@ public class OpenSSOMonitoringUtil {
                     if (st.countTokens() > 1) {
                         String userid = st.nextToken();
                         String passwd = st.nextToken();
-                        String decpswd =
-                            (String)AccessController.doPrivileged(
+                        String decpswd = AccessController.doPrivileged(
                                 new DecodeAction(passwd));
                         hm.put(userid, decpswd);
                     }
                 }
             }
             if (!hm.isEmpty()) {
-                int len = hm.size();
-                String ents[][] = new String[len][2];
-                Set hs = hm.keySet();
-                int i = 0;
-                for (Iterator it = hs.iterator(); it.hasNext(); ) {
-                    String userid = (String)it.next();
-                    ents[i][0] = userid;
-                    ents[i++][1] = (String)hm.get(userid);
-                }
-                return(ents);
+                return hm;
             } else {
                 return null;
             }
         } catch (IOException e) {
-            debug.error(classMethod + "IOex on file " + filePath + ": " +
+            debug.error(classMethod + "IOex on file " + authFilePath + ": " +
                 e.getMessage());
         } catch (RuntimeException e) {
             debug.error(classMethod +
-                "RuntimeEx on file " + filePath + ": ", e);
+                "RuntimeEx on file " + authFilePath + ": ", e);
         } catch (Exception e) {
             debug.error(classMethod +
-                "Exception on file " + filePath + ": ", e);
+                "Exception on file " + authFilePath + ": ", e);
         }
         return null;
+    }
+
+    /**
+     *  date/time format is "YYYY-MM-DD HH:MM:SS"
+     *  it should be an 8-Byte array, where
+     *    bytes 0-1: year
+     *    byte    2: month
+     *    byte    3: day
+     *    byte    4: hours
+     *    byte    5: minutes
+     *    byte    6: seconds
+     *    byte    7: deci-seconds (will be 0)
+     * 
+     * @param date
+     * @return
+     */
+    public static Byte[] convertDate(String date) {
+        StringTokenizer st = new StringTokenizer(date);
+        String sdate = st.nextToken();
+        String stime = st.nextToken();
+
+        st = new StringTokenizer(sdate, "-");
+        String year = st.nextToken();
+        int iyear = 0;
+        try {
+            iyear = Integer.parseInt(year);
+        } catch (NumberFormatException ex) {
+            debug.error("MonitoringUtil.convertDate year = " + year + " not parsable");
+        }
+        byte yrlow = (byte) (iyear & 0xff);
+        byte yrhigh = (byte) (((iyear & 0xff00) >> 8) & 0xff);
+        String month = st.nextToken();
+        String day = st.nextToken();
+
+        st = new StringTokenizer(stime, ":");
+        String hour = st.nextToken();
+        String min = st.nextToken();
+        String sec = st.nextToken();
+
+        Byte bz = Byte.valueOf((byte) 0);
+        Byte byrhi = bz;
+        Byte byrlo = bz;
+        Byte bmo = bz;
+        Byte bdy = bz;
+        Byte bhr = bz;
+        Byte bmn = bz;
+        Byte bsc = bz;
+        try {
+            byrhi = new Byte(yrhigh);
+            byrlo = new Byte(yrlow);
+            bmo = new Byte(month);
+            bdy = new Byte(day);
+            bhr = new Byte(hour);
+            bmn = new Byte(min);
+            bsc = new Byte(sec);
+        } catch (NumberFormatException ex) {
+            debug.error("MonitoringUtil error converting start date/time"
+                    + ", date = " + sdate + ", time = " + stime);
+        }
+        Byte[] ret = new Byte[8];
+        ret[0] = byrhi;
+        ret[1] = byrlo;
+        ret[2] = bmo;
+        ret[3] = bdy;
+        ret[4] = bhr;
+        ret[5] = bmn;
+        ret[6] = bsc;
+        ret[7] = bz;
+
+        return ret;
+    }
+
+    public static boolean isRunning() {
+        if (!initialized) {
+            try {
+                Class.forName("com.sun.identity.monitoring.Agent");
+            } catch (ClassNotFoundException cnfe) {
+                isMonAvailable = false;
+            } catch (NoClassDefFoundError ncdfe) {
+                // if the Agent class is avaliable, but the SNMP library isn't (ssoadm)
+                // TODO: fix this when the project is modularized
+                isMonAvailable = false;
+            }
+            initialized = true;
+        }
+        
+        return isMonAvailable ? Agent.isRunning() : false;
     }
 }

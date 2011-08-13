@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.plugin.monitoring.impl;
 
 import com.sun.identity.monitoring.Agent;
@@ -48,7 +51,7 @@ public class FedMonSAML2SvcProvider implements FedMonSAML2Svc {
     }
 
     public void init() {
-        sSAML2Svc = (SsoServerSAML2SvcImpl)Agent.getSaml2SvcMBean();
+        sSAML2Svc = Agent.getSaml2SvcMBean();
     }
 
     public void incFedSessionCount() {

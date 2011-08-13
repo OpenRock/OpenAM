@@ -26,9 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.plugin.monitoring.impl;
 
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
 
 /**
@@ -48,7 +52,7 @@ public class AgentProvider implements FedMonAgent
      *  Returns whether agent is "running" or not
      */
     public boolean isRunning() {
-        return Agent.isRunning();
+        return MonitoringUtil.isRunning();
     }
 
     /*

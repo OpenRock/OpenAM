@@ -26,38 +26,26 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.configuration;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationInstance;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.config.AMConfigurationException;
-import com.sun.identity.cli.CLIConstants;
-import com.sun.identity.common.configuration.AgentConfiguration;
-import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.COTConstants;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaException;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
 import com.sun.identity.monitoring.Agent;
-import com.sun.identity.monitoring.SSOServerGlobalFedInfo;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SSOServerRealmFedInfo;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -76,13 +64,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 
 /**
  * This class gathers the configuration information for the
@@ -92,14 +78,6 @@ import java.util.StringTokenizer;
  */
 
 public class ConfigFedMonitoring {
-
-    /**
-     * Initializes the servlet.  This method does all the "work"
-     * of gathering the configuration information for, and passing it
-     * to the Monitoring service.
-     * @param config servlet config
-     * @throws ServletException if it fails to get servlet context.
-     */
 
     Debug debug;
     SSOToken ssoToken;
@@ -134,7 +112,7 @@ public class ConfigFedMonitoring {
         debug = Debug.getInstance("amMonitoring");
         String classMethod = "ConfigFedMonitoring.configureMonitoring: ";
 
-        if (!Agent.isRunning()) {
+        if (!MonitoringUtil.isRunning()) {
             if (debug.warningEnabled()) {
                 debug.warning(classMethod + "monitoring is disabled");
             }

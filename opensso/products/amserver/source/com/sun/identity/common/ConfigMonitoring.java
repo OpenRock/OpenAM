@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.common;
 
@@ -64,6 +64,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,7 +79,7 @@ import java.util.Set;
 public class ConfigMonitoring {
     Debug debug;
     SSOToken ssoToken;
-    private ArrayList realmList;
+    private List<String> realmList;
     /*
      *  in AMLoginModule.java, the requested realm/org (i.e., in the
      *  "?realm=xxx" parameter) is not available, so realm-specific
@@ -143,14 +144,14 @@ public class ConfigMonitoring {
             return;
         }
 
-        HashMap puMap = new HashMap(); // sitename -> primary URL
-        HashMap siteMap = new HashMap(); // primary URL -> sitename
+        HashMap<String, String> puMap = new HashMap<String, String>(); // sitename -> primary URL
+        HashMap<String, String> siteMap = new HashMap<String, String>(); // primary URL -> sitename
         try {
-            Set siteNames = SiteConfiguration.getSites(ssoToken);
+            Set<String> siteNames = SiteConfiguration.getSites(ssoToken);
             // get primary url for each site
             if (siteNames.size() > 0) {
-                for (Iterator it = siteNames.iterator(); it.hasNext(); ) {
-                    String site = (String)it.next();
+                for (Iterator<String> it = siteNames.iterator(); it.hasNext(); ) {
+                    String site = it.next();
                     String purl =
                         SiteConfiguration.getSitePrimaryURL(ssoToken, site);
                     puMap.put(site, purl);
@@ -196,9 +197,6 @@ public class ConfigMonitoring {
                 "    Start time " + startDate + "\n" +
                 "    End time = " + sdf.format(date1));
         }
-
-        Agent.setMonitoringConfig(true);
-        return;
     }
 
     private SSOToken getSSOToken() throws SSOException {
@@ -214,7 +212,7 @@ public class ConfigMonitoring {
                 new OrganizationConfigManager(ssoToken, startRealm);
             Set orgs = orgMgr.getSubOrganizationNames("*", true);
             rlmCnt += orgs.size();
-            realmList = new ArrayList(rlmCnt);
+            realmList = new ArrayList<String>(rlmCnt);
             realmList.add(startRealm);
             for (Iterator it = orgs.iterator(); it.hasNext(); ) {
                 String ss = "/" + (String)it.next();

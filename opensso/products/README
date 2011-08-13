@@ -44,7 +44,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
                webservices-rt.jar, webservices-tools.jar, 
                webservices-extra.jar, webservices-extra-api.jar, OpenDS.jar, 
                je.jar, xercesImpl.jar, jss4.jar,
-               esapiport.jar, jdmkrt.jar, je.jar, json.jar, asm-3.1.jar,
+               esapiport.jar, json.jar, asm-3.1.jar,
                commons-logging-api-1.1.jar, rome-1.0.jar,jdom.jar,
                commons-collections-3.2.1.jar, commons-fileupload-1.2.1.jar,
                commons-beanutils-1.6.jar, backport-util-concurrent-2.2.jar,
@@ -275,13 +275,12 @@ libraries/native to opensso/products/extlib.
        http://repo.fusesource.com/nexus/content/groups/public/ognl/ognl/2.6.9/
 
 %% 2.18 Obtaining OpenDMK
-2.18.1  Download from
+2.18.1 Download OpenDMK 1.0-b02 Full binary bundle from
        http://opendmk.java.net/download/index.html
-2.18.2 Unpack using the jar command to a temporary directory
-2.18.3 Copy jdmkrt.jar and jdmktk.jar to the products/extlib directory
-2.18.4 Remove the docs directory
-2.18.4 Use zip -r . ../opendmk.jar . command to repack the DMK files
-2.18.5 Copy the opendmk.jar file to the products/extlib directory
+2.18.2 Install OpenDMK by issuing the following command
+        java -jar opendmk-1.0-b02-bin-dual-01-Oct-2007_19-17-46.jar
+2.18.3 Copy jdmkrt.jar and jdmktk.jar from <install dir>/lib dierctory
+       to <workspace>/opensso/products/extlib
 
 %% 3. Building the workspace
 

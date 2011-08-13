@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -37,20 +40,17 @@ import javax.management.MBeanServer;
  */
 public class SsoServerIdRepoSvcImpl extends SsoServerIdRepoSvc {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerIdRepoSvcImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerIdRepoSvcImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -58,11 +58,6 @@ public class SsoServerIdRepoSvcImpl extends SsoServerIdRepoSvc {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        IdRepoSearchCacheHits = new Long(0);
-        IdRepoSearchRqts = new Long(0);
-        IdRepoCacheHits = new Long(0);
-        IdRepoCacheEntries = new Long(0);
-        IdRepoGetRqts = new Long(0);
     }
 
     /*

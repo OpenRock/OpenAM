@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -92,8 +92,7 @@ public class SsoServerEntitlementPolicyStatsEntryImpl extends
                 return null;
             } else {
                 // is the object name sufficiently unique?
-                return
-                    new ObjectName(objname);
+                return new ObjectName(objname);
             }
         } catch (Exception ex) {
             debug.error(classModule + objname, ex);
@@ -110,10 +109,10 @@ public class SsoServerEntitlementPolicyStatsEntryImpl extends
 
         int i = OpenSSOIndexStore.getNumCachedPolicies(
                     EntitlementPolicyStatsRealmName);
-        EntitlementPolicyCaches = new Integer(i);
+        EntitlementPolicyCaches = Integer.valueOf(i);
 
         if (debug.messageEnabled()) {
-            StringBuffer sb = new StringBuffer(classMethod);
+            StringBuilder sb = new StringBuilder(classMethod);
             sb.append("for realm ").append(EntitlementPolicyStatsRealmName);
             sb.append(" = ").append(i);
             debug.message(sb.toString());
@@ -130,10 +129,10 @@ public class SsoServerEntitlementPolicyStatsEntryImpl extends
             "getEntitlementReferralCaches: ";
         int i = OpenSSOIndexStore.getNumCachedReferrals(
                     EntitlementPolicyStatsRealmName);
-        EntitlementReferralCaches = new Integer(i);
+        EntitlementReferralCaches = Integer.valueOf(i);
 
         if (debug.messageEnabled()) {
-            StringBuffer sb = new StringBuffer(classMethod);
+            StringBuilder sb = new StringBuilder(classMethod);
             sb.append("for realm ").append(EntitlementPolicyStatsRealmName);
             sb.append(" = ").append(i);
             debug.message(sb.toString());

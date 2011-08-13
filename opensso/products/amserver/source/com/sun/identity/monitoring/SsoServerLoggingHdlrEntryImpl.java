@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -53,13 +56,6 @@ public class SsoServerLoggingHdlrEntryImpl extends SsoServerLoggingHdlrEntry {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        LoggingHdlrConnFailed = new Long(0);
-        LoggingHdlrConnMade = new Long(0);
-        LoggingHdlrConnRqts = new Long(0);
-        LoggingHdlrDroppedCt = new Long(0);
-        LoggingHdlrFailureCt = new Long(0);
-        LoggingHdlrSuccessCt = new Long(0);
-        LoggingHdlrRqtCt = new Long(0);
     }
 
     public ObjectName

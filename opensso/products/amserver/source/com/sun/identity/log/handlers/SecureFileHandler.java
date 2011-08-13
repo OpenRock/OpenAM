@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.log.handlers;
 
@@ -71,6 +71,7 @@ import com.sun.identity.log.spi.Authorizer;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.log.spi.Token;
 import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import com.sun.identity.security.AdminPasswordAction;
@@ -355,9 +356,9 @@ public class SecureFileHandler extends java.util.logging.Handler {
             initializeSecurity();
         }
 
-        if(Agent.isRunning()){
+        if(MonitoringUtil.isRunning()){
     	    logServiceImplForMonitoring =
-        	(SsoServerLoggingSvcImpl) Agent.getLoggingSvcMBean();
+                Agent.getLoggingSvcMBean();
             sfLogHandlerForMonitoring = 
 		logServiceImplForMonitoring.getHandler(
                     SsoServerLoggingSvcImpl.SECURE_FILE_HANDLER_NAME);
@@ -420,7 +421,7 @@ public class SecureFileHandler extends java.util.logging.Handler {
      * @param lrecord the log record to be published.
      */
     public synchronized void publish(LogRecord lrecord) {
-        if (Agent.isRunning() && sfLogHandlerForMonitoring != null) {
+        if (MonitoringUtil.isRunning() && sfLogHandlerForMonitoring != null) {
             sfLogHandlerForMonitoring.incHandlerRequestCount(1);
         }
         if (writer == null) {
@@ -438,13 +439,13 @@ public class SecureFileHandler extends java.util.logging.Handler {
                 headerWritten = true;
             }
             writer.write(message);
-            if (Agent.isRunning() && sfLogHandlerForMonitoring != null) {
+            if (MonitoringUtil.isRunning() && sfLogHandlerForMonitoring != null) {
                 sfLogHandlerForMonitoring.incHandlerSuccessCount(1);
             }
         } catch (IOException ex) {
             Debug.error(logName +
                 ":SecureFileHandler: could not write to file", ex);
-            if (Agent.isRunning() && sfLogHandlerForMonitoring != null) {
+            if (MonitoringUtil.isRunning() && sfLogHandlerForMonitoring != null) {
                 sfLogHandlerForMonitoring.incHandlerDroppedCount(1);
             }
         }

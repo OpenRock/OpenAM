@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -90,9 +93,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void incSAML2IDPArtifsIssued() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.incSAML2IDPArtifsIssued:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -102,9 +102,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void incSAML2IDPAssertsIssued() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.incSAML2IDPAssertsIssued:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -114,9 +111,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void incSAML2IDPInvalRqtsRcvd() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.incSAML2IDPInvalRqtsRcvd:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -126,9 +120,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void incSAML2IDPRqtsRcvd() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.incSAML2IDPRqtsRcvd:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -138,9 +129,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void incSAML2IDPArtifsInCache() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.incSAML2IDPArtifsInCache:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -150,9 +138,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void decSAML2IDPArtifsInCache() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.decSAML2IDPArtifsInCache:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -162,9 +147,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void incSAML2IDPAssertsInCache() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.incSAML2IDPAssertsInCache:";
-        
         if (!Agent.isRunning()) {
             return;
         }
@@ -174,9 +156,6 @@ public class SsoServerSAML2IDPEntryImpl extends SsoServerSAML2IDPEntry {
     }
 
     public void decSAML2IDPAssertsInCache() {
-        String classModule =
-            "SsoServerSAML2IDPEntryImpl.decSAML2IDPAssertsInCache:";
-        
         if (!Agent.isRunning()) {
             return;
         }

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.policy;
 
@@ -57,6 +57,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.policy.interfaces.PolicyListener;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.AttributeSchema;
@@ -761,9 +762,9 @@ public class PolicyEvaluator {
         SSOToken token, String resourceName, Set actionNames,
         Map envParameters, Set visitedOrgs)
         throws PolicyException, SSOException {
-        if (Agent.isRunning()) {
+        if (MonitoringUtil.isRunning()) {
             SsoServerPolicySvcImpl sspsi =
-                (SsoServerPolicySvcImpl)Agent.getPolicySvcMBean();
+                Agent.getPolicySvcMBean();
             sspsi.incPolicyEvalsIn();
         }
 
@@ -774,9 +775,9 @@ public class PolicyEvaluator {
                 actionNames,
                 envParameters, visitedOrgs);
         } finally {
-            if (Agent.isRunning()) {
+            if (MonitoringUtil.isRunning()) {
                 SsoServerPolicySvcImpl sspsi =
-                    (SsoServerPolicySvcImpl)Agent.getPolicySvcMBean();
+                        Agent.getPolicySvcMBean();
                 sspsi.incPolicyEvalsOut();
             }
         }

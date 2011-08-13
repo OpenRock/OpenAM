@@ -1279,7 +1279,6 @@
 ./WEB-INF/lib/jaxrpc-impl.jar
 ./WEB-INF/lib/jaxrpc-spi.jar
 ./WEB-INF/lib/jdmkrt.jar
-./WEB-INF/lib/jdmktk.jar
 ./WEB-INF/lib/jdom.jar
 ./WEB-INF/lib/je.jar
 ./WEB-INF/lib/jersey-bundle-1.1.1-ea-SNAPSHOT.jar
@@ -1292,7 +1291,6 @@
 ./WEB-INF/lib/ldapjdk.jar
 ./WEB-INF/lib/log4j-1.2.8.jar
 ./WEB-INF/lib/mail.jar
-./WEB-INF/lib/mfwk_instrum_tk-2.0.jar
 ./WEB-INF/lib/oauth-client-1.1.5-ea-SNAPSHOT.jar
 ./WEB-INF/lib/oauth-server-1.1.5-ea-SNAPSHOT.jar
 ./WEB-INF/lib/oauth-signature-1.1.5-ea-SNAPSHOT.jar

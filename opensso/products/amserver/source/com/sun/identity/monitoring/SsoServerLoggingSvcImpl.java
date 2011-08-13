@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
@@ -42,7 +45,6 @@ import javax.management.ObjectName;
  */
 public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
     private static Debug debug = null;
-    private static String myMibName;
     private boolean isBogus = true;
     private static SsoServerLoggingHdlrEntryImpl lg_dbh = null;
     private static SsoServerLoggingHdlrEntryImpl lg_fh = null;
@@ -53,20 +55,19 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
     public static final String SECURE_FILE_HANDLER_NAME = "Secure File Handler";
     public static final String REMOTE_HANDLER_NAME = "Remote Handler";
 
-    private Map handlerMap = new HashMap();
+    private Map<String, SsoServerLoggingHdlrEntryImpl> handlerMap =
+            new HashMap<String, SsoServerLoggingHdlrEntryImpl>();
 
     /**
      * Constructor
      */
     public SsoServerLoggingSvcImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerLoggingSvcImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -79,14 +80,7 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
             int ind = 1;
             // DB Handler
             lg_dbh = new SsoServerLoggingHdlrEntryImpl(myMib);
-            lg_dbh.LoggingHdlrConnRqts = new Long(0);
-            lg_dbh.LoggingHdlrDroppedCt = new Long(0);
-            lg_dbh.LoggingHdlrFailureCt = new Long(0);
-            lg_dbh.LoggingHdlrSuccessCt = new Long(0);
             lg_dbh.LoggingHdlrName = DB_HANDLER_NAME;
-            lg_dbh.LoggingHdlrRqtCt = new Long(0);
-            lg_dbh.LoggingHdlrConnMade = new Long(0);
-            lg_dbh.LoggingHdlrConnFailed = new Long(0);
             lg_dbh.LoggingHdlrIndex = new Integer(ind++);
 
             final ObjectName dbhName =
@@ -105,14 +99,7 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
 
             // File Handler
             lg_fh = new SsoServerLoggingHdlrEntryImpl(myMib);
-            lg_fh.LoggingHdlrConnRqts = new Long(0);
-            lg_fh.LoggingHdlrDroppedCt = new Long(0);
-            lg_fh.LoggingHdlrFailureCt = new Long(0);
-            lg_fh.LoggingHdlrSuccessCt = new Long(0);
             lg_fh.LoggingHdlrName = FILE_HANDLER_NAME;
-            lg_fh.LoggingHdlrRqtCt = new Long(0);
-            lg_fh.LoggingHdlrConnMade = new Long(0);
-            lg_fh.LoggingHdlrConnFailed = new Long(0);
             lg_fh.LoggingHdlrIndex = new Integer(ind++);
 
             final ObjectName fhName =
@@ -131,14 +118,7 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
 
             // Secure File Handler
             lg_sfh = new SsoServerLoggingHdlrEntryImpl(myMib);
-            lg_sfh.LoggingHdlrConnRqts = new Long(0);
-            lg_sfh.LoggingHdlrDroppedCt = new Long(0);
-            lg_sfh.LoggingHdlrFailureCt = new Long(0);
-            lg_sfh.LoggingHdlrName = new String(SECURE_FILE_HANDLER_NAME);
-            lg_sfh.LoggingHdlrRqtCt = new Long(0);
-            lg_sfh.LoggingHdlrSuccessCt = new Long(0);
-            lg_sfh.LoggingHdlrConnMade = new Long(0);
-            lg_sfh.LoggingHdlrConnFailed = new Long(0);
+            lg_sfh.LoggingHdlrName = SECURE_FILE_HANDLER_NAME;
             lg_sfh.LoggingHdlrIndex = new Integer(ind++);
 
             final ObjectName sfhName =
@@ -157,14 +137,7 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
 
             // Remote Handler
             lg_rh = new SsoServerLoggingHdlrEntryImpl(myMib);
-            lg_rh.LoggingHdlrConnRqts = new Long(0);
-            lg_rh.LoggingHdlrDroppedCt = new Long(0);
-            lg_rh.LoggingHdlrFailureCt = new Long(0);
-            lg_rh.LoggingHdlrSuccessCt = new Long(0);
-            lg_rh.LoggingHdlrRqtCt = new Long(0);
             lg_rh.LoggingHdlrName = REMOTE_HANDLER_NAME;
-            lg_rh.LoggingHdlrConnMade = new Long(0);
-            lg_rh.LoggingHdlrConnFailed = new Long(0);
             lg_rh.LoggingHdlrIndex = new Integer(ind++);
 
             final ObjectName rhName =
@@ -194,14 +167,14 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
      * Setter for the "LoggingBufferSize" variable.
      */
     public void setSsoServerLoggingBufferSize(long l) {
-        LoggingBufferSize = new Long(l);
+        LoggingBufferSize = l;
     }
 
     /**
      * Setter for the "LoggingBufferTime" variable.
      */
     public void setSsoServerLoggingBufferTime(long l) {
-        LoggingBufferTime = new Long(l);
+        LoggingBufferTime = l;
     }
 
     /**
@@ -222,14 +195,14 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
      * Setter for the "LoggingNumberHistoryFiles" variable.
      */
     public void setSsoServerLoggingNumberHistoryFiles(long l) {
-        LoggingNumHistFiles = new Long(l);
+        LoggingNumHistFiles = l;
     }
 
     /**
      * Setter for the "LoggingMaxLogSize" variable.
      */
     public void setSsoServerLoggingMaxLogSize(long l) {
-        LoggingMaxLogSize = new Long(l);
+        LoggingMaxLogSize = l;
     }
 
     /**
@@ -250,7 +223,7 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
      * Setter for the "LoggingRecsRejected" variable.
      */
     public void setSsoServerLoggingRecsRejected(long l) {
-        LoggingRecsRejected = new Long(l);
+        LoggingRecsRejected = l;
     }
 
     /**
@@ -277,14 +250,8 @@ public class SsoServerLoggingSvcImpl extends SsoServerLoggingSvc {
     public SsoServerLoggingHdlrEntryImpl getHandler(String handlerName) {
         String classMethod = "SsoServerLoggingSvcImpl.getHandler:";
 
-        if (!Agent.isRunning()) {
-            return null;
-        }
-
         if ((handlerName != null) && (handlerName.length() > 0)) {
-            SsoServerLoggingHdlrEntryImpl handler =
-                    (SsoServerLoggingHdlrEntryImpl) handlerMap.get(
-                    handlerName);
+            SsoServerLoggingHdlrEntryImpl handler = handlerMap.get(handlerName);
             if (handler != null) {
                 return handler;
             } else {

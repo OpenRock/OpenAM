@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.security;
 
 import java.security.PrivilegedAction;
@@ -60,11 +63,9 @@ import com.iplanet.services.util.Crypt;
  *
  * @supported.all.api
  */
-public class DecodeAction implements PrivilegedAction {
+public class DecodeAction implements PrivilegedAction<String> {
+
     protected String value;
-
-    protected boolean useSpecifiedKey = false;
-
     protected AMEncryption encr;
 
     /**
@@ -90,7 +91,6 @@ public class DecodeAction implements PrivilegedAction {
         super();
         this.value = value;
         this.encr = encrKey;
-        useSpecifiedKey = true;
     }
 
     /*
@@ -98,8 +98,8 @@ public class DecodeAction implements PrivilegedAction {
      * 
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
-        if (useSpecifiedKey) {
+    public String run() {
+        if (encr != null) {
             return Crypt.decode(value, encr);
         } else {
             return Crypt.decode(value);

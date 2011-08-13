@@ -3,6 +3,10 @@
 -- Copyright (c) 2009, Sun Microsystems, All Rights Reserved.
 --
 
+--
+-- Portions Copyrighted 2011 ForgeRock AS
+--
+
 SUN-OPENSSO-SERVER-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -352,6 +356,7 @@ authenticationSuccessCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of successful authentications"
+    DEFVAL        { 0 }
     ::= { ssoServerAuthSvc 1 }
 
 authenticationFailureCount OBJECT-TYPE
@@ -360,6 +365,7 @@ authenticationFailureCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of unsuccessful authentications"
+    DEFVAL        { 0 }
     ::= { ssoServerAuthSvc 2 }
 
 authenticationSuccessRate OBJECT-TYPE
@@ -368,6 +374,7 @@ authenticationSuccessRate OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Current Auth success rate / second based on a fixed preconfigured window."
+    DEFVAL        { 0 }
     ::= { ssoServerAuthSvc 3 }
 
 authenticationFailureRate OBJECT-TYPE
@@ -376,6 +383,7 @@ authenticationFailureRate OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Current Auth failure rate / second based on a fixed preconfigured window."
+    DEFVAL        { 0 }
     ::= { ssoServerAuthSvc 4 }
 --
 -- Authentication Modules Table 
@@ -460,6 +468,7 @@ sessionActiveCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Current number of sessions on this server"
+    DEFVAL { 0 }
     ::= { ssoServerSessSvc 1 }
 
 sessionCreatedCount OBJECT-TYPE
@@ -468,6 +477,7 @@ sessionCreatedCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Sessions created since server startup."
+    DEFVAL        { 0 }
     ::= { ssoServerSessSvc 2 }
 
 sessionValidationsCount OBJECT-TYPE
@@ -476,6 +486,7 @@ sessionValidationsCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of session validations"
+    DEFVAL        { 0 }
     ::= { ssoServerSessSvc 3 }
 
 sessionNotifCount OBJECT-TYPE
@@ -484,6 +495,7 @@ sessionNotifCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Session notifications emitted by this server"
+    DEFVAL        { 0 }
     ::= { ssoServerSessSvc 4 }
 
 sessionNotifListnrCount OBJECT-TYPE
@@ -492,6 +504,7 @@ sessionNotifListnrCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of registered session notification listeners"
+    DEFVAL        { 0 }
     ::= { ssoServerSessSvc 5 }
 
 sessionAveSessSize OBJECT-TYPE
@@ -500,6 +513,7 @@ sessionAveSessSize OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Session size metrics - for approximate memory usage"
+    DEFVAL        { 0 }
     ::= { ssoServerSessSvc 6 }
 
 sessionSFOBroker OBJECT-TYPE
@@ -508,6 +522,7 @@ sessionSFOBroker OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Session Failover : comma-separated broker connection string with status : eg : <broker>|on,<broker>|off. (TODO:change to table)?"
+    DEFVAL        { "N/A" }
     ::= { ssoServerSessSvc 7 }
 
 
@@ -654,6 +669,7 @@ loggingHdlrRqtCt  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of log records requested logged"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 3 }
 
 loggingHdlrSuccessCt OBJECT-TYPE
@@ -662,6 +678,7 @@ loggingHdlrSuccessCt OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of log records successfully logged"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 4 }
 
 loggingHdlrFailureCt OBJECT-TYPE
@@ -670,6 +687,7 @@ loggingHdlrFailureCt OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of log records unsuccessfully logged"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 5 }
 
 loggingHdlrDroppedCt OBJECT-TYPE
@@ -678,6 +696,7 @@ loggingHdlrDroppedCt OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of log records dropped"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 6 }
 
 loggingHdlrConnRqts OBJECT-TYPE
@@ -686,6 +705,7 @@ loggingHdlrConnRqts OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of Database handler connection requests"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 7 }
 
 loggingHdlrConnMade OBJECT-TYPE
@@ -694,6 +714,7 @@ loggingHdlrConnMade OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of Database handler successful connections"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 8 }
 
 loggingHdlrConnFailed OBJECT-TYPE
@@ -702,6 +723,7 @@ loggingHdlrConnFailed OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Count of Database handler connection failures"
+    DEFVAL        { 0 }
     ::= { ssoServerLoggingHdlrEntry 9 }
 
 --
@@ -716,6 +738,7 @@ policyStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Policy service operational status : dormant | operational"
+    DEFVAL        { "dormant" }
     ::= { ssoServerPolicySvc 1 }
 
 policyEvalsIn OBJECT-TYPE
@@ -724,6 +747,7 @@ policyEvalsIn OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of policy evaluations in"
+    DEFVAL        { 0 }
     ::= { ssoServerPolicySvc 2 }
 
 policyEvalsOut OBJECT-TYPE
@@ -732,6 +756,7 @@ policyEvalsOut OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of policy evaluations out"
+    DEFVAL        { 0 }
     ::= { ssoServerPolicySvc 3 }
 
 --
@@ -801,6 +826,7 @@ idRepoGetRqts OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of get requests"
+    DEFVAL        { 0 }
     ::= { ssoServerIdRepoSvc 1 }
 
 idRepoCacheEntries OBJECT-TYPE
@@ -809,6 +835,7 @@ idRepoCacheEntries OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of cache entries"
+    DEFVAL        { 0 }
     ::= { ssoServerIdRepoSvc 2 }
 
 idRepoCacheHits OBJECT-TYPE
@@ -817,6 +844,7 @@ idRepoCacheHits OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of cache hits"
+    DEFVAL        { 0 }
     ::= { ssoServerIdRepoSvc 3 }
 
 idRepoSearchRqts OBJECT-TYPE
@@ -825,6 +853,7 @@ idRepoSearchRqts OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of search requests"
+    DEFVAL        { 0 }
     ::= { ssoServerIdRepoSvc 4 }
 
 idRepoSearchCacheHits OBJECT-TYPE
@@ -833,6 +862,7 @@ idRepoSearchCacheHits OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of search cache hits"
+    DEFVAL        { 0 }
     ::= { ssoServerIdRepoSvc 5 }
 
 
@@ -1069,6 +1099,7 @@ sAML2Status OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "SAML2 service operational status : dormant | operational"
+    DEFVAL        { "dormant" }
     ::= { ssoServerSAML2Svc 1 }
 
 sAML2IDPSessionCount OBJECT-TYPE
@@ -1077,6 +1108,7 @@ sAML2IDPSessionCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of IDP Sessions"
+    DEFVAL        { 0 }
     ::= { ssoServerSAML2Svc 2 }
 
 sAML2FedSessionCount OBJECT-TYPE
@@ -1085,6 +1117,7 @@ sAML2FedSessionCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of Federation Sessions"
+    DEFVAL        { 0 }
     ::= { ssoServerSAML2Svc 3 }
 --
 -- Hosted and Remote IDP counts in this realm
@@ -1095,6 +1128,7 @@ sAML2HostedIDPCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of This Realm's Hosted IDPs"
+    DEFVAL        { 0 }
     ::= { ssoServerSAML2Svc 4 }
 
 sAML2RemoteIDPCount OBJECT-TYPE
@@ -1103,6 +1137,7 @@ sAML2RemoteIDPCount OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Count of This Realm's Remote IDPs"
+    DEFVAL        { 0 }
     ::= { ssoServerSAML2Svc 5 }
 
 --
@@ -1459,6 +1494,7 @@ iDFFStatus OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "ID-FF service operational status : dormant | operational"
+    DEFVAL        { "dormant" }
     ::= { ssoServerIDFFSvc 1 }
 
 iDFFAssertions OBJECT-TYPE
@@ -1467,6 +1503,7 @@ iDFFAssertions OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of assertions for all ID-FF providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 2 }
 
 iDFFArtifacts OBJECT-TYPE
@@ -1475,6 +1512,7 @@ iDFFArtifacts OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of artifacts for all ID-FF providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 3 }
 
 iDFFUserIDSessionList OBJECT-TYPE
@@ -1483,6 +1521,7 @@ iDFFUserIDSessionList OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of entries in UserID Session List Map for all ID-FF Providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 4 }
 
 iDFFIdAuthnRqt OBJECT-TYPE
@@ -1491,6 +1530,7 @@ iDFFIdAuthnRqt OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of entries in ID Authentication Request Map for all ID-FF Providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 5 }
 
 iDFFIdLocalSessToken OBJECT-TYPE
@@ -1499,6 +1539,7 @@ iDFFIdLocalSessToken OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of entries in ID Local Session Token Map for all ID-FF Providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 6 }
 
 iDFFIdDestn OBJECT-TYPE
@@ -1507,6 +1548,7 @@ iDFFIdDestn OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of entries in ID Destination Map for all ID-FF Providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 7 }
 
 iDFFRelayState OBJECT-TYPE
@@ -1515,6 +1557,7 @@ iDFFRelayState OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "Number of entries in Relay State Map for all ID-FF Providers"
+    DEFVAL        { 0 }
     ::= { ssoServerIDFFSvc 8 }
 
 
@@ -2353,6 +2396,7 @@ numPolicies OBJECT-TYPE
     STATUS        current
     DESCRIPTION
 	"Total number of policies"
+    DEFVAL        { 0 }
     ::= { ssoServerEntitlementSvc 1 }
 
 numReferrals OBJECT-TYPE
@@ -2361,6 +2405,7 @@ numReferrals OBJECT-TYPE
     STATUS        current
     DESCRIPTION
 	"Total number of referrals"
+    DEFVAL        { 0 }
     ::= { ssoServerEntitlementSvc 2 }
 
 numCachedPolicies OBJECT-TYPE
@@ -2369,6 +2414,7 @@ numCachedPolicies OBJECT-TYPE
     STATUS        current
     DESCRIPTION
 	"Total number of cached policies"
+    DEFVAL        { 0 }
     ::= { ssoServerEntitlementSvc 3 }
 
 numCachedReferrals OBJECT-TYPE
@@ -2377,6 +2423,7 @@ numCachedReferrals OBJECT-TYPE
     STATUS        current
     DESCRIPTION
 	"Total number of cached policies"
+    DEFVAL        { 0 }
     ::= { ssoServerEntitlementSvc 4 }
 
 --
@@ -2497,6 +2544,74 @@ entitlementReferralCaches  OBJECT-TYPE
     DESCRIPTION
 	    "Number of Cached Referrals"
     ::= { ssoServerEntitlementPolicyStatsEntry 4 }
+
+--
+-- LDAP Connectionpool monitoring values
+--
+ssoServerConnPoolSvc OBJECT IDENTIFIER ::= { ssoServerInstance 24 }
+
+connRequestWaitTimeHighWaterMark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "High watermark for request wait time"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 1 }
+
+connRequestWaitTimeLowWaterMark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Low watermark for request wait time"
+    DEFVAL        { 9223372036854775807 }
+    ::= { ssoServerConnPoolSvc 2 }
+
+connRequestWaitTimeCurrent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current request wait time"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 3 }
+
+numConnUsedHighWaterMark OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum number of concurrent connections in use"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 4 }
+
+numConnUsedLowWaterMark OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Minimum number of concurrent connections in use"
+    DEFVAL        { 2147483647 }
+    ::= { ssoServerConnPoolSvc 5 }
+
+numConnUsedCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current number of connections in use"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 6 }
+
+numConnReleased OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of connections returned to the pool"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 7 }
 
 --
 -- SSO Conformance
@@ -2679,7 +2794,14 @@ entitlementReferralCaches  OBJECT-TYPE
 	    entitlementMonitorThruPut,
 	    entitlementPolicyStatsRealmName,
 	    entitlementPolicyCaches,
-	    entitlementReferralCaches
+	    entitlementReferralCaches,
+            connRequestWaitTimeHighWaterMark,
+            connRequestWaitTimeLowWaterMark,
+            connRequestWaitTimeCurrent,
+            numConnUsedHighWaterMark,
+            numConnUsedLowWaterMark,
+            numConnUsedCurrent,
+            numConnReleased
         }
     STATUS  current
     DESCRIPTION

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -40,20 +40,17 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class SsoServerFedEntitiesImpl extends SsoServerFedEntities {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerFedEntitiesImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerFedEntitiesImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -61,7 +58,6 @@ public class SsoServerFedEntitiesImpl extends SsoServerFedEntities {
         if (debug == null) {
             debug = Debug.getInstance("amMonitoring");
         }
-        String classModule = "SsoServerFedEntitiesImpl.init:";
     }
 }
 

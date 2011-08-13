@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.monitoring;
 
 import com.sun.identity.entitlement.util.NetworkMonitor;
@@ -43,7 +46,6 @@ public class SsoServerEntitlementExecStatsEntryImpl extends
 {
     private static Debug debug = null;
     private static String myMibName;
-    OpenSSOMonitoringUtil osUtil = new OpenSSOMonitoringUtil();
 
     /**
      * Constructor
@@ -83,8 +85,7 @@ public class SsoServerEntitlementExecStatsEntryImpl extends
                 return null;
             } else {
                 // is the object name sufficiently unique?
-                return
-                    new ObjectName(objname);
+                return new ObjectName(objname);
             }
         } catch (Exception ex) {
             debug.error(classModule + objname, ex);
@@ -97,7 +98,7 @@ public class SsoServerEntitlementExecStatsEntryImpl extends
      */
     public Long getEntitlementMonitorThruPut() throws SnmpStatusException {
         // see if this network monitor has been instantiated
-        if (osUtil.networkMonitorExist(EntitlementNetworkMonitorName)) {
+        if (MonitoringUtil.networkMonitorExist(EntitlementNetworkMonitorName)) {
             NetworkMonitor nm =
                 NetworkMonitor.getInstance(EntitlementNetworkMonitorName);
             // "current" doesn't seem to be all that interesting
@@ -106,8 +107,8 @@ public class SsoServerEntitlementExecStatsEntryImpl extends
             for (int i = 0; i < fa.length; i++) {
                 fi += fa[i];
             }
-            Float fFt = new Float(fi);
-            EntitlementMonitorThruPut = new Long(fFt.longValue());
+            Float fFt = Float.valueOf(fi);
+            EntitlementMonitorThruPut = Long.valueOf(fFt.longValue());
         } else {
             if (debug.warningEnabled()) {
                 debug.warning("SsoServerEntitlementExecStatsEntryImpl: " +
@@ -121,7 +122,7 @@ public class SsoServerEntitlementExecStatsEntryImpl extends
      * Getter for the "EntitlementMonitorTotalTime" variable.
      */
     public Long getEntitlementMonitorTotalTime() throws SnmpStatusException {
-        if (osUtil.networkMonitorExist(EntitlementNetworkMonitorName)) {
+        if (MonitoringUtil.networkMonitorExist(EntitlementNetworkMonitorName)) {
             NetworkMonitor nm =
                 NetworkMonitor.getInstance(EntitlementNetworkMonitorName);
             
@@ -130,8 +131,8 @@ public class SsoServerEntitlementExecStatsEntryImpl extends
             for (int i = 0; i < fa.length; i++) {
                 fi += fa[i];
             }
-            Float fFtm = new Float(fi);
-            EntitlementMonitorTotalTime = new Long(fFtm.longValue());
+            Float fFtm = Float.valueOf(fi);
+            EntitlementMonitorTotalTime = Long.valueOf(fFtm.longValue());
         } else {
             if (debug.warningEnabled()) {
                 debug.warning("SsoServerEntitlementExecStatsEntryImpl: " +

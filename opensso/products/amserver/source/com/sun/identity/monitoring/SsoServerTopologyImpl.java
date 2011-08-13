@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -36,8 +36,8 @@ import com.sun.management.snmp.agent.SnmpMib;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -47,20 +47,17 @@ import javax.management.ObjectName;
  */
 public class SsoServerTopologyImpl extends SsoServerTopology {
     private static Debug debug = null;
-    private static String myMibName;
 
     /**
      * Constructor
      */
     public SsoServerTopologyImpl (SnmpMib myMib) {
         super(myMib);
-        myMibName = myMib.getMibName();
         init(myMib, null);
     }
 
     public SsoServerTopologyImpl (SnmpMib myMib, MBeanServer server) {
         super(myMib, server);
-        myMibName = myMib.getMibName();
         init(myMib, server);
     }
 
@@ -86,27 +83,23 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
          *  and add them to their corresponding tables.
          */
         
-        Hashtable ntbl = Agent.getNamingTable();
-        Hashtable sidtbl = Agent.getSiteIdTable();
-        HashMap u2stbl = Agent.getURLToSiteTable();
-        Set sidKeys = sidtbl.keySet();
+        Hashtable<String, String> ntbl = Agent.getNamingTable();
+        Hashtable<String, String> sidtbl = Agent.getSiteIdTable();
 
-        for (Iterator it = sidKeys.iterator(); it.hasNext(); ) {
-            String svrId = (String)it.next();
-            String siteId = (String)sidtbl.get(svrId);
-            String svrURL = (String)ntbl.get(svrId);
+        for (Map.Entry<String, String> entry : sidtbl.entrySet()) {
+            String svrId = entry.getKey();
+            String svrURL = ntbl.get(svrId);
+            String siteId = sidtbl.get(svrId);
 
             URL url = null;
             String proto = null;
             String host = null;
             int port = 0;
-            String path = null;
             try {
                 url = new URL(svrURL);
                 proto = url.getProtocol();
                 host = url.getHost();
                 port = url.getPort();
-                path = url.getPath();
             } catch (MalformedURLException mue) {
                 debug.error(classModule + "invalid URL: " +
                     svrURL + "; " + mue.getMessage());
@@ -128,7 +121,7 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
             ssrv.ServerProtocol = proto;
             ssrv.ServerId = iid;
             /* need a way to know what the real status is */
-            ssrv.ServerStatus = new Integer(1);
+            ssrv.ServerStatus = Integer.valueOf(1);
 
             final ObjectName svrName =
                 ssrv.createSsoServerServerEntryObjectName(server);
@@ -140,38 +133,30 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
              } catch (Exception ex) {
                 debug.error(classModule  + svrURL, ex);
              }
-        }
 
-        /*
-         *  fill the SsoServerSitesTable.
-         *  entries have siteid, site name, and site state
-         *  sidKeys has the serverIDs; the values are the site they
-         *  belong to.
-         *
-         *  unfortunately, SiteConfiguration.getSites(SSOToken) needs
-         *  an SSOToken, which can be gotten after the server is more
-         *  closer to being operational than when the Agent is started,
-         *  so that part will have to be updated at a later time.
-         *
-         *  where the key == value in sidKeys is the one that is the site
-         */
-
-        int sidmapIndx = 1;
-        for (Iterator it = sidKeys.iterator(); it.hasNext(); ) {
-            String svrId = (String)it.next();
-            String siteId = (String)sidtbl.get(svrId);
-            Integer sid = new Integer(0);
-
+            /*
+             *  fill the SsoServerSitesTable.
+             *  entries have siteid, site name, and site state
+             *  sidKeys has the serverIDs; the values are the site they
+             *  belong to.
+             *
+             *  unfortunately, SiteConfiguration.getSites(SSOToken) needs
+             *  an SSOToken, which can be gotten after the server is more
+             *  closer to being operational than when the Agent is started,
+             *  so that part will have to be updated at a later time.
+             *
+             *  where the key == value in sidKeys is the one that is the site
+             */
             if (debug.messageEnabled()) {
-                debug.message(classModule + "svrId = " + svrId +
-                    ", siteId = " + siteId);
+                debug.message(classModule + "svrId = " + svrId
+                        + ", siteId = " + siteId);
             }
 
             try {
-                sid = new Integer(siteId);
+                Integer.valueOf(siteId);
             } catch (NumberFormatException nfe) {
-                debug.error(classModule + "invalid siteid (" +
-                    siteId + "): " + nfe.getMessage(), nfe);
+                debug.error(classModule + "invalid siteid ("
+                        + siteId + "): " + nfe.getMessage(), nfe);
             }
         }
     }
