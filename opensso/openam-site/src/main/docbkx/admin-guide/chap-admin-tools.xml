@@ -98,7 +98,10 @@
  
  <section xml:id="openam-cli-overview">
   <title>OpenAM Command-Line Tools</title>
+  <para>The script tools in the following list have <literal>.bat</literal>
+  versions for use on Microsoft Windows.</para>
   
+  <indexterm><primary>Silent installation</primary></indexterm>
   <variablelist>
    <para>You can install the following OpenAM command-line tools.</para>
    <varlistentry>
@@ -125,6 +128,17 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term><command>configurator.jar</command></term>
+    <listitem>
+     <para>This executable .jar file lets you perform silent installation,
+     configuring a deployed OpenAM server by applying settings from a
+     configuration file, as in <command>java -jar configurator.jar -f
+     config.file</command>. The .jar is provided with a sample configuration
+     file.</para>
+     <para>Install this from <filename>tools/ssoConfiguratorTools.zip</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term><command>ssoadm</command></term>
     <listitem>
      <para>This tool provides a rich command-line interface for configuration
@@ -136,6 +150,16 @@
      after activating it when you installed OpenAM, for example
      <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
      <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>ssodtool.sh</command></term>
+    <listitem>
+     <para>This extensible diagnostic tool runs in GUI mode by default, but can
+     also be run in command-line mode. The tool helps you check configuration
+     settings and verify configuration integrity, test connectivity, and
+     generate test reports.</para>
+     <para>Install this from <filename>tools/ssoDiagnosticTools.zip</filename>.</para>
     </listitem>
    </varlistentry>
   </variablelist>

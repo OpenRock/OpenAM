@@ -81,6 +81,7 @@
  <refsect1>
   <title>Examples</title>
   <para>The following example checks the <literal>amConsole</literal> logs.</para>
-  <screen>TODO pending NPE</screen>
+  <screen>$ amverifyarchive -l amConsole -p $HOME/openam/openam/log
+ -u amadmin -w password</screen>
  </refsect1>
 </refentry>
