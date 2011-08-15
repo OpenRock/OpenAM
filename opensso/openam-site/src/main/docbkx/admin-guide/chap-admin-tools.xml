@@ -139,6 +139,39 @@
     </listitem>
    </varlistentry>
   </variablelist>
+  
+  <note>
+   <para>The commands access the OpenAM configuration over HTTP (or HTTPS).
+   When using the administration commands in a site configuration, the
+   commands access the configuration through the front end load balancer.</para>
+   <itemizedlist>
+    <para>Sometimes a command cannot access the load balancer, because:</para>
+    <listitem>
+     <para>Network routing restrictions prevent the tool from accessing
+     the load balancer.</para>
+    </listitem>
+    <listitem>
+     <para>For testing purposes, the load balancer uses a self-signed
+     certificate for HTTPS, and the tool does not have a way of trusting the
+     self-signed certificate.</para>
+    </listitem>
+    <listitem>
+     <para>The load balancer is temporarily unavailable.</para>
+    </listitem>
+   </itemizedlist>
+   <para>In such cases you can work around the problem by adding an option
+   such as the following to the <command>java</command> command in the
+   tool's script. (This all belongs on one line with no spaces in the
+   script.)</para>
+   <para><literal> -D"com.iplanet.am.naming.map.site.to.server=
+https://lb.example.com:443/openam=
+http://server1.example.com:8080/openam=
+http://server2.example.com:8080/openam"</literal></para>
+   <para>In the above example the load balancer is on the <literal>lb</literal>
+   host, <literal>https://lb.example.com:443/openam</literal> is the site name,
+   and the additional OpenAM servers in the site follow with
+   <literal>=</literal> as the separator character.</para>
+  </note>
  </section>
 </chapter>
 
