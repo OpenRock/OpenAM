@@ -79,19 +79,20 @@
   <para>The following example runs the command in REVIEW mode.</para>
   <screen># su
 Password:
-# echo DIRMGR_PASSWORD=password > pwd.file
-# echo SSOADM_PASSWORD=password >> pwd.file
+# echo DIRMGR_PASSWORD=password &gt; pwd.file
+# echo SSOADM_PASSWORD=password &gt;&gt; pwd.file
 # chmod 400 /tmp/pwd.file
 # vi amtune-env.properties
-# grep -E "^[A-Z_]*=.+" amtune-env.properties 
+# grep -E "^[A-Z_]*=.+" amtune-env.properties
 AMTUNE_MODE=REVIEW
-AMTUNE_LOG_LEVEL=TERM
+AMTUNE_LOG_LEVEL=FILE
 AMTUNE_TUNE_OS=true
 AMTUNE_TUNE_DS=false
 AMTUNE_TUNE_WEB_CONTAINER=false
 AMTUNE_TUNE_OPENSSO=true
+WEB_CONTAINER=other
 AMTUNE_WEB_CONTAINER_JAVA_POLICY=false
-SSOADM_LOCATION=/home/mark/tools/admin/openam/bin/amtune
+SSOADM_LOCATION=/home/mark/tools/admin/openam/bin
 OPENSSOADMIN_USER=amadmin
 OPENSSOSERVER_URL=http://openam.example.com:8080/openam
 REALM_NAME=/
@@ -102,6 +103,173 @@ AMTUNE_PER_THREAD_STACK_SIZE_IN_KB=128
 AMTUNE_MIN_MEMORY_TO_USE_IN_MB=512
 AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS=3584
 AMTUNE_MAX_MEMORY_TO_USE_IN_MB_DEFAULT=1536
-# TODO pending OPENAM-787</screen>
+# # amtune ./pwd.file
+=====================================================================
+Error log file :
+ /home/mark/tools/admin/openam/bin/amtune/../../logs/amtune-errors
+Configuration information file :
+ /home/mark/tools/.../logs/amtune-config.2011-08-15-14-50-05.log
+=====================================================================
+Checking System Environment...
+Checking User...
+---------------------------------------------------------------------
+OpenSSO tune information...
+---------------------------------------------------------------------
+amtune Mode      : REVIEW
+OS               : true 
+OpenAM          : true 
+Directory        : false 
+Web Container    : false 
+---------------------------------------------------------------------
+Detecting System Environment...
+---------------------------------------------------------------------
+Number of Cores in the system : 1 
+Acceptor Threads : 1 
+Memory Available (MB) : 2023 
+Memory to Use (MB) : 1517 
+There is enough memory.
+---------------------------------------------------------------------
+Calculating Tuning Parameters...
+---------------------------------------------------------------------
+Max heap size (MB) : 1327 
+Min Heap size (MB) : 1327 
+Max new size (MB) : 165 
+Session Cache Size (MB) : 442 
+Number of Session Cache Entries : 75434 
+Maximum Number of Java Threads : 663 
+Maximum Number of Thread Pool : 276 
+LDAP Auth Threads : 27 
+Service management LDAP Threads : 27 
+Notification Threads : 3 
+Notification Queue Size : 22627 
+=====================================================================
+Linux Tuning 
+---------------------------------------------------------------------
+Linux Kernel Tuning...
+ 
+File                 : /etc/sysctl.conf
+Parameter tuning     : 
+ 
+1.   fs.file-max
+Current Value        : fs.file-max =  
+Recommended Value    : fs.file-max = 65536
+ 
+2.   net.ipv4.ip_local_port_range
+Current Value        : net.ipv4.ip_local_port_range = 32768 61000
+Recommended Value    : net.ipv4.ip_local_port_range = 1204 65000
+ 
+3.   net.core.rmem_max
+Current Value        : net.core.rmem_max = 131071
+Recommended Value    : net.core.rmem_max = 8388608
+ 
+4.   net.ipv4.tcp_rmem
+Current Value        : net.ipv4.tcp_rmem = 4096 87380 3473408
+Recommended Value    : net.ipv4.tcp_rmem = 4096 131072 8388608
+ 
+5.   net.ipv4.tcp_wmem
+Current Value        : net.ipv4.tcp_wmem = 4096 16384 3473408
+Recommended Value    : net.ipv4.tcp_wmem = 4096 131072 8388608
+ 
+6.   net.ipv4.tcp_sack
+Current Value        : net.ipv4.tcp_sack = 1
+Recommended Value    : net.ipv4.tcp_sack = 0
+ 
+7.   net.ipv4.tcp_timestamps
+Current Value        : net.ipv4.tcp_timestamps = 1
+Recommended Value    : net.ipv4.tcp_timestamps = 0
+ 
+8.   net.ipv4.tcp_window_scaling
+Current Value        : net.ipv4.tcp_window_scaling = 1
+Recommended Value    : net.ipv4.tcp_window_scaling = 0
+ 
+9.  net.ipv4.tcp_keepalive_time
+Current Value        : net.ipv4.tcp_keepalive_time = 7200
+Recommended Value    : net.ipv4.tcp_keepalive_time = 60
+ 
+10.  net.ipv4.tcp_keepalive_intvl
+Current Value        : net.ipv4.tcp_keepalive_intvl = 75
+Recommended Value    : net.ipv4.tcp_keepalive_intvl = 75
+ 
+11.  net.ipv4.tcp_fin_timeout
+Current Value        : net.ipv4.tcp_fin_timeout = 60
+Recommended Value    : net.ipv4.tcp_fin_timeout = 30
+ 
+---------------------------------------------------------------------
+Linux Boot Script Tuning...
+ 
+File                 : /etc/rc.local
+Parameter tuning     : 
+ 
+1.   /proc/sys/net/ipv4/tcp_fin_timeout
+Current Value        : 
+Recommended Value    : echo 30 &gt; /proc/sys/net/ipv4/tcp_fin_timeout
+ 
+2.   /proc/sys/net/ipv4/tcp_keepalive_time
+Current Value        : 
+Recommended Value    : echo 60 &gt; /proc/sys/net/ipv4/tcp_keepalive_time
+ 
+3.   /proc/sys/net/ipv4/tcp_keepalive_intvl
+Current Value        : 
+Recommended Value    : echo 75 &gt; /proc/sys/net/ipv4/tcp_keepalive_intvl
+ 
+4.   /proc/sys/net/ipv4/tcp_window_scaling
+Current Value        : 
+Recommended Value    : echo 0 &gt; /proc/sys/net/ipv4/tcp_window_scaling
+ 
+5.   Loading Kernel file with sysctl -p /etc/sysctl.conf
+Current Value        : 
+Recommended Value    : sysctl -p /etc/sysctl.conf
+ 
+---------------------------------------------------------------------
+Open file and File Descriptors Tuning...
+ 
+File                 : /etc/security/limits.conf
+Parameter tuning     : 
+ 
+1.   Number of Soft files.
+Current Value        :  
+Recommended Value    : *               soft    nofile          65536
+ 
+2.   Number of Hard files.
+Current Value        :  
+Recommended Value    : *               hard    nofile          65536
+ 
+=====================================================================
+#####################################################################
+OpenAM Tuning.....
+#####################################################################
+Initializing...
+---------------------------------------------------------------------
+Recommended OpenAM Server tuning parameters are...
+ 
+Parameter tuning     : 
+ 
+1.    com.iplanet.am.sdk.cache.maxSize
+Current Value        : com.iplanet.am.sdk.cache.maxSize=&lt;No value set&gt;
+Recommended Value    : com.iplanet.am.sdk.cache.maxSize=10000
+ 
+2.    com.iplanet.am.notification.threadpool.size
+Current Value        : com.iplanet.am.notification.threadpool.size=
+ &lt;No value set&gt;
+Recommended Value    : com.iplanet.am.notification.threadpool.size=3
+ 
+3.    com.iplanet.am.notification.threadpool.threshold
+Current Value        : com.iplanet.am.notification.threadpool.threshold=
+ &lt;No value set&gt;
+Recommended Value    : com.iplanet.am.notification.threadpool.threshold=22627
+ 
+4.    com.iplanet.am.session.maxSessions
+Current Value        : com.iplanet.am.session.maxSessions=&lt;No value set&gt;
+Recommended Value    : com.iplanet.am.session.maxSessions=75434
+ 
+5.    com.iplanet.am.session.purgedelay
+Current Value        : com.iplanet.am.session.purgedelay=&lt;No value set&gt;
+Recommended Value    : com.iplanet.am.session.purgedelay=0
+ 
+6.    com.iplanet.am.session.invalidsessionmaxtime
+Current Value        : com.iplanet.am.session.invalidsessionmaxtime=
+ &lt;No value set&gt;
+Recommended Value    : com.iplanet.am.session.invalidsessionmaxtime=3
+...</screen>
  </refsect1>
 </refentry>
