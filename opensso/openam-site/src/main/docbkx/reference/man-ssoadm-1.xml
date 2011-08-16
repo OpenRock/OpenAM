@@ -1176,7 +1176,8 @@
     <varlistentry>
      <term><command>update-server-cfg</command></term>
      <listitem>
-      <para>Update server configuration.</para>
+      <para>Update server configuration, including the default configuration
+      when using the <option>-s default</option> option.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
