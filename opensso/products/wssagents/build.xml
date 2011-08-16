@@ -25,7 +25,9 @@
    $Id: build.xml,v 1.34 2010/01/15 18:54:35 mrudul_uchil Exp $
 
 -->
-
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 <project name="Open WSS Agents" default="usage">
     <description>Open Web Services Security Agents</description>
     <import file="../products.xml" />
@@ -138,6 +140,11 @@
 
         <checksum file="${wssagents.dist.dir}/openssowssproviders.jar" 
             algorithm="SHA" fileext=".sha" />
+        <copy file="${products.basedir}/build_date.js.template" tofile="${wssagents.dist.dir}/build_date.js" filtering="true">
+            <filterset>
+                <filter token="BUILD_DATE" value="${nightly.date}" />
+            </filterset>
+        </copy>
     </target>
 
     <target name="build-JAX-WS" depends="checkjar, preparebuild">
