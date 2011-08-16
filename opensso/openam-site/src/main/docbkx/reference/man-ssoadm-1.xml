@@ -94,7 +94,240 @@
   </variablelist>
  </refsect1>
  <refsect1>
-  <title>Subcommands</title>
+  <title>Subcommands: By Category</title>
+  <para>This section lists subcommands by category. The subsequent section
+  lists subcommands in alphabetical order with a short description.</para>
+  <para>See <command>ssoadm <replaceable>subcommand</replaceable>
+  --help</command> for detailed options.</para>
+  <refsect2>
+   <title>Agent Configuration</title>
+   <itemizedlist>
+    <listitem><para><command>add-agent-to-grp</command></para></listitem>
+    <listitem><para><command>agent-remove-props</command></para></listitem>
+    <listitem><para><command>create-agent</command></para></listitem>
+    <listitem><para><command>create-agent-grp</command></para></listitem>
+    <listitem><para><command>delete-agent-grps</command></para></listitem>
+    <listitem><para><command>delete-agents</command></para></listitem>
+    <listitem><para><command>list-agent-grp-members</command></para></listitem>
+    <listitem><para><command>list-agent-grps</command></para></listitem>
+    <listitem><para><command>list-agents</command></para></listitem>
+    <listitem><para><command>remove-agent-from-grp</command></para></listitem>
+    <listitem><para><command>show-agent</command></para></listitem>
+    <listitem><para><command>show-agent-grp</command></para></listitem>
+    <listitem><para><command>show-agent-membership</command></para></listitem>
+    <listitem><para><command>show-agent-types</command></para></listitem>
+    <listitem><para><command>update-agent</command></para></listitem>
+    <listitem><para><command>update-agent-grp</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Authentication Service Management</title>
+   <itemizedlist>
+    <listitem><para><command>add-auth-cfg-entr</command></para></listitem>
+    <listitem><para><command>create-auth-cfg</command></para></listitem>
+    <listitem><para><command>create-auth-instance</command></para></listitem>
+    <listitem><para><command>delete-auth-cfgs</command></para></listitem>
+    <listitem><para><command>delete-auth-instances</command></para></listitem>
+    <listitem><para><command>get-auth-cfg-entr</command></para></listitem>
+    <listitem><para><command>get-auth-instance</command></para></listitem>
+    <listitem><para><command>list-auth-cfgs</command></para></listitem>
+    <listitem><para><command>list-auth-instances</command></para></listitem>
+    <listitem><para><command>register-auth-module</command></para></listitem>
+    <listitem><para><command>unregister-auth-module</command></para></listitem>
+    <listitem><para><command>update-auth-cfg-entr</command></para></listitem>
+    <listitem><para><command>update-auth-cfg-props</command></para></listitem>
+    <listitem><para><command>update-auth-instance</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Data Store Management</title>
+   <itemizedlist>
+    <listitem><para><command>add-amsdk-idrepo-plugin</command></para></listitem>
+    <listitem><para><command>create-datastore</command></para></listitem>
+    <listitem><para><command>delete-datastores</command></para></listitem>
+    <listitem><para><command>list-datastore-types</command></para></listitem>
+    <listitem><para><command>list-datastores</command></para></listitem>
+    <listitem><para><command>show-datastore</command></para></listitem>
+    <listitem><para><command>update-datastore</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Entitlements</title>
+   <itemizedlist>
+    <listitem><para><command>add-app-priv</command></para></listitem>
+    <listitem><para><command>create-xacml</command></para></listitem>
+    <listitem><para><command>delete-appls</command></para></listitem>
+    <listitem><para><command>delete-xacml</command></para></listitem>
+    <listitem><para><command>list-appls</command></para></listitem>
+    <listitem><para><command>list-xacml</command></para></listitem>
+    <listitem><para><command>set-appl</command></para></listitem>
+    <listitem><para><command>set-entitlement-conf</command></para></listitem>
+    <listitem><para><command>show-app-priv</command></para></listitem>
+    <listitem><para><command>show-appl</command></para></listitem>
+    <listitem><para><command>show-entitlement-conf</command></para></listitem>
+    <listitem><para><command>update-app-priv</command></para></listitem>
+    <listitem><para><command>update-app-priv-resources</command></para></listitem>
+    <listitem><para><command>update-app-priv-subjects</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Federation Management</title>
+   <itemizedlist>
+    <listitem><para><command>add-cot-member</command></para></listitem>
+    <listitem><para><command>create-cot</command></para></listitem>
+    <listitem><para><command>create-metadata-templ</command></para></listitem>
+    <listitem><para><command>delete-cot</command></para></listitem>
+    <listitem><para><command>delete-entity</command></para></listitem>
+    <listitem><para><command>do-bulk-federation</command></para></listitem>
+    <listitem><para><command>export-entity</command></para></listitem>
+    <listitem><para><command>import-bulk-fed-data</command></para></listitem>
+    <listitem><para><command>import-entity</command></para></listitem>
+    <listitem><para><command>list-cot-members</command></para></listitem>
+    <listitem><para><command>list-cots</command></para></listitem>
+    <listitem><para><command>list-entities</command></para></listitem>
+    <listitem><para><command>remove-cot-member</command></para></listitem>
+    <listitem><para><command>update-entity-keyinfo</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Identity Management</title>
+   <itemizedlist>
+    <listitem><para><command>add-member</command></para></listitem>
+    <listitem><para><command>add-privileges</command></para></listitem>
+    <listitem><para><command>add-svc-identity</command></para></listitem>
+    <listitem><para><command>create-identity</command></para></listitem>
+    <listitem><para><command>delete-identities</command></para></listitem>
+    <listitem><para><command>get-identity</command></para></listitem>
+    <listitem><para><command>get-identity-svcs</command></para></listitem>
+    <listitem><para><command>list-identities</command></para></listitem>
+    <listitem><para><command>list-identity-assignable-svcs</command></para></listitem>
+    <listitem><para><command>remove-member</command></para></listitem>
+    <listitem><para><command>remove-privileges</command></para></listitem>
+    <listitem><para><command>remove-svc-identity</command></para></listitem>
+    <listitem><para><command>set-identity-attrs</command></para></listitem>
+    <listitem><para><command>set-identity-svc-attrs</command></para></listitem>
+    <listitem><para><command>show-identity-ops</command></para></listitem>
+    <listitem><para><command>show-identity-svc-attrs</command></para></listitem>
+    <listitem><para><command>show-identity-types</command></para></listitem>
+    <listitem><para><command>show-members</command></para></listitem>
+    <listitem><para><command>show-memberships</command></para></listitem>
+    <listitem><para><command>show-privileges</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Policy Management</title>
+   <itemizedlist>
+    <listitem><para><command>create-policies</command></para></listitem>
+    <listitem><para><command>delete-policies</command></para></listitem>
+    <listitem><para><command>list-policies</command></para></listitem>
+    <listitem><para><command>update-policies</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Realm Management</title>
+   <itemizedlist>
+    <listitem><para><command>add-svc-attrs</command></para></listitem>
+    <listitem><para><command>add-svc-realm</command></para></listitem>
+    <listitem><para><command>create-realm</command></para></listitem>
+    <listitem><para><command>delete-realm</command></para></listitem>
+    <listitem><para><command>delete-realm-attr</command></para></listitem>
+    <listitem><para><command>get-realm</command></para></listitem>
+    <listitem><para><command>get-realm-svc-attrs</command></para></listitem>
+    <listitem><para><command>list-realm-assignable-svcs</command></para></listitem>
+    <listitem><para><command>list-realms</command></para></listitem>
+    <listitem><para><command>remove-svc-attrs</command></para></listitem>
+    <listitem><para><command>remove-svc-realm</command></para></listitem>
+    <listitem><para><command>set-realm-attrs</command></para></listitem>
+    <listitem><para><command>set-svc-attrs</command></para></listitem>
+    <listitem><para><command>set-realm-svc-attrs</command></para></listitem>
+    <listitem><para><command>show-auth-modules</command></para></listitem>
+    <listitem><para><command>show-data-types</command></para></listitem>
+    <listitem><para><command>show-realm-svcs</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Server Configuration</title>
+   <itemizedlist>
+    <listitem><para><command>add-site-members</command></para></listitem>
+    <listitem><para><command>add-site-sec-urls</command></para></listitem>
+    <listitem><para><command>clone-server</command></para></listitem>
+    <listitem><para><command>create-server</command></para></listitem>
+    <listitem><para><command>create-site</command></para></listitem>
+    <listitem><para><command>delete-server</command></para></listitem>
+    <listitem><para><command>delete-site</command></para></listitem>
+    <listitem><para><command>export-server</command></para></listitem>
+    <listitem><para><command>get-svrcfg-xml</command></para></listitem>
+    <listitem><para><command>import-server</command></para></listitem>
+    <listitem><para><command>list-server-cfg</command></para></listitem>
+    <listitem><para><command>list-servers</command></para></listitem>
+    <listitem><para><command>list-sites</command></para></listitem>
+    <listitem><para><command>remove-server-cfg</command></para></listitem>
+    <listitem><para><command>remove-site-members</command></para></listitem>
+    <listitem><para><command>remove-site-sec-urls</command></para></listitem>
+    <listitem><para><command>set-site-pri-url</command></para></listitem>
+    <listitem><para><command>set-site-sec-urls</command></para></listitem>
+    <listitem><para><command>set-svrcfg-xml</command></para></listitem>
+    <listitem><para><command>show-site</command></para></listitem>
+    <listitem><para><command>show-site-members</command></para></listitem>
+    <listitem><para><command>update-server-cfg</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Service Management</title>
+   <itemizedlist>
+    <listitem><para><command>add-attr-defs</command></para></listitem>
+    <listitem><para><command>add-attrs</command></para></listitem>
+    <listitem><para><command>add-plugin-interface</command></para></listitem>
+    <listitem><para><command>add-sub-schema</command></para></listitem>
+    <listitem><para><command>create-boot-url</command></para></listitem>
+    <listitem><para><command>create-sub-cfg</command></para></listitem>
+    <listitem><para><command>create-svc</command></para></listitem>
+    <listitem><para><command>create-svrcfg-xml</command></para></listitem>
+    <listitem><para><command>delete-attr</command></para></listitem>
+    <listitem><para><command>delete-sub-cfg</command></para></listitem>
+    <listitem><para><command>delete-svc</command></para></listitem>
+    <listitem><para><command>export-svc-cfg</command></para></listitem>
+    <listitem><para><command>get-attr-defs</command></para></listitem>
+    <listitem><para><command>get-revision-number</command></para></listitem>
+    <listitem><para><command>import-svc-cfg</command></para></listitem>
+    <listitem><para><command>remove-attr-choicevals</command></para></listitem>
+    <listitem><para><command>remove-attr-defs</command></para></listitem>
+    <listitem><para><command>remove-sub-schema</command></para></listitem>
+    <listitem><para><command>set-attr-any</command></para></listitem>
+    <listitem><para><command>set-attr-bool-values</command></para></listitem>
+    <listitem><para><command>set-attr-choicevals</command></para></listitem>
+    <listitem><para><command>set-attr-defs</command></para></listitem>
+    <listitem><para><command>set-attr-end-range</command></para></listitem>
+    <listitem><para><command>set-attr-i18n-key</command></para></listitem>
+    <listitem><para><command>set-attr-start-range</command></para></listitem>
+    <listitem><para><command>set-attr-syntax</command></para></listitem>
+    <listitem><para><command>set-attr-type</command></para></listitem>
+    <listitem><para><command>set-attr-ui-type</command></para></listitem>
+    <listitem><para><command>set-attr-validator</command></para></listitem>
+    <listitem><para><command>set-attr-view-bean-url</command></para></listitem>
+    <listitem><para><command>set-inheritance</command></para></listitem>
+    <listitem><para><command>set-plugin-viewbean-url</command></para></listitem>
+    <listitem><para><command>set-revision-number</command></para></listitem>
+    <listitem><para><command>set-sub-cfg</command></para></listitem>
+    <listitem><para><command>set-svc-i18n-key</command></para></listitem>
+    <listitem><para><command>set-svc-view-bean-url</command></para></listitem>
+    <listitem><para><command>update-svc</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+  <refsect2>
+   <title>Other</title>
+   <itemizedlist>
+    <listitem><para><command>add-res-bundle</command></para></listitem>
+    <listitem><para><command>do-batch</command></para></listitem>
+    <listitem><para><command>do-migration70</command></para></listitem>
+    <listitem><para><command>list-res-bundle</command></para></listitem>
+    <listitem><para><command>list-sessions</command></para></listitem>
+    <listitem><para><command>remove-res-bundle</command></para></listitem>
+   </itemizedlist>
+  </refsect2>
+ </refsect1>
+ <refsect1>
+  <title>Subcommands: Alphabetical Order</title>
   <para>The following subcommands are supported.</para>
   <para>See <command>ssoadm <replaceable>subcommand</replaceable>
   --help</command> for detailed options.</para>
@@ -1144,7 +1377,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term><command>update-auth-cfg-entr</command></term>
+     <term><command>update-auth-cfg-props</command></term>
      <listitem>
       <para>Set authentication configuration properties.</para>
      </listitem>
