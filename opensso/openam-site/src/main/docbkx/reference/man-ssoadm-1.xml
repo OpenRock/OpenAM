@@ -1144,6 +1144,12 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term><command>update-auth-cfg-entr</command></term>
+     <listitem>
+      <para>Set authentication configuration properties.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term><command>update-auth-instance</command></term>
      <listitem>
       <para>Update authentication instance values.</para>
