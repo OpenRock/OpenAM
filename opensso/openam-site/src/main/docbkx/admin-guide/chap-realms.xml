@@ -31,9 +31,84 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuring Realms</title>
-
- <para>This chapter shows how to configure OpenAM realms, which are used to
- group configuration and identities together.</para>
-
+ 
+ <indexterm><primary>Realms</primary></indexterm>
+ <para>This chapter shows how to configure OpenAM <firstterm>realms</firstterm>,
+ which are used to group configuration and identities together.</para>
+ 
+ <para>OpenAM associates a realm with at least one identity repository and
+ authentication process. OpenAM also associates the realm with authorization
+ policies and entitlements for users, and privileges for administrators. Each
+ realm can have its own configuration for services.</para>
+ 
+ <para>When you first configure OpenAM, OpenAM sets up the default
+ <literal>/ (Top Level Realm)</literal>, containing OpenAM configuration
+ data, and allowing authentication using the identity repository you choose
+ during initial configuration. The top level realm might hold the overall
+ configuration for Example.com for instance.</para>
+ 
+ <para>You create new realms to subdivide authentication, and authorization,
+ and to delegate management of sub-realms. For example, your organization
+ might require separate realms for payroll, human resources, and IT management
+ domains and their applications.</para>
+ 
+ <procedure xml:id="create-new-realm">
+  <title>To Create a New Realm</title>
+  <indexterm><primary>Create realms</primary></indexterm>
+  
+  <para>You can create a new realm through the OpenAM console as described
+  below, or by using the <command>ssoadm create-realm</command> command.</para>
+  
+  <step>
+   <para>Login to the OpenAM console as OpenAM Administrator,
+   <literal>amadmin</literal>.</para>
+  </step>
+  <step>
+   <para>On the Access Control tab &gt; Realms table, click New... to open
+   the New Realm page, where you configure the realm.</para>
+   <para>If you configure the realm to be inactive, then users cannot use
+   it to authenticate or be granted access to protected resources.</para>
+   <para>Realm/DNS aliases must be meaningful in DNS terms, such as
+   <literal>.hr.example.com</literal> or
+   <literal>pay.example.com</literal>.</para>
+  </step>
+  <step>
+   <para>Save your work after defining the configuration for the new realm.</para>
+  </step>
+ </procedure>
+ 
+ <para>You configure a realm through the console starting from the Access
+ Control tab &gt; Realms table. By default the new realm inherits configuration
+ from the global configuration. The default identity repository is the one you
+ choose when configuring OpenAM after deployment. The default authentication
+ mechanism corresponds to that identity repository as well. You can, however,
+ constrain authentication to rely on different data stores, and set policy
+ for agents to define authorization in the realm.</para>
+ 
+ <procedure>
+  <title>To Delegate Administration</title>
+  <indexterm><primary>Delegate administration</primary></indexterm>
+  
+  <para>You can delegate administration in a realm. OpenAM grants
+  administrative capabilities to members of groups having administrative
+  privileges.</para>
+  
+  <para>You can grant privileges through the OpenAM console as described
+  below, or by using the <command>ssoadm add-privileges</command> command.</para>
+  
+  <step>
+   <para>On the Access Control tab &gt; Realms table, click the realm
+   for which you want to delegate administration to view the realm
+   configuration.</para>
+  </step>
+  <step>
+   <para>On the Privileges tab, click the name of the group to whom you
+   intend to grant access.</para>
+  </step>
+  <step>
+   <para>Select the administrative privileges to delegate for the realm,
+   and then save your work.</para>
+  </step>
+ </procedure>
+ 
 </chapter>
-
