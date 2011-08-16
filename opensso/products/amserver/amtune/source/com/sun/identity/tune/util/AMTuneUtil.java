@@ -26,7 +26,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.tune.util;
 
@@ -1465,7 +1465,7 @@ import java.util.zip.ZipOutputStream;
                 int idx = s.indexOf(" ");
                 if (idx != -1) {
                     String permission = s.substring(0, idx);
-                    if (!permission.equals("-r--------")) {
+                    if (!permission.startsWith("-r--------")) {
                         String msg = getResourceBundle().getString(
                                 "pt-error-password-file-not-readonly");
                         Object[] param = {fileName};
