@@ -29,23 +29,18 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  */
-
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.openam.session.service.DestroyOldestAction;
 
 /**
  * <code>SessionConstraint</code> represents the session quota for a given user
@@ -73,9 +68,8 @@ import java.util.Set;
  
 public class SessionConstraint {
 
-    public static final int DESTROY_OLD_SESSION = 1;
-
-    public static final int DENY_ACCESS = 2;
+    public static final String DESTROY_OLDEST_SESSION =
+            "org.forgerock.openam.session.service.DestroyOldestAction";
 
     private static final int DEFAULT_QUOTA = Integer.MAX_VALUE;
 
@@ -86,14 +80,7 @@ public class SessionConstraint {
 
     private static Debug debug = SessionService.sessionDebug;
 
-    private static QuotaExhaustionAction quotaExhaustionActionDeny = null;
-
-    private static QuotaExhaustionAction quotaExhaustionActionDestroy = null;
-
-    private static QuotaExhaustionAction quotaExhaustionActionDestoryAll = null;
-
-    private static boolean destroyAllButOne =
-            SystemProperties.getAsBoolean(Constants.DESTROY_ALL_SESSIONS);
+    private static QuotaExhaustionAction quotaExhaustionAction = null;
 
     /*
      * Get the session service
@@ -101,19 +88,6 @@ public class SessionConstraint {
     static {
         // FIXME Is this initialization necessary?
         getSS();
-        // Note: The current implementation reserves the room for
-        // the future enhancement of providing the true plugin
-        // mechanism for handling the session quota exhausion. The
-        // desired behaviors for each case can actually be achieved
-        // by implementing the QuotaExhaustionAction.action(...)
-        // interface.
-        //
-        // For now, use the simple program logic to determine which
-        // action class should be instantiated for the two existing
-        // supported scenarios.
-        quotaExhaustionActionDeny = new DenyAccessAction();
-        quotaExhaustionActionDestroy = new DestroyNextExpiringSessionAction();
-        quotaExhaustionActionDestoryAll = new DestroyAllExistingSessionsAction();
     }
 
     static SessionService getSS() {
@@ -121,32 +95,21 @@ public class SessionConstraint {
     }
 
     private static QuotaExhaustionAction getQuotaExhaustionAction() {
-        if ((SessionService.getConstraintResultingBehavior() == DESTROY_OLD_SESSION) &&
-            !(destroyAllButOne)) {
-            if (debug.messageEnabled()) {
-		    debug.message("SessionConstraint." +
-                        "getQuotaExhaustionAction: " +
-                        "Using quotaExhaustionActionDestroy");
-            }
-
-            return quotaExhaustionActionDestroy;
-        } else if ((SessionService.getConstraintResultingBehavior() == DESTROY_OLD_SESSION) &&
-            (destroyAllButOne)) {
-            if (debug.messageEnabled()) {
-		    debug.message("SessionConstraint." +
-                        "getQuotaExhaustionAction: " +
-                        "Using quotaExhaustionActionDestoryAll");
-            }
-
-            return quotaExhaustionActionDestoryAll;
+        String clazzName = SessionService.getConstraintResultingBehavior();
+        if (quotaExhaustionAction != null
+                && quotaExhaustionAction.getClass().getName().equals(clazzName)) {
+            return quotaExhaustionAction;
         } else {
-            if (debug.messageEnabled()) {
-		    debug.message("SessionConstraint." +
-                        "getQuotaExhaustionAction: " +
-                        "Using quotaExhaustionActionDeny");
+            try {
+                quotaExhaustionAction = Class.forName(clazzName).asSubclass(
+                        QuotaExhaustionAction.class).newInstance();
+            } catch (Exception ex) {
+                debug.error("Unable to load the Session Quota Exhaustion Action "
+                        + "class: " + clazzName
+                        + "\nFalling back to DESTROY_OLDEST_SESSION mode", ex);
+                quotaExhaustionAction = new DestroyOldestAction();
             }
-
-            return quotaExhaustionActionDeny;
+            return quotaExhaustionAction;
         }
     }
 
@@ -225,87 +188,6 @@ public class SessionConstraint {
 	    SessionCount.incrementSessionCount(is);
 	}
 	return reject;
-    }
-
-    /*
-     * <code> DenyAccessAction</code> if session quota is exhausted
-     */
-    private static class DenyAccessAction implements QuotaExhaustionAction {
-
-       public boolean action(InternalSession is, Map sessions) {
-            // no-op, simply deny the session activation request
-            return true;
-        }
-    }
-
-    private static class DestroyNextExpiringSessionAction implements
-            QuotaExhaustionAction {
-
-        public boolean action(InternalSession is, Map sessions) {
-
-            String nextExpiringSessionID = null;
-            long smallestExpTime = Long.MAX_VALUE;
-            Set sids = sessions.keySet();
-            synchronized (sessions) {
-                for (Iterator m = sids.iterator(); m.hasNext();) {
-                    String sid = (String) m.next();
-                    long expirationTime = ((Long) sessions.get(sid))
-                            .longValue();
-                    if (expirationTime < smallestExpTime) {
-                        smallestExpTime = expirationTime;
-                        nextExpiringSessionID = sid;
-                    }
-                }
-            }
-            if (nextExpiringSessionID != null) {
-                SessionID sessID = new SessionID(nextExpiringSessionID);
-                try {
-                    Session s = Session.getSession(sessID);
-                    s.destroySession(s);
-                } catch (SessionException e) {
-                    if (debug.messageEnabled()) {
-                        debug.message("Failed to destroy the next "
-                                + "expiring session.", e);
-                    }
-                    // deny the session activation request
-                    // in this case
-                    return true;
-                }
-            }
-            SessionCount.incrementSessionCount(is);
-            return false;
-        }
-    }
-
-    private static class DestroyAllExistingSessionsAction implements
-            QuotaExhaustionAction {
-
-        public boolean action(InternalSession is, Map sessions) {
-            Set<String> sids = sessions.keySet();
-            debug.message("there are " + sids.size() + " sessions");
-            synchronized (sessions) {
-                for (String sid : sids) {
-                    SessionID sessID = new SessionID(sid);
-
-                    try {
-                        Session s = Session.getSession(sessID);
-                        s.destroySession(s);
-                        debug.message("Destroy sid " + sessID);
-                    } catch (SessionException se) {
-                        if (debug.messageEnabled()) {
-                            debug.message("Failed to destroy the next "
-                                    + "expiring session.", se);
-                        }
-                        
-                        // deny the session activation request
-                        // in this case
-                        return true;
-                    }
-                }
-            }
-            SessionCount.incrementSessionCount(is);
-            return false;
-        }
     }
 
     /*

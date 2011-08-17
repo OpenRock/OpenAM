@@ -25,7 +25,9 @@
  * $Id: SessionConfigListener.java,v 1.7 2008/08/19 19:08:39 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.iplanet.dpro.session.service;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -67,10 +69,6 @@ public class SessionConfigListener implements ServiceListener {
     private static final String CONSTARINT_RESULTING_BEHAVIOR = 
         "iplanet-am-session-constraint-resulting-behavior";
 
-    private static final String DESTROY_OLD_SESSION = "DESTROY_OLD_SESSION";
-
-    private static final String DENY_ACCESS = "DENY_ACCESS";
-    
     private static final String MAX_WAIT_TIME_FOR_CONSTRAINT = 
         "iplanet-am-session-constraint-max-wait-time";    
 
@@ -174,15 +172,9 @@ public class SessionConfigListener implements ServiceListener {
             	SessionService.setBypassConstraintForToplevelAdmin(false);
             }
 
-            String resultingBehaviorStr = CollectionHelper.getMapAttr(
-                attrs, CONSTARINT_RESULTING_BEHAVIOR, DESTROY_OLD_SESSION);
-            if (resultingBehaviorStr.equalsIgnoreCase(DESTROY_OLD_SESSION)) {
-                SessionService.setConstraintResultingBehavior(
-                    SessionConstraint.DESTROY_OLD_SESSION);                    
-            } else if (resultingBehaviorStr.equalsIgnoreCase(DENY_ACCESS)) {
-                SessionService.setConstraintResultingBehavior(
-                    SessionConstraint.DENY_ACCESS);                    
-            }
+            SessionService.setConstraintResultingBehavior(CollectionHelper.getMapAttr(
+                    attrs, CONSTARINT_RESULTING_BEHAVIOR,
+                    SessionConstraint.DESTROY_OLDEST_SESSION));
 
             defmaxWaitTimeForConstraintStr = CollectionHelper.getMapAttr(attrs,
                 MAX_WAIT_TIME_FOR_CONSTRAINT, defmaxWaitTimeForConstraintStr);            

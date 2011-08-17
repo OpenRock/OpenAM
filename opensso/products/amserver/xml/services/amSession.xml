@@ -140,11 +140,12 @@
                     syntax="string"
                     i18nKey="a119b">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="choiceDenyAccess">DENY_ACCESS</ChoiceValue>
-                        <ChoiceValue i18nKey="choiceDestroyOldSession">DESTROY_OLD_SESSION</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDenyAccess">org.forgerock.openam.session.service.DenyAccessAction</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyOldSession">org.forgerock.openam.session.service.DestroyOldestAction</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyAll">org.forgerock.openam.session.service.DestroyAllAction</ChoiceValue>
                    </ChoiceValues>
                     <DefaultValues>
-                        <Value>DESTROY_OLD_SESSION</Value>
+                        <Value>org.forgerock.openam.session.service.DestroyOldestAction</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-constraint-max-wait-time"

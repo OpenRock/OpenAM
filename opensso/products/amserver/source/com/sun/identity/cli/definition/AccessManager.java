@@ -626,6 +626,23 @@ public class AccessManager {
     private String set_attr_defs;
 
     @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.schema.GetAttributeSchemaChoiceValues",
+        description="Get choice values of attribute schema.",
+        webSupport="true",
+        mandatoryOptions={
+            "servicename|s|s|Name of service.",
+            "schematype|t|s|Type of schema.",
+            "attributename|a|s|Name of attribute."},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={
+            "subschemaname|c|s|Name of sub schema."},
+        resourceStrings={
+            "attribute-schema-i18nkey=I18n Key",
+            "attribute-schema-choice-value=Choice Value"})
+    private String get_attr_choicevals;
+
+    @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.SetAttributeSchemaChoiceValues",
         description="Set choice values of attribute schema.",
         webSupport="true",

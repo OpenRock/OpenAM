@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted [2010] [ForgeRock AS]
+    Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
 <!DOCTYPE logmessages
@@ -1083,6 +1083,52 @@
         </actions>
     </logmessage>
     
+    <logmessage name="ATTEMPT_GET_ATTRIBUTE_SCHEMA_CHOICE_VALUES" id="2155"
+        loglevel="LL_INFO"
+        description="Attempt to get choice value to attribute schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>schema type</item>
+            <item>name of sub schema</item>
+            <item>name of attribute schema</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get attribute schema choice values Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEED_GET_ATTRIBUTE_SCHEMA_CHOICE_VALUES" id="2156"
+        loglevel="LL_INFO"
+        description="Choice values are listed.">
+        <datainfo>
+            <item>name of service</item>
+            <item>schema type</item>
+            <item>name of sub schema</item>
+            <item>name of attribute schema</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get attribute schema choice values Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_GET_ATTRIBUTE_SCHEMA_CHOICE_VALUES" id="2157"
+        loglevel="LL_INFO"
+        description="Unable to get choice value to attribute schema.">
+        <datainfo>
+            <item>name of service</item>
+            <item>schema type</item>
+            <item>name of sub schema</item>
+            <item>name of attribute schema</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get attribute schema choice values Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+
     <logmessage name="ATTEMPT_REMOVE_ATTRIBUTE_SCHEMA_CHOICE_VALUE" id="2160"
         loglevel="LL_INFO"
         description="Attempt to remove choice value from attribute schema.">

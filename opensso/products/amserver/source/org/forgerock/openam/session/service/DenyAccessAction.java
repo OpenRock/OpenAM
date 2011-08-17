@@ -21,32 +21,20 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * $Id: QuotaExhaustionAction.java,v 1.2 2008/06/25 05:41:30 qcheng Exp $
- *
  */
-/**
- * Portions Copyrighted 2011 ForgeRock AS
- */
-package com.iplanet.dpro.session.service;
+package org.forgerock.openam.session.service;
 
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.QuotaExhaustionAction;
 import java.util.Map;
 
 /**
- * Interface to defined the resulting behavior if the session quota is
- * exhausted.
+ * <code> DenyAccessAction</code> if session quota is exhausted
  */
-public interface QuotaExhaustionAction {
+public class DenyAccessAction implements QuotaExhaustionAction {
 
-    /**
-     * Check if the session quota for a given user has been exhausted and
-     * perform necessary actions in such as case.
-     * 
-     * @param is the to-be-actived InternalSession
-     * @param existingSessions all existing sessions belonging to the same uuid
-     *          (Map:sid-&gt;expiration_time)
-     * @return true if the session activation request should be rejected, false
-     *         otherwise
-     */
-    public boolean action(InternalSession is, Map<String, Long> existingSessions);
+    public boolean action(InternalSession is, Map<String, Long> sessions) {
+        // no-op, simply deny the session activation request
+        return true;
+    }
 }

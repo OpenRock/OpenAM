@@ -209,12 +209,8 @@ public class SessionService {
     private static final String BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS = 
         "iplanet-am-session-enable-session-constraint-bypass-topleveladmin";
 
-    private static final String CONSTARINT_RESULTING_BEHAVIOR = 
+    private static final String CONSTRAINT_RESULTING_BEHAVIOR =
         "iplanet-am-session-constraint-resulting-behavior";
-
-    private static final String DESTROY_OLD_SESSION = "DESTROY_OLD_SESSION";
-
-    private static final String DENY_ACCESS = "DENY_ACCESS";
 
     private static final String TOP_LEVEL_ADMIN_ROLE = 
         "Top-level Admin Role";
@@ -390,8 +386,8 @@ public class SessionService {
     
     private static boolean bypassConstratintForToplevelAdmin = false;
 
-    private static int constraintResultingBehavior = 
-        SessionConstraint.DESTROY_OLD_SESSION;
+    private static String constraintResultingBehavior =
+        SessionConstraint.DESTROY_OLDEST_SESSION;
 
     private String thisSessionServer;
 
@@ -2047,11 +2043,11 @@ public class SessionService {
         return bypassConstratintForToplevelAdmin;
     }
 
-    static public void setConstraintResultingBehavior(int value) {
+    public static void setConstraintResultingBehavior(String value) {
         constraintResultingBehavior = value;
     }
 
-    static public int getConstraintResultingBehavior() {
+    public static String getConstraintResultingBehavior() {
         return constraintResultingBehavior;
     }
 
@@ -2146,14 +2142,9 @@ public class SessionService {
                         + bypassConstratintForToplevelAdmin);
             }
 
-            String resultingBehaviorStr = CollectionHelper.getMapAttr(
-                attrs, CONSTARINT_RESULTING_BEHAVIOR, DESTROY_OLD_SESSION);
-            if (resultingBehaviorStr.equalsIgnoreCase(DESTROY_OLD_SESSION)) {
-                constraintResultingBehavior = 
-                    SessionConstraint.DESTROY_OLD_SESSION;
-            } else if (resultingBehaviorStr.equalsIgnoreCase(DENY_ACCESS)) {
-                constraintResultingBehavior = SessionConstraint.DENY_ACCESS;
-            }
+            String resultingBehaviorStr = CollectionHelper.getMapAttr(attrs,
+                    CONSTRAINT_RESULTING_BEHAVIOR,
+                    SessionConstraint.DESTROY_OLDEST_SESSION);
 
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("Resulting behavior if session "

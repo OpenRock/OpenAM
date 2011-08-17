@@ -25,7 +25,9 @@
  * $Id: SessionCount.java,v 1.5 2008/06/25 05:41:31 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.iplanet.dpro.session.service;
 
 import java.net.URL;
@@ -240,7 +242,7 @@ public class SessionCount {
      * @param internalsession for the user
      *
      */
-    static void incrementSessionCount(InternalSession is) {
+    public static void incrementSessionCount(InternalSession is) {
 
         if (deploymentMode == SINGLE_SERVER_MODE) {
             Set sessions = (Set) uuidSessionMap.get(is.getUUID());

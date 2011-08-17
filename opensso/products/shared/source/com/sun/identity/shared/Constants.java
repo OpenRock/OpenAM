@@ -1091,9 +1091,6 @@ public interface Constants {
     public static final String AUTH_RATE_MONITORING_INTERVAL =
         "openam.auth.rate_monitoring_interval";
 
-    public static final String DESTROY_ALL_SESSIONS =
-        "openam.session.destroy_all_sessions";
-
     public static final String RETAINED_HTTP_HEADERS_LIST =
             "openam.retained.http.headers";
 
