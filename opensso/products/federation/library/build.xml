@@ -27,7 +27,7 @@
 -->
 
 <!--
-   "Portions Copyrighted [2011] [ForgeRock AS]"
+   Portions Copyrighted 2011 ForgeRock AS
 -->
 <project name="Open Federation Library" default="usage">
                 
@@ -140,6 +140,7 @@
             </manifest>
             <fileset dir="${products.license.dir}" includes="license.txt" />
             <fileset dir="${library.xml.dir}" includes="*.xml" />
+            <fileset dir="${library.res.dir}" includes="*.template" />
             <zipfileset dir="${library.classes.dir}"
                 excludes="com/sun/identity/saml2/idpdiscovery/*.class" />
         </jar>

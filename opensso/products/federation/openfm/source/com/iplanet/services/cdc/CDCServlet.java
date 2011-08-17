@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.iplanet.services.cdc;
 
 import com.iplanet.dpro.session.SessionException;
@@ -183,16 +182,6 @@ public class CDCServlet extends HttpServlet {
             }
         }
     }
-    private static final String AUTHN_RESPONSE_HTML = 
-        "<HTML><BODY Onload=\"document.Response.submit()\">" +
-        "<FORM NAME=\"Response\" METHOD=\"POST\" ACTION=\"{0}\">" +
-        "<INPUT TYPE=\"HIDDEN\" NAME=\"" +
-            IFSConstants.POST_AUTHN_RESPONSE_PARAM + "\" " + "VALUE=\"{1}\"/>" +
-        "<NOSCRIPT><CENTER>" +
-        "<INPUT TYPE=\"SUBMIT\" VALUE=\"" +
-            FSUtils.bundle.getString("laresPostCustomKey") +
-            "\"/></CENTER></NOSCRIPT>" +
-        "</FORM></BODY></HTML>";
     
     private SSOTokenManager tokenManager;
     private SessionService sessionService;
@@ -861,11 +850,13 @@ public class CDCServlet extends HttpServlet {
             response.setContentType("text/html");
             response.setHeader("Pragma", "no-cache");
             response.setHeader(RESPONSE_HEADER_ALERT, RESPONSE_HEADER_ALERT_VALUE);
-            
-            Object[] params = {destURL, b64Resp};
-            PrintWriter out = response.getWriter();
-            out.println(MessageFormat.format(AUTHN_RESPONSE_HTML, params));
-            out.close();
+
+            request.setAttribute("destURL", destURL);
+            request.setAttribute("authnResponse", b64Resp);
+            RequestDispatcher rd
+                    = request.getRequestDispatcher("config/federation/default/cdclogin.jsp");
+            rd.forward(request, response);
+
             if (debug.messageEnabled()) {
                 debug.message("CDCServlet:sendAuthnResponse: "
                     + "AuthnResponse sent successfully to: " + destURL);
@@ -874,6 +865,8 @@ public class CDCServlet extends HttpServlet {
             debug.error("CDCServlet.sendAuthnResponse:" + fme);
         } catch (IOException ioe) {
             debug.error("CDCServlet.sendAuthnResponse:" + ioe);
+        } catch (ServletException se) {
+            debug.error("CDCServlet.sendAuthnResponse:" + se);
         }
     }
 }

@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -168,6 +167,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import com.sun.identity.saml2.plugins.JMQSAML2Repository;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.owasp.esapi.ESAPI;
 
 /**
@@ -3860,30 +3861,23 @@ public class SAML2Utils extends SAML2SDKUtils {
          
         PrintWriter out = response.getWriter();
         response.setHeader("Pragma", "no-cache");
-        response.setHeader("Cache-Control", "no-cache,no-store"); 
-        out.println("<HTML>");
-        out.println("<HEAD>\n");
-        out.println("<TITLE>Access rights validated</TITLE>\n");
-        out.println("</HEAD>\n");
-        out.println("<BODY onLoad=\"document.forms[0].submit()\">");
+        response.setHeader("Cache-Control", "no-cache,no-store");
 
-        out.println("<FORM METHOD=\"POST\" ACTION=\"" 
-                + ESAPI.encoder().encodeForHTML(targetURL) + "\">");
-        out.println("<INPUT TYPE=\"HIDDEN\" NAME=\""
-                + ESAPI.encoder().encodeForHTML(SAMLmessageName)
-                + "\" " + "VALUE=\"" 
-                + ESAPI.encoder().encodeForHTML(SAMLmessageValue) + "\">");
+        String authnResponse;
+        Map<String, String> tagSwap = new HashMap<String, String>(6);
+        tagSwap.put("@TARGET_URL@", ESAPI.encoder().encodeForHTML(targetURL));
+        tagSwap.put("@SAML_MESSAGE_NAME@", ESAPI.encoder().encodeForHTML(SAMLmessageName));
+        tagSwap.put("@SAML_MESSAGE_VALUE@", ESAPI.encoder().encodeForHTML(SAMLmessageValue));
+        tagSwap.put("@SAML_POST_KEY@", bundle.getString("samlPostKey"));
         if (relayStateValue != null && relayStateValue.length() != 0) {
-            out.println("<INPUT TYPE=\"HIDDEN\" NAME=\""+
-                ESAPI.encoder().encodeForHTML(relayStateName) + "\" " +
-                "VALUE=\"" + ESAPI.encoder().encodeForHTML(relayStateValue)
-                + "\">");
+            tagSwap.put("@RELAY_STATE_NAME@", ESAPI.encoder().encodeForHTML(relayStateName));
+            tagSwap.put("@RELAY_STATE_VALUE@", ESAPI.encoder().encodeForHTML(relayStateValue));
+            authnResponse = IOUtils.getFileContentFromClassPath("/saml2loginwithrelay.template");
+        } else {
+            authnResponse = IOUtils.getFileContentFromClassPath("/saml2login.template");
         }
-        out.println("<NOSCRIPT><CENTER>");
-        out.println("<INPUT TYPE=\"SUBMIT\" VALUE=\"" +
-                    bundle.getString("samlPostKey") +
-                     "\"/></CENTER></NOSCRIPT>");
-        out.println("</FORM></BODY></HTML>");
+        authnResponse = StringUtils.tagSwap(authnResponse, tagSwap);
+        out.println(authnResponse);
         out.close();
     }
 
