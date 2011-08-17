@@ -27,7 +27,7 @@ your own identifying information:
 $Id: README,v 1.23 2009/12/23 02:02:12 leiming Exp $
 
 ------------------------------------------------------------------------------
-Portions Copyrighted [2010] [ForgeRock AS]
+Portions Copyrighted 2010-2011 ForgeRock AS
 ------------------------------------------------------------------------------
 
 %% Contents:
@@ -121,10 +121,11 @@ workspace (opensso/products/j2eeagents/extlib).
 the OpenSSO nightly build.
 
 Follow these steps to obtain the library:
-2.2.1.1 download the latest openssoclientsdk.jar from:
-    https://opensso.dev.java.net/public/use/index.html
-2.2.1.2 Copy the downloaded openssoclientsdk.jar into opensso/products/j2eeagents/extlib 
-directory. 
+2.2.1.1 Download the latest nightly build in ZIP format from:
+    http://www.forgerock.org/openam.html
+2.2.1.2 Unzip the nightly ZIP
+2.2.1.3 Copy the libraries/jars/openssoclientsdk.jar into opensso/products/j2eeagents/extlib
+directory.
 
 2.2.2 Alternatively the OpenSSO ClientSDK library openssoclientsdk.jar can be
 built from the OpenSSO workspace.
