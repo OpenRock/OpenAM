@@ -26,10 +26,10 @@
 
 -->
 
-<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+<!-- Portions Copyrighted 2010-2011 ForgeRock AS -->
 
 <project name="open-source-j2ee-agents-appserver-v10" default="build">
-    <description>OpenSSO Policy Agent for Appserver 10</description>
+    <description>OpenAM Policy Agent for Appserver 10</description>
 
     <fail message="*** jdk target is not set ***">
         <condition>
@@ -65,11 +65,25 @@
 
         <concat destfile="${j2eeagents.container.classes.dir}/.version" append="true">Build Date: ${nightly.date}&#10;&#10;</concat>
 
-        <jar destfile="${j2eeagents.container.archive.dir}/agent.jar" basedir="${j2eeagents.container.classes.dir}"/>
+        <jar destfile="${j2eeagents.container.archive.dir}/agent.jar" basedir="${j2eeagents.container.classes.dir}">
+            <manifest>
+                <attribute name="Created-On" value="${nightly.date}" />
+                <section name="com.sun.identity">
+                    <attribute name="Implementation-Title"
+                        value="OpenAM Agent SDK"/>
+                    <attribute name="Implementation-Version"
+                        value="${j2eeagents.version}_${nightly.date}_${revision.number}"/>
+                    <attribute name="Implementation-Vendor"
+                        value="ForgeRock AS"/>
+                </section>
+            </manifest>
+        </jar>
+
         <copy todir="${j2eeagents.container.lib.dir}">
             <fileset dir="${j2eeagents.container.extlib.dir}">
                 <include name="**/*.jar"/>
             </fileset>
+
         </copy>
 
         <copy todir="${container.j2ee_agent.config.dir}">

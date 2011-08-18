@@ -46,7 +46,7 @@
         <format property="pstamp" pattern="yyyy-MMMM-d hh:mm"/>
     </tstamp>
     <property name="clientsdk.stamp" 
-        value="${clientsdk.version}_${DSTAMP}${TSTAMP}"/>
+        value="${clientsdk.version}_${DSTAMP}${TSTAMP}_${build.number.set}"/>
 
     <!-- clientsdk class path -->
     <path id="build.class.path">
@@ -104,18 +104,12 @@
             <manifest>
                <attribute name="Created-On" value="${pstamp}" />
                 <section name="com.sun.identity">
-                    <attribute name="Specification-Title"
-                        value="OpenSSO Client SDK"/>
-                    <attribute name="Specification-Version"
-                        value="${clientsdk.version}"/>
-                    <attribute name="Specification-Vendor"
-                        value="Sun Microsystems, Inc."/>
                     <attribute name="Implementation-Title"
-                        value="com.sun.identity"/>
+                        value="OpenAM Client SDK"/>
                     <attribute name="Implementation-Version"
                         value="${clientsdk.stamp}"/>
                     <attribute name="Implementation-Vendor"
-                        value="Sun Microsystems, Inc."/>
+                        value="ForgeRock AS"/>
                 </section>
             </manifest>
             <zipfileset src="${sharedlib.dist.dir}/opensso-sharedlib.jar" includes="**/*.class"/>

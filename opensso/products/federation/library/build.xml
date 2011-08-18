@@ -34,6 +34,7 @@
     <description>Open Federation</description>
     <import file="../../products.xml" />
     <import file="library.xml" />
+    <property name="library.version" value="${opensso.version}" />
 
     <fail message="*** jdk target is not set ***">
         <condition>

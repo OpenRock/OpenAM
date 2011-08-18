@@ -25,9 +25,12 @@
    $Id: build.xml,v 1.5 2009/07/09 17:04:21 veiming Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <project name="open-source-j2ee-agents-jboss-v42" default="build">
-    <description>OpenSSO Policy Agent for JBoss AS 42</description>
+    <description>OpenAM Policy Agent for JBoss AS 42</description>
 
     <fail message="*** jdk target is not set ***">
         <condition>
@@ -60,7 +63,19 @@
                 <include name=".version"/>
             </fileset>
         </copy>
-        <jar destfile="${j2eeagents.container.archive.dir}/agent.jar" basedir="${j2eeagents.container.classes.dir}"/>
+        <jar destfile="${j2eeagents.container.archive.dir}/agent.jar" basedir="${j2eeagents.container.classes.dir}">
+            <manifest>
+                <attribute name="Created-On" value="${nightly.date}" />
+                <section name="com.sun.identity">
+                    <attribute name="Implementation-Title"
+                        value="OpenAM Agent SDK"/>
+                    <attribute name="Implementation-Version"
+                        value="${j2eeagents.version}_${nightly.date}_${revision.number}"/>
+                    <attribute name="Implementation-Vendor"
+                        value="ForgeRock AS"/>
+                </section>
+            </manifest>
+        </jar>
         <copy todir="${container.j2ee_agent.config.dir}">
             <fileset dir="${j2eeagents.basedir}/${containername}/v40/config">
                 <include name="OpenSSOAgentBootstrap.template"/>

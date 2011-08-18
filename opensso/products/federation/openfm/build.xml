@@ -33,6 +33,7 @@
                 
     <description>Open Federation</description>
 
+    <property name="openfm.version" value="${opensso.version}" />
     <import file="../../products.xml" />
     <import file="../library/library.xml" />
     <import file="openfm.xml" />
