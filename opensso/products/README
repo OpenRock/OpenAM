@@ -38,7 +38,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
         %% 2.1 Obtaining j2ee.jar and mail.jar
         %% 2.2 Obtaining shared library jars: jaxb-api.jar, jaxb-impl.jar, 
                jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, 
-               jaxrpc-api.jar, activation.jar, saaj-api.jar, saaj-impl.jar, 
+               jaxrpc-api.jar, saaj-api.jar, saaj-impl.jar,
                relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar, 
                FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
                webservices-rt.jar, webservices-tools.jar, 
@@ -108,7 +108,7 @@ The libraries needed for compiling OpenSSO sources are:
    - Java EE 5 SDK: j2ee.jar, mail.jar
    - SUN shared library jars: jaxb-api.jar, jaxb-impl.jar, 
      jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, 
-     jaxrpc-api.jar, activation.jar, saaj-api.jar, saaj-impl.jar, 
+     jaxrpc-api.jar, saaj-api.jar, saaj-impl.jar,
      relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar, 
      FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
      webservices-rt.jar, webservices-tools.jar, webservices-extra.jar,

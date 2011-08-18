@@ -1249,7 +1249,6 @@
 ./WEB-INF/lib/FastInfoset.jar
 ./WEB-INF/lib/OpenDS.jar
 ./WEB-INF/lib/acmecrypt.jar
-./WEB-INF/lib/activation.jar
 ./WEB-INF/lib/amserver.jar
 ./WEB-INF/lib/asm-3.1.jar
 ./WEB-INF/lib/authapi.jar
