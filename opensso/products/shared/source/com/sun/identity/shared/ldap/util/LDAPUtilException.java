@@ -30,25 +30,24 @@
  * Portions Copyrighted 2011 ForgeRock AS
  */
 
-package com.sun.identity.authentication.modules.ldap;
+package com.sun.identity.shared.ldap.util;
 
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * Exception that is thrown when the user  
  * fail the LDAP  authentication.
  */
-public class LDAPUtilException extends ErrorResultException implements L10NMessage {
+public class LDAPUtilException extends com.sun.identity.shared.ldap.LDAPException 
+    implements L10NMessage {
+
     private String msgID;
     private String bundleName;
     private String message;
     private Object[] args;
-    private ResultCode resultCode;
 
     private static String defaultBundleName = "amAuthLDAP";
     AMResourceBundleCache amCache = AMResourceBundleCache.getInstance();
@@ -73,9 +72,8 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
      * @param message Message of the exception
      * @param errorCode The error code of LDAPException
      */
-    protected LDAPUtilException(String message, ResultCode errorCode) {
-        super(message);
-        this.resultCode = errorCode;
+    protected LDAPUtilException(String message, int errorCode) {
+        super(message, errorCode);
     }
 
     /**
@@ -98,9 +96,8 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
      * @param errorCode The error code of LDAPException
      * @param args arguments to the error message identified by msgID
      */
-    public LDAPUtilException(String msgID, ResultCode errorCode, Object[] args) {
-        super(msgID);
-        this.resultCode = errorCode;
+    public LDAPUtilException(String msgID, int errorCode, Object[] args) {
+        super(msgID, errorCode);
         this.msgID  = msgID;
         this.args   = args;
         this.bundleName = defaultBundleName;
@@ -115,10 +112,9 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
      * @param errorCode Error code of LDAPException
      * @param args Arguments to the error message  
      */
-    public LDAPUtilException(String rbName, String msgID, ResultCode errorCode, 
+    public LDAPUtilException(String rbName, String msgID, int errorCode, 
         Object[] args) {
-        super(msgID);
-        this.resultCode = errorCode;
+        super(msgID, errorCode);
         this.msgID  = msgID;
         this.args   = args;
         this.bundleName = rbName;
@@ -156,7 +152,7 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
             ResourceBundle bundle = amCache.getResBundle (bundleName, locale);
             result = bundle.getString (msgID);
             if (args != null && args.length != 0) {
-                result = MessageFormat.format(result,args);
+                result = MessageFormat.format (result,args);
             }
         }
 
@@ -172,7 +168,6 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
         if (message != null) {
             return message;
         }
-        
         return super.getMessage();
     }
 
@@ -200,10 +195,6 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
      */
     public String getResourceBundleName() {
         return bundleName;
-    }
-    
-    public ResultCode getResultCode () {
-        return resultCode;
     }
 }
  

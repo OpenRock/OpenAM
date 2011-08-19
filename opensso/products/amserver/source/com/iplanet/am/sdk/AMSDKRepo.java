@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.iplanet.am.sdk;
 
 import com.iplanet.am.sdk.common.IDirectoryServices;
@@ -37,8 +41,6 @@ import com.iplanet.services.ldap.Server;
 import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.modules.ldap.LDAPAuthUtils;
-import com.sun.identity.authentication.modules.ldap.LDAPUtilException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -53,6 +55,7 @@ import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idm.RepoSearchResults;
+import com.sun.identity.idm.plugins.ldapv3.LDAPAuthUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
@@ -75,6 +78,7 @@ import javax.security.auth.callback.PasswordCallback;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.shared.ldap.util.LDAPUtilException;
 
 public class AMSDKRepo extends IdRepo {
 

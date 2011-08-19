@@ -28,6 +28,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
+
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -121,6 +125,18 @@
                         <Value>@UM_SSL@</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a117">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-return-user-dn"
                     type="single"
                     syntax="boolean"
@@ -168,6 +184,18 @@
                     i18nKey="a115">
                     <DefaultValues>
                         <Value>8</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-ldap-behera-password-policy-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a116">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
@@ -251,6 +279,18 @@
                             <Value>@UM_SSL@</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a117">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-return-user-dn"
                         type="single"
                         syntax="boolean"
@@ -298,6 +338,18 @@
                         i18nKey="a115">
                         <DefaultValues>
                             <Value>8</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-ldap-behera-password-policy-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a116">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

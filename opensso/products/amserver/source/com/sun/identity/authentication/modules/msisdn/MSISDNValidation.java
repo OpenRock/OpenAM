@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.authentication.modules.msisdn;
 
 import java.util.ResourceBundle;
@@ -37,7 +38,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.modules.ldap.LDAPAuthUtils;
+import com.sun.identity.idm.plugins.ldapv3.LDAPAuthUtils;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 
 /**

@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.idm.plugins.ldapv3;
 
 import java.io.UnsupportedEncodingException;
@@ -88,8 +89,6 @@ import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.modules.ldap.LDAPAuthUtils;
-import com.sun.identity.authentication.modules.ldap.LDAPUtilException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -110,6 +109,7 @@ import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
+import com.sun.identity.shared.ldap.util.LDAPUtilException;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SchemaType;
@@ -5057,8 +5057,8 @@ public class LDAPv3Repo extends IdRepo {
                     throw new AuthLoginException(amAuthLDAP, "LDAPex", null);
             }
         }
-        return ((ldapAuthUtil.getState() == ldapAuthUtil.SUCCESS) || 
-            (ldapAuthUtil.getState() == ldapAuthUtil.PASSWORD_EXPIRING));
+        return ((ldapAuthUtil.getState() == LDAPAuthUtils.SUCCESS) || 
+            (ldapAuthUtil.getState() == LDAPAuthUtils.PASSWORD_EXPIRING));
     }
 
 

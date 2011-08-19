@@ -164,7 +164,7 @@
             </compilation-unit>
             <compilation-unit>
                 <package-root>amserver/source</package-root>
-                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDS.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar</classpath>
+                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDS.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/publicsuffix-1.0.1.jar:extlib/opendj-ldap-sdk-3.0.0-SNAPSHOT.jar</classpath>
                 <built-to>amserver/built/classes</built-to>
                 <built-to>amserver/built/dist/amserver.jar</built-to>
                 <source-level>1.5</source-level>
