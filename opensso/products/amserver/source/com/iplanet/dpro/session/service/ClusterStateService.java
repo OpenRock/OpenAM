@@ -37,8 +37,11 @@ import com.sun.identity.common.SystemTimer;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
@@ -49,6 +52,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 /**
  * A <code>ClusterStateService </code> class implements monitoring the state of 
@@ -61,6 +67,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     private class ServerInfo implements Comparable {
         String id;
+        
+        String protocol;
+        
+        URL url;
 
         InetSocketAddress address;
 
@@ -73,10 +83,11 @@ public class ClusterStateService extends GeneralTaskRunnable {
     }
 
     /** Servers in the cluster environment*/
-    private Map servers = new HashMap();
+    private final Map<String, ServerInfo> servers = 
+            new HashMap<String, ServerInfo>();
     
     /** Servers are down in the cluster environment*/
-    private Set downServers = new HashSet();
+    private Set<String> downServers = new HashSet<String>();
 
     /** Server Information */
     private ServerInfo[] serverSelectionList = new ServerInfo[0];
@@ -90,13 +101,14 @@ public class ClusterStateService extends GeneralTaskRunnable {
     private static String GET_REQUEST = "";
     private final static String EMPTY_STRING = "";
     private final static String SUCCESS_200 = "200";
+    private final static String HTTP = "http";
 
     private static String hcPath = SystemProperties.
                                     get(Constants.URLCHECKER_TARGET_URL, null);
 
     private static boolean doRequest = true;
-    private static String  doRequestFlag = SystemProperties.
-                                    get(Constants.URLCHECKER_DOREQUEST, null);
+    private static final String doRequestFlag = SystemProperties.
+                                    get(Constants.URLCHECKER_DOREQUEST, "false");
 
     private int timeout = DEFAULT_TIMEOUT; // in milliseconds
 
@@ -141,23 +153,26 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @throws Exception
      */
     public ClusterStateService(SessionService ss, String localServerId,
-            int timeout, long period, Map members) throws Exception {
+            int timeout, long period, Map<String, String> members) throws Exception {
         this.ss = ss;
         this.localServerId = localServerId;
         this.timeout = timeout;
         this.period = period;
         serverSelectionList = new ServerInfo[members.size()];
-
-        for (Iterator m = members.entrySet().iterator(); m.hasNext();) {
+        
+        for (Map.Entry<String, String> entry : members.entrySet()) {
             ServerInfo info = new ServerInfo();
-            Map.Entry entry = (Map.Entry) m.next();
-            info.id = (String) entry.getKey();
-            URL url = new URL((String) entry.getValue());
+            info.id = entry.getKey();
+            URL url = new URL(entry.getValue() + "/namingservice");
+            info.url = url;
+            info.protocol = url.getProtocol();
             info.address = new InetSocketAddress(url.getHost(), url.getPort());
             info.isUp = checkServerUp(info);
+            
             if (!info.isUp) {
                 downServers.add(info.id);
             }
+            
             servers.put(info.id, info);
             serverSelectionList[getNextSelected()] = info;
         }
@@ -188,7 +203,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return true if server is up, false otherwise
      */
     boolean isUp(String serverId) {
-        return ((ServerInfo) servers.get(serverId)).isUp;
+        return (servers.get(serverId)).isUp;
     }
 
     /**
@@ -201,7 +216,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      */
 
     boolean checkServerUp(String serverId) {
-        ServerInfo info = (ServerInfo) servers.get(serverId);
+        ServerInfo info = servers.get(serverId);
         info.isUp = checkServerUp(info);
         return info.isUp;
     }
@@ -274,10 +289,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
         try {
             boolean cleanRemoteSessions = false;
             synchronized (servers) {
-                Iterator i = servers.values().iterator();
-                while (i.hasNext()) {
-                    ServerInfo info = (ServerInfo) i.next();
+                for (Map.Entry<String, ServerInfo> server : servers.entrySet()) {
+                    ServerInfo info = server.getValue();
                     info.isUp = checkServerUp(info);
+                    
                     if (!info.isUp) {
                         downServers.add(info.id);
                     } else {
@@ -291,7 +306,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
             if (cleanRemoteSessions) {
                 ss.cleanUpRemoteSessions();
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
         }
     }
 
@@ -316,32 +331,85 @@ public class ClusterStateService extends GeneralTaskRunnable {
             sock.connect(info.address, timeout);
             /*
              * If we need to check for a front end proxy, we need
-             * to send a request.  this is HTTP ONLY for now.
-             * FIX!!!
+             * to send a request.  
              */
             if (doRequest) {
-                out = new PrintWriter(sock.getOutputStream());
-                in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-                out.println(GET_REQUEST);
-                out.println(EMPTY_STRING);
-                out.flush();
+                if (info.protocol.equals(HTTP)) {
+                    out = new PrintWriter(sock.getOutputStream());
+                    in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                    out.println(GET_REQUEST);
+                    out.println(EMPTY_STRING);
+                    out.flush();
 
-                String response = in.readLine();
+                    String response = in.readLine();
 
-                if (response.contains(SUCCESS_200)) {
-                    result = true;
+                    if (response.contains(SUCCESS_200)) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
                 } else {
-                    result = false;
+                    HttpsURLConnection connection = null;
+                    int responseCode = 0;
+                    InputStream is = null;
+
+                    try {
+                        connection = (HttpsURLConnection) info.url.openConnection();
+                        
+
+                        connection.setHostnameVerifier(new HostnameVerifier() {
+                            public boolean verify(String hostname, SSLSession session) {
+                                return true;
+                            }
+                        });
+                
+                        responseCode = connection.getResponseCode();
+                        is = connection.getInputStream();
+                        int ret = 0;
+                        byte[] buf = new byte[512];
+
+                        // clear the stream
+                        while ((ret = is.read(buf)) > 0) {
+                            // do nothing
+                        }
+
+                        // close the inputstream
+                        is.close();
+                    } catch (IOException ioe) {
+                        InputStream es = null;
+
+                        try {
+                            es = ((HttpsURLConnection)connection).getErrorStream();
+                            int ret = 0;
+                            byte[] buf = new byte[512];
+
+                            // read the response body to clear
+                            while ((ret = es.read(buf)) > 0) {
+                                // do nothing
+                            }
+
+                            // close the errorstream
+                            es.close();
+                        } catch(IOException ex) {
+                            // deal with the exception
+                        }
+                    }
+                    
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
                 }
             } else {
                 result = true;
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             result = false;
         } finally {
             try {
                 sock.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
         return result;
