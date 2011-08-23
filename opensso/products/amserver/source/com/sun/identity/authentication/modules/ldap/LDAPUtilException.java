@@ -36,14 +36,14 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import java.util.concurrent.ExecutionException;
 import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * Exception that is thrown when the user  
  * fail the LDAP  authentication.
  */
-public class LDAPUtilException extends ErrorResultException implements L10NMessage {
+public class LDAPUtilException extends ExecutionException implements L10NMessage {
     private String msgID;
     private String bundleName;
     private String message;
@@ -168,6 +168,7 @@ public class LDAPUtilException extends ErrorResultException implements L10NMessa
      *
      * @return the English message for this exception.
      */
+    @Override
     public String getMessage() {
         if (message != null) {
             return message;

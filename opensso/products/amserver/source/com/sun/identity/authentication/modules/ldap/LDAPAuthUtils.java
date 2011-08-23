@@ -112,7 +112,7 @@ public class LDAPAuthUtils {
     private String authPassword = "";
     private String expiryTime;
     private SearchScope searchScope;
-    private ScreenState screenState;
+    private ModuleState screenState;
     private int graceLogins;
     private Debug debug = null;
     // JSS integration
@@ -279,13 +279,13 @@ public class LDAPAuthUtils {
         String bindingPwd,
         boolean adminPool,
         boolean trustAll
-    ) throws ErrorResultException {
+    ) throws ErrorResultException, LDAPUtilException {
         ConnectionPool conPool = null;
         
         try {
             String key = hostName + ":" + portNumber + ":" + bindingUser;
             Set<String> allHostNames = getAllHostNames(hostName, portNumber, bindingUser);
-            conPool = (ConnectionPool) connectionPools.get(key);
+            conPool = connectionPools.get(key);
             
             if (conPool == null) {
                 if (debug2.messageEnabled()) {
@@ -454,7 +454,7 @@ public class LDAPAuthUtils {
         userPassword = password;
         searchForUser();
         
-        if (screenState == ScreenState.SERVER_DOWN || screenState == ScreenState.USER_NOT_FOUND) {
+        if (screenState == ModuleState.SERVER_DOWN || screenState == ModuleState.USER_NOT_FOUND) {
             return;
         }
         
@@ -468,7 +468,7 @@ public class LDAPAuthUtils {
      * @return connection that is available to use
      */
     private Connection getConnection()
-    throws ErrorResultException {
+    throws ErrorResultException, LDAPUtilException {
         if (cPool == null) {
             cPool = createConnectionPool(connectionPools,
             null, serverHost, serverPort,
@@ -495,7 +495,7 @@ public class LDAPAuthUtils {
      * @return connection that is available to use
      */
     private Connection getAdminConnection()
-    throws ErrorResultException {
+    throws ErrorResultException, LDAPUtilException {
         if (acPool == null) {
             acPool = createConnectionPool(adminConnectionPools,
              connectionPoolsStatus, serverHost, serverPort,
@@ -546,15 +546,15 @@ public class LDAPAuthUtils {
         String confirmPassword
     ) throws LDAPUtilException {
         if (password.equals(oldPwd)){
-            setState(ScreenState.WRONG_PASSWORD_ENTERED);
+            setState(ModuleState.WRONG_PASSWORD_ENTERED);
             return;
         }
         if (!(password.equals(confirmPassword))) {
-            setState(ScreenState.PASSWORD_MISMATCH);
+            setState(ModuleState.PASSWORD_MISMATCH);
             return;
         }
         if (password.equals(userId)) {
-            setState(ScreenState.USER_PASSWORD_SAME);
+            setState(ModuleState.USER_PASSWORD_SAME);
             return;
         }
         
@@ -584,7 +584,7 @@ public class LDAPAuthUtils {
                     debug.message("No controls returned");
                 }
                 
-                setState(ScreenState.PASSWORD_UPDATED_SUCCESSFULLY);
+                setState(ModuleState.PASSWORD_UPDATED_SUCCESSFULLY);
             } else {
                 processPasswordPolicyControls(result);
             }
@@ -593,7 +593,7 @@ public class LDAPAuthUtils {
                 // set log message to be logged in LDAP modules
                 setLogMessage(ere.getLocalizedMessage() + " : " +
                     ere.getResult().getDiagnosticMessage());
-                setState(ScreenState.PASSWORD_MIN_CHARACTERS);
+                setState(ModuleState.PASSWORD_MIN_CHARACTERS);
             } else if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
                 ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
@@ -602,7 +602,7 @@ public class LDAPAuthUtils {
                     serverHost +": ", ere);
                 }
                 
-                setState(ScreenState.SERVER_DOWN);
+                setState(ModuleState.SERVER_DOWN);
                 return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
                 Result r = ere.getResult();
@@ -627,7 +627,7 @@ public class LDAPAuthUtils {
                     }    
                 }
             } else {
-                setState(ScreenState.PASSWORD_NOT_UPDATE);
+                setState(ModuleState.PASSWORD_NOT_UPDATE);
             }
             
             if (debug.warningEnabled()) {
@@ -828,7 +828,7 @@ public class LDAPAuthUtils {
                     debug.message("Cannot find entries for " + searchFilter);
                 }
                 
-                setState(ScreenState.USER_NOT_FOUND);
+                setState(ModuleState.USER_NOT_FOUND);
                 return;
             } else {
                 if (userDN == null) {
@@ -837,10 +837,10 @@ public class LDAPAuthUtils {
                             "Cannot find entries for " + searchFilter);
                     }
                     
-                    setState(ScreenState.USER_NOT_FOUND);
+                    setState(ModuleState.USER_NOT_FOUND);
                     return;
                 } else {
-                    setState(ScreenState.USER_FOUND);
+                    setState(ModuleState.USER_FOUND);
                 }
             }
             if (userMatches > 1) {
@@ -864,7 +864,7 @@ public class LDAPAuthUtils {
                 erio.getCause().getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
                 if (debug.warningEnabled()) {
                     debug.warning("Cannot connect to " + serverHost, erio);
-                    setState(ScreenState.SERVER_DOWN);
+                    setState(ModuleState.SERVER_DOWN);
                     return;
                 }
             }
@@ -889,7 +889,7 @@ public class LDAPAuthUtils {
                     debug.warning("Cannot connect to " + serverHost, ere);
                 }
                 
-                setState(ScreenState.SERVER_DOWN);
+                setState(ModuleState.SERVER_DOWN);
                 return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 if (debug.warningEnabled()) {
@@ -913,7 +913,7 @@ public class LDAPAuthUtils {
                     debug.warning("Exception while searching", ere);
                 }
                 
-                setState(ScreenState.USER_NOT_FOUND);
+                setState(ModuleState.USER_NOT_FOUND);
                 return;
             }
         }
@@ -955,7 +955,7 @@ public class LDAPAuthUtils {
                     debug.message("No controls returned");
                 }
                 
-                setState(ScreenState.SUCCESS);
+                setState(ModuleState.SUCCESS);
             } else {
                 processPasswordPolicyControls(result);
             }
@@ -970,7 +970,7 @@ public class LDAPAuthUtils {
                         debug.message("Password expired and must be reset");
                     }
 
-                    setState(ScreenState.PASSWORD_EXPIRED_STATE);
+                    setState(ModuleState.PASSWORD_EXPIRED_STATE);
                     return;  
                 } else if (result != null && result.getPasswordPolicyErrorType() != null &&
                     result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.ACCOUNT_LOCKED)) {
@@ -1003,7 +1003,7 @@ public class LDAPAuthUtils {
                     debug.message("Cannot connect to " + serverHost, ere);
                 }
                 
-                setState(ScreenState.SERVER_DOWN);
+                setState(ModuleState.SERVER_DOWN);
                 return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
                 if (debug.messageEnabled()) {
@@ -1097,63 +1097,63 @@ public class LDAPAuthUtils {
                         debug.message("Account is locked" );
                     }
 
-                    setState(ScreenState.ACCOUNT_LOCKED);
+                    setState(ModuleState.ACCOUNT_LOCKED);
                     break;
                 case CHANGE_AFTER_RESET:
                     if (debug.messageEnabled()) {
                         debug.message("Password must be changed after reset" );
                     }
 
-                    setState(ScreenState.PASSWORD_RESET_STATE);
+                    setState(ModuleState.PASSWORD_RESET_STATE);
                     break;
                 case INSUFFICIENT_PASSWORD_QUALITY:
                     if (debug.messageEnabled()) {
                         debug.message("Insufficient password quality" );
                     }
 
-                    setState(ScreenState.INSUFFICIENT_PASSWORD_QUALITY);
+                    setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
                     break;                            
                 case MUST_SUPPLY_OLD_PASSWORD:
                     if (debug.messageEnabled()) {
                         debug.message("Must supply old password" );
                     }
 
-                    setState(ScreenState.MUST_SUPPLY_OLD_PASSWORD);
+                    setState(ModuleState.MUST_SUPPLY_OLD_PASSWORD);
                     break;
                 case PASSWORD_EXPIRED:
                     if (debug.messageEnabled()) {
                         debug.message("Password expired and must be reset" );
                     }
 
-                    setState(ScreenState.PASSWORD_RESET_STATE);
+                    setState(ModuleState.PASSWORD_RESET_STATE);
                     break;
                 case PASSWORD_IN_HISTORY:
                     if (debug.messageEnabled()) {
                         debug.message("Password in history" );
                     }
 
-                    setState(ScreenState.PASSWORD_IN_HISTORY);
+                    setState(ModuleState.PASSWORD_IN_HISTORY);
                     break;                            
                 case PASSWORD_MOD_NOT_ALLOWED:
                     if (debug.messageEnabled()) {
                         debug.message("password modification is not allowed" );
                     }
 
-                    setState(ScreenState.PASSWORD_MOD_NOT_ALLOWED);
+                    setState(ModuleState.PASSWORD_MOD_NOT_ALLOWED);
                     break;                              
                 case PASSWORD_TOO_SHORT:
                     if (debug.messageEnabled()) {
                         debug.message("password too short" );
                     }
 
-                    setState(ScreenState.PASSWORD_TOO_SHORT);
+                    setState(ModuleState.PASSWORD_TOO_SHORT);
                     break;                              
                 case PASSWORD_TOO_YOUNG:
                     if (debug.messageEnabled()) {
                         debug.message("password too young" );
                     }
 
-                    setState(ScreenState.PASSWORD_TOO_YOUNG);
+                    setState(ModuleState.PASSWORD_TOO_YOUNG);
                     break;                              
             }
         }
@@ -1167,7 +1167,7 @@ public class LDAPAuthUtils {
                         debug.message("Number of grace logins remaining " + result.getValue());
                     }
 
-                    setState(ScreenState.GRACE_LOGINS);
+                    setState(ModuleState.GRACE_LOGINS);
                     break;
                 case TIME_BEFORE_EXPIRATION:
                     setExpTime(result.getValue());
@@ -1176,7 +1176,7 @@ public class LDAPAuthUtils {
                         debug.message("Password expires in " + result.getValue() + " seconds");
                     }
 
-                    setState(ScreenState.PASSWORD_EXPIRING);
+                    setState(ModuleState.PASSWORD_EXPIRING);
                     break;
             }
         }
@@ -1457,7 +1457,7 @@ public class LDAPAuthUtils {
      *
      * @return The latest screen state.
      */
-    public ScreenState getState() {
+    public ModuleState getState() {
         return screenState;
     }
 
@@ -1466,7 +1466,7 @@ public class LDAPAuthUtils {
      *
      * @param code Screen state.
      */
-    public void setState(ScreenState code) {
+    public void setState(ModuleState code) {
         screenState = code;
     }
 

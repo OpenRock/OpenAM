@@ -30,7 +30,7 @@ package com.sun.identity.authentication.modules.ldap;
  * 
  * @author steve
  */
-public enum ScreenState {
+public enum ModuleState {
     USER_NOT_FOUND(1, "userNotFound"),
             
     CONFIG_ERROR(4, "configError"),
@@ -86,7 +86,7 @@ public enum ScreenState {
     private final int intValue;
     private final String name;
 
-    private ScreenState(final int intValue, final String name) {
+    private ModuleState(final int intValue, final String name) {
         this.intValue = intValue;
         this.name = name;
     }

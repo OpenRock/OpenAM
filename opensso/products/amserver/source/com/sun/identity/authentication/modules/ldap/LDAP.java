@@ -462,7 +462,7 @@ public class LDAP extends AMLoginModule {
     public int process(Callback[] callbacks, int state)
             throws AuthLoginException {
         currentState = state;
-        ScreenState newState;
+        ModuleState newState;
         LoginScreen loginScreen = LoginScreen.get(state);
         
         try {
@@ -507,7 +507,7 @@ public class LDAP extends AMLoginModule {
                     AuthD.directoryPort, ldapSSL, bundle, debug);
                     ldapUtil.authenticateSuperAdmin(userName, userPassword);
                     
-                    if (ldapUtil.getState().equals(ScreenState.SUCCESS)) {
+                    if (ldapUtil.getState().equals(ModuleState.SUCCESS)) {
                         validatedUserID = userName;
                         return ISAuthConstants.LOGIN_SUCCEED;
                     } else {
@@ -526,13 +526,13 @@ public class LDAP extends AMLoginModule {
                         ldapUtil.authenticateUser(userName, userPassword);
                         newState = ldapUtil.getState();
                     } else {
-                        newState = ScreenState.SERVER_DOWN;
+                        newState = ModuleState.SERVER_DOWN;
                     }
                     
                     boolean passwordValidationSuccessFlag = true;
                     // Validating Password only if authentication
                     // information entered is correct
-                    if (newState == ScreenState.SUCCESS) {
+                    if (newState == ModuleState.SUCCESS) {
                         try {
                             validatePassword(userPassword);
                         } catch (UserNamePasswordValidationException upve) {
@@ -585,7 +585,7 @@ public class LDAP extends AMLoginModule {
                                     + " than the minimal length of " 
                                     + requiredPasswordLength);
                             }
-                            newState = ScreenState.PASSWORD_MIN_CHARACTERS;
+                            newState = ModuleState.PASSWORD_MIN_CHARACTERS;
                             // add log
                             getLoginState("LDAP").logFailed(
                                 bundle.getString("PasswdMinChars"),
@@ -597,13 +597,13 @@ public class LDAP extends AMLoginModule {
                             String logMsg = ldapUtil.getLogMessage();
                             
                             if (newState == 
-                                ScreenState.PASSWORD_UPDATED_SUCCESSFULLY){
+                                ModuleState.PASSWORD_UPDATED_SUCCESSFULLY){
                                 // log change password success
                                 getLoginState("LDAP").logSuccess(
                                     "changePasswdSucceeded",
                                     "CHANGE_USER_PASSWORD_SUCCEEDED");
                             } else if ((logMsg != null) && (newState ==
-                                ScreenState.PASSWORD_MIN_CHARACTERS)) {
+                                ModuleState.PASSWORD_MIN_CHARACTERS)) {
                                 // add log
                                 getLoginState("LDAP").logFailed(logMsg,
                                     "CHANGE_USER_PASSWORD_FAILED", false, null);
@@ -735,7 +735,7 @@ public class LDAP extends AMLoginModule {
         amAuthLDAP = null;
     }
     
-    private void processLoginScreen(ScreenState newState) throws AuthLoginException {
+    private void processLoginScreen(ModuleState newState) throws AuthLoginException {
         try {
             switch (newState) {
                 case SUCCESS:
@@ -814,7 +814,7 @@ public class LDAP extends AMLoginModule {
                         ldapUtil.authenticateUser(userName, userPassword);
                         newState = ldapUtil.getState();
                     } else {
-                        newState = ScreenState.SERVER_DOWN;
+                        newState = ModuleState.SERVER_DOWN;
                     }
                     processLoginScreen(newState);
                     break;
@@ -860,7 +860,7 @@ public class LDAP extends AMLoginModule {
                         ldapUtil.authenticateUser(userName, userPassword);
                         newState = ldapUtil.getState();
                     } else {
-                        newState = ScreenState.SERVER_DOWN;
+                        newState = ModuleState.SERVER_DOWN;
                     }
                     processLoginScreen(newState);
                     break;
@@ -872,14 +872,14 @@ public class LDAP extends AMLoginModule {
                 currentState = LoginScreen.LOGIN_START.intValue();
                 return;
             }
-            if (newState != ScreenState.USER_NOT_FOUND) {
+            if (newState != ModuleState.USER_NOT_FOUND) {
                 debug.error("Unknown Login State:", ex);
             }
             throw new AuthLoginException(amAuthLDAP, "LDAPex", null, ex);
         }
     }
     
-    private void processPasswordScreen(ScreenState newState)
+    private void processPasswordScreen(ModuleState newState)
             throws AuthLoginException {
         switch (newState) {
             case PASSWORD_UPDATED_SUCCESSFULLY:
