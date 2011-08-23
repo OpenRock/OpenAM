@@ -32,6 +32,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.security.auth.Subject;
 
 /**
@@ -50,6 +54,8 @@ public class SubjectAttributesManager {
     private static Map<String, SubjectAttributesManager> instances =
         new HashMap<String, SubjectAttributesManager>();
     private Subject adminSubject;
+
+    private static ReadWriteLock instancesLock = new ReentrantReadWriteLock();
 
     private SubjectAttributesManager(Subject adminSubject, String realmName) {
         this.realmName = realmName;
@@ -128,14 +134,34 @@ public class SubjectAttributesManager {
      * @param realmName Name of realm.
      * @return <code>SubjectAttributesManager</code> of a given realm.
      */
-    public synchronized static SubjectAttributesManager getInstance(
+    public static SubjectAttributesManager getInstance(
         Subject adminSubject,
         String realmName) {
-        SubjectAttributesManager sam = instances.get(realmName);
+        SubjectAttributesManager sam = null;
+
+        instancesLock.readLock().lock();
+        try {
+            sam = instances.get(realmName);
+        } finally {
+            instancesLock.readLock().unlock();
+        }
+
         if (sam == null) {
             sam = new SubjectAttributesManager(adminSubject, realmName);
-            instances.put(realmName, sam);
+
+            instancesLock.writeLock().lock();
+            try {
+                SubjectAttributesManager temp = instances.get(realmName);
+                if(temp == null) {
+                    instances.put(realmName, sam);
+                } else {
+                    sam = temp;
+                }
+            } finally {
+                instancesLock.writeLock().unlock();
+            }
         }
+
         return sam;
     }
 
