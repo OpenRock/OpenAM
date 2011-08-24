@@ -256,36 +256,6 @@ public abstract class AMPrimaryMastHeadViewBean
         mm.setShowUserRole(true);
         mm.setVersionFileName("help/version.html");
         
-        // set the masthead help link properties
-        mm.setHelpType("help2");
-        if (model != null) {
-            mm.setHelpStatus(model.getLocalizedString(
-                "masthead.button.help.status"));
-            mm.setHelpTooltip(model.getLocalizedString(
-                "masthead.button.help.tooltip"));
-            mm.setHelpWindowTitle(model.getLocalizedString(
-                "help.title"));
-        }
-        String helpID = getHelpID();
-        if (AMModelBase.debug.messageEnabled()) {
-            String[] arg = {helpID};
-            mm.setHelpTooltip(MessageFormat.format(model.getLocalizedString(
-                "masthead.button.help.tooltip.debug"), (Object[])arg));
-        }
-        if (helpID != null) {
-            HelpConfig helpConfig = HelpConfig.getInstance();
-            // our tech writer's tool will generate all lower cases
-            helpID = helpID.toLowerCase();
-            String helpFileName = helpConfig.getHelpFileName(helpID);
-            if (helpFileName != null) {
-                mm.setHelpFileName(helpFileName);
-                String helpAnchor = helpConfig.getHelpAnchor(helpID);
-                if (helpAnchor != null) {
-                    mm.setHelpAnchor(helpAnchor);
-                }
-            }
-        }
-
         return mm;
     }
 
@@ -409,30 +379,6 @@ public abstract class AMPrimaryMastHeadViewBean
         return "opensso.SelectedTabId";
     }
     
-    /**
-     * Returns the JavaHelp map ID (help topic) about this view bean.
-     * <p>
-     * The implementation in this class returns the JavaHelp map ID based on
-     * the runtime view bean class name.  It's the fully qualified class name
-     * removing "ViewBean" suffix and "com.sun.identity.console." prefix. For
-     * example, the helpID of view bean
-     * "com.sun.identity.console.dm.Organization" will be "dm.Organization".
-     *
-     * @return the JavaHelp map ID as specified in the help-set map file(s);
-     *         null if the help topic is unknown.
-     */
-    protected String getHelpID() {
-        final String prefix = "com.sun.identity.console.";
-        final String suffix = "ViewBean";
-        final int pLen = prefix.length();
-        final int sLen = suffix.length();
-        String cName = this.getClass().getName();
-        if (cName.startsWith(prefix) && cName.endsWith(suffix)) {
-            return cName.substring(pLen, cName.length()-sLen);
-        }
-        return null;
-    }
-
     protected boolean isRootRealm(String realm, String startDN) {
         boolean isRoot = false;
         if ((realm == null) ||

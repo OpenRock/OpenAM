@@ -220,10 +220,6 @@
         <servlet-class>com.sun.identity.console.task.TaskServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>Help2Servlet</servlet-name>
-        <servlet-class>com.sun.identity.console.help.Help2Servlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>VersionServlet</servlet-name>
         <servlet-class>com.sun.identity.console.version.VersionServlet</servlet-class>
     </servlet>
@@ -315,11 +311,6 @@
         <url-pattern>/agentconfig/*</url-pattern>
     </servlet-mapping>
 
-    <!-- lockhart 2.x servlet mappings -->
-    <servlet-mapping>
-        <servlet-name>Help2Servlet</servlet-name>
-        <url-pattern>/cchelp2/*</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VersionServlet</servlet-name>
         <url-pattern>/ccversion/*</url-pattern>

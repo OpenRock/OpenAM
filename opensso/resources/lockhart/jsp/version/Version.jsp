@@ -1,11 +1,31 @@
 <%--
-/**
- * ident "@(#)Version.jsp 1.13 05/07/14 SMI"
- * 
- * Copyright 2004 Sun Microsystems, Inc. All rights reserved.
- * Use is subject to license terms.
- */
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: Version.jsp,v 1.1 2009/08/05 20:15:51 veiming Exp $
+
 --%>
+
 <%@ page language="java" %>
 <%@taglib uri="/WEB-INF/tld/com_iplanet_jato/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/tld/com_sun_web_ui/cc.tld" prefix="cc" %>
@@ -13,7 +33,7 @@
 <%@ page import="com.sun.web.ui.common.CCI18N" %>
 <%@ page import="com.sun.web.ui.common.CCSystem" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="com.iplanet.jato.util.NonSyncStringBuffer" %>
+<%@page import="com.sun.identity.console.version.VersionViewBean" %>
 
 <%
     // Get query parameters.
@@ -24,12 +44,7 @@
     String versionFile = (request.getParameter("versionFile") != null)
 	? request.getParameter("versionFile") : "";
 
-    String versionNumber = (request.getParameter("versionNumber") != null)
-	? request.getParameter("versionNumber") : "";
-    if (versionNumber == null || versionNumber.length() == 0) {
-        versionNumber = CCSystem.getVersionTxt(versionFile,
-            request.getContextPath());
-    }
+    windowTitle = VersionViewBean.escapeHTML(windowTitle);
 
     String productNameHeight =
 	(request.getParameter("productNameHeight") != null)
@@ -39,15 +54,13 @@
         ? request.getParameter("productNameWidth") : "";
 
     // Create button frame URL.
-    NonSyncStringBuffer buttonBuffer =
-        new NonSyncStringBuffer(request.getContextPath())
-        .append("/ccversion/ButtonFrame?")
-	.append("versionNumber=")
-        .append(URLEncoder.encode(versionNumber, CCI18N.UTF8_ENCODING));
+    StringBuilder buttonBuffer =
+        new StringBuilder(request.getContextPath())
+        .append("/ccversion/ButtonFrame");
 
     // Create masthead frame URL.
-    NonSyncStringBuffer buffer =
-        new NonSyncStringBuffer(request.getContextPath())
+    StringBuilder buffer =
+        new StringBuilder(request.getContextPath())
         .append("/ccversion/Masthead.jsp?");
 
     buffer.append("productNameSrc=")
@@ -60,7 +73,7 @@
         .append(URLEncoder.encode(productNameWidth, CCI18N.UTF8_ENCODING));
 %>
 
-<jato:useViewBean className="com.sun.web.ui.servlet.version.VersionViewBean">
+<jato:useViewBean className="com.sun.identity.console.version.VersionViewBean">
 
 <html>
 <title><%=windowTitle %></title>
@@ -75,7 +88,7 @@
 
 <frameset rows="110,*,60" frameborder="no" border="0" framespacing="0">
   <frame src="<%=buffer.toString() %>" name="topFrame" scrolling="no" noresize="noresize" id="topFrame" title="Masthead Frame">
-  <frame src="<%=versionFile%>?versionNumber=<%=versionNumber%>" name="mainFrame" id="mainFrame" title="Content Frame">
+  <frame src="<%= request.getContextPath() + "/base/Version" %>" name="mainFrame" id="mainFrame" title="Content Frame">
   <frame src="<%=buttonBuffer.toString() %>" name="buttonFrame" scrolling="no" noresize="noresize" id="bottomFrame" title="Button Frame">
   <noframes>
     <body>

@@ -369,16 +369,6 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
         return false;
     }
 
-    protected String getHelpID() {
-        String serviceName = (String)getPageSessionAttribute(
-            AMServiceProfile.SERVICE_NAME);
-        if (serviceName != null) {
-            return super.getHelpID()+"."+serviceName;
-        } else {
-            return super.getHelpID();
-        }
-    }
-     
     // button1 (Save) request done in AMServiceProfileViewBean
     // button2 (Reset) request done in AMServiceProfileViewBean
 

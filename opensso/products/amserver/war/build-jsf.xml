@@ -52,7 +52,6 @@
                 <exclude name="console.jar"/>
             </lib>
             <lib dir="${jsflockhart.dir}/lib" />
-            <lib dir="${javahelp.dir}/lib" />
             <lib dir="${jatolib.dir}">
                 <include name="jato.jar" />
             </lib>
@@ -178,86 +177,6 @@
             <zipfileset dir="${lockhart.dir}/css" prefix="css">
                 <exclude name="css_generic.css" />
             </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/en/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/en" prefix="html/en/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/en/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/en/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/en/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/de/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/de_DE" prefix="html/de/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/de/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/de/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/de/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/fr/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/fr_FR" prefix="html/fr/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/fr/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/fr/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/fr/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/es/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/es_ES" prefix="html/es/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/es/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/es/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/es/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/ja/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/ja_JP" prefix="html/ja/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/ja/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/ja/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/ja/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/ko/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/ko_KR" prefix="html/ko/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/ko/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/ko/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/ko/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh_CN/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/zh_CN" prefix="html/zh_CN/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/zh_CN/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/zh_CN/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/zh_CN/help/graphics" />
-            
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh_TW/help">
-                <include name="app.hs" />
-                <include name="map.jhm" />
-                <include name="version.html" />
-            </zipfileset>
-            <zipfileset dir="${amserver.docs.dir}/console/javahelp/zh_TW" prefix="html/zh_TW/help" />
-            <zipfileset dir="${javahelp.dir}/css" prefix="html/zh_TW/help/css" />
-            <zipfileset dir="${javahelp.dir}/ents" prefix="html/zh_TW/help/ents" />
-            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/zh_TW/help/graphics" />            
-            
         </war>
         <checksum file="${amserver.dist.dir}/opensso-amserver.war" algorithm="SHA" fileext=".sha" />
     </target>
