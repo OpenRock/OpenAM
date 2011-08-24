@@ -2843,7 +2843,7 @@
   <!-- ===================== HtmlHeader Tag ====================== -->
   <tag>
     <name>header</name>
-    <tagclass>com.sun.web.ui.taglib.header.CCHtmlHeaderTag</tagclass>
+    <tagclass>org.forgerock.openam.console.ui.taglib.header.CCHtmlHeaderTag</tagclass>
     <bodycontent>JSP</bodycontent>
     <attribute>
       <name>name</name>
@@ -3527,7 +3527,7 @@
   <!-- ===================== Property Sheet Tag ====================== -->
   <tag>
     <name>propertysheet</name>
-    <tagclass>com.sun.web.ui.taglib.propertysheet.CCPropertySheetTag</tagclass>
+    <tagclass>org.forgerock.openam.console.ui.taglib.propertysheet.CCPropertySheetTag</tagclass>
     <bodycontent>EMPTY</bodycontent>
     <attribute>
       <name>name</name>

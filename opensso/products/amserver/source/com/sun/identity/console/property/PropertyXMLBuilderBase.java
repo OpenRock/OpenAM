@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.console.property;
 
@@ -53,6 +53,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;      
 import java.util.TreeSet;
+import org.forgerock.openam.console.ui.taglib.propertysheet.CCPropertySheetTag;
 
 public abstract class PropertyXMLBuilderBase
     implements PropertyTemplate
@@ -679,7 +680,10 @@ public abstract class PropertyXMLBuilderBase
         }
         
         try {
-            String helpString = serviceBundle.getString(i18nKey + ".help");
+            String helpString = CCPropertySheetTag.getDynamicHelp(serviceBundle, i18nKey + ".help");
+            if (helpString == null) {
+                return;
+            }
             Object[] params = {as.getName(), escapeSpecialChars(helpString)};
             xml.append(MessageFormat.format(HELP_TAG, params));
         } catch (MissingResourceException e) {

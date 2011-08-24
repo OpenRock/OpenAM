@@ -1546,6 +1546,7 @@
 ./console/base/index.html
 ./console/css/commontask.css
 ./console/css/css_master.css
+./console/css/help.css
 ./console/css/index.html
 ./console/css/opensso.css
 ./console/delegation/Delegation.jsp
@@ -1646,6 +1647,9 @@
 ./console/idm/ServicesNoAttribute.jsp
 ./console/idm/ServicesSelect.jsp
 ./console/idm/index.html
+./console/images/help/info.gif
+./console/images/help/info-hover.gif
+./console/images/help/info-selected.gif
 ./console/images/tasks/bkgrnd.gif
 ./console/images/tasks/close.gif
 ./console/images/tasks/close2.gif
@@ -1686,6 +1690,7 @@
 ./console/js/am.js
 ./console/js/index.html
 ./console/js/tasksPage.js
+./console/js/help.js
 ./console/policy/AuthToRealm.jsp
 ./console/policy/AuthToRealmAdd.jsp
 ./console/policy/AuthToRealmEdit.jsp
