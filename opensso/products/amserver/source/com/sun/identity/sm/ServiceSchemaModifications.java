@@ -26,18 +26,21 @@ package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.xml.XMLUtils;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringTokenizer;
 import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
 import org.forgerock.openam.upgrade.ServiceSchemaUpgradeWrapper;
 import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
 import org.forgerock.openam.upgrade.SubSchemaModificationWrapper;
 import org.forgerock.openam.upgrade.SubSchemaUpgradeWrapper;
 import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeHelper;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -49,6 +52,7 @@ import org.w3c.dom.Node;
  * @author steve
  */
 public class ServiceSchemaModifications {
+    private static Map<String, UpgradeHelper> serviceHelpers;
     protected String serviceName = null;
     protected Document serviceSchemaDoc = null;
     protected SSOToken adminToken = null;
@@ -57,6 +61,12 @@ public class ServiceSchemaModifications {
     private boolean hasSubSchemaChanges = false;
     private Map<String, ServiceSchemaUpgradeWrapper> modifications = null;
     private Map<String, SubSchemaUpgradeWrapper> subSchemaChanges = null;
+    private static final String SERVER_UPGRADE = "serverupgrade";
+    private static final String ATTR_UPGRADE_HELPER = "upgrade.helper";
+    
+    static {
+        populateUpgradeHelpers();
+    }
     
     public ServiceSchemaModifications(String serviceName, 
                           Document schemaDoc, 
@@ -65,10 +75,6 @@ public class ServiceSchemaModifications {
         this.serviceName = serviceName;
         this.serviceSchemaDoc = schemaDoc;
         this.adminToken = adminToken;
-        
-        /*if (serviceName.equals("AgentService")) {
-            int i = 0;
-        }*/
         
         parseServiceDefinition();
     } 
@@ -245,7 +251,8 @@ public class ServiceSchemaModifications {
                                                     existingSchemaMap.get(newAttrSchemaEntry.getKey()));
 
                 if (attrsAdded.hasBeenModified() || attrsModified.hasBeenModified() || attrsDeleted.hasBeenModified()) {
-                    modifications.put(newAttrSchemaEntry.getKey(), new ServiceSchemaUpgradeWrapper(attrsAdded, attrsModified, attrsDeleted));
+                    modifications.put(newAttrSchemaEntry.getKey(), 
+                            new ServiceSchemaUpgradeWrapper(attrsAdded, attrsModified, attrsDeleted));
                 }
             }
         } catch (SMSException smse) {
@@ -385,7 +392,27 @@ public class ServiceSchemaModifications {
     }
     
     protected Set<AttributeSchemaImpl> getAttributesModified(Set<AttributeSchemaImpl> newAttrs, Set<AttributeSchemaImpl> existingAttrs) {
-        return Collections.EMPTY_SET;
+        Set<AttributeSchemaImpl> attrMods = new HashSet<AttributeSchemaImpl>();
+        
+        for (AttributeSchemaImpl newAttr : newAttrs) {
+            for (AttributeSchemaImpl existingAttr : existingAttrs) {                
+                if (upgradeAttributeSchema(existingAttr, newAttr)) {
+                    if (serviceHelpers.get(serviceName) != null) {
+                        UpgradeHelper helper = serviceHelpers.get(serviceName);
+                        
+                        try {
+                            newAttr = helper.upgradeAttribute(existingAttr, newAttr);
+                        } catch (UpgradeException ue) {
+                            UpgradeUtils.debug.error("Unable to process upgrade helper", ue);
+                        }
+                    }
+                    
+                    attrMods.add(newAttr);
+                }
+            }
+        }
+        
+        return attrMods;
     }
     
     protected Set<AttributeSchemaImpl> getAttributesDeleted(Set<AttributeSchemaImpl> newAttrs, Set<AttributeSchemaImpl> existingAttrs) {
@@ -419,5 +446,67 @@ public class ServiceSchemaModifications {
         Map<String, ServiceSchemaImpl> schemas = getAttributes(ssm.getDocumentCopy());
         
         return schemas;
+    }
+    
+    protected boolean upgradeAttributeSchema(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr) {
+        boolean choiceValuesMapNoMatch = false;
+        boolean defaultValuesSetNoMatch = false;
+        
+        if (oldAttr == null || newAttr == null) {
+            return false;
+        }
+        
+        if (!(oldAttr.getName().equals(newAttr.getName()))) {
+            return false;
+        }
+        
+        if (oldAttr.getChoiceValuesMap() != null && newAttr.getChoiceValuesMap() != null) {
+            choiceValuesMapNoMatch = !(oldAttr.getChoiceValuesMap().equals(newAttr.getChoiceValuesMap()));
+        }
+        
+        if (oldAttr.getDefaultValues() != null && newAttr.getDefaultValues() != null) {
+            defaultValuesSetNoMatch = !(oldAttr.getChoiceValuesSet().equals(newAttr.getChoiceValuesSet()));
+        }
+        
+        return choiceValuesMapNoMatch | defaultValuesSetNoMatch;
+    }
+    
+    protected static void populateUpgradeHelpers() {
+        ResourceBundle res = ResourceBundle.getBundle(SERVER_UPGRADE);
+        Map<String, UpgradeHelper> values = new HashMap<String, UpgradeHelper>();
+            
+        String attrValues = res.getString(ATTR_UPGRADE_HELPER);
+        
+        if (attrValues != null) {
+            StringTokenizer st = new StringTokenizer(attrValues, Constants.COLON);
+            
+            while (st.hasMoreTokens()) {
+                String serviceHelper = st.nextToken();
+                
+                if (serviceHelper != null) {
+                    if (serviceHelper.indexOf(Constants.EQUALS) == -1) {
+                        // bad formatting
+                        continue;
+                    }
+                    
+                    String serviceName = serviceHelper.substring(0, serviceHelper.indexOf(Constants.EQUALS));
+                    String helperClass = serviceHelper.substring(serviceHelper.indexOf(Constants.EQUALS) + 1);
+                    UpgradeHelper helper = null;
+                    
+                    try {
+                        helper = (UpgradeHelper) Class.forName(helperClass).newInstance();
+                        values.put(serviceName, helper);
+                    } catch (Exception ex) {
+                        UpgradeUtils.debug.error("Unable to load helper class: " + helperClass, ex);
+                    }
+                }
+            }
+        }
+        
+        if (UpgradeUtils.debug.messageEnabled()) {
+            UpgradeUtils.debug.message("Helper classes: " + serviceHelpers);
+        }
+        
+        serviceHelpers = values;
     }
 }

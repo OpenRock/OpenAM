@@ -777,7 +777,7 @@ public class AttributeSchema {
         updateChoiceValues(choiceValues, null);
     }
 
-    protected void updateChoiceValues(Map choiceValues, Document doc)
+     protected void updateChoiceValues(Map choiceValues, Document doc)
             throws SMSException, SSOException {
         // Construct ChoiceValues
         StringBuffer sb = new StringBuffer(100);

@@ -1048,6 +1048,11 @@ public interface Constants {
      * colon sign
      */
     public static final String COLON = ":";
+    
+    /**
+     * colon sign
+     */
+    public static final String COMMA = ",";
 
     /**
      * amp sign
