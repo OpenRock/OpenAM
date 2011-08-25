@@ -25,6 +25,9 @@
    $Id: Version.jsp,v 1.1 2009/08/05 20:15:51 veiming Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2011 ForgeRock AS
+--%>
 
 <%@ page language="java" %>
 <%@taglib uri="/WEB-INF/tld/com_iplanet_jato/jato.tld" prefix="jato" %>

@@ -365,8 +365,6 @@
               tofile="${amserver.dist.dir}/opensso-sharedlib.jar" />
         <copy file="${sharedlib.dist.dir}/opensso-sharedlib.jar.sha"
               tofile="${amserver.dist.dir}/opensso-sharedlib.jar.sha" />
-        <copy file="${amserver.docs.dir}/nightly.html"
-              tofile="${amserver.dist.dir}/index.html" />
     </target>
     
     <target name="nightly-clean">

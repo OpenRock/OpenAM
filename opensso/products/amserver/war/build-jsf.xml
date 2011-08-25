@@ -25,6 +25,9 @@
    $Id: build-jsf.xml,v 1.6 2008/06/25 05:44:24 qcheng Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <project name="opensso-war" default="all">
                 
