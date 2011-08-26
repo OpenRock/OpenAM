@@ -30,6 +30,7 @@ import com.sun.identity.shared.ldap.LDAPRequestParser;
  * This class implements the attribute value assertion filter.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public abstract class JDAPFilterAVA extends JDAPFilter {
     /**

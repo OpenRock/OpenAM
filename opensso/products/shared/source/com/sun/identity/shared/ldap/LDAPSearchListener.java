@@ -27,7 +27,7 @@ import com.sun.identity.shared.ldap.client.*;
 /**
  * Manages search results, references and responses returned on one or 
  * more search requests
- *
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSearchListener extends LDAPMessageQueue {
 

@@ -75,6 +75,7 @@ import java.util.*;
  * @see com.sun.identity.shared.ldap.LDAPAttributeSchema
  * @see com.sun.identity.shared.ldap.LDAPMatchingRuleSchema
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  **/
 
 public abstract class LDAPSchemaElement implements java.io.Serializable {

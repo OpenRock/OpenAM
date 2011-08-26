@@ -129,6 +129,7 @@ import java.io.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPReferralException
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPException extends java.lang.Exception
                            implements java.io.Serializable {

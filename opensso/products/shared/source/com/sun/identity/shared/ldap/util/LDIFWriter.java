@@ -30,6 +30,7 @@ import java.io.*;
  * Class for outputting LDAP entries to a stream as LDIF.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDIFWriter extends LDAPWriter {
 

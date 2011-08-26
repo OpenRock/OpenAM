@@ -170,6 +170,7 @@ import com.sun.identity.shared.ldap.controls.*;
  * @see com.sun.identity.shared.ldap.LDAPConstraints#getServerControls
  * @see com.sun.identity.shared.ldap.LDAPConstraints#setClientControls
  * @see com.sun.identity.shared.ldap.LDAPConstraints#setServerControls
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPControl implements Cloneable, java.io.Serializable {
     static final long serialVersionUID = 5149887553272603753L;

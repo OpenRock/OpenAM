@@ -25,6 +25,7 @@ package com.sun.identity.shared.ldap.util;
     MIME encoding and decoding: base64.
     @see com.sun.identity.shared.ldap.util.MimeBase64Encoder
     @see com.sun.identity.shared.ldap.util.MimeBase64Decoder
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public abstract class MimeEncoder implements java.io.Serializable {

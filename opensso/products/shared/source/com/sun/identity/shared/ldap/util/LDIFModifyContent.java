@@ -37,6 +37,7 @@ import com.sun.identity.shared.ldap.LDAPModification;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.util.LDIFRecord#getContent
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDIFModifyContent extends LDIFBaseContent {
     /**

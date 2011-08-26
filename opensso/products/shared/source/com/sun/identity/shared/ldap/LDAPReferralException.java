@@ -34,6 +34,7 @@ import java.io.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPException
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPReferralException extends LDAPException {
 

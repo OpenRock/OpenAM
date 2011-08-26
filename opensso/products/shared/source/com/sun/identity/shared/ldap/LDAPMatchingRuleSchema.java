@@ -98,6 +98,7 @@ import java.util.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPSchemaElement
+ * @deprecated As of ForgeRock OpenAM 10.
  **/
 
 public class LDAPMatchingRuleSchema extends LDAPAttributeSchema {

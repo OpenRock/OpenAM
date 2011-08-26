@@ -31,6 +31,7 @@ import java.util.LinkedList;
  * Represents the response to a particular LDAP operation.
  * 
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPResponse extends LDAPMessage {
     static final long serialVersionUID = 5822205242593427418L;

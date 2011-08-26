@@ -52,7 +52,7 @@ import java.net.*;
  *   referral [3] Referral OPTIONAL
  * }
  * </pre>
- *
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JDAPResult {
     /**

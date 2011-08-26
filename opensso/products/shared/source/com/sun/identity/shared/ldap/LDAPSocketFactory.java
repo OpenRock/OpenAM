@@ -43,6 +43,7 @@ import java.net.*;
  * @version 1.0
  * @see LDAPConnection#LDAPConnection(com.sun.identity.shared.ldap.LDAPSocketFactory)
  * @see LDAPSSLSocketFactory
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPSocketFactory {
     /**

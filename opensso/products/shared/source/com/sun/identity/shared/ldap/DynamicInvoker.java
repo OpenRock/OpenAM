@@ -27,6 +27,7 @@ import java.util.Hashtable;
 /**
  * Utility class to dynamically find methods of a class and to invoke
  * them
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 class DynamicInvoker {
     static Object invokeMethod(Object obj, String packageName,

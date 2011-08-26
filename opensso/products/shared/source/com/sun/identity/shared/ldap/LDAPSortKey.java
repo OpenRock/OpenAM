@@ -25,6 +25,7 @@ package com.sun.identity.shared.ldap;
  * Represents sorting instructions for a particular attribute.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSortKey implements java.io.Serializable {
     static final long serialVersionUID = -7044232342344864405L;

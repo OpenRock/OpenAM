@@ -21,10 +21,11 @@
  */
 package com.sun.identity.shared.ldap;
 
-/*
+/**
  * This object represents the value of the LDAPConnection.m_responseControlTable hashtable.
  * It stores the response controls and its corresponding LDAPConnection and
  * the message ID for its corresponding LDAPMessage.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 class LDAPResponseControl implements java.io.Serializable {
     static final long serialVersionUID = 389472019686058593L;

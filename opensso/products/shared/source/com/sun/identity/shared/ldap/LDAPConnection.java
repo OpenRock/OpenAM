@@ -90,6 +90,7 @@ import java.net.*;
  * @see com.sun.identity.shared.ldap.LDAPRebind
  * @see com.sun.identity.shared.ldap.LDAPRebindAuth
  * @see com.sun.identity.shared.ldap.LDAPException
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPConnection
        implements LDAPv3, LDAPAsynchronousConnection, Cloneable, Serializable {

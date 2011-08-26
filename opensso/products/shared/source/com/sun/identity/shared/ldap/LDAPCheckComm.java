@@ -24,6 +24,7 @@ package com.sun.identity.shared.ldap;
 /**
  * This static class checks if the caller is an applet running in
  * Netscape Communicator. If so, it returns the appropriate method.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 class LDAPCheckComm {
 

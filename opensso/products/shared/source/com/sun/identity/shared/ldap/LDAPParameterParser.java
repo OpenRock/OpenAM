@@ -33,6 +33,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public class LDAPParameterParser {
 
     public static int getLengthOctets(InputStream stream, int[] bytesRead,

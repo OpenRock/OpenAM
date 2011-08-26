@@ -29,6 +29,9 @@ package com.sun.identity.shared.ldap;
 import com.sun.identity.shared.ldap.client.opers.JDAPProtocolOp;
 import java.util.LinkedList;
 
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public class LDAPDeleteRequest extends LDAPRequest {
 
     private String dn;

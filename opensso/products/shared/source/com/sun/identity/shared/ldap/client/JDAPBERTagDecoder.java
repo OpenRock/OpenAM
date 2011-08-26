@@ -28,6 +28,7 @@ import java.io.*;
 /**
  * This class is to help BER libraries to make decision
  * on how to decode an implicit object.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JDAPBERTagDecoder extends BERTagDecoder {
     /**

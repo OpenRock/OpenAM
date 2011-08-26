@@ -48,6 +48,7 @@ import java.util.StringTokenizer;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPDN
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public final class DN implements Serializable {
 

@@ -122,6 +122,7 @@ import java.util.*;
  * </PRE>
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class GetOpt implements java.io.Serializable {
     /**

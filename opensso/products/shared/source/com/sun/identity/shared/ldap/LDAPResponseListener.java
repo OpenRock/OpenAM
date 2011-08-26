@@ -25,7 +25,7 @@ package com.sun.identity.shared.ldap;
 /**
  * Represents the message queue associated with a particular LDAP
  * operation or operations.
- * 
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPResponseListener extends LDAPMessageQueue {
 

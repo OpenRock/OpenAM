@@ -51,6 +51,7 @@ import com.sun.identity.shared.ldap.LDAPException;
  *       contextID     OCTET STRING OPTIONAL 
  *  }
  *</PRE>
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public class LDAPVirtualListResponse extends LDAPControl {

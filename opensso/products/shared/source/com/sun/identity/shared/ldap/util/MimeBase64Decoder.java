@@ -22,6 +22,7 @@
 package com.sun.identity.shared.ldap.util;
 
 /** Implements a plaintext -> Base64 encoder.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public final class MimeBase64Decoder extends MimeEncoder {
 

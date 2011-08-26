@@ -45,6 +45,7 @@ import java.util.LinkedList;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPConnection#modify(java.lang.String, com.sun.identity.shared.ldap.LDAPModification)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPModification implements java.io.Serializable {
 

@@ -29,6 +29,7 @@ import java.io.*;
  * for messages received. 
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPAsynchronousConnection {
   

@@ -26,6 +26,7 @@ import com.sun.identity.shared.ldap.LDAPControl;
 /**
  * Represents an LDAP v3 server control that contains a string as its
  * only value. This is to be used as a base class by real such controls.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 abstract class LDAPStringControl extends LDAPControl {
     protected String m_msg = null;

@@ -36,6 +36,7 @@ import java.io.*;
  *
   * @version 1.0
  * seeAlso CCITT X.209
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class BERTag extends BERElement {
     /**

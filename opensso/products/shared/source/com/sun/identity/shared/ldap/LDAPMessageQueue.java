@@ -34,7 +34,7 @@ import java.util.Set;
  * same queue.
  * 
  * Superclass for LDAResponseListener and LDAPSearchListener
- *
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 abstract class LDAPMessageQueue implements java.io.Serializable {
 

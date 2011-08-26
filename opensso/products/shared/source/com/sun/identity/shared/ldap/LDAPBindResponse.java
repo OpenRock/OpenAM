@@ -29,6 +29,9 @@ package com.sun.identity.shared.ldap;
 import com.sun.identity.shared.ldap.client.opers.JDAPBindResponse;
 import com.sun.identity.shared.ldap.ber.stream.BERElement;
 
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public class LDAPBindResponse extends LDAPResponse {
 
     protected byte[] m_credentials = null;

@@ -43,6 +43,7 @@ package com.sun.identity.shared.ldap;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPConnection#setProperty(java.lang.String, java.lang.Object)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPTraceWriter {
 

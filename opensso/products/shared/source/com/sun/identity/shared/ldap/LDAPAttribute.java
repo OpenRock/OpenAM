@@ -30,6 +30,7 @@ import com.sun.identity.shared.ldap.ber.stream.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPAttributeSet
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPAttribute implements java.io.Serializable {
 

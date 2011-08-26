@@ -34,6 +34,7 @@ import com.sun.identity.shared.ldap.LDAPRequestParser;
  *
  * @version 1.0
  * @see <a href="http://www.faqs.org/rfcs/rfc1777.html">RFC1777</a>
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JDAPFilterPresent extends JDAPFilter {
     /**

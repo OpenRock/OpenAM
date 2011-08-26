@@ -30,6 +30,7 @@ import com.sun.identity.shared.ldap.LDAPRequestParser;
  * This class implements the base class of filter "and" and filter "or".
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public abstract class JDAPFilterSet extends JDAPFilter {
     /**

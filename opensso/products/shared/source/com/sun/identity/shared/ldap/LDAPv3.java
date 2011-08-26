@@ -33,6 +33,7 @@ import java.io.*;
  * TARGET=_blank">RFC 2251</A>.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPv3 extends LDAPv2 {
 

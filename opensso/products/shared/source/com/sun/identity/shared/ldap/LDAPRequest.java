@@ -28,6 +28,9 @@ package com.sun.identity.shared.ldap;
 
 import java.util.LinkedList;
 
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public abstract class LDAPRequest {
 
     protected LinkedList bytesList;

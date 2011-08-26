@@ -44,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
  * @version 1.0
  * @see LDAPSSLSocketFactoryExt
  * @see LDAPConnection#LDAPConnection(com.sun.identity.shared.ldap.LDAPSocketFactory)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSSLSocketFactory implements LDAPSSLSocketFactoryExt,
     java.io.Serializable {    

@@ -44,6 +44,7 @@ import java.net.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.util.LDIFRecord
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDIF implements Serializable {
 

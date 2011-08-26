@@ -40,7 +40,7 @@ import java.io.*;
  *   serverCreds [7] SaslCredentials OPTIONAL
  * }
  * </pre>
- *
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JDAPBindResponse extends JDAPResult implements JDAPProtocolOp {
     /**

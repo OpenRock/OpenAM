@@ -32,6 +32,7 @@ import com.sun.identity.shared.ldap.LDAPException;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPControl
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPPasswordExpiredControl extends LDAPStringControl {
     public final static String EXPIRED = "2.16.840.1.113730.3.4.4";

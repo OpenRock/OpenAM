@@ -33,6 +33,7 @@ import java.net.*;
  *
  * @version 1.0
  * @see <a href="http://www.faqs.org/rfcs/rfc1777.html">RFC1777</a>
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface JDAPProtocolOp {
     /**

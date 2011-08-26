@@ -45,6 +45,7 @@ import java.io.*;
  * sequence (Strings or binary values).
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPv2 {
     /**

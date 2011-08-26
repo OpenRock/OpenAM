@@ -215,6 +215,7 @@ import com.sun.identity.shared.ldap.ber.stream.*;
  * @see com.sun.identity.shared.ldap.LDAPConstraints
  * @see com.sun.identity.shared.ldap.LDAPSearchConstraints
  * @see com.sun.identity.shared.ldap.LDAPConstraints#setServerControls(LDAPControl)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSortControl extends LDAPControl {
     public final static String SORTREQUEST  = "1.2.840.113556.1.4.473";

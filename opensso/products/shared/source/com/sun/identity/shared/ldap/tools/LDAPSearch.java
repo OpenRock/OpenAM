@@ -51,6 +51,7 @@ import com.sun.identity.shared.ldap.controls.*;
  * </pre>
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSearch extends LDAPTool { 
 	/**

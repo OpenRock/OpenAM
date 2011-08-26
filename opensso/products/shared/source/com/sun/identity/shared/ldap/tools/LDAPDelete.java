@@ -49,6 +49,7 @@ import com.sun.identity.shared.ldap.util.*;
  * </pre>
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public class LDAPDelete extends LDAPTool { /* LDAPDelete */

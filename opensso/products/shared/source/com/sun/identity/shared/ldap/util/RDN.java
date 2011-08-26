@@ -42,6 +42,7 @@ import java.util.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.util.DN
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public final class RDN implements java.io.Serializable {
 

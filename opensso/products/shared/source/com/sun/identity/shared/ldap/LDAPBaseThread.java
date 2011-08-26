@@ -1,7 +1,9 @@
 
 package com.sun.identity.shared.ldap;
 
-
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public class LDAPBaseThread extends Thread {
     
     private volatile boolean shouldTerminate;

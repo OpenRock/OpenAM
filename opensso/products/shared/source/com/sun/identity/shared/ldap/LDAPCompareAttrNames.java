@@ -36,6 +36,7 @@ import java.text.*;
  * @version 1.0
  * @see LDAPEntryComparator
  * @see LDAPSearchResults#sort
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public class LDAPCompareAttrNames

@@ -32,6 +32,7 @@ import com.sun.identity.shared.ldap.controls.*;
  *
  * @version 1.0
  * @author Rob Weltman
+ * @deprecated As of ForgeRock OpenAM 10.
  **/
 class LDAPTool {
 

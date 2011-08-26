@@ -37,6 +37,7 @@ import java.io.*;
  *
  * @version 1.0
  * seeAlso X.209
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class BERVisibleString extends BERCharacterString {
 

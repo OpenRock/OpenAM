@@ -109,6 +109,7 @@ import java.util.zip.CRC32;
  *
  * @see com.sun.identity.shared.ldap.LDAPConnection#setCache(com.sun.identity.shared.ldap.LDAPCache)
  * @see com.sun.identity.shared.ldap.LDAPConnection#getCache
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPCache implements Serializable {
     static final long serialVersionUID = 6275167993337814294L;

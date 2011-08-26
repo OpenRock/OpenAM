@@ -72,6 +72,7 @@ import com.sun.identity.shared.ldap.*;
  * a new connection for each client
  *
  * @version 1.2
+ * @deprecated As of ForgeRock OpenAM 10.
  **/
 public class ConnectionPool {
  

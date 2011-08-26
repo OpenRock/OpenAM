@@ -63,6 +63,7 @@ import java.io.*;
  *
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPRebind {
 

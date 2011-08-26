@@ -41,6 +41,7 @@ import java.io.*;
  *
  * </pre>
  * @see java.util.Locale
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 class LDAPResourceBundle implements java.io.Serializable {
 

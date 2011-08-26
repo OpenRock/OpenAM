@@ -53,6 +53,7 @@ import com.sun.identity.shared.ldap.LDAPControl;
  * @see com.sun.identity.shared.ldap.util.LDIFModifyContent
  * @see com.sun.identity.shared.ldap.util.LDIFDeleteContent
  * @see com.sun.identity.shared.ldap.util.LDIFModDNContent
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDIFContent {
 

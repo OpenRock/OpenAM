@@ -147,6 +147,7 @@ import java.util.*;
  * @see com.sun.identity.shared.ldap.LDAPSchemaElement
  * @version 1.0
  * @author Rob Weltman
+ * @deprecated As of ForgeRock OpenAM 10.
  **/
 public class LDAPSchema implements java.io.Serializable {
 

@@ -33,6 +33,7 @@ import javax.net.SocketFactory;
  *
  * @version 1.0
  * @since LDAPJDK 4.17
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public interface LDAPTLSSocketFactory extends LDAPSocketFactory {
 

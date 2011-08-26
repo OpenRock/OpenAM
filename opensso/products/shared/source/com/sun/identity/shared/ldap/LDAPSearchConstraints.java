@@ -30,6 +30,7 @@ package com.sun.identity.shared.ldap;
  * <P>
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSearchConstraints extends LDAPConstraints 
                                    implements Cloneable {

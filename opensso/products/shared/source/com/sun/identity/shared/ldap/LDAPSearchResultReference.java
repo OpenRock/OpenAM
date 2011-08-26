@@ -31,6 +31,7 @@ import java.util.LinkedList;
  * reference from a search operation.
  * 
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSearchResultReference extends LDAPMessage {
 

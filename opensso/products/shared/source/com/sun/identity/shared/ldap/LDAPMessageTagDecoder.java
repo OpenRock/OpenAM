@@ -30,6 +30,9 @@ import com.sun.identity.shared.ldap.client.opers.JDAPProtocolOp;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public class LDAPMessageTagDecoder {
 
     public static LDAPMessage decodeResponseMessageTag(int tag, int msgid,

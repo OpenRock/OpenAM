@@ -31,6 +31,7 @@ import java.util.Enumeration;
  * A LDAPSearchResult object encapsulates a single search result.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSearchResult extends LDAPMessage {
 

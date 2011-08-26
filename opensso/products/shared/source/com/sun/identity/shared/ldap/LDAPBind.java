@@ -28,6 +28,7 @@ package com.sun.identity.shared.ldap;
  * (through <CODE>LDAPConnection.setOption()</CODE>). It is typically used
  * to control the authentication mechanism used on implicit referral 
  * handling.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public interface LDAPBind {

@@ -49,6 +49,7 @@ import com.sun.identity.shared.debug.Debug;
  *
  * All LDAPConnections send requests and get responses from
  * LDAPConnThread (a thread).
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 class LDAPConnThread implements Runnable {

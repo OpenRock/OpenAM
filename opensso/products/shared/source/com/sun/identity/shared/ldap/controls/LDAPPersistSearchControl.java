@@ -109,6 +109,7 @@ import com.sun.identity.shared.ldap.ber.stream.*;
  *
  * @see com.sun.identity.shared.ldap.LDAPControl
  * @see com.sun.identity.shared.ldap.controls.LDAPEntryChangeControl
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public class LDAPPersistSearchControl extends LDAPControl {

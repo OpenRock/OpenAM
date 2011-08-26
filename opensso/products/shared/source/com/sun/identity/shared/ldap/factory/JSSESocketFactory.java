@@ -36,6 +36,7 @@ import com.sun.identity.shared.ldap.*;
  * @version 1.0
  * @see LDAPSocketFactory
  * @see LDAPConnection#LDAPConnection(com.sun.identity.shared.ldap.LDAPSocketFactory)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JSSESocketFactory implements LDAPTLSSocketFactory,
                                           java.io.Serializable {

@@ -29,6 +29,7 @@ import java.io.*;
  * Abstract class for outputting LDAP entries to a stream.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public abstract class LDAPWriter implements Serializable {
 

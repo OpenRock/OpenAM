@@ -145,7 +145,7 @@ package com.sun.identity.shared.ldap;
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPConnection#extendedOperation(com.sun.identity.shared.ldap.LDAPExtendedOperation)
  * @see com.sun.identity.shared.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
- *
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPExtendedOperation implements java.io.Serializable {
 

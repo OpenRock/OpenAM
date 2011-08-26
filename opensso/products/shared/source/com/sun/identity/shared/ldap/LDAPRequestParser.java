@@ -35,6 +35,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Enumeration;
 
+/**
+ * @deprecated As of ForgeRock OpenAM 10.
+ */
 public class LDAPRequestParser {
 
     public static final int DEFAULT_DEREFERENCE = 0;

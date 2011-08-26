@@ -61,6 +61,7 @@ import com.sun.identity.shared.ldap.*;
  *
  * @see com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl
  * @see com.sun.identity.shared.ldap.LDAPConnection#getResponseControls
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 public class LDAPEntryChangeControl extends LDAPControl {

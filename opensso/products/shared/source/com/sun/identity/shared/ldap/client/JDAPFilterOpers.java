@@ -30,6 +30,7 @@ import com.sun.identity.shared.ldap.ber.stream.*;
  * It converts string with escape characters to the byte array. It also
  * returns the ber octet string for the specified string with escape
  * characters.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JDAPFilterOpers {
 

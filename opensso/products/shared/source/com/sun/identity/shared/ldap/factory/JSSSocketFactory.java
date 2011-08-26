@@ -46,6 +46,7 @@ import org.mozilla.jss.CryptoManager;
  * @version 1.1
  * @see LDAPSocketFactory
  * @see LDAPConnection#LDAPConnection(com.sun.identity.shared.ldap.LDAPSocketFactory)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 
 

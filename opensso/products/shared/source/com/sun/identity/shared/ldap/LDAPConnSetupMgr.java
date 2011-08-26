@@ -40,6 +40,7 @@ import java.net.*;
  * invalidateConnection() if the connection is lost due to a network or 
  * server error, or closeConnection() if the connection is deliberately terminated
  * by the user.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 // NPCTE fix for bugId esc 1-15977888, March-2006
 //class LDAPConnSetupMgr implements java.io.Serializable {

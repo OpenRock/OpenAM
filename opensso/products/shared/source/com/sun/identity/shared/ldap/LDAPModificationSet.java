@@ -36,6 +36,7 @@ import java.util.*;
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPModification
  * @see com.sun.identity.shared.ldap.LDAPConnection#modify(java.lang.String, com.sun.identity.shared.ldap.LDAPModificationSet)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPModificationSet implements java.io.Serializable {
 

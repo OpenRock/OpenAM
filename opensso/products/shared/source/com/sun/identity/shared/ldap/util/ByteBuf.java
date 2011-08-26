@@ -53,6 +53,7 @@ import java.io.Serializable;
  * <LI>Additional "helper" methods are provided (for example,
  * functions for comparing data).
  * </UL>
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public final class ByteBuf implements Serializable {
 

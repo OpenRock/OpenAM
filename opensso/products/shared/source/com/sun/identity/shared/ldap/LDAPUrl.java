@@ -77,6 +77,7 @@ import java.net.MalformedURLException;
  * of the URL.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPUrl implements java.io.Serializable {
 

@@ -33,6 +33,7 @@ import java.net.*;
  * class is due to the JDAPReferralThread.
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public abstract class JDAPBaseDNRequest {
 

@@ -40,6 +40,7 @@ import java.io.*;
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPConnection#search(java.lang.String, int, java.lang.String, java.lang.String[], boolean)
  * @see com.sun.identity.shared.ldap.LDAPConnection#abandon(com.sun.identity.shared.ldap.LDAPSearchResults)
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSearchResults implements Enumeration, java.io.Serializable {
 

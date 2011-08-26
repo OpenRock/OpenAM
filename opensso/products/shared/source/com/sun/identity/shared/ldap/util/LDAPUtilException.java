@@ -40,6 +40,7 @@ import java.util.ResourceBundle;
 /**
  * Exception that is thrown when the user  
  * fail the LDAP  authentication.
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPUtilException extends com.sun.identity.shared.ldap.LDAPException 
     implements L10NMessage {

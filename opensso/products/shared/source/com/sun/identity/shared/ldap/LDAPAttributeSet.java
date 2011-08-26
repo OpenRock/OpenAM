@@ -31,6 +31,7 @@ import com.sun.identity.shared.ldap.client.opers.*;
  *
  * @version 1.0
  * @see com.sun.identity.shared.ldap.LDAPAttribute
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPAttributeSet implements Cloneable, java.io.Serializable {
     static final long serialVersionUID = 5018474561697778100L;

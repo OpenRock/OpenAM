@@ -54,6 +54,7 @@ import java.net.*;
  * </pre>
  *
  * @version 1.0
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class JDAPSearchResponse implements JDAPProtocolOp {
     /**

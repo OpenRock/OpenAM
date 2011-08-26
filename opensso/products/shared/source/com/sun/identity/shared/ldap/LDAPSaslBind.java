@@ -32,6 +32,7 @@ import java.net.*;
 
 /**
  * Authenticates to a server using SASL
+ * @deprecated As of ForgeRock OpenAM 10.
  */
 public class LDAPSaslBind implements LDAPBind, java.io.Serializable {
 
