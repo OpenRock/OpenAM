@@ -45,7 +45,6 @@ ${JAVA_HOME}/bin/java -Xms64m -Xmx256m \
     -D"max_conn_pool=10" \
     -D"min_conn_pool=1" \
     -D"s1is.java.util.logging.config.class=com.sun.identity.log.s1is.LogConfigReader" \
-    -D"java.util.logging.manager=com.sun.identity.log.LogManager" \
     -D"com.iplanet.services.configpath=@CONFIG_DIR@" \
     -D"com.sun.identity.configFilePath=@CONFIG_DIR@" \
     -D"com.iplanet.coreservices.configpath=@CONFIG_DIR@" \
