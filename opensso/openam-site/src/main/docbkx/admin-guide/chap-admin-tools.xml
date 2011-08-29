@@ -197,5 +197,45 @@ http://server2.example.com:8080/openam"</literal></para>
    <literal>=</literal> as the separator character.</para>
   </note>
  </section>
+ <section xml:id="openam-ssoadm-jsp-overview">
+  <title>OpenAM ssoadm.jsp</title>
+  <para>You can use the <command>ssoadm.jsp</command> page for extended
+  configuration capabilites similar to <command>ssoadm</command> on the
+  command line. Yet, <command>ssoadm.jsp</command> is disabled by default
+  to prevent potential misuse.</para>
+  <procedure xml:id="enable-ssoadm-jsp">
+   <title>To enable ssoadm.jsp</title>
+   <indexterm><primary>Enable ssoadm.jsp</primary></indexterm>
+   <step>
+    <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
+   </step>
+   <step>
+    <para>Click Configuration &gt; Servers and Sites tabs, then in the
+    Servers list, click the link to configure your server.</para>
+   </step>
+   <step>
+    <para>Click the Advanced tab to display the Advanced Properties table,
+    and then click Add to include the property that enables
+    <command>ssoadm.jsp</command> before saving your change.</para>
+    <variablelist>
+     <varlistentry>
+      <term>Property Name</term>
+      <listitem><para>ssoadm.disabled</para></listitem>
+     </varlistentry>
+     <varlistentry>
+       <term>Property Value</term>
+      <listitem><para>false</para></listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>Browse to <command>ssoadm.jsp</command> to check that it is
+    enabled.</para>
+    <para>The URL is something like
+    <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>,
+    depending on your installation.</para>
+   </step>
+  </procedure>
+ </section>
 </chapter>
 
