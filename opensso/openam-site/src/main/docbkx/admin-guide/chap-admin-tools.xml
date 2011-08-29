@@ -84,10 +84,11 @@
   under Access Control &gt; / (Top Level Realm) &gt; Privileges. Kirsten
   has authorization to read and write policy properties and configured
   policy agent properties.) When Kirsten logs in, she sees only part of the
-  console capabilities.</para>
+  console capabilities.<footnote><para>For more on delegated administration,
+  see the chapter covering realms.</para></footnote></para>
   
   <mediaobject>
-   <alt>How the console looks to an an administrator</alt>
+   <alt>How the console looks to an administrator</alt>
    <imageobject>
     <imagedata fileref="images/console-as-kvaughan.png" format="PNG" />
    </imageobject>
@@ -238,4 +239,3 @@ http://server2.example.com:8080/openam"</literal></para>
   </procedure>
  </section>
 </chapter>
-

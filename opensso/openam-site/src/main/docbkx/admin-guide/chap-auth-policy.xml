@@ -30,12 +30,117 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Defining Authentication Policies</title>
-
- <para>This chapter describes how to configure authentication policies
- managed by OpenAM.</para>
+ <title>Defining Authentication Services</title>
+ 
+ <para>An <firstterm>authentication</firstterm> service confirms the identity
+ of a user or a client application.</para>
+ 
+ <para>This chapter describes how to configure authentication in OpenAM.</para>
+ 
+ <section xml:id="what-is-authn">
+  <title>About Authentication in OpenAM</title>
+  
+  <para>Access management is about controlling access to resources. OpenAM
+  plays a role similar to border control at an international airport. Instead
+  of having each and every airline company deal with access to each
+  destination, all airlines redirects passengers to border control. Border
+  control then determines who each passenger is according to passport
+  credentials. Border control also checks whether the identified passenger
+  is authorized to fly to the destination corresponding to the ticket, perhaps
+  based on visa credentials. Then, at the departure gate, an agent enforces
+  the authorization from border control, allowing the passenger to board the
+  plane as long as the passenger has not gotten lost, or tried to board the
+  wrong plane, or swapped tickets with someone else. Thus, border control
+  handles access management at the airport.</para>
+  
+  <para>OpenAM is most frequently used to protect web-accessible resources.
+  Users browse to a protected web application page. Rather than have the
+  web application manage user access itself, an agent in the server where the
+  web application runs redirects the user to OpenAM for access management.
+  OpenAM determines who the user is, and whether the user has the right to
+  access the protected page. OpenAM then redirects the user back to the
+  protected page, this time with authorization that the agent can check.
+  The agent enforces the authorization from OpenAM, letting through the user
+  with the right to access the page. Thus, OpenAM handles access management
+  to web resources.</para>
+  
+  <para>Notice that OpenAM basically needs to determine two things for
+  access management: who the user is; whether the user has access to the
+  protected page. <firstterm>Authentication</firstterm> is the term meaning
+  the determination of who a user is. This chapter covers how to set up the
+  authentication process. <firstterm>Authorization</firstterm> is the term
+  meaning determination whether a user has access to a protected resource.
+  Authorization is covered later.</para>
+  
+  <para>To process authentication, OpenAM obtains credentials from the user or
+  client application authenticating, based on the mechanisms defined to
+  validate credentials and complete the authentication. In other words, how a
+  user authenticates differs depending on the situation. Passengers for
+  international flights authenticate with passports and visas. Passengers for
+  domestic flights might authenticate with an identity card or a driver's
+  license. Customers withdrawing cash from an ATM authenticate with a
+  card and a PIN. </para>
+  
+  <para>As the authentication process depends on the situation, OpenAM allows
+  you to configure authentication processes and then configure how they are
+  applied depending on the situation. OpenAM uses <firstterm>authentication
+  modules</firstterm> to handle different ways of authenticating. Basically,
+  each authentication module handles one way of obtaining and verifying
+  credentials. When a single set of credentials is not enough, or alternate
+  sets of credentials can be used, you can choose to chain modules together.
+  In OpenAM, this is called <firstterm>authentication chaining</firstterm>.
+  When you chain authentication modules, you can configure each module as
+  required, optional, requisite, or sufficient.<footnote><para>The four terms,
+  required, optional, requisite, and sufficient, come from JAAS, the Java
+  standard for authentication and authorization.</para></footnote></para>
+  
+  <itemizedlist>
+   <listitem>
+    <para>When a <firstterm>required</firstterm> module fails, the rest of
+    the chain is processed, but the authentication fails.</para>
+    <para>A required module might be used for login with email and password,
+    but then fall through to another module to handle new users who have not
+    yet signed up.</para>
+   </listitem>
+   <listitem>
+    <para>When an <firstterm>optional</firstterm> module fails,
+    authentication continues.</para>
+    <para>An optional module might be used to permit a higher level of access
+    if the user can present a X.509 certificate for example.</para>
+   </listitem>
+   <listitem>
+    <para>When a <firstterm>requisite</firstterm> module fails, authentication
+    fails and authentication processing stops.</para>
+    <para>A requisite module might be used with exclusive SSO.</para>
+   </listitem>
+   <listitem>
+    <para>When a <firstterm>sufficient</firstterm> succeeds, authentication
+    is successful and later modules in the chain are skipped.</para>
+    <para>You could set Windows Desktop SSO as sufficient, so authenticated
+    Windows users are let through, whereas web users have to traverse another
+    authentication module such as one requiring an email address and a
+    password.</para>
+   </listitem>
+  </itemizedlist>
+  
+  <para>With OpenAM, you can further set <firstterm>authentication
+  levels</firstterm> per module, with higher levels being used typically
+  to allow access to more restricted resources. The OpenAM APIs also let you
+  develop your own authentication modules, and post-authentication plugins.
+  Client applications can specify the authentication level, module, user, and
+  authentication service to use among those you have configured. As described
+  later in this guide, you can use <firstterm>realms</firstterm> to organize
+  which authentication process applies for different applications or different
+  domains, perhaps managed by different people.</para>
+  
+  <para>OpenAM leaves the authentication process flexible so that you can adapt
+  how it works to your situation. Although at first the number of choices
+  can seem daunting, now that you understand the basic process, you begin to
+  see how choosing authentication modules and arranging them in authentication
+  chains lets you use OpenAM to protect access to a wide range of applications
+  used in your organization.</para>
+ </section>
  
  <!-- TODO: Include in particular configuration information for YubiKey auth. -->
 
 </chapter>
-

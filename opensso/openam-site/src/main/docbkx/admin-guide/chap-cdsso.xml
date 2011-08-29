@@ -36,6 +36,18 @@
  typically used when you have multiple domains in a single organization. For
  single sign on across multiple organizations, typically federation is
  used.</para>
-
+ 
+ <para><firstterm>Cross-domain single sign on</firstterm> (CDSSO) provides
+ a safe mechanism for managing access across multiple different domains that
+ you control. CDSSO lets OpenAM set up in <literal>example.org</literal>
+ manage access for <literal>example.com</literal>, and
+ <literal>example.net</literal>. Single sign on depends on cookies to store
+ session information. Yet to avoid cross-site scripting attacks, browsers
+ should not let a web site in one domain get a cookie from another domain.
+ CDSSO relies on OpenAM essentially to duplicate cookies on domains you control
+ so that a session valid in one domain is also valid in the other domains.
+ All the cookie duplication work takes place without users having to provide
+ new credentials.</para>
+ 
+ <para>TODO</para>
 </chapter>
-

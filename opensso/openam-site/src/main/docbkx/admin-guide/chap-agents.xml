@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-agents'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Configuring Policy Agent Profiles</title>
+
+ <para>You install policy agents in web servers and web application containers
+ to enforce access policies OpenAM applies to protected web sites and web
+ applications. Policy agents depend on OpenAM for all authentication and
+ authorization decisions. Their primary responsibility consists in enforcing
+ what OpenAM decides in a way that is unobtrusive to the user. In organizations
+ with many servers, you might well install many policy agents.</para>
+ 
+ <para>Policy agents can have local configurations where they are installed,
+ but usually you store all policy agent configuration information in the
+ OpenAM configuration store, defining policy agent profiles for each, and then
+ you let the policy agents access their profiles through OpenAM such that you
+ manage all agent configuration changes centrally. This chapter describes how
+ to set up policy agent profiles in OpenAM for centralized configuration.</para>
+ 
+ <section xml:id="gateway-or-policy-agent">
+  <title>Universal Gateway or Policy Agent?</title>
+  
+  <para>OpenAM includes both the Universal Gateway and also a variety of
+  policy agents. Both the Universal Gateway and also the policy agents
+  enforce policy, redirecting users to authenticate when necessary, and
+  policing access to protected resources. Yet the Universal Gateway runs
+  as a self-contained reverse proxy located between the users and the
+  protected applications. Policy agents are installed into the servers
+  where applications run, intercepting requests in that context.</para>
+  
+  <para>The Universal Gateway works well with applications where you
+  want to protect access but you cannot install a policy agent anywhere.
+  For example, you might have a web application running in a server for
+  which no policy agent has been developed. Or you might be protecting an
+  application where you simply cannot install a policy agent.</para>
+  
+  <para>Policy agents have the advantage, where you can install them,
+  of sitting within your existing server infrastructure. Once you have
+  agents installed into the servers with web applications or sites to protect,
+  then you can manage their configurations centrally from OpenAM.</para>
+  
+  <para>Of course, for organizations with both servers where you can install
+  policy agents and also applications that you must protect without touching
+  the server, you can use policy agents on the former and the Universal
+  Gateway for the latter.</para>
+ </section>
+ 
+ <section xml:id="kinds-of-agent-profiles">
+  <title>Kinds of Agent Profiles</title>
+  
+  <para>When you open the OpenAM console to configure agents for the top level
+  realm, you see a number of different kinds to choose. Web and J2EE policy
+  agents are the most common, requiring the least integration effort.</para>
+  
+  <variablelist>
+   <varlistentry>
+    <term>Web</term>
+    <listitem>
+     <para>You install web agents in web servers to protect web sites.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>J2EE</term>
+    <listitem>
+     <para>You install J2EE agents in web application containers to protect
+     web applications.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Web Service Provider</term>
+    <listitem>
+     <para>WSP agents are for use with Web Services Security.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Web Service Client</term>
+    <listitem>
+     <para>WSC agents are for use with Web Services Security.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>STS Client</term>
+    <listitem>
+     <para>The Security Token Service client agent is for securing
+     requests to the Security Token Service and the Discovery Service.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2.2 Agents</term>
+    <listitem>
+     <para>Version 2.2 web and J2EE policy agents hold their configuration
+     locally, connecting to OpenAM with a user name, password combination.
+     This kind of agent is provided for backwards compatibility.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Authenticator</term>
+    <listitem>
+     <para>The agent authenticator can read agent profiles by connecting
+     to OpenAM with a user name, password combination, but unlike the
+     agent profile administrator, cannot change agent configuration.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+ 
+ <section xml:id="configure-agent-profiles">
+  <title>Configuring Agent Profiles</title>
+  
+  <para>This section concerns creating agent profiles, and creating groups
+  that let agents inherit settings when you have many agents with nearly
+  the same profile settings.</para>
+  
+  <procedure xml:id="create-agent-profile">
+   <title>To Create an Agent Profile</title>
+   
+   <para>To create a new web or J2EE policy agent profile, you need a name and
+   password for the agent, and the URLs to OpenAM and the application to
+   protect.</para>
+   <step>
+    <para>On the Access Control tab page of the OpenAM console, click the link
+    for the realm in which you manage agents.</para>
+   </step>
+   <step>
+    <para>Click the Agents tab, click the tab page for the kind of agent you
+    want to create, and then click the New... button in the Agent table.</para>
+   </step>
+   <step>
+    <para>Provide a name for the agent, and also the URLs to OpenAM and to
+    the application to protect, then click Create.</para>
+    <mediaobject>
+     <alt>Creating a new web agent profile</alt>
+     <imageobject>
+      <imagedata fileref="images/create-agent.png" format="PNG" />
+     </imageobject>
+     <textobject><para>At first, you provide only minimal configuration
+     for your new agent.</para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>After creating the agent profile, you can click the link to the
+    new profile to fine-tune or export the configuration.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="create-agent-group">
+   <title>To Create an Agent Profile Group &amp; Inherit Settings</title>
+   
+   <indexterm><primary>Inherit agent configuration</primary></indexterm>
+   <para>Agent profile groups let you set up multiple agents to inherit
+   settings from the group. To create a new web or J2EE agent profile group,
+   you need a name and the URL to the OpenAM server in which you store the
+   profile.</para>
+   <step>
+    <para>On the Access Control tab page of the OpenAM console, click the link
+    for the realm in which you manage agents.</para>
+   </step>
+   <step>
+    <para>Click the Agents tab, click the tab page for the kind of agent you
+    want to create, and then click the New... button in the Group table.</para>
+    <para>After creating the group profile, you can click the link to the new
+    group profile to fine-tune or export the configuration.</para>
+   </step>
+   <step>
+    <para>Inherit group settings by selecting your agent profile, and then
+    selecting the group name in the Group drop-down list near the top of
+    the profile page.</para>
+    <para>You can then adjust inheritance by clicking Inheritance Settings
+    on the agent profile page.</para>
+   </step>
+  </procedure>
+ </section>
+</chapter>
