@@ -82,9 +82,15 @@
  <section>
   <title>Deprecated Functionality</title>
   
-  <para>No functionality is deprecated in OpenAM <?eval ${product.version}?>.</para>
+  <para>The following functionality is deprecated in OpenAM <?eval ${product.version}?>.</para>
   
-  <para>No functionality is planned to be deprecated at this time.</para>
+  <itemizedlist>
+   <listitem>
+    <para>The Netscape LDAP API is to be removed from OpenAM, with OpenAM
+    using the OpenDJ LDAP SDK instead. This affects all classes in
+    <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
+   </listitem>
+  </itemizedlist>
  </section>
  
  <section>
