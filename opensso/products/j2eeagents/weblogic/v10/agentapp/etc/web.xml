@@ -27,16 +27,17 @@
    $Id: web.xml,v 1.7 2008/08/19 19:14:47 veiming Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>agentapp</display-name>
 
     <filter>
-        <filter-name>Agent</filter-name>
-        <display-name>Agent</display-name>
         <description>OpenSSO Policy Agent</description>
+        <display-name>Agent</display-name>
+        <filter-name>Agent</filter-name>
         <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
     </filter>
     <filter-mapping>
@@ -45,23 +46,23 @@
     </filter-mapping>
 
     <servlet>
-        <servlet-name>NotificationServlet</servlet-name>
-        <display-name>NotificationServlet</display-name>
         <description>A resource for handling notifications</description>
+        <display-name>NotificationServlet</display-name>
+        <servlet-name>NotificationServlet</servlet-name>
         <jsp-file>/notification.jsp</jsp-file>
     </servlet>
 
     <servlet>
-        <servlet-name>LegacySupportURIServlet</servlet-name>
-        <display-name>LegacySupportURIServlet</display-name>
         <description>A resource for handling legacy browser support</description>
+        <display-name>LegacySupportURIServlet</display-name>
+        <servlet-name>LegacySupportURIServlet</servlet-name>
         <jsp-file>/legacy_support_uri.jsp</jsp-file>
     </servlet>
 
     <servlet>
-        <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
-        <display-name>SunwCDSSORedirectURIServlet</display-name>
         <description>A resource for handling CDSSO authentication responses</description>
+        <display-name>SunwCDSSORedirectURIServlet</display-name>
+        <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
         <jsp-file>/sunwCDSSORedirectURI.jsp</jsp-file>
     </servlet>
 

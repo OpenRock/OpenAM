@@ -26,12 +26,11 @@
    $Id: web.xml,v 1.6 2008/06/25 05:52:19 qcheng Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
-<!DOCTYPE web-app PUBLIC 
-    "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" 
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app id="WebApp_agentsample">
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" id="WebApp_agentsample">
     <display-name>
         Sun Federated Access Manager J2EE Policy Agent Sample Application
     </display-name>
@@ -39,9 +38,9 @@
         An application to demonstrate the features of J2EE Policy Agents.
     </description>
     <filter id="Filter_PolicyAgent">
-        <filter-name>Agent</filter-name>
-        <display-name>Agent</display-name>
         <description>J2EE Policy Agent Filter</description>
+        <display-name>Agent</display-name>
+        <filter-name>Agent</filter-name>
         <filter-class>
             com.sun.identity.agents.filter.AmAgentFilter
         </filter-class>
@@ -52,37 +51,37 @@
     </filter-mapping>
 
     <servlet id="Servlet_ProtectedServlet">
-        <servlet-name>ProtectedServlet</servlet-name>
-        <display-name>ProtectedServlet</display-name>
         <description>
             A Servlet protected by web-tier declarative security
             constraints and requires the user to be in the role
             manager for access.
         </description>
+        <display-name>ProtectedServlet</display-name>
+        <servlet-name>ProtectedServlet</servlet-name>
         <servlet-class>
             com.sun.identity.agents.sample.ProtectedServlet
         </servlet-class>
     </servlet>
 
     <servlet id="Servlet_UnprotectedServlet">
-        <servlet-name>UnprotectedServlet</servlet-name>
-        <display-name>UnprotectedServlet</display-name>
         <description>
             A Servlet that accesses an EJB which is protected
             by a declarative constraint that requires the user
             to be in the role employee for access.
         </description>
+        <display-name>UnprotectedServlet</display-name>
+        <servlet-name>UnprotectedServlet</servlet-name>
         <servlet-class>
             com.sun.identity.agents.sample.UnprotectedServlet
         </servlet-class>
     </servlet>
 
     <servlet id="Servlet_SecurityAwareServlet">
-        <servlet-name>SecurityAwareServlet</servlet-name>
-        <display-name>SecurityAwareServlet</display-name>
         <description>
             A Servlet that invokes J2EE Security APIs.
         </description>
+        <display-name>SecurityAwareServlet</display-name>
+        <servlet-name>SecurityAwareServlet</servlet-name>
         <servlet-class>
             com.sun.identity.agents.sample.SecurityAwareServlet
         </servlet-class>
@@ -97,25 +96,25 @@
     </servlet>
 
     <servlet id="Servlet_InvokerServlet">
-        <servlet-name>InvokerServlet</servlet-name>
-        <display-name>InvokerServlet</display-name>
         <description>
             A Servlet that accesses an EJB which in turn
             invokes security APIs available in the EJB tier.
         </description>
+        <display-name>InvokerServlet</display-name>
+        <servlet-name>InvokerServlet</servlet-name>
         <servlet-class>
             com.sun.identity.agents.sample.InvokerServlet
         </servlet-class>
     </servlet>
 
     <servlet id="Servlet_URLPolicyServlet">
-        <servlet-name>URLPolicyServlet</servlet-name>
-        <display-name>URLPolicyServlet</display-name>
         <description>
             A Servlet that is protected by a URL policy
             which requires the user to be in LDAP Group
             called customer.
         </description>
+        <display-name>URLPolicyServlet</display-name>
+        <servlet-name>URLPolicyServlet</servlet-name>
         <servlet-class>
             com.sun.identity.agents.sample.URLPolicyServlet
         </servlet-class>

@@ -26,27 +26,30 @@
    $Id: web.xml,v 1.1 2009/01/30 11:57:18 kalpanakm Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 <web-app version="2.4"
 	 xmlns="http://java.sun.com/xml/ns/j2ee"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>agentapp</display-name>
     <servlet>
-        <servlet-name>NotificationServlet</servlet-name>
-        <display-name>NotificationServlet</display-name>
         <description>A resource for handling notifications</description>
+        <display-name>NotificationServlet</display-name>
+        <servlet-name>NotificationServlet</servlet-name>
         <jsp-file>/notification.jsp</jsp-file>
     </servlet>
     <servlet>
-        <servlet-name>LegacySupportURIServlet</servlet-name>
-        <display-name>LegacySupportURIServlet</display-name>
         <description>A resource for handling legacy browser support</description>
+        <display-name>LegacySupportURIServlet</display-name>
+        <servlet-name>LegacySupportURIServlet</servlet-name>
         <jsp-file>/legacy_support_uri.jsp</jsp-file>
     </servlet>
     <servlet>
-        <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
-        <display-name>SunwCDSSORedirectURIServlet</display-name>
         <description>A resource for handling CDSSO authentication responses</description>
+        <display-name>SunwCDSSORedirectURIServlet</display-name>
+        <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
         <jsp-file>/sunwCDSSORedirectURI.jsp</jsp-file>
     </servlet>
     <servlet-mapping>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 <display-name>OpenSSO Services</display-name>
 <distributable/>
 
@@ -81,18 +80,18 @@
         <load-on-startup>5</load-on-startup>
     </servlet>    
     <servlet>
-        <servlet-name>GetHttpSession</servlet-name>
         <description>GetHttpSession</description>
+        <servlet-name>GetHttpSession</servlet-name>
         <servlet-class>com.iplanet.dpro.session.service.GetHttpSession</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>pllservice</servlet-name>
         <description>pllservice</description>
+        <servlet-name>pllservice</servlet-name>
         <servlet-class>com.iplanet.services.comm.server.PLLRequestServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>jaxrpc</servlet-name>
         <description>jaxrpc</description>
+        <servlet-name>jaxrpc</servlet-name>
         <servlet-class>com.sun.xml.rpc.server.http.JAXRPCServlet</servlet-class>
         </servlet>
     <servlet>
@@ -108,25 +107,25 @@
         <servlet-class>com.sun.identity.password.ui.PWResetServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>notificationservice</servlet-name>
         <description>notificationservice</description>
+        <servlet-name>notificationservice</servlet-name>
         <servlet-class>com.iplanet.services.comm.client.PLLNotificationServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>IdentityServices</servlet-name>
-        <display-name>IdentityServices</display-name>
         <description>Web Service Endpoint - Identity Services</description>
+        <display-name>IdentityServices</display-name>
+        <servlet-name>IdentityServices</servlet-name>
         <servlet-class>com.sun.identity.idsvcs.IdentityServicesServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>IdentityServicesHandler</servlet-name>
-        <display-name>IdentityServicesHandler</display-name>
         <description>REST Endpoint - Identity Services</description>
+        <display-name>IdentityServicesHandler</display-name>
+        <servlet-name>IdentityServicesHandler</servlet-name>
         <servlet-class>com.sun.identity.idsvcs.rest.IdentityServicesHandler</servlet-class>
         <init-param>
+            <description>Default security provider</description>
             <param-name>provider</param-name>
             <param-value>com.sun.identity.idsvcs.opensso.IdentityServicesImpl</param-value>
-            <description>Default security provider</description>
         </init-param>
     </servlet>
 
@@ -277,25 +276,27 @@
     </welcome-file-list>
 
     <!-- The taglib is only specified once -->
-    <taglib>
-        <taglib-uri>/WEB-INF/jato.tld</taglib-uri>
-        <taglib-location>/WEB-INF/jato.tld</taglib-location>
-    </taglib>
-    <taglib>
-        <taglib-uri>/WEB-INF/cc.tld</taglib-uri>
-        <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
-    </taglib>
+    <jsp-config>
+        <taglib>
+            <taglib-uri>/WEB-INF/jato.tld</taglib-uri>
+            <taglib-location>/WEB-INF/jato.tld</taglib-location>
+        </taglib>
+        <taglib>
+            <taglib-uri>/WEB-INF/cc.tld</taglib-uri>
+            <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
+        </taglib>
 
-    <!-- workarounds for lockart 2.x --> 
-    <taglib>
-        <taglib-uri>/WEB-INF/tld/com_iplanet_jato/jato.tld</taglib-uri>
-        <taglib-location>/WEB-INF/jato.tld</taglib-location>
-    </taglib>
-    <taglib>
-        <taglib-uri>/WEB-INF/tld/com_sun_web_ui/cc.tld</taglib-uri>
-        <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
-    </taglib>
+        <!-- workarounds for lockart 2.x -->
+        <taglib>
+            <taglib-uri>/WEB-INF/tld/com_iplanet_jato/jato.tld</taglib-uri>
+            <taglib-location>/WEB-INF/jato.tld</taglib-location>
+        </taglib>
+        <taglib>
+            <taglib-uri>/WEB-INF/tld/com_sun_web_ui/cc.tld</taglib-uri>
+            <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
+        </taglib>
     <!-- taglib definition -->
+    </jsp-config>
     <!-- comment it out due to issue 4891 in WAS/JBOSS/Geronimo
     <resource-ref>
         <description>mysql db idrepo</description>

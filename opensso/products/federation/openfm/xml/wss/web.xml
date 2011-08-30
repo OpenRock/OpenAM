@@ -25,6 +25,9 @@
    $Id: web.xml,v 1.6 2008/11/17 23:59:09 mallas Exp $
 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <display-name>sts</display-name>
 <description>sts</description>
@@ -34,9 +37,9 @@
 </listener>
 
 <servlet>
-    <servlet-name>sts</servlet-name>
-    <display-name>sts</display-name>
     <description>JAX-WS endpoint - sts</description>
+    <display-name>sts</display-name>
+    <servlet-name>sts</servlet-name>
     <servlet-class>com.sun.identity.wss.sts.SecurityTokenService</servlet-class>
     <load-on-startup>1</load-on-startup>
 </servlet>

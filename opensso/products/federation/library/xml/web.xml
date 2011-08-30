@@ -27,10 +27,11 @@
    $Id: web.xml,v 1.21 2009/12/14 23:42:49 mallas Exp $
                                                                                 
 -->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 <display-name>OpenSSO Services</display-name>
 <distributable/>
         <servlet>
@@ -39,38 +40,38 @@
             <load-on-startup>30</load-on-startup>
         </servlet>
         <servlet>
-            <servlet-name>cdcservlet</servlet-name>
             <description>CDCServlet</description>
+            <servlet-name>cdcservlet</servlet-name>
             <servlet-class>com.iplanet.services.cdc.CDCServlet</servlet-class>
         </servlet>
         <servlet>
-            <servlet-name>SAMLAwareServlet</servlet-name>
             <description>SAMLAwareServlet</description>
+            <servlet-name>SAMLAwareServlet</servlet-name>
             <servlet-class>com.sun.identity.saml.servlet.SAMLAwareServlet</servlet-class>
         </servlet>
         <servlet>
-            <servlet-name>SAMLPOSTProfileServlet</servlet-name>
             <description>SAMLPOSTProfileServlet</description>
+            <servlet-name>SAMLPOSTProfileServlet</servlet-name>
             <servlet-class>com.sun.identity.saml.servlet.SAMLPOSTProfileServlet</servlet-class>
         </servlet>
         <servlet>
-            <servlet-name>SAMLSOAPReceiver</servlet-name>
             <description>SAMLSOAPReceiver</description>
+            <servlet-name>SAMLSOAPReceiver</servlet-name>
             <servlet-class>com.sun.identity.saml.servlet.SAMLSOAPReceiver</servlet-class>
         </servlet>
         <servlet>
-            <servlet-name>AssertionManagerServlet</servlet-name>
             <description>AssertionManagerServlet</description>
+            <servlet-name>AssertionManagerServlet</servlet-name>
             <servlet-class>com.sun.identity.saml.servlet.AssertionManagerServlet</servlet-class>
         </servlet>
         <servlet>
-            <servlet-name>FSAssertionManagerServlet</servlet-name>
             <description>FSAssertionManagerServlet</description>
+            <servlet-name>FSAssertionManagerServlet</servlet-name>
             <servlet-class>com.sun.identity.federation.services.FSAssertionManagerServlet</servlet-class>
         </servlet>
         <servlet>
-            <servlet-name>SecurityTokenManagerServlet</servlet-name>
             <description>SecurityTokenManagerServlet</description>
+            <servlet-name>SecurityTokenManagerServlet</servlet-name>
             <servlet-class>com.sun.identity.liberty.ws.security.SecurityTokenManagerServlet</servlet-class>
         </servlet>
         <servlet>
