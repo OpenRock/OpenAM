@@ -58,6 +58,7 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.interfaces.PolicyListener;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.AttributeSchema;
@@ -65,6 +66,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import java.security.AccessController;
+import java.security.Principal;
 import java.util.List;
 import javax.security.auth.Subject;
 
@@ -528,7 +530,7 @@ public class PolicyEvaluator {
     }
 
     private void padEnvParameters(SSOToken token, String resourceName,
-        String actionName, Map envParameters) throws PolicyException {
+        String actionName, Map envParameters) throws PolicyException, SSOException {
         if ((resourceName == null) || (resourceName.trim().length() == 0)) {
             resourceName = Rule.EMPTY_RESOURCE_NAME;
         }
@@ -568,6 +570,23 @@ public class PolicyEvaluator {
         envParameters.put(SUN_AM_REQUESTED_ACTIONS, actions);
         envParameters.put(SUN_AM_POLICY_CONFIG,
             policyManager.getPolicyConfig());
+        
+        // Fix for OPENAM-811
+        String userid = null; 
+        Principal principal = token.getPrincipal();
+        if (principal != null) {
+            userid = principal.getName();
+        }
+        if ((userid != null) && (userid.length() != 0)) {
+           HashSet<String> set = new HashSet<String>();
+           set.add(userid);
+           // Required by the AMIdentityMembershipCondition
+           envParameters.put(Condition.INVOCATOR_PRINCIPAL_UUID, set);
+        } else {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("PolicyEvaluator.padEnvParameters() unable to get userid from token.");
+            }
+        }
     }
 
     private boolean isAllowedE(SSOToken token, String resourceName,
