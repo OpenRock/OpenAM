@@ -300,4 +300,22 @@ public abstract class EntitlementConfiguration {
     public abstract String getRealmName(String realm);
 
     public abstract boolean doesRealmExist();
+    
+    /**
+     * For the passed in Entitlement environment, update the Map of Policy Configuration values with 
+     * those for the specified sub-realm.
+     * @param environment The Entitlement environment to update with new Policy Configuration values.
+     * @param subRealm The Sub Realm used to lookup the Policy Configuration values.
+     * @return A Map containing the existing Policy Configuration to enable it to be restored.
+     */
+    public abstract Map updatePolicyConfigForSubRealm(Map<String, Set<String>> environment, String subRealm);
+    
+    /**
+     * For the passed in Entitlement environment, replace the existing Policy Configuration with the Map of values
+     * passed in savedPolicyConfig.
+     * @param environment The Entitlement environment to update with the saved Policy Configuration values.
+     * @return A Map containing the existing Policy Configuration to enable it to be restored, may be
+     * null if the Policy Configuration for the Sub Realm could not be loaded.
+     */
+    public abstract void restoreSavedPolicyConfig(Map<String, Set<String>> environment, Map savedPolicyConfig);
 }

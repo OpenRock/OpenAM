@@ -479,10 +479,20 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                                 subject.getPrincipals(), new HashSet(),
                                 subject.getPrivateCredentials());
 
+                            // Fix for OPENAM-790
+                            // Ensure that the Entitlement environment contains the correct 
+                            // Policy Configuration for the realm being evaluated.
+                            Map savedConfig = ec.updatePolicyConfigForSubRealm(environment, rlm);
+                            
                             List<Entitlement> entitlements = evaluator.evaluate(
                                 rlm,
                                 adminSubject, subjectSubRealm, applicationName,
                                 resName, environment, recursive);
+                            
+                            if (savedConfig != null) {
+                                ec.restoreSavedPolicyConfig(environment, savedConfig);
+                            }
+                            
                             if (entitlements != null) {
                                 entitlementCombiner.add(entitlements);
                                 results = entitlementCombiner.getResults();
