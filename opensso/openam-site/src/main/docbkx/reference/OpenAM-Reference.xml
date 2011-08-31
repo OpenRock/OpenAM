@@ -72,7 +72,7 @@
   <xinclude:include href='man-ssoadm-1.xml' />
  </reference>
  
- <xinclude:include href='chap-log-formats.xml' />
+ <xinclude:include href='chap-log-messages.xml' />
  <xinclude:include href='chap-error-codes.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />
