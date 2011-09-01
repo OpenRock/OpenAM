@@ -413,8 +413,9 @@ public class LDAPFilterCondition implements Condition {
         LDAPConnection ld = null;
         try {
             LDAPSearchResults res = null;
+            int ldapVersion = 3;
             LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                authid, authpw);
+                ldapVersion, authid, authpw);
             LDAPSearchRequest searchRequest =
                 LDAPRequestParser.parseSearchRequest(baseDN, userSearchScope,
                 searchFilter, attrs, false, timeLimit,
