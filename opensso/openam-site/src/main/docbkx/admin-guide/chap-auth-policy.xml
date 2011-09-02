@@ -39,7 +39,7 @@
  
  <section xml:id="what-is-authn">
   <title>About Authentication in OpenAM</title>
-  
+  <indexterm><primary>Authentication</primary></indexterm>
   <para>Access management is about controlling access to resources. OpenAM
   plays a role similar to border control at an international airport. Instead
   of having each and every airline company deal with access to each
@@ -81,6 +81,8 @@
   license. Customers withdrawing cash from an ATM authenticate with a
   card and a PIN. </para>
   
+  <indexterm><primary>Authentication modules</primary></indexterm>
+  <indexterm><primary>Authentication chaining</primary></indexterm>
   <para>As the authentication process depends on the situation, OpenAM allows
   you to configure authentication processes and then configure how they are
   applied depending on the situation. OpenAM uses <firstterm>authentication
@@ -96,6 +98,7 @@
   
   <itemizedlist>
    <listitem>
+    <indexterm><primary>Required authentication module</primary></indexterm>
     <para>When a <firstterm>required</firstterm> module fails, the rest of
     the chain is processed, but the authentication fails.</para>
     <para>A required module might be used for login with email and password,
@@ -103,17 +106,20 @@
     yet signed up.</para>
    </listitem>
    <listitem>
+    <indexterm><primary>Optional authentication module</primary><secondary>optional module</secondary></indexterm>
     <para>When an <firstterm>optional</firstterm> module fails,
     authentication continues.</para>
     <para>An optional module might be used to permit a higher level of access
     if the user can present a X.509 certificate for example.</para>
    </listitem>
    <listitem>
+    <indexterm><primary>Requisite authentication module</primary></indexterm>
     <para>When a <firstterm>requisite</firstterm> module fails, authentication
     fails and authentication processing stops.</para>
     <para>A requisite module might be used with exclusive SSO.</para>
    </listitem>
    <listitem>
+    <indexterm><primary>Sufficient authentication module</primary></indexterm>
     <para>When a <firstterm>sufficient</firstterm> succeeds, authentication
     is successful and later modules in the chain are skipped.</para>
     <para>You could set Windows Desktop SSO as sufficient, so authenticated
@@ -123,6 +129,7 @@
    </listitem>
   </itemizedlist>
   
+  <indexterm><primary>Authentication levels</primary></indexterm>
   <para>With OpenAM, you can further set <firstterm>authentication
   levels</firstterm> per module, with higher levels being used typically
   to allow access to more restricted resources. The OpenAM APIs also let you
@@ -141,6 +148,1583 @@
   used in your organization.</para>
  </section>
  
- <!-- TODO: Include in particular configuration information for YubiKey auth. -->
-
+ <section xml:id="configure-authn-modules">
+  <title>Configuring Authentication Modules</title>
+  <!-- TODO: add ssoadm tips -->
+  <para>The OpenAM console provides two places where the OpenAM administrator
+  can configure authentication modules.</para>
+  
+  <orderedlist>
+   <listitem>
+    <para>Under Configuration &gt; Authentication, you configure available
+    modules for use throughout OpenAM. What you set up here is inherited
+    for use elsewhere.</para>
+   </listitem>
+   <listitem>
+    <para>Under Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
+    Authentication, you configure modules for your realm. What you set up
+    at this level inherits from the global configuration, but you can override
+    what is inherited. You can also add your own modules if necessary.</para>
+   </listitem>
+  </orderedlist>
+  
+  <para>Individual module configuration depends completely on what the module
+  does. Configuring the module that connects to Active Directory over LDAP to
+  authenticate a user using user name and password requires connection
+  information and details about where to search for users, whereas configuring
+  the HOTP module for one-time password authentication requires information
+  about the password length and the mail server or SMS gateway for sending the
+  password during authentication.</para>
+  
+  <tip>
+   <indexterm><primary>Authentication levels</primary></indexterm>
+   <para>One parameter shared by all modules is Authentication Level.
+   You change Authentication Level from 0 to a positive integer in order to
+   indicate those modules are seen as more secure. Then you configure
+   authorization to require a minimum authentication level required to access
+   protected resources.</para>
+  </tip>
+  
+  <section xml:id="ad-module-conf-hints">
+   <title>Hints For the Active Directory Authentication Module</title>
+   <para>OpenAM connects to Active Directory over Lightweight Directory Access
+   Protocol (LDAP). OpenAM provides separate Active Directory and LDAP
+   modules to make it easier for you to use both Active Directory and also
+   another directory service in an authentication chain.</para>
+   <indexterm><primary>Active Directory authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Primary Active Directory Server</term>
+     <term>Secondary Active Directory Server</term>
+     <listitem>
+      <para>The default port for LDAP is 389. If you are connecting to
+      Active Directory over SSL, the default port for LDAP/SSL is 636.</para>
+      <para>If you want to use SSL or TLS for security, then scroll down to
+      enable SSL/TLS Access to Active Directory Server. Make sure that OpenAM
+      can trust the Active Directory certificate when using this option.</para>
+      <para>OpenAM first attempts to contact primary servers. If no primary
+      server is available, then OpenAM attempts to contact secondaries.</para>
+      <para>When authenticating users from a directory server that is remote
+      from OpenAM, set both the primary and secondary server values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>DN to Start User Search</term>
+     <listitem>
+      <para>LDAP data is organized hierarchically, a bit like a file system
+      on Windows or UNIX. More specific DNs likely result in better performance.
+      When configuring the module for a particular part of the organization,
+      you can perhaps start searches from a specific organizational unit such as
+      <literal>OU=sales,DC=example,DC=com</literal>.</para>
+      <para>If multiple entries exist with identical search attribute values,
+      make this value specific enough to return only one entry.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Bind User DN, Bind User Password</term>
+     <listitem>
+      <para>If OpenAM stores attributes in Active Directory, for example to
+      manage account lockout, or if Active Directory requires that OpenAM
+      authenticate in order to read users' attributes, then OpenAM needs the
+      DN and password to authenticate to Active Directory.</para>
+      <para>The default is <literal>amldapuser</literal>. Make sure that
+      password is correct before you logout. If it is incorrect, you will be
+      locked out. If this should occur, you can login with the super user DN,
+      which by default is
+      <literal>uid=amAdmin,ou=People,<replaceable>OpenAM-deploy-base</replaceable></literal>,
+      where <replaceable>OpenAM-deploy-base</replaceable> you set during
+      OpenAM configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attributes, Filter, Scope</term>
+     <listitem>
+      <para>LDAP searches for user entries return entries with attribute
+      values matching the filter you provide. For example if you search under
+      <literal>CN=Users,DC=example,DC=com</literal> with a filter
+      <literal>"(MAIL=bjensen@example.com)"</literal>, then the directory
+      returns the entry that has <literal>MAIL=bjensen@example.com</literal>.
+      In this example the attribute used to search for a user is
+      <literal>mail</literal>. Multiple attribute values mean the user can
+      authenticate with any one of the values. For example, if you have
+      both <literal>uid</literal> and <literal>mail</literal>, then Barbara
+      Jensen can authenticate with either <literal>bjensen</literal> or
+      <literal>bjensen@example.com</literal>.</para>
+      <para>Should you require a more complex filter for performance, you
+      add that to the User Search Filter text box. For example, if you search
+      on <literal>mail</literal> and add User Search Filter
+      <literal>(objectClass=inetOrgPerson)</literal>, then OpenAM uses the
+      resulting search filter
+      <literal>(&amp;(mail=<replaceable>address</replaceable>)(objectClass=inetOrgPerson))</literal>,
+      where <replaceable>address</replaceable> is the mail address provided
+      by the user.</para>
+      <para>Scope OBJECT means search only the entry specified as the DN to
+      Start User Search, whereas ONELEVEL means search only the entries
+      that are directly children of that object. SUBTREE means search the
+      entry specified and every entry under it.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Creation Attributes</term>
+     <listitem>
+      <para>This list lets you map (external) attribute names from Active
+      Directory to (internal) attribute names used by OpenAM.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="anon-module-conf-hints">
+   <title>Hints For the Anonymous Authentication Module</title>
+   <para>This module lets you track and manage anonymous users, perhaps
+   forcing further authentication later when a user moves to access resources
+   that require more protection.</para>
+   <indexterm><primary>Anonymous authentication</primary></indexterm>
+   <para>When you need additional ID besides that of the default,
+   <literal>anonymous</literal>, add them to the Valid Anonymous Users
+   list.</para>
+  </section>
+  
+  <section xml:id="cert-module-conf-hints">
+   <title>Hints For the Certificate Authentication Module</title>
+   <para>X.509 digital certificates can enable secure authentication without
+   the need for user names and passwords or other credentials. Certificate
+   authentication can be handy to manage authentication by applications.
+   If all certificates are signed by a recognized Certficate Authority (CA),
+   then you might get away without additional configuration. If you need to
+   look up public keys of OpenAM clients, this module can also look up public
+   keys in an LDAP directory server.</para>
+   <para>When you store certificates and certificate revocation lists (CRL)
+   in an LDAP directory service, you must configure both how to access the
+   directory service and also how to look up the certificates and CRLs,
+   based on the fields in the certificates that OpenAM clients present to
+   authenticate.</para>
+   <para>Access to the LDAP server and how to search for users is similar
+   to LDAP module configuration as in <xref linkend="ldap-module-conf-hints" />.
+   The primary difference is that, unlike for LDAP configuration, OpenAM
+   retrieves the user identifier from a field in the certificate that the
+   client application presents, then uses that identifier to search for the
+   LDAP directory entry that holds the certificate, which should match the
+   certificate presented. For example, if the Subject field of a typical
+   certificate has a DN <literal>C=FR, O=Example Corp, CN=Barbara
+   Jensen</literal>, and Barbara Jensen's entry in the directory has
+   <literal>cn=Barbara Jensen</literal>, then you can use <literal>CN=Barbara
+   Jensen</literal> from the Subject DN to search for the entry with
+   <literal>cn=Barbara Jensen</literal> in the directory.</para>
+   <indexterm><primary>Certificate-based authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Match Certificate in LDAP</term>
+     <listitem>
+      <para>When enabled, OpenAM searches for a match for the user's
+      certificate in the LDAP directory. If a match is found and not revoked
+      according to a CRL or OCSP validation, then authentication succeeds.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Subject DN Attribute Used to Search LDAP for Certificates</term>
+     <listitem>
+      <para>Indicates which attribute and value in the certificate Subject DN
+      is used to find the LDAP entry holding the certificate.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Match Certificate to CRL</term>
+     <listitem>
+      <para>When enabled, OpenAM checks whether the certificate has been
+      revoked according to a CRL in the LDAP directory.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Issuer DN Attribute Used to Search LDAP for CRLs</term>
+     <listitem>
+      <para>Indicates which attribute and value in the certificate Issuer DN
+      is used to find the CRL in the LDAP directory.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>HTTP Parameters for CRL Update</term>
+     <listitem>
+      <para>Your certificate authority should provide the URL to use here,
+      from which OpenAM can get CRL updates.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Match CA Certificate to CRL</term>
+     <listitem>
+      <para>When enabled, OpenAM checks the CRL against the CA certificate to
+      ensure it has not been compromised.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>OCSP Validation</term>
+     <listitem>
+      <para>Enable this to use Online Certificate Status Protocol (OCSP)
+      instead of CRLs to check certificates' revocation status.</para>
+      <para>If you enable this, you also must configure OSCP for OpenAM
+      under Configuration &gt; Server and Sites &gt; Default Server Settings,
+      or Configuration &gt; Server and Sites &gt; <replaceable>Server
+      Name</replaceable> &gt; Security.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Server Where Certificates are Stored</term>
+     <listitem>
+      <para>The default port for LDAP is 389. If you are connecting to the
+      directory service over SSL, the default port for LDAP/SSL is 636.
+      When a secure connection, scroll down to enable Use SSL/TLS for LDAP
+      Access.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Search Start DN</term>
+     <listitem>
+      <para>Valid base DN for the LDAP search, such as
+      <literal>dc=example,dc=com</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Server Principal User, LDAP Server Principal Password</term>
+     <listitem>
+      <para>If OpenAM stores attributes in the LDAP directory, for example to
+      manage account lockout, or if the LDAP directory requires that OpenAM
+      authenticate in order to read users' attributes, then OpenAM needs the
+      DN and password to authenticate to the LDAP directory.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Certificate Field Used to Access User Profile</term>
+     <listitem>
+      <para>If the user profile is in a different entry from the user
+      certificate, then this can be different from subject DN attribute
+      used to find the entry with the certificate. When you select other,
+      provide an attribute name in the Other Certificate Field Used to Access
+      User Profile text box.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SubjectAltNameExt Value Type to Access User Profile</term>
+     <listitem>
+      <para>Use this if you want to look up the user profile from an RFC 822
+      style name, or a User Principal Name as used in Active Directory.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Trusted Remote Hosts</term>
+     <listitem>
+      <para>Hosts trusted to send certificates to OpenAM, such as load balancers
+      doing SSL termination, or OpenAM distributed authentication UI
+      instances.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>HTTP Header Name for Client Certificate</term>
+     <listitem>
+      <para>If you configure trusted hosts, specify the HTTP header name for
+      the client certificate inserted by the trusted host.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="core-module-conf-hints">
+   <title>Hints For the Core Authentication Module</title>
+   <para>The Core module is a sort of meta-module.</para>
+   <para>The Core module lets you set up the list of modules available,
+   and specify what types of client applications can authenticate with which
+   modules. It also lets you configure connection pools for access to
+   directory servers, and whether to retain objects used during authentication
+   for use during logout. Furthermore, the Core module lets you set defaults
+   used when configuring authentication in a particular realm.</para>
+   <indexterm><primary>Authentication modules global configuration</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Pluggable Authentication Module Classes</term>
+     <listitem>
+      <para>Add class names for custom authentication modules to this list.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Supported Authentication Modules for Clients</term>
+     <listitem>
+      <para>This list serves to limit what types of authentication modules
+      can be used with specify types of client applications. The client type
+      is an arbitary string, such as the default <literal>genericHTML</literal>,
+      which is set by OpenAM when the Client Detection Service is enabled.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
+     <listitem>
+      <para>Sets a minimum and maximum number of LDAP connections in the pool
+      for connecting to a directory server. When tuning for production, start
+      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
+      for specific servers override the default.</para>
+      <para>This attribute is for LDAP and Membership authentication services
+      only.</para>
+      <para>This connection pool is different than the SDK connection pool
+      configured in <filename>serverconfig.xml</filename>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Remote Auth Security</term>
+     <listitem>
+      <para>Require the authenticating application to send its SSOToken. This
+      allows the Authentication Service to obtain the username and password
+      associated with the application.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Keep Post Process Objects for Logout Processing, Keep Authentication
+     Module Objects for Logout Processing</term>
+     <listitem>
+      <para>When enabled, retain objects used to process authentication or
+      post authentication operations in the user session until the user
+      logs out.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Profile</term>
+     <listitem>
+      <para>Whether a user profile needs to exist in the user data store,
+      or should be created on successful authentication.</para>
+      <variablelist>
+       <varlistentry>
+        <term>Dynamic</term>
+        <listitem>
+         <para>Specifies that on successful authentication the Authentication
+         Service creates a user profile if one does not already exist.
+         OpenAM then issues the SSOToken. OpenAM creates the user profile 
+         in the user data store configured for the realm.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>Dynamic with User Alias</term>
+        <listitem>
+         <para>Specifies that on successful authentication the Authentication
+         Service creates a user profile that contains the User Alias List
+         attribute which defines one or more aliases that for mapping a
+         user's multiple profiles.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>Ignored</term>
+        <listitem>
+         <para>Specifies that a user profile is not required for the
+         Authentication Service to issue an SSOToken after a successful
+         authentication.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>Required</term>
+        <listitem>
+         <para>Specifies that on successful authentication the user must have
+         a user profile in the user data store configured for the realm in
+         order for the Authentication Service to issue an SSOToken.</para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Administrator Authentication Configuration</term>
+     <listitem>
+      <para>Defines the authentication chain used by administrators when the
+      process needs to be different from the authentication chain defined
+      for end users. The authentication chain must first be created before
+      it is displayed as an option in this attribute's drop down list.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Profile Dynamic Creation Default Roles</term>
+     <listitem>
+      <para>Specifies the Distinguished Name (DN) of a role to be assigned to
+      a new user whose profile is created when either of the Dynamic options
+      is selected under the User Profile attribute. There are no default
+      values. The role specified must be within the realm for which the
+      authentication process is configured.</para>
+      <para>This role can be either an OpenAM or Sun DSEE role, but it cannot
+      be a filtered role. If you wish to automatically assign specific services
+      to the user, you have to configure the Required Services attribute in
+      the User Profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Persistent Cookie Mode</term>
+     <listitem>
+      <para>Determines whether users can return to their authenticated session
+      after restarting the browser. When enabled, a user session does not
+      expire until its persistent cookie expires (as specified by the value of
+      the Persistent Cookie Maximum Time attribute), or the user explicitly
+      logs out. By default, the Authentication Service uses only memory cookies
+      (expires when the browser is closed).</para>
+      <para>The client must explicitly request a persistent cookie by adding
+      <literal>iPSPCookie=yes</literal> as a parameter to the login URL.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Persistent Cookie Maximum Time</term>
+     <listitem>
+      <para>Specifies the interval after which a persistent cookie expires.
+      The interval begins when the user's session is successfully authenticated.
+      The maximum value is 2147483647 (in seconds, so a bit more than 68 years).
+      The field accepts any integer value less than the maximum.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Alias Search Attribute Name</term>
+     <listitem>
+      <para>After a user is successfully authenticated, the user's profile is
+      retrieved. This field specifies a second LDAP attribute to use in a
+      search for the profile if a search using the first LDAP attribute fails
+      to locate a matching user profile. Primarily, this attribute is used
+      when the user identification returned from an authentication module
+      is not the same as that specified in User Naming Attribute. For example,
+      a RADIUS server might return abc1234 but the user name is abc. There is
+      no default value for this attribute. The field takes any valid
+      LDAP attribute.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default Authentication Locale</term>
+     <listitem>
+      <para>Specifies the default language subtype to be used by the
+      Authentication Service. The default value is
+      <literal>en_US</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Organization Authentication Configuration</term>
+     <listitem>
+      <para>Defines the default authentication chain used by the realm's users.
+      The authentication chain must first be created before it is displayed as
+      an option in this attribute's drop down list.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Login Failure Lockout Mode</term>
+     <listitem>
+      <para>Selecting this attribute enables a physical lockout. Physical
+      lockout will inactivate an LDAP attribute (defined in the Lockout
+      Attribute Name property) in the user's profile. This attribute works in
+      conjunction with several other lockout and notification attributes.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Login Failure Lockout Count</term>
+     <listitem>
+      <para>Defines the number of attempts that a user has to authenticate,
+      within the time interval defined in Login Failure Lockout Interval,
+      before being locked out.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Login Failure Lockout Interval</term>
+     <listitem>
+      <para>Defines the time in minutes during which failed login attempts are
+      counted. If one failed login attempt is followed by a second failed
+      attempt, within this defined lockout interval time, the lockout count
+      starts, and the user is locked out if the number of attempts reaches
+      the number defined in Login Failure Lockout Count. If an attempt within
+      the defined lockout interval time proves successful before the number of
+      attempts reaches the number defined in Login Failure Lockout Count, the
+      lockout count is reset.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Email Address to Send Lockout Notification</term>
+     <listitem>
+      <para>Specify one (or more) email address(es) to which notification is
+      sent if a user lockout occurs.</para>
+      <para>Separate multiple addresses with spaces, and append
+      <literal>|<replaceable>locale</replaceable>|<replaceable>charset</replaceable></literal>
+      to addresses for recipients in non-English locales.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Warn User After N Failures</term>
+     <listitem>
+      <para>The number of authentication failures after which OpenAM displays
+      a warning message that the user will be locked out.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Login Failure Lockout Duration</term>
+     <listitem>
+      <para>Defines how many minutes a user must wait after a lockout before
+      attempting to authenticate again. Entering a value greater than 0 enables
+      memory lockout and disables physical lockout. Memory lockout means
+      the user's account is locked in memory for the number of minutes
+      specified. The account is unlocked after the time period has passed.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Lockout Duration Multiplier</term>
+     <listitem>
+      <para>Defines a value with which to multiply the value of the Login
+      Failure Lockout Duration attribute for each successive lockout. For
+      example, if Login Failure Lockout Duration is set to 3 minutes, and the
+      Lockout Duration Multiplier is set to 2, the user is locked out of the
+      account for 6 minutes. Once the 6 minutes has elapsed, if the user again
+      provides the wrong credentials, the lockout duration is then 12 minutes.
+      With the Lockout Duration Multiplier, the lockout duration is
+      incrementally increased based on the number of times the user has been
+      locked out.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Lockout Attribute Name</term>
+     <listitem>
+      <para>Defines the LDAP attribute used for physical lockout. The default
+      value is <literal>inetuserstatus</literal>, although the field in the
+      OpenAM console is empty. The Lockout Attribute Value field must also
+      contain an appropriate value.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Lockout Attribute Value</term>
+     <listitem>
+      <para>Specifies the action to take on the attribute defined in Lockout
+      Attribute Name. The default value is <literal>inactive</literal>,
+      although the field in the OpenAM console is empty. The Lockout Attribute
+      Name field must also contain an appropriate value.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invalid Attempts Data Attribute Name</term>
+     <listitem>
+      <para>Specifies the LDAP attribute used to hold the number of failed
+      authentication attempts towards Login Failure Lockout Count.</para>
+      <!-- sunAMAuthInvalidAttemptsDataAttrName -->
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default Success Login URL</term>
+     <listitem>
+      <para>Accepts a list of values that specifies where users are directed
+      after successful authentication. The format of this attribute is
+      <literal><replaceable>client-type</replaceable>|<replaceable>URL</replaceable></literal>
+      although the only value you can specify at this time is a URL
+      which assumes the type HTML. The default value is
+      <literal>/openam/console</literal>. Values that do not specify HTTP have
+      that appended to the deployment URI.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default Failure Login URL</term>
+     <listitem>
+      <para>Accepts a list of values that specifies where users are directed
+      after authentication has failed. The format of this attribute is
+      <literal><replaceable>client-type</replaceable>|<replaceable>URL</replaceable></literal>
+      although the only value you can specify at this time is a URL
+      which assumes the type HTML. The default value is
+      <literal>/openam/console</literal>. Values that do not specify HTTP have
+      that appended to the deployment URI.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Post Processing Classes</term>
+     <listitem>
+      <para>Specifies one or more Java classes used to customize post
+      authentication processes for successful or unsuccessful logins.
+      The Java class must implement the
+      <literal>com.sun.identity.authentication.spi.AMPostAuthProcessInterface</literal>
+      OpenAM interface.</para>
+      <para>The class or .jar containing the post processing class belongs in
+      the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
+      instance, and so you should add it to a custom OpenAM .war file that you
+      deploy.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Generate UserID Mode</term>
+     <listitem>
+      <para>When enabled, the Membership module generates a list of alternate
+      user identifiers if the one entered by a user during the
+      self-registration process is not valid or already exists. The user
+      identifiers are generated by the class specified in the Pluggable User
+      Name Generator Class property.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Pluggable User Name Generator Class</term>
+     <listitem>
+      <para>Specifies the name of the class used to generate alternate user
+      identifiers when Generate UserID Mode is enabled. The default value is
+      <literal>com.sun.identity.authentication.spi.DefaultUserIDGenerator</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Identity Types</term>
+     <listitem>
+      <para>Lists the type or types of identities for which OpenAM searches.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Pluggable User Status Event Classes</term>
+     <listitem>
+      <para>Specifies one or more Java classes used to provide a callback
+      mechanism for user status changes during the authentication process.
+      The Java class must implement the
+      <literal>com.sun.identity.authentication.spi.AMAuthCallBack</literal>
+      OpenAM interface. OpenAM supports account lockout and password changes.
+      OpenAM supports password changes through the LDAP authentication module,
+      and so the feature is only available for the LDAP module.</para>
+      <para>The class or .jar containing the status event class belongs in
+      the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
+      instance, and so you should add it to a custom OpenAM .war file that you
+      deploy.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Store Invalid Attempts in Data Store</term>
+     <listitem>
+      <para>Enables the storage of information regarding failed authentication
+      attempts as the value of the Invalid Attempts Data Attribute Name in
+      the user data store. In order to store data in this attribute, the
+      OpenAM schema has to be loaded. Information stored includes number of
+      invalid attempts, time of last failed attempt, lockout time and lockout
+      duration. Storing this information in the identity repository allows it
+      to be shared among multiple instances of OpenAM.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Module Based Authentication</term>
+     <listitem>
+      <para>Enables users to authenticate using module-based authentication.
+      Otherwise, all attempts at authentication using the
+      <literal>module=<replaceable>module-name</replaceable></literal> login
+      parameter result in failure.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Attribute Mapping to Session Attribute</term>
+     <listitem>
+      <para>Enables the authenticating user's identity attributes (stored in
+      the identity repository) to be set as session properties in the user's
+      AMToken. The value takes the format
+      <literal><replaceable>User-Profile-Attribute</replaceable>|<replaceable>Session-Attribute-Name</replaceable></literal>.
+      If <replaceable>Session-Attribute-Name</replaceable> is not specified,
+      the value of <replaceable>User-Profile-Attribute</replaceable> is used.
+      All session attributes contain the <literal>am.protected</literal> prefix
+      to ensure that they cannot be edited by the Client SDK.</para>
+      <para>For example, if you define the user profile attribute as mail and
+      the user's email address (available in the user session) as
+      <literal>user.mail</literal>, the entry for this attribute would be
+      <literal>mail|user.mail</literal>. After a successful authentication,
+      the <literal>AMToken.getProperty(String)</literal> method is used to
+      retrieve the user profile attribute set in the session. The user's email
+      address is retrieved from the user's session using the
+      <literal>AMToken.getProperty("am.protected.user.mail")</literal> method
+      call.</para>
+      <para>Properties that are set in the user session using User Attribute
+      Mapping to Session Attributes can not be modified (for example,
+      <literal>AMToken.setProperty(String, String)</literal>). This results in
+      an <literal>AMException</literal>. Multi-value attributes, such as
+      <literal>memberOf</literal>, are listed as a single session variable
+      with a <literal>|</literal> separator.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Valid goto URL domains</term>
+     <listitem>
+      <para>List external domains to which clients can be redirected after
+      authentication.</para>
+      <!-- iplanet-am-auth-valid-goto-domains -->
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default Authentication Level</term>
+     <listitem>
+      <para>The level set here applies when no authentication level has been
+      specified in the Authentication Level field for a realm.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="datastore-module-conf-hints">
+   <title>Hints For the Data Store Authentication Module</title>
+   <para>The Data Store authentication module allows a login using the Identity
+   Repository of the realm to authenticate users. Using the Data Store module
+   removes the requirement to write an authentication plug-in module, load,
+   and then configure the authentication module if you need to authenticate
+   against the same data store repository. Additionally, you do not need to
+   write a custom authentication module where flat-file authentication is
+   needed for the corresponding repository in that realm.</para>
+   <indexterm><primary>Data Store authentication</primary></indexterm>
+   <tip>
+    <para><command>ssoadm</command> attribute tip:</para>
+    <variablelist>
+     <varlistentry>
+      <term>Service Name</term>
+      <listitem><para><literal>sunAMAuthDataStoreService</literal></para></listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Attribute Name</term>
+      <listitem><para><literal>amAuthDataStore</literal></para></listitem>
+     </varlistentry>
+    </variablelist>
+   </tip>
+  </section>
+  
+  <section xml:id="federation-module-conf-hints">
+   <title>Hints For the Federation Authentication Module</title>
+   <para>The Federation authentication module is used by a service provider
+   to create a user session after validating single sign-on protocol messages.
+   This authentication module is used by the SAML, SAMLv2, ID-FF, and
+   WS-Federation protocols.</para>
+   <indexterm><primary>Federated authentication</primary></indexterm>
+  </section>
+  
+  <section xml:id="hotp-module-conf-hints">
+   <title>Hints For the HOTP Authentication Module</title>
+   <para>The HMAC One-Time Password authentication module works together with
+   the Data Store module to retrieve a user's mail address or telephone number
+   to send a one-time password to complete authentication.</para>
+   <para>To use HOTP you set up an authentication chain with the Data Store
+   module as the <literal>requisite</literal> first module, and the HOTP module
+   as the second <literal>requisite</literal> module. When authentication
+   succeeds against the Data Store module, OpenAM passes the Email Address
+   and Telephone Number attributes from the user profile to the HOTP module.
+   For the HOTP module to use either attribute, the Email Address must contain
+   a valid email address, or the Telephone Number must contain a valid
+   SMS telephone number such as <literal>18285551212@txt.att.net</literal>.</para>
+   <indexterm><primary>HMAC One-Time Password (HOTP) authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>SMS Gateway Implementation Class</term>
+     <listitem>
+      <para>Change this if you must customize the SMS gateway implementation.
+      The default class sends an SMS or email, depending on the configuration.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP Host Name</term>
+     <listitem>
+      <para>Host name of the mail server supporting Simple Message Transfer
+      Protocol for electronic mail.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP Host Port</term>
+     <listitem>
+      <para>The default SMTP port is 25, 465 (when connecting over SSL).</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP User Name</term>
+     <listitem>
+      <para>User name for OpenAM to connect to the mail server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP User Password</term>
+     <listitem>
+      <para>Password for OpenAM to connect to the mail server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP Connection</term>
+     <listitem>
+      <para>If OpenAM connects to the mail server securely, OpenAM must be able
+      to trust the server certificate.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP From Address</term>
+     <listitem>
+      <para>The <literal>From:</literal> address when sending a one-time
+      password by mail.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>One Time Password Validity Length (in minutes)</term>
+     <listitem>
+      <para>One-time passwords are valid for 5 minutes after they are generated
+      by default.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>One Time Password Length (in digits)</term>
+     <listitem>
+      <para>Set the length of the one-time password to 6 or 8 digits.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>One Time Password Delivery</term>
+     <listitem>
+      <para>Send the one-time password by SMS, by mail, or both.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="http-module-conf-hints">
+   <title>Hints For the HTTP Basic Authentication Module</title>
+   <para>HTTP basic authentication takes a user name and password from HTTP
+   authentication and tries authentication against the backend module in OpenAM,
+   depending on what you configure as the Backend Module Name.</para>
+   <indexterm><primary>HTTP authentication</primary></indexterm>
+  </section>
+  
+  <section xml:id="jdbc-module-conf-hints">
+   <title>Hints For the JDBC Authentication Module</title>
+   <para>The Java Database Connectivity (JDBC) module lets OpenAM connect to
+   a database such as MySQL or Oracle DB to authenticate users.</para>
+   <indexterm><primary>JDBC authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Connection Type</term>
+     <listitem>
+      <para>Choose Connection pool is retrieved via JNDI to connect using the
+      Java Naming and Diretory Interface connection pool supported by the web
+      container in which OpenAM runs. Choose Non-persistent JDBC connection to
+      connect directly through the JDBC driver.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Connection Pool JNDI Name</term>
+     <listitem>
+      <para>When using Connection pool is retrieved via JNDI, this specifies
+      the pool. How you configure connection pooling depends on the web
+      container where you run OpenAM. Refer to the documentation for your
+      web container for instructions on setting up connection pooling.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>JDBC Driver</term>
+     <listitem>
+      <para>When using Non-persistent JDBC connection, this specifies the JDBC
+      driver provided by the database.</para>
+      <para>The .jar containing the JDBC driver belongs in the
+      <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
+      instance, and so you should add it to a custom OpenAM .war file that you
+      deploy.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>JDBC URL</term>
+     <listitem>
+      <para>When using Non-persistent JDBC connection, this specifies the URL
+      to connect to the database.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Connect This User to Database</term>
+     <listitem>
+      <para>Specify the user name to open the database connection.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Password for Connecting to Database</term>
+     <listitem>
+      <para>Specify the password for the user opening the database connection.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Password Column String</term>
+     <listitem>
+      <para>Specify the database column name where passwords are stored.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Prepared Statement</term>
+     <listitem>
+      <para>Specify the SQL query to return the password corresponding to the
+      user to authenticate.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Class to Transform Password Syntax</term>
+     <listitem>
+      <para>Specify the class that transforms the password retrieved to the
+      same format as provided by the user.</para>
+      <para>The default class expects the password in clear text. Custom
+      classes must implement the
+      <literal>JDBCPasswordSyntaxTransform</literal> interface.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="ldap-module-conf-hints">
+   <title>Hints For the LDAP Authentication Module</title>
+   <para>OpenAM connects to directory servers using Lightweight Directory
+   Access Protocol (LDAP). To build an easy-to-manage, high performance, pure
+   Java, open source directory service, try
+   <link xlink:href="http://opendj.org">OpenDJ</link> directory services.</para>
+   <indexterm><primary>LDAP authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Primary LDAP Server</term>
+     <term>Secondary LDAP Server</term>
+     <listitem>
+      <para>Directory servers generally use built-in data replication for high
+      availability. Thus a directory service likely consists of a pool of
+      replicas to which OpenAM can connect to retrieve and update directory
+      data. You set up primary and secondary servers in case a replica is down
+      due to maintenance or to a problem with a particular server.</para>
+      <para>OpenAM first attempts to contact primary servers. If no primary
+      server is available, then OpenAM attempts to contact secondaries. If
+      all directory replica share the same data, you could choose for example
+      to configure directory replica in the same data center as primaries, and
+      to configure directory replica in another data center as secondaries.</para>
+      <para>When authenticating users from a directory service that is remote
+      from OpenAM, set both the primary and secondary server values.</para>
+      <para>The default port for LDAP is 389. If you are connecting to
+      the directory over SSL, the default port for LDAP/SSL is 636.</para>
+      <para>If you want to use SSL or TLS for security, then scroll down to
+      enable SSL/TLS Access to LDAP Server. Make sure that OpenAM
+      can trust the servers' certificates when using this option.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>DN to Start User Search</term>
+     <listitem>
+      <para>LDAP data is organized hierarchically, a bit like a file system
+      on Windows or UNIX. More specific DNs likely result in better search
+      performance. When configuring the module for a particular part of the
+      organization, you can perhaps start searches from a specific
+      organizational unit such as
+      <literal>ou=sales,dc=example,dc=com</literal>.</para>
+      <para>If multiple entries exist with identical search attribute values,
+      make this value specific enough to return only one entry.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Bind User DN, Bind User Password</term>
+     <listitem>
+      <para>If OpenAM stores attributes in the directory, for example to
+      manage account lockout, or if the directory requires that OpenAM
+      authenticate in order to read users' attributes, then OpenAM needs the
+      DN and password to authenticate to the directory.</para>
+      <para>The default is <literal>cn=Directory Manager</literal>. Make sure
+      that password is correct before you logout. If it is incorrect, you will
+      be locked out. If this should occur, you can login with the super user DN,
+      which by default is
+      <literal>uid=amAdmin,ou=People,<replaceable>OpenAM-deploy-base</replaceable></literal>,
+      where <replaceable>OpenAM-deploy-base</replaceable> you set during
+      OpenAM configuration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attributes, Filter, Scope</term>
+     <listitem>
+      <para>LDAP searches for user entries return entries with attribute
+      values matching the filter you provide. For example if you search under
+      <literal>ou=people,dc=example,dc=com</literal> with a filter
+      <literal>"(mail=bjensen@example.com)"</literal>, then the directory
+      returns the entry that has <literal>mail=bjensen@example.com</literal>.
+      In this example the attribute used to search for a user is
+      <literal>mail</literal>. Multiple attribute values mean the user can
+      authenticate with any one of the values. For example, if you have
+      both <literal>uid</literal> and <literal>mail</literal>, then Barbara
+      Jensen can authenticate with either <literal>bjensen</literal> or
+      <literal>bjensen@example.com</literal>.</para>
+      <para>Should you require a more complex filter for performance, you
+      add that to the User Search Filter text box. For example, if you search
+      on <literal>mail</literal> and add User Search Filter
+      <literal>(objectClass=inetOrgPerson)</literal>, then OpenAM uses the
+      resulting search filter
+      <literal>(&amp;(mail=<replaceable>address</replaceable>)(objectClass=inetOrgPerson))</literal>,
+      where <replaceable>address</replaceable> is the mail address provided
+      by the user.</para>
+      <para>Scope OBJECT means search only the entry specified as the DN to
+      Start User Search, whereas ONELEVEL means search only the entries
+      that are directly children of that object. SUBTREE means search the
+      entry specified and every entry under it.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Creation Attributes</term>
+     <listitem>
+      <para>This list lets you map (external) attribute names from Active
+      Directory to (internal) attribute names used by OpenAM.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Minimum Password Length</term>
+     <listitem>
+      <para>Specify the minimum acceptable password length.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="membership-module-conf-hints">
+   <title>Hints For the Membership Authentication Module</title>
+   <para>The Membership module permits self-registration for new users. You
+   can then have OpenAM create new user profiles in the identity
+   repository.</para>
+   <indexterm><primary>Membership (&amp; self-registration) authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Minimum Password Length</term>
+     <listitem>
+      <para>Specify the minimum acceptable number of characters in the password
+      provided during self-registration.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default User Roles</term>
+     <listitem>
+      <para>Specifies the Distinguished Name (DN) of a role to be assigned to
+      a new user whose profile is created. There are no default values. The
+      role specified must be within the realm for which the authentication
+      process is configured.</para>
+      <para>This role can be either an OpenAM or Sun DSEE role, but it cannot
+      be a filtered role. If you wish to automatically assign specific services
+      to the user, you have to configure the Required Services attribute in
+      the User Profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Status After Registration</term>
+     <listitem>
+      <para>If you choose Inactive, then the new user has no access to services
+      until an administrator activates the account.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="msisdn-module-conf-hints">
+   <title>Hints For the MSISDN Authentication Module</title>
+   <para>The Mobile Station Integrated Services Digital Network (MSISDN)
+   authentication module enables non-interactive authentication using a mobile
+   subscriber ISDN associated with a terminal such as a mobile phone.
+   The module checks the subscriber ISDN against the value found on a user's
+   entry in an LDAP directory service.</para>
+   <indexterm><primary>MSISDN authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Trusted Gateway IP Address</term>
+     <listitem>
+      <para>Specifies a list of IP addresses of trusted clients that can access
+      MSIDSN modules. You can set the IP addresses of all clients allows to
+      access the MSISDN module by adding each address such as 10.0.0.2.
+      If you leave the list empty, then all clients are allowed.
+      If you specify the value <literal>none</literal>, no clients are
+      allowed.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>MSISDN Number Argument</term>
+     <listitem>
+      <para>Specifies a list of parameter names that identify which parameters
+      to search in the request header or cookie header for the MSISDN number.
+      For example, if you define x-Cookie-Param, AM_NUMBER, and COOKIE-ID,
+      the MSISDN authentication service checks those parameters for the
+      MSISDN number.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Server and Port</term>
+     <listitem>
+      <para>The default port for LDAP is 389. If you are connecting to
+      the directory over SSL, the default port for LDAP/SSL is 636.</para>
+      <para>If you want to use SSL or TLS for security, then scroll down to
+      enable SSL/TLS Access to LDAP. Make sure that OpenAM can trust the
+      servers' certificates when using this option.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Start Search DN</term>
+     <listitem>
+      <para>Specify the DN of the entry where the search for the user's MSISDN
+      number should start.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute To Use To Search LDAP</term>
+     <listitem>
+      <para>Specify the name of the attribute in the user's profile that
+      contains the MSISDN number to search for the user. The default is
+      <literal>sunIdentityMSISDNNumber</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Server Principal User</term>
+     <listitem>
+      <para>If OpenAM must authenticate to the directory server in order to
+      search, then specify the bind DN. The default is
+      <literal>cn=amldapuser,ou=DSAME Users,dc=example,dc=com</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Server Principal Password</term>
+     <listitem>
+      <para>Specify the password corresponding to the bind DN.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SSL/TLS for LDAP Access</term>
+     <listitem>
+      <para>If you choose to use SSL or TLS for security, then make sure that
+      OpenAM can trust the servers' certificates.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>MSISDN Header Search Attribute</term>
+     <listitem>
+      <para>Specify the headers to use for searching the request for the
+      MSISDN number.</para>
+      <itemizedlist>
+       <listitem>
+        <para>Cookie Header tells OpenAM to search the cookie.</para>
+       </listitem>
+       <listitem>
+        <para>Request Header tells OpenAM to search the request header.</para>
+       </listitem>
+       <listitem>
+        <para>Request Parameter tells OpenAM to search the request parameters.</para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Attribute Used to Retrieve User Profile</term>
+     <listitem>
+      <para>Specify the LDAP attribute that is used during a search to return
+      the user profile for MSISDN authentication service. The default is
+      <literal>uid</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Return User DN to DataStore</term>
+     <listitem>
+      <para>Enable this option only when the OpenAM directory is the same as
+      the directory configured for MSISDN searches. When enabled, this option
+      allows the authentication module to return the DN instead of the User ID.
+      OpenAM thus does not need to perform an additional search with the user
+      ID to find the user's entry.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="radius-module-conf-hints">
+   <title>Hints For the RADIUS Authentication Module</title>
+   <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
+   OpenAM authenticate users against RADIUS servers.</para>
+   <indexterm><primary>RADIUS authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Server 1</term>
+     <listitem>
+      <para>Specify the IP address or fully qualified domain name of the
+      primary RADIUS server. The default is <literal>127.0.0.1</literal>
+      (localhost loopback).</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server 2</term>
+     <listitem>
+      <para>Specify the IP address or fully qualified domain name of the
+      secondary RADIUS server. The default is <literal>127.0.0.1</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Shared Secret</term>
+     <listitem>
+      <para>Specify the shared secret for RADIUS authentication. The shared
+      secret should be as secure as a well-chosen password.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Port Number</term>
+     <listitem>
+      <para>Specify the RADIUS server port. Default is 1645.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Timeout</term>
+     <listitem>
+      <para>Specify how many seconds to wait for the RADIUS server to respond.
+      The default value is 3 seconds.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="sae-module-conf-hints">
+   <title>Hints For the SAE Authentication Module</title>
+   <para>The Secure Attribute Exchange (SAE) module lets OpenAM authenticate
+   a user who has already authenticated with an entity that can vouch for
+   the user to OpenAM, so that OpenAM creates a session for the user.
+   This module is useful in virtual federation, where an existing entity
+   instructs the local OpenAM instance to use federation protocols to transfer
+   authentication and attribute information to a partner application.</para>
+   <indexterm><primary>Secure Attribute Exchange (SAE) authentication</primary></indexterm>
+  </section>
+  
+  <section xml:id="securid-module-conf-hints">
+   <title>Hints For the SecurID Authentication Module</title>
+   <para>The SecurID module lets OpenAM authenticate users with RSA
+   Authentication Manager software and RSA SecurID authenticators.</para>
+   <indexterm><primary>SecurID authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>ACE/Server Configuration Path</term>
+     <listitem>
+      <para>Specify the directory in which the SecurID ACE/Server
+      <filename>sdconf.rec</filename> file is located, which by default is
+      expected under the configuration directory for OpenAM, such as
+      <filename>$HOME/openam/openam/auth/ace/data</filename>. The directory
+      must exist before OpenAM can use SecurID authentication.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="desktop-module-conf-hints">
+   <title>Hints For the Windows Desktop SSO Authentication Module</title>
+   <para>The Windows Desktop SSO module uses Kerberos authentication. The user
+   presents a Kerberos token to OpenAM through the Simple and Protected
+   GSS-API Negotiation Mechanism (SPNEGO) protocol. The Windows Desktop SSO
+   authentication module enables desktop single sign on such that a user who
+   has already authenticated with a Kerberos Key Distribution Center can
+   authenticate to OpenAM without having to provide the login information
+   again. Users might need to set up Integrated Windows Authentication in
+   Internet Explorer to benefit from single sign on when logged on to
+   a Windows desktop.</para>
+   <indexterm><primary>Kerberos authentication</primary></indexterm>
+   <indexterm><primary>Windows Desktop SSO authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Service Principal</term>
+     <listitem>
+      <para>Specify the Kerberos principal for authentication in the following
+      format.</para>
+      <literallayout>HTTP/<replaceable>host</replaceable>.<replaceable>domain</replaceable>@<replaceable>dc-domain-name</replaceable></literallayout>
+      <para>Here, <replaceable>host</replaceable> and
+      <replaceable>domain</replaceable> correspond to the host and domain names
+      of the OpenAM instance, and <replaceable>dc-domain-name</replaceable>
+      is the domain name of the Windows Kerberos domain controller server.
+      The <replaceable>dc-domain-name</replaceable> can differ from the domain
+      name for OpenAM.</para>
+      <para>You set up the account on the Windows domain controller, creating
+      a computer account for OpenAM and associating the new account with a
+      service provider name.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Keytab File Name</term>
+     <listitem>
+      <para>Specify the full path of the keytab file for the Service Principal.
+      You generate the keytab file using the Windows <command>ktpass</command>
+      utility.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Kerberos Realm</term>
+     <listitem>
+      <para>Specify the Kerberos Key Distribution Center realm. For the
+      Windows Kerberos service this is the domain controller server domain
+      name.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Kerberos Server Name</term>
+     <listitem>
+      <para>Specify the fully qualified domain name of the Kerberos Key
+      Distribution Center server, such as that of the domain controller
+      server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Return Principal with Domain Name</term>
+     <listitem>
+      <para>When enabled, OpenAM automatically returns the Kerberos principal
+      with the domain controller's domain name during authentication.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="winnt-module-conf-hints">
+   <title>Hints For the Windows NT Authentication Module</title>
+   <para>The Windows NT module lets OpenAM authenticate against a Microsoft
+   Windows NT server.</para>
+   <para>This module requires that you install a Samba client in a 
+   <filename>bin</filename> directory under the OpenAM configuration directory
+   such as <filename>$HOME/openam/openam/bin</filename>.</para>
+   <indexterm><primary>Windows NT authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>Authentication Domain</term>
+     <listitem>
+      <para>Specify the Windows domain name to which users belong.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Host</term>
+     <listitem>
+      <para>Specify the NetBIOS name of the Windows NT host to which to
+      authenticate users.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Samba Configuration File Name</term>
+     <listitem>
+      <para>Specify the full path to the Samba configuration file.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="wss-module-conf-hints">
+   <title>Hints For the WSSAuth Authentication Module</title>
+   <para>The Web Service Security (WSSAuth) module lets OpenAM validate a
+   user name, password combination received as an authentication token in
+   a request from a Web Service Client to a Web Service Provider.</para>
+   <indexterm><primary>WSSAuth authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>User search attribute</term>
+     <listitem>
+      <para>Specify a user attribute to search for a user. Default is
+      <literal>uid</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User realm</term>
+     <listitem>
+      <para>Specify the realm to which users belong. For the OpenAM Security
+      Token Service, this is <literal>/</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User password attribute</term>
+     <listitem>
+      <para>Specify the password attribute or that of the password equivalent.
+      The default is <literal>userPassword</literal>.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="yubikey-module-conf-hints">
+   <title>Hints For the YubiKey Authentication Module</title>
+   <para>Use the following hints to configure the module.</para>
+   <indexterm><primary>YubiKey authentication</primary></indexterm>
+   <variablelist>
+    <varlistentry>
+     <term>TODO</term>
+     <listitem>
+      <para>TODO</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+ </section>
+ 
+ <section xml:id="configure-authn-chains">
+  <title>Configuring Authentication Chains</title>
+  <indexterm><primary>Authentication chaining</primary></indexterm>
+  <para>Once you have configured authentication modules, and added the modules
+  needed for you realm to the list of module instances, you can configure
+  authentication chains. Authentication chains let you handle situations where
+  alternative modules are needed, or where a single set of credentials is not
+  sufficient.</para>
+  
+  <procedure xml:id="create-authn-chain">
+   <title>To Create an Authentication Chain</title>
+   
+   <step>
+    <para>On the Access Control tab page of the OpenAM console, click the
+    realm for which to create the authentication chain.</para>
+   </step>
+   <step>
+    <para>On the Authentication tab page for the realm, scroll to the bottom
+    of the page, and click the New button in the Authentication Chaining
+    table.</para>
+   </step>
+   <step>
+    <para>Give the new authentication chain a name, and add instances of the
+    modules to use in the chain.</para>
+   </step>
+   <step>
+    <para>Assign at least criteria (optional, required, requisite, sufficient)
+    as described above in <xref linkend="what-is-authn" />. You can also
+    configure where OpenAM redirects the user upon successful and failed
+    authentication, and plug in your post-authentication processing classes
+    as necessary.</para>
+   </step>
+   <step>
+    <para>Save your work.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="set-default-authn-chain">
+   <title>To Select the Default Chain</title>
+   <para>Before you select the default chain for users, and especially for
+   administrators, test the authentication chain first. For example,
+   <literal>http://openam.example.com:8080/openam/UI/Login?service=NewChain</literal>.
+   If you cannot log in, then go back and fix the authentication chain's
+   configuration before making it the default.</para>
+   
+   <step>
+    <para>On the Access Control tab page of the OpenAM console, click the
+    realm for which to set the default authentication chain.</para>
+   </step>
+   <step>
+    <para>On the Authentication tab page for the realm, adjust the drop-down
+    lists for Organization Authentication Configuration and Administrator
+    Authentication Configuration to the appropriate authentication chains.</para>
+   </step>
+   <step>
+    <para>Save your work.</para>
+   </step>
+  </procedure>
+ </section>
+ 
+ <section xml:id="authn-from-browser">
+  <title>Authenticating To OpenAM</title>
+  
+  <para>This section explains how to connect to OpenAM for user authentication
+  by adding parameters to the login URL when testing your configuration.</para>
+  
+  <para>The base URL to authenticate to OpenAM points to
+  <literal>/UI/Login</literal> under the deployment URL, such as
+  <literal>http://openam.example.com:8080/openam/UI/Login</literal>.
+  <footnote><para>The base URL to logout is similar, for example
+  <literal>http://openam.example.com:8080/openam/UI/Logout</literal>.</para>
+  </footnote> You can, however, specify parameters in the query string
+  of the URL to request a specific authentication configuration. For example,
+  <literal>http://openam.example.com:8080/openam/UI/Login?module=LDAP</literal>
+  requests that OpenAM use the LDAP authentication module.</para>
+  
+  <variablelist>
+   <para>OpenAM accepts the following parameters in the query string. With
+   the exception of <literal>IDToken</literal> parameters, use no more than
+   one occurrence of each.</para>
+   <varlistentry>
+    <term>arg=newsession</term>
+    <listitem>
+     <para>Request that OpenAM end the user's current session and start a
+     new session.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?arg=newsession</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>authlevel</term>
+    <listitem>
+     <para>Request that OpenAM authenticate the user using a module with at
+     least the specified authentication level that you have configured.</para>
+     <para>As this parameter determines authentication module selection, do
+     not use it with <literal>module</literal>, <literal>service</literal>,
+     or <literal>user</literal>.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?authlevel=1</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>forceAuth</term>
+    <listitem>
+     <para>If <literal>forceAuth=true</literal>, request that OpenAM force the
+     user to authenticate even if she already has a valid session. On
+     successful authentication, OpenAM updates the session token.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?forceAuth=true</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>goto</term>
+    <listitem>
+     <para>On successful authentication, or successful logout, request that
+     OpenAM redirect the user to the specified location.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?goto=http%3A%2F%2Fwww.example.com%2Fsuccess.html</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>gotoOnFail</term>
+    <listitem>
+     <para>On authentication failure, request that OpenAM redirect the user to
+     the specified location.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?goto=http%3A%2F%2Fwww.example.com%2Ffailure.html</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>IDToken1, IDToken2, ..., IDTokenN</term>
+    <listitem>
+     <para>Pass the specified credentials as <literal>IDToken</literal>
+     parameters in the URL. The <literal>IDToken</literal> credentials map
+     to the fields in the login page for the authentication module, such as
+     <literal>IDToken1</literal> as user ID and <literal>IDToken2</literal>
+     as password for basic user name, password authentication.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?IDToken1=bjensen&amp;IDToken2=hifalutin</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>iPSPCookie=yes</term>
+    <listitem>
+     <para>Request that OpenAM return a persistent cookie that remains in the
+     browser after the browser is closed, allowing the user to login again
+     without being prompted for credentials. This only works if you have
+     configured persistent cookie mode for the realm where the user logs
+     in.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?iPSPCookie=yes</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>locale</term>
+    <listitem>
+     <para>Request that OpenAM display the user interface in the specified,
+     supported locale. Locale can also be set in the user's profile, in
+     the HTTP header from her browser, configured in OpenAM, and so on.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?locale=fr</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>module</term>
+    <listitem>
+     <para>Request that OpenAM use the specified authentication module that you
+     have configured for the realm where the user is authenticating.</para>
+     <para>As this parameter determines authentication module selection, do
+     not use it with <literal>authlevel</literal>, <literal>service</literal>,
+     or <literal>user</literal>.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?module=DataStore</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>PersistAMCookie=yes</term>
+    <listitem>
+     <para>Request that OpenAM save the cookie to memory so that another
+     application on the user's system can read it to create an
+     <literal>SSOToken</literal>.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?PersistAMCookie=yes</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>realm</term>
+    <listitem>
+     <para>Request that OpenAM authenticate the user to the specified realm.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?realm=sales</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>service</term>
+    <listitem>
+     <para>Request that OpenAM authenticate the user with the specified
+     authentication chain.</para>
+     <para>As this parameter determines authentication module selection, do
+     not use it with <literal>authlevel</literal>, <literal>module</literal>,
+     or <literal>user</literal>.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?service=ExternalChain</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>user</term>
+    <listitem>
+     <para>Request that the user, specified by her OpenAM universal ID,
+     authenticate according to the chain specified in her profile.</para>
+     <para>As this parameter determines authentication module selection, do
+     not use it with <literal>authlevel</literal>, <literal>module</literal>,
+     or <literal>service</literal>.</para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?user=admin</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
 </chapter>

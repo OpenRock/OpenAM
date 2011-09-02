@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuring Policy Agent Profiles</title>
-
+ <indexterm><primary>Policy agents</primary></indexterm>
  <para>You install policy agents in web servers and web application containers
  to enforce access policies OpenAM applies to protected web sites and web
  applications. Policy agents depend on OpenAM for all authentication and
@@ -48,7 +48,7 @@
  
  <section xml:id="gateway-or-policy-agent">
   <title>Universal Gateway or Policy Agent?</title>
-  
+  <indexterm><primary>Universal Gateway</primary></indexterm>
   <para>OpenAM includes both the Universal Gateway and also a variety of
   policy agents. Both the Universal Gateway and also the policy agents
   enforce policy, redirecting users to authenticate when necessary, and
@@ -76,7 +76,6 @@
  
  <section xml:id="kinds-of-agent-profiles">
   <title>Kinds of Agent Profiles</title>
-  
   <para>When you open the OpenAM console to configure agents for the top level
   realm, you see a number of different kinds to choose. Web and J2EE policy
   agents are the most common, requiring the least integration effort.</para>
@@ -135,14 +134,13 @@
  
  <section xml:id="configure-agent-profiles">
   <title>Configuring Agent Profiles</title>
-  
+  <indexterm><primary>Policy agent profile configuration</primary></indexterm>
   <para>This section concerns creating agent profiles, and creating groups
   that let agents inherit settings when you have many agents with nearly
   the same profile settings.</para>
   
   <procedure xml:id="create-agent-profile">
    <title>To Create an Agent Profile</title>
-   
    <para>To create a new web or J2EE policy agent profile, you need a name and
    password for the agent, and the URLs to OpenAM and the application to
    protect.</para>

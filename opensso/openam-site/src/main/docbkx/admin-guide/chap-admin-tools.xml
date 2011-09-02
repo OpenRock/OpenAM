@@ -36,7 +36,7 @@
  
  <section xml:id="openam-console-overview">
   <title>OpenAM Web-Based Console</title>
-  
+  <indexterm><primary>Console overview</primary></indexterm>
   <para>After you install OpenAM, login to the web-based console as OpenAM
   Administrator, <literal>amadmin</literal> with the password you set during
   installation. The URL to visit in your browser is something like
@@ -101,7 +101,7 @@
   <title>OpenAM Command-Line Tools</title>
   <para>The script tools in the following list have <literal>.bat</literal>
   versions for use on Microsoft Windows.</para>
-  
+  <indexterm><primary>Command line tools overview</primary></indexterm>
   <indexterm><primary>Silent installation</primary></indexterm>
   <variablelist>
    <para>You can install the following OpenAM command-line tools.</para>
@@ -205,7 +205,7 @@ http://server2.example.com:8080/openam"</literal></para>
   command line. Yet, <command>ssoadm.jsp</command> is disabled by default
   to prevent potential misuse.</para>
   <procedure xml:id="enable-ssoadm-jsp">
-   <title>To enable ssoadm.jsp</title>
+   <title>To Enable ssoadm.jsp</title>
    <indexterm><primary>Enable ssoadm.jsp</primary></indexterm>
    <step>
     <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
