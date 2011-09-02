@@ -33,6 +33,76 @@
  <title>OpenAM Web Policy Agents</title>
 
  <para>This chapter covers what web policy agents do and how they work.</para>
-
+ 
+ <para>A <firstterm>policy agent</firstterm> enforces policy for OpenAM. A
+ <firstterm>web policy agent</firstterm> installed in a web server intercepts
+ requests from users trying to access a protected web resource, and denies
+ access until the user has authorization from OpenAM to access the
+ resource.</para>
+ 
+ <section xml:id="example-agent-interaction">
+  <title>How the User, Web Policy Agent, &amp; OpenAM Interact</title>
+  
+  <para>Imagine that a user attempts to access a protected resource before
+  having authenticated by pointing her browser to a web page. Assume that you
+  have configured OpenAM to protect the web page. Then the web policy agent
+  intercepting her browser's request finds no session token in the request,
+  and so redirects the user's browser to the OpenAM login page for
+  authentication. After the user has successfully authenticated, OpenAM
+  sets a session token in a browser cookie, and redirects her browser back to
+  the page she tried to access initially.</para>
+  
+  <para>When the user's browser reiterates the request, the policy agent again
+  checks that the request has a session token, finds a session token this
+  time, and validates the session token with OpenAM. Given the valid session
+  token, the policy agents gets a policy decision from OpenAM concerning whether
+  the user can access the page. If OpenAM's Policy Service determines that
+  the user is allowed to access the page, OpenAM responds to the policy agent
+  that access should be granted. The web policy agent then permits the web
+  page to be returned to the user's browser.</para>
+ </section>
+ 
+ <section xml:id="web-agent-configuration">
+  <title>How Web Policy Agents are Configured</title>
+  
+  <para>You install web policy agents in the web servers holding web resources
+  that you want to protect. By default, the web policy agent has only enough
+  configuration at installation time to connect to OpenAM in order to get the
+  rest of its configuration from the OpenAM configuration store. With nearly
+  all configuration stored centrally, you can manage policy agents centrally
+  from the OpenAM console.</para>
+  
+  <para>You can opt to store the agent configuration locally if necessary.
+  If you store the configuration locally, then avoid issues with the
+  configuration by making sure you provide valid values for configuration
+  properties ending in the following.</para>
+  <!-- Fix for OPENAM-724. -->
+  <itemizedlist>
+   <listitem><para><literal>.cookie.name</literal></para></listitem>
+   <listitem><para><literal>.fqdn.default</literal></para></listitem>
+   <listitem><para><literal>.agenturi.prefix</literal></para></listitem>
+   <listitem><para><literal>.naming.url</literal></para></listitem>
+   <listitem><para><literal>.login.url</literal></para></listitem>
+   <listitem><para><literal>.instance.name</literal></para></listitem>
+   <listitem><para><literal>.username</literal></para></listitem>
+   <listitem><para><literal>.password</literal></para></listitem>
+   <listitem><para><literal>.connection_timeout</literal></para></listitem>
+   <listitem><para><literal>.policy_clock_skew</literal></para></listitem>
+  </itemizedlist>
+  
+  <para>You configure web policy agents per realm. Thus to access centralized
+  configuration, you select Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Agents &gt; Web &gt; <replaceable>Agent
+  Name</replaceable>. Web policy agent configuration is distinct from
+  policy configuration. The only policy-like configuration that you apply to
+  web policy agents is indicating which URLs in the web server can be
+  ignored (<firstterm>not enforced URLs</firstterm>) and which client IP
+  address are exempt from policy enforcement (<firstterm>not enforced
+  IPs</firstterm>).</para>
+  
+  <para>For each aspect of web policy agent configuration, you can configure
+  the policy agent through the OpenAM console during testing, and then
+  export the resulting configuration in order to script configuration in
+  your production environment.</para>
+ </section>
 </chapter>
-
