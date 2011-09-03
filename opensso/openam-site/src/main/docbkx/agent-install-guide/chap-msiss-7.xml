@@ -305,6 +305,6 @@ Internet services successfully restarted</screen>
   <title>Remove IIS 7 Web Policy Agent Software</title>
   
   <para>To remove the web policy agent, log on as a user with Administrator
-  privileges, and run <command>csript IIS7Admin.vbs -unconfig</command>.</para>
+  privileges, and run <command>cscript IIS7Admin.vbs -unconfig</command>.</para>
  </section>
 </chapter>
