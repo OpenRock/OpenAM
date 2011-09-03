@@ -114,14 +114,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import javax.servlet.http.HttpSession;
 
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerSessSvcImpl;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
 /**  
@@ -264,8 +271,8 @@ public class SessionService {
     private static boolean isPropertyNotificationEnabled = false;
 
     protected static Set notificationProperties;
-    protected static Set<String> timeoutHandlers;
-
+    protected static volatile Set<String> timeoutHandlers;
+    private static ExecutorService executorService = Executors.newCachedThreadPool();
     /*
      * This token is used to satisfy the admin interfaces
      */
@@ -2232,14 +2239,18 @@ public class SessionService {
      * @param changeType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
      */
     static void execSessionTimeoutHandlers(final SessionID sessionId, final int changeType) {
-        if (timeoutHandlers != null && !timeoutHandlers.isEmpty()) {
+        // Take snapshot of reference to ensure atomicity.
+        final Set<String> handlers = timeoutHandlers;
+
+        if (!handlers.isEmpty()) {
             try {
                 final SSOToken token = ssoManager.createSSOToken(sessionId.toString());
-                List<Thread> threads = new ArrayList<Thread>();
-                for (final String clazz : timeoutHandlers) {
-                    Thread thread = new Thread() {
+                final List<Future<?>> futures = new ArrayList<Future<?>>();
+                final CountDownLatch latch = new CountDownLatch(handlers.size());
 
-                        @Override
+                for (final String clazz : handlers) {
+                    Runnable timeoutTask = new Runnable() {
+
                         public void run() {
                             try {
                                 SessionTimeoutHandler handler =
@@ -2254,21 +2265,34 @@ public class SessionService {
                                         break;
                                 }
                             } catch (Exception ex) {
-                                sessionDebug.error("Error while handling session timeout in " + clazz, ex);
+                                if (Thread.interrupted()
+                                        || ex instanceof InterruptedException
+                                        || ex instanceof InterruptedIOException) {
+                                    sessionDebug.warning("Timeout Handler was interrupted");
+                                } else {
+                                    sessionDebug.error("Error while executing the following session timeout handler: " + clazz, ex);
+                                }
+                            } finally {
+                                latch.countDown();
                             }
                         }
                     };
-                    thread.start();
-                    threads.add(thread);
+                    futures.add(executorService.submit(timeoutTask)); // This should not throw any exceptions.
                 }
-                for (Thread thread : threads) {
-                    try {
-                        thread.join(500);
-                        thread.interrupt();
-                    } catch (InterruptedException ex) {
-                        sessionDebug.warning("Error while stopping custom timeouthandlers");
-                    }
 
+                // Wait 1000ms for all handlers to complete.
+                try {
+                    latch.await(1000, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException ignored) {
+                    // This should never happen: we can't handle it here, so propagate it.
+                    Thread.currentThread().interrupt();
+                }
+
+                for (Future<?> future : futures) {
+                    if (!future.isDone()) {
+                        // It doesn't matter really if the future completes between isDone and cancel.
+                        future.cancel(true); // Interrupt.
+                    }
                 }
             } catch (SSOException ssoe) {
                 sessionDebug.warning("Unable to construct SSOToken for executing timeout handlers", ssoe);
@@ -3613,12 +3637,12 @@ public class SessionService {
         notificationProperties = prop;
     }
 
-    protected static Set<String> getTimeoutHandlers() {
-        return timeoutHandlers;
-    }
-
     protected static void setTimeoutHandlers(Set<String> handlers) {
-        timeoutHandlers = handlers;
+        if (handlers == null) {
+            timeoutHandlers = Collections.EMPTY_SET;
+        } else {
+            timeoutHandlers = new HashSet<String>(handlers);
+        }
     }
     // TODO check if restructuring of interface between Auth and Session
     // can eliminate the need for this utility class
