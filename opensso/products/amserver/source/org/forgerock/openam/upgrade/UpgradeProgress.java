@@ -25,7 +25,6 @@
 
 package org.forgerock.openam.upgrade;
 
-import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.setup.InstallLog;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -114,24 +113,23 @@ public class UpgradeProgress {
             out = new OutputStream() {
                 @Override
                 public void write(int b) throws IOException {
-                    writer.write("<script>addProgressText('");
-                    writer.write(URLEncDec.encodeLDAPUrl(String.valueOf((char) b).trim()));
-                    writer.write("<br>');</script>");
+                    writer.write("<script>addProgressText(\"");
+                    writer.write(String.valueOf((char) b).replace("\n", "\\\n"));
+                    writer.write("<br>\");</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b) throws IOException {
-                    writer.write("<script>addProgressText('");
-                    writer.write(URLEncDec.encodeLDAPUrl(new String(b, encoding).trim()));
-                    writer.write("<br>');</script>");
+                    writer.write("<script>addProgressText(\"");
+                    writer.write(new String(b, encoding).replace("\n", "\\\n"));
+                    writer.write("<br>\");</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b, int off, int len) throws IOException {
-                    writer.write("<script>addProgressText('");
-                    writer.write(URLEncDec.encodeLDAPUrl(
-                            new String(b, off, len, encoding).trim()));
-                    writer.write("<br>');</script>");
+                    writer.write("<script>addProgressText(\"");
+                    writer.write(new String(b, off, len, encoding).replace("\n", "\\\n"));
+                    writer.write("<br>\");</script>");
                     writer.flush();
                 }
                 @Override
