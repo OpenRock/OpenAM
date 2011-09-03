@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.config;
 import java.io.CharArrayWriter;
 import java.io.Writer;
@@ -41,7 +44,7 @@ public class SetupWriter extends Writer {
     private Writer realWriter = null;
     private CharArrayWriter buf = new CharArrayWriter();
     private boolean flushflag = false;
-    private boolean closeflag = false;
+    private volatile boolean closeflag = false;
 
     public SetupWriter(Writer wt) {
         realWriter = wt;
@@ -54,12 +57,15 @@ public class SetupWriter extends Writer {
         flushflag = true;
         notify();
     }
+
     synchronized public void close() throws IOException {
-        // Noop
+        closeflag = true;
+        notify();
     }
+
     synchronized public void realFlush() {
         try {
-            while (true) {
+            while (true && !closeflag) {
                 wait(600000);
                 buf.writeTo(realWriter);
                 buf.reset();

@@ -144,6 +144,14 @@ public class SetupProgress {
         out = ostr;
     }
 
+    public static void closeOutputStream() {
+        try {
+            writer.close();
+        } catch (IOException ex) {
+            //ignore
+        }
+    }
+
     /**
      * Sets text mode.
      * @param textMode true if output should be in text format or false in 

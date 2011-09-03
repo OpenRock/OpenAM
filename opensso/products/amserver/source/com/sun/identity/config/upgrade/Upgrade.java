@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.apache.click.control.ActionLink;
 import org.forgerock.openam.upgrade.ServiceUpgradeWrapper;
 import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 
@@ -79,6 +80,8 @@ public class Upgrade extends AjaxPage {
             writeToResponse(ue.getMessage());
             setPath(null);
             debug.error("Error occured while upgrading OpenAM", ue);
+        } finally {
+            UpgradeProgress.closeOutputStream();
         }
         return false;
     }

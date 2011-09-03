@@ -600,6 +600,7 @@ public class AMSetupServlet extends HttpServlet {
                 params, configLocale);
         } finally {
             InstallLog.getInstance().close();
+            SetupProgress.closeOutputStream();
         }
 
         if (WebtopNaming.configMonitoring() >= 0) {

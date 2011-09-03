@@ -77,6 +77,14 @@ public class UpgradeProgress {
         return out;
     }
 
+    public static void closeOutputStream() {
+        try {
+            writer.close();
+        } catch (IOException ex) {
+            //ignore
+        }
+    }
+
     /**
       * Sets setup writer.
       * @param w Setup writer to be used.
