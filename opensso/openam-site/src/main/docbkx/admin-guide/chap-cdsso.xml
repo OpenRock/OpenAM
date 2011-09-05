@@ -49,5 +49,31 @@
  All the cookie duplication work takes place without users having to provide
  new credentials.</para>
  
- <para>TODO</para>
+ <procedure xml:id="enable-cdsso">
+  <title>To Enable CDSSO For a Web Policy Agent</title>
+  
+  <step>
+   <para>In the OpenAM console, browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable> &gt; Agents &gt; Web &gt;
+   <replaceable>Agent Name</replaceable> &gt; SSO.</para>
+  </step>
+  <step>
+   <para>Enable Cross Domain SSO (configuration file property:
+   <literal>com.sun.identity.agents.config.cdsso.enable</literal>).</para>
+  </step>
+  <step>
+   <para>Set the CDSSO Servlet URL to the Cross Domain Controller location,
+   such as <literal>http://openam.example.com:8080/openam/cdcservelet</literal>
+   (configuration file property:
+   <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal>).</para>
+  </step>
+  <step>
+   <para>Add the list of domains, such as <literal>.example.com</literal> to
+   the Cookies Domain List (configuration file property:
+   <literal>com.sun.identity.agents.config.cookie.domain</literal>).</para>
+  </step>
+  <step>
+   <para>Save your work.</para>
+  </step>
+ </procedure>
 </chapter>
