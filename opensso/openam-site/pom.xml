@@ -32,24 +32,24 @@
   <artifactId>forgerock-parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
  </parent>
-  <repositories>
-    <repository>
-      <id>forgerock-staging-repository</id>
-      <name>ForgeRock Release Repository</name>
-      <url>http://maven.forgerock.org/repo/releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>forgerock-snapshots-repository</id>
-      <name>ForgeRock Snapshot Repository</name>
-      <url>http://maven.forgerock.org/repo/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
+ <repositories>
+  <repository>
+   <id>forgerock-staging-repository</id>
+   <name>ForgeRock Release Repository</name>
+   <url>http://maven.forgerock.org/repo/releases</url>
+   <snapshots>
+    <enabled>false</enabled>
+   </snapshots>
+  </repository>
+  <repository>
+   <id>forgerock-snapshots-repository</id>
+   <name>ForgeRock Snapshot Repository</name>
+   <url>http://maven.forgerock.org/repo/snapshots</url>
+   <releases>
+    <enabled>false</enabled>
+   </releases>
+  </repository>
+ </repositories>
  <groupId>org.forgerock.openam</groupId>
  <artifactId>openam-site</artifactId>
  <version>10.0.0-SNAPSHOT</version>
@@ -97,7 +97,8 @@
    <url>http://www.opensource.org/licenses/cddl1.php</url>
    <comments>Common Development and Distribution License (CDDL) 1.0.
    This license applies to OpenAM source code as indicated in the
-   sources themselves.</comments>
+   sources themselves.
+   </comments>
    <distribution>repo</distribution>
   </license>
   <license>
@@ -105,7 +106,8 @@
    <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
    <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
    Unported. This license applies to the site content, and to the
-   documentation as indicated in the documentation source code.</comments>
+   documentation as indicated in the documentation source code.
+   </comments>
    <distribution>repo</distribution>
   </license>
  </licenses>
@@ -135,11 +137,11 @@
       <phase>pre-site</phase>
       <inherited>false</inherited>
       <goals>
-       <goal>generate-epub</goal>
+<!--       <goal>generate-epub</goal>-->
        <goal>generate-html</goal>
-       <goal>generate-pdf</goal>
-       <goal>generate-rtf</goal>
-       <goal>generate-manpages</goal>
+<!--       <goal>generate-pdf</goal>-->
+<!--       <goal>generate-rtf</goal>-->
+<!--       <goal>generate-manpages</goal>-->
       </goals>
       <configuration>
        <sourceDirectory>${basedir}/src/main/docbkx</sourceDirectory>
@@ -222,6 +224,63 @@
     </dependencies>
    </plugin>
    <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>xml-maven-plugin</artifactId>
+    <version>1.0</version>
+    <executions>
+     <execution>
+      <phase>generate-resources</phase>
+      <goals>
+       <goal>transform</goal>
+      </goals>
+      <configuration>
+       <transformationSets>
+        <transformationSet>
+         <dir>../products</dir>
+         <includes>
+          <include>amserver/xml/log/AuthenticationLogMessageIDs.xml</include>
+          <include>amserver/xml/log/CLILogMessageIDs.xml</include>
+          <include>amserver/xml/log/ConsoleLogMessageIDs.xml</include>
+          <include>amserver/xml/log/CoreTokenLogMessageIDs.xml</include>
+          <include>amserver/xml/log/EntitlementLogMessageIDs.xml</include>
+          <include>amserver/xml/log/LoggingLogMessageIDs.xml</include>
+          <include>amserver/xml/log/PolicyLogMessageIDs.xml</include>
+          <include>amserver/xml/log/SessionLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/COTLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/IDFFLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/LibertyLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/SAML2LogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/SAMLLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/WebServicesSecurityLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/WSFederationLogMessageIDs.xml</include>
+          <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>
+         </includes>
+         <stylesheet>src/main/xslt/logs.xsl</stylesheet>
+         <outputProperties>
+          <outputProperty>
+           <name>omit-xml-declaration</name>
+           <value>yes</value>
+          </outputProperty>
+         </outputProperties>
+         <validating>false</validating>
+        </transformationSet>
+       </transformationSets>
+       <catalogs>
+        <catalog>src/main/xslt/catalog.xml</catalog>
+       </catalogs>
+       <validating>true</validating>
+      </configuration>
+     </execution>
+    </executions>
+    <dependencies>
+     <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.1</version>
+     </dependency>
+    </dependencies>
+   </plugin>
+   <plugin>
     <artifactId>maven-antrun-plugin</artifactId>
     <executions>
      <execution>
@@ -233,7 +292,7 @@
       </goals>
       <configuration>
        <detail>true</detail>
-       <tasks>
+       <target>
         <!-- TODO: Figure out how to say foreach in ant. -->
         <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/admin-guide' />
         <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/agent-install-guide' />
@@ -241,7 +300,24 @@
         <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/install-guide' />
         <copy file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/reference' />
         <move file='${basedir}/legalnotice.html' todir='${basedir}/target/docbkx/html/release-notes' />
-       </tasks>
+       </target>
+      </configuration>
+     </execution>
+     <execution>
+      <phase>generate-resources</phase>
+      <inherited>false</inherited>
+      <goals>
+       <goal>run</goal>
+      </goals>
+      <configuration>
+       <detail>true</detail>
+       <target>
+        <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
+         <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header" />
+         <fileset dir="${project.build.directory}/generated-resources/xml/xslt" includes="**/*.xml"/>
+         <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer" />
+        </concat>
+       </target>
       </configuration>
      </execution>
     </executions>
