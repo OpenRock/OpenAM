@@ -117,6 +117,7 @@ typedef struct {
     char *path;    // cookie path, or NULL if no path.
     char *max_age;  // max age, or NULL if no max age.
     PRBool isSecure;  //if cookie is secure or not
+    PRBool isHttpOnly;  //if cookie is httponly or not
 } cookie_info_t;
 
 typedef struct cookie_info_list {

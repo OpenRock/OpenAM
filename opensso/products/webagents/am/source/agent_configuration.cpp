@@ -160,6 +160,12 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 this->properties, parameter,
                 AM_FALSE, &this->is_cookie_secure);
     }
+    /* Get the is_cookie_httponly flag */
+    if (AM_SUCCESS == status) {
+        status = am_properties_get_boolean_with_default(
+                this->properties, "com.sun.identity.cookie.httponly",
+                AM_FALSE, &this->is_cookie_httponly);
+    }
     
     /* Get fqdn.check.enable */
     if (AM_SUCCESS == status) {

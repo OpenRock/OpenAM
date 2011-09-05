@@ -84,6 +84,7 @@ public:
     const char *cookie_name;
     size_t cookie_name_len;
     PRBool is_cookie_secure;
+    PRBool is_cookie_httponly;
     const char *access_denied_url;
     const char *logout_redirect_url;
     PRLock *lock;
@@ -194,6 +195,7 @@ public:
         this->cookie_name = NULL;
         this->cookie_name_len = 0;
         this->is_cookie_secure = AM_FALSE;
+        this->is_cookie_httponly = AM_FALSE;
         this->access_denied_url = NULL;
         this->logout_redirect_url = NULL;
         this->lock = (PRLock *) NULL;

@@ -1476,6 +1476,9 @@ buildSetCookieHeader(Utils::cookie_info_t *cookie)
         }
         if (AM_TRUE == cookie->isSecure) {
             resetCookieVal.append(";Secure");            
+        }
+        if (AM_TRUE == cookie->isHttpOnly) {
+            resetCookieVal.append(";HttpOnly");            
         } 
         reset_header = strdup(resetCookieVal.c_str());
 
@@ -3243,6 +3246,7 @@ am_web_do_cookie_domain_set(am_status_t (*setFunc)(const char *, void **),
     cookieInfo.max_age = NULL;
     cookieInfo.path = const_cast<char*>("/");
     cookieInfo.isSecure = (*agentConfigPtr)->is_cookie_secure;
+    cookieInfo.isHttpOnly = (*agentConfigPtr)->is_cookie_httponly;
 
     try {
 	std::set<std::string> *cookie_domains = (*agentConfigPtr)->cookie_domain_list;
@@ -5430,6 +5434,8 @@ set_cookie_in_domains(const char *sso_token,
 	// netscape 4.79, IE 5.5, mozilla < 1.4.
 	cookieInfo.max_age = NULL;
 	cookieInfo.path = const_cast<char*>("/");
+        cookieInfo.isSecure = (*agentConfigPtr)->is_cookie_secure;
+        cookieInfo.isHttpOnly = (*agentConfigPtr)->is_cookie_httponly;
 
 	if (NULL == cookie_domains || cookie_domains->size() <= 0) {
 	    // if no domains configured, don't set domain,
