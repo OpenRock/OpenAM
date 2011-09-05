@@ -292,7 +292,8 @@
     <varlistentry>
      <term>Configuration Reload Interval</term>
      <listitem>
-      <para>Interval in minutes to fetch agent configuration from OpenAM.</para>
+      <para>Interval in minutes to fetch agent configuration from OpenAM. Used
+      if notifications are not enabled.</para>
       <para>Property: <literal>com.sun.identity.agents.config.polling.interval</literal></para>
       <para>Hot swap: no</para>
      </listitem>
@@ -341,7 +342,8 @@
      <term>Agent Debug Level</term>
      <listitem>
       <para>Default is <literal>Error</literal>. Increase to
-      <literal>Message</literal> for fine-grained detail.</para>
+      <literal>Message</literal> or even <literal>All</literal> for
+      fine-grained detail.</para>
       <para>Property: <literal>com.sun.identity.agents.config.debug.level</literal></para>
      </listitem>
     </varlistentry>
@@ -399,7 +401,7 @@
     <varlistentry>
      <term>Rotate Local Audit Log</term>
      <listitem>
-      <para>When enabled, audit log files are rotated when reaching a the
+      <para>When enabled, audit log files are rotated when reaching the
       specified size.</para>
       <para>Property: <literal>com.sun.identity.agents.config.local.log.rotate</literal></para>
      </listitem>
@@ -729,7 +731,8 @@
       <itemizedlist>
        <listitem>
         <para><literal>Cookie1</literal>, corresponding to
-        <literal>com.sun.identity.agents.config.cookie.reset[0]=Cookie1</literal></para>
+        <literal>com.sun.identity.agents.config.cookie.reset[0]=Cookie1</literal>.
+        The default domain is taken from FQDN Default.</para>
        </listitem>
        <listitem>
         <para><literal>Cookie2=value;Domain=subdomain.example.com</literal>,
