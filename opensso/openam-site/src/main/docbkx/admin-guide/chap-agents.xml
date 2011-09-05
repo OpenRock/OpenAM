@@ -900,6 +900,20 @@
    Web &gt; <replaceable>Agent Name</replaceable> &gt; Miscellaneous.</para>
    
    <variablelist>
+    <!-- OPENAM-754: Option to send composite advice in the query instead of sending it through a POST request -->
+    <para>Advice Handling properties</para>
+    <varlistentry>
+     <term>Composite Advice Handling (Not yet in OpenAM console)</term>
+     <listitem>
+      <para>As of version 3.0.4, when set to <literal>true</literal>, the agent
+      sends composite advice in the query (GET request) instead of sending it
+      through a POST request.</para>
+      <para>Property: <literal>com.sun.am.use_redirect_for_advice</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   
+   <variablelist>
     <para>Locale properties</para>
     <varlistentry>
      <term>Agent Locale</term>
