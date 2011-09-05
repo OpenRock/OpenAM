@@ -50,10 +50,10 @@ namespace sdk {
     namespace utils {
 
         std::string format(const char *fmt, ...);
-        std::string urldecode(std::string &src);
         inline std::string trim(std::string &str);
         void stringtokenize(std::string &str, std::string separator, std::list<std::string>* results);
-        std::string timestamp();
+        std::string timestamp(const long sec);
+        std::string timestamp(const char *sec);
 
         struct url {
 
@@ -69,12 +69,20 @@ namespace sdk {
                 return host_;
             }
 
+            const std::string & domain() const {
+                return domain_;
+            }
+
             const std::string & path() const {
                 return path_;
             }
 
             const std::string & query() const {
                 return query_;
+            }
+
+            const std::string & uri() const {
+                return uri_;
             }
 
             const int port() const {
@@ -101,7 +109,7 @@ namespace sdk {
         private:
             void parse(const std::string & url_s);
         private:
-            std::string protocol_, host_, port_, path_, query_;
+            std::string protocol_, host_, port_, path_, query_, domain_, uri_;
         };
 
         int validate_agent_credentials(url *u, const char *aname, const char *apwd,

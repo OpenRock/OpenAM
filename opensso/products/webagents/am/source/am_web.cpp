@@ -1451,7 +1451,7 @@ buildSetCookieHeader(Utils::cookie_info_t *cookie)
         char *domain = cookie->domain;
         char *max_age = cookie->max_age;
         char *path = cookie->path;
-        std::string resetCookieVal;
+        std::string resetCookieVal, expires;
 
         PUSH_BACK_CHAR(resetCookieVal, ' ');
         resetCookieVal.append(name);
@@ -1469,6 +1469,11 @@ buildSetCookieHeader(Utils::cookie_info_t *cookie)
         if (NULL != max_age && '\0' != max_age[0]) {
             resetCookieVal.append(";Max-Age=");
             resetCookieVal.append(max_age);
+            expires = sdk::utils::timestamp(max_age);
+            if (!expires.empty()) {
+                resetCookieVal.append(";Expires=");
+                resetCookieVal.append(expires);
+            }
         }
         if (NULL != path && '\0' != path[0]) {
             resetCookieVal.append(";Path=");

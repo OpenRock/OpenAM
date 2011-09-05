@@ -53,6 +53,7 @@
 #include <algorithm>
 #include <cctype>
 #include <functional>
+#include <errno.h>
 
 #include <nspr.h>
 #include <nss.h> 
@@ -72,6 +73,12 @@ static char toLowerCase(char c) {
 }
 
 void sdk::utils::url::parse(const std::string& url_s) {
+    std::size_t lst;
+    std::size_t lstp;
+#ifdef _MSC_VER
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
     const std::string prot_end("://");
     std::string::const_iterator prot_i = std::search(url_s.begin(), url_s.end(),
             prot_end.begin(), prot_end.end());
@@ -102,10 +109,6 @@ void sdk::utils::url::parse(const std::string& url_s) {
     }
 
     //validate host value
-#ifdef _MSC_VER
-    WSADATA wsaData;
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
-#endif
     if (inet_addr(host_.c_str()) == INADDR_NONE && gethostbyname(host_.c_str()) == NULL) {
         host_.clear();
         return;
@@ -116,6 +119,19 @@ void sdk::utils::url::parse(const std::string& url_s) {
     if (query_i != url_s.end())
         ++query_i;
     query_.assign(query_i, url_s.end());
+
+    if (query_.empty()) {
+        uri_ = path_;
+    } else {
+        uri_ = path_ + "?" + query_;
+    }
+
+    if ((lst = host_.find_last_of(".")) != std::string::npos) {
+        if (lst - 1 != std::string::npos
+                && (lstp = host_.find_last_of(".", lst - 1)) != std::string::npos) {
+            domain_.assign(host_.substr(lstp));
+        }
+    }
 }
 
 std::string sdk::utils::format(const char *fmt, ...) {
@@ -133,23 +149,6 @@ std::string sdk::utils::format(const char *fmt, ...) {
         assert(needed < buf.size());
     }
     return std::string(&buf[0]);
-}
-
-std::string sdk::utils::urldecode(std::string &src) {
-    std::string ret;
-    char ch;
-    int i, ii;
-    for (i = 0; i < src.length(); i++) {
-        if (int(src[i]) == 37) {
-            sscanf(src.substr(i + 1, 2).c_str(), "%x", &ii);
-            ch = static_cast<char> (ii);
-            ret += ch;
-            i = i + 2;
-        } else {
-            ret += src[i];
-        }
-    }
-    return (ret);
 }
 
 inline std::string sdk::utils::trim(std::string &str) {
@@ -175,32 +174,26 @@ void sdk::utils::stringtokenize(std::string &str, std::string separator, std::li
     }
 }
 
-std::string sdk::utils::timestamp() {
-    int offset;
-    char time_string[20];
-    char time_string_tz[30];
-#ifdef _MSC_VER
-    struct tm ptmw;
+std::string sdk::utils::timestamp(const long sec) {
+    char time_string[50];
+    struct tm *now;
     time_t rawtime;
+    if (sec == 0) {
+        return std::string("Thu, 01-Jan-1970 00:00:01 GMT");
+    }
     time(&rawtime);
-    localtime_s(&ptmw, &rawtime);
-    offset = (-(int) timezone);
-    if (ptmw.tm_isdst)
-        offset += 3600;
-    strftime(time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", &ptmw);
-#else
-    struct tm *ptm;
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    ptm = localtime(&tv.tv_sec);
-    offset = (-(int) timezone); //ptm->tm_gmtoff;
-    if (ptm->tm_isdst)
-        offset += 3600;
-    strftime(time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", ptm);
-#endif
-    snprintf(time_string_tz, sizeof (time_string_tz), "%s %+03d%02d", time_string, (int) (offset / 3600),
-            (int) ((abs((int) offset) / 60) % 60));
-    return std::string(time_string_tz);
+    rawtime += sec;
+    now = gmtime(&rawtime);
+    strftime(time_string, sizeof (time_string), "%a, %d-%b-%Y %H:%M:%S GMT", now);
+    return std::string(time_string);
+}
+
+std::string sdk::utils::timestamp(const char *sec) {
+    long sec_ = atol(sec);
+    if (errno != ERANGE || errno != EINVAL || sec_ != LONG_MAX || sec_ != LONG_MIN) {
+        return sdk::utils::timestamp(sec_);
+    }
+    return std::string();
 }
 
 int sdk::utils::validate_agent_credentials(url *u, const char *aname, const char *apwd, const char *arealm,
