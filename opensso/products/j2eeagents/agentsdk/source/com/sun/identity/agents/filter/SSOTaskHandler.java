@@ -137,7 +137,16 @@ implements ISSOTaskHandler {
                     // invalidate the current session before storing the new
                     // userDN in a new session
                     String currentUserDN = (String)session.getAttribute(HTTPSESSION_BINDING_ATTRIBUTE);
-                    if (!userDN.equals(currentUserDN)) {
+                    // If null then we have not recorded the user in the session yet
+                    if (currentUserDN == null) {
+                        // Record the user for next request
+                        session.setAttribute(HTTPSESSION_BINDING_ATTRIBUTE, userDN);
+                        if (isLogMessageEnabled()) {
+                            logMessage("SSOTaskHandler: "
+                                    + "recording the user "
+                                    + userDN + " in the HTTP Session");
+                        }
+                    } else if (!userDN.equals(currentUserDN)) {
                         if (isLogMessageEnabled()) {
                             logMessage("SSOTaskHandler: "
                                     + "invalidating HTTP Session because the "
