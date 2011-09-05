@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.iplanet.services.cdc;
 
 import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
@@ -261,14 +265,12 @@ public class LdapSPValidator implements SPValidator {
                 sr = amIdRepo.searchIdentities(IdType.AGENT, "*", idsc);
             }
             return sr.getResultAttributes();
-        } catch (IdRepoException e) {
-            exception = e;
-            CDCServlet.debug.error("LdapSPValidator.searchAgents", e);
-            throw (exception);
-        } catch (SSOException e) {
-            exception = e;
-            CDCServlet.debug.error("LdapSPValidator.searchAgents", e);
-            throw (exception);
+        } catch (IdRepoException ire) {
+            CDCServlet.debug.error("LdapSPValidator.searchAgents", ire);
+            throw new Exception(ire);
+        } catch (SSOException ssoe) {
+            CDCServlet.debug.error("LdapSPValidator.searchAgents", ssoe);
+            throw new Exception(ssoe);
         }
     }
 

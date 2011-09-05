@@ -53,6 +53,7 @@ import com.sun.identity.federation.message.common.AuthnContext;
 import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.message.common.IDPProvidedNameIdentifier;
 import com.sun.identity.federation.services.util.FSServiceUtils;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.saml.assertion.AssertionIDReference;
 import com.sun.identity.saml.assertion.AudienceRestrictionCondition;
 import com.sun.identity.saml.assertion.Conditions;
@@ -419,6 +420,7 @@ public class CDCServlet extends HttpServlet {
                 debug.error("CDCServlet.doGetPost", ssoe);
             } catch (Exception e) {
                 debug.error("CDCServlet.doGetPost", e);
+                spValidator = new LdapSPValidator();
                 showError(response, FORBIDDEN_STR_MATCH);
             }
         }
