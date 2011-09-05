@@ -688,8 +688,8 @@
     <varlistentry>
      <term>Cross Domain SSO</term>
      <listitem>
-      <para></para>
-      <para>Property: <literal></literal></para>
+      <para>Enables Cross Domain Single Sign On.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.cdsso.enable</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1290,7 +1290,7 @@
   the agent configuration locally and configure the agent by changing
   values in the properties file. This section covers centralized configuration,
   indicating the corresponding properties for use in a local configuration
-  file where applicable..</para>
+  file where applicable.</para>
   
   <para>TODO</para>
  </section>
