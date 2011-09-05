@@ -23,7 +23,7 @@
   !      Copyright 2011 ForgeRock AS
   !    
 -->
-<chapter xml:id='chap-msiss-7'
+<chapter xml:id='chap-msiis-7'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -35,7 +35,7 @@
  <para>This chapter covers installation of the policy agent for Microsoft 
  Internet Information Services 7.</para>
  
- <section xml:id="before-ii7-agent-install">
+ <section xml:id="before-iis7-agent-install">
   <title>Before You Install</title>
   
   <para>You must install Microsoft IIS 7 before you install the policy agent.
@@ -74,7 +74,7 @@
   </variablelist>
  </section>
  
- <section xml:id="install-ii7-web-agent">
+ <section xml:id="install-iis7-web-agent">
   <title>Installing IIS 7 Web Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
@@ -140,11 +140,11 @@
    <title>To Create the Password File</title>
    
    <step>
-    <para>Create a text file containing only the password.</para>
-    <screen>C:\&gt;notepad C:\Windows\Temp\pwd.txt</screen>
+    <para>Protect the password file you will create as appropriate.</para>
    </step>
    <step>
-    <para>Protect the password file as appropriate.</para>
+    <para>Create a text file containing only the password.</para>
+    <screen>C:\&gt;notepad C:\Windows\Temp\pwd.txt</screen>
    </step>
   </procedure>
   
@@ -166,15 +166,7 @@
      not the site name.</para>
     </note>
     <screen>C:\web_agents\iis7_agent\bin&gt;cscript IIS7CreateConfig.vbs config.txt
-Microsoft (R) Windows Script Host Version 5.8
-Copyright (C) Microsoft Corporation. All rights reserved.
-
-
-Copyright c 2009 Sun Microsystems, Inc. All rights reserved
-Use is subject to license terms
----------------------------------------------------------
-    Microsoft (TM) Internet Information Server (7.0)
----------------------------------------------------------
+...
 Enter the Agent Resource File Name [IIS7Resource.en] :
 
 Enter the Agent URL (Example: http://agent.example.com:80) :
@@ -182,13 +174,11 @@ Enter the Agent URL (Example: http://agent.example.com:80) :
 
 Displaying the list of Web Sites and its corresponding Identifiers (id)
 
-SITE "Default Web Site" (id:1,bindings:http/*:80:,state:Started)
+SITE "Default Web Site" (<emphasis role="strong">id:1</emphasis>,bindings:http/*:80:,state:Started)
 
 Web Site Identifier :
 <userinput>1</userinput>
-------------------------------------------------
-Sun OpenSSO Enterprise 8.0
-------------------------------------------------
+...
 Enter the URL where the OpenSSO server is running. Please include the deployment
  URI also as shown in the example (Example: http://opensso.example.com:58080/ope
 nsso):
@@ -218,12 +208,7 @@ Agent Configuration file created : config.txt
    <step>
     <para>Run <command>IIS7Admin.vbs</command> to install the agent.</para>
     <screen>C:\web_agents\iis7_agent\bin&gt;cscript IIS7Admin.vbs -config config.txt
-Microsoft (R) Windows Script Host Version 5.8
-Copyright (C) Microsoft Corporation. All rights reserved.
-
-Copyright c 2009 Sun Microsystems, Inc. All rights reserved
-Use is subject to license terms
-
+...
 Enter the Agent Resource File Name [IIS7Resource.en] :
 
 Creating the Agent Config Directory

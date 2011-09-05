@@ -180,12 +180,13 @@ Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)</screen>
    <title>To Create the Password File</title>
    
    <step>
-    <para>Create a text file containing only the password.</para>
-    <screen>$ echo password > /tmp/pwd.txt</screen>
+    <para>Protect the password file you create as appropriate for your
+    operating system.</para>
+    <screen>$ umask 366</screen>
    </step>
    <step>
-    <para>Protect the password file as appropriate for your operating system.</para>
-    <screen>$ chmod 600 /tmp/pwd.txt</screen>
+    <para>Create a text file containing only the password.</para>
+    <screen>$ echo password > /tmp/pwd.txt</screen>
    </step>
   </procedure>
   
@@ -205,46 +206,7 @@ $ apachectl -k stop</screen>
     <para>Run <command>agentadmin --install</command> to install the agent.</para>
     <screen>$ cd /path/to/web_agents/apache22_agent/bin/
 $ ./agentadmin --install
-
-
-
-************************************************************************
-Welcome to the OpenSSO Policy Agent for Apache Server.
-
-************************************************************************
-
-
-Enter the complete path to the directory which is used by Apache Server to
-store its configuration Files. This directory uniquely identifies the
-Apache Server instance that is secured by this Agent.
-[ ? : Help, ! : Exit ]
-Enter the Apache Server Config Directory Path [/opt/apache22/conf]:
- <userinput>/path/to/apache22/conf</userinput>
-
-
-Enter the URL where the OpenSSO server is running. Please include the
-deployment URI also as shown below:
-(http://opensso.sample.com:58080/opensso)
-[ ? : Help, &lt; : Back, ! : Exit ]
-OpenSSO server URL: <userinput>http://openam.example.com:8080/openam</userinput>
-
-
-Enter the Agent URL as shown below: (http://agent1.sample.com:1234)
-[ ? : Help, &lt; : Back, ! : Exit ]
-Agent URL: <userinput>http://www.example.com:80</userinput>
-
-
-Enter the Agent profile name
-[ ? : Help, &lt; : Back, ! : Exit ]
-Enter the Agent Profile name: <userinput>Apache Web Agent</userinput>
-
-
-Enter the path to a file that contains the password to be used for identifying
-the Agent.
-[ ? : Help, &lt; : Back, ! : Exit ]
-Enter the path to the password file: <userinput>/tmp/pwd.txt</userinput>
-
-
+...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -254,32 +216,7 @@ Agent URL : http://www.example.com:80
 Agent Profile name : Apache Web Agent 
 Agent Profile Password file name : /tmp/pwd.txt 
 
-Verify your settings above and decide from the choices below.
-1. Continue with Installation
-2. Back to the last interaction
-3. Start Over
-4. Exit
-Please make your selection [1]: 
-
-Creating directory layout and configuring Agent file for Agent_001
-instance ...DONE.
-
-Reading data from file /tmp/pwd.txt and encrypting it ...DONE.
-
-Generating audit log file name ...DONE.
-
-Creating tag swapped OpenSSOAgentBootstrap.properties file for instance
-Agent_001 ...DONE.
-
-Creating a backup for file /path/to/apache22/conf/httpd.conf ...DONE.
-
-Adding Agent parameters to
-/path/to/web_agents/apache22_agent/Agent_001/config/dsame.conf
-file ...DONE.
-
-Adding Agent parameters to /path/to/apache22/conf/httpd.conf file ...DONE.
-
-
+...
 SUMMARY OF AGENT INSTALLATION
 -----------------------------
 Agent instance name: Agent_001
@@ -297,8 +234,7 @@ Agent Debug directory location:
 
 Install log file location:
 /path/to/web_agents/apache22_agent/installer-logs/audit/install.log
-
-Thank you for using OpenSSO Policy Agent</screen>
+...</screen>
     <para>Upon successful completion, the installer has added the agent as
     a module to the Apache 2.2 configuration, and also set up configuration
     and log directories for the agent.</para>
@@ -394,35 +330,13 @@ $ apachectl -k start</screen>
   --uninstall</command>.</para>
   
   <screen>$ agentadmin --uninstall
-
-
-
-************************************************************************
-Welcome to the OpenSSO Policy Agent for Apache Server.
-
-************************************************************************
-
-
-Enter the complete path to the directory which is used by Apache Server to
-store its configuration Files. This directory uniquely identifies the
-Apache Server instance that is secured by this Agent.
-[ ? : Help, ! : Exit ]
-Enter the Apache Server Config Directory Path [/opt/apache22/conf]:
- /path/to/apache22/conf
-
-
+...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 Apache Server Config Directory : /path/to/apache22/conf 
 
-Verify your settings above and decide from the choices below.
-1. Continue with Uninstallation
-2. Back to the last interaction
-3. Start Over
-4. Exit
-Please make your selection [1]: 
-
+...
 Deleting the config directory
 /path/to/web_agents/apache22_agent/Agent_001/config
 ...DONE.
@@ -433,7 +347,6 @@ Removing Agent parameters from /path/to/apache22/conf/httpd.conf file
 
 Uninstall log file location:
 /path/to/web_agents/apache22_agent/installer-logs/audit/uninstall.log
-
-Thank you for using OpenSSO Policy Agent</screen>
+...</screen>
  </section>
 </chapter>
