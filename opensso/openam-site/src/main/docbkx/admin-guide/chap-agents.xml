@@ -676,8 +676,8 @@
      <term>HTTPOnly Cookies (Not yet in OpenAM console)</term>
      <listitem>
       <para>As of version 3.0.5, web policy agents with this property set to
-      <literal>true</literal> mark persistent cookies as HTTPOnly, to prevent
-      scripts and third-party programs from accessing the cookies.</para>
+      <literal>true</literal> mark cookies as HTTPOnly, to prevent scripts
+      and third-party programs from accessing the cookies.</para>
       <para>Property: <literal>com.sun.identity.cookie.httponly</literal></para>
      </listitem>
     </varlistentry>
