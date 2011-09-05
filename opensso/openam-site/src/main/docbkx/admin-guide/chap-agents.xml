@@ -501,7 +501,40 @@
       <para>No authentication and authorization are required for the requests
       coming from these client IP addresses.</para>
       <para>Property: <literal>com.sun.identity.agents.config.notenforced.ip</literal></para>
-      <!-- TODO: Fix for OPENAM-717: Document com.forgerock.agents.config.notenforced.ip.handler enhancement -->
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <!-- Fix for OPENAM-717: Document com.forgerock.agents.config.notenforced.ip.handler enhancement -->
+     <term>CIDR Client IP Specification (Not yet in OpenAM console)</term>
+     <listitem>
+      <para>As of version 3.0.4, web policy agents with this property set to
+      <literal>cidr</literal> can use IPv4 netmasks and IP ranges instead of
+      wildcards as values for Not Enforced Client IP addresses.</para>
+      <para>When the parameter is defined, wildcards are ignored in Not
+      Enforced Client IP settings. Instead, you can use settings such as
+      those shown in the following examples.</para>
+      <variablelist>
+       <varlistentry>
+        <term>Netmask Example</term>
+        <listitem>
+         <para>To disable policy agent enforcement for addresses in
+         192.168.1.0 to 192.168.1.255, use the following setting.</para>
+         <literallayout>com.sun.identity.agents.config.notenforced.ip = 192.168.1.0/24</literallayout>
+         <para>Currently the policy agent stops evaluating properties after
+         reaching an invalid netmask in the list.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>IP Range Example</term>
+        <listitem>
+         <para>To disable policy agent enforcement for addresses between
+         192.168.1.10 to 192.168.1.127 inclusive, use the following setting.</para>
+         <literallayout>com.sun.identity.agents.config.notenforced.ip = 192.168.1.10-192.168.1.127</literallayout>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+      <para><literal>com.forgerock.agents.config.notenforced.ip.handler</literal></para>
+      <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
     <varlistentry>
