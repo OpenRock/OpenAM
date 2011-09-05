@@ -106,6 +106,13 @@
   <variablelist>
    <para>You can install the following OpenAM command-line tools.</para>
    <varlistentry>
+    <term><command>agentadmin</command></term>
+    <listitem>
+     <para>This tool lets you manage OpenAM policy agent installations.</para>
+     <para>Unpack this tool as part of policy agent installation.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term><command>ampassword</command></term>
     <listitem>
      <para>This tool lets you change OpenAM Administrator passwords, and

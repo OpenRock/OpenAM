@@ -65,7 +65,7 @@
 
  <reference>
   <title>OpenAM Command Line Tools</title>
-  
+  <xinclude:include href='man-agentadmin-1.xml' />
   <xinclude:include href='man-ampassword-1.xml' />
   <xinclude:include href='man-amtune-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
