@@ -226,8 +226,8 @@
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
    Web &gt; <replaceable>Agent Name</replaceable> &gt; Global.</para>
    
-   <variablelist>
-    <para>Profile properties</para>
+   <variablelist xml:id="web-agent-profile-properties">
+    <title>Profile properties</title>
     <varlistentry>
      <term>Group</term>
      <listitem>
@@ -321,8 +321,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>General properties</para>
+   <variablelist xml:id="web-agent-general-properties">
+    <title>General properties</title>
     <varlistentry>
      <term>SSO Only Mode</term>
      <listitem>
@@ -363,8 +363,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Audit properties</para>
+   <variablelist xml:id="web-agent-audit-properties">
+    <title>Audit properties</title>
     <varlistentry>
      <term>Audit Access Types</term>
      <listitem>
@@ -416,8 +416,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Fully Qualified Domain Name Checking properties</para>
+   <variablelist xml:id="web-agent-fqdn-properties">
+    <title>Fully Qualified Domain Name Checking properties</title>
     <varlistentry>
      <term>FQDN Check</term>
      <listitem>
@@ -458,8 +458,8 @@
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
    Web &gt; <replaceable>Agent Name</replaceable> &gt; Application.</para>
    
-   <variablelist>
-    <para>Not Enforced URL Processing properties</para>
+   <variablelist xml:id="web-agent-not-enforced-url-properties">
+    <title>Not Enforced URL Processing properties</title>
     <varlistentry>
      <term>Ignore Path Info for Not Enforced URLs</term>
      <listitem>
@@ -495,8 +495,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Not Enforced IP Processing properties</para>
+   <variablelist xml:id="web-agent-not-enforced-ip-properties">
+    <title>Not Enforced IP Processing properties</title>
     <varlistentry>
      <term>Not Enforced Client IP List</term>
      <listitem>
@@ -550,8 +550,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Profile Attributes Processing properties</para>
+   <variablelist xml:id="web-agent-profile-attributes-processing-properties">
+    <title>Profile Attributes Processing properties</title>
     <varlistentry>
      <term>Profile Attribute Fetch Mode</term>
      <listitem>
@@ -577,7 +577,7 @@
    </variablelist>
    
    <variablelist>
-    <para>Response Attributes Processing properties</para>
+    <title>Response Attributes Processing properties</title>
     <varlistentry>
      <term>Response Attribute Fetch Mode</term>
      <listitem>
@@ -602,8 +602,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Session Attributes Processing properties</para>
+   <variablelist xml:id="web-agent-session-attributes-processing-properties">
+    <title>Session Attributes Processing properties</title>
     <varlistentry>
      <term>Session Attribute Fetch Mode</term>
      <listitem>
@@ -629,8 +629,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Common Attributes Fetching Processing properties</para>
+   <variablelist xml:id="web-agent-attributes-fetching-properties">
+    <title>Common Attributes Fetching Processing properties</title>
     <varlistentry>
      <term>Attribute Multi Value Separator</term>
      <listitem>
@@ -651,8 +651,8 @@
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
    Web &gt; <replaceable>Agent Name</replaceable> &gt; SSO</para>
    
-   <variablelist>
-    <para>Cookie properties</para>
+   <variablelist xml:id="web-agent-cookie-properties">
+    <title>Cookie properties</title>
     <varlistentry>
      <term>Cookie Name</term>
      <listitem>
@@ -683,8 +683,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Cross Domain SSO properties</para>
+   <variablelist xml:id="web-agent-cdsso-properties">
+    <title>Cross Domain SSO properties</title>
     <varlistentry>
      <term>Cross Domain SSO</term>
      <listitem>
@@ -711,8 +711,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Cookie Reset properties</para>
+   <variablelist xml:id="web-agent-cookie-reset-properties">
+    <title>Cookie Reset properties</title>
     <varlistentry>
      <term>Cookie Reset</term>
      <listitem>
@@ -755,8 +755,8 @@
    Agents &gt; Web &gt; <replaceable>Agent Name</replaceable> &gt; OpenAM
    Services.</para>
    
-   <variablelist>
-    <para>Login URL properties</para>
+   <variablelist xml:id="web-agent-login-url-properties">
+    <title>Login URL properties</title>
     <varlistentry>
      <term>OpenAM Login URL</term>
      <listitem>
@@ -784,8 +784,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Logout URL properties</para>
+   <variablelist xml:id="web-agent-logout-url-properties">
+    <title>Logout URL properties</title>
     <varlistentry>
      <term>OpenAM Logout URL</term>
      <listitem>
@@ -796,8 +796,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Agent Logout URL properties</para>
+   <variablelist xml:id="web-agent-agent-logout-url-properties">
+    <title>Agent Logout URL properties</title>
     <varlistentry>
      <term>Logout URL List</term>
      <listitem>
@@ -827,8 +827,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Policy Client Service properties</para>
+   <variablelist xml:id="web-agent-policy-client-service-properties">
+    <title>Policy Client Service properties</title>
     <varlistentry>
      <term>Policy Cache Polling Period</term>
      <listitem>
@@ -899,9 +899,9 @@
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
    Web &gt; <replaceable>Agent Name</replaceable> &gt; Miscellaneous.</para>
    
-   <variablelist>
+   <variablelist xml:id="web-agent-advice-handling-properties">
     <!-- OPENAM-754: Option to send composite advice in the query instead of sending it through a POST request -->
-    <para>Advice Handling properties</para>
+    <title>Advice Handling properties</title>
     <varlistentry>
      <term>Composite Advice Handling (Not yet in OpenAM console)</term>
      <listitem>
@@ -913,8 +913,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Locale properties</para>
+   <variablelist xml:id="web-agent-locale-properties">
+    <title>Locale properties</title>
     <varlistentry>
      <term>Agent Locale</term>
      <listitem>
@@ -925,8 +925,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Anonymous user properties</para>
+   <variablelist xml:id="web-agent-anonymous-user-properties">
+    <title>Anonymous user properties</title>
     <varlistentry>
      <term>Anonymous User</term>
      <listitem>
@@ -936,8 +936,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Cookie Processing properties</para>
+   <variablelist xml:id="web-agent-cookie-processing-properties">
+    <title>Cookie Processing properties</title>
     <varlistentry>
      <term>Encode special chars in Cookies</term>
      <listitem>
@@ -965,8 +965,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>URL Handling properties</para>
+   <variablelist xml:id="web-agent-url-handling-properties">
+    <title>URL Handling properties</title>
     <varlistentry>
      <term>URL Comparison Case Sensitivity Check</term>
      <listitem>
@@ -985,8 +985,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Ignore Naming URL properties</para>
+   <variablelist xml:id="web-agent-ignore-naming-url-properties">
+    <title>Ignore Naming URL properties</title>
     <varlistentry>
      <term>Ignore Preferred Naming URL in Naming Request</term>
      <listitem>
@@ -996,8 +996,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Ignore Server Check properties</para>
+   <variablelist xml:id="web-agent-ignore-server-check-properties">
+    <title>Ignore Server Check properties</title>
     <varlistentry>
      <term>Ignore Server Check</term>
      <listitem>
@@ -1008,8 +1008,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Ignore Path Info properties</para>
+   <variablelist xml:id="web-agent-ignore-path-info-properties">
+    <title>Ignore Path Info properties</title>
     <varlistentry>
      <term>Ignore Path Info in Request URL</term>
      <listitem>
@@ -1020,8 +1020,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Multi-byte Enable properties</para>
+   <variablelist xml:id="web-agent-multi-byte-properties">
+    <title>Multi-byte Enable properties</title>
     <varlistentry>
      <term>Native Encoding of Profile Attributes</term>
      <listitem>
@@ -1033,8 +1033,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Goto Parameter Name properties</para>
+   <variablelist xml:id="web-agent-goto-parameter-name-properties">
+    <title>Goto Parameter Name properties</title>
     <varlistentry>
      <term>Goto Parameter Name</term>
      <listitem>
@@ -1056,8 +1056,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Deprecated Agent properties</para>
+   <variablelist xml:id="web-agent-deprecated-properties">
+    <title>Deprecated Agent properties</title>
     <varlistentry>
      <term>Anonymous User Default Value</term>
      <listitem>
@@ -1077,8 +1077,8 @@
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
    Web &gt; <replaceable>Agent Name</replaceable> &gt; Advanced.</para>
    
-   <variablelist>
-    <para>Client Identification properties</para>
+   <variablelist xml:id="web-agent-client-identification-properties">
+    <title>Client Identification properties</title>
     <varlistentry>
      <term>Client IP Address Header</term>
      <listitem>
@@ -1095,8 +1095,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Load Balancer properties</para>
+   <variablelist xml:id="web-agent-lb-properties">
+    <title>Load Balancer properties</title>
     <varlistentry>
      <term>Load Balancer Setup</term>
      <listitem>
@@ -1139,8 +1139,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Post Data Preservation properties</para>
+   <variablelist xml:id="web-agent-post-data-preservation-properties">
+    <title>Post Data Preservation properties</title>
     <varlistentry>
      <term>POST Data Preservation</term>
      <listitem>
@@ -1159,8 +1159,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Sun Java System Proxy Server properties</para>
+   <variablelist xml:id="web-agent-sjsws-properties">
+    <title>Sun Java System Proxy Server properties</title>
     <varlistentry>
      <term>Override Proxy Server's Host and Port</term>
      <listitem>
@@ -1170,8 +1170,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Microsoft IIS Server properties</para>
+   <variablelist xml:id="web-agent-iis-properties">
+    <title>Microsoft IIS Server properties</title>
     <varlistentry>
      <term>Authentication Type</term>
      <listitem>
@@ -1219,8 +1219,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>IBM Lotus Domino Server properties</para>
+   <variablelist xml:id="web-agent-domino-properties">
+    <title>IBM Lotus Domino Server properties</title>
     <varlistentry>
      <term>Check User in Domino Database</term>
      <listitem>
@@ -1260,8 +1260,8 @@
     </varlistentry>
    </variablelist>
    
-   <variablelist>
-    <para>Custom properties</para>
+   <variablelist xml:id="web-agent-custom-properties">
+    <title>Custom properties</title>
     <varlistentry>
      <term>Custom Properties</term>
      <listitem>
