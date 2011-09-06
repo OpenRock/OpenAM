@@ -60,10 +60,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.forgerock.openam.upgrade.ServerUpgrade;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeReport;
 import org.forgerock.openam.upgrade.UpgradeUtils;
@@ -79,10 +79,8 @@ public class ServerConfiguration extends ConfigurationBase {
     private static final String ATTR_PARENT_SITE_ID = "parentsiteid";
     private static final String ATTR_SERVER_CONFIG = "serverconfig";
     private static final String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
-    private static final String ATTR_DEFAULT_UPGRADE = "defaults.to.upgrade";
 
     public static final String SERVER_DEFAULTS = "serverdefaults";
-    public static final String SERVER_UPGRADE = "serverupgrade";
     private static final String DEFAULT_SERVER_ID = "00";
 
     /**
@@ -391,7 +389,7 @@ public class ServerConfiguration extends ConfigurationBase {
             Set<String> attrsToUpgrade = null;
         
             try {
-                attrsToUpgrade = getAttrsToUpgrade();
+                attrsToUpgrade = ServerUpgrade.getAttrsToUpgrade();
             } catch (UpgradeException ue) {
                 if (UpgradeUtils.debug.warningEnabled()) {
                     UpgradeUtils.debug.warning("Unable to fetch server defaults to upgrade", ue);
@@ -1478,27 +1476,5 @@ public class ServerConfiguration extends ConfigurationBase {
                 updateOrganizationAlias(ssoToken, serverName, true);
             }
         }
-    }
-    
-    private static Set<String> getAttrsToUpgrade() 
-    throws UpgradeException {
-        ResourceBundle res = ResourceBundle.getBundle(SERVER_UPGRADE);
-        Set<String> values = new HashSet<String>();
-            
-        if (!res.containsKey(ATTR_DEFAULT_UPGRADE)) {
-            throw new UpgradeException("Unable to find " + ATTR_DEFAULT_UPGRADE + " in " + SERVER_UPGRADE);
-        }
-        
-        String attrValues = res.getString(ATTR_DEFAULT_UPGRADE);
-        
-        if (attrValues != null) {
-            StringTokenizer st = new StringTokenizer(attrValues, ",");
-            
-            while (st.hasMoreTokens()) {
-                values.add(st.nextToken());
-            }
-        }
-        
-        return values;
     }
 }
