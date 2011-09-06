@@ -343,8 +343,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }
             }
             
-            ac = AuthUtils.getAuthContext(
-                    request, response, sessionID, sessionUpgrade, isBackPost);            
             if ((ssoToken != null) && (!sessionUpgrade)) {
                 try {
                     loginDebug.message("Session is Valid / already "
@@ -355,7 +353,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                      * redirect URL.
                      */
                     if (request != null) {
-	                redirect_url = AuthUtils.getValidGotoURL(request, ac);
+	                redirect_url = AuthUtils.getValidGotoURL(request, ssoToken.getProperty("Organization"));
 	                if ((redirect_url == null) || (redirect_url.length() 
                             == 0)){
                             redirect_url = ssoToken.getProperty(
@@ -367,7 +365,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                             ("authentication.already.login");
                     }
                     LoginSuccess = true;
-                    boolean doForward = AuthUtils.isForwardSuccess(ac,request);
+                    boolean doForward = AuthUtils.forwardSuccessExists(request);
                     if (doForward) {  
                         if(loginDebug.messageEnabled()){
                             loginDebug.message(
@@ -375,17 +373,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                             loginDebug.message("LoginViewBean.forwardTo():" +
                             "Forward URL before appending cookie is " + 
                             redirect_url); 
-                        }
-                        Cookie appendCookie = 
-                            AuthUtils.getCookieString(ac, null);
-                        if(redirect_url.indexOf("?") == -1){
-                            redirect_url = redirect_url + "?" + 
-                            appendCookie.getName() + "=" + 
-                            AMURLEncDec.encode(appendCookie.getValue()); 
-                        }else{
-                            redirect_url = redirect_url + "&" + 
-                            appendCookie.getName() + "=" + 
-                            AMURLEncDec.encode(appendCookie.getValue());                            
                         }
                         if(loginDebug.messageEnabled()){
                             loginDebug.message("LoginViewBean.forwardTo():" +
@@ -417,6 +404,9 @@ public class LoginViewBean extends AuthViewBeanBase {
                     setErrorMessage(er);
                 }
             }
+
+            ac = AuthUtils.getAuthContext(
+                    request, response, sessionID, sessionUpgrade, isBackPost);
             if (sessionID != null) {
                 intSession = AuthD.getSession(sessionID);
             }
