@@ -26,39 +26,29 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
  <xsl:import href="urn:docbkx:stylesheet" />
 
-<!-- <xsl:param name="chunk.section.depth" select="0" />-->
-<!-- <xsl:param name="chunker.output.encoding">UTF-8</xsl:param>-->
-<!-- <xsl:param name="chunker.output.indent">yes</xsl:param>-->
+ <xsl:param name="html.stylesheet">css/coredoc.css</xsl:param>
  <xsl:param name="generate.legalnotice.link" select="1" />
-<!-- <xsl:param name="generate.revhistory.link" select="1" />-->
- <xsl:param name="root.filename">index</xsl:param>
- <xsl:param name="use.id.as.filename" select="1" />	
-<!-- <xsl:template name="user.footer.content">-->
-<!--  <a>-->
-<!--   <xsl:attribute name="href">-->
-<!--    <xsl:apply-templates select="//legalnotice[1]" mode="chunk-filename" />-->
-<!--   </xsl:attribute>-->
-<!--   <xsl:apply-templates select="//copyright[1]" mode="titlepage.mode" />-->
-<!--  </a>-->
-<!-- </xsl:template>-->
-  <xsl:param name="generate.toc">
-   appendix  nop
-   article/appendix  nop
-   article   nop
-   book      toc,title,figure,table,example,equation
-   chapter   nop
-   part      toc,title
-   preface   nop
-   qandadiv  nop
-   qandaset  nop
-   reference nop
-   sect1     nop
-   sect2     nop
-   sect3     nop
-   sect4     nop
-   sect5     nop
-   section   nop
-   set       toc,title
-  </xsl:param>
+ <xsl:param name="root.filename">index</xsl:param> <!-- docbkx-tools ignores this. -->
+ <xsl:param name="use.id.as.filename" select="1" />
+ <xsl:param name="generate.toc">
+  appendix  nop
+  article/appendix  nop
+  article   nop
+  book      toc,title
+  chapter   nop
+  part      toc,title
+  preface   nop
+  qandadiv  nop
+  qandaset  nop
+  reference toc,title
+  sect1     nop
+  sect2     nop
+  sect3     nop
+  sect4     nop
+  sect5     nop
+  section   nop
+  set       toc,title
+ </xsl:param>
  <xsl:param name="toc.section.depth" select="0" />
+ <xsl:param name="generate.meta.abstract" select="1" />
 </xsl:stylesheet>
