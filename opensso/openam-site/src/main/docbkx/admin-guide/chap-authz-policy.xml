@@ -125,8 +125,424 @@
  </section>
  
  <section xml:id="configure-authz-policy">
-  <title>Configuring Authorization Policies</title>
+  <title>Configuring Policies</title>
   
-  <para>TODO</para>
+  <para>An OpenAM authorization policy defines who can access what, under what
+  conditions. The OpenAM agents enforcing policy call upon OpenAM to make
+  policy decisions. Decisions from OpenAM can be as simple as "allow" or
+  "deny." Decisions from OpenAM can alternatively provide additional
+  information required for policy enforcement. OpenAM policies use response
+  providers to return such additional information.</para>
+  
+  <procedure xml:id="create-policy">
+   <title>To Create a Policy</title>
+   
+   <step>
+    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies, then click New Policy...</para>
+   </step>
+   <step>
+    <para>Provide at minimum a name for the policy.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="configure-url-policy">
+   <title>To Configure a Policy For a Web Site</title>
+   
+   <para>Once a policy is created, you can further specify rules, subjects,
+   conditions, and response providers.</para>
+   
+   <itemizedlist>
+    <para>OpenAM has, by default, three kinds of resources that you can protect
+    with a policy.</para>
+    <listitem>
+     <para>A <firstterm>Discovery Service</firstterm>, used in federated access
+     management, locates the web service providing the data needed to complete
+     an operation. Your policy protects what clients can look up and what they
+     can update.</para>
+    </listitem>
+    <listitem>
+     <para>A <firstterm>Liberty Personal Profile Service</firstterm>, used in
+     federated access management, provides an identity's basic profile
+     information. Your policy protects what clients can query and what they
+     can modify.</para>
+    </listitem>
+    <listitem>
+     <para>A <firstterm>URL Policy Agent</firstterm> protects resources on a
+     specific web site or web application. Your policy protects what URLs
+     client applications can access with HTTP GET and POST operations.</para>
+    </listitem>
+   </itemizedlist>
+   
+   <para>Follow these steps to configure a policy to protect a web site or web
+   application.</para>
+   
+   <step>
+    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies &gt; <replaceable>Policy
+    Name</replaceable> to display the policy to edit.</para>
+   </step>
+   <step xml:id="define-rules">
+    <para>In the Rules table, click New... to create a rule, identifying
+    a URL to protect.</para>
+    <substeps>
+     <step>
+      <para>Select URL Policy Agent (with resource name), and click Next.</para>
+     </step>
+     <step>
+      <para>Name the new rule, add the URL to protect in the Resource Name
+      field, and set whether to allow or deny HTTP GET and POST requests
+      to the URL.</para>
+      <para>The URL can include asterisks as wildcards (<literal>*</literal>).
+      Wildcard matches for rules work as follows.</para>
+      <itemizedlist>
+       <listitem>
+        <para>A <literal>*</literal> matches zero or more characters including
+        <literal>/</literal>, but</para>
+       </listitem>
+       <listitem>
+        <para>A <literal>*</literal> at the end of the Resource Name
+        immediately following <literal>/</literal> matches one or more
+        characters including <literal>/</literal>.</para>
+       </listitem>
+       <listitem>
+        <para>Multiple forward slashes do not match a single forward slash, so
+        <literal>mult/*/dirs</literal> matches
+        <literal>mult/iple/dirs</literal>, yet <literal>mult/*/dirs</literal>
+        does not match <literal>mult/dirs</literal>.</para>
+       </listitem>
+       <listitem>
+        <para>Trailing forward slashes are not recognized as part of a Resource
+        Name. Therefore <literal>http://www.example.com/images//</literal> and
+        <literal>http://www.example.com/images</literal> are equivalent.</para>
+       </listitem>
+      </itemizedlist>
+     </step>
+     <step>
+      <para>Click Finish.</para>
+      <para>The new rule is not yet saved until you click the Save button
+      in the Edit Policy screen.</para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>In the Subjects table, click New... to define a subject, identifying
+    the users to whom the policy applies.</para>
+    <substeps>
+     <step>
+      <para>In the Select Subject Type screen, make your selection,
+      and then click next.</para>
+      <itemizedlist>
+       <listitem>
+        <para>Authenticated Users refers to users who have authenticated
+        with OpenAM, even if they do not have profiles in the realm where
+        you define the policy.</para>
+       </listitem>
+       <listitem>
+        <para>OpenAM Identity Subject refers to users or groups you can find
+        under Access Control &gt; Realm Name &gt; Subjects.</para>
+       </listitem>
+       <listitem>
+        <para>Web Services Clients are for federated access management.</para>
+       </listitem>
+      </itemizedlist>
+     </step>
+     <step>
+      <para>Name the subject.</para>
+     </step>
+     <step performance="optional">
+      <para>If you want to apply the policy to everyone but the subjects
+      you identified, then select Exclusive.</para>
+      <para>For example</para>
+     </step>
+     <step performance="optional">
+      <para>If you selected OpenAM Identity Subject, use the Filter section
+      to find and add to your list the subjects to whom to apply the
+      policy.</para>
+     </step>
+     <step>
+      <para>Click Finish.</para>
+     </step>
+    </substeps>
+   </step>
+   <step performance="optional">
+    <para>In the Conditions table, click New... to create a condition,
+    constraining the circumstances under which the policy applies.</para>
+    <substeps>
+     <step>
+      <para>Select the Condition Type from the list.</para>
+      <itemizedlist>
+       <listitem>
+        <para>Active Session Time lets you make the policy depend on how
+        long the user's session has been active, and even to terminate the
+        session if deemed too old, such that the user must authenticate
+        again.</para>
+       </listitem>
+       <listitem>
+        <para>Authentication by Module Chain lets you make the policy depend
+        on the realm where the user authenticated, and on the authentication
+        chain used to authenticate.</para>
+       </listitem>
+       <listitem>
+        <para>Authentication by Module Instance lets you make the policy depend
+        on the realm where the user authenticated, and on the authentication
+        module used to authenticate, as well as setting timeouts for
+        application authentication.</para>
+       </listitem>
+       <listitem>
+        <para>Authentication Level (greater than or equal to) lets you
+        make the policy depend on the realm where the user authenticated,
+        and on a minimum acceptable authentication level.</para>
+       </listitem>
+       <listitem>
+        <para>Authentication Level (less than or equal to) lets you
+        make the policy depend on the realm where the user authenticated,
+        and on a maximum acceptable authentication level.</para>
+       </listitem>
+       <listitem>
+        <para>Authentication to a Realm lets you make the policy depend on
+        the realm where the user authenticated.</para>
+       </listitem>
+       <listitem>
+        <para>Current Session Properties lets you make the policy depend on
+        attributes set in the user's session.</para>
+       </listitem>
+       <listitem>
+        <para>Identity Membership lets you make the policy depend on a list
+        of OpenAM subjects that you select, and whether the user belongs to
+        the list of users or is a member of a group you selected.</para>
+       </listitem>
+       <listitem>
+        <para>IP Address/DNS Name lets you apply the policy to clients in
+        specific IP address ranges or coming from a particular DNS
+        domain.</para>
+       </listitem>
+       <listitem>
+        <para>LDAP Filter Condition lets you make the policy depend on whether
+        the user's entry can be found using the LDAP search filter you specify
+        in the directory configured for the policy service, which by default
+        is the identity repository. See Configuration &gt; Global &gt; Policy
+        Configuration &gt; Realm Attributes &gt; Primary LDAP Server.</para>
+       </listitem>
+       <listitem>
+        <para>Resource/Environment/IP Address lets you make the policy apply
+        using a complex condition such as whether the user is making a request
+        from the localhost and has authenticated with the LDAP authentication
+        module.</para>
+       </listitem>
+       <listitem>
+        <para>Time (day, date, time, and timezone) lets you make the policy
+        depend on when the policy is evaluated.</para>
+       </listitem>
+      </itemizedlist>
+     </step>
+     <step>
+      <para>Based on the Condition Type you choose, configure the condition,
+      and then click Finish.</para>
+     </step>
+    </substeps>
+   </step>
+   <step performance="optional">
+    <para>In the Response Providers table, click New... to set up a response
+    provider that adds attributes retrieved from the user entry in the identity
+    repository into the headers of the request at policy decision time.</para>
+    <substeps>
+     <step>
+      <para>Name the provider.</para>
+     </step>
+     <step>
+      <para>Add static attributes having the form
+      <literal><replaceable>attribute</replaceable>=<replaceable>value</replaceable></literal>.</para>
+     </step>
+     <step>
+      <para>Add dynamic attributes having the form
+      <literal><replaceable>responseAttr</replaceable>=<replaceable>repoAttr</replaceable></literal>,
+      where <replaceable>responseAttr</replaceable> is the attribute name
+      to be put into the header of the request, and
+      <replaceable>repoAttr</replaceable> is the attribute name used in the
+      identity repository.</para>
+     </step>
+     <step>
+      <para>Click Finish.</para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>Save your work.</para>
+   </step>
+  </procedure>
+ </section>
+ 
+ <section xml:id="policy-resolution">
+  <title>How OpenAM Reaches Policy Decisions</title>
+  
+  <para>OpenAM has to match policies to resources to take policy decisions.
+  For a policy to match, the resource has to match a resources identified in
+  a rule. The user making the request has to match a subject. Furthermore, at
+  least one condition for each condition type has to be satisfied.</para>
+  
+  <para>If more than one policy matches, OpenAM has to reconcile differences.
+  When multiple policies match, the order in which OpenAM uses them to make a
+  policy decision is not deterministic. However, a deny decision overrides an
+  allow decision, and so by default once OpenAM reaches a deny decision its
+  stops checking further policies. (If you want OpenAM to continue checking
+  despite the deny, see Configuration &gt; Global &gt; Policy Configuration
+  &gt; Continue Evaluation on Deny Decision.)</para>
+ </section>
+ 
+ <section xml:id="script-policy">
+  <title>Managing Policies Outside the Console</title>
+  
+  <para>When you first create policies, the OpenAM console helps you to get
+  started quickly. Yet, when you have many policies to manage you might find
+  it easier to script operations, starting from policies originally created
+  in the console, then exported to XML.</para>
+  
+  <procedure xml:id="export-policy-to-xml">
+   <title>To Export Policies From the Console</title>
+   
+   <para>You can export policies created in the console to an XML Policies
+   document.</para>
+   
+   <step>
+    <para>Use the <command>ssoadm list-policies</command> command.</para>
+    <screen>$ ssoadm list-policies --realm "/" --adminid amadmin
+ --password-file /tmp/pwd.txt 
+
+Policy definitions were returned under realm, /.
+&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;!DOCTYPE Policies 
+PUBLIC "-//OpenSSO Policy Administration DTD//EN"
+"jar://com/sun/identity/policy/policyAdmin.dtd"&gt;
+
+&lt;!-- extracted from realm, / --&gt;
+&lt;Policies&gt;
+&lt;Policy name="URL Policy" createdby="id=amadmin,ou=user,o=openam"
+ lastmodifiedby="id=amadmin,ou=user,o=openam" creationdate="1312553988059"
+ lastmodifieddate="1315403023466" referralPolicy="false" active="true" &gt;
+&lt;Rule name="Allow GET with parameters"&gt;
+&lt;ServiceName name="iPlanetAMWebAgentService" /&gt;
+&lt;ResourceName name="http://www.example.com/ching/*?*" /&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name="GET" /&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;/Rule&gt;
+&lt;Rule name="Allow GET and POST"&gt;
+&lt;ServiceName name="iPlanetAMWebAgentService" /&gt;
+&lt;ResourceName name="http://www.example.com/ching/*" /&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name="POST" /&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name="GET" /&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;/Rule&gt;
+&lt;Subjects name="Subjects:1312553593870WmIuFvI=" description=""&gt;
+&lt;Subject name="All Authenticated Users" type="AuthenticatedUsers"
+ includeType="inclusive"&gt;
+&lt;/Subject&gt;
+&lt;/Subjects&gt;
+&lt;/Policy&gt;
+&lt;/Policies&gt;</screen>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="import-policy-from-xml">
+   <title>To Import Policies Using the Command Line</title>
+   
+   <para>In a production environment where you manage operations using scripts
+   rather than the console, use exported, file-based policies edited for your
+   needs, and then import the policies using <command>ssoadm</command>.</para>
+   
+   <step>
+    <para>Create your XML policy file.</para>
+    <screen>$ cat policy.xml &lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;!DOCTYPE Policies 
+PUBLIC "-//OpenSSO Policy Administration DTD//EN"
+"jar://com/sun/identity/policy/policyAdmin.dtd"&gt;
+&lt;!-- New policy, same as the old policy --&gt;
+&lt;Policies&gt;
+&lt;Policy name="New Policy" referralPolicy="false" active="true" &gt;
+&lt;Rule name="Allow GET with parameters"&gt;
+&lt;ServiceName name="iPlanetAMWebAgentService" /&gt;
+&lt;ResourceName name="http://www.example.com/ching/*?*" /&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name="GET" /&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;/Rule&gt;
+&lt;Rule name="Allow GET and POST"&gt;
+&lt;ServiceName name="iPlanetAMWebAgentService" /&gt;
+&lt;ResourceName name="http://www.example.com/ching/*" /&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name="POST" /&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name="GET" /&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;/Rule&gt;
+&lt;Subjects name="Subjects" description="Everybody authenticated"&gt;
+&lt;Subject name="All Authenticated Users" type="AuthenticatedUsers"
+ includeType="inclusive"&gt;
+&lt;/Subject&gt;
+&lt;/Subjects&gt;
+&lt;/Policy&gt;
+&lt;/Policies&gt;</screen>
+   </step>
+   <step>
+    <para>Use the <command>ssoadm create-policies</command> command.</para>
+    <screen>$ ssoadm create-policies --realm "/" --adminid amadmin
+ --password-file /tmp/pwd.txt --xmlfile policy.xml
+
+Policies were created under realm, /.</screen>
+   </step>
+  </procedure>
+ </section>
+ 
+ <section xml:id="delegate-policy">
+  <title>Delegating Policy Management &amp; Decisions</title>
+  
+  <para>You use a <firstterm>referral</firstterm> to delegate policy
+  management, and to delegate policy decision making.</para>
+  
+  <procedure xml:id="create-referral">
+   <title>To Create a Referral</title>
+   
+   <step>
+    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies, then click New Referral...</para>
+   </step>
+   <step>
+    <para>Provide at minimum a name for the referral.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="update-referral">
+   <title>To Configure a Referral</title>
+   
+   <step>
+    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies &gt; <replaceable>Referral
+    Name</replaceable> to display the referral to edit.</para>
+   </step>
+   <step>
+    <para>Set up rules to identify the resources to which the referral
+    applies.</para>
+    <para>Rules are defined as for policies, though you specify only the
+    Name and Resource Name. See <xref linkend="define-rules" /> for
+    details.</para>
+   </step>
+   <step>
+    <para>Set up referrals to identify the realms to which to delegate
+    policy management.</para>
+    <para>You can delegate to peer realms or sub realms (child realms), but
+    not to parent realms.</para>
+   </step>
+  </procedure>
  </section>
 </chapter>
