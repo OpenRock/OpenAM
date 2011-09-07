@@ -104,12 +104,9 @@
   desktops to visit protected web sites without having to type their user names
   and passwords again.</para>
   
-  <para>Policies can be extended to implement <firstterm>response
-  providers</firstterm>, which extends HTTP headers for authorized access,
-  and to send <firstterm>advice</firstterm>. OpenAM can be configured to
-  send advice for example when authorization results in access being denied,
-  though in fact the reason for the denial was obviously something that
-  could be corrected by further authentication. For instance, suppose a
+  <para>When OpenAM denies a request due to a condition that could be corrected
+  by further authentication, OpenAM can send advice to the policy agent, and
+  the policy agent can then take remedial action. For instance, suppose a
   user comes to a web site having authenticated with an email address and
   password, which is configured as authentication level 0. Had the user
   authenticated over the VPN which relies on one-time password authentication,
@@ -119,6 +116,17 @@
   prompting the agent or application to redirect her to authenticate again with
   a one-time password, gaining authentication level 1, and thus having OpenAM
   grant her access to the protected page.</para>
+  
+  <para>Policies can include <firstterm>response providers</firstterm>.
+  Response providers extend HTTP headers with additional information beyond
+  an "allow" or "deny" decision. For example, a response provider can return
+  a user's full name upon login so that a web application can show the user's
+  name on the pages it displays.</para>
  </section>
-
+ 
+ <section xml:id="configure-authz-policy">
+  <title>Configuring Authorization Policies</title>
+  
+  <para>TODO</para>
+ </section>
 </chapter>
