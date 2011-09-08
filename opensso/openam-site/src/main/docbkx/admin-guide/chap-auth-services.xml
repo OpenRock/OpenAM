@@ -23,7 +23,7 @@
   !      Copyright 2011 ForgeRock AS
   !    
 -->
-<chapter xml:id='chap-auth-policy'
+<chapter xml:id='chap-auth-services'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'

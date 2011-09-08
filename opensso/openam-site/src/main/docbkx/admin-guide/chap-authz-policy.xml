@@ -39,6 +39,8 @@
  
  <section xml:id="what-is-authz">
   <title>About Authorization in OpenAM</title>
+  <indexterm><primary>Authorization</primary></indexterm>
+  <indexterm><primary>Policy</primary></indexterm>
   
   <para>Applications rely on OpenAM for access management, which breaks down
   into authentication, or determining who is trying to access a resource,
@@ -506,43 +508,9 @@ Policies were created under realm, /.</screen>
  
  <section xml:id="delegate-policy">
   <title>Delegating Policy Management &amp; Decisions</title>
-  
   <para>You use a <firstterm>referral</firstterm> to delegate policy
   management, and to delegate policy decision making.</para>
-  
-  <procedure xml:id="create-referral">
-   <title>To Create a Referral</title>
-   
-   <step>
-    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
-    Name</replaceable> &gt; Policies, then click New Referral...</para>
-   </step>
-   <step>
-    <para>Provide at minimum a name for the referral.</para>
-   </step>
-  </procedure>
-  
-  <procedure xml:id="update-referral">
-   <title>To Configure a Referral</title>
-   
-   <step>
-    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
-    Name</replaceable> &gt; Policies &gt; <replaceable>Referral
-    Name</replaceable> to display the referral to edit.</para>
-   </step>
-   <step>
-    <para>Set up rules to identify the resources to which the referral
-    applies.</para>
-    <para>Rules are defined as for policies, though you specify only the
-    Name and Resource Name. See <xref linkend="define-rules" /> for
-    details.</para>
-   </step>
-   <step>
-    <para>Set up referrals to identify the realms to which to delegate
-    policy management.</para>
-    <para>You can delegate to peer realms or sub realms (child realms), but
-    not to parent realms.</para>
-   </step>
-  </procedure>
+  <!-- TODO: add an olink once that becomes possible. -->
+  <para>Referrals are covered in the chapter on Realms.</para>
  </section>
 </chapter>

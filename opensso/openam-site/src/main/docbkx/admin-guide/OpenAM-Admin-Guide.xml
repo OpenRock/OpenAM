@@ -52,7 +52,7 @@
 
  <xinclude:include href='chap-admin-tools.xml' />
  <xinclude:include href='chap-gateway.xml' />
- <xinclude:include href='chap-auth-policy.xml' />
+ <xinclude:include href='chap-auth-services.xml' />
  <xinclude:include href='chap-authz-policy.xml' />
  <xinclude:include href='chap-entitlements.xml' />
  <xinclude:include href='chap-realms.xml' />
