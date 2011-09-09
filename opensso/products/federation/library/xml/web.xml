@@ -295,10 +295,6 @@
             <jsp-file>/saml2/jsp/idpSSOFederate.jsp</jsp-file>
         </servlet>
         <servlet>
-            <servlet-name>idpArtifactResolution</servlet-name>
-            <jsp-file>/saml2/jsp/idpArtifactResolution.jsp</jsp-file>
-        </servlet>
-        <servlet>
             <servlet-name>idpsaehandler</servlet-name>
             <jsp-file>/saml2/jsp/SA_IDP.jsp</jsp-file>
         </servlet>
@@ -317,10 +313,6 @@
         <servlet>
             <servlet-name>RealmSelection</servlet-name>
             <jsp-file>/wsfederation/jsp/realmSelection.jsp</jsp-file>
-        </servlet>
-        <servlet>
-            <servlet-name>LoggedOut</servlet-name>
-            <jsp-file>/wsfederation/jsp/loggedOut.jsp</jsp-file>
         </servlet>
         <servlet>
         <servlet-name>federationrest</servlet-name>
@@ -455,10 +447,6 @@
         <servlet-mapping>
             <servlet-name>idpSSOFederate</servlet-name>
             <url-pattern>/idpSSOFederate/*</url-pattern>
-        </servlet-mapping>
-        <servlet-mapping>
-            <servlet-name>idpArtifactResolution</servlet-name>
-            <url-pattern>/idpArtifactResolution/*</url-pattern>
         </servlet-mapping>
         <servlet-mapping>
             <servlet-name>idpsaehandler</servlet-name>
@@ -607,10 +595,6 @@
         <servlet-mapping>
             <servlet-name>RealmSelection</servlet-name>
             <url-pattern>/RealmSelection/*</url-pattern>
-        </servlet-mapping>
-        <servlet-mapping>
-            <servlet-name>LoggedOut</servlet-name>
-            <url-pattern>/LoggedOut/*</url-pattern>
         </servlet-mapping>
         <servlet-mapping>
             <servlet-name>saml2query</servlet-name>
