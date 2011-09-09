@@ -26,12 +26,16 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.iplanet.services.util;
 
 import java.security.MessageDigest;
 
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.util.internal.TextCrypt;
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * The class <code>Hash</code> provides generic methods to hash data.

@@ -26,10 +26,9 @@
  *
  */
 
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.saml2.meta;
 
 import java.security.KeyStore;
@@ -439,7 +438,7 @@ public final class SAML2MetaSecurityUtils {
 
         if (cert != null) {
             try {
-                return Base64.encode(cert.getEncoded(), 76);
+                return Base64.encode(cert.getEncoded(), true);
             } catch (Exception ex) {
                 if (debug.messageEnabled()) {
                     debug.message(

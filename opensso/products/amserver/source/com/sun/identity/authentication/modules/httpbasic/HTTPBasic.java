@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.authentication.modules.httpbasic;
 
@@ -53,10 +53,10 @@ import javax.security.auth.callback.PasswordCallback;
 import java.io.IOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.encode.Base64;
 import java.security.AccessController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import sun.misc.BASE64Decoder;
 
 /**
  * HTTP Basic login module.
@@ -194,8 +194,7 @@ public class HTTPBasic extends AMLoginModule {
             null, null);
         }
         String userPwdEncoded = auth.substring(6);  // removes 'BASIC '
-        BASE64Decoder decoder = new BASE64Decoder();
-        String decode = new String(decoder.decodeBuffer(userPwdEncoded));
+        String decode = new String(Base64.decode(userPwdEncoded));
         int idx = decode.indexOf(':');
         if (idx != -1) {
             userPassword = decode.substring(idx+1);

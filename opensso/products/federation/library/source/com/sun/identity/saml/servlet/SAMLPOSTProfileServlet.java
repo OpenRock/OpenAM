@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.saml.servlet;
 
 import com.sun.identity.shared.encode.Base64;
@@ -211,8 +213,7 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
         // base64 encode the signed samlResponse
         String encodedResponse = null;
         try {
-            encodedResponse = Base64.encode(signedBytes, 
-                         SAMLConstants.BASE64CHARPERLINE).trim();
+            encodedResponse = Base64.encode(signedBytes, true).trim();
         } catch (Exception e) {
             SAMLUtils.debug.error("SAMLPOSTProfileServlet.doGet: Exception "
             + "when encoding the response:", e);

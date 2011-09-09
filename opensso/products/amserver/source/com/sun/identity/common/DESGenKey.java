@@ -26,12 +26,15 @@
  *
  */
  
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.common;
 
+import com.sun.identity.shared.encode.Base64;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import sun.misc.BASE64Encoder;
 
 /**
  * This class is used to generate a unique key used for DES
@@ -45,9 +48,8 @@ public class DESGenKey
 
             SecretKey key = kg.generateKey();
             byte[] desKey = key.getEncoded();
-            BASE64Encoder keyencoder = new BASE64Encoder();
 
-            String deskeystr = keyencoder.encodeBuffer(desKey);
+            String deskeystr = Base64.encode(desKey);
             System.out.println("Key ==> " + deskeystr);
         } catch (NoSuchAlgorithmException noe) {
             System.out.println("DESGenKey.main: NoSuchAlgorithmException " +

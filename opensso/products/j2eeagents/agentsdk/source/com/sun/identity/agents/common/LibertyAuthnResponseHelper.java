@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.common;
 
 import java.net.URLDecoder;
@@ -34,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.iplanet.services.util.Base64;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.SurrogateBase;

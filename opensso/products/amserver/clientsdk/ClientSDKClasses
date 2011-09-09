@@ -409,7 +409,6 @@ com/iplanet/am/util/OrderedSet.class
 com/iplanet/am/util/AMURLEncDec.class
 com/iplanet/am/util/FileLookupException.class
 com/iplanet/am/util/FileLookup.class
-com/iplanet/services/util/Base64.class
 com/iplanet/services/util/CookieUtils.class
 com/sun/identity/common/L10NMessageImpl.class
 com/sun/identity/common/L10NMessage.class

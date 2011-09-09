@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.console.base;
 
@@ -38,10 +38,10 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
+import com.sun.identity.shared.encode.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import sun.misc.BASE64Encoder;
 
 /**
  * This singleton class governs the tracking of page trail per user session.
@@ -54,7 +54,6 @@ public class PageTrailManager
      
     private static PageTrailManager instance = new PageTrailManager();
     private Map mapTokenIDs = new HashMap(100);
-    private static BASE64Encoder encoder = new BASE64Encoder();
 
     /**
      * The generated random string is used to cache page trail object when
@@ -158,7 +157,7 @@ public class PageTrailManager
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
         sb.append(System.currentTimeMillis());
-        sb.append(encoder.encode(keyRandom));
+        sb.append(Base64.encode(keyRandom));
         return (sb.toString());
     }
 }

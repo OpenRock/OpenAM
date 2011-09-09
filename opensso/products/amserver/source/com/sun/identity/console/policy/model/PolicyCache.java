@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.console.policy.model;
 
@@ -38,10 +38,10 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
+import com.sun.identity.shared.encode.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import sun.misc.BASE64Encoder;
 
 /* - NEED NOT LOG - */
 
@@ -54,7 +54,6 @@ public class PolicyCache
 {        
     private static PolicyCache instance = new PolicyCache();
     private Map mapTokenIDs = new HashMap(100);
-    private static BASE64Encoder encoder = new BASE64Encoder();
 
     /**
      * The generated random string is used to cache policy object when
@@ -215,7 +214,7 @@ public class PolicyCache
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
         sb.append(System.currentTimeMillis());
-        sb.append(encoder.encode(keyRandom));
+        sb.append(Base64.encode(keyRandom));
         return (sb.toString());
     }
 }

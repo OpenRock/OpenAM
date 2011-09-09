@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-  
 package com.sun.identity.saml.common;
 
 import java.util.HashSet;
@@ -1474,11 +1473,6 @@ public final class SAMLConstants
      * User Name attribute key in the Attribute Map.
      */
     public static final String USER_NAME = "USER_NAME";
-
-    /**
-     * Number of charactors per line for <code>Base64</code> encoded data.
-     */
-    public static final int    BASE64CHARPERLINE=76;
 
     /**
      * SAML component name to be used to get datastore provider.

@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.modules.windowsdesktopsso;
 
 import com.sun.identity.shared.debug.Debug;
@@ -36,6 +38,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.util.DerValue;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.encode.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
@@ -55,7 +58,6 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
-import sun.misc.BASE64Decoder;
 
 public class WindowsDesktopSSO extends AMLoginModule {
     private static final String amAuthWindowsDesktopSSO = 
@@ -323,9 +325,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
         String header = req.getHeader("Authorization");
         if ((header != null) && header.startsWith("Negotiate")) {
             header = header.substring("Negotiate".length()).trim();
-            BASE64Decoder decoder = new BASE64Decoder();
             try { 
-                spnegoToken = decoder.decodeBuffer(header);
+                spnegoToken = Base64.decode(header);
             } catch (Exception e) {
                 debug.error("Decoding token error.");
                 if (debug.messageEnabled()) {
@@ -341,9 +342,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
         if (callbacks != null && callbacks.length != 0) {
             String spnegoTokenStr =
                 ((HttpCallback)callbacks[0]).getAuthorization();
-            BASE64Decoder decoder = new BASE64Decoder();
             try {
-                spnegoToken = decoder.decodeBuffer(spnegoTokenStr);
+                spnegoToken = Base64.decode(spnegoTokenStr);
             } catch (Exception e) {
                 debug.error("Decoding token error.");
                 if (debug.messageEnabled()) {

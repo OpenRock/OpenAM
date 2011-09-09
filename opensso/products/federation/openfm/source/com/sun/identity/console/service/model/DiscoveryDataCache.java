@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.console.service.model;
 
 import com.iplanet.sso.SSOException;
@@ -33,11 +36,10 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
-import com.sun.identity.console.service.model.SMDiscoveryServiceData;
+import com.sun.identity.shared.encode.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import sun.misc.BASE64Encoder;
 
 /* - NEED NOT LOG - */
 
@@ -50,7 +52,6 @@ public class DiscoveryDataCache
 {
     private static DiscoveryDataCache instance = new DiscoveryDataCache();
     private Map mapTokenIDs = new HashMap(100);
-    private static BASE64Encoder encoder = new BASE64Encoder();
 
     /**
      * The generated random string is used to cache discover data object when
@@ -159,11 +160,11 @@ public class DiscoveryDataCache
      * @return random string
      */
     private static String getRandomString() {
-	StringBuffer sb = new StringBuffer(30);
+	StringBuilder sb = new StringBuilder(30);
 	byte[] keyRandom = new byte[5];
 	random.nextBytes(keyRandom);
 	sb.append(System.currentTimeMillis());
-	sb.append(encoder.encode(keyRandom));
+	sb.append(Base64.encode(keyRandom));
 	return (sb.toString());
     }
 }

@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.federation.meta;
 
 import com.sun.identity.federation.common.FSUtils;
@@ -121,7 +123,7 @@ public final class IDFFMetaSecurityUtils {
 
         if (cert != null) {
             try {
-                return Base64.encode(cert.getEncoded(), 76);
+                return Base64.encode(cert.getEncoded(), true);
             } catch (Exception ex) {
                 if (debug.messageEnabled()) {
                     debug.message(

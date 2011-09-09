@@ -84,7 +84,6 @@ import com.iplanet.services.cdm.ClientsManager;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.services.util.Base64;
 
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
@@ -114,6 +113,7 @@ import com.sun.identity.sm.SMSEntry;
 
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
+import com.sun.identity.shared.encode.Base64;
 import java.util.Arrays;
 
 public class AuthClientUtils {

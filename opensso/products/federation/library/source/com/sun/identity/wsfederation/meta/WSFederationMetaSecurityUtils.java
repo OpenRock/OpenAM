@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.wsfederation.meta;
 
 import java.security.KeyStore;
@@ -434,7 +436,7 @@ public final class WSFederationMetaSecurityUtils {
 
         if (cert != null) {
             try {
-                return Base64.encode(cert.getEncoded(), 76);
+                return Base64.encode(cert.getEncoded(), true);
             } catch (Exception ex) {
                 if (debug.messageEnabled()) {
                     debug.message(classMethod, ex);

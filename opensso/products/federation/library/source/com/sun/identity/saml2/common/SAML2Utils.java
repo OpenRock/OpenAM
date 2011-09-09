@@ -1175,8 +1175,7 @@ public class SAML2Utils extends SAML2SDKUtils {
     public static String encodeForPOST(String str) {
         String encoded = null;
         try {
-            encoded = Base64.encode(str.getBytes("UTF-8"),
-                SAMLConstants.BASE64CHARPERLINE);
+            encoded = Base64.encode(str.getBytes("UTF-8"), true);
         } catch (UnsupportedEncodingException uee) {
             debug.error("SAML2Utils.encodeForPOST", uee);
         }

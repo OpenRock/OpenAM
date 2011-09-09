@@ -1,384 +1,622 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * Licence (BSD):
+ * ==============
  *
- * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2004, Mikael Grev, MiG InfoCom AB. (base64 @ miginfocom . com)
+ * All rights reserved.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution.
+ * Neither the name of the MiG InfoCom AB nor the names of its contributors may be
+ * used to endorse or promote products derived from this software without specific
+ * prior written permission.
  *
- * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * $Id: Base64.java,v 1.2 2008/06/25 05:53:02 qcheng Exp $
- *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.shared.encode;
 
+import java.util.Arrays;
+
 /**
- * This class provides encode/decode for RFC 2045 Base64 as defined by RFC 2045,
- * N. Freed and N. Borenstein. RFC 2045: Multipurpose Internet Mail Extensions
- * (MIME) Part One: Format of Internet Message Bodies. Reference 1996 Available
- * at: http://www.ietf.org/rfc/rfc2045.txt This class is used by XML Schema
- * binary format validation
- * 
- * This implementation does not encode/decode streaming data. You need the data
- * that you will encode/decode already on a byte array.
+ * A very fast and memory efficient class to encode and decode to and from BASE64 in full accordance
+ * with RFC 2045.<br><br>
+ * On Windows XP sp1 with 1.4.2_04 and later ;), this encoder and decoder is about 10 times faster
+ * on small arrays (10 - 1000 bytes) and 2-3 times as fast on larger arrays (10000 - 1000000 bytes)
+ * compared to <code>sun.misc.Encoder()/Decoder()</code>.<br><br>
+ *
+ * On byte arrays the encoder is about 20% faster than Jakarta Commons Base64 Codec for encode and
+ * about 50% faster for decoding large arrays. This implementation is about twice as fast on very small
+ * arrays (&lt 30 bytes). If source/destination is a <code>String</code> this
+ * version is about three times as fast due to the fact that the Commons Codec result has to be recoded
+ * to a <code>String</code> from <code>byte[]</code>, which is very expensive.<br><br>
+ *
+ * This encode/decode algorithm doesn't create any temporary arrays as many other codecs do, it only
+ * allocates the resulting array. This produces less garbage and it is possible to handle arrays twice
+ * as large as algorithms that create a temporary array. (E.g. Jakarta Commons Codec). It is unknown
+ * whether Sun's <code>sun.misc.Encoder()/Decoder()</code> produce temporary arrays but since performance
+ * is quite low it probably does.<br><br>
+ *
+ * The encoder produces the same output as the Sun one except that the Sun's encoder appends
+ * a trailing line separator if the last character isn't a pad. Unclear why but it only adds to the
+ * length and is probably a side effect. Both are in conformance with RFC 2045 though.<br>
+ * Commons codec seem to always att a trailing line separator.<br><br>
+ *
+ * <b>Note!</b>
+ * The encode/decode method pairs (types) come in three versions with the <b>exact</b> same algorithm and
+ * thus a lot of code redundancy. This is to not create any temporary arrays for transcoding to/from different
+ * format types. The methods not used can simply be commented out.<br><br>
+ *
+ * There is also a "fast" version of all decode methods that works the same way as the normal ones, but
+ * har a few demands on the decoded input. Normally though, these fast verions should be used if the source if
+ * the input is known and it hasn't bee tampered with.<br><br>
+ *
+ * If you find the code useful or you find a bug, please send me a note at base64 @ miginfocom . com.
+ *
+ * @version 2.2
+ * @author Mikael Grev
+ *         Date: 2004-aug-02
+ *         Time: 11:31:11
  */
-public final class Base64 {
+public class Base64 {
 
-    static private final int DEFAULTMAXQUARTET = 19;
-
-    static private final int BASELENGTH = 255;
-
-    static private final int LOOKUPLENGTH = 64;
-
-    static private final int TWENTYFOURBITGROUP = 24;
-
-    static private final int EIGHTBIT = 8;
-
-    static private final int SIXTEENBIT = 16;
-
-    static private final int FOURBYTE = 4;
-
-    static private final int SIGN = -128;
-
-    static private final char PAD = '=';
-
-    static final private byte[] base64Alphabet = new byte[BASELENGTH];
-
-    static final private char[] lookUpBase64Alphabet = new char[LOOKUPLENGTH];
+    private static final char[] CA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
+    private static final int[] IA = new int[256];
 
     static {
-
-        for (int i = 0; i < BASELENGTH; i++) {
-            base64Alphabet[i] = -1;
+        Arrays.fill(IA, -1);
+        for (int i = 0, iS = CA.length; i < iS; i++) {
+            IA[CA[i]] = i;
         }
-        for (int i = 'Z'; i >= 'A'; i--) {
-            base64Alphabet[i] = (byte) (i - 'A');
-        }
-        for (int i = 'z'; i >= 'a'; i--) {
-            base64Alphabet[i] = (byte) (i - 'a' + 26);
-        }
-
-        for (int i = '9'; i >= '0'; i--) {
-            base64Alphabet[i] = (byte) (i - '0' + 52);
-        }
-
-        base64Alphabet['+'] = 62;
-        base64Alphabet['/'] = 63;
-
-        for (int i = 0; i <= 25; i++)
-            lookUpBase64Alphabet[i] = (char) ('A' + i);
-
-        for (int i = 26, j = 0; i <= 51; i++, j++)
-            lookUpBase64Alphabet[i] = (char) ('a' + j);
-
-        for (int i = 52, j = 0; i <= 61; i++, j++)
-            lookUpBase64Alphabet[i] = (char) ('0' + j);
-        lookUpBase64Alphabet[62] = '+';
-        lookUpBase64Alphabet[63] = '/';
-
+        IA['='] = 0;
     }
 
-    protected static boolean isWhiteSpace(char octect) {
-        return (octect == 0x20 || octect == 0xd || octect == 0xa 
-                || octect == 0x9);
-    }
-
-    protected static boolean isPad(char octect) {
-        return (octect == PAD);
-    }
-
-    protected static boolean isData(char octect) {
-        return (base64Alphabet[octect] != -1);
-    }
-
-    protected static boolean isBase64(char octect) {
-        return (isWhiteSpace(octect) || isPad(octect) || isData(octect));
-    }
-
-    /**
-     * Encodes hex octects into Base64
-     * 
-     * @param binaryData
-     *            Array containing binaryData
-     * @return Encoded Base64 array
+    // ****************************************************************************************
+    // *  char[] version
+    // ****************************************************************************************
+    /** Encodes a raw byte array into a BASE64 <code>char[]</code> representation i accordance with RFC 2045.
+     * @param sArr The bytes to convert. If <code>null</code> or length 0 an empty array will be returned.
+     * @param lineSep Optional "\r\n" after 76 characters, unless end of file.<br>
+     * No line separator will be in breach of RFC 2045 which specifies max 76 per line but will be a
+     * little faster.
+     * @return A BASE64 encoded array. Never <code>null</code>.
      */
-    public static String encode(byte[] binaryData) {
-        return encode(binaryData, 0);
-    }
-
-    /**
-     * Encodes hex octects into Base64
-     * 
-     * @param binaryData
-     *            Array containing binaryData
-     * @param maxCharsPerLine
-     *            the max characters per line If 0, the encoded result appears
-     *            on a single line.
-     * @return Encoded Base64 array
-     */
-    public static String encode(byte[] binaryData, int maxCharsPerLine) {
-
-        // check maxCharsPerLine can be divided by
-        int numQuartetPerLine = DEFAULTMAXQUARTET;
-        if (maxCharsPerLine == 0) {
-            numQuartetPerLine = DEFAULTMAXQUARTET;
-        } else if (maxCharsPerLine % FOURBYTE == 0) {
-            numQuartetPerLine = maxCharsPerLine / FOURBYTE;
-        } else {
-            // Illegal input. Take default 76 chars per line.
-            numQuartetPerLine = DEFAULTMAXQUARTET;
+    public static char[] encodeToChar(byte[] sArr, boolean lineSep) {
+        // Check special case
+        int sLen = sArr != null ? sArr.length : 0;
+        if (sLen == 0) {
+            return new char[0];
         }
 
-        if (binaryData == null)
-            return null;
+        int eLen = (sLen / 3) * 3;              // Length of even 24-bits.
+        int cCnt = ((sLen - 1) / 3 + 1) << 2;   // Returned character count
+        int dLen = cCnt + (lineSep ? (cCnt - 1) / 76 << 1 : 0); // Length of returned array
+        char[] dArr = new char[dLen];
 
-        int lengthDataBits = binaryData.length * EIGHTBIT;
-        if (lengthDataBits == 0) {
-            return "";
-        }
+        // Encode even 24-bits
+        for (int s = 0, d = 0, cc = 0; s < eLen;) {
+            // Copy next three bytes into lower 24 bits of int, paying attension to sign.
+            int i = (sArr[s++] & 0xff) << 16 | (sArr[s++] & 0xff) << 8 | (sArr[s++] & 0xff);
 
-        int fewerThan24bits = lengthDataBits % TWENTYFOURBITGROUP;
-        int numberTriplets = lengthDataBits / TWENTYFOURBITGROUP;
-        int numberQuartet = fewerThan24bits != 0 ? numberTriplets + 1
-                : numberTriplets;
-        int numberLines = (numberQuartet - 1) / numQuartetPerLine + 1;
-        char encodedData[] = null;
+            // Encode the int into four chars
+            dArr[d++] = CA[(i >>> 18) & 0x3f];
+            dArr[d++] = CA[(i >>> 12) & 0x3f];
+            dArr[d++] = CA[(i >>> 6) & 0x3f];
+            dArr[d++] = CA[i & 0x3f];
 
-        if (maxCharsPerLine == 0) {
-            encodedData = new char[numberQuartet * 4];
-        } else {
-            encodedData = new char[numberQuartet * 4 + numberLines];
-        }
-        byte k = 0, l = 0, b1 = 0, b2 = 0, b3 = 0;
-
-        int encodedIndex = 0;
-        int dataIndex = 0;
-        int i = 0;
-
-        for (int line = 0; line < numberLines - 1; line++) {
-            for (int quartet = 0; quartet < numQuartetPerLine; quartet++) {
-                b1 = binaryData[dataIndex++];
-                b2 = binaryData[dataIndex++];
-                b3 = binaryData[dataIndex++];
-
-                l = (byte) (b2 & 0x0f);
-                k = (byte) (b1 & 0x03);
-
-                byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
-                        : (byte) ((b1) >> 2 ^ 0xc0);
-
-                byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4)
-                        : (byte) ((b2) >> 4 ^ 0xf0);
-                byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6)
-                        : (byte) ((b3) >> 6 ^ 0xfc);
-
-                encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
-                encodedData[encodedIndex++] = lookUpBase64Alphabet[val2
-                        | (k << 4)];
-                encodedData[encodedIndex++] = lookUpBase64Alphabet[(l << 2)
-                        | val3];
-                encodedData[encodedIndex++] = lookUpBase64Alphabet[b3 & 0x3f];
-
-                i++;
-            }
-
-            if (maxCharsPerLine != 0) {
-                encodedData[encodedIndex++] = 0xa;
+            // Add optional line separator
+            if (lineSep && ++cc == 19 && d < dLen - 2) {
+                dArr[d++] = '\r';
+                dArr[d++] = '\n';
+                cc = 0;
             }
         }
 
-        for (; i < numberTriplets; i++) {
-            b1 = binaryData[dataIndex++];
-            b2 = binaryData[dataIndex++];
-            b3 = binaryData[dataIndex++];
+        // Pad and encode last bits if source isn't even 24 bits.
+        int left = sLen - eLen; // 0 - 2.
+        if (left > 0) {
+            // Prepare the int
+            int i = ((sArr[eLen] & 0xff) << 10) | (left == 2 ? ((sArr[sLen - 1] & 0xff) << 2) : 0);
 
-            l = (byte) (b2 & 0x0f);
-            k = (byte) (b1 & 0x03);
-
-            byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
-                    : (byte) ((b1) >> 2 ^ 0xc0);
-
-            byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4)
-                    : (byte) ((b2) >> 4 ^ 0xf0);
-            byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6)
-                    : (byte) ((b3) >> 6 ^ 0xfc);
-
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[val2 | (k << 4)];
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[(l << 2) | val3];
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[b3 & 0x3f];
+            // Set last four chars
+            dArr[dLen - 4] = CA[i >> 12];
+            dArr[dLen - 3] = CA[(i >>> 6) & 0x3f];
+            dArr[dLen - 2] = left == 2 ? CA[i & 0x3f] : '=';
+            dArr[dLen - 1] = '=';
         }
-
-        // form integral number of 6-bit groups
-        if (fewerThan24bits == EIGHTBIT) {
-            b1 = binaryData[dataIndex];
-            k = (byte) (b1 & 0x03);
-
-            byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
-                    : (byte) ((b1) >> 2 ^ 0xc0);
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[k << 4];
-            encodedData[encodedIndex++] = PAD;
-            encodedData[encodedIndex++] = PAD;
-        } else if (fewerThan24bits == SIXTEENBIT) {
-            b1 = binaryData[dataIndex];
-            b2 = binaryData[dataIndex + 1];
-            l = (byte) (b2 & 0x0f);
-            k = (byte) (b1 & 0x03);
-
-            byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2)
-                    : (byte) ((b1) >> 2 ^ 0xc0);
-            byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4)
-                    : (byte) ((b2) >> 4 ^ 0xf0);
-
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[val1];
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[val2 | (k << 4)];
-            encodedData[encodedIndex++] = lookUpBase64Alphabet[l << 2];
-            encodedData[encodedIndex++] = PAD;
-        }
-
-        if (maxCharsPerLine != 0) {
-            encodedData[encodedIndex] = 0xa;
-        }
-        return new String(encodedData);
+        return dArr;
     }
 
-    /**
-     * Decodes Base64 data into octects
-     * 
-     * @param encoded
-     *            String containing Base64 data
-     * @return Array containing decoded data.
+    /** Decodes a BASE64 encoded char array. All illegal characters will be ignored and can handle both arrays with
+     * and without line separators.
+     * @param sArr The source array. <code>null</code> or length 0 will return an empty array.
+     * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the legal characters
+     * (including '=') isn't divideable by 4.  (I.e. definitely corrupted).
      */
-    public static byte[] decode(String encoded) {
-
-        if (encoded == null)
-            return null;
-
-        char[] base64Data = encoded.toCharArray();
-        // remove white spaces
-        int len = removeWhiteSpace(base64Data);
-
-        if (len % FOURBYTE != 0) {
-            return null;// should be divisible by four
-        }
-
-        int numberQuadruple = (len / FOURBYTE);
-
-        if (numberQuadruple == 0)
+    public static byte[] decode(char[] sArr) {
+        // Check special case
+        int sLen = sArr != null ? sArr.length : 0;
+        if (sLen == 0) {
             return new byte[0];
-
-        byte decodedData[] = null;
-        byte b1 = 0, b2 = 0, b3 = 0, b4 = 0;
-        char d1 = 0, d2 = 0, d3 = 0, d4 = 0;
-
-        int i = 0;
-        int encodedIndex = 0;
-        int dataIndex = 0;
-        decodedData = new byte[(numberQuadruple) * 3];
-
-        for (; i < numberQuadruple - 1; i++) {
-
-            if (!isData((d1 = base64Data[dataIndex++]))
-                    || !isData((d2 = base64Data[dataIndex++]))
-                    || !isData((d3 = base64Data[dataIndex++]))
-                    || !isData((d4 = base64Data[dataIndex++])))
-                return null;// if found "no data" just return null
-
-            b1 = base64Alphabet[d1];
-            b2 = base64Alphabet[d2];
-            b3 = base64Alphabet[d3];
-            b4 = base64Alphabet[d4];
-
-            decodedData[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
-            decodedData[encodedIndex++] = (byte) (((b2 & 0xf) << 4) 
-                                                | ((b3 >> 2) & 0xf));
-            decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
         }
 
-        if (!isData((d1 = base64Data[dataIndex++]))
-                || !isData((d2 = base64Data[dataIndex++]))) {
-            return null;// if found "no data" just return null
-        }
-
-        b1 = base64Alphabet[d1];
-        b2 = base64Alphabet[d2];
-
-        d3 = base64Data[dataIndex++];
-        d4 = base64Data[dataIndex++];
-        if (!isData((d3)) || !isData((d4))) {// Check if they are PAD
-                                                // characters
-            if (isPad(d3) && isPad(d4)) {
-                // Two PAD e.g. 3c[Pad][Pad]
-                if ((b2 & 0xf) != 0)// last 4 bits should be zero
-                    return null;
-                byte[] tmp = new byte[i * 3 + 1];
-                System.arraycopy(decodedData, 0, tmp, 0, i * 3);
-                tmp[encodedIndex] = (byte) (b1 << 2 | b2 >> 4);
-                return tmp;
-            } else if (!isPad(d3) && isPad(d4)) {
-                // One PAD e.g. 3cQ[Pad]
-                b3 = base64Alphabet[d3];
-                if ((b3 & 0x3) != 0)// last 2 bits should be zero
-                    return null;
-                byte[] tmp = new byte[i * 3 + 2];
-                System.arraycopy(decodedData, 0, tmp, 0, i * 3);
-                tmp[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
-                tmp[encodedIndex] = (byte) (((b2 & 0xf) << 4)
-                                                | ((b3 >> 2) & 0xf));
-                return tmp;
-            } else {
-                return null;
-                // an error like "3c[Pad]r", "3cdX", "3cXd", "3cXX"
-                // where X is non data
+        // Count illegal characters (including '\r', '\n') to know what size the returned array will be,
+        // so we don't have to reallocate & copy it later.
+        int sepCnt = 0; // Number of separator characters. (Actually illegal characters, but that's a bonus...)
+        for (int i = 0; i < sLen; i++) // If input is "pure" (I.e. no line separators or illegal chars) base64 this loop can be commented out.
+        {
+            if (IA[sArr[i]] < 0) {
+                sepCnt++;
             }
-        } else { // No PAD e.g 3cQl
-            b3 = base64Alphabet[d3];
-            b4 = base64Alphabet[d4];
-            decodedData[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
-            decodedData[encodedIndex++] = (byte) (((b2 & 0xf) << 4) 
-                                                    | ((b3 >> 2) & 0xf));
-            decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
-
         }
 
-        return decodedData;
+        // Check so that legal chars (including '=') are evenly divideable by 4 as specified in RFC 2045.
+        if ((sLen - sepCnt) % 4 != 0) {
+            return null;
+        }
+
+        int pad = 0;
+        for (int i = sLen; i > 1 && IA[sArr[--i]] <= 0;) {
+            if (sArr[i] == '=') {
+                pad++;
+            }
+        }
+
+        int len = ((sLen - sepCnt) * 6 >> 3) - pad;
+
+        byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
+
+        for (int s = 0, d = 0; d < len;) {
+            // Assemble three bytes into an int from four "valid" characters.
+            int i = 0;
+            for (int j = 0; j < 4; j++) {   // j only increased if a valid char was found.
+                int c = IA[sArr[s++]];
+                if (c >= 0) {
+                    i |= c << (18 - j * 6);
+                } else {
+                    j--;
+                }
+            }
+            // Add the bytes
+            dArr[d++] = (byte) (i >> 16);
+            if (d < len) {
+                dArr[d++] = (byte) (i >> 8);
+                if (d < len) {
+                    dArr[d++] = (byte) i;
+                }
+            }
+        }
+        return dArr;
+    }
+
+    /** Decodes a BASE64 encoded char array that is known to be resonably well formatted. The method is about twice as
+     * fast as {@link #decode(char[])}. The preconditions are:<br>
+     * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
+     * + Line separator must be "\r\n", as specified in RFC 2045
+     * + The array must not contain illegal characters within the encoded string<br>
+     * + The array CAN have illegal characters at the beginning and end, those will be dealt with appropriately.<br>
+     * @param sArr The source array. Length 0 will return an empty array. <code>null</code> will throw an exception.
+     * @return The decoded array of bytes. May be of length 0.
+     */
+    public static byte[] decodeFast(char[] sArr) {
+        // Check special case
+        int sLen = sArr.length;
+        if (sLen == 0) {
+            return new byte[0];
+        }
+
+        int sIx = 0, eIx = sLen - 1;    // Start and end index after trimming.
+
+        // Trim illegal chars from start
+        while (sIx < eIx && IA[sArr[sIx]] < 0) {
+            sIx++;
+        }
+
+        // Trim illegal chars from end
+        while (eIx > 0 && IA[sArr[eIx]] < 0) {
+            eIx--;
+        }
+
+        // get the padding count (=) (0, 1 or 2)
+        int pad = sArr[eIx] == '=' ? (sArr[eIx - 1] == '=' ? 2 : 1) : 0;  // Count '=' at end.
+        int cCnt = eIx - sIx + 1;   // Content count including possible separators
+        int sepCnt = sLen > 76 ? (sArr[76] == '\r' ? cCnt / 78 : 0) << 1 : 0;
+
+        int len = ((cCnt - sepCnt) * 6 >> 3) - pad; // The number of decoded bytes
+        byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
+
+        // Decode all but the last 0 - 2 bytes.
+        int d = 0;
+        for (int cc = 0, eLen = (len / 3) * 3; d < eLen;) {
+            // Assemble three bytes into an int from four "valid" characters.
+            int i = IA[sArr[sIx++]] << 18 | IA[sArr[sIx++]] << 12 | IA[sArr[sIx++]] << 6 | IA[sArr[sIx++]];
+
+            // Add the bytes
+            dArr[d++] = (byte) (i >> 16);
+            dArr[d++] = (byte) (i >> 8);
+            dArr[d++] = (byte) i;
+
+            // If line separator, jump over it.
+            if (sepCnt > 0 && ++cc == 19) {
+                sIx += 2;
+                cc = 0;
+            }
+        }
+
+        if (d < len) {
+            // Decode last 1-3 bytes (incl '=') into 1-3 bytes
+            int i = 0;
+            for (int j = 0; sIx <= eIx - pad; j++) {
+                i |= IA[sArr[sIx++]] << (18 - j * 6);
+            }
+
+            for (int r = 16; d < len; r -= 8) {
+                dArr[d++] = (byte) (i >> r);
+            }
+        }
+
+        return dArr;
+    }
+
+    // ****************************************************************************************
+    // *  byte[] version
+    // ****************************************************************************************
+    /** Encodes a raw byte array into a BASE64 <code>byte[]</code> representation i accordance with RFC 2045.
+     * @param sArr The bytes to convert. If <code>null</code> or length 0 an empty array will be returned.
+     * @param lineSep Optional "\r\n" after 76 characters, unless end of file.<br>
+     * No line separator will be in breach of RFC 2045 which specifies max 76 per line but will be a
+     * little faster.
+     * @return A BASE64 encoded array. Never <code>null</code>.
+     */
+    public static byte[] encodeToByte(byte[] sArr, boolean lineSep) {
+        // Check special case
+        int sLen = sArr != null ? sArr.length : 0;
+        if (sLen == 0) {
+            return new byte[0];
+        }
+
+        int eLen = (sLen / 3) * 3;                              // Length of even 24-bits.
+        int cCnt = ((sLen - 1) / 3 + 1) << 2;                   // Returned character count
+        int dLen = cCnt + (lineSep ? (cCnt - 1) / 76 << 1 : 0); // Length of returned array
+        byte[] dArr = new byte[dLen];
+
+        // Encode even 24-bits
+        for (int s = 0, d = 0, cc = 0; s < eLen;) {
+            // Copy next three bytes into lower 24 bits of int, paying attension to sign.
+            int i = (sArr[s++] & 0xff) << 16 | (sArr[s++] & 0xff) << 8 | (sArr[s++] & 0xff);
+
+            // Encode the int into four chars
+            dArr[d++] = (byte) CA[(i >>> 18) & 0x3f];
+            dArr[d++] = (byte) CA[(i >>> 12) & 0x3f];
+            dArr[d++] = (byte) CA[(i >>> 6) & 0x3f];
+            dArr[d++] = (byte) CA[i & 0x3f];
+
+            // Add optional line separator
+            if (lineSep && ++cc == 19 && d < dLen - 2) {
+                dArr[d++] = '\r';
+                dArr[d++] = '\n';
+                cc = 0;
+            }
+        }
+
+        // Pad and encode last bits if source isn't an even 24 bits.
+        int left = sLen - eLen; // 0 - 2.
+        if (left > 0) {
+            // Prepare the int
+            int i = ((sArr[eLen] & 0xff) << 10) | (left == 2 ? ((sArr[sLen - 1] & 0xff) << 2) : 0);
+
+            // Set last four chars
+            dArr[dLen - 4] = (byte) CA[i >> 12];
+            dArr[dLen - 3] = (byte) CA[(i >>> 6) & 0x3f];
+            dArr[dLen - 2] = left == 2 ? (byte) CA[i & 0x3f] : (byte) '=';
+            dArr[dLen - 1] = '=';
+        }
+        return dArr;
+    }
+
+    /** Decodes a BASE64 encoded byte array. All illegal characters will be ignored and can handle both arrays with
+     * and without line separators.
+     * @param sArr The source array. Length 0 will return an empty array. <code>null</code> will throw an exception.
+     * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the legal characters
+     * (including '=') isn't divideable by 4. (I.e. definitely corrupted).
+     */
+    public static byte[] decode(byte[] sArr) {
+        // Check special case
+        int sLen = sArr.length;
+
+        // Count illegal characters (including '\r', '\n') to know what size the returned array will be,
+        // so we don't have to reallocate & copy it later.
+        int sepCnt = 0; // Number of separator characters. (Actually illegal characters, but that's a bonus...)
+        for (int i = 0; i < sLen; i++) // If input is "pure" (I.e. no line separators or illegal chars) base64 this loop can be commented out.
+        {
+            if (IA[sArr[i] & 0xff] < 0) {
+                sepCnt++;
+            }
+        }
+
+        // Check so that legal chars (including '=') are evenly divideable by 4 as specified in RFC 2045.
+        if ((sLen - sepCnt) % 4 != 0) {
+            return null;
+        }
+
+        int pad = 0;
+        for (int i = sLen; i > 1 && IA[sArr[--i] & 0xff] <= 0;) {
+            if (sArr[i] == '=') {
+                pad++;
+            }
+        }
+
+        int len = ((sLen - sepCnt) * 6 >> 3) - pad;
+
+        byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
+
+        for (int s = 0, d = 0; d < len;) {
+            // Assemble three bytes into an int from four "valid" characters.
+            int i = 0;
+            for (int j = 0; j < 4; j++) {   // j only increased if a valid char was found.
+                int c = IA[sArr[s++] & 0xff];
+                if (c >= 0) {
+                    i |= c << (18 - j * 6);
+                } else {
+                    j--;
+                }
+            }
+
+            // Add the bytes
+            dArr[d++] = (byte) (i >> 16);
+            if (d < len) {
+                dArr[d++] = (byte) (i >> 8);
+                if (d < len) {
+                    dArr[d++] = (byte) i;
+                }
+            }
+        }
+
+        return dArr;
+    }
+
+    /** Decodes a BASE64 encoded byte array that is known to be resonably well formatted. The method is about twice as
+     * fast as {@link #decode(byte[])}. The preconditions are:<br>
+     * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
+     * + Line separator must be "\r\n", as specified in RFC 2045
+     * + The array must not contain illegal characters within the encoded string<br>
+     * + The array CAN have illegal characters at the beginning and end, those will be dealt with appropriately.<br>
+     * @param sArr The source array. Length 0 will return an empty array. <code>null</code> will throw an exception.
+     * @return The decoded array of bytes. May be of length 0.
+     */
+    public static byte[] decodeFast(byte[] sArr) {
+        // Check special case
+        int sLen = sArr.length;
+        if (sLen == 0) {
+            return new byte[0];
+        }
+
+        int sIx = 0, eIx = sLen - 1;    // Start and end index after trimming.
+
+        // Trim illegal chars from start
+        while (sIx < eIx && IA[sArr[sIx] & 0xff] < 0) {
+            sIx++;
+        }
+
+        // Trim illegal chars from end
+        while (eIx > 0 && IA[sArr[eIx] & 0xff] < 0) {
+            eIx--;
+        }
+
+        // get the padding count (=) (0, 1 or 2)
+        int pad = sArr[eIx] == '=' ? (sArr[eIx - 1] == '=' ? 2 : 1) : 0;  // Count '=' at end.
+        int cCnt = eIx - sIx + 1;   // Content count including possible separators
+        int sepCnt = sLen > 76 ? (sArr[76] == '\r' ? cCnt / 78 : 0) << 1 : 0;
+
+        int len = ((cCnt - sepCnt) * 6 >> 3) - pad; // The number of decoded bytes
+        byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
+
+        // Decode all but the last 0 - 2 bytes.
+        int d = 0;
+        for (int cc = 0, eLen = (len / 3) * 3; d < eLen;) {
+            // Assemble three bytes into an int from four "valid" characters.
+            int i = IA[sArr[sIx++]] << 18 | IA[sArr[sIx++]] << 12 | IA[sArr[sIx++]] << 6 | IA[sArr[sIx++]];
+
+            // Add the bytes
+            dArr[d++] = (byte) (i >> 16);
+            dArr[d++] = (byte) (i >> 8);
+            dArr[d++] = (byte) i;
+
+            // If line separator, jump over it.
+            if (sepCnt > 0 && ++cc == 19) {
+                sIx += 2;
+                cc = 0;
+            }
+        }
+
+        if (d < len) {
+            // Decode last 1-3 bytes (incl '=') into 1-3 bytes
+            int i = 0;
+            for (int j = 0; sIx <= eIx - pad; j++) {
+                i |= IA[sArr[sIx++]] << (18 - j * 6);
+            }
+
+            for (int r = 16; d < len; r -= 8) {
+                dArr[d++] = (byte) (i >> r);
+            }
+        }
+
+        return dArr;
+    }
+
+    // ****************************************************************************************
+    // * String version
+    // ****************************************************************************************
+    /** Encodes a raw byte array into a BASE64 <code>String</code> representation i accordance with RFC 2045.
+     * @param sArr The bytes to convert. If <code>null</code> or length 0 an empty array will be returned.
+     * @param lineSep Optional "\r\n" after 76 characters, unless end of file.<br>
+     * No line separator will be in breach of RFC 2045 which specifies max 76 per line but will be a
+     * little faster.
+     * @return A BASE64 encoded array. Never <code>null</code>.
+     */
+    public static String encode(byte[] sArr, boolean lineSep) {
+        // Reuse char[] since we can't create a String incrementally anyway and StringBuffer/Builder would be slower.
+        return new String(encodeToChar(sArr, lineSep));
     }
 
     /**
-     * remove WhiteSpace from MIME containing encoded Base64 data.
-     * 
-     * @param data
-     *            the byte array of base64 data (with WS)
-     * @return the new length
+     * This method is using {@link #encode(byte[], boolean)}, and it
+     * only exists so we don't break the API. 
+     *
+     * @param content The bytearray that needs to be Base64 encoded
+     * @return the Base64 encoded
      */
-    protected static int removeWhiteSpace(char[] data) {
-        if (data == null)
-            return 0;
+    public static String encode(byte[] content) {
+        return encode(content, false);
+    }
 
-        // count characters that's not whitespace
-        int newSize = 0;
-        int len = data.length;
-        for (int i = 0; i < len; i++) {
-            if (!isWhiteSpace(data[i]))
-                data[newSize++] = data[i];
+    /** Decodes a BASE64 encoded <code>String</code>. All illegal characters will be ignored and can handle both strings with
+     * and without line separators.<br>
+     * <b>Note!</b> It can be up to about 2x the speed to call <code>decode(str.toCharArray())</code> instead. That
+     * will create a temporary array though. This version will use <code>str.charAt(i)</code> to iterate the string.
+     * @param str The source string. <code>null</code> or length 0 will return an empty array.
+     * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the legal characters
+     * (including '=') isn't divideable by 4.  (I.e. definitely corrupted).
+     */
+    public static byte[] decode(String str) {
+        // Check special case
+        int sLen = str != null ? str.length() : 0;
+        if (sLen == 0) {
+            return new byte[0];
         }
-        return newSize;
+
+        // Count illegal characters (including '\r', '\n') to know what size the returned array will be,
+        // so we don't have to reallocate & copy it later.
+        int sepCnt = 0; // Number of separator characters. (Actually illegal characters, but that's a bonus...)
+        for (int i = 0; i < sLen; i++) // If input is "pure" (I.e. no line separators or illegal chars) base64 this loop can be commented out.
+        {
+            if (IA[str.charAt(i)] < 0) {
+                sepCnt++;
+            }
+        }
+
+        // Check so that legal chars (including '=') are evenly divideable by 4 as specified in RFC 2045.
+        if ((sLen - sepCnt) % 4 != 0) {
+            return null;
+        }
+
+        // Count '=' at end
+        int pad = 0;
+        for (int i = sLen; i > 1 && IA[str.charAt(--i)] <= 0;) {
+            if (str.charAt(i) == '=') {
+                pad++;
+            }
+        }
+
+        int len = ((sLen - sepCnt) * 6 >> 3) - pad;
+
+        byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
+
+        for (int s = 0, d = 0; d < len;) {
+            // Assemble three bytes into an int from four "valid" characters.
+            int i = 0;
+            for (int j = 0; j < 4; j++) {   // j only increased if a valid char was found.
+                int c = IA[str.charAt(s++)];
+                if (c >= 0) {
+                    i |= c << (18 - j * 6);
+                } else {
+                    j--;
+                }
+            }
+            // Add the bytes
+            dArr[d++] = (byte) (i >> 16);
+            if (d < len) {
+                dArr[d++] = (byte) (i >> 8);
+                if (d < len) {
+                    dArr[d++] = (byte) i;
+                }
+            }
+        }
+        return dArr;
+    }
+
+    /** Decodes a BASE64 encoded string that is known to be resonably well formatted. The method is about twice as
+     * fast as {@link #decode(String)}. The preconditions are:<br>
+     * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
+     * + Line separator must be "\r\n", as specified in RFC 2045
+     * + The array must not contain illegal characters within the encoded string<br>
+     * + The array CAN have illegal characters at the beginning and end, those will be dealt with appropriately.<br>
+     * @param s The source string. Length 0 will return an empty array. <code>null</code> will throw an exception.
+     * @return The decoded array of bytes. May be of length 0.
+     */
+    public static byte[] decodeFast(String s) {
+        // Check special case
+        int sLen = s.length();
+        if (sLen == 0) {
+            return new byte[0];
+        }
+
+        int sIx = 0, eIx = sLen - 1;    // Start and end index after trimming.
+
+        // Trim illegal chars from start
+        while (sIx < eIx && IA[s.charAt(sIx) & 0xff] < 0) {
+            sIx++;
+        }
+
+        // Trim illegal chars from end
+        while (eIx > 0 && IA[s.charAt(eIx) & 0xff] < 0) {
+            eIx--;
+        }
+
+        // get the padding count (=) (0, 1 or 2)
+        int pad = s.charAt(eIx) == '=' ? (s.charAt(eIx - 1) == '=' ? 2 : 1) : 0;  // Count '=' at end.
+        int cCnt = eIx - sIx + 1;   // Content count including possible separators
+        int sepCnt = sLen > 76 ? (s.charAt(76) == '\r' ? cCnt / 78 : 0) << 1 : 0;
+
+        int len = ((cCnt - sepCnt) * 6 >> 3) - pad; // The number of decoded bytes
+        byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
+
+        // Decode all but the last 0 - 2 bytes.
+        int d = 0;
+        for (int cc = 0, eLen = (len / 3) * 3; d < eLen;) {
+            // Assemble three bytes into an int from four "valid" characters.
+            int i = IA[s.charAt(sIx++)] << 18 | IA[s.charAt(sIx++)] << 12 | IA[s.charAt(sIx++)] << 6 | IA[s.charAt(sIx++)];
+
+            // Add the bytes
+            dArr[d++] = (byte) (i >> 16);
+            dArr[d++] = (byte) (i >> 8);
+            dArr[d++] = (byte) i;
+
+            // If line separator, jump over it.
+            if (sepCnt > 0 && ++cc == 19) {
+                sIx += 2;
+                cc = 0;
+            }
+        }
+
+        if (d < len) {
+            // Decode last 1-3 bytes (incl '=') into 1-3 bytes
+            int i = 0;
+            for (int j = 0; sIx <= eIx - pad; j++) {
+                i |= IA[s.charAt(sIx++)] << (18 - j * 6);
+            }
+
+            for (int r = 16; d < len; r -= 8) {
+                dArr[d++] = (byte) (i >> r);
+            }
+        }
+
+        return dArr;
     }
 }
