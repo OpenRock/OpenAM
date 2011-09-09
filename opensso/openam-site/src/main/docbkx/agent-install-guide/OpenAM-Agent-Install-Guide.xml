@@ -64,7 +64,6 @@
   </partintro>
   
   <xinclude:include href='chap-about-web-agents.xml' />
-  <xinclude:include href='chap-web-agent-common-tasks.xml' />
   <xinclude:include href='chap-apache-20.xml' />
   <xinclude:include href='chap-apache-22.xml' />
   <xinclude:include href='chap-msiis-6.xml' />
@@ -84,7 +83,6 @@
   </partintro>
   
   <xinclude:include href='chap-about-jee-agents.xml' />
-  <xinclude:include href='chap-jee-agent-common-tasks.xml' />
   <xinclude:include href='chap-apache-tomcat.xml' />
   <xinclude:include href='chap-glassfish.xml' />
   <xinclude:include href='chap-jboss.xml' />
