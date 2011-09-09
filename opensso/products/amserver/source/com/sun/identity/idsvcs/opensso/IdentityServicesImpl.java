@@ -417,7 +417,7 @@ public class IdentityServicesImpl
      * @throws TokenExpired when Token has expired.
      * @throws GeneralFailure on other errors.
      */
-    public UserDetails attributes(List attributeNames, Token subject, Boolean refresh)
+    public UserDetails attributes(List<String> attributeNames, Token subject, Boolean refresh)
         throws TokenExpired, GeneralFailure, RemoteException, AccessDenied {
         UserDetails details = new UserDetails();
         try {
@@ -425,20 +425,27 @@ public class IdentityServicesImpl
             if (refresh) {
                 SSOTokenManager.getInstance().refreshSession(ssoToken);
             }
-            Map sessionAttributes = new HashMap();
-            Set s = null; 
+            Map<String, Set<String>> sessionAttributes = new HashMap<String, Set<String>>();
+            Set<String> s = null;
             if (attributeNames != null) {
-                String attrNext = null; 
                 String propertyNext = null;
-                for (Iterator attrIt = attributeNames.iterator();
-                     attrIt.hasNext();) {
-                     attrNext = (String) attrIt.next();
-                     propertyNext = ssoToken.getProperty(attrNext); 
-                     s = new HashSet(); 
-                     s.add(propertyNext);
-                     sessionAttributes.put(attrNext, s); 
+                for (String attrNext : attributeNames) {
+                    s = new HashSet<String>();
+                    if (attrNext.equalsIgnoreCase("idletime")) {
+                        s.add(Long.toString(ssoToken.getIdleTime()));
+                    } else if (attrNext.equalsIgnoreCase("timeleft")) {
+                        s.add(Long.toString(ssoToken.getTimeLeft()));
+                    } else if (attrNext.equalsIgnoreCase("maxsessiontime")) {
+                        s.add(Long.toString(ssoToken.getMaxSessionTime()));
+                    } else if (attrNext.equalsIgnoreCase("maxidletime")) {
+                        s.add(Long.toString(ssoToken.getMaxIdleTime()));
+                    } else {
+                        propertyNext = ssoToken.getProperty(attrNext);
+                        s.add(propertyNext);
+                    }
+                    sessionAttributes.put(attrNext, s);
                 }
-            } 
+            }
             // Obtain user memberships (roles and groups)
             AMIdentity userIdentity = IdUtils.getIdentity(ssoToken);
             if (isSpecialUser(userIdentity)) {
