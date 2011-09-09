@@ -196,8 +196,7 @@ Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)</screen>
    <step>
     <para>Shut down the Apache 2.2 server where you plan to install the
     agent.</para>
-    <screen>$ cd /path/to/apache22/bin/
-$ apachectl -k stop</screen>
+    <screen>$ /path/to/apache22/bin/apachectl -k stop</screen>
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
@@ -261,14 +260,14 @@ Install log file location:
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><filename>audit/</filename></term>
+      <term><filename>logs/audit/</filename></term>
       <listitem>
        <para>Operational audit log directory, only used if remote logging
        to OpenAM is disabled</para>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><filename>debug/</filename></term>
+      <term><filename>logs/debug/</filename></term>
       <listitem>
        <para>Debug directory where the <filename>amAgent</filename> debug file
        resides. Useful in troubleshooting policy agent issues.</para>
@@ -278,8 +277,7 @@ Install log file location:
    </step>
    <step>
     <para>Start the Apache 2.2 server where you installed the agent.</para>
-    <screen>$ cd /path/to/apache22/bin
-$ apachectl -k start</screen>
+    <screen>$ /path/to/apache22/bin/apachectl -k start</screen>
    </step>
   </procedure>
   
@@ -289,8 +287,7 @@ $ apachectl -k start</screen>
    <step>
     <para>Check the Apache 2.2 error log after you start the server to make
     sure startup completed successfully.</para>
-    <screen>[mark@lb bin]$ tail -n 3 /path/to/apache22/logs/error_log
-[Sat Sep 03 12:37:28 2011] [notice] caught SIGTERM, shutting down
+    <screen>$ tail -n 2 /path/to/apache22/logs/error_log
 [Sat Sep 03 13:28:16 2011] [notice] Policy web agent shared memory conf...
 [Sat Sep 03 13:28:16 2011] [notice] Apache/2.2.19 (Unix) DSAME/3.0 configured
  -- resuming normal operations</screen>
