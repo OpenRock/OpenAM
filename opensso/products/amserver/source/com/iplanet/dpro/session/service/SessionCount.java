@@ -47,6 +47,7 @@ import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.session.util.RestrictedTokenContext;
 
  
@@ -96,14 +97,22 @@ public class SessionCount {
                     + "SSOTokenManager instance.");
         }
 
-        if (getSS().isSiteEnabled()) {
-            if (getSS().isSessionFailoverEnabled()) {
-                deploymentMode = SFO_MODE;
-            } else {
+        if (getSS().isSessionFailoverEnabled()) {
+            deploymentMode = SFO_MODE;
+        } else {
+            try {
+                int count = WebtopNaming.getAllServerIDs().size();
+                if (count == 1 || (count == 2
+                        && (getSS().isSiteEnabled()
+                        || !SiteConfiguration.getSites(getAdminToken()).isEmpty()))) {
+                    deploymentMode = SINGLE_SERVER_MODE;
+                } else {
+                    deploymentMode = MULTI_SERVER_MODE;
+                }
+            } catch (Exception ex) {
+                //If an error occurs fallback to multi server mode
                 deploymentMode = MULTI_SERVER_MODE;
             }
-        } else {
-            deploymentMode = SINGLE_SERVER_MODE;
         }
     }
 
