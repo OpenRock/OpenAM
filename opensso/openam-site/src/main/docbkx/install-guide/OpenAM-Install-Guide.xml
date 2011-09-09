@@ -50,7 +50,12 @@
  
  <xinclude:include href="preface.xml" />
  
- <xinclude:include href='chap-install.xml' />
+ <xinclude:include href='chap-install-core.xml' />
+ <xinclude:include href='chap-install-tools.xml' />
+ <xinclude:include href='chap-install-console-only.xml' />
+ <xinclude:include href='chap-install-core-only.xml' />
+ <xinclude:include href='chap-install-das.xml' />
+ <xinclude:include href='chap-install-samples.xml' />
  <xinclude:include href='chap-custom-ui.xml' />
  <xinclude:include href='chap-session-failover.xml' />
  <xinclude:include href='chap-upgrade.xml' />

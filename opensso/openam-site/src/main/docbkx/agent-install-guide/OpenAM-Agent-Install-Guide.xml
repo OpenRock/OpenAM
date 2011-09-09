@@ -47,7 +47,10 @@
  </info>
 
  <!-- TODO: Consider moving this guide to live with the agents. -->
-
+ <!-- TODO: Add Gateway install. See
+      http://resources.apexidentity.com/projects/docs/wiki/Installation
+      http://resources.apexidentity.com/projects/docs/wiki/Federation
+      http://resources.apexidentity.com/projects/docs/wiki/Containerhelp -->
  <toc />
  
  <xinclude:include href="preface.xml" />

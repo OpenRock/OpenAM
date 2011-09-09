@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-tools'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing OpenAM Tools</title>
+ 
+ <para>OpenAM tools are found in the <filename>tools/</filename> directory
+ where you unpacked the archive of the entire package.</para>
+ <variablelist>
+  <varlistentry>
+   <term><filename>tools/ssoAdminTools.zip</filename></term>
+   <listitem>
+    <para>Administration tools: <command>ampassword</command>, <command>amtune</command>,
+    <command>ssoadm</command> and <command>amverifyarchive</command></para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><filename>tools/ssoConfiguratorTools.zip</filename></term>
+   <listitem>
+    <para>Tools for command line installation and configuration</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><filename>tools/ssoDiagnosticTools.zip</filename></term>
+   <listitem>
+    <para>Tool to check for problems with your deployment and
+    configuration</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><filename>tools/ssoSessionTools.zip</filename></term>
+   <listitem>
+    <para>Session failover utilities</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+ 
+ <procedure xml:id="install-openam-admin-tools">
+  <title>To Set Up Administration Tools</title>
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk1.6</screen>
+  </step>
+  <step>
+   <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <screen>$ cd /path/to/admin/tools
+$ unzip /path/to/OpenAM/tools/ssoAdminTools.zip
+...
+  inflating: template/windows/bin/amtune/amtune.bat.template  
+  inflating: template/windows/bin/amverifyarchive.bat.template  
+  inflating: template/windows/bin/ssoadm.bat.template</screen>
+  </step>
+  <step>
+   <para>Run the <command>setup</command> utility (<command>setup.bat</command>
+   on Windows), providing the path to the directory where OpenAM configuration
+   files are located, and where you want debug and log information to be
+   located.</para>
+   <screen>$ ./setup
+Path to config files of OpenAM server [/home/mark/openam]:
+Debug Directory [/path/to/admin/tools/debug]:
+Log Directory [/path/to/admin/tools/log]:
+The scripts are properly setup under directory: /path/to/admin/tools/openam
+Debug directory is /path/to/admin/tools/debug.
+Log directory is /path/to/admin/tools/log.
+The version of this tools.zip is: (2011-July-11 00:05)
+The version of your server instance is: (2011-July-11 00:05)</screen>
+   <para>After setup, the tools are located under a directory named after the
+   instance of OpenAM.</para>
+   <screen>$ ls openam/bin/
+ampassword  amtune/  amverifyarchive  ssoadm</screen>
+  </step>
+  <step>
+   <para>Check that <command>ssoadm</command> works properly.</para>
+   <screen>$ umask 366
+$  echo password > /tmp/pwd.txt
+$ openam/bin/ssoadm list-servers -u amadmin -f /tmp/pwd.txt
+
+http://openam.example.com:8080/openam</screen>
+   <para>The <command>ssoadm</command> commands can also be run from
+   <filename>ssoadm.jsp</filename> in OpenAM, for example at
+   <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
+   <!-- TODO add admin guide link here -->
+  </step>
+ </procedure>
+
+ <procedure xml:id="install-openam-config-tools">
+  <title>To Set Up Configuration Tools</title>
+  
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk1.6</screen>
+  </step>
+  <step>
+   <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <screen>$ unzip /path/to/OpenAM/tools/ssoConfiguratorTools.zip 
+Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
+  inflating: README.setup            
+  inflating: configurator.jar        
+  inflating: sampleconfiguration</screen>
+   <para>Set up configuration files based on the
+   <filename>sampleconfiguration</filename> example, and then apply the
+   configuration to a deployed OpenAM .war file using the following
+   command.</para>
+   <screen>$ java -jar configurator.jar -f <replaceable>config.file</replaceable></screen>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="install-openam-diagnostic-tool">
+  <title>To Set Up Diagnostic Tool</title>
+  <para>The diagnostic tool, <command>ssodtool.sh</command>
+  (<command>ssodtool.bat</command> on Windows), works in both graphical and
+  console mode.</para>
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk1.6</screen>
+  </step>
+  <step>
+   <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <screen>$ unzip /path/to/OpenAM/tools/ssoDiagnosticTools.zip
+...
+  inflating: services/webcontainer/service.xml
+  inflating: ssodtool.bat            
+  inflating: ssodtool.sh</screen>
+ <para>You can start the graphical user interface by using the tools without
+ options, or in console mode using the <command>ssodtool.sh --console</command>
+ command.</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="install-openam-session-tools">
+  <title>To Set Up Session Tools</title>
+  
+  <note>
+   <para>Expect this procedure to change as the new, OpenDJ-based session
+   failover capabilities are included in OpenAM.</para>
+  </note>
+  
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk1.6</screen>
+  </step>
+  <step>
+   <para>Install the necessary scripts for session failover.</para>
+   <screen>$ setup -p scripts
+The scripts are properly setup under directory: /path/to/session/tools/scripts
+...</screen>
+   <!-- TODO: Add olink when the machinery is available. -->
+   <para>For instructions on making sessions available across a site, see
+   the chapter on <citetitle>Setting Up OpenAM Session
+   Failover</citetitle>.</para>
+  </step>
+ </procedure>
+</chapter>
