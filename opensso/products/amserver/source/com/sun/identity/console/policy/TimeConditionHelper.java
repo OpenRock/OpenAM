@@ -25,7 +25,9 @@
  * $Id: TimeConditionHelper.java,v 1.2 2008/06/25 05:43:06 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.view.html.OptionList;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 public class TimeConditionHelper
 {
@@ -65,6 +68,7 @@ public class TimeConditionHelper
     public static final String RADIOTIMEZONE = "radioTimeZone";
     private static String DATE_FORMAT = "MM/dd/yyyy";
     private static final String PLUGIN_DATE_FORMAT = "yyyy:MM:dd";
+    private static final Pattern RFC_822_PATTERN = Pattern.compile("(-|\\+)[0-9]{4}");
 
     private static TimeConditionHelper instance = new TimeConditionHelper();
 
@@ -321,12 +325,16 @@ public class TimeConditionHelper
                 tz = (String)propModel.getValue(STANDARDTIMEZONE);
                 valid = true;
             } else {
-                tz = (String)propModel.getValue(CUSTOMTIMEZONE);
-                if (!isValidTimeZone(tz)) {
+                tz = (String) propModel.getValue(CUSTOMTIMEZONE);
+                if (RFC_822_PATTERN.matcher(tz).matches()) {
+                    tz = getNormalizedTimeZone("GMT" + tz);
+                    valid = true;
+                } else {
+                    valid = isValidTimeZone(tz);
+                }
+                if (!valid) {
                     viewBean.setErrorMessage(
                         "policy.condition.time.invalid.timezone");
-                } else {
-                    valid = true;
                 }
             }
 
@@ -451,10 +459,14 @@ public class TimeConditionHelper
         } else {
             TimeZone t = TimeZone.getTimeZone(tz);
             String id = t.getID();
-            valid = id.equals(tz) ||
-                id.equals(TimeZone.getTimeZone("GMT+10:00").getID());
+            valid = id.equals(tz);
         }
 
         return valid;
+    }
+
+    private String getNormalizedTimeZone(String tz) {
+        TimeZone t = TimeZone.getTimeZone(tz);
+        return t.getID();
     }
 }
