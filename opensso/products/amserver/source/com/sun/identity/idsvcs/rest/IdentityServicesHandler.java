@@ -205,6 +205,8 @@ public class IdentityServicesHandler extends HttpServlet {
             new SecurityParameter("FILTER");
         public static final SecurityParameter ATTRIBUTES =
             new SecurityParameter("ATTRIBUTES", Attribute[].class);
+        public static final SecurityParameter REFRESH =
+                new SecurityParameter("REFRESH", Boolean.class);
         // ===================================================================
         // Fields
         // ===================================================================
@@ -237,10 +239,17 @@ public class IdentityServicesHandler extends HttpServlet {
                 ret = getAttributeArray(request);
             } else if (this.type == IdentityDetails.class) {
                 ret = getIdentityDetails(request);
+            } else if (type == Boolean.class) {
+                ret = getBoolean(request);
             } else {
                 ret = getString(request);
             }
             return ret;
+        }
+
+        public Boolean getBoolean(ServletRequest request) {
+            String name = name().toLowerCase();
+            return Boolean.valueOf(request.getParameter(name));
         }
 
         public String getString(ServletRequest request) {
@@ -519,7 +528,7 @@ public class IdentityServicesHandler extends HttpServlet {
             SecurityParameter.ACTION, SecurityParameter.SUBJECTID);
         public static final SecurityMethod ATTRIBUTES = new SecurityMethod(
             "ATTRIBUTES", UserDetails.class, SecurityParameter.ATTRIBUTENAMES,
-            SecurityParameter.SUBJECTID);
+            SecurityParameter.SUBJECTID, SecurityParameter.REFRESH);
         public static final SecurityMethod LOG = new SecurityMethod(
                 "LOG", Void.class, new SecurityParameter[]
                 {SecurityParameter.APPID, SecurityParameter.SUBJECTID,

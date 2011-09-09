@@ -399,14 +399,14 @@ public class IdentityServicesImpl
      * @throws GeneralFailure on other errors.
      * @throws AccessDenied if reading of attributes for the user is disallowed.
      */
-    public UserDetails attributes(String[] attributeNames, Token subject)
+    public UserDetails attributes(String[] attributeNames, Token subject, Boolean refresh)
         throws TokenExpired, GeneralFailure, RemoteException, AccessDenied {
         List attrNames = null;
         if ((attributeNames != null) && (attributeNames.length > 0)) {
             attrNames = new ArrayList();
             attrNames.addAll(Arrays.asList(attributeNames));
         }
-        return attributes(attrNames, subject);
+        return attributes(attrNames, subject, refresh);
     }
 
     /**
@@ -417,11 +417,14 @@ public class IdentityServicesImpl
      * @throws TokenExpired when Token has expired.
      * @throws GeneralFailure on other errors.
      */
-    public UserDetails attributes(List attributeNames, Token subject)
+    public UserDetails attributes(List attributeNames, Token subject, Boolean refresh)
         throws TokenExpired, GeneralFailure, RemoteException, AccessDenied {
         UserDetails details = new UserDetails();
         try {
             SSOToken ssoToken = getSSOToken(subject);
+            if (refresh) {
+                SSOTokenManager.getInstance().refreshSession(ssoToken);
+            }
             Map sessionAttributes = new HashMap();
             Set s = null; 
             if (attributeNames != null) {

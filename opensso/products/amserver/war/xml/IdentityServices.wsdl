@@ -44,6 +44,8 @@
             <xsd:element name="DuplicateObject" type="tns:DuplicateObject"></xsd:element>
             
             <xsd:element name="attributes" type="tns:attributes"></xsd:element>
+
+            <xsd:element name="attributesRequest" type="tns:attributesRequest"></xsd:element>
             
             <xsd:element name="attributesResponse" type="tns:attributesResponse"></xsd:element>
             
@@ -94,7 +96,7 @@
             <xsd:element name="delete" type="tns:delete"></xsd:element>
             
             <xsd:element name="deleteResponse" type="tns:deleteResponse"></xsd:element>
-            
+
             <xsd:complexType name="log">
                 <xsd:sequence>
                     <xsd:element name="app" type="tns:token" minOccurs="0"></xsd:element>
@@ -169,6 +171,14 @@
                 </xsd:sequence>
             </xsd:complexType>
             
+            <xsd:complexType name="attributesRequest">
+                <xsd:sequence>
+                    <xsd:element name="attributes" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                    <xsd:element name="subject" type="tns:token" minOccurs="0"></xsd:element>
+                    <xsd:element name="refresh" type="xsd:boolean" minOccurs="0" maxOccurs="1"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
             <xsd:complexType name="attributesResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="tns:userDetails" minOccurs="0"></xsd:element>
@@ -404,8 +414,8 @@
     <message name="MaximumSessionReached">
         <part name="fault" element="tns:MaximumSessionReached"></part>
     </message>
-    <message name="attributes">
-        <part name="parameters" element="tns:attributes"></part>
+    <message name="attributesRequest">
+        <part name="parameters" element="tns:attributesRequest"></part>
     </message>
     <message name="attributesResponse">
         <part name="parameters" element="tns:attributesResponse"></part>
@@ -506,7 +516,7 @@
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
         </operation>
         <operation name="attributes">
-            <input message="tns:attributes"></input>
+            <input message="tns:attributesRequest"></input>
             <output message="tns:attributesResponse"></output>
             <fault message="tns:TokenExpired" name="TokenExpired"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>

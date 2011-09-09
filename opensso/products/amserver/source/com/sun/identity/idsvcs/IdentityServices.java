@@ -25,7 +25,9 @@
  * $Id: IdentityServices.java,v 1.5 2009/12/15 00:34:57 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.idsvcs;
 
 import java.util.List;
@@ -87,7 +89,7 @@ public interface IdentityServices extends Remote {
      * @throws GeneralFailure on other errors.
      * @throws AccessDenied if reading of attributes for the user is disallowed
      */
-    public UserDetails attributes(List attributeNames, Token subject)
+    public UserDetails attributes(List attributeNames, Token subject, boolean refresh)
         throws TokenExpired, GeneralFailure, RemoteException, AccessDenied;
 
     /**
