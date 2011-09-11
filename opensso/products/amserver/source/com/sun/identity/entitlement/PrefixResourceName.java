@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -75,6 +79,9 @@ public class PrefixResourceName implements ResourceName {
     private final static String TRUE = "true";
     private final static String FALSE = "false";
     private final static String DUMMY_URI = "dummy.html";
+    
+    //parameter wildcard is no longer required in the entitlement framework
+    private final static String PARAM_WILDCARD = "*?*";
 
     /**
      * empty no argument constructor.
@@ -166,6 +173,11 @@ public class PrefixResourceName implements ResourceName {
             requestResource = requestResource.toLowerCase();
             targetResource = targetResource.toLowerCase();
         }
+        
+        // if the strings are identical then we have an exact match
+        if (requestResource.equals(targetResource)) {
+            return ResourceMatch.EXACT_MATCH;
+        }
 
         String leftPrecedence =
                 SystemPropertiesManager.get(Constants.DELIMITER_PREF_LEFT, FALSE);
@@ -191,6 +203,21 @@ public class PrefixResourceName implements ResourceName {
             int len = targetResource.length();
             targetResource = targetResource.substring(0, len - 1);
         }
+        
+        // get rid of ending '?*' if any from requestResource 
+        // new entitlement engine no longer evaluates parameter wildcard
+        while (requestResource.endsWith(PARAM_WILDCARD)) {
+            int len = requestResource.length();
+            requestResource = requestResource.substring(0, len - 2);
+        }
+
+        // get rid of ending '?*' if any from targetResource
+        // new entitlement engine no longer evaluates parameter wildcard
+        while (targetResource.endsWith(PARAM_WILDCARD)) {
+            int len = targetResource.length();
+            targetResource = targetResource.substring(0, len - 2);
+        }
+        
         /**
          * checks if one level wild card pattern is embedded in wildcard pattern
          * and wild card pattern is not in the resource, then implies that
@@ -268,6 +295,7 @@ public class PrefixResourceName implements ResourceName {
                 }
                 return (ResourceMatch.NO_MATCH);
             }
+
         } 
         // yes, requestResource does start with substr
         // move the pointers to the next char after the substring

@@ -416,6 +416,22 @@ public class ResourceResult {
             if (resourceMatch.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
                 isSuperResource = true;
             }
+            // Results will contain both incoming URL as well as matched policy URL with decision. 
+            // The problem is we don't know which order results will come in.
+            // Incoming URL will be missing policyDecision so we need to check resourceResult contains '*' 
+            // and if it does, check if resourceResult is parent of incoming URL and use parent's
+            // policyDecision for this object.  
+            else if (resourceResult.resourceName.indexOf('*') != -1 ) {
+            	String resResultResName = resourceResult.resourceName;
+            	String substrResultResName = resResultResName.substring(0, resResultResName.indexOf('*'));
+            	if (resourceName.startsWith(substrResultResName)) {
+            	    //check if policyDecision is null
+            	    //if null, then copy policyDecision from parents
+            	    if (policyDecision==null || policyDecision.getActionDecisions().isEmpty()) {
+            		    policyDecision = resourceResult.policyDecision;
+            	    }
+            	}
+            }
         } else {
             isSuperResource =
                     resourceResult.resourceName.startsWith(resourceName);
