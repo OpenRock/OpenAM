@@ -23,32 +23,40 @@
  *
  */
 
-package org.forgerock.openam.upgrade;
+package org.forgerock.openam.upgrade.helpers;
 
+import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
 import java.util.Set;
+import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
- *
+ * Used to upgrade the iPlanetAMAuthService. 
+ * 
  * @author steve
  */
-public interface UpgradeHelper {
-    /**
-     * Given the existing attribute schema and the new attribute schema the upgrade helper
-     * can decide how to change the new attr based on the state of the existing attribute.
-     * 
-     * @param oldAttr The old attribute schema
-     * @param newAttr The new attribute schema
-     * @return The possibly updated attribute schema, this will be used in the upgrade
-     * @throws UpgradeException If something bad happens, this will be used to log not stop the upgrade
-     */
-    public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
-    throws UpgradeException;
+public class AuthServiceHelper extends AbstractUpgradeHelper {    
+    private final static String attrAdded = "com.sun.identity.authentication.modules.securid.SecurID";
+    private final static String ATTR = "iplanet-am-auth-authenticators";
     
-    /**
-     * Return the Set of attributes that are to be upgrade by this service helper
-     * 
-     * @return The set of upgraded attributes names
-     */
-    public Set<String> getAttributes();
+    static {
+        initialize();
+    }
+    
+    private static void initialize() {
+        attributes.add(ATTR);
+    }
+    
+    @Override
+    public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
+    throws UpgradeException {
+            if (!(newAttr.getName().equals(ATTR))) {
+            return newAttr;
+        }
+        
+        Set<String> defaultValues = existingAttr.getDefaultValues();
+        defaultValues.add(attrAdded);
+        
+        return existingAttr;
+    }    
 }

@@ -505,34 +505,30 @@ public class UpgradeUtils {
                                                 ServiceSchema serviceSchema,
                                                 SSOToken adminToken)
     throws UpgradeException {
-        if (!(schemaMods.getAttributes().isEmpty())) {
-            for(AttributeSchemaImpl attrs : schemaMods.getAttributes()) {
-                    modifyAttributeInExistingSchema(serviceName, 
-                                         null, 
-                                         schemaType,
-                                         attrs.getName(),
-                                         attrs.getAttributeSchemaNode(), 
-                                         adminToken);
-            }
+        for (AttributeSchemaImpl attrs : schemaMods.getAttributes()) {
+                modifyAttributeInExistingSchema(serviceName, 
+                                     null, 
+                                     schemaType,
+                                     attrs.getName(),
+                                     attrs.getAttributeSchemaNode(), 
+                                     adminToken);
         }
       
         if (schemaMods.hasSubSchema()) {
             for (Map.Entry<String, ServiceSchemaModificationWrapper> schema : schemaMods.getSubSchemas().entrySet()) {
-                if (!(schema.getValue().getAttributes().isEmpty())) {
-                    for(AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
-                        ServiceSchema subSchema = null;
-                        
-                        try {
-                            subSchema = serviceSchema.getSubSchema(schema.getKey());
-                        } catch (SMSException smse) {
-                            debug.error("Unable to modify attributes in schema", smse);
-                            throw new UpgradeException(smse);
-                        }
-                        
-                        modifyAttributeInExistingSchema(subSchema, attrs.getName(), attrs.getAttributeSchemaNode());
-                    }
-                }
+                for (AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
+                    ServiceSchema subSchema = null;
 
+                    try {
+                        subSchema = serviceSchema.getSubSchema(schema.getKey());
+                    } catch (SMSException smse) {
+                        debug.error("Unable to modify attributes in schema", smse);
+                        throw new UpgradeException(smse);
+                    }
+
+                    modifyAttributeInExistingSchema(subSchema, attrs.getName(), attrs.getAttributeSchemaNode());
+                }
+                
                 if (schema.getValue().hasSubSchema()) {
                     ServiceSchema ss = null;
                     
@@ -846,9 +842,9 @@ public class UpgradeUtils {
                     + "for service :" + serviceName);
         }
         
-        removeAttributeSchema(serviceName, null, schemaType, attrName, adminToken);
+        removeAttributeSchema(serviceName, subSchemaName, schemaType, attrName, adminToken);
         addAttributeToSchema(serviceName, 
-                             null, 
+                             subSchemaName, 
                              schemaType, 
                              attributeSchemaNode, 
                              adminToken);

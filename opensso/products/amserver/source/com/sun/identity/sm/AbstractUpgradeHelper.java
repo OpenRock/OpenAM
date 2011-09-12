@@ -26,6 +26,7 @@
 package com.sun.identity.sm;
 
 import com.sun.identity.shared.xml.XMLUtils;
+import java.util.HashSet;
 import java.util.Set;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeHelper;
@@ -44,6 +45,7 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
             + SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT + ">";
     private static final String VALUE_BEGIN = "<" + SMSUtils.ATTRIBUTE_VALUE + ">";
     private static final String VALUE_END = "</" + SMSUtils.ATTRIBUTE_VALUE + ">";
+    protected static Set<String> attributes = new HashSet<String>();
     
     protected AttributeSchemaImpl updateDefaultValues(AttributeSchemaImpl attribute, Set<String> defaultValues) 
     throws UpgradeException {
@@ -84,4 +86,8 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
     
     public abstract AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
     throws UpgradeException;
+    
+    public Set<String> getAttributes() {
+        return attributes;
+    }
 }

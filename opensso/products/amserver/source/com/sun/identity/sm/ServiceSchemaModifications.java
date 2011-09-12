@@ -296,7 +296,7 @@ public class ServiceSchemaModifications {
     protected ServiceSchemaModificationWrapper getServiceModificationsRecursive(String schemaName, 
                                                                            ServiceSchemaImpl newSchema,
                                                                            ServiceSchemaImpl existingSchema) 
-    throws SMSException {
+    throws SMSException, UpgradeException {
         Set<AttributeSchemaImpl> attrsModified = new HashSet<AttributeSchemaImpl>();
         ServiceSchemaModificationWrapper attrModifiedResult = new ServiceSchemaModificationWrapper(serviceName, schemaName);
         
@@ -382,24 +382,32 @@ public class ServiceSchemaModifications {
         return attrAdded;
     }
     
-    protected Set<AttributeSchemaImpl> getAttributesModified(Set<AttributeSchemaImpl> newAttrs, Set<AttributeSchemaImpl> existingAttrs) {
+    protected Set<AttributeSchemaImpl> getAttributesModified(Set<AttributeSchemaImpl> newAttrs, Set<AttributeSchemaImpl> existingAttrs) 
+    throws UpgradeException {
         Set<AttributeSchemaImpl> attrMods = new HashSet<AttributeSchemaImpl>();
         
         for (AttributeSchemaImpl newAttr : newAttrs) {
-            for (AttributeSchemaImpl existingAttr : existingAttrs) {                
-                if (upgradeAttributeSchema(existingAttr, newAttr)) {
+            // skip attributes that are not explicitly named for upgrade
+            if (ServerUpgrade.getServiceHelper(serviceName) != null &&
+                    !ServerUpgrade.getServiceHelper(serviceName).getAttributes().contains(newAttr.getName())) {
+                continue;
+            }
+            
+            for (AttributeSchemaImpl existingAttr : existingAttrs) {
+                if (!existingAttr.getName().equals(newAttr.getName())) {
+                    continue;
+                }
+                
+                try {
                     if (ServerUpgrade.getServiceHelper(serviceName) != null) {
                         UpgradeHelper helper = ServerUpgrade.getServiceHelper(serviceName);
-                        
-                        try {
-                            newAttr = helper.upgradeAttribute(existingAttr, newAttr);
-                        } catch (UpgradeException ue) {
-                            UpgradeUtils.debug.error("Unable to process upgrade helper", ue);
-                        }
+                        newAttr = helper.upgradeAttribute(existingAttr, newAttr);
+                        attrMods.add(newAttr);
                     }
-                    
-                    attrMods.add(newAttr);
-                }
+                } catch (UpgradeException ue) {
+                    UpgradeUtils.debug.error("Unable to process upgrade helper", ue);
+                    throw ue;
+                }               
             }
         }
         
@@ -440,6 +448,16 @@ public class ServiceSchemaModifications {
     }
     
     protected boolean upgradeAttributeSchema(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr) {
+        // if the attribute names do not match, skip
+        if (oldAttr.getName().equals(newAttr.getName())) {
+            return false;
+        }
+                
+        if (oldAttr.getName().equals("iplanet-am-auth-login-success-url") &&
+                newAttr.getName().equals("iplanet-am-auth-login-success-url")) {
+            int i = 1;
+        }
+        
         boolean choiceValuesMapNoMatch = false;
         boolean defaultValuesSetNoMatch = false;
         
@@ -456,7 +474,7 @@ public class ServiceSchemaModifications {
         }
         
         if (oldAttr.getDefaultValues() != null && newAttr.getDefaultValues() != null) {
-            defaultValuesSetNoMatch = !(oldAttr.getChoiceValuesSet().equals(newAttr.getChoiceValuesSet()));
+            defaultValuesSetNoMatch = !(oldAttr.getDefaultValues().equals(newAttr.getDefaultValues()));
         }
         
         return choiceValuesMapNoMatch | defaultValuesSetNoMatch;

@@ -699,4 +699,9 @@ public interface SetupConstants {
      * User Management Datastore Normalized Root Suffix tag.
      */
     String UM_NORMALIZED_ORGBASE = "UM_NORMALIZED_ORGBASE";
+    
+    /**
+     * Name of the config param file
+     */
+    String CONFIG_PARAM_FILE = "/.configParam";
 }

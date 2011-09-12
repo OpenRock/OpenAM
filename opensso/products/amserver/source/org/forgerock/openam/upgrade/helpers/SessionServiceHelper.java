@@ -39,23 +39,33 @@ import org.forgerock.openam.upgrade.UpgradeException;
  * follows:
  * 
  * <UL>
- * <LI>Destroy All Sessions property is set to true; post upgrade setting should
- * be DestroyAllAction
- * <LI>Destroy Oldest Session; This is the default, no action need be taken. 
- * <LI>Deny Access; If this is the current value (and destroy all property is false)
- * then post upgrade value should be DenyAccessAction.
+ * <LI>Destroy All Sessions property is set to true and service settings is
+ * DESTROY_OLD_SESSION; post upgrade setting should be DestroyAllAction
+ * <LI>Destroy All Sessions property is set to false and service settings is 
+ * DESTROY_OLD_SESSION; This is the default, no action need be taken. 
+ * <LI>Deny Access; If this is the current value then post upgrade value should 
+ * be DenyAccessAction.
  * </UL>
  * 
  * @author steve
  */
 public class SessionServiceHelper extends AbstractUpgradeHelper {
     private final static String DENY_ACCESS = "DENY_ACCESS";
+    private final static String DESTROY_OLD_SESSION = "DESTROY_OLD_SESSION";
     private final static String NEW_DENY_ACCESS = 
             "org.forgerock.openam.session.service.DenyAccessAction";
     private final static String DESTROY_ALL_SESSIONS_CLASS = 
             "org.forgerock.openam.session.service.DestroyAllAction";
     private static final String DESTROY_ALL_SESSIONS =
             "openam.session.destroy_all_sessions";
+    
+    static {
+        initialize();
+    }
+    
+    private static void initialize() {
+        attributes.add("iplanet-am-session-constraint-resulting-behavior");
+    }
             
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr) 
     throws UpgradeException {
@@ -65,8 +75,7 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
         
         Set<String> defaultValues = existingAttr.getDefaultValues();
         
-        // the property overrides the service value
-        if (destroyAllSessionsSet()) {
+        if (destroyAllSessionsSet() && defaultValues.contains(DESTROY_OLD_SESSION)) {
             Set<String> newDefaultValues = new HashSet<String>();
             newDefaultValues.add(DESTROY_ALL_SESSIONS_CLASS);
             newAttr = updateDefaultValues(newAttr, newDefaultValues);

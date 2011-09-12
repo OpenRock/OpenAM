@@ -613,42 +613,44 @@ public class AMSetupServlet extends HttpServlet {
 
         return isConfiguredFlag;
     }
-
+    
     private static void writeInputToFile(IHttpServletRequest request)
         throws IOException {
         StringBuilder buff = new StringBuilder();
-        Map map = request.getParameterMap();
-        for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
-            String key = (String)i.next();
-            if (!key.equals("actionLink")) {
-                Object val = map.get(key);
-                if (val instanceof String) {
-                    buff.append(key).append("=");
+        Map<String, ?> map = request.getParameterMap();
+        
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            if (!entry.getKey().equals("actionLink")) {
+                if (entry.getValue() instanceof String) {
+                    buff.append(entry.getKey()).append("=");
 
-                    if (passwordParams.contains(key)) {
+                    if (passwordParams.contains(entry.getKey())) {
                         buff.append("********");
+                    } else if (entry.getKey().equals(SetupConstants.CONFIG_VAR_SERVER_URI)) {
+                        buff.append(request.getContextPath());
                     } else {
-                        buff.append((String)val);
+                        buff.append(entry.getValue());
                     }
                     buff.append("\n");
-                } else if (val instanceof Map) {
-                    Map valMap = (Map)val;
-                    for (Iterator j = valMap.keySet().iterator(); j.hasNext();){
-                        String k = (String)j.next();
-                        buff.append(key).append(".").append(k).append("=");
+                } else if (entry.getValue() instanceof Map) {
+                    Map<String, String> valMap = (Map) entry.getValue();
+                    
+                    for (Map.Entry<String, String> mapEntry : valMap.entrySet()) {
+                        buff.append(entry.getKey()).append(".").append(mapEntry.getKey()).append("=");
 
-                        if (passwordParams.contains(k)) {
+                        if (passwordParams.contains(mapEntry.getKey())) {
                             buff.append("********");
                         } else {
-                            buff.append((String)valMap.get(k));
+                            buff.append(mapEntry.getValue());
                         }
                         buff.append("\n");
                     }
                 }
             }
         }
+        
         String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
-        writeToFile(basedir + "/.configParam", buff.toString());
+        writeToFile(basedir + SetupConstants.CONFIG_PARAM_FILE, buff.toString());
     }
     
     private static void checkBaseDir(String basedir, IHttpServletRequest req)

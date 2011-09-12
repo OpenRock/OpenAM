@@ -43,6 +43,7 @@ public class ServerUpgrade {
     private static final String ATTR_UPGRADE_HELPER = "upgrade.helper";
     private static final String ATTR_DEFAULT_UPGRADE = "defaults.to.upgrade";
     private static ResourceBundle res = null;
+    private static UpgradeException initializationException = null;
     
     static {
         loadResourceBundle();
@@ -55,6 +56,10 @@ public class ServerUpgrade {
     
     public static Set<String> getAttrsToUpgrade() 
     throws UpgradeException {
+        if (!isInitialized()) {
+            throw initializationException;
+        }
+        
         Set<String> values = new HashSet<String>();
             
         if (!res.containsKey(ATTR_DEFAULT_UPGRADE)) {
@@ -80,9 +85,16 @@ public class ServerUpgrade {
      * 
      * @param serviceName The service name for which a service upgrade helper should be returned
      * @return The service upgrade helper if available
+     * @throws UpgradeException If the resource bundle is missing
      */
-    public static UpgradeHelper getServiceHelper(String serviceName) {
+    public static UpgradeHelper getServiceHelper(String serviceName) 
+    throws UpgradeException {
+        if (!isInitialized()) {
+            throw initializationException;
+        }
+        
         return serviceHelpers.get(serviceName);
+         
     }
     
     protected static void populateUpgradeHelpers() {
@@ -90,7 +102,7 @@ public class ServerUpgrade {
         String attrValues = res.getString(ATTR_UPGRADE_HELPER);
         
         if (attrValues != null) {
-            StringTokenizer st = new StringTokenizer(attrValues, Constants.COLON);
+            StringTokenizer st = new StringTokenizer(attrValues, Constants.COMMA);
             
             while (st.hasMoreTokens()) {
                 String serviceHelper = st.nextToken();
@@ -110,15 +122,22 @@ public class ServerUpgrade {
                         values.put(serviceName, helper);
                     } catch (Exception ex) {
                         UpgradeUtils.debug.error("Unable to load helper class: " + helperClass, ex);
+                        initializationException = 
+                                new UpgradeException("Unable to load helper class: " + helperClass + ex.getMessage());
                     }
                 }
             }
         }
         
         if (UpgradeUtils.debug.messageEnabled()) {
-            UpgradeUtils.debug.message("Helper classes: " + serviceHelpers);
+            UpgradeUtils.debug.message("Helper classes: " + values);
         }
         
         serviceHelpers = values;
     }
+    
+    protected static boolean isInitialized() {
+        return initializationException == null;
+    }
 }
+

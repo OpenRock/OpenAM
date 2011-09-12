@@ -25,6 +25,7 @@
 package org.forgerock.openam.upgrade;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.util.AMEncryption;
 import com.iplanet.services.util.ConfigurableKey;
 import com.iplanet.services.util.JCEEncryption;
@@ -33,8 +34,10 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.IHttpServletRequest;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
@@ -58,6 +61,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -253,7 +257,7 @@ public class UpgradeServices {
     throws UpgradeException {
         Map map = ServicesDefaultValues.getDefaultValues();
         Map<String, Document> newServiceDefinitions = new HashMap<String, Document>();
-        String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
+        String basedir = SystemProperties.get(SystemProperties.CONFIG_PATH);
         String dirXML = basedir + "/config/xml";
         
         File xmlDirs = new File(dirXML);
@@ -265,6 +269,19 @@ public class UpgradeServices {
                 debug.message("Created directory: " + xmlDirs);
             }
         }
+        
+        // need to reinitialize the tag swap property map with original install params
+        IHttpServletRequest requestFromFile = new UpgradeHttpServletRequest(basedir);
+        
+        try {
+            Properties foo = ServerConfiguration.getServerInstance(adminToken, WebtopNaming.getLocalServer());
+            requestFromFile.addParameter(SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, foo.getProperty(Constants.ENC_PWD_PROPERTY));
+        } catch (Exception ex) {
+            debug.error("Unable to initialise services defaults", ex);
+            throw new UpgradeException("Unable to initialise services defaults: " + ex.getMessage());
+        }
+        
+        ServicesDefaultValues.setServiceConfigValues(requestFromFile);
 
         for (String serviceFileName : serviceNames) {
             boolean tagswap = true;
