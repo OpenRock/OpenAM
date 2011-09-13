@@ -86,6 +86,13 @@ Service Configuration was exported.</screen>
   <para>The following steps restore OpenAM configuration data from
   backup as described in <xref linkend="backup-config-to-xml" />.</para>
   
+  <tip>
+   <para>If using the default OpenAM configuration data store, run
+   <command>ssoadm embedded-status</command> to check the data store status
+   to determine whether you must restore the configuration files including
+   the embedded data store, or only the service configuration.</para>
+  </tip>
+  
   <step>
    <para>Deploy the OpenAM web application as you did for installation, but
    do not start OpenAM or configure it.</para>
