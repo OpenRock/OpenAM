@@ -76,12 +76,11 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <title>JMX Monitoring</title>
    <indexterm><primary>JMX</primary></indexterm>
    
-   <para>By default OpenAM listens on port 9999 for JMX monitoring, though
-   you must run <command>rmiregistry 9999</command> before connecting
-   remotely.</para>
+   <para>By default OpenAM listens on port 9999 for JMX monitoring.</para>
    
    <para>You can then use <command>jconsole</command> or other JMX-enabled
-   tools to browse the MBeans.</para>
+   tools to browse the MBeans. You can also browse the MBeans by connecting
+   to your web application container, and browsing to the OpenAM MBeans.</para>
    
    <mediaobject>
     <alt>Jconsole browsing OpenAM MBeans</alt>
@@ -159,13 +158,14 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <title>Logging in OpenAM Policy Agents</title>
    
    <para>By default, OpenAM Policy Agents log to local files in their
-   configuration directories. The exactly location depends on where you
-   installed the agent.</para>
+   configuration directories for debugging. The exactly location depends on
+   where you installed the agent.</para>
    
-   <para>OpenAM policy agents can send log messages remotely to OpenAM to
-   facilitate auditing. To configure logging for a centrally managed policy
-   agent, login to the OpenAM console as administrator, and browse to Access
-   Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   <para>By default OpenAM policy agents send log messages remotely to OpenAM
+   when you log auditing information about URL access attempts. To configure
+   audit logging for a centrally managed policy agent, login to the OpenAM
+   console as administrator, and browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable> &gt; Agents &gt;
    <replaceable>Agent Type</replaceable> &gt; <replaceable>Agent
    Name</replaceable> &gt; Global, and then scroll down to the Audit
    section.</para>
