@@ -34,6 +34,162 @@
 
  <para>This chapter covers how to monitor OpenAM services to ensure
  appropriate performance and service availability.</para>
-
+ 
+ <section xml:id="monitoring-interfaces">
+  <title>Monitoring Interfaces</title>
+  <indexterm><primary>Monitoring</primary></indexterm>
+  
+  <para>OpenAM lets you monitor OpenAM over protocol through web pages,
+  Java Management Extensions (JMX), or Simple Network Management Protocol
+  (SNMP). The services are based on JMX. To configure monitoring services,
+  login to OpenAM console as OpenAM administrator, and browse to Configuration
+  &gt; System &gt; Monitoring.</para>
+  
+  <section xml:id="monitoring-web-pages">
+   <title>Web Based Monitoring</title>
+   
+   <para>By default you can access a web based view of OpenAM MBeans on port
+   8082 where the core server runs, such as
+   <literal>http://openam-ter.example.com:8082/</literal>. The default
+   authentication file allows you to authenticate over HTTP as user
+   <literal>demo</literal>, password <literal>changeit</literal>. The user name
+   and password are kept in the file specified, with the password
+   encrypted.</para>
+   
+   <screen>$ cat openam/openam/opensso_mon_auth 
+demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
+   
+   <para>You can encrypt a new password using the <command>ampassword</command>
+   command. After changing the authentication file, you must restart OpenAM
+   for the changes to take effect.</para>
+   
+   <mediaobject>
+    <alt>OpenAM MBeans in a browser</alt>
+    <imageobject>
+     <imagedata fileref="images/web-based-monitoring.png" format="PNG" />
+    </imageobject>
+    <textobject><para>You can monitor OpenAM through a web browser.</para></textobject>
+   </mediaobject>
+  </section>
+  
+  <section xml:id="monitoring-jmx">
+   <title>JMX Monitoring</title>
+   <indexterm><primary>JMX</primary></indexterm>
+   
+   <para>By default OpenAM listens on port 9999 for JMX monitoring, though
+   you must run <command>rmiregistry 9999</command> before connecting
+   remotely.</para>
+   
+   <para>You can then use <command>jconsole</command> or other JMX-enabled
+   tools to browse the MBeans.</para>
+   
+   <mediaobject>
+    <alt>Jconsole browsing OpenAM MBeans</alt>
+    <imageobject>
+     <imagedata fileref="images/jconsole-to-openam.png" format="PNG" />
+    </imageobject>
+    <textobject><para>You can monitor OpenAM over JMX.</para></textobject>
+   </mediaobject>
+  </section>
+  
+  <section xml:id="monitoring-snmp">
+   <title>SNMP Monitoring</title>
+   <indexterm><primary>SNMP</primary></indexterm>
+   
+   <para>By default OpenAM listens on port 8085 for SNMP monitoring.</para>
+  </section>
+ </section>
+ 
+ <section xml:id="is-openam-alive">
+  <title>Is OpenAM Up?</title>
+  <indexterm><primary>Health check</primary></indexterm>
+  
+  <para>You can check over HTTP whether OpenAM is up, using
+  <filename>isAlive.jsp</filename>. Point your application to the file
+  under the OpenAM URL, such as
+  <literal>http://openam.example.com:8080/openam/isAlive.jsp</literal>.</para>
+  
+  <para>If you get a success code (with <literal>Server is ALIVE:</literal> in
+  the body of the page returned, then OpenAM is up.</para>
+ </section>
+ 
+ <section xml:id="log-mgmt">
+  <title>Log Management</title>
+  <indexterm><primary>Logging</primary></indexterm>
+  
+  <para>OpenAM implements logging as a service. This means remote clients
+  such as your OpenAM policy agents can log messages to the central logging
+  service.</para>
+  
+  <section xml:id="log-mgmt-core">
+   <title>Logging in OpenAM Core Services</title>
+   
+   <para>By default OpenAM logs to files in the configuration directory for
+   the instance, such as <filename>$HOME/openam/log/</filename> for log files,
+   and <filename>$HOME/openam/debug/</filename> for debug files. You can also
+   configure OpenAM to log through JDBC to a database such as MySQL or Oracle
+   DB.</para>
+   
+   <para>OpenAM sends messages to different log files, each named after the
+   service logging the message, with two different types log files per service:
+   <filename>.access</filename> and <filename>.error</filename>. Thus the
+   current log files for the authentication service are named
+   <filename>amAuthentication.access</filename> and
+   <filename>amAuthentication.error</filename>.</para>
+   
+   <!-- TODO: When olinks become available, include a link to the log message
+        reference. -->
+   
+   <para>OpenAM lets you change the log level on the fly. OpenAM also supports
+   log rotation, secure logging, and log message buffering.</para>
+   
+   <para>To configure OpenAM logging properties overall, login to the OpenAM
+   console as OpenAM administrator, and browse to Configuration &gt; System &gt;
+   Logging.</para>
+   
+   <para>To adjust the debug level while OpenAM is running, login to the OpenAM
+   console as OpenAM administrator, and browse to Configuration &gt; Servers
+   and Sites &gt; <replaceable>Server Name</replaceable> &gt; General, and then
+   scroll down to Debugging. The default level for debug logging is Error.
+   This level is appropriate for normal production operations, in which case
+   no debug log messages are expected.</para>
+  </section>
+  
+  <section xml:id="log-mgmt-agents">
+   <title>Logging in OpenAM Policy Agents</title>
+   
+   <para>By default, OpenAM Policy Agents log to local files in their
+   configuration directories. The exactly location depends on where you
+   installed the agent.</para>
+   
+   <para>OpenAM policy agents can send log messages remotely to OpenAM to
+   facilitate auditing. To configure logging for a centrally managed policy
+   agent, login to the OpenAM console as administrator, and browse to Access
+   Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   <replaceable>Agent Type</replaceable> &gt; <replaceable>Agent
+   Name</replaceable> &gt; Global, and then scroll down to the Audit
+   section.</para>
+  </section>
+ </section>
+ 
+ <section xml:id="session-mgmt">
+  <title>Session Management</title>
+  <indexterm><primary>Session management</primary></indexterm>
+  
+  <para>OpenAM console lets the administrator view and manage current
+  user sessions under the Sessions tab page.</para>
+  
+  <mediaobject>
+   <alt>Session management tab page</alt>
+   <imageobject>
+    <imagedata fileref="images/session-management.png" format="PNG" />
+   </imageobject>
+   <textobject><para>The OpenAM Administrator can view and end user
+   sessions.</para></textobject>
+  </mediaobject>
+  
+  <para>To end a user session manually, select the user's session, and then
+  click the Invalidate Session button. As a result, the user has to
+  authenticate again.</para>
+ </section>
 </chapter>
-
