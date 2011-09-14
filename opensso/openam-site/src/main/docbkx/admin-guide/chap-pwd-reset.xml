@@ -109,10 +109,10 @@
        <filename>WEB-INF/classes/amPasswordReset.properties_<replaceable>locale</replaceable></filename>,
        and localize only the values of the questions. For example if the
        default properties file contains:</para>
-       <literallayout>favourite-restaurant=What is your favorite restaurant?</literallayout>
+       <literallayout class="monospaced">favourite-restaurant=What is your favorite restaurant?</literallayout>
        <para>Then <filename>WEB-INF/classes/amPasswordReset.properties_fr</filename>
        ought to contain:</para>
-       <literallayout>favourite-restaurant=Quel est votre restaurant préféré ?</literallayout>
+       <literallayout class="monospaced">favourite-restaurant=Quel est votre restaurant préféré ?</literallayout>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -357,7 +357,7 @@
      <textobject><para>OpenAM confirms password reset.</para></textobject>
     </mediaobject>
     <para>The user receives the email with a line such as the following.</para>
-    <literallayout>Your OpenAM password was changed to:  647bWluw</literallayout>
+    <literallayout class="monospaced">Your OpenAM password was changed to:  647bWluw</literallayout>
    </step>
    <step>
     <para>The user logs in using the new password.</para>

@@ -66,7 +66,7 @@
  &lt;/listener-class&gt;
 &lt;/listener&gt;</programlisting>
     <para>For standalone applications, set the following JVM property.</para>
-    <literallayout>-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
+    <literallayout class="monospaced">-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
    </listitem>
    <listitem>
     <!-- Fix for OpenAM-699 -->

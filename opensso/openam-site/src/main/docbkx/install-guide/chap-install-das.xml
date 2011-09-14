@@ -174,7 +174,7 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
    host systems housing OpenAM and the DAS, you must at least redirect the
    browser after successful login to a page that exists. One way to do this
    is to use the <literal>goto</literal> parameter in the URL.</para>
-   <literallayout>https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
+   <literallayout class="monospaced">https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
    <para>As an alternative add sample authentication data, and a sample
    realm that gives you a landing page after successful login. Otherwise the
    default result of successful login is a redirect to the default success

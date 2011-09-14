@@ -607,7 +607,7 @@
         <listitem>
          <para>To disable policy agent enforcement for addresses in
          192.168.1.0 to 192.168.1.255, use the following setting.</para>
-         <literallayout>com.sun.identity.agents.config.notenforced.ip = 192.168.1.0/24</literallayout>
+         <literallayout class="monospaced">com.sun.identity.agents.config.notenforced.ip = 192.168.1.0/24</literallayout>
          <para>Currently the policy agent stops evaluating properties after
          reaching an invalid netmask in the list.</para>
         </listitem>
@@ -617,7 +617,7 @@
         <listitem>
          <para>To disable policy agent enforcement for addresses between
          192.168.1.10 to 192.168.1.127 inclusive, use the following setting.</para>
-         <literallayout>com.sun.identity.agents.config.notenforced.ip = 192.168.1.10-192.168.1.127</literallayout>
+         <literallayout class="monospaced">com.sun.identity.agents.config.notenforced.ip = 192.168.1.10-192.168.1.127</literallayout>
         </listitem>
        </varlistentry>
       </variablelist>
@@ -819,7 +819,7 @@
       <para>To set the list to <literal>.example.com</literal>, and
       <literal>.example.net</literal> using the configuration file property,
       include the following.</para>
-      <literallayout>com.sun.identity.agents.config.cdsso.cookie.domain[0]=.example.com 
+      <literallayout class="monospaced">com.sun.identity.agents.config.cdsso.cookie.domain[0]=.example.com 
 com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayout>
       <para>Property: <literal>com.sun.identity.agents.config.cookie.domain</literal></para>
      </listitem>

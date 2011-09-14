@@ -1398,7 +1398,7 @@
      <listitem>
       <para>Specify the Kerberos principal for authentication in the following
       format.</para>
-      <literallayout>HTTP/<replaceable>host</replaceable>.<replaceable>domain</replaceable>@<replaceable>dc-domain-name</replaceable></literallayout>
+      <literallayout class="monospaced">HTTP/<replaceable>host</replaceable>.<replaceable>domain</replaceable>@<replaceable>dc-domain-name</replaceable></literallayout>
       <para>Here, <replaceable>host</replaceable> and
       <replaceable>domain</replaceable> correspond to the host and domain names
       of the OpenAM instance, and <replaceable>dc-domain-name</replaceable>
