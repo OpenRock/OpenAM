@@ -86,7 +86,8 @@
    or locally with your agents, the agent requires a profile so that it can
    connect to and communicate with OpenAM.</para>
    <step>
-    <para>In the OpenAM console, browse to Access Control &gt; Agents &gt; Web,
+    <para>In the OpenAM console, browse to Access Control &gt;
+    <replaceable>Realm Name</replaceable>&gt; Agents &gt; Web,
     and then click the New... button in the Agent table.</para>
    </step>
    <step>
