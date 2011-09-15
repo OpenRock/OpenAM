@@ -274,8 +274,8 @@ Install log file location:
      <varlistentry>
       <term><filename>logs/debug/</filename></term>
       <listitem>
-       <para>Debug directory where the <filename>amAgent</filename> debug file
-       resides. Useful in troubleshooting policy agent issues.</para>
+       <para>Debug directory where the <filename>debug.out</filename> debug
+       file resides. Useful in troubleshooting policy agent issues.</para>
       </listitem>
      </varlistentry>
     </variablelist>
