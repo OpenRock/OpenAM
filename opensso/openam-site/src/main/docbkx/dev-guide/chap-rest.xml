@@ -163,6 +163,20 @@ userdetails.attribute.name=uid
 userdetails.attribute.value=bjensen
 userdetails.attribute.name=mail
 userdetails.attribute.value=bjensen@example.com</screen>
+  
+  <para>When retrieving attributes, you can refresh the session thus setting
+  the idle time to 0, by adding the boolean parameter
+  <literal>refresh=true</literal> to the query string.</para>
+  
+  <screen>$ curl "https://openam.example.com:8080/openam/identity/attributes?
+ subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
+ &amp;attributenames=cn
+ &amp;refresh=true"
+userdetails.token.id=
+ AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
+userdetails.attribute.name=cn
+userdetails.attribute.value=Babs Jensen
+userdetails.attribute.value=Barbara Jensen</screen>
  </section>
  
  <section xml:id="rest-api-authz">
