@@ -92,7 +92,7 @@
    <varlistentry>
     <term><filename>etc</filename></term>
     <listitem>
-     <para>Configuration templates used during installation</para>
+     <para>Agent web application used during installation</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -177,7 +177,8 @@
      <varlistentry>
       <term>Agent URL</term>
       <listitem>
-       <para>The URL to the J2EE application that the agent protects</para>
+       <para>The URL to the J2EE agent application, such as
+       <literal>http://www.example.com:8080/agentapp</literal></para>
        <para>In centralized configuration mode, the Agent URL is used to
        populate the Agent Profile for services such as notifications.</para>
       </listitem>
@@ -244,8 +245,9 @@ Install log file location:
 /path/to/j2ee_agents/jetty_v61_agent/installer-logs/audit/install.log
 ...</screen>
     <para>Upon successful completion, the installer has updated Jetty's
-    <filename>start.jar</filename> to reference the agent, and also set up
-    configuration and log directories for the agent.</para>
+    <filename>start.jar</filename> to reference the agent, set up the agent
+    web application, and also set up configuration and log directories for the
+    agent.</para>
    </step>
    <step>
     <para>Take note of the configuration files and log locations.</para>
@@ -283,6 +285,25 @@ Install log file location:
       </listitem>
      </varlistentry>
     </variablelist>
+   </step>
+   <step>
+    <para>To protect a web application, you must add the following filter
+    to the application's <filename>web.xml</filename> configuration,
+    following the opening &lt;web-app&gt; tag.</para>
+    <programlisting language="xml"> &lt;filter&gt;
+  &lt;filter-name&gt;Agent&lt;/filter-name&gt;
+  &lt;display-name&gt;Agent&lt;/display-name&gt;
+  &lt;description&gt;OpenSSO Policy Agent Filter&lt;/description&gt;
+ &lt;filter-class&gt;com.sun.identity.agents.filter.AmAgentFilter&lt;/filter-class&gt;
+ &lt;/filter&gt;
+ &lt;filter-mapping&gt;
+  &lt;filter-name&gt;Agent&lt;/filter-name&gt;
+  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+  &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+  &lt;dispatcher&gt;INCLUDE&lt;/dispatcher&gt;
+  &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
+  &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
+ &lt;/filter-mapping&gt;</programlisting>
    </step>
    <step>
     <para>Start the Jetty server where you installed the agent.</para>
