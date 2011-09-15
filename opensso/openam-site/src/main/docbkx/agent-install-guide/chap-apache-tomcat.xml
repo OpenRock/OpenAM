@@ -56,7 +56,7 @@
   Also verify the checksum of the file you download against the checksum
   posted on the download page.</para>
   
-  <para>Unzip the file in the directory where you plan to install the web
+  <para>Unzip the file in the directory where you plan to install the J2EE
   policy agent. The agent you install stores its configuration and logs
   under this directory.</para>
   
@@ -98,7 +98,7 @@
    <varlistentry>
     <term><filename>lib</filename></term>
     <listitem>
-     <para>Shared libraries used by the web policy agent</para>
+     <para>Shared libraries used by the J2EE policy agent</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -117,7 +117,7 @@
   </variablelist>
  </section>
  
- <section xml:id="install-tomcat-web-agent">
+ <section xml:id="install-tomcat-agent">
   <title>Installing the Tomcat Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
@@ -345,7 +345,7 @@ Build Machine: builds.forgerock.org
  <section xml:id="uninstall-tomcat-agent">
   <title>Remove Tomcat Policy Agent Software</title>
   
-  <para>To remove the web policy agent, use <command>agentadmin
+  <para>To remove the J2EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the Tomcat server configuration
   directory location.</para>
   
