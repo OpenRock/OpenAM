@@ -55,7 +55,7 @@
   <para>When the user's browser reiterates the request, the policy agent again
   checks that the request has a session token, finds a session token this
   time, and validates the session token with OpenAM. Given the valid session
-  token, the policy agents gets a policy decision from OpenAM concerning whether
+  token, the policy agent gets a policy decision from OpenAM concerning whether
   the user can access the page. If OpenAM's Policy Service determines that
   the user is allowed to access the page, OpenAM responds to the policy agent
   that access should be granted. The web policy agent then permits the web

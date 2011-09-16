@@ -293,7 +293,7 @@ Install log file location:
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
-  &lt;description&gt;OpenSSO Policy Agent Filter&lt;/description&gt;
+  &lt;description&gt;OpenAM Policy Agent Filter&lt;/description&gt;
  &lt;filter-class&gt;com.sun.identity.agents.filter.AmAgentFilter&lt;/filter-class&gt;
  &lt;/filter&gt;
  &lt;filter-mapping&gt;
