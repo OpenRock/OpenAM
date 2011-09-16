@@ -461,7 +461,7 @@ public class SAMLv2ForceAuthNTests extends TestCommon {
             }
             out.write("\">");
             out.write(newline);
-            out.write("<form name=\"Login\" buttonName=\"\" >");
+            out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
             out.write(newline);
             out.write("<input name=\"IDToken1\" value=\"" + sp_user + "\" />");
             out.write(newline);

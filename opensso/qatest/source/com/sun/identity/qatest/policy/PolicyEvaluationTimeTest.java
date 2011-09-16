@@ -682,7 +682,7 @@ public class PolicyEvaluationTimeTest extends TestCommon {
             SimpleDateFormat dayFormatter = new SimpleDateFormat("EEE");
             SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy:MM:dd");
             SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
-            SimpleDateFormat zoneFormatter = new SimpleDateFormat("z");
+            SimpleDateFormat zoneFormatter = new SimpleDateFormat("Z");
             Calendar rightNow = Calendar.getInstance();
             Calendar working = (Calendar)rightNow.clone();
             working.add(Calendar.HOUR_OF_DAY, + 20);

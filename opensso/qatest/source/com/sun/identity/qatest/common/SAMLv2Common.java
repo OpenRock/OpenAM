@@ -106,7 +106,7 @@ public class SAMLv2Common extends TestCommon {
         }
         out.write("\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\" >");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + idp_user + "\" />");
         out.write(newline);
@@ -116,7 +116,7 @@ public class SAMLv2Common extends TestCommon {
         if ((idpProxy) && (!idpLoginOnly)) {
             out.write("</form>");
             out.write(newline);
-            out.write("<form name=\"Login\" buttonName=\"\" >");
+            out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
             out.write(newline);
             out.write("<input name=\"IDToken1\" value=\"" + idp_proxy_user + "\" />");
             out.write(newline);
@@ -127,7 +127,7 @@ public class SAMLv2Common extends TestCommon {
         if (!idpLoginOnly) {
             out.write("</form>");
             out.write(newline);
-            out.write("<form name=\"Login\" buttonName=\"\" >");
+            out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
             out.write(newline);
             out.write("<input name=\"IDToken1\" value=\"" + sp_user + "\" />");
             out.write(newline);
@@ -188,7 +188,7 @@ public class SAMLv2Common extends TestCommon {
         out.write("\">");
         out.write(newline);
         if (!idpLoginOnly) {
-            out.write("<form name=\"Login\" buttonName=\"\" >");
+            out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
             out.write(newline);
             out.write("<input name=\"IDToken1\" value=\"" + sp_user + "\" />");
             out.write(newline);
@@ -247,7 +247,7 @@ public class SAMLv2Common extends TestCommon {
             out.write("&amp;binding=HTTP-POST\">");
         }
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\">");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\">");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + idp_user + "\"/>");
         out.write(newline);
@@ -418,7 +418,7 @@ public class SAMLv2Common extends TestCommon {
         }
         out.write("\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\">");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\">");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + sp_user + "\"/>");
         out.write(newline);
@@ -478,7 +478,7 @@ public class SAMLv2Common extends TestCommon {
         }
         out.write("\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\">");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\">");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + idp_user + "\"/>");
         out.write(newline);
@@ -582,7 +582,7 @@ public class SAMLv2Common extends TestCommon {
                 + sp_port + sp_deployment_uri
                 + "/samples/saml2/sp/configure.jsp\" >");
         out.write(newline);
-        out.write("<form name=\"_none_\" buttonName=\"\">");
+        out.write("<form name=\"_none_\" buttonName=\"IDButton\">");
         out.write(newline);
         out.write("<input name=\"proto\" value=\"" + idp_proto + "\"/>");
         out.write(newline);
@@ -633,7 +633,7 @@ public class SAMLv2Common extends TestCommon {
                 + idp_port + idp_deployment_uri
                 + "/samples/saml2/idp/configure.jsp\" >");
         out.write(newline);
-        out.write("<form name=\"_none_\" buttonName=\"\">");
+        out.write("<form name=\"_none_\" buttonName=\"IDButton\">");
         out.write(newline);
         out.write("<input name=\"proto\" value=\"" + sp_proto + "\"/>");
         out.write(newline);
@@ -674,7 +674,7 @@ public class SAMLv2Common extends TestCommon {
         out.write("<url href=\"" + sp_proto +"://" + sp_host + ":"
                 + sp_port + sp_deployment_uri + "/UI/Login\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\" >");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + sp_user + "\" />");
         out.write(newline);
@@ -712,7 +712,7 @@ public class SAMLv2Common extends TestCommon {
         out.write("<url href=\"" + idp_proto +"://" + idp_host + ":"
                 + idp_port + idp_deployment_uri + "/UI/Login\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\" >");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + idp_user + "\" />");
         out.write(newline);
@@ -752,7 +752,7 @@ public class SAMLv2Common extends TestCommon {
                 + sp_port + sp_deployment_uri +
                 "/UI/Login\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\" >");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + sp_admin + "\" />");
         out.write(newline);
@@ -792,7 +792,7 @@ public class SAMLv2Common extends TestCommon {
                 + idp_port + idp_deployment_uri +
                 "/UI/Login\">");
         out.write(newline);
-        out.write("<form name=\"Login\" buttonName=\"\" >");
+        out.write("<form name=\"Login\" buttonName=\"IDButton\" >");
         out.write(newline);
         out.write("<input name=\"IDToken1\" value=\"" + idp_admin + "\" />");
         out.write(newline);

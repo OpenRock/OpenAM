@@ -3402,9 +3402,11 @@ public class FederationManager extends TestCommon {
         }
 
         if (privileges != null) {
-            HtmlSelect slprivileges= (HtmlSelect)form.getSelectByName("privileges");
+            HtmlTextInput txtprivinput = (HtmlTextInput)form.getInputByName("privilegeslblb");
             for (Object privilege : privileges) {
-                slprivileges.setSelectedAttribute((String)privilege,true);
+                txtprivinput.setValueAttribute((String)privilege);
+                HtmlButtonInput btnAdd = form.getInputByValue("Add");
+                btnAdd.click();
             }
         }
 
