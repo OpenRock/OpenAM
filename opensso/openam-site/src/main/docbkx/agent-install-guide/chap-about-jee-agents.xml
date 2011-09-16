@@ -31,8 +31,77 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>About OpenAM Java EE Policy Agents</title>
-
+ 
  <para>This chapter covers what Java EE policy agents do and how they work.</para>
-
+ 
+ <para>A <firstterm>policy agent</firstterm> enforces policy for OpenAM. A
+ <firstterm>J2EE policy agent</firstterm> installed in a web application
+ container intercepts requests from users trying to access resources in
+ protected web applications. The agent denies access until the user has
+ authorization from OpenAM to access a particular resource.</para>
+ 
+ <section xml:id="example-j2ee-agent-interaction">
+  <title>How the User, Application, Policy Agent, &amp; OpenAM Interact</title>
+  
+  <para>Imagine that a user attempts to access a protected resource before
+  having authenticated by pointing her browser to a page in a protected
+  application. Assume that you have configured OpenAM to protect the web
+  application. You have therefore installed the J2EE agent in the web container,
+  and also configured the protected web application to use the agent filter,
+  thus sending requests through the agent. Then the J2EE policy agent
+  intercepting her filtered browser's request finds no session token in the
+  request, and so redirects the user's browser to the OpenAM login page for
+  authentication. After the user has successfully authenticated, OpenAM
+  sets a session token in a browser cookie, and redirects her browser back to
+  the page she tried to access initially.</para>
+  
+  <para>When the user's browser reiterates the request, the policy agent again
+  checks that the request has a session token, finds a session token this
+  time, and validates the session token with OpenAM. Given the valid session
+  token, the policy agent gets a policy decision from OpenAM concerning whether
+  the user can access the page. If OpenAM's Policy Service determines that
+  the user is allowed to access the page, OpenAM responds to the policy agent
+  that access should be granted. The J2EE policy agent then permits the page
+  to be returned to the user's browser.</para>
+  
+  <para>You can also configure J2EE agent filters to work in tandem with
+  the J2EE security policies defined alongside the policies for OpenAM. In this
+  case the filter ensures the J2EE security policy grants access to the
+  resource before the agent gets a decision from OpenAM.</para>
+ </section>
+ 
+ <section xml:id="j2ee-agent-configuration">
+  <title>How J2EE Policy Agents are Configured</title>
+  
+  <para>You install J2EE policy agents in the web application containers
+  serving web applications that you want to protect. J2EE policy agents are
+  themselves web applications running in the container whose applications you
+  configure OpenAM to protect. By default, the J2EE policy agent has only
+  enough configuration at installation time to connect to OpenAM in order to
+  get the rest of its configuration from the OpenAM configuration store. With
+  nearly all configuration stored centrally, you can manage policy agents
+  centrally from the OpenAM console.<footnote><para>You can opt to store the
+  agent configuration locally if necessary.</para></footnote></para>
+  
+  <para>For each web application that you protect, you also configure at least
+  the deployment descriptor to filter requests through the policy agent.
+  ForgeRock delivers the J2EE policy agents with a sample application under
+  <filename>j2ee_agents/<replaceable>container</replaceable>_agent/sampleapp/</filename>
+  demonstrating the configuration to use to protect your web application.</para>
+  
+  <para>You configure J2EE policy agents per OpenAM realm. Thus to access
+  centralized configuration, you select Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Agents &gt; J2EE &gt; <replaceable>Agent
+  Name</replaceable>. J2EE policy agent configuration is distinct from
+  policy configuration. The only policy-like configuration that you apply to
+  J2EE policy agents is indicating which URLs in the web server can be
+  ignored (<firstterm>not enforced URLs</firstterm>) and which client IP
+  address are exempt from policy enforcement (<firstterm>not enforced
+  IPs</firstterm>).</para>
+  
+  <para>For each aspect of J2EE policy agent configuration, you can configure
+  the policy agent through the OpenAM console during testing, and then
+  export the resulting configuration in order to script configuration in
+  your production environment.</para>
+ </section>
 </chapter>
-
