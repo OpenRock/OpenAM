@@ -588,6 +588,7 @@
                                 <pathelement path="${client.cp}"/>
                                 <pathelement path="${built.classes.dir}"/>
                             </classpath>
+                            <jvmarg value="-Xmx512m"/>
                             <jvmarg value="-Xdebug"/>
                             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y"/>
                             <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="${ModuleToExecute}-${EXECUTION_MODE}-generated.xml"/>
@@ -599,6 +600,7 @@
                                 <pathelement path="${client.cp}"/>
                                 <pathelement path="${built.classes.dir}"/>
                             </classpath>
+                            <jvmarg value="-Xmx512m"/>
                             <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="${ModuleToExecute}-${EXECUTION_MODE}-generated.xml"/>
                         </testng>
                     </else>
@@ -614,6 +616,7 @@
                                 <pathelement path="${client.cp}"/>
                                 <pathelement path="${built.classes.dir}"/>
                             </classpath>
+                            <jvmarg value="-Xmx512m"/>
                             <jvmarg value="-Xdebug"/>
                             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y"/>
                             <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="testng-failed.xml"/>
@@ -625,6 +628,7 @@
                                 <pathelement path="${client.cp}"/>
                                 <pathelement path="${built.classes.dir}"/>
                             </classpath>
+                            <jvmarg value="-Xmx512m"/>
                             <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="testng-failed.xml"/>
                         </testng>
                     </else>

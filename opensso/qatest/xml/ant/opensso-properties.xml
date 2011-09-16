@@ -25,7 +25,7 @@
 
 <project>
     <property environment="env"/>
-    <property name="single_modules" value="idm,delegation,policy,session,authentication,xacml,notification,idsvcs" />
+    <property name="single_modules" value="idm,delegation,policy,session,authentication,notification,idsvcs" />
    
     <target name="init-common"
         depends="setTimeStamp,setOSVariables">
