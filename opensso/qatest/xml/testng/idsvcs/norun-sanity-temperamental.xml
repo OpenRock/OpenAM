@@ -1,16 +1,5 @@
-    <test name="IdSvcs">
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsREST"/> 
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsSOAP"/> 
-        </classes>
-    </test>    
-    <test name="IdSvcs_create_group_5">
-        <parameter name="testNumber" value="5"/>
+    <test name="IdSvcs_isTokenValid_tokenid_normaluser_22">
+        <parameter name="testNumber" value="22"/>
     	<parameter name="setup" value="true"/>
         <parameter name="cleanup" value="false"/>
         <groups>
@@ -23,9 +12,8 @@
             <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
         </classes>
     </test>
-    
-    <test name="IdSvcs_search_group_6">
-        <parameter name="testNumber" value="6"/>
+    <test name="IdSvcs_isTokenValid_iPlanetDirectoryPro_normaluser_23">
+        <parameter name="testNumber" value="23"/>
     	<parameter name="setup" value="true"/>
         <parameter name="cleanup" value="false"/>
         <groups>
@@ -38,8 +26,8 @@
             <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
         </classes>
     </test>
-    <test name="IdSvcs_read_group_7">
-        <parameter name="testNumber" value="7"/>
+    <test name="IdSvcs_multiple_crsereupdeisau_user_29">
+        <parameter name="testNumber" value="29"/>
     	<parameter name="setup" value="true"/>
         <parameter name="cleanup" value="false"/>
         <groups>
@@ -52,18 +40,3 @@
             <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
         </classes>
     </test>
-    <test name="IdSvcs_delete_group_9">
-        <parameter name="testNumber" value="9"/>
-    	<parameter name="setup" value="true"/>
-        <parameter name="cleanup" value="true"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
-        </classes>
-    </test> 
-    

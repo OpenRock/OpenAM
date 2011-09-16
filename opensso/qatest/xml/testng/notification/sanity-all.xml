@@ -1,4 +1,3 @@
-
 <!--
  The contents of this file are subject to the terms
  of the Common Development and Distribution License
@@ -39,17 +38,6 @@
     </test> 
     <test name="Agentnotification">
     <parameter name="idtype" value="AGENT"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.notification.IDRepoNotificationTests"/> 
-        </classes>
-    </test> 
-    <test name="GroupNotification">
-    <parameter name="idtype" value="GROUP"/>
         <groups>
             <run>
                 <include name="@mode@"/>

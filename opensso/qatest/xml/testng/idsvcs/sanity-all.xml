@@ -96,34 +96,6 @@
             <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
         </classes>
     </test>
-    <test name="IdSvcs_isTokenValid_tokenid_normaluser_22">
-        <parameter name="testNumber" value="22"/>
-    	<parameter name="setup" value="true"/>
-        <parameter name="cleanup" value="false"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
-        </classes>
-    </test>
-    <test name="IdSvcs_isTokenValid_iPlanetDirectoryPro_normaluser_23">
-        <parameter name="testNumber" value="23"/>
-    	<parameter name="setup" value="true"/>
-        <parameter name="cleanup" value="false"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
-        </classes>
-    </test>
     <test name="IdSvcs_isTokenValid_tokenid_adminuser_24">
         <parameter name="testNumber" value="24"/>
     	<parameter name="setup" value="true"/>
@@ -182,20 +154,6 @@
     </test>
     <test name="IdSvcs_multiple_crsede_j2eeagent_28">
         <parameter name="testNumber" value="28"/>
-    	<parameter name="setup" value="true"/>
-        <parameter name="cleanup" value="false"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
-            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
-        </classes>
-    </test>
-    <test name="IdSvcs_multiple_crsereupdeisau_user_29">
-        <parameter name="testNumber" value="29"/>
     	<parameter name="setup" value="true"/>
         <parameter name="cleanup" value="false"/>
         <groups>
