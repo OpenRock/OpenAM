@@ -26,9 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.shared.locale;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -73,7 +77,7 @@ public class L10NMessageImpl
         this.bundleName = rbName;
         this.errorCode = errorCode;
         this.args = args;
-        this.message = getL10NMessage(java.util.Locale.ENGLISH);
+        this.message = getL10NMessage(Locale.ENGLISH);
     }
 
     /**
@@ -84,6 +88,7 @@ public class L10NMessageImpl
      *        bundleName,errorCode and args are extracted from throwable
      */
     public L10NMessageImpl(Throwable ex) {
+        super(ex);
         this.message = ex.getMessage();
         if (ex instanceof L10NMessage) {
             L10NMessage lex = (L10NMessage) ex;
@@ -101,7 +106,7 @@ public class L10NMessageImpl
      * @return localized error message.
      * @see #L10NMessageImpl(String, String, Object[])
      */
-    public String getL10NMessage(java.util.Locale locale) {
+    public String getL10NMessage(Locale locale) {
         if (errorCode == null) {
             return getMessage();
         }
