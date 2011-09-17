@@ -25,6 +25,9 @@
    $Id: configure.jsp,v 1.6 2008/11/25 23:50:41 exu Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2011 ForgeRock AS
+--%>
 
 <html>
 <head>
@@ -242,12 +245,13 @@
             Iterator it = wsfedProviders.iterator();
             while (it.hasNext()) {
                 String entityID = (String) it.next();
+                WSFederationMetaManager wsfedMetaManager = new WSFederationMetaManager();
                 com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
-                    config3 = WSFederationMetaManager.getEntityConfig(defaultRealm, entityID);
+                    config3 = wsfedMetaManager.getEntityConfig(defaultRealm, entityID);
                 com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement
-                        idpConfig = WSFederationMetaManager.getIDPSSOConfig(defaultRealm, entityID);
+                        idpConfig = wsfedMetaManager.getIDPSSOConfig(defaultRealm, entityID);
                 com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement
-                        spConfig = WSFederationMetaManager.getSPSSOConfig(defaultRealm, entityID);
+                        spConfig = wsfedMetaManager.getSPSSOConfig(defaultRealm, entityID);
                 if (config3.isHosted()) {
                     // hosted provider
                     if (idpConfig != null) {

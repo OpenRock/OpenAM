@@ -25,7 +25,9 @@
    $Id: util.jspf,v 1.1 2008/11/25 23:50:41 exu Exp $ 
 
 --%>
-
+<%--
+   Portions Copyrighted 2011 ForgeRock AS
+--%>
 
 <%@ page language="java"
 import="java.io.IOException,
@@ -154,8 +156,9 @@ import="java.io.IOException,
         // handle WS-Fed
         entityID = hostedSPEntitySuffix + SingleLogoutManager.WS_FED
             + SP_SUFFIX;
+        WSFederationMetaManager wsfedMetaManager = new WSFederationMetaManager();
         spEntityList = 
-            WSFederationMetaManager.getAllHostedServiceProviderEntities(defaultRealm);
+            wsfedMetaManager.getAllHostedServiceProviderEntities(defaultRealm);
         spExists = ((spEntityList != null && !spEntityList.isEmpty()) 
               && spEntityList.contains(entityID)) ;
         if (spExists) {
@@ -446,7 +449,8 @@ import="java.io.IOException,
         String port = "" + url.getPort();
         String deploymenturi = getDeploymentUri(url);
 
-        List spEntityList = WSFederationMetaManager.getAllHostedServiceProviderEntities(defaultRealm);
+        WSFederationMetaManager wsfedMetaManager = new WSFederationMetaManager();
+        List spEntityList = wsfedMetaManager.getAllHostedServiceProviderEntities(defaultRealm);
         boolean spExists = ((spEntityList != null && !spEntityList.isEmpty()) 
               && spEntityList.contains(hostedSPEntityID)) ;
         if (!spExists) {
@@ -510,17 +514,17 @@ import="java.io.IOException,
             com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement
                 descriptor = (com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement)
                 WSFederationMetaUtils.convertStringToJAXB(metaXML);
-            WSFederationMetaManager.createFederation(defaultRealm, descriptor);
+            wsfedMetaManager.createFederation(defaultRealm, descriptor);
         
             com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
                 extendConfigElm = (com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement)
                 WSFederationMetaUtils.convertStringToJAXB(extendedXML);
-            WSFederationMetaManager.createEntityConfig(defaultRealm, extendConfigElm);
+            wsfedMetaManager.createEntityConfig(defaultRealm, extendConfigElm);
             // [END] Import these XMLs
         }
         
         List idpEntityList = 
-            WSFederationMetaManager.getAllRemoteIdentityProviderEntities(defaultRealm);
+            wsfedMetaManager.getAllRemoteIdentityProviderEntities(defaultRealm);
         boolean idpExists = ((idpEntityList != null && !idpEntityList.isEmpty())
               && idpEntityList.contains(remoteIDPEntityID)) ;
         if (!idpExists) {
@@ -568,13 +572,13 @@ import="java.io.IOException,
             com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement
                 descriptor = (com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement)
                 WSFederationMetaUtils.convertStringToJAXB(idpMetaXML);
-            WSFederationMetaManager.createFederation(defaultRealm, descriptor);
+            wsfedMetaManager.createFederation(defaultRealm, descriptor);
 
             com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
                 extendConfigElm2 = (com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement)
                 WSFederationMetaUtils.convertStringToJAXB(extendedXML);
 
-            WSFederationMetaManager.createEntityConfig(defaultRealm, extendConfigElm2);
+            wsfedMetaManager.createEntityConfig(defaultRealm, extendConfigElm2);
             // [END] importing XMLs
         }
 
@@ -873,8 +877,9 @@ import="java.io.IOException,
         String port = "" + url.getPort();
         String deploymenturi = getDeploymentUri(url);
 
+        WSFederationMetaManager wsfedMetaManager = new WSFederationMetaManager();
         List idpEntityList = 
-            WSFederationMetaManager.getAllHostedIdentityProviderEntities(defaultRealm);
+            wsfedMetaManager.getAllHostedIdentityProviderEntities(defaultRealm);
         boolean idpExists = ((idpEntityList != null && !idpEntityList.isEmpty())
               && idpEntityList.contains(hostedIDPEntityID)) ;
         if (!idpExists) {
@@ -919,16 +924,16 @@ import="java.io.IOException,
             com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement
                 descriptor = (com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement)
                 WSFederationMetaUtils.convertStringToJAXB(metaXML);
-            WSFederationMetaManager.createFederation(defaultRealm, descriptor);
+            wsfedMetaManager.createFederation(defaultRealm, descriptor);
         
             com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
                 extendConfigElm = (com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement)
                 WSFederationMetaUtils.convertStringToJAXB(extendedXML);
-            WSFederationMetaManager.createEntityConfig(defaultRealm, extendConfigElm);
+            wsfedMetaManager.createEntityConfig(defaultRealm, extendConfigElm);
             // [END] Import these XMLs
         }
         
-        List spEntityList = WSFederationMetaManager.getAllRemoteServiceProviderEntities(defaultRealm);
+        List spEntityList = wsfedMetaManager.getAllRemoteServiceProviderEntities(defaultRealm);
         boolean spExists = ((spEntityList != null && !spEntityList.isEmpty()) 
               && spEntityList.contains(remoteSPEntityID)) ;
         if (!spExists) {
@@ -979,13 +984,13 @@ import="java.io.IOException,
             com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement
                 descriptor = (com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement)
                 WSFederationMetaUtils.convertStringToJAXB(spMetaXML);
-            WSFederationMetaManager.createFederation(defaultRealm, descriptor);
+            wsfedMetaManager.createFederation(defaultRealm, descriptor);
 
             com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
                 extendConfigElm2 = (com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement)
                 WSFederationMetaUtils.convertStringToJAXB(extendedXML);
 
-            WSFederationMetaManager.createEntityConfig(defaultRealm, extendConfigElm2);
+            wsfedMetaManager.createEntityConfig(defaultRealm, extendConfigElm2);
             // [END] importing XMLs
         }
 

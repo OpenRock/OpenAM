@@ -27,7 +27,9 @@
    $Id: home.jsp,v 1.6 2008/11/25 23:50:41 exu Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2011 ForgeRock AS
+--%>
 <%@ page import="com.iplanet.sso.SSOTokenManager,
             com.iplanet.sso.SSOException,
             com.iplanet.sso.SSOToken"
@@ -187,12 +189,13 @@
             Iterator it = wsfedProviders.iterator();
             while (it.hasNext()) {
                 String entityID = (String) it.next();
+                WSFederationMetaManager wsfedMetaManager = new WSFederationMetaManager();
                 com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
-                    config3 = WSFederationMetaManager.getEntityConfig(REALM, entityID);
+                    config3 = wsfedMetaManager.getEntityConfig(REALM, entityID);
                 com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement
-                        idpConfig = WSFederationMetaManager.getIDPSSOConfig(REALM, entityID);
+                        idpConfig = wsfedMetaManager.getIDPSSOConfig(REALM, entityID);
                 com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement
-                        spConfig = WSFederationMetaManager.getSPSSOConfig(REALM, entityID);
+                        spConfig = wsfedMetaManager.getSPSSOConfig(REALM, entityID);
                 if (config3.isHosted()) {
                     // hosted provider
                     if (idpConfig != null) {
