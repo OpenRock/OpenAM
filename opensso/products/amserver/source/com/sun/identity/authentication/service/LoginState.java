@@ -1261,7 +1261,7 @@ public class LoginState {
                         (SSOToken) AccessController.doPrivileged(
                             AdminTokenAction.getInstance());
                     AMAuthenticationManager authManager =
-                        new AMAuthenticationManager(adminToken,orgName);
+                        new AMAuthenticationManager(adminToken,getOrgName());
                     AMAuthenticationInstance authInstance =
                         authManager.getAuthenticationInstance(
                             oldAuthenticationModuleInstanceName);
