@@ -90,6 +90,12 @@
     using the OpenDJ LDAP SDK instead. This affects all classes in
     <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
    </listitem>
+   <listitem>
+    <!-- Fix for OpenAM-837 -->
+    <para>Support for Liberty Identity Web Services Framework (ID-WSF) is
+    deprecated. The functionality is likely to be removed in a future
+    release.</para>
+   </listitem>
   </itemizedlist>
  </section>
  
