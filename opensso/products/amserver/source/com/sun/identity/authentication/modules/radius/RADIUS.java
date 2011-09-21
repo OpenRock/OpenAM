@@ -27,43 +27,40 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.authentication.modules.radius;
 
-import java.util.*;
-import java.net.*;
-import com.iplanet.am.util.*;
-
-
-import com.sun.identity.authentication.spi.*;
-
+import com.sun.identity.authentication.modules.radius.client.ChallengeException;
+import com.sun.identity.authentication.modules.radius.client.RadiusConn;
+import com.sun.identity.authentication.modules.radius.client.RejectException;
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
-
-
-import com.sun.identity.authentication.modules.radius.client.*;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.Locale;
 import java.io.IOException;
-import javax.security.auth.*;
-import javax.security.auth.callback.*;
+import java.net.SocketException;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 
 public class RADIUS extends AMLoginModule {
     // initial state
     private Map sharedState;
-    private static String adminDN;
-    private static String hostName;
     private String userTokenId = null;
 
-    private String challengeID;
-    private static HashSet orgHash = new HashSet(); 
-
-// configurable option
-    private boolean primary = true;
-
-// the authentication status
+    private String challengeID; 
+    
+    // the authentication status
     private boolean succeeded = false;
-    private boolean commitSucceeded = false;
     private RADIUSPrincipal userPrincipal = null;
 
     private String username;
@@ -71,8 +68,7 @@ public class RADIUS extends AMLoginModule {
     private static final int MSG_WARNING = 1;
     private static final int MSG_ERROR = 2;
 
-    private static boolean helperConfigDone = false;
-    private static com.iplanet.am.util.Locale locale = null;
+    private static Locale locale = null;
     private ResourceBundle bundle = null;
     private static Debug debug = null;
 
@@ -82,11 +78,9 @@ public class RADIUS extends AMLoginModule {
     private String server1;
     private String server2;
     private String sharedSecret;
-    private int    iServerPort = 1645;
+    private int iServerPort = 1645;
     private int iTimeOut = 5;
     private RadiusConn _radiusConn = null;
-    private int screenState;
-    private boolean radiusSSL = false;
     private static final String amAuthRadius = "amAuthRadius";
     private boolean getCredentialsFromSharedState;
     private ChallengeException cException = null;
@@ -96,6 +90,7 @@ public class RADIUS extends AMLoginModule {
             debug = Debug.getInstance(amAuthRadius);
         }
     }
+    
     /**
      * Initializes this <code>LoginModule</code>.
      *
@@ -108,39 +103,48 @@ public class RADIUS extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
         try {
 	    bundle = amCache.getResBundle(amAuthRadius, getLoginLocale());
+            
 	    if (debug.messageEnabled()) {
 		debug.message("Radius resbundle locale="+getLoginLocale());
 	    }
+            
 	    this.sharedState = sharedState;
 
             if(options != null) {
                 try {
-                    server1 = Misc.getServerMapAttr(options, 
+                    server1 = CollectionHelper.getServerMapAttr(options, 
                         "iplanet-am-auth-radius-server1");
+                    
                     if (server1 == null) {
                         server1 = "localhost";
                         debug.error("Error: primary server attribute " + 
                             "misconfigured using localhost");
                     }
-                    server2 = Misc.getServerMapAttr(options, 
+                    
+                    server2 = CollectionHelper.getServerMapAttr(options, 
                         "iplanet-am-auth-radius-server2");
+                    
                     if (server1 == null) {
                         server1 = "localhost";
                         debug.error("Error: primary server attribute " + 
                             "misconfigured using localhost");
                     }
-                    sharedSecret = Misc.getMapAttr(options, 
+                    
+                    sharedSecret = CollectionHelper.getMapAttr(options, 
                         "iplanet-am-auth-radius-secret");
-                    String serverPort = Misc.getMapAttr(options,
+                    
+                    String serverPort = CollectionHelper.getMapAttr(options,
                         "iplanet-am-auth-radius-server-port",
                         DEFAULT_SERVER_PORT);
+                    
                     iServerPort = Integer.parseInt(serverPort);
-                    String timeOut = Misc.getMapAttr(options, 
+                    String timeOut = CollectionHelper.getMapAttr(options, 
                         "iplanet-am-auth-radius-timeout", 
                         DEFAULT_TIMEOUT);
                     iTimeOut = Integer.parseInt(timeOut);
-                    String authLevel = Misc.getMapAttr(options, 
+                    String authLevel = CollectionHelper.getMapAttr(options, 
                         "iplanet-am-auth-radius-auth-level");
+                    
                     if (authLevel != null) {
                         try {
                             setAuthLevel(Integer.parseInt(authLevel));
@@ -149,6 +153,7 @@ public class RADIUS extends AMLoginModule {
                             authLevel);
                         }
                     }
+                    
                     if (debug.messageEnabled()) {
                         debug.message("server1: "+server1
 			    +" server2: " + server2 
@@ -178,9 +183,11 @@ public class RADIUS extends AMLoginModule {
         Callback[] callbacks = getCallback(state);
         String prompt = ((PasswordCallback)callbacks[0]).getPrompt();
         boolean echo = ((PasswordCallback)callbacks[0]).isEchoOn();
+        
         if (challengeID != null) {
             prompt += "[" + challengeID + "]: ";
         }
+        
         callbacks[0] = new PasswordCallback(prompt, echo);
         replaceCallback(state, 0, callbacks[0]);
     }
@@ -222,14 +229,16 @@ public class RADIUS extends AMLoginModule {
                   throw new AuthLoginException(amAuthRadius, "RadiusNoServer",
 			null);                   
               }
+              
 	      if (callbacks !=null && callbacks.length == 0) {		
 	          username = (String) sharedState.get(getUserKey());
 		  tmp_passwd = (String) sharedState.get(getPwdKey());
+                  
 		  if (username == null || tmp_passwd == null) {
 		     return ISAuthConstants.LOGIN_START;
 		  }
+                  
 		  getCredentialsFromSharedState = true;
-			
 	      } else {
                   username = ((NameCallback)callbacks[0]).getName();
                   tmp_passwd = charToString(
@@ -239,7 +248,9 @@ public class RADIUS extends AMLoginModule {
                       debug.message("username: " + username );
                   }
               }
-            storeUsernamePasswd(username, tmp_passwd);
+            
+              storeUsernamePasswd(username, tmp_passwd);
+              
               try {
                   succeeded = false;
                   _radiusConn.authenticate( username, tmp_passwd);
@@ -249,55 +260,62 @@ public class RADIUS extends AMLoginModule {
 		     getCredentialsFromSharedState = false;
 		     return ISAuthConstants.LOGIN_START;
 		  }
-                  debug.message("Radius login request rejected", re );
+                  
+                  if (debug.messageEnabled()) {
+                      debug.message("Radius login request rejected", re );
+                  }
+                  
                   shutdown();
 		  setFailureID(username);
-                  throw new InvalidPasswordException(amAuthRadius, 
-                     "RadiusLoginFailed", null, username, re);
+                  throw new InvalidPasswordException(amAuthRadius, "RadiusLoginFailed", null, username, re);
               } catch (IOException ioe) {
 		  if (getCredentialsFromSharedState 
                       && !isUseFirstPassEnabled()) {
 		     getCredentialsFromSharedState = false;
 		     return ISAuthConstants.LOGIN_START;
 		  }
+                  
                   debug.error("Radius request IOException", ioe);
                   shutdown();
 		  setFailureID(username);
-                  throw new AuthLoginException(amAuthRadius,
-                      "RadiusLoginFailed", null);
+                  throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
               } catch (java.security.NoSuchAlgorithmException ne) {
 		  if (getCredentialsFromSharedState 
                       && !isUseFirstPassEnabled()) {
 		     getCredentialsFromSharedState = false;
 		     return ISAuthConstants.LOGIN_START;
 		  }
+                  
                   debug.error("Radius No Such Algorithm Exception", ne );
                   shutdown();
 		  setFailureID(username);
-                  throw new AuthLoginException(amAuthRadius,
-                      "RadiusLoginFailed", null);
+                  throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
               } catch (ChallengeException ce) {
 		  if (getCredentialsFromSharedState 
                       && !isUseFirstPassEnabled()) {
 		     getCredentialsFromSharedState = false;
 		     return ISAuthConstants.LOGIN_START;
 		  }
+                  
                   cException = ce;
                   sState = ce.getState();
+                  
                   if (sState == null) {
-                      debug.error(
-                          "Radius failure - no state returned in challenge");
+                      debug.error("Radius failure - no state returned in challenge");
                       shutdown();
 		      setFailureID(username);
-                      throw new AuthLoginException(amAuthRadius, 
-			  "RadiusAuth", null);
+                      throw new AuthLoginException(amAuthRadius, "RadiusAuth", null);
                   }
+                  
                   challengeID = ce.getReplyMessage();
+                  
                   if (debug.messageEnabled()) {
                       debug.message("Server challenge with "+
                           "challengeID: "+challengeID);
                   }
+                  
                   setDynamicText(2);
+                  
                   return ISAuthConstants.LOGIN_CHALLENGE;
               } catch ( Exception e ) {
 		  if (getCredentialsFromSharedState 
@@ -305,94 +323,94 @@ public class RADIUS extends AMLoginModule {
 		     getCredentialsFromSharedState = false;
 		     return ISAuthConstants.LOGIN_START;
 		  }
+                  
                   shutdown();
 		  setFailureID(username);
-                  throw new AuthLoginException(amAuthRadius, 
-                      "RadiusLoginFailed", null, e);
+                  throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null, e);
               } 
 
-          succeeded = true;
-          break;
+              succeeded = true;
+              break;
 
           case ISAuthConstants.LOGIN_CHALLENGE: 
               String passwd = getChallengePassword(callbacks);
+              
               if (debug.messageEnabled()) {
                   debug.message("reply to challenge--username: "+username);
               }
+              
               try {
                   succeeded = false;
                   _radiusConn.replyChallenge(username, passwd, cException);
               } catch ( ChallengeException ce ) {
                   sState = ce.getState();
+                  
                   if (sState== null) {
-                      debug.error(
-                          "handle Challenge failure - no state returned");
+                      debug.error("handle Challenge failure - no state returned");
                       shutdown();
 		      setFailureID(username);
-                      throw new AuthLoginException(amAuthRadius, 
-                          "RadiusLoginFailed", null);
+                      throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
                   }
+                  
                   resetCallback(2, 0);
                   challengeID = ce.getReplyMessage();
+                  
                   if (debug.messageEnabled()) {
-                      debug.message("Server challenge again"+
-                          " with challengeID: "+challengeID);
+                      debug.message("Server challenge again with challengeID: " + challengeID);
                   }
+                  
                   cException = ce;  // save it for next replyChallenge
                   setDynamicText(2);
                   // note that cException is reused
+                  
                   return ISAuthConstants.LOGIN_CHALLENGE;
               } catch (RejectException ex) {
                   debug.error("Radius challenge response rejected", ex);
                   shutdown();
 		  setFailureID(username);
-                  throw new InvalidPasswordException(amAuthRadius, 
-                     "RadiusLoginFailed", null, username, ex);
+                  throw new InvalidPasswordException(amAuthRadius, "RadiusLoginFailed", null, username, ex);
               }  catch (IOException ioe) {
                   debug.error("Radius challenge IOException", ioe);
                   shutdown();
 		  setFailureID(username);
-                  throw new AuthLoginException(amAuthRadius, 
-                      "RadiusLoginFailed", null);
+                  throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
               }  catch (java.security.NoSuchAlgorithmException ex) {
                   debug.error("Radius No Such Algorithm Exception", ex);
                   shutdown();
 		  setFailureID(username);
-                  throw new AuthLoginException(amAuthRadius,
-                      "RadiusLoginFailed", null);
+                  throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
               }  catch (Exception e ) {
-                  debug.error(
-                      "RADIUS challenge Authentication Failed ", e);
+                  debug.error("RADIUS challenge Authentication Failed ", e);
                   shutdown();
 		  setFailureID(username);
-                  throw new AuthLoginException(amAuthRadius,
-                      "RadiusLoginFailed", null);
+                  throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
               }
               succeeded = true;
-          break;
+              break;
 
           default:
-              debug.error(
-                  "RADIUS Authentication Failed - invalid state" +
-                  state);
+              debug.error("RADIUS Authentication Failed - invalid state" + state);
               shutdown();
               succeeded = false;
 	      setFailureID(username);
-              throw new AuthLoginException(amAuthRadius,
-                  "RadiusLoginFailed", null);
+              throw new AuthLoginException(amAuthRadius, "RadiusLoginFailed", null);
         }
-        if ( succeeded == true ) {
+        
+        if (succeeded == true) {
             if (debug.messageEnabled()) {
                 debug.message("RADIUS authentication successful");
             }
+            
  	    if (username != null) {
                 StringTokenizer usernameToken =
-                                new StringTokenizer(username,",");
+                                new StringTokenizer(username, ",");
                 userTokenId = usernameToken.nextToken();
             }
+            
             if (debug.messageEnabled()) {
-              debug.message("userTokenID: " + userTokenId);
+                debug.message("userTokenID: " + userTokenId);
             }
+            
             shutdown();
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
@@ -433,23 +451,22 @@ public class RADIUS extends AMLoginModule {
     public void nullifyUsedVars() {
         sharedState = null;
         challengeID = null;
-
         bundle = null;
-
         server1 = null;
         server2 = null;
         sharedSecret = null;
     }
 
-
     private String getChallengePassword(Callback[] callbacks) 
         throws AuthLoginException {
         // callback[0] is for password(also display challenge text)
         char[] tmpPassword = ((PasswordCallback)callbacks[0]).getPassword();
+        
         if (tmpPassword == null) {
             // treat a NULL password as an empty password
             tmpPassword = new char[0];
         }
+        
         char[] pwd = new char[tmpPassword.length];
         System.arraycopy(tmpPassword, 0, pwd, 0, tmpPassword.length);
         ((PasswordCallback)callbacks[0]).clearPassword();
@@ -459,12 +476,14 @@ public class RADIUS extends AMLoginModule {
 
     private String charToString (char [] tmpPassword, Callback cbk ) {
         if (tmpPassword == null) {
-                // treat a NULL password as an empty password
-                tmpPassword = new char[0];
-            }
+            // treat a NULL password as an empty password
+            tmpPassword = new char[0];
+        }
+        
         char[] pwd = new char[tmpPassword.length];
         System.arraycopy(tmpPassword, 0, pwd, 0, tmpPassword.length);
         ((PasswordCallback)cbk).clearPassword();
+        
         return new String(pwd);
     }
 
@@ -476,6 +495,7 @@ public class RADIUS extends AMLoginModule {
             _radiusConn.disconnect();
         } catch (IOException e) {
         }
+        
         _radiusConn = null;
     }
 
