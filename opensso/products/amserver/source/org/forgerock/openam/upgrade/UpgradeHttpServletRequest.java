@@ -64,11 +64,13 @@ public class UpgradeHttpServletRequest implements IHttpServletRequest {
                 new BufferedReader(new FileReader(baseDir + SetupConstants.CONFIG_PARAM_FILE));
         String input;
         
-        while ((input = fileIn.readLine()) != null) {
-            file.add(input);
+        try {
+            while ((input = fileIn.readLine()) != null) {
+                file.add(input);
+            }
+        } finally {
+            fileIn.close();
         }
-        
-        fileIn.close();
         
         for (String line : file) {
             if (line.indexOf('=') == -1) {

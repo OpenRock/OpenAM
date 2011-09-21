@@ -56,10 +56,7 @@ public class ServerUpgrade {
     
     public static Set<String> getAttrsToUpgrade() 
     throws UpgradeException {
-        if (!isInitialized()) {
-            throw initializationException;
-        }
-        
+        assertInitialized();
         Set<String> values = new HashSet<String>();
             
         if (!res.containsKey(ATTR_DEFAULT_UPGRADE)) {
@@ -89,12 +86,9 @@ public class ServerUpgrade {
      */
     public static UpgradeHelper getServiceHelper(String serviceName) 
     throws UpgradeException {
-        if (!isInitialized()) {
-            throw initializationException;
-        }
+        assertInitialized();
         
         return serviceHelpers.get(serviceName);
-         
     }
     
     protected static void populateUpgradeHelpers() {
@@ -136,8 +130,11 @@ public class ServerUpgrade {
         serviceHelpers = values;
     }
     
-    protected static boolean isInitialized() {
-        return initializationException == null;
+    protected static void assertInitialized() 
+    throws UpgradeException {
+        if (initializationException != null) {
+            throw initializationException;
+        }
     }
 }
 

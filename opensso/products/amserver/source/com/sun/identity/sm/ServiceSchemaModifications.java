@@ -446,37 +446,4 @@ public class ServiceSchemaModifications {
         
         return schemas;
     }
-    
-    protected boolean upgradeAttributeSchema(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr) {
-        // if the attribute names do not match, skip
-        if (oldAttr.getName().equals(newAttr.getName())) {
-            return false;
-        }
-                
-        if (oldAttr.getName().equals("iplanet-am-auth-login-success-url") &&
-                newAttr.getName().equals("iplanet-am-auth-login-success-url")) {
-            int i = 1;
-        }
-        
-        boolean choiceValuesMapNoMatch = false;
-        boolean defaultValuesSetNoMatch = false;
-        
-        if (oldAttr == null || newAttr == null) {
-            return false;
-        }
-        
-        if (!(oldAttr.getName().equals(newAttr.getName()))) {
-            return false;
-        }
-        
-        if (oldAttr.getChoiceValuesMap() != null && newAttr.getChoiceValuesMap() != null) {
-            choiceValuesMapNoMatch = !(oldAttr.getChoiceValuesMap().equals(newAttr.getChoiceValuesMap()));
-        }
-        
-        if (oldAttr.getDefaultValues() != null && newAttr.getDefaultValues() != null) {
-            defaultValuesSetNoMatch = !(oldAttr.getDefaultValues().equals(newAttr.getDefaultValues()));
-        }
-        
-        return choiceValuesMapNoMatch | defaultValuesSetNoMatch;
-    }
 }
