@@ -50,13 +50,12 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.io.InterruptedIOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
@@ -121,6 +120,7 @@ public class LDAPAuthUtils {
     private String logMessage = null;
     private boolean beheraEnabled = true;
     private boolean trustAll = true;
+    private boolean isAd = false;
     
     // Resource Bundle used to get l10N message
     private ResourceBundle bundle;
@@ -151,7 +151,14 @@ public class LDAPAuthUtils {
     private Map userAttributeValues = new HashMap();
     private boolean isDynamicUserEnabled;
     String [] attrs = null;
-    private static  Debug debug2 = Debug.getInstance("amAuthLDAP");
+    private static Debug debug2 = Debug.getInstance("amAuthLDAP");
+    private static String AD_PASSWORD_EXPIRED = "data 532";
+    private static String AD_ACCOUNT_DISABLED = "data 553";
+    private static String AD_ACCOUNT_EXPIRED = "data 701";
+    private static String AD_PASSWORD_RESET = "data 773";
+    private static String AD_ACCOUNT_LOCKED = "data 775";
+    private static String LDAP_PASSWD_ATTR = "userpassword";
+    private static String AD_PASSWD_ATTR = "UnicodePwd";
     
     enum ServerStatus {
         STATUS_UP("statusUp"),    
@@ -567,12 +574,18 @@ public class LDAPAuthUtils {
             if (beheraEnabled) {
                 mods.addControl(PasswordPolicyRequestControl.newControl(false));        
             }
-            
-            mods.addModification(ModificationType.DELETE, "userpassword", oldPwd);
-            mods.addModification(ModificationType.ADD, "userpassword", password);
                
-            modConn = getConnection();
-            modConn.bind(userDN, oldPwd.toCharArray());
+            if (!isAd) {
+                mods.addModification(ModificationType.DELETE, LDAP_PASSWD_ATTR, oldPwd);
+                mods.addModification(ModificationType.ADD, LDAP_PASSWD_ATTR, password);
+                modConn = getConnection();
+                modConn.bind(userDN, oldPwd.toCharArray());
+            } else {                
+                mods.addModification(ModificationType.DELETE, AD_PASSWD_ATTR, updateADPassword(oldPwd));
+                mods.addModification(ModificationType.ADD, AD_PASSWD_ATTR, updateADPassword(password));
+                modConn = getAdminConnection();
+            }
+            
             Result modResult = modConn.modify(mods);
             controls = processControls(modResult);
             
@@ -675,6 +688,20 @@ public class LDAPAuthUtils {
         return buf.toString();
     }
     
+    private ByteString updateADPassword(String password) {
+        String quotedPassword = "\"" + password + "\"";
+        
+        byte[] newUnicodePassword = quotedPassword.getBytes();
+        
+        try {
+            newUnicodePassword = quotedPassword.getBytes("UTF-16LE");
+        } catch (UnsupportedEncodingException uee) {
+            uee.printStackTrace();
+        }
+        
+        return ByteString.wrap(newUnicodePassword);
+    }
+    
     /**
      * Searches and returns user for a specified attribute using parameters
      * specified in constructor and/or by setting properties.
@@ -683,11 +710,9 @@ public class LDAPAuthUtils {
      */
     public void searchForUser() 
     throws LDAPUtilException {
-        
         // make some special case where searchScope == BASE
         // construct the userDN without searching directory
         // assume that there is only one user attribute
-        
         if (searchScope == SearchScope.BASE_OBJECT) {
             if (userSearchAttrs.size() == 1) {
                 StringBuilder dnBuffer = new StringBuilder();
@@ -921,7 +946,7 @@ public class LDAPAuthUtils {
     
     /**
      * Connect to LDAP server using parameters specified in
-     * constructor and/or by settin properties attempt to authenticate.
+     * constructor and/or by setting properties attempt to authenticate.
      * checks for the password controls and  sets to the appropriate states
      */
     private void authenticate()
@@ -937,7 +962,7 @@ public class LDAPAuthUtils {
                 if (beheraEnabled) {
                     bindRequest.addControl(PasswordPolicyRequestControl.newControl(false));        
                 }
-                
+                                
                 conn = getConnection();
                 BindResult bindResult = conn.bind(bindRequest);
                 controls = processControls(bindResult);
@@ -961,33 +986,49 @@ public class LDAPAuthUtils {
             }
         } catch(ErrorResultException ere) {
             if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
-                controls = processControls(ere.getResult());
-                PasswordPolicyResult result = checkControls(controls);
-                
-                if (result != null && result.getPasswordPolicyErrorType() != null &&
-                    result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.PASSWORD_EXPIRED)) {                
-                    if(debug.messageEnabled()){
-                        debug.message("Password expired and must be reset");
-                    }
+                if (!isAd) {
+                    controls = processControls(ere.getResult());
+                    PasswordPolicyResult result = checkControls(controls);
 
-                    setState(ModuleState.PASSWORD_EXPIRED_STATE);
-                    return;  
-                } else if (result != null && result.getPasswordPolicyErrorType() != null &&
-                    result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.ACCOUNT_LOCKED)) {
-                    
-                    if (debug.messageEnabled()) {
-                        debug.message("Account Locked");
+                    if (result != null && result.getPasswordPolicyErrorType() != null &&
+                        result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.PASSWORD_EXPIRED)) {                
+                        if(debug.messageEnabled()){
+                            debug.message("Password expired and must be reset");
+                        }
+
+                        setState(ModuleState.PASSWORD_EXPIRED_STATE);
+                        return;  
+                    } else if (result != null && result.getPasswordPolicyErrorType() != null &&
+                        result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.ACCOUNT_LOCKED)) {
+
+                        if (debug.messageEnabled()) {
+                            debug.message("Account Locked");
+                        }
+
+                        processPasswordPolicyControls(result);
+                        return;
+                    } else {
+                        if (debug.messageEnabled()) {
+                            debug.message("Failed auth due to invalid credentials");
+                        }
+
+                        throw new LDAPUtilException("CredInvalid",
+                                ResultCode.INVALID_CREDENTIALS, null);
                     }
-                    
-                    processPasswordPolicyControls(result);
-                    return;
                 } else {
-                    if (debug.messageEnabled()) {
-                        debug.message("Failed auth due to invalid credentials");
+                    PasswordPolicyResult result = checkADResult(ere.getResult().getDiagnosticMessage());
+                    
+                    if (result != null) {
+                        processPasswordPolicyControls(result);
+                        return;
+                    } else {
+                        if (debug.messageEnabled()) {
+                            debug.message("Failed auth due to invalid credentials");
+                        }
+
+                        throw new LDAPUtilException("CredInvalid",
+                                ResultCode.INVALID_CREDENTIALS, null);
                     }
-	                   
-                    throw new LDAPUtilException("CredInvalid",
-                            ResultCode.INVALID_CREDENTIALS, null);
                 }
             } else if (ere.getResult().getResultCode().equals(ResultCode.NO_SUCH_OBJECT)) {
                 if (debug.messageEnabled()) {
@@ -1341,6 +1382,28 @@ public class LDAPAuthUtils {
         return result;
     }
     
+    /**
+     * Given a specific AD diagnostic message, creates a valid PasswordPolicyResult
+     * 
+     * @param diagMessage The message from AD describing the status of the account
+     * @return The correct PasswordPolicyResult or null if not matched
+     */
+    private PasswordPolicyResult checkADResult(String diagMessage) {
+        if (diagMessage.contains(AD_PASSWORD_EXPIRED)) {
+            return new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_EXPIRED);
+        } else if (diagMessage.contains(AD_ACCOUNT_DISABLED)) {
+            return new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
+        } else if (diagMessage.contains(AD_ACCOUNT_EXPIRED)) {
+            return new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
+        } else if (diagMessage.contains(AD_PASSWORD_RESET)) {
+            return new PasswordPolicyResult(PasswordPolicyErrorType.CHANGE_AFTER_RESET);
+        } else if (diagMessage.contains(AD_ACCOUNT_LOCKED)) {
+            return new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
+        } else {
+            return null;
+        }
+    }
+    
     // LDAP parameters are set  here .......
     /**
      * TODO-JAVADOC
@@ -1441,6 +1504,15 @@ public class LDAPAuthUtils {
      */
     public void setBeheraEnabled(boolean beheraEnabled) {
         this.beheraEnabled = beheraEnabled;
+    }
+    
+    /**
+     * Sets if the directory is Active Directory
+     * 
+     * @param isAd true if the module is AD
+     */
+    public void setAD(boolean isAd) {
+        this.isAd = isAd;
     }
     
     /**

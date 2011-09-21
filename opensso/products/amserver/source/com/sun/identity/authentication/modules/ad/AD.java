@@ -75,7 +75,8 @@ public class AD extends LDAP {
                 debug.error("Unable to set auth level " + authLevel);
             }
         }
-
+        
+        ldapUtil.setAD(true);
         return returnValue;
     }
 }

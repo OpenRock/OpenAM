@@ -101,7 +101,7 @@ public class LDAP extends AMLoginModule {
     private int currentState;
     private boolean primary = true;
     private int previousScreen;
-    private LDAPAuthUtils ldapUtil;
+    protected LDAPAuthUtils ldapUtil;
     private static volatile FailbackManager fMgr;
     private boolean isReset;
     private int primaryServerPort;
