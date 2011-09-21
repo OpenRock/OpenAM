@@ -283,7 +283,7 @@ $ ./domain/mydomain/bin/startWebLogic.sh</screen>
    </step>
   </procedure>
   
-  <procedure xml:id="protect-applications-after-agent-installation">
+  <procedure xml:id="protect-weblogic-apps-after-agent-installation">
    <title>To Protect Applications After Agent Installation</title>
    
    <step performance="optional">

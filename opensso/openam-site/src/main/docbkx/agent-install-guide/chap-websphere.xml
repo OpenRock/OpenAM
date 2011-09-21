@@ -283,7 +283,7 @@ Install log file location:
    </step>
   </procedure>
   
-  <procedure xml:id="protect-applications-after-agent-installation">
+  <procedure xml:id="protect-websphere-apps-after-agent-installation">
    <title>To Protect Applications After Agent Installation</title>
    
    <step performance="optional">
