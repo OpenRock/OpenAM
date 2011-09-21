@@ -34,11 +34,13 @@ class Properties:
                   'ad.available',
                   'ad.host',
                   'ad.port',
+                  'ad.rootsuffix',
                   'ad.user', 
                   'ad.password',
                   'ldap.available', 
                   'ldap.host',
                   'ldap.port',
+                  'ldap.rootsuffix',
                   'ldap.user',
                   'ldap.password',
                   'db.available',
@@ -74,13 +76,15 @@ class Properties:
             'openam.diradmport':
                 ['Administration port for embedded Directory Server', '4444', REGEX_number],
             'openam.rootsuffix':
-                ['Root Suffix for OpenAM Config', 'dc=opensso,dc=java,dc=net', REGEX_all],
+                ['Root Suffix for OpenAM Config', 'dc=internal,dc=forgerock,dc=com', REGEX_all],
             'ad.available':
                 ['Is an Active Directory instance available {yes|no}', 'yes', REGEX_bool],
             'ad.host': 
                 ['Hostname for Active Directory instance', 'ad.internal.forgerock.com', REGEX_host],
             'ad.port':
                 ['Port for Active Directory', '389', REGEX_number],
+            'ad.rootsuffix':
+                ['Root Suffix for Active Directory', 'dc=internal,dc=forgerock,dc=com', REGEX_all],
             'ad.user':
                 ['Administrative User for Active Directory', 'cn=administrator,cn=users,dc=internal,dc=forgerock,dc=com', REGEX_all],
             'ad.password':
@@ -91,6 +95,8 @@ class Properties:
                 ['Hostname for LDAP instance', 'opendj.internal.forgerock.com', REGEX_host],
             'ldap.port':
                 ['Port number for LDAP instance', '1389', REGEX_number],
+            'ldap.rootsuffix':
+                ['Root Suffix for LDAP instance', 'dc=internal,dc=forgerock,dc=com', REGEX_all],
             'ldap.user':
                 ['Administrative User for LDAP instance', 'cn=Directory Manager', REGEX_all],
             'ldap.password':

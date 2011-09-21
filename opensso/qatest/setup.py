@@ -103,30 +103,31 @@ elif loadVal:
     read.save()
 
 resources = {
-        "resources/authentication/AuthenticationConfig.properties": 
+        "resources/authentication/AuthenticationConfig.properties":
             [("ldap.iplanet-am-auth-ldap-server.2", read.lookup("ldap.host")),
             ("ldap.iplanet-am-auth-ldap-server2.2", read.lookup("ldap.host") + ":" + read.lookup("ldap.port")),
-            ("ldap.iplanet-am-auth-ldap-base-dn.2", read.lookup("openam.rootsuffix")),
+            ("ldap.iplanet-am-auth-ldap-base-dn.2", read.lookup("ldap.rootsuffix")),
             ("ldap.iplanet-am-auth-ldap-bind-dn.2", read.lookup("ldap.user")),
             ("ldap.iplanet-am-auth-ldap-bind-passwd.2", read.lookup("ldap.password")),
             ("ad.iplanet-am-auth-ldap-server.2", read.lookup("ad.host")),
             ("ad.iplanet-am-auth-ldap-server2.2", read.lookup("ad.host") + ":" + read.lookup("ad.port")),
-            ("ad.iplanet-am-auth-ldap-base-dn.2", "cn=users," + read.lookup("openam.rootsuffix")),
+            ("ad.iplanet-am-auth-ldap-base-dn.2", "cn=users," + read.lookup("ad.rootsuffix")),
             ("ad.iplanet-am-auth-ldap-bind-dn.2", read.lookup("ad.user")),
             ("ad.iplanet-am-auth-ldap-bind-passwd.2", read.lookup("ad.password"))],
+        "resources/authentication/AuthTest.properties":
+            [("ad.password", read.lookup("ad.password"))],
         "resources/log/DBConfigInfo.properties":
             [("iplanet-am-logging-location", "jdbc:mysql://" + read.lookup("db.host") + ":" + read.lookup("db.port") + "/IDENTITY"),
             ("iplanet-am-logging-db-user", read.lookup("db.user")),
             ("iplanet-am-logging-db.password", read.lookup("db.user"))],
         "resources/config/AuthenticationConfig.properties":
-            [("ldap.iplanet-am-auth-ldap-server.1", read.lookup("ldap.host")),
-            ("ldap.iplanet-am-auth-ldap-server2.1", read.lookup("ldap.host") + ":" + read.lookup("ldap.port")),
-            ("ldap.iplanet-am-auth-ldap-base-dn.1", read.lookup("openam.rootsuffix")),
-            ("ldap.iplanet-am-auth-ldap-bind-dn.1", read.lookup("ldap.user")),
-            ("ldap.iplanet-am-auth-ldap-bind-passwd.1", read.lookup("ldap.password")),
+            [("ldap.iplanet-am-auth-ldap-server", read.lookup("ldap.host") + ":" + read.lookup("ldap.port")),
+            ("ldap.iplanet-am-auth-ldap-base-dn", read.lookup("ldap.rootsuffix")),
+            ("ldap.iplanet-am-auth-ldap-bind-dn", read.lookup("ldap.user")),
+            ("ldap.iplanet-am-auth-ldap-bind-passwd", read.lookup("ldap.password")),
             ("ad.iplanet-am-auth-ldap-server.1", read.lookup("ad.host")),
             ("ad.iplanet-am-auth-ldap-server2.1", read.lookup("ad.host") + ":" + read.lookup("ad.port")),
-            ("ad.iplanet-am-auth-ldap-base-dn.1", "cn=users," + read.lookup("openam.rootsuffix")),
+            ("ad.iplanet-am-auth-ldap-base-dn.1", "cn=users," + read.lookup("ad.rootsuffix")),
             ("ad.iplanet-am-auth-ldap-bind-dn.1", read.lookup("ad.user")),
             ("ad.iplanet-am-auth-ldap-bind-passwd.1", read.lookup("ad.password"))],
         "resources/config/default/ConfiguratorCommon.properties":
