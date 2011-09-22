@@ -57,5 +57,10 @@
             <groupId>org.forgerock.opendj</groupId> 
             <artifactId>opendj-server</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>i18n-core</artifactId>
+            <version>1.3.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

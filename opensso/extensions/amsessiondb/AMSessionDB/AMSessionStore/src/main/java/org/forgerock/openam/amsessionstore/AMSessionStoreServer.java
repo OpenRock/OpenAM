@@ -24,6 +24,7 @@
  */
 package org.forgerock.openam.amsessionstore;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,6 +42,7 @@ import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.restlet.security.MapVerifier;
 import org.restlet.ext.crypto.DigestAuthenticator;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * This is the main class of the amsessiondb server. Starts the RESTlet server
@@ -90,11 +92,10 @@ public class AMSessionStoreServer {
             guard.setWrappedVerifier(mapVerifier);
             guard.setNext(amsessiondbApp);
             component.getDefaultHost().attach(uri, guard);
-            
-            Log.logger.log(Level.FINE, "amsessiondb started with DIGEST authentication");
+            Log.logger.log(Level.FINE, DB_STARTED_AUTH.get().toString());
         } else {
             component.getDefaultHost().attach(uri, amsessiondbApp);
-            Log.logger.log(Level.WARNING, "amsessiondb started without authentication");
+            Log.logger.log(Level.WARNING, DB_STARTED_NOAUTH.get().toString());
         }
         
         // Start the component, persistents store and statistics framework.  
@@ -112,23 +113,21 @@ public class AMSessionStoreServer {
             Thread shutdownThread = new Thread(shutdownServer);
             shutdownThread.setDaemon(true);
             shutdownThread.start();
-            
-            Object[] params = { shutdownAddr, shutdownPort };
-            Log.logger.log(Level.FINE, "Shutdown listener started on address {0} and port {1}", params);
+            final LocalizableMessage message = DB_SHUT_LIST.get(shutdownAddr, Integer.toString(shutdownPort));
+            Log.logger.log(Level.FINE, message.toString());
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to start shutdown listener", ex);
+            Log.logger.log(Level.WARNING, DB_SHUT_FAIL.get().toString(), ex);
         }
             
-        
-        Object[] params = { port, maxThreads};
-        Log.logger.log(Level.FINE, "amsessiondb started on port {0} with maximum threads {1}", params);
+        final LocalizableMessage message = DB_STARTED.get(Integer.toString(port), maxThreads);
+        Log.logger.log(Level.FINE, message.toString());
     }
     
     public static void stop() {
         try {
             component.stop();
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to stop amsessiondb", ex);
+            Log.logger.log(Level.WARNING, DB_STOP_FAIL.get().toString(), ex);
         }
     }
     
@@ -153,35 +152,35 @@ public class AMSessionStoreServer {
                     String command = in.readLine();
                     
                     if (command.equals(SHUTDOWN)) {
-                        Log.logger.log(Level.FINE, "Shutdown amsessiondb called");
+                        Log.logger.log(Level.FINE, DB_SHUT_CALL.get().toString());
                         
                         try {
                             PersistentStoreFactory.getPersistentStore().shutdown();
                         } catch (Exception ex) {
-                            Log.logger.log(Level.WARNING, "Unable to shutdown persistent store", ex);
+                            Log.logger.log(Level.WARNING, DB_SHUT_PER_FAIL.get().toString(), ex);
                         }
                         
                         AMSessionStoreServer.stop();
                         break;
                     }
                 } catch (IOException ioe) {
-                    Log.logger.log(Level.WARNING, "Unable to receive socket connection", ioe);
+                    Log.logger.log(Level.WARNING, DB_SOCK_FAIL.get().toString(), ioe);
                 } finally {
                     try {
                         in.close();
                         clientSocket.close(); 
                     } catch (IOException ioe) {
-                        Log.logger.log(Level.WARNING, "Unable to close socket resource", ioe);
+                        Log.logger.log(Level.WARNING, DB_SOCK_CLOSE_R.get().toString(), ioe);
                     }
                 }
                 
                 try {
                     socket.close();
                 } catch (IOException ioe) {
-                    Log.logger.log(Level.WARNING, "Unable to close server socket", ioe);
+                    Log.logger.log(Level.WARNING, DB_SOCK_CLOSE.get().toString(), ioe);
                 }
                 
-                Log.logger.log(Level.FINE, "Shutdown amsessiondb complete");
+                Log.logger.log(Level.FINE, DB_SHUT_FIN.get().toString());
             }
         }    
     }

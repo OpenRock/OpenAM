@@ -25,18 +25,15 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -45,16 +42,13 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -66,28 +60,23 @@ import org.opends.messages.Message;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
 import org.opends.server.core.DirectoryServer;
-import org.opends.server.core.ModifyOperation;
 import org.opends.server.extensions.ConfigFileHandler;
 import org.opends.server.protocols.internal.InternalClientConnection;
 import org.opends.server.protocols.internal.InternalSearchOperation;
 import org.opends.server.protocols.ldap.LDAPAttribute;
-import org.opends.server.protocols.ldap.LDAPModification;
 import org.opends.server.types.DirectoryEnvironmentConfig;
 import org.opends.server.util.EmbeddedUtils;
 import org.opends.server.util.ServerConstants;
 import org.opends.server.tools.InstallDS;
-import org.opends.server.tools.dsconfig.DSConfig;
 import org.opends.server.tools.dsreplication.ReplicationCliMain;
 import org.opends.server.types.Attribute;
-import org.opends.server.types.AttributeValue;
 import org.opends.server.types.DereferencePolicy;
 import org.opends.server.types.DirectoryException;
-import org.opends.server.types.ModificationType;
 import org.opends.server.types.RawAttribute;
-import org.opends.server.types.RawModification;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -171,7 +160,7 @@ public class EmbeddedOpenDJ {
     throws Exception {
         new File(odjRoot).mkdir();
 
-        Log.logger.log(Level.FINE, "Starting OpenDJ Setup");
+        Log.logger.log(Level.FINE, DB_DJ_START.get().toString());
         ZipFile opendjZip = new ZipFile("../install/opendj.zip");
         Enumeration files = opendjZip.entries();
 
@@ -194,7 +183,7 @@ public class EmbeddedOpenDJ {
                     fos.write(is.read());
                 }
             } catch (IOException ioe) {
-                Log.logger.log(Level.SEVERE, "Error copying zip contents", ioe);
+                Log.logger.log(Level.SEVERE, DB_DJ_ZIP_ERR.get().toString(), ioe);
                 throw ioe;
             } finally {
                 if (is != null) {
@@ -244,7 +233,7 @@ public class EmbeddedOpenDJ {
                 String inpStr = sbuf.toString();
                 fout.write(tagSwap(inpStr));
             } catch (IOException ioe) {
-                Log.logger.log(Level.SEVERE, "EmbeddedOpenDJ.setup(): Error tag swapping files", ioe);
+                Log.logger.log(Level.SEVERE, DB_DJ_SWP_ERR.get().toString(), ioe);
                 throw ioe;
             } finally {
                 if (fin != null) {
@@ -278,7 +267,7 @@ public class EmbeddedOpenDJ {
             try {
                 channelCopy(inChannel, outChannel);
             } catch (IOException ioe) {
-                Log.logger.log(Level.SEVERE, "EmbeddedOpenDS.setup(): Error copying schema file(s)", ioe);
+                Log.logger.log(Level.SEVERE, DB_DJ_SCH_ERR.get().toString(), ioe);
                 throw ioe;
             } finally {
                 if (inChannel != null) {
@@ -311,15 +300,15 @@ public class EmbeddedOpenDJ {
         // Check: If adding a new server to a existing cluster
         if (OpenDJConfig.getExistingServerUrl() == null) {
             // Default: single / first server.
-            Log.logger.log(Level.FINE, "Configuring First Server");
+            Log.logger.log(Level.FINE, DB_DJ_CONF_FIR.get().toString());
             int ret = EmbeddedOpenDJ.loadLDIF(OpenDJConfig.getOpenDJSetupMap(), odjRoot, "../ldif/amsessiondb_suffix.ldif");
             
             if (ret == 0) {
-                Log.logger.log(Level.FINE, "amsessiondb suffix created successfully.");
+                Log.logger.log(Level.FINE, DB_DJ_SUF_OK.get().toString());
             } else {
-                Object[] error = { Integer.toString(ret) };
-                Log.logger.log(Level.SEVERE, "EmbeddedOpenDJ.setupOpenDJ. Error loading amsessiondb suffix", error);
-                throw new StoreException("Unable to create amsessiondb suffix");
+                final LocalizableMessage message = DB_DJ_SUF_FAIL.get(Integer.toString(ret));
+                Log.logger.log(Level.SEVERE, message.toString());
+                throw new StoreException(message.toString());
             }
             
             registerServer(OpenDJConfig.getHostUrl());
@@ -379,8 +368,8 @@ public class EmbeddedOpenDJ {
         int ret = 0;
 
         try {
-            Object[] error = { ldif };
-            Log.logger.log(Level.FINE, "Loading amsessiondb ldif ", error);
+            final LocalizableMessage message = DB_DJ_LD.get(ldif);
+            Log.logger.log(Level.FINE, message.toString());
 
             String[] args1 = 
             { 
@@ -404,9 +393,9 @@ public class EmbeddedOpenDJ {
             ret = org.opends.server.tools.ImportLDIF.mainImportLDIF(args1, false,
                     SetupProgress.getOutputStream(), SetupProgress.getOutputStream());
 
-            Log.logger.log(Level.FINE, "amsessiondb ldif loading, success");
+            Log.logger.log(Level.FINE, DB_DJ_LD_OK.get().toString());
         } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE,"amsessiondb ldif loading failed", ex);
+            Log.logger.log(Level.SEVERE, DB_DJ_LD_FAIL.get().toString(), ex);
         }
 
         return ret;
@@ -421,17 +410,16 @@ public class EmbeddedOpenDJ {
      */
     public static void setupOpenDS(String configFile, Map<String, String> map)
     throws Exception {
-        Log.logger.log(Level.FINE, "Starting OpenDJ setup");
+        Log.logger.log(Level.FINE, DB_DJ_SETUP.get().toString());
 
         int ret = runOpenDSSetup(map, configFile);
 
         if (ret == 0) {
-            Log.logger.log(Level.FINE, "OpenDJ setup complete");
+            Log.logger.log(Level.FINE, DB_DJ_SETUP_OK.get().toString());
         } else {
-            Object[] params = {Integer.toString(ret)};
-            Log.logger.log(Level.FINE, 
-                "EmbeddedOpenDS.setupOpenDS. Error setting up OpenDS {0}", params);
-            throw new StoreException("Unable to setup OpenDJ");
+            final LocalizableMessage message = DB_DJ_SETUP_FAIL.get(Integer.toString(ret));
+            Log.logger.log(Level.FINE, message.toString());
+            throw new StoreException(message.toString());
         }
     }
     
@@ -474,8 +462,8 @@ public class EmbeddedOpenDJ {
         setupCmd[13] = map.get(Constants.OPENDJ_JMX_PORT);
         setupCmd[16] = configFile;
 
-        Object[] params = { concat(setupCmd) };
-        Log.logger.log(Level.FINE, "Running OpenDJ Setup command {0}", params);
+        final LocalizableMessage message = DB_DJ_SETUP_RUN.get(concat(setupCmd));
+        Log.logger.log(Level.FINE, message.toString());
 
         setupCmd[11] = map.get(Constants.OPENDJ_DS_MGR_PASSWD);
 
@@ -486,9 +474,9 @@ public class EmbeddedOpenDJ {
             null);
 
         if (ret == 0) {
-            Log.logger.log(Level.FINE, "OpenDJ setup successfully.");
+            Log.logger.log(Level.FINE, DB_DJ_SETUP_FIN.get().toString());
         } else {
-            Log.logger.log(Level.WARNING, "OpenDJ setup failed.");
+            Log.logger.log(Level.WARNING, DB_DJ_SETUP_FAIL2.get().toString());
         }
 
         return ret;
@@ -509,16 +497,15 @@ public class EmbeddedOpenDJ {
         ResultCode resultCode = ao.getResultCode();
         
         if (resultCode == ResultCode.SUCCESS) {
-            Object[] params = { dn };
-            Log.logger.log(Level.FINE, "Successfully created" +" entry: {0}", params);
+            final LocalizableMessage message = DB_SVR_CREATE.get(dn);
+            Log.logger.log(Level.FINE, message.toString());
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
-            Object[] params = { dn };
-            Log.logger.log(Level.WARNING, " unable to create: Entry " +
-                        "Already Exists Error for DN {0}", params);
+            final LocalizableMessage message = DB_SVR_CRE_FAIL.get(dn);
+            Log.logger.log(Level.WARNING, message.toString());
         } else {
-            Object[] params = { dn, resultCode };
-            Log.logger.log(Level.WARNING, "Error creating entry: {0}, error code = {1}", params);
-            throw new StoreException("Unable to create entry: " + dn);
+            final LocalizableMessage message = DB_SVR_CRE_FAIL2.get(dn, resultCode.toString());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new StoreException(message.toString());
         }
     }
     
@@ -556,8 +543,8 @@ public class EmbeddedOpenDJ {
                             } else if (attribute.getName().equals("replPort")) {
                                 server.setReplPort(attribute.iterator().next().getValue().toString());
                             } else {
-                                Object[] error = { attribute.getName() };
-                                Log.logger.log(Level.WARNING, "Unknown attribute: {0}", error);
+                                final LocalizableMessage message = DB_UNK_ATTR.get(attribute.getName());
+                                Log.logger.log(Level.WARNING, message.toString());
                             }
                         }
                         
@@ -565,19 +552,20 @@ public class EmbeddedOpenDJ {
                     }
                 } 
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] error = { baseDn };
-                Log.logger.log(Level.FINE,"Entry not present: {0}", error);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(baseDn);
+                Log.logger.log(Level.FINE, message.toString());
                 
                 return null;
             } else {
-                Object[] error = { baseDn, resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", error);
-                throw new StoreException("Unable to access entry DN" + baseDn);
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(baseDn, resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
             Object[] error = { baseDn };
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}", error);
-            throw new StoreException("Unable to read record from store", dex);
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(baseDn);
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new StoreException(message.toString(), dex);
         }
         
         return serverList;
@@ -589,8 +577,8 @@ public class EmbeddedOpenDJ {
         try {
             url = new URL(urlHost);
         } catch (MalformedURLException mue) {
-            Object[] error = { urlHost };
-            Log.logger.log(Level.WARNING, "Malformed URL: {0}", error);
+            final LocalizableMessage message = DB_MAL_URL.get(urlHost);
+            Log.logger.log(Level.WARNING, message.toString());
             return urlHost;
         }
         
@@ -626,7 +614,9 @@ public class EmbeddedOpenDJ {
         } else if (key.equals(Constants.OPENDJ_REPL_PORT)) {
             return OpenDJConfig.AmSessionDbAttr.REPL_PORT.toString();
         } else {
-            Log.logger.log(Level.WARNING, "Invalid map attr: {0}", key);
+            final LocalizableMessage message = DB_INV_MAP.get(key);
+            Log.logger.log(Level.WARNING, message.toString());
+            
             return "";
         }
     }
@@ -643,7 +633,8 @@ public class EmbeddedOpenDJ {
         ResultCode resultCode = dop.getResultCode();
         
         if (resultCode != ResultCode.SUCCESS) {
-            Log.logger.log(Level.WARNING, "Unable to delete entry: {0}", dn);
+            final LocalizableMessage message = DB_DEL_FAIL.get(dn);
+            Log.logger.log(Level.WARNING, message.toString());
         }
     }
     
@@ -653,10 +644,11 @@ public class EmbeddedOpenDJ {
         
         if (ret == 0) {
             ret = setupReplicationInitialize(localMap, remoteMap);
-            Log.logger.log(Level.FINE, "replication setup succeeded.");
+            Log.logger.log(Level.FINE, DB_REPL_SETUP.get().toString());
         } else {
-            Log.logger.log(Level.FINE, "Error setting up replication: {0}", ret);
-            throw new StoreException("Unable to setup replication: error=" + ret);
+            final LocalizableMessage message = DB_REPL_SETUP_FAIL.get(Integer.toString(ret));
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new StoreException(message.toString());
         }
     }
     
@@ -721,14 +713,14 @@ public class EmbeddedOpenDJ {
         enableCmd[25] = localMap.get(Constants.OPENDJ_DS_MGR_PASSWD);
         enableCmd[30] = localMap.get(Constants.OPENDJ_ROOT) + "/config/config.ldif";
 
-        Object[] params = { enableCmd[3] };
-        Log.logger.log(Level.FINE, "Host 1 {0}", params);
-        Object[] params2 = { enableCmd[13] };
-        Log.logger.log(Level.FINE, "Host 2 {0}", params2);
-        Object[] params3 = { enableCmd[5] };
-        Log.logger.log(Level.FINE, "Port 1 {0}", params3);
-        Object[] params4 = { enableCmd[15] };
-        Log.logger.log(Level.FINE, "Port 2 {0}", params4);
+        LocalizableMessage message = DB_H_A.get(enableCmd[3]);
+        Log.logger.log(Level.FINE, message.toString());
+        message = DB_H_B.get(enableCmd[13]);
+        Log.logger.log(Level.FINE, message.toString());
+        message = DB_P_A.get(enableCmd[5]);
+        Log.logger.log(Level.FINE, message.toString());
+        message = DB_P_B.get(enableCmd[15]);
+        Log.logger.log(Level.FINE, message.toString());
         
         int ret = ReplicationCliMain.mainCLI(
             enableCmd, false, 
@@ -737,9 +729,9 @@ public class EmbeddedOpenDJ {
             null);         
 
         if (ret == 0) {
-            SetupProgress.reportEnd("OpenDJ replication setup successfully.", null);
+            SetupProgress.reportEnd(DB_REPL_SETUP_OK.get().toString(), null);
         } else {
-            SetupProgress.reportEnd("OpenDJ replication setup failed.", null);
+            SetupProgress.reportEnd(DB_REPL_SETUP_FAILED.get().toString(), null);
         }
         
         return ret;
@@ -782,8 +774,8 @@ public class EmbeddedOpenDJ {
         enableCmd[11] = localMap.get(Constants.OPENDJ_SUFFIX);
         enableCmd[15] = localMap.get(Constants.OPENDJ_ROOT) + "/config/config.ldif";
 
-        Object[] params = { enableCmd[3], enableCmd[5], enableCmd[11] };
-        Log.logger.log(Level.FINE, "Removing replication server host: {0} admin port: {1} suffix: {2} ", params);
+        final LocalizableMessage message = DB_REPL_DEL.get(enableCmd[3], enableCmd[5], enableCmd[11]);
+        Log.logger.log(Level.FINE, message.toString());
         
         int ret = ReplicationCliMain.mainCLI(
             enableCmd, false, 
@@ -792,9 +784,9 @@ public class EmbeddedOpenDJ {
             null);         
 
         if (ret == 0) {
-            SetupProgress.reportEnd("OpenDJ replication disabled successfully.", null);
+            SetupProgress.reportEnd(DB_REPL_DEL_OK.get().toString(), null);
         } else {
-            SetupProgress.reportEnd("OpenDJ replication failed to be disabled.", null);
+            SetupProgress.reportEnd(DB_REPL_DEL_FAIL.get().toString(), null);
         }
         
         return ret;
@@ -846,439 +838,14 @@ public class EmbeddedOpenDJ {
             null); 
 
         if (ret == 0) {
-            Log.logger.log(Level.FINE, "Replication Setup Success.");
+            Log.logger.log(Level.FINE, DB_REPL_OK.get().toString());
         } else {
-            Log.logger.log(Level.SEVERE, "Replication Setup Failed.");
+            Log.logger.log(Level.SEVERE, DB_REPL_FAIL.get().toString());
         }
         
         return ret;
     }
-
-    /**
-     * Returns Replication Status by invoking OpenDJ <code>dsreplication</code>
-     * CLI
-     * @param port LDAP port number of embedded OpenDJ
-     * @param passwd Directory Manager password
-     * @param oo Standard output
-     * @param err : Standard error
-     * @return <code>dsreplication</code> CLI exit code.
-     */
-    public static int getReplicationStatus(String port, 
-                                           String passwd,
-                                           OutputStream oo, 
-                                           OutputStream err) {
-        String[] statusCmd= {
-                              "status","--no-prompt",
-                              "-h",  "localhost",
-                              "-p",  port,
-                              "--adminUID", "admin",
-                              "--adminPassword",  passwd,
-                              "-s"
-                            };
-
-        String dbgcmd = concat(statusCmd).replaceAll(passwd, "****");
-        Object[] params = { dbgcmd };
-        Log.logger.log(Level.FINE, "exec dsreplication : {0}", params);
-        
-        int ret = ReplicationCliMain.mainCLI(statusCmd, false, oo, err, null);
-        Object[] params2 = { ret }; 
-        Log.logger.log(Level.FINE, "dsreplication ret: {0}", params2);
-        return ret;
-    }
-    
-    /**
-     * Synchronizes replication domain info with current list of opensso servers. 
-     */
-    public static boolean syncReplicatedDomains(
-                          Set<String> currServerSet, String port, String passwd) {
-        Log.logger.log(Level.FINE, "Domains:started");
-        
-        String[] args = {
-            "-p", port,      // 1 : ds port num
-            "-h", "localhost", 
-            "-D",  "cn=directory manager",
-            "-w", passwd,    // 7 : password
-            "list-replication-domains",
-            "--provider-name", "Multimaster Synchronization",
-            "--property", "replication-server",
-            "--no-prompt",
-            "--trustAll"
-        };
-
-        String dbgcmd = concat(args).replaceAll(passwd, "****");
-        Object[] params = { dbgcmd };
-        Log.logger.log(Level.FINE, "exec dsconfig: {0}", params);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ByteArrayOutputStream boe = new ByteArrayOutputStream();
-        DSConfig.main(args, false, bos, boe);
-        String str = bos.toString();
-        String stre = boe.toString();
-        
-        if (stre.length() != 0) {
-            Object[] params2 = { stre };
-            Log.logger.log(Level.WARNING, "EmbeddedOpenDS:syncReplication:stderr: {0}", params2);
-        }
-        
-        BufferedReader brd = new BufferedReader(new StringReader(str));
-        String line = null;
-        
-        try {
-            line = brd.readLine(); // 1st line
-            line = brd.readLine(); // 2nd line
             
-            while ((line = brd.readLine()) != null) {
-                try {
-                    int dcolon = line.indexOf(':');
-                    String domainname = line.substring(0, dcolon).trim();
-                    int stcolon = line.indexOf(':', dcolon+1);
-                    String replservers = line.substring(stcolon+1);
-                    
-                    Object[] params3 = { domainname, replservers };
-                    Log.logger.log(Level.FINE, "domain={0} replservers={1}", params3);
-                    
-                    StringTokenizer stok = new StringTokenizer(replservers, ",");
-                    
-                    // Check if this server is part of server list
-                    List<String> cmdlist = new ArrayList<String>();
-                    cmdlist.add("-p"); 
-                    cmdlist.add(port);
-                    cmdlist.add("-h"); 
-                    cmdlist.add("localhost"); 
-                    cmdlist.add("-D");  
-                    cmdlist.add("cn=directory manager");
-                    cmdlist.add("-w"); 
-                    cmdlist.add(passwd);
-                    cmdlist.add("--no-prompt");
-                    cmdlist.add("--trustAll");
-                    cmdlist.add("set-replication-domain-prop");
-                    cmdlist.add("--provider-name"); 
-                    cmdlist.add("Multimaster Synchronization");
-                    cmdlist.add("--domain-name"); 
-                    cmdlist.add(domainname);
-    
-                    int numremoved = 0;
-                    while (stok.hasMoreTokens()) {
-                        String tok = stok.nextToken().trim();
-                        if (!currServerSet.contains(tok)) {
-                            cmdlist.add("--remove"); 
-                            cmdlist.add("replication-server:"+tok);
-                            numremoved++;
-                        }
-                    }
-                    
-                    if (numremoved > 0) {
-                        String[] args1 = cmdlist.toArray(new String[cmdlist.size()]);
-
-                        String dbgcmd1 = concat(args1).replaceAll(passwd, "****");
-                        Object[] error = { dbgcmd1 };
-                        Log.logger.log(Level.FINE, " Execute: {0}", error);
-                        
-                        bos = new ByteArrayOutputStream();
-                        boe = new ByteArrayOutputStream();
-                        DSConfig.main(args1, false, bos, boe);
-                        str = bos.toString();
-                        stre = boe.toString();
-                        
-                        if (stre.length() != 0) {
-                            Object[] params2 = { stre };
-                            Log.logger.log(Level.WARNING, "EmbeddedOpenDS:syncRepl:stderr={0}", params2);
-                        }
-                        
-                        Object[] params4 = { str };
-                        Log.logger.log(Level.FINE, "syncReplication:Result: {0}", params4);
-                    } 
-                } catch (Exception ex) {
-                    Log.logger.log(Level.SEVERE, "EmbeddedOpenDS:syncReplication:Failed:", ex);
-                    return false;
-                } 
-            }
-        } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, "EmbeddedOpenDS:syncReplication:Failed:", ex);
-            return false;
-        } 
-        return true;
-    }
-    
-    /**
-     * Synchronizes replication domain info with current list of opensso servers. 
-     */
-    public static boolean syncReplicatedServerList(
-                          Set<String> currServerSet, String port, String passwd) {
-        InternalClientConnection icConn = InternalClientConnection.getRootConnection();
-        
-        try {
-            Set<String> dsServers = getServerSet(icConn);
-
-            if (dsServers == null) {
-                return false;
-            }
-            
-            for (String tok : dsServers) {
-                if (!currServerSet.contains(tok)) {
-                    delOpenDJServer(icConn, tok);
-                }
-            }
-        } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, "Unable to delete OpenDJ replication instance.", ex);
-            return false;
-        }
-        
-        return true;
-    }
-    
-    /**
-     *  Removes host:port from OpenDJ replication
-     */
-    public static void delOpenDJServer(InternalClientConnection icConn, String delServer) 
-    throws StoreException {
-        String replServerDN = "cn=" + delServer + ",cn=Servers,cn=admin data";
-        LinkedHashSet<String> returnAttrs = new LinkedHashSet<String>();
-        returnAttrs.add("ds-cfg-key-id");
- 
-        if (icConn == null) {
-            Object[] params = { replServerDN };
-            Log.logger.log(Level.SEVERE, "Could not connect to local opends instance. {0}", params);
-            return;
-        }
-        
-        String trustKey = null;
-        
-        try {
-            InternalSearchOperation iso = icConn.processSearch(replDN,
-                SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, "objectclass=*" , returnAttrs);
-            ResultCode resultCode = iso.getResultCode();
-
-            if (resultCode == ResultCode.SUCCESS) {
-                LinkedList<SearchResultEntry> searchResult = iso.getSearchEntries();
-                
-                if (!searchResult.isEmpty()) {
-                    SearchResultEntry entry = searchResult.get(0);
-                    List<Attribute> attributes = entry.getAttributes();
-                    
-                    for (Attribute attribute : attributes) {
-                        trustKey = attribute.toString();
-                    }
-                }
-            } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] error = { replDN };
-                Log.logger.log(Level.FINE, "Entry not present: {0}", error);
-            } else {
-                Object[] error = { replDN, resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0} , error code = ", error);
-                throw new StoreException("Unable to access entry DN" + replDN);
-            }
-        } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + replDN, dex);
-            throw new StoreException("Unable to read record from store", dex);
-        }
-        
-        if (trustKey != null) {
-            String keyDN = "ds-cfg-key-id=" + trustKey + ",cn=instance keys,cn=admin data";
-            DeleteOperation dop = icConn.processDelete(keyDN);
-            ResultCode resultCode = dop.getResultCode();
-        
-            if (resultCode != ResultCode.SUCCESS) {
-                Object[] error = { keyDN };
-                Log.logger.log(Level.WARNING, "Unable to delete entry: {0}", error);
-            }
-        }
-        
-        DeleteOperation dop = icConn.processDelete(replServerDN);
-        ResultCode resultCode = dop.getResultCode();
-        
-        if (resultCode != ResultCode.SUCCESS) {
-            Object[] error = { replServerDN };
-            Log.logger.log(Level.WARNING, "Unable to delete entry: {0}", error);
-        }
-        
-        RawAttribute toDelete = new LDAPAttribute("uniqueMember", "cn="+ delServer);
-        RawModification mod = new LDAPModification(ModificationType.DELETE, toDelete);
-        List<RawModification> mods = new ArrayList<RawModification>();
-        mods.add(mod);
-        ModifyOperation mop = icConn.processModify(replDN,  mods);
-        resultCode = mop.getResultCode();
-        
-        if (resultCode != ResultCode.SUCCESS) {
-            Object[] error = { replDN };
-            Log.logger.log(Level.WARNING, "Unable to modify entry: {0}", replDN);
-        }
-    }
-    
-    /**
-     *  Gets list of replicated servers from local OpenDJ directory.
-     */
-    public static Set<String> getServerSet(InternalClientConnection icConn) 
-    throws StoreException {
-        LinkedHashSet<String> returnAttrs = new LinkedHashSet<String>();
-        returnAttrs.add("uniqueMember");
-        
-        if (icConn != null) {
-            try {
-                InternalSearchOperation iso = icConn.processSearch(replDN,
-                    SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, "objectclass=*" , returnAttrs);
-                ResultCode resultCode = iso.getResultCode();
-
-                if (resultCode == ResultCode.SUCCESS) {
-                    LinkedList<SearchResultEntry> searchResult = iso.getSearchEntries();
-                
-                    if (!searchResult.isEmpty()) {
-                        Set<String> hostSet = new HashSet<String>();
-                    
-                        for (SearchResultEntry entry : searchResult) {
-                            Map<String, Set<String>> resultsMap = 
-                                    EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(entry.getAttributes());
-                            
-                            for (Map.Entry<String, Set<String>> attribute : resultsMap.entrySet()) {
-                                Set<String> values = attribute.getValue();
-                                
-                                for (String value : values) {
-                                    hostSet.add(value.substring(3, value.length()));
-                                }
-                            }
-                        }
-                    
-                        return hostSet;
-                    } else {
-                        return null;
-                    }
-                } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                    Object[] param = { replDN };
-                    Log.logger.log(Level.FINE, "Entry not present: {0}", param);
-
-                    return null;
-                } else {
-                    Object[] error = { replDN, resultCode };
-                    Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0} error code = {1}", error);
-                    throw new StoreException("Unable to access entry DN" + replDN);
-                }
-            } catch (DirectoryException dex) {
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + replDN, dex);
-                throw new StoreException("Unable to read record from store", dex);
-            }
-        }
-        
-        return returnAttrs;
-    }
-    
-      
-    /**
-     * Synchronizes replication server info with current list of amsessiondb servers. 
-     */
-    public static boolean syncReplicatedServers(
-                          Set<String> currServerSet, String port, String passwd) {
-        Log.logger.log(Level.FINE, "syncReplication:start processing.");
-        
-        String[] args = {
-            "-p", port,      // 1 : ds port num
-            "-h", "localhost", 
-            "-D",  "cn=directory manager",
-            "-w", passwd,    // 7 : password
-            "list-replication-server",
-            "--provider-name", "Multimaster Synchronization",
-            "--property", "replication-server",
-            "--property", "replication-port","--no-prompt", "--trustAll"
-        };
-        
-        String dbgcmd = concat(args).replaceAll(passwd, "****");
-        Object[] params = { dbgcmd };
-        Log.logger.log(Level.FINE, "exec dsconfig: {0}", params);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ByteArrayOutputStream boe = new ByteArrayOutputStream();
-        DSConfig.main(args, false, bos, boe);
-        String str = bos.toString();
-        String stre = boe.toString();
-        
-        if (stre.length() > 0 &&
-                !stre.contains("Unable to continue since there are no Replication Server currently")) {
-            Object[] params2 = { stre };
-            Log.logger.log(Level.SEVERE, "syncReplication: stderr is not empty: {0}", params2);
-            return false;
-        } else {
-            Object[] params3 = { stre };
-            Log.logger.log(Level.FINE, "syncReplication: stderr is not empty: {0}", params3);
-        }
-
-        BufferedReader brd = new BufferedReader(new StringReader(str));
-        String line = null;
-        
-        try {
-            line = brd.readLine(); // 1st line
-            line = brd.readLine(); // 2nd line
-            line = brd.readLine(); // 3rd line
-        } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, "syncReplication:Failed:", ex);
-        } 
-        
-        if (line == null)  {
-            Object[] params2 = { str };
-            Log.logger.log(Level.SEVERE, "syncReplication:cmd failed {0}", params2);
-            return false;
-        }
-        
-        try {
-            int lastcolon= line.lastIndexOf(':');
-            int stcolon = line.indexOf(':', line.indexOf(':')+1);
-            String replservers = line.substring(stcolon+1, lastcolon);
-
-            StringTokenizer stok = new StringTokenizer(replservers, ",");
-            // Check if this server is part of server list
-            List<String> cmdlist = new ArrayList<String>();
-            cmdlist.add("-p"); 
-            cmdlist.add(port);
-            cmdlist.add("-h"); 
-            cmdlist.add("localhost"); 
-            cmdlist.add("-D");  
-            cmdlist.add("cn=directory manager");
-            cmdlist.add("-w"); 
-            cmdlist.add(passwd);
-            cmdlist.add("--no-prompt");
-            cmdlist.add("--trustAll");
-            cmdlist.add("set-replication-server-prop");
-            cmdlist.add("--provider-name"); 
-            cmdlist.add("Multimaster Synchronization");
-
-            int numremoved = 0;
-            while (stok.hasMoreTokens()) {
-                String tok = stok.nextToken().trim();
-                if (!currServerSet.contains(tok)) {
-                    cmdlist.add("--remove"); 
-                    cmdlist.add("replication-server:" + tok);
-                    numremoved++;
-                }
-            }
-            
-            if (numremoved > 0) {
-                String[] args1 = cmdlist.toArray(new String[cmdlist.size()]);
-                String dbgcmd1 = concat(args1).replaceAll(passwd, "****");
-                Object[] params2 = { dbgcmd1 };
-                Log.logger.log(Level.SEVERE, "EmbeddedOpenDS:syncReplication:Execute: {0}", params2);
-                
-                bos = new ByteArrayOutputStream();
-                boe = new ByteArrayOutputStream();
-                DSConfig.main(args1, false, bos, boe);
-                str = bos.toString();
-                stre = boe.toString();
-
-                Object[] params3 = { str };
-                Log.logger.log(Level.SEVERE, "syncReplication:Result: {0}", params3);
-                
-                if (stre.length() != 0) {
-                    Object[] params4 = { stre };
-                    Log.logger.log(Level.SEVERE, "syncReplication:cmd stderr: {0}", params4);
-                }
-            }
-        } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, "EmbeddedOpenDS:syncReplication:Failed:", ex);
-            return false;
-        } 
-        
-        return true;
-    }
-
     /**
      *  Starts the embedded <code>OpenDJ</code> instance.
      *
@@ -1293,17 +860,17 @@ public class EmbeddedOpenDJ {
             return;
         }
         
-        Object[] params = { odjRoot };
-        Log.logger.log(Level.INFO, "Start embedded OpenDJ server {0}", params);
+        final LocalizableMessage message = DB_DJ_STARTING.get(odjRoot);
+        Log.logger.log(Level.INFO, message.toString());
 
         DirectoryEnvironmentConfig config = new DirectoryEnvironmentConfig();
         config.setServerRoot(new File(odjRoot));
         config.setForceDaemonThreads(true);
         config.setConfigClass(ConfigFileHandler.class);
         config.setConfigFile(new File(odjRoot + "/config", "config.ldif"));
-        Log.logger.log(Level.FINE, "EmbeddedOpenDJ.startServer:starting DS Server...");
+        Log.logger.log(Level.FINE, DB_DJ_STARTING1.get().toString());
         EmbeddedUtils.startServer(config);
-        Log.logger.log(Level.FINE, "...EmbeddedOpenDJ.startServer:DS Server started.");
+        Log.logger.log(Level.FINE, DB_DJ_STARTING2.get().toString());
 
         int sleepcount = 0;
         
@@ -1313,15 +880,14 @@ public class EmbeddedOpenDJ {
         }
         
         if (EmbeddedUtils.isRunning()) {
-            Log.logger.log(Level.INFO, "...EmbeddedOpenDJ.startServer:DS Server started.");
+            Log.logger.log(Level.INFO, DB_DJ_STARTING2.get().toString());
         } else {
-            Log.logger.log(Level.SEVERE, "...EmbeddedOpenDJ.startServer:DS Server not started.");
+            Log.logger.log(Level.SEVERE, DB_DJ_START_FAIL.get().toString());
         }
 
         serverStarted = true;
     }
     
-
     /**
      *  Gracefully shuts down the embedded OpenDJ instance.
      *
@@ -1330,7 +896,7 @@ public class EmbeddedOpenDJ {
     public static void shutdownServer() 
     throws Exception {
         if (isStarted()) {
-            Log.logger.log(Level.FINE, "EmbeddedOpenDJ.shutdown server...");
+            Log.logger.log(Level.FINE, DB_DJ_SHUT.get().toString());
             DirectoryServer.shutDown(
                 "org.forgerock.openam.amsessionstore.db.opendj.EmbeddedOpenDJ",
                 Message.EMPTY);
@@ -1342,7 +908,7 @@ public class EmbeddedOpenDJ {
             }
             
             serverStarted = false;
-            Log.logger.log(Level.FINE, "EmbeddedOpenDJ shutdown server success.");
+            Log.logger.log(Level.FINE, DB_DJ_SHUT_OK.get().toString());
         }
     }
     

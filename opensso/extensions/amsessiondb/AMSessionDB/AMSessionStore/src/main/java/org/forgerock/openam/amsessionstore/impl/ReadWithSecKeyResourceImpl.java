@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.impl;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.util.Set;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
@@ -36,6 +37,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the read with sec key resource functionality
@@ -50,14 +52,17 @@ public class ReadWithSecKeyResourceImpl extends ServerResource implements ReadWi
         try {
             records = PersistentStoreFactory.getPersistentStore().readWithSecKey(id);
         } catch (StoreException sex) {
-            Log.logger.log(Level.WARNING, "Unable to read with secondary key", sex.getMessage());
+            final LocalizableMessage message = DB_R_SEC_KEY.get(sex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());
         } catch (NotFoundException nfe) {
-            Log.logger.log(Level.WARNING, "Unable to read with secondary key", nfe.getMessage());
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, nfe.getMessage());
+            final LocalizableMessage message = DB_R_SEC_KEY.get(nfe.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to read with secondary key", ex.getMessage());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
+            final LocalizableMessage message = DB_R_SEC_KEY.get(ex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
         
         return records;

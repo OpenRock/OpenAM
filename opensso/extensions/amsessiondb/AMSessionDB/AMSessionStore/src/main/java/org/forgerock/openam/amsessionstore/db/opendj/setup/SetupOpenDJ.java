@@ -25,11 +25,13 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj.setup;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.io.OutputStreamWriter;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import org.forgerock.openam.amsessionstore.db.opendj.EmbeddedOpenDJ;
 import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -38,8 +40,7 @@ import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
 public class SetupOpenDJ {
     public static void main(String[] argv) {
         if (EmbeddedOpenDJ.isInstalled()) {
-            System.out.println("amsessiondb is already installed and configured on this node\n");
-            System.out.println("to reinstall, try removing the opendj directory and re-run this command\n");
+            System.out.println(DB_SETUP_ALD.get());
         } else {
             try {
                 SetupProgress.setWriter(new OutputStreamWriter(System.out));
@@ -56,7 +57,8 @@ public class SetupOpenDJ {
                 
                 EmbeddedOpenDJ.shutdownServer();
             } catch (Exception ex) {
-                System.err.println("Unable to setup amsessiondb: " + ex.getMessage());
+                final LocalizableMessage message = DB_SETUP_FAIL.get(ex.getMessage());
+                System.err.println(message);
                 System.exit(Constants.EXIT_INSTALL_FAILED);
             }
         }

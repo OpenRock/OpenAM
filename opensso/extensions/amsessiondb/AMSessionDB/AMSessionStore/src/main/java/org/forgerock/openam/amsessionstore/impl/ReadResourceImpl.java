@@ -30,6 +30,7 @@ package org.forgerock.openam.amsessionstore.impl;
  * @author steve
  */
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Log;
@@ -42,6 +43,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 public class ReadResourceImpl extends ServerResource implements ReadResource {
     @Get
@@ -57,14 +59,17 @@ public class ReadResourceImpl extends ServerResource implements ReadResource {
         try {
             record = PersistentStoreFactory.getPersistentStore().read(id);
         } catch (StoreException sex) {
-            Log.logger.log(Level.WARNING, "Unable to read", sex.getMessage());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());
+            final LocalizableMessage message = DB_R_READ.get(sex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         } catch (NotFoundException nfe) {
-            Log.logger.log(Level.WARNING, "Unable to read", nfe.getMessage());
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, nfe.getMessage());
+            final LocalizableMessage message = DB_R_READ.get(nfe.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to read", ex.getMessage());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
+            final LocalizableMessage message = DB_R_READ.get(ex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
         
         if (Statistics.isEnabled()) {

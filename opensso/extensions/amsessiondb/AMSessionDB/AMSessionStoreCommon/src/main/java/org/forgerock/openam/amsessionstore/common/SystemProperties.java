@@ -25,10 +25,12 @@
 
 package org.forgerock.openam.amsessionstore.common;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Level;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -72,7 +74,8 @@ public final class SystemProperties {
         try {
             return value != null? Integer.parseInt(value) : defaultValue;
         } catch (NumberFormatException nfe) {
-            Log.logger.log(Level.WARNING, "Error while converting property value: {0}", new Object[]{value});
+            final LocalizableMessage message = DB_PROP_ERR.get(value);
+            Log.logger.log(Level.WARNING, message.toString());
             return defaultValue;
         }
     }

@@ -25,9 +25,11 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj.setup;
 
+import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.db.opendj.EmbeddedOpenDJ;
 import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -36,14 +38,14 @@ import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
 public class RemoveOpenDJ {
     public static void main(String[] argv) {
         if (EmbeddedOpenDJ.isInstalled()) {
-            System.out.println("amsessiondb is configured on this node\n");
-            System.out.println("removing this node from the amsessiondb\n");
+            System.out.println(DB_SET_CON_ND.get());
             
             if (!EmbeddedOpenDJ.isStarted()) {
                 try {
                     EmbeddedOpenDJ.startServer(OpenDJConfig.getOdjRoot());
                 } catch (Exception ex) {
-                    System.err.println("Unable to start embedded OpenDJ server: " + ex.getMessage());
+                    final LocalizableMessage message = DB_DJ_NO_START2.get(ex.getMessage());
+                    System.err.println(message);
                     System.exit(Constants.EXIT_REMOVE_FAILED);
                 }
             }
@@ -53,12 +55,12 @@ public class RemoveOpenDJ {
                 EmbeddedOpenDJ.replicationDisable(OpenDJConfig.getOpenDJSetupMap());
                 EmbeddedOpenDJ.shutdownServer();
             } catch (Exception ex) {
-                System.err.println("Unable to setup amsessiondb: " + ex.getMessage());
+                final LocalizableMessage message = DB_DJ_SETUP_FAIL3.get(ex.getMessage());
+                System.err.println(message);
                 System.exit(Constants.EXIT_REMOVE_FAILED);
             }
         } else {
-            System.out.println("amsessiondb is not configured on this host \n");
-            System.out.println("removal of this node is not possible.\n");
+            System.out.println(DB_SET_CON_ND_NOT.get());
         }
     }    
 }

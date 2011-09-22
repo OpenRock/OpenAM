@@ -33,8 +33,10 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.SystemProperties;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -82,8 +84,8 @@ public class OpenDJConfig {
                 URL existingServerUrl = new URL(url);
                 openDJSetupMap.put(Constants.EXISTING_SERVER_URL, existingServerUrl.toString());
             } catch (MalformedURLException mue) {
-                System.err.println(Constants.EXISTING_SERVER_URL + " URL in amsessiondb.properties " +
-                        url + " is invalid, exiting.");
+                final LocalizableMessage message = DB_SETUP_URL.get(Constants.EXISTING_SERVER_URL, url);
+                System.err.println(message);
                 System.exit(Constants.EXIT_INVALID_URL);
             }
         }
@@ -99,8 +101,8 @@ public class OpenDJConfig {
                 openDJSetupMap.put(Constants.HOST_PORT, Integer.toString(hostUrl.getPort()));
                 openDJSetupMap.put(Constants.HOST_URI, hostUrl.getPath());
             } catch (MalformedURLException mue) {
-                System.err.println(Constants.EXISTING_SERVER_URL + " URL in amsessiondb.properties " +
-                        url + " is invalid, exiting.");
+                final LocalizableMessage message = DB_SETUP_URL.get(Constants.EXISTING_SERVER_URL, url);
+                System.err.println(message);
                 System.exit(Constants.EXIT_INVALID_URL);
             }
         }

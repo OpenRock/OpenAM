@@ -28,7 +28,6 @@ package org.forgerock.openam.amsessionstore.db.opendj.setup;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;

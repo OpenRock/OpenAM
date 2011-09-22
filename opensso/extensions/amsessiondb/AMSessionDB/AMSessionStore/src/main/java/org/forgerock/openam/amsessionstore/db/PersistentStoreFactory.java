@@ -26,9 +26,11 @@
 package org.forgerock.openam.amsessionstore.db;
 
 import java.util.logging.Level;
+import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.common.SystemProperties;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Singleton used to fetch the shared instance of the persistent store.
@@ -62,7 +64,8 @@ public class PersistentStoreFactory {
     throws Exception {
         persistentStoreImpl = SystemProperties.get(Constants.PERSISTER_KEY,
                 DEFAULT_PERSISTER_VALUE);
-        Log.logger.log(Level.FINE, "Configured Persistent Store: {0}", persistentStoreImpl);
+        final LocalizableMessage message = DB_PER_CONF.get(persistentStoreImpl);
+        Log.logger.log(Level.FINE, message.toString());
     }
     
     /**
@@ -77,9 +80,9 @@ public class PersistentStoreFactory {
             try {
                 persistentStore = (PersistentStore) Class.forName(
                 persistentStoreImpl).newInstance(); 
-                Log.logger.log(Level.FINE, "Created PersistentStoreManager instance");
+                Log.logger.log(Level.FINE, DB_PER_CREATE.get().toString());
             } catch (Exception ex) {
-                Log.logger.log(Level.SEVERE, "Unable to create PersistentStoreManager", ex);
+                Log.logger.log(Level.SEVERE, DB_PER_FAIL.get().toString(), ex);
                 throw ex;
             }
         }

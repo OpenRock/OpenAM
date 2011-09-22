@@ -32,6 +32,7 @@ import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * This class implements the shutdown REST call sent by OpenAM when it is 
@@ -45,12 +46,12 @@ public class ShutdownResourceImpl extends ServerResource implements ShutdownReso
     @Get
     @Override
     public void shutdown() {
-        Log.logger.log(Level.FINEST, "Shutdown called");
+        Log.logger.log(Level.FINEST, DB_AM_SHUT.get().toString());
         
         try {
             PersistentStoreFactory.getPersistentStore().shutdown();
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to shutdown", ex);
+            Log.logger.log(Level.WARNING, DB_AM_SHUT_FAIL.get().toString(), ex);
         }
         
         AMSessionStoreServer.stop();

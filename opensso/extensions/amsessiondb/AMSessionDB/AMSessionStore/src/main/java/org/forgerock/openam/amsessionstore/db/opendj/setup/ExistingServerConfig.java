@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj.setup;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -61,7 +63,8 @@ public class ExistingServerConfig {
         try {
             remoteConfig = replicationResource.getConfig();
         } catch (Exception ex) {
-            Log.logger.log(Level.FINE, "Unauthorized: " + existingServerUrl);
+            final LocalizableMessage message = DB_SET_UNAUTH.get(existingServerUrl);
+            Log.logger.log(Level.FINE, message.toString());
         }
 
         if (r1.getStatus().getCode() == 401) {
@@ -77,9 +80,9 @@ public class ExistingServerConfig {
             c2 = new ChallengeResponse(c1, r1.getResponse(),
                                                         username,
                                                         password.toCharArray());
-            Log.logger.log(Level.FINE, "Authentication setup");
+            Log.logger.log(Level.FINE, DB_SET_AUTH_OK.get().toString());
         } else {
-            Log.logger.log(Level.FINE, "Authentication not required");
+            Log.logger.log(Level.FINE, DB_SET_AUTH_NREQ.get().toString());
         }
 
         r1.setChallengeResponse(c2);
@@ -112,8 +115,9 @@ public class ExistingServerConfig {
         try {
             hostname = new URL(hostUrl);
         } catch (MalformedURLException mre) {
-            Log.logger.log(Level.SEVERE, "URL is malformed: " + hostUrl);
-            throw new StoreException("URL is malformed: " + hostUrl, mre);
+            final LocalizableMessage message = DB_MAL_URL.get(hostUrl);
+            Log.logger.log(Level.SEVERE, message.toString());
+            throw new StoreException(message.toString(), mre);
         }
         
         return hostname.getHost();

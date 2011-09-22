@@ -32,6 +32,7 @@ import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Calls the shutdown method on the server
@@ -45,9 +46,9 @@ public class ShutdownStoreServer {
     
     public static void main(String[] argv) {
         ShutdownStoreServer dbServer = new ShutdownStoreServer();
-        System.out.print("amsessiondb: shutdown,");
+        System.out.print(DB_START_MSG.get());
         dbServer.shutdown();
-        System.out.println(" complete.");
+        System.out.println(DB_COMPLETE.get());
     }
     
     public ShutdownStoreServer() {
@@ -87,10 +88,10 @@ public class ShutdownStoreServer {
         try {
             shutdown.shutdown();
         } catch (Exception ex) {
-            System.err.println("Unable to shutdown amsessiondb server");
+            System.err.println(DB_SHUT_FAIL.get());
 
             if (authResource.getStatus().getCode() == 401) {
-                System.err.println("Unauthorized access to amsessiondb server");
+                System.err.println(DB_SHUT_NOAUTH.get());
             }
         }
     }

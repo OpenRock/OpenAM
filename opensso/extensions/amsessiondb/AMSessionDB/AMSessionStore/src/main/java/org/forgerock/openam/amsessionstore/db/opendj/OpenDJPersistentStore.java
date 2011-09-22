@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +38,6 @@ import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Constants;
 import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.common.SystemProperties;
 import org.forgerock.openam.amsessionstore.db.DBStatistics;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.amsessionstore.db.PersistentStore;
@@ -57,6 +57,7 @@ import org.opends.server.types.RawModification;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *
@@ -109,56 +110,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         storeThread = new Thread(this);        
         storeThread.setName(ID);
         storeThread.start();
-        initializeOpenDJ();
-        
-        // Syncup embedded opends replication with current 
-        // server instances.
-        //if (syncServerInfoWithReplication() == false) {
-        //    Log.logger.log(Level.FINE, "embedded replication sync failed.");
-        //}
-        
+        initializeOpenDJ();        
         icConn = InternalClientConnection.getRootConnection();
-        Log.logger.log(Level.FINE, "OpenDJPersistentStore created successfully.");
-    }
-    
-    private boolean syncServerInfoWithReplication() {
-        try {
-            if (!replicationEnabled()) {
-                return false;
-            }
-            
-            // Get list of amsessiondb servers
-            Set<AMSessionDBOpenDJServer> serverSet = EmbeddedOpenDJ.getServers();
-            if (serverSet == null) { 
-                return true;
-            }
-
-            String openDJAdminPort = SystemProperties.get(Constants.OPENDJ_ADMIN_PORT);
-            String openDJPasswd = SystemProperties.get(Constants.OPENDJ_DS_MGR_PASSWD);
-
-            Set<String> currServerSet = new HashSet<String>();
-            Set<String> currServerDSSet = new HashSet<String>();
-            Set<String> currServerDSAdminPortsSet = new HashSet<String>();
-
-            for (AMSessionDBOpenDJServer server : serverSet) {
-                String hostName = server.getHostName();
-                String replPort = server.getReplPort();
-                currServerSet.add(hostName + ":" + replPort);
-
-                currServerDSAdminPortsSet.add(hostName + ":" + server.getAdminPort());
-            }
- 
-            boolean stats = EmbeddedOpenDJ.syncReplicatedServers(
-                  currServerSet, openDJAdminPort, openDJPasswd);
-            boolean statd = EmbeddedOpenDJ.syncReplicatedDomains(
-                  currServerSet, openDJAdminPort, openDJPasswd);
-            boolean statl = EmbeddedOpenDJ.syncReplicatedServerList(
-                  currServerDSAdminPortsSet, openDJPasswd, openDJPasswd);
-            return stats || statd || statl;
-        } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, "Could not sync servers with embedded replication:", ex);
-            return false;
-        }
+        Log.logger.log(Level.FINE, DB_DJ_STR_OK.get().toString());
     }
     
     private boolean replicationEnabled() {
@@ -167,7 +121,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         try {
             multipleServers = EmbeddedOpenDJ.getServers().size() > 1;
         } catch (StoreException se) {
-            Log.logger.log(Level.SEVERE, "Unable to determine server count", se);
+            Log.logger.log(Level.SEVERE, DB_DJ_SVR_CNT.get().toString(), se);
         }
         
         return multipleServers;
@@ -178,8 +132,8 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         try {
             EmbeddedOpenDJ.startServer(OpenDJConfig.getOdjRoot());
         } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, "Unable to start embedded OpenDJ server.", ex);
-            throw new StoreException("Unable to start embedded OpenDJ server.", ex);
+            Log.logger.log(Level.SEVERE, DB_DJ_NO_START.get().toString(), ex);
+            throw new StoreException(DB_DJ_NO_START.get().toString(), ex);
         }
     }
     
@@ -192,9 +146,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                 long curTime = System.currentTimeMillis() / 1000;
                 deleteExpired(curTime);
             } catch (InterruptedException ie) {
-                Log.logger.log(Level.WARNING, "Thread interupted", ie);
+                Log.logger.log(Level.WARNING, DB_THD_INT.get().toString(), ie);
             } catch (StoreException se) {
-                Log.logger.log(Level.WARNING, "Store Exception", se);
+                Log.logger.log(Level.WARNING, DB_STR_EX.get().toString(), se);
             }   
         }
     }
@@ -215,20 +169,21 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {
-                Object[] params = { baseDN };
-                Log.logger.log(Level.FINE,"Entry present: {0}", params);
+                final LocalizableMessage message = DB_ENT_P.get(baseDN);
+                Log.logger.log(Level.FINE, message.toString());
                 found = true;
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] params = { baseDN };
-                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(baseDN);
+                Log.logger.log(Level.FINE, message.toString());
             } else {
-                Object[] params = { baseDN, resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
-                throw new StoreException("Unable to access entry DN" + baseDN);
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(baseDN, resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + baseDN, dex);
-            throw new StoreException("Unable to read record from store", dex);
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(baseDN);
+            Log.logger.log(Level.WARNING, message.toString(), dex);
+            throw new StoreException(message.toString(), dex);
         }
         
         if (found) {
@@ -251,16 +206,15 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         ResultCode resultCode = ao.getResultCode();
         
         if (resultCode == ResultCode.SUCCESS) {
-            Object[] params = { dn };
-            Log.logger.log(Level.FINE, "Successfully created entry: {0}", params);
+            final LocalizableMessage message = DB_SVR_CREATE.get(dn);
+            Log.logger.log(Level.FINE, message.toString());
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
-            Object[] params = { dn };
-            Log.logger.log(Level.WARNING, " unable to create: Entry " +
-                        "Already Exists Error for DN {0}", params);
+            final LocalizableMessage message = DB_SVR_CRE_FAIL.get(dn);
+            Log.logger.log(Level.WARNING, message.toString());
         } else {
-            Object[] params = { dn, resultCode };
-            Log.logger.log(Level.WARNING, "Error creating entry: {0}, error code = {1}", params);
-            throw new StoreException("Unable to create entry: " + dn);
+            final LocalizableMessage message = DB_SVR_CRE_FAIL2.get(dn, resultCode.toString());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new StoreException(message.toString());
         }
     }
     
@@ -276,11 +230,12 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         ResultCode resultCode = mo.getResultCode();
         
         if (resultCode == ResultCode.SUCCESS) {
-            Log.logger.log(Level.FINE, "Successfully modified entry: {0}" + dn);
+            final LocalizableMessage message = DB_SVR_MOD.get(dn);
+            Log.logger.log(Level.FINE, message.toString());
         } else {
-            Object[] params = { dn, resultCode };
-            Log.logger.log(Level.WARNING, "Error modifying entry {0}, error code = {1}", params);
-            throw new StoreException("Unable to modify entry: " + dn);
+            final LocalizableMessage message = DB_SVR_MOD_FAIL.get(dn, resultCode.toString());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new StoreException(message.toString());
         }
     }
     
@@ -328,18 +283,20 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] params = { baseDN };
-                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(baseDN);
+                Log.logger.log(Level.FINE, message.toString());
                 
                 return null;
             } else {
                 Object[] params = { baseDN, resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
-                throw new StoreException("Unable to access entry DN" + baseDN);
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(baseDN, resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + baseDN, dex);
-            throw new StoreException("Unable to read record from store", dex);
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(baseDN);
+            Log.logger.log(Level.WARNING, message.toString(), dex);
+            throw new StoreException(message.toString(), dex);
         }
     }
     
@@ -381,18 +338,19 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
-                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(OpenDJConfig.getSessionDBSuffix());
+                Log.logger.log(Level.FINE, message.toString());
                 
                 return null;
             } else {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
-                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(OpenDJConfig.getSessionDBSuffix(), resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
-            throw new StoreException("Unable to read record from store", dex);
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(OpenDJConfig.getSessionDBSuffix());
+            Log.logger.log(Level.WARNING, message.toString(), dex);
+            throw new StoreException(message.toString(), dex);
         }
     }
     
@@ -407,8 +365,8 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         ResultCode resultCode = dop.getResultCode();
         
         if (resultCode != ResultCode.SUCCESS) {
-            Object[] params = { dn };
-            Log.logger.log(Level.WARNING, "Unable to delete entry: {0}", params);
+            final LocalizableMessage message = DB_ENT_DEL_FAIL.get(dn);
+            Log.logger.log(Level.WARNING, message.toString());
         }
     }
     
@@ -442,29 +400,30 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                                 try {
                                     delete(v);
                                 } catch (NotFoundException nfe) {
-                                    Object[] params = { v };
-                                    Log.logger.log(Level.WARNING, "Unable to delete {0} not found", params);
+                                    final LocalizableMessage message = DB_ENT_NOT_FOUND.get(v);
+                                    Log.logger.log(Level.WARNING, message.toString());
                                 }
                             }
                         }
                     }
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
-                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(OpenDJConfig.getSessionDBSuffix());
+                Log.logger.log(Level.FINE, message.toString());
             } else { 
-                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
-                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(OpenDJConfig.getSessionDBSuffix(), resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
-            throw new StoreException("Unable to read record from store", dex);
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(OpenDJConfig.getSessionDBSuffix());
+            Log.logger.log(Level.WARNING, message.toString(), dex);
+            throw new StoreException(message.toString(), dex);
         } catch (Exception ex) {
             if (!shutdown) {
-                Log.logger.log(Level.WARNING, "Error in deleting expired records", ex);
+                Log.logger.log(Level.WARNING, DB_ENT_EXP_FAIL.get().toString(), ex);
             } else {
-                Log.logger.log(Level.FINEST, "Error in deleting expired records", ex);
+                Log.logger.log(Level.FINEST, DB_ENT_EXP_FAIL.get().toString(), ex);
             }          
         }        
     }
@@ -520,25 +479,26 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                     return null;
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix() };
-                Log.logger.log(Level.FINE,"Entry not present: {0}", params);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(OpenDJConfig.getSessionDBSuffix());
+                Log.logger.log(Level.FINE, message.toString());
                 
                 return null;
             } else {
-                Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
-                throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(OpenDJConfig.getSessionDBSuffix(), resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
-            Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
-            throw new StoreException("Unable to read record from store", dex);
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(OpenDJConfig.getSessionDBSuffix());
+            Log.logger.log(Level.WARNING, message.toString(), dex);
+            throw new StoreException(message.toString(), dex);
         }
     }
     
     @Override
     public void shutdown() {
         internalShutdown();
-        Log.logger.log(Level.FINE, "shutdown called");
+        Log.logger.log(Level.FINE, DB_AM_SHUT.get().toString());
     }
     
     @Override
@@ -548,12 +508,12 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     
     protected void internalShutdown() {
         shutdown = true;    
-        Log.logger.log(Level.FINE, "Internal Shutdown called");
+        Log.logger.log(Level.FINE, DB_AM_INT_SHUT.get().toString());
         
         try {
             EmbeddedOpenDJ.shutdownServer(); 
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "OpenDJ shutdown failure", ex);
+            Log.logger.log(Level.WARNING, DB_AM_SHUT_FAIL.get().toString(), ex);
         }
     }
 }

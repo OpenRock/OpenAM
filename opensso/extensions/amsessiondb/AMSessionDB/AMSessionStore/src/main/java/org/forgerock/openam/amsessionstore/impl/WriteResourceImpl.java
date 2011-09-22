@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.impl;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.common.Log;
@@ -35,6 +36,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the write resource functionality
@@ -55,8 +57,9 @@ public class WriteResourceImpl extends ServerResource implements WriteResource {
         try {
             PersistentStoreFactory.getPersistentStore().write(record);
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to process write", ex);
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, ex.getMessage());
+            final LocalizableMessage message = DB_R_WRITE.get(ex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
         }
         
         if (Statistics.isEnabled()) {

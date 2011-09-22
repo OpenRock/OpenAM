@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.impl;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
 import org.forgerock.openam.amsessionstore.common.Log;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
@@ -36,6 +37,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the delete resource functionality
@@ -55,14 +57,17 @@ public class DeleteResourceImpl extends ServerResource implements DeleteResource
         try {
             PersistentStoreFactory.getPersistentStore().delete(id);
         } catch (StoreException sex) {
-            Log.logger.log(Level.WARNING, "Unable to delete", sex.getMessage());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(sex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         } catch (NotFoundException nfe) {
-            Log.logger.log(Level.WARNING, "Unable to delete", nfe.getMessage());
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, nfe.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(nfe.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
         } catch (Exception ex) {
-            Log.logger.log(Level.WARNING, "Unable to delete", ex.getMessage());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(ex.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
         
         if (Statistics.isEnabled()) {

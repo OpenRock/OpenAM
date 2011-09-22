@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.amsessionstore.db.memory;
 
+import org.forgerock.i18n.LocalizableMessage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.forgerock.openam.amsessionstore.db.DBStatistics;
 import org.forgerock.openam.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.amsessionstore.db.StoreException;
+import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Demonstration implementation of the PersistentStore interface
@@ -49,6 +51,7 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
     private int sleepInterval = 60 * 1000;
     private final static String ID = "MemoryPersistentStore";
     
+    @SuppressWarnings("CallToThreadStartDuringObjectConstruction")
     public MemoryPersistentStore() {
         store = new HashMap<String, AMRecord>();
 
@@ -65,6 +68,7 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
     }
     
     @SuppressWarnings("SleepWhileInLoop")
+    @Override
     public void run() {
         while (!shutdown) {
             try {
@@ -72,24 +76,26 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
                 long curTime = System.currentTimeMillis() / 1000;
                 deleteExpired(curTime);
             } catch (InterruptedException ie) {
-                Log.logger.log(Level.WARNING, "Thread interrupted", ie);
+                Log.logger.log(Level.WARNING, DB_THD_INT.get().toString(), ie);
             } catch (StoreException se) {
-                Log.logger.log(Level.WARNING, "Store Exception", se);
-            } 
-            
+                Log.logger.log(Level.WARNING, DB_STR_EX.get().toString(), se);
+            }           
         }
     }
     
+    @Override
     public void write(AMRecord record) 
     throws StoreException {
         store.put(record.getPrimaryKey(), record);
     }
 
+    @Override
     public AMRecord read(String id) 
     throws StoreException, NotFoundException {
         return store.get(id);
     }
 
+    @Override
     public Set<String> readWithSecKey(String id) 
     throws StoreException, NotFoundException {
         Set<String> records = new HashSet<String>();
@@ -107,27 +113,18 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
         return records;
     }
     
-    /*public Set<AMRecord> readWithSecKey(String id) {
-        Set<AMRecord> records = new HashSet<AMRecord>();
-        
-        for (Map.Entry<String, AMRecord> entry : store.entrySet()) {
-            if (entry.getValue().getSecondaryKey().equals(id)) {
-                records.add(entry.getValue());
-            }
-        }
-        
-        return records;
-    }*/
-
+    @Override
     public void delete(String id)
     throws StoreException, NotFoundException {
         Object removed = store.remove(id);
         
         if (removed == null) {
-            throw new NotFoundException("Session was not found: " + id);
+            final LocalizableMessage message = DB_MEM_SES_EX.get(id);
+            throw new NotFoundException(message.toString());
         }
     }
 
+    @Override
     public void deleteExpired(long expDate) 
     throws StoreException {
         for (Map.Entry<String, AMRecord> entry : store.entrySet()) {
@@ -137,10 +134,12 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
         }
     }
 
+    @Override
     public void shutdown() {
         internalShutdown();
     }
 
+    @Override
     public Map<String, Long> getRecordCount(String id) 
     throws StoreException {
         Map<String, Long> sessions = new HashMap<String, Long>();
@@ -155,6 +154,7 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
         return sessions;
     }
     
+    @Override
     public DBStatistics getDBStatistics() {
         DBStatistics stats = DBStatistics.getInstance();
         stats.setNumRecords(store.size());
