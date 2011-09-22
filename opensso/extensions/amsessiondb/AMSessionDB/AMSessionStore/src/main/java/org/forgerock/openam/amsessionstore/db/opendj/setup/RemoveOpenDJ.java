@@ -39,13 +39,22 @@ public class RemoveOpenDJ {
             System.out.println("amsessiondb is configured on this node\n");
             System.out.println("removing this node from the amsessiondb\n");
             
+            if (!EmbeddedOpenDJ.isStarted()) {
+                try {
+                    EmbeddedOpenDJ.startServer(OpenDJConfig.getOdjRoot());
+                } catch (Exception ex) {
+                    System.err.println("Unable to start embedded OpenDJ server: " + ex.getMessage());
+                    System.exit(Constants.EXIT_REMOVE_FAILED);
+                }
+            }
+            
             try {
                 EmbeddedOpenDJ.unregisterServer(OpenDJConfig.getHostUrl());
-                //EmbeddedOpenDJ.syncReplicationServers();
+                EmbeddedOpenDJ.replicationDisable(OpenDJConfig.getOpenDJSetupMap());
                 EmbeddedOpenDJ.shutdownServer();
             } catch (Exception ex) {
                 System.err.println("Unable to setup amsessiondb: " + ex.getMessage());
-                System.exit(Constants.EXIT_INSTALL_FAILED);
+                System.exit(Constants.EXIT_REMOVE_FAILED);
             }
         } else {
             System.out.println("amsessiondb is not configured on this host \n");

@@ -41,6 +41,10 @@ public final class Constants {
     
     public static final String PORT = "amsessiondb.port";
     
+    public static final String SHUTDOWN_PORT = "amsessiondb.shutdown.port";
+    
+    public static final String SHUTDOWN_ADDR = "amsessiondb.shutdown.addr";
+    
     public static final String URI = "amsessiondb.uri";
     
     public static final String MIN_THREADS = "amsessiondb.min.threads";
@@ -113,4 +117,6 @@ public final class Constants {
     public static final int EXIT_INVALID_URL = 1;
     
     public static final int EXIT_INSTALL_FAILED = 2;
+    
+    public static final int EXIT_REMOVE_FAILED = 3;
 }

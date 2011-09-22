@@ -309,7 +309,6 @@ public class EmbeddedOpenDJ {
         EmbeddedOpenDJ.startServer(odjRoot);
 
         // Check: If adding a new server to a existing cluster
-
         if (OpenDJConfig.getExistingServerUrl() == null) {
             // Default: single / first server.
             Log.logger.log(Level.FINE, "Configuring First Server");
@@ -747,6 +746,61 @@ public class EmbeddedOpenDJ {
     }
     
     /**
+     * Disable replication between the local OpenDJ amsessiondb store.
+     * $ dsreplication disable
+     *    --no-prompt
+     *    --hostname host1 --port 4444 
+     *    --adminUID admin --adminPassword password 
+     *    --baseDN "dc=amsessiondb,dc=com" -X -n
+     *
+     *
+     *  @param map Map of configuration properties 
+     *  @return status : 0 == success, !0 == failure
+     */
+    public static int replicationDisable(Map<String, String> localMap) {
+        String[] enableCmd= {
+            "disable",                // 0
+            "--no-prompt",            // 1
+            "--hostname",             // 2
+            "hostval",                // 3
+            "--port",                 // 4
+            "portval",                // 5
+            "--adminUID",             // 6
+            "admin",                  // 7
+            "--adminPassword",        // 8
+            "xxxxxxxx",               // 9 
+            "--baseDN",               // 10
+            "dc=example,dc=com",      // 11
+            "-X",                     // 12
+            "-n",                     // 13
+            "--configFile",           // 14
+            "path/to/config.ldif"     // 15
+        };
+        enableCmd[3] = localMap.get(Constants.HOST_FQDN);
+        enableCmd[5] = localMap.get(Constants.OPENDJ_ADMIN_PORT);
+        enableCmd[9] = localMap.get(Constants.OPENDJ_DS_MGR_PASSWD);
+        enableCmd[11] = localMap.get(Constants.OPENDJ_SUFFIX);
+        enableCmd[15] = localMap.get(Constants.OPENDJ_ROOT) + "/config/config.ldif";
+
+        Object[] params = { enableCmd[3], enableCmd[5], enableCmd[11] };
+        Log.logger.log(Level.FINE, "Removing replication server host: {0} admin port: {1} suffix: {2} ", params);
+        
+        int ret = ReplicationCliMain.mainCLI(
+            enableCmd, false, 
+            SetupProgress.getOutputStream(), 
+            SetupProgress.getOutputStream(), 
+            null);         
+
+        if (ret == 0) {
+            SetupProgress.reportEnd("OpenDJ replication disabled successfully.", null);
+        } else {
+            SetupProgress.reportEnd("OpenDJ replication failed to be disabled.", null);
+        }
+        
+        return ret;
+    }
+    
+    /**
       * Syncs replication data between two OpenDJ amsessiondb stores.
       * $ dsreplication initialize 
       *     --baseDN "dc=amsessiondb,dc=com" --adminUID admin --adminPassword pass
@@ -1106,7 +1160,7 @@ public class EmbeddedOpenDJ {
             }
         }
         
-        return Collections.EMPTY_SET;
+        return returnAttrs;
     }
     
       

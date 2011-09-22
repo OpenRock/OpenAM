@@ -113,9 +113,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         
         // Syncup embedded opends replication with current 
         // server instances.
-        if (syncServerInfoWithReplication() == false) {
-            Log.logger.log(Level.FINE, "embedded replication sync failed.");
-        }
+        //if (syncServerInfoWithReplication() == false) {
+        //    Log.logger.log(Level.FINE, "embedded replication sync failed.");
+        //}
         
         icConn = InternalClientConnection.getRootConnection();
         Log.logger.log(Level.FINE, "OpenDJPersistentStore created successfully.");
@@ -454,12 +454,18 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                 Log.logger.log(Level.FINE,"Entry not present: {0}", params);
             } else { 
                 Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}" + params);
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
                 throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {
             Log.logger.log(Level.WARNING, "Error in accessing entry DN: " + OpenDJConfig.getSessionDBSuffix(), dex);
             throw new StoreException("Unable to read record from store", dex);
+        } catch (Exception ex) {
+            if (!shutdown) {
+                Log.logger.log(Level.WARNING, "Error in deleting expired records", ex);
+            } else {
+                Log.logger.log(Level.FINEST, "Error in deleting expired records", ex);
+            }          
         }        
     }
     
@@ -520,7 +526,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                 return null;
             } else {
                 Object[] params = { OpenDJConfig.getSessionDBSuffix(), resultCode };
-                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}" + params);
+                Log.logger.log(Level.WARNING, "Error in accessing entry DN: {0}, error code = {1}", params);
                 throw new StoreException("Unable to access entry DN" + OpenDJConfig.getSessionDBSuffix());
             }
         } catch (DirectoryException dex) {

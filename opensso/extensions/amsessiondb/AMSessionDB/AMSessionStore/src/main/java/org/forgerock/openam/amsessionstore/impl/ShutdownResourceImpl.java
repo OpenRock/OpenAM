@@ -26,7 +26,9 @@
 package org.forgerock.openam.amsessionstore.impl;
 
 import java.util.logging.Level;
+import org.forgerock.openam.amsessionstore.AMSessionStoreServer;
 import org.forgerock.openam.amsessionstore.common.Log;
+import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -41,8 +43,16 @@ import org.restlet.resource.ServerResource;
  */
 public class ShutdownResourceImpl extends ServerResource implements ShutdownResource {
     @Get
+    @Override
     public void shutdown() {
         Log.logger.log(Level.FINEST, "Shutdown called");
-
+        
+        try {
+            PersistentStoreFactory.getPersistentStore().shutdown();
+        } catch (Exception ex) {
+            Log.logger.log(Level.WARNING, "Unable to shutdown", ex);
+        }
+        
+        AMSessionStoreServer.stop();
     }
 }

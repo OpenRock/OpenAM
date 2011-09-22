@@ -134,8 +134,8 @@
                 <include>config/servicetag/</include>
                 <include>config/servicetag/opends.uuids.properties</include>
                 <include>config/upgrade/</include>
-                <include>config/upgrade/config.ldif.6500</include>
-                <include>config/upgrade/schema.ldif.6500</include>
+                <include>config/upgrade/config.ldif.*</include>
+                <include>config/upgrade/schema.ldif.*</include>
                 <include>db/</include>
                 <include>import-tmp/</include>
                 <include>ldif/</include>
