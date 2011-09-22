@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.RequestManager;
@@ -121,7 +125,11 @@ public abstract class ConditionOpViewBeanBase
             if ((curRealm == null) || (curRealm.trim().length() == 0)) {
                 setPageSessionAttribute(
                     AMAdminConstants.CURRENT_REALM, curRealm);
+            } else {
+                realmName = curRealm;
             }
+        } else {
+            realmName = curRealm;
         }
 
         init = (curRealm != null) && (curRealm.trim().length() > 0) &&
