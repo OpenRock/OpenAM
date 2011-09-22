@@ -38,8 +38,9 @@
  <section xml:id="before-iis7-agent-install">
   <title>Before You Install</title>
   
-  <para>You must install Microsoft IIS 7 before you install the policy agent.
-  You must restart IIS 7 after installing the policy agent.</para>
+  <para>You must install Microsoft IIS 7 before you install the policy agent,
+  and make sure that IIS 7 allows anonymous authentication. Furthermore, you
+  must reset IIS 7 after installing the policy agent.</para>
   
   <para>Download the IIS 7 policy agent for 32 or 64-bit Windows from the
   <link xlink:href="http://forgerock.org/openam.html">download page</link>.
@@ -291,6 +292,7 @@ Internet services successfully restarted</screen>
   <title>Remove IIS 7 Web Policy Agent Software</title>
   
   <para>To remove the web policy agent, log on as a user with Administrator
-  privileges, and run <command>cscript IIS7Admin.vbs -unconfig</command>.</para>
+  privileges, run <command>cscript IIS7Admin.vbs -unconfig config.txt</command>,
+  and then run <command>iisreset</command>.</para>
  </section>
 </chapter>
