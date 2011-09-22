@@ -69,6 +69,8 @@ import com.sun.identity.shared.ldap.LDAPSearchConstraints;
 import com.sun.identity.shared.ldap.controls.LDAPPasswordExpiringControl;
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 import com.sun.identity.shared.ldap.util.LDAPUtilException;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import java.util.Locale;
 
 public class LDAPAuthUtils {
     private boolean returnUserDN;
@@ -198,20 +200,14 @@ public class LDAPAuthUtils {
         dUserToken = null;
     }
    
-    /**
-     * TODO-JAVADOC
-     */
-    public LDAPAuthUtils() throws LDAPUtilException {
-    }
-    
     public LDAPAuthUtils(
         String host,
         int port,
         boolean ssl,
-        ResourceBundle bundle,
+        Locale locale,
         Debug debug
     ) throws LDAPUtilException {
-        this.bundle = bundle;
+        this.bundle = AMResourceBundleCache.getInstance().getResBundle("amAuthLDAP", locale);
         serverHost = host;
         serverPort = port;
         ldapSSL = ssl;
@@ -379,11 +375,11 @@ public class LDAPAuthUtils {
         String host,
         int port,
         boolean ssl,
-        ResourceBundle bundle,
+        Locale locale,
         String searchBaseDN,
         Debug debug
     ) throws LDAPUtilException {
-        this(host, port, ssl, bundle, debug);
+        this(host, port, ssl, locale, debug);
         baseDN = searchBaseDN;
         if (baseDN.length() < 1) {
             debug.message("Invalid  search Base");

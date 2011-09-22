@@ -196,11 +196,9 @@ public class MSISDNValidation {
     protected String getUserId(String msisdnNumber) throws AuthLoginException {
         String validatedUserID = null;
         try {
-            ResourceBundle ldapBundle = 
-                    amCache.getResBundle("amAuthLDAP",locale);
             LDAPAuthUtils ldapUtil = 
                 new LDAPAuthUtils(serverHost,serverPort,useSSL,
-                          ldapBundle,startSearchLoc,debug) ;
+                          locale,startSearchLoc,debug) ;
             String searchFilter = new StringBuffer(250).append("(")
                 .append(userSearchAttr).append("=")
                 .append(msisdnNumber).append(")").toString();

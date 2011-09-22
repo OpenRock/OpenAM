@@ -315,7 +315,7 @@ public class Application extends AMLoginModule {
         try {
             if (isSuperAdmin(userName)) {
                 ldapUtil = new LDAPAuthUtils(AuthD.directoryHostName,
-                AuthD.directoryPort, ldapSSL, bundle, debug);
+                AuthD.directoryPort, ldapSSL, getLoginLocale(), debug);
                 ldapUtil.authenticateSuperAdmin(userName, userPassword);
                 if (ldapUtil.getState() == LDAPAuthUtils.SUCCESS) {
                     userTokenId = userName;
@@ -453,7 +453,7 @@ public class Application extends AMLoginModule {
             }
             
             // set the optional attributes here
-            ldapUtil = new LDAPAuthUtils(serverHost,serverPort,ssl,bundle,
+            ldapUtil = new LDAPAuthUtils(serverHost,serverPort,ssl,getLoginLocale(),
                 baseDN, debug);
             ldapUtil.setScope(searchScope) ;
             ldapUtil.setFilter(searchFilter);

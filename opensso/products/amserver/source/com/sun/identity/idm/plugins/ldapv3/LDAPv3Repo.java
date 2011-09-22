@@ -4892,9 +4892,6 @@ public class LDAPv3Repo extends IdRepo {
             debug.message("LDAPv3Repo:authenticate: username="
                      + username);
         }
-        ResourceBundle bundle =
-                AMResourceBundleCache.getInstance().getResBundle("amAuth",
-                        Locale.getDefaultLocale());
         String sslStr = getPropertyStringValue(myConfigMap,
                 LDAPv3Config_LDAP_SSL_ENABLED);
         boolean ssl = ((sslStr != null) && sslStr.equalsIgnoreCase("true"));
@@ -4911,7 +4908,7 @@ public class LDAPv3Repo extends IdRepo {
         LDAPAuthUtils ldapAuthUtil = null;
         try {
             ldapAuthUtil = new LDAPAuthUtils(ldapServerName, ldapPort,
-                    ssl, bundle, debug);
+                    ssl, Locale.getDefaultLocale(), debug);
         } catch (LDAPUtilException ldapUtilEx) {
             if (debug.messageEnabled()) {
                 debug.message("LDAPv3Repo:authenticate" +

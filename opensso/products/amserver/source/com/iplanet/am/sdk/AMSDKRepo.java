@@ -2164,14 +2164,12 @@ public class AMSDKRepo extends IdRepo {
         }
 
         ServerInstance svrCfg = getDsSvrCfg(LDAPUser.Type.AUTH_ADMIN);
-        ResourceBundle bundle = AMResourceBundleCache.getInstance()
-                .getResBundle("amAuth", Locale.getDefaultLocale());
         boolean ssl = (svrCfg.getConnectionType() == Server.Type.CONN_SSL);
 
         LDAPAuthUtils ldapAuthUtil = null;
         try {
             ldapAuthUtil = new LDAPAuthUtils(svrCfg.getServerName(), svrCfg
-                    .getPort(), ssl, bundle, debug);
+                    .getPort(), ssl, Locale.getDefaultLocale(), debug);
         } catch (LDAPUtilException ldapUtilEx) {
             if (debug.messageEnabled()) {
                 debug.message("AMSDKRepo: authenticate"
