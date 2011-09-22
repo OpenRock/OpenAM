@@ -863,9 +863,13 @@ public class Session extends GeneralTaskRunnable {
      * @param value The property value.
      * @exception SessionException if the session reached its maximum session
      *            time, or the session was destroyed, or there was an error
-     *            during communication with session service.
+     *            during communication with session service, or if the property
+     *            name or value was null.
      */
     public void setProperty(String name, String value) throws SessionException {
+        if (name == null || value == null) {
+            throw new SessionException("Session property name/value cannot be null");
+        }
         try {
             if (isLocal()) {
                 sessionService.setProperty(sessionID, name, value);
