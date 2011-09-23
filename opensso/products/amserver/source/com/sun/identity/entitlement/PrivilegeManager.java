@@ -24,11 +24,13 @@
  *
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
  */
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.util.DebugFactory;
 import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.IDebug;
+import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
@@ -43,7 +45,7 @@ public abstract class PrivilegeManager {
     /**
      * Debug for Policy Administration Point classes
      */
-    public static final IDebug debug = DebugFactory.getDebug("Entitlement");
+    public static final Debug debug = Debug.getInstance("Entitlement");
 
     //REF: make configurable
     private static final Pattern PRIVILEGE_NAME_PATTERN = Pattern.compile(

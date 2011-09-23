@@ -26,14 +26,14 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.NetworkMonitor;
 
-import com.sun.identity.shared.debug.IDebug;
+import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -165,7 +165,7 @@ class PrivilegeEvaluator {
         this.recursive = recursive;
 
         if (PrivilegeManager.debug.messageEnabled()) {
-            IDebug debug = PrivilegeManager.debug;
+            Debug debug = PrivilegeManager.debug;
             debug.message("[PolicyEval] PrivilegeEvaluator:init()", null);
             debug.message("[PolicyEval] subject: " + getPrincipalId(subject), null);
             debug.message("[PolicyEval] realm: " + realm, null);
@@ -284,7 +284,7 @@ class PrivilegeEvaluator {
         // First collect tasks to be evaluated locally
         Set<IPrivilege> localPrivileges = new HashSet<IPrivilege>(
             2*tasksPerThread);
-        IDebug debug = PrivilegeManager.debug;
+        Debug debug = PrivilegeManager.debug;
 
         int totalCount = 0;
         while (totalCount != tasksPerThread) {
