@@ -2066,13 +2066,15 @@ public class AuthClientUtils {
             strlocale = locale.toString();
         }
         String filePath = getFilePath(getClientType(request));
-        String fileRoot = ISAuthConstants.DEFAULT_DIR;
+        String fileRoot = getFileRoot();
+        String orgDN = getDomainNameByRequest(request, parseRequestParameters(request));
+        String orgFilePath = getOrgFilePath(orgDN);
 
         String templateFile = null;
         try {
             templateFile = ResourceLookup.getFirstExisting(
                 servletContext,
-                fileRoot,strlocale,null,filePath,fileName,
+                fileRoot,strlocale,orgFilePath,filePath,fileName,
                 templatePath,true);
         } catch (Exception e) {
             templateFile = new StringBuffer().append(templatePath)
@@ -2095,7 +2097,7 @@ public class AuthClientUtils {
     /* get the root dir to start lookup from./<default org>
      * default is /default
      */
-    private static String getFileRoot() {
+    protected static String getFileRoot() {
         String fileRoot = ISAuthConstants.DEFAULT_DIR;
         String rootOrgName = DNUtils.DNtoName(rootSuffix);
         if (utilDebug.messageEnabled()) {
@@ -2202,7 +2204,7 @@ public class AuthClientUtils {
      * eg. if orgDN = o=org1,o=org11,o=org12,dc=iplanet,dc=com
      * then orgFilePath will be org12/org11/org1
      */
-    static String getOrgFilePath(String orgDN) {
+    public static String getOrgFilePath(String orgDN) {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("getOrgFilePath : orgDN is: " + orgDN);
         }

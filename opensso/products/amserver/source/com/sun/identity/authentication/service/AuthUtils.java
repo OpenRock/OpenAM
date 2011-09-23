@@ -903,13 +903,14 @@ public class AuthUtils extends AuthClientUtils {
         
         String locale = ad.getPlatformLocale();
         String filePath = getFilePath(getClientType(request));
-        String fileRoot = ISAuthConstants.DEFAULT_DIR;
-        
+        String fileRoot = getFileRoot();
+        String orgDN = getDomainNameByRequest(request, parseRequestParameters(request));
+        String orgFilePath = getOrgFilePath(orgDN);
         String templateFile = null;
         try {
             templateFile = ResourceLookup.getFirstExisting(
             ad.getServletContext(),
-            fileRoot,locale,null,filePath,fileName,
+            fileRoot,locale,orgFilePath,filePath,fileName,
             templatePath,true);
         } catch (Exception e) {
             templateFile = new StringBuffer().append(templatePath)
