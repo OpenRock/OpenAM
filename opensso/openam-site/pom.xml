@@ -52,7 +52,7 @@
  </repositories>
  <groupId>org.forgerock.openam</groupId>
  <artifactId>openam-site</artifactId>
- <version>10.0.0-SNAPSHOT</version>
+ <version>10</version>
  <name>OpenAM Project</name>
  <inceptionYear>2011</inceptionYear>
  <packaging>pom</packaging>
