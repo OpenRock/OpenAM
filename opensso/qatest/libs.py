@@ -56,6 +56,7 @@ def unzip_libs(file_loc, **kwargs):
                     if verbose:
                         print "Making folder : " + file
                     os.mkdir(folder + "/" + file)
+            # Security measure... do not extract upwards
             elif ".." not in file:
                 if verbose:
                     print "Extracting file : " + file
