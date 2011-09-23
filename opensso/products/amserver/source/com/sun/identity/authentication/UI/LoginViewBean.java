@@ -325,7 +325,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                 } else {
                     loginDebug.message("Old Session is Active.");
                     newOrgExist = checkNewOrg(ssoToken);
-                    if (!newOrgExist) {
+                    if (!newOrgExist && !dontLogIntoDiffOrg) {
                         if (isPost) {
                             isBackPost = canGetOrigCredentials(ssoToken);
                         }
@@ -343,7 +343,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }
             }
             
-            if ((ssoToken != null) && (!sessionUpgrade)) {
+            if ((ssoToken != null) && !sessionUpgrade && !newOrgExist) {
                 try {
                     loginDebug.message("Session is Valid / already "
                     + "authenticated");
@@ -482,7 +482,9 @@ public class LoginViewBean extends AuthViewBeanBase {
 		    if (AuthUtils.persistAMCookie(reqDataHash)) {
 			enableCookieTimeToLive();
 		    }
-                    setCookie();
+                    if (!newOrgExist) {
+                        setCookie();
+                    }
                     setlbCookie();
                 }
             } else {
@@ -1646,7 +1648,8 @@ public class LoginViewBean extends AuthViewBeanBase {
     private boolean checkNewOrg(SSOToken ssot) {
         loginDebug.message("Check New Organization!");
         boolean checkNewOrg = false;
-        
+        dontLogIntoDiffOrg = false;
+
         try {
             // always make sure the orgName is the same
             String orgName = ssot.getProperty("Organization");
@@ -1688,11 +1691,9 @@ public class LoginViewBean extends AuthViewBeanBase {
                         AuthUtils.clearHostUrlCookie(response);
                         AuthUtils.clearlbCookie(request, response);
                         SSOTokenManager.getInstance().destroyToken(ssot);
-                    } else if (!(strButton.trim().equals(rb.getString("No")
-                        .trim()))
-                    ) {
-                        loginDebug.message(
-                            "Submit with Invalid button for newOrg case");
+                    } else if (strButton.trim().equals(rb.getString("No").trim())) {
+                        loginDebug.message("Aborting different realm auth");
+                        dontLogIntoDiffOrg = true;
                         return checkNewOrg;
                     }
                 } else {
@@ -2357,6 +2358,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     private boolean newOrg = false;
     private boolean bHttpBasic = false;
     private boolean newOrgExist = false;
+    private boolean dontLogIntoDiffOrg = false;
     HttpServletRequest request;
     HttpServletResponse response;
     Cookie cookie;
