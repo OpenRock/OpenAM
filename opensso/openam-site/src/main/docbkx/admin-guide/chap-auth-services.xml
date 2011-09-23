@@ -150,7 +150,7 @@
  
  <section xml:id="configure-authn-modules">
   <title>Configuring Authentication Modules</title>
-  <!-- TODO: add ssoadm tips -->
+  
   <para>The OpenAM console provides two places where the OpenAM administrator
   can configure authentication modules.</para>
   
@@ -192,6 +192,10 @@
    modules to make it easier for you to use both Active Directory and also
    another directory service in an authentication chain.</para>
    <indexterm><primary>Active Directory authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthADService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Primary Active Directory Server</term>
@@ -206,6 +210,9 @@
       server is available, then OpenAM attempts to contact secondaries.</para>
       <para>When authenticating users from a directory server that is remote
       from OpenAM, set both the primary and secondary server values.</para>
+      <para><command>ssoadm</command> attributes: primary is
+      <literal>iplanet-am-auth-ldap-server</literal>; secondary is
+      <literal>iplanet-am-auth-ldap-server2</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -218,6 +225,8 @@
       <literal>OU=sales,DC=example,DC=com</literal>.</para>
       <para>If multiple entries exist with identical search attribute values,
       make this value specific enough to return only one entry.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-base-dn</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -234,6 +243,9 @@
       <literal>uid=amAdmin,ou=People,<replaceable>OpenAM-deploy-base</replaceable></literal>,
       where <replaceable>OpenAM-deploy-base</replaceable> you set during
       OpenAM configuration.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-bind-dn</literal> and
+      <literal>iplanet-am-auth-ldap-bind-passwd</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -262,6 +274,43 @@
       Start User Search, whereas ONELEVEL means search only the entries
       that are directly children of that object. SUBTREE means search the
       entry specified and every entry under it.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-user-naming-attribute</literal>,
+      <literal>iplanet-am-auth-ldap-user-search-attributes</literal>,
+      <literal>iplanet-am-auth-ldap-search-filter</literal>, and
+      <literal>iplanet-am-auth-ldap-search-scope</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SSL Access to Active Directory Server</term>
+     <listitem>
+      <para>If you enable SSL, OpenAM must be able to trust Active Directory
+      certificates, either because the Active Directory certificates were
+      signed by a CA whose certificate is already included in the trust store
+      used by the container where OpenAM runs, or because you imported the
+      certificates into the trust store.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-ssl-enabled</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Return User DN to Authenticate</term>
+     <listitem>
+      <para>When enabled, and OpenAM uses Active Directory as the user store,
+      the module returns the DN rather than the rather than the User ID, so the
+      bind for authentication can be completed without a search to retrieve
+      the DN.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-return-user-dn</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Active Directory Server Check Interval</term>
+     <listitem>
+      <para>Specifies the number of minutes between checks that Active
+      Directory continues to respond.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-server-check</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -269,6 +318,31 @@
      <listitem>
       <para>This list lets you map (external) attribute names from Active
       Directory to (internal) attribute names used by OpenAM.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-ldap-user-creation-attr-list</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>sunAMAuthADAuthLevel</literal></para></listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
+  <section xml:id="adaptive-auth-module-conf-hints">
+   <title>Hints For the Adaptive Authentication Module</title>
+   <para>Use the following hints to configure the module.</para>
+   <indexterm><primary>Adaptive authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>TODO</literal></para>
+   
+   <variablelist>
+    <varlistentry>
+     <term>TODO</term>
+     <listitem>
+      <para>TODO</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -280,9 +354,44 @@
    forcing further authentication later when a user moves to access resources
    that require more protection.</para>
    <indexterm><primary>Anonymous authentication</primary></indexterm>
-   <para>When you need additional ID besides that of the default,
-   <literal>anonymous</literal>, add them to the Valid Anonymous Users
-   list.</para>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthAnonymousService</literal></para>
+   
+   <variablelist>
+    <varlistentry>
+     <term>Valid Anonymous Users</term>
+     <listitem>
+      <para>Specifies valid anonymous user IDs in addition to the default.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-anonymous-users-list</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default Anonymous User Name</term>
+     <listitem>
+      <para>Specifies the user ID assigned by the module if the Valid
+      Anonymous Users list is empty. Default: <literal>anonymous</literal></para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-anonymous-default-user-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Case Sensitive User IDs</term>
+     <listitem>
+      <para>Whether case matters for anonymous user IDs.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-anonymous-case-sensitive</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-anonymous-auth-level</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
   </section>
   
   <section xml:id="cert-module-conf-hints">
@@ -312,6 +421,10 @@
    Jensen</literal> from the Subject DN to search for the entry with
    <literal>cn=Barbara Jensen</literal> in the directory.</para>
    <indexterm><primary>Certificate-based authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthCertService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Match Certificate in LDAP</term>
@@ -319,6 +432,8 @@
       <para>When enabled, OpenAM searches for a match for the user's
       certificate in the LDAP directory. If a match is found and not revoked
       according to a CRL or OCSP validation, then authentication succeeds.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-check-cert-in-ldap</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -326,6 +441,8 @@
      <listitem>
       <para>Indicates which attribute and value in the certificate Subject DN
       is used to find the LDAP entry holding the certificate.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-attr-check-ldap</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -333,6 +450,8 @@
      <listitem>
       <para>When enabled, OpenAM checks whether the certificate has been
       revoked according to a CRL in the LDAP directory.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-check-crl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -340,6 +459,8 @@
      <listitem>
       <para>Indicates which attribute and value in the certificate Issuer DN
       is used to find the CRL in the LDAP directory.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-attr-check-crl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -347,6 +468,8 @@
      <listitem>
       <para>Your certificate authority should provide the URL to use here,
       from which OpenAM can get CRL updates.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-param-get-crl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -354,6 +477,8 @@
      <listitem>
       <para>When enabled, OpenAM checks the CRL against the CA certificate to
       ensure it has not been compromised.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMValidateCACert</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -365,6 +490,8 @@
       under Configuration &gt; Server and Sites &gt; Default Server Settings,
       or Configuration &gt; Server and Sites &gt; <replaceable>Server
       Name</replaceable> &gt; Security.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-check-ocsp</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -374,6 +501,8 @@
       directory service over SSL, the default port for LDAP/SSL is 636.
       When a secure connection, scroll down to enable Use SSL/TLS for LDAP
       Access.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-ldap-provider-url</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -381,6 +510,8 @@
      <listitem>
       <para>Valid base DN for the LDAP search, such as
       <literal>dc=example,dc=com</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-start-search-loc</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -390,6 +521,18 @@
       manage account lockout, or if the LDAP directory requires that OpenAM
       authenticate in order to read users' attributes, then OpenAM needs the
       DN and password to authenticate to the LDAP directory.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-cert-principal-user</literal>, and
+      <literal> iplanet-am-auth-cert-principal-passwd</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Use SSL for LDAP Access</term>
+     <listitem>
+      <para>If you use SSL for LDAP access, OpenAM must be able to trust the
+      LDAP server certificate.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-use-ssl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -400,6 +543,8 @@
       used to find the entry with the certificate. When you select other,
       provide an attribute name in the Other Certificate Field Used to Access
       User Profile text box.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-user-profile-mapper</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -407,6 +552,8 @@
      <listitem>
       <para>Use this if you want to look up the user profile from an RFC 822
       style name, or a User Principal Name as used in Active Directory.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal> iplanet-am-auth-cert-user-profile-mapper-ext</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -415,6 +562,8 @@
       <para>Hosts trusted to send certificates to OpenAM, such as load balancers
       doing SSL termination, or OpenAM distributed authentication UI
       instances.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-gw-cert-auth-enabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -422,7 +571,14 @@
      <listitem>
       <para>If you configure trusted hosts, specify the HTTP header name for
       the client certificate inserted by the trusted host.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMHttpParamName</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-cert-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -437,11 +593,17 @@
    for use during logout. Furthermore, the Core module lets you set defaults
    used when configuring authentication in a particular realm.</para>
    <indexterm><primary>Authentication modules global configuration</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Pluggable Authentication Module Classes</term>
      <listitem>
       <para>Add class names for custom authentication modules to this list.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-authenticators</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -451,6 +613,8 @@
       can be used with specify types of client applications. The client type
       is an arbitary string, such as the default <literal>genericHTML</literal>,
       which is set by OpenAM when the Client Detection Service is enabled.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-supported-auth-modules</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -464,6 +628,9 @@
       only.</para>
       <para>This connection pool is different than the SDK connection pool
       configured in <filename>serverconfig.xml</filename>.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-connection-pool-size </literal>, and
+      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -472,6 +639,8 @@
       <para>Require the authenticating application to send its SSOToken. This
       allows the Authentication Service to obtain the username and password
       associated with the application.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunRemoteAuthSecurityEnabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -481,6 +650,9 @@
       <para>When enabled, retain objects used to process authentication or
       post authentication operations in the user session until the user
       logs out.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>sunAMAuthKeepPostProcessInstances</literal>, and
+      <literal>sunAMAuthKeepAuthModuleIntances</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -524,6 +696,8 @@
         </listitem>
        </varlistentry>
       </variablelist>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-dynamic-profile-creation</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -533,6 +707,8 @@
       process needs to be different from the authentication chain defined
       for end users. The authentication chain must first be created before
       it is displayed as an option in this attribute's drop down list.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-admin-auth-module</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -547,6 +723,8 @@
       be a filtered role. If you wish to automatically assign specific services
       to the user, you have to configure the Required Services attribute in
       the User Profile.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-default-role</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -560,6 +738,8 @@
       (expires when the browser is closed).</para>
       <para>The client must explicitly request a persistent cookie by adding
       <literal>iPSPCookie=yes</literal> as a parameter to the login URL.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-persistent-cookie-mode</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -569,6 +749,8 @@
       The interval begins when the user's session is successfully authenticated.
       The maximum value is 2147483647 (in seconds, so a bit more than 68 years).
       The field accepts any integer value less than the maximum.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-persistent-cookie-time</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -583,6 +765,8 @@
       a RADIUS server might return abc1234 but the user name is abc. There is
       no default value for this attribute. The field takes any valid
       LDAP attribute.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-alias-attr-name</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -591,6 +775,8 @@
       <para>Specifies the default language subtype to be used by the
       Authentication Service. The default value is
       <literal>en_US</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-locale</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -599,6 +785,8 @@
       <para>Defines the default authentication chain used by the realm's users.
       The authentication chain must first be created before it is displayed as
       an option in this attribute's drop down list.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-org-config</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -608,6 +796,8 @@
       lockout will inactivate an LDAP attribute (defined in the Lockout
       Attribute Name property) in the user's profile. This attribute works in
       conjunction with several other lockout and notification attributes.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-login-failure-lockout-mode</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -616,6 +806,8 @@
       <para>Defines the number of attempts that a user has to authenticate,
       within the time interval defined in Login Failure Lockout Interval,
       before being locked out.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-login-failure-count</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -629,6 +821,8 @@
       the defined lockout interval time proves successful before the number of
       attempts reaches the number defined in Login Failure Lockout Count, the
       lockout count is reset.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-login-failure-duration</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -639,6 +833,8 @@
       <para>Separate multiple addresses with spaces, and append
       <literal>|<replaceable>locale</replaceable>|<replaceable>charset</replaceable></literal>
       to addresses for recipients in non-English locales.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-lockout-email-address</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -646,6 +842,8 @@
      <listitem>
       <para>The number of authentication failures after which OpenAM displays
       a warning message that the user will be locked out.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal> iplanet-am-auth-lockout-warn-user</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -656,6 +854,8 @@
       memory lockout and disables physical lockout. Memory lockout means
       the user's account is locked in memory for the number of minutes
       specified. The account is unlocked after the time period has passed.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-lockout-duration</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -670,6 +870,8 @@
       With the Lockout Duration Multiplier, the lockout duration is
       incrementally increased based on the number of times the user has been
       locked out.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunLockoutDurationMultiplier</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -679,6 +881,8 @@
       value is <literal>inetuserstatus</literal>, although the field in the
       OpenAM console is empty. The Lockout Attribute Value field must also
       contain an appropriate value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-lockout-attribute-name</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -688,6 +892,8 @@
       Attribute Name. The default value is <literal>inactive</literal>,
       although the field in the OpenAM console is empty. The Lockout Attribute
       Name field must also contain an appropriate value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-lockout-attribute-value</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -695,7 +901,8 @@
      <listitem>
       <para>Specifies the LDAP attribute used to hold the number of failed
       authentication attempts towards Login Failure Lockout Count.</para>
-      <!-- sunAMAuthInvalidAttemptsDataAttrName -->
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthInvalidAttemptsDataAttrName</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -708,6 +915,8 @@
       which assumes the type HTML. The default value is
       <literal>/openam/console</literal>. Values that do not specify HTTP have
       that appended to the deployment URI.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-login-success-url</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -720,6 +929,8 @@
       which assumes the type HTML. The default value is
       <literal>/openam/console</literal>. Values that do not specify HTTP have
       that appended to the deployment URI.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-login-failure-url</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -734,6 +945,8 @@
       the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
       instance, and so you should add it to a custom OpenAM .war file that you
       deploy.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-post-login-process-class</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -744,6 +957,8 @@
       self-registration process is not valid or already exists. The user
       identifiers are generated by the class specified in the Pluggable User
       Name Generator Class property.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-username-generator-enabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -752,12 +967,16 @@
       <para>Specifies the name of the class used to generate alternate user
       identifiers when Generate UserID Mode is enabled. The default value is
       <literal>com.sun.identity.authentication.spi.DefaultUserIDGenerator</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-username-generator-class</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Identity Types</term>
      <listitem>
       <para>Lists the type or types of identities for which OpenAM searches.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMIdentityType</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -774,6 +993,8 @@
       the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
       instance, and so you should add it to a custom OpenAM .war file that you
       deploy.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMUserStatusCallbackPlugins</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -786,6 +1007,8 @@
       invalid attempts, time of last failed attempt, lockout time and lockout
       duration. Storing this information in the identity repository allows it
       to be shared among multiple instances of OpenAM.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunStoreInvalidAttemptsInDS</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -795,6 +1018,8 @@
       Otherwise, all attempts at authentication using the
       <literal>module=<replaceable>module-name</replaceable></literal> login
       parameter result in failure.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunEnableModuleBasedAuth</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -823,6 +1048,8 @@
       an <literal>AMException</literal>. Multi-value attributes, such as
       <literal>memberOf</literal>, are listed as a single session variable
       with a <literal>|</literal> separator.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMUserAttributesSessionMapping</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -830,7 +1057,8 @@
      <listitem>
       <para>List external domains to which clients can be redirected after
       authentication.</para>
-      <!-- iplanet-am-auth-valid-goto-domains -->
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-valid-goto-domains</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -838,6 +1066,8 @@
      <listitem>
       <para>The level set here applies when no authentication level has been
       specified in the Authentication Level field for a realm.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-default-auth-level</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -853,19 +1083,12 @@
    write a custom authentication module where flat-file authentication is
    needed for the corresponding repository in that realm.</para>
    <indexterm><primary>Data Store authentication</primary></indexterm>
-   <tip>
-    <para><command>ssoadm</command> attribute tip:</para>
-    <variablelist>
-     <varlistentry>
-      <term>Service Name</term>
-      <listitem><para><literal>sunAMAuthDataStoreService</literal></para></listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Attribute Name</term>
-      <listitem><para><literal>amAuthDataStore</literal></para></listitem>
-     </varlistentry>
-    </variablelist>
-   </tip>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthDataStoreService</literal></para>
+   <para><command>ssoadm</command> attributes:
+   <literal>amAuthDataStore</literal>, and
+   <literal>sunAMAuthDataStoreAuthLevel</literal></para>
   </section>
   
   <section xml:id="federation-module-conf-hints">
@@ -875,6 +1098,11 @@
    This authentication module is used by the SAML, SAMLv2, ID-FF, and
    WS-Federation protocols.</para>
    <indexterm><primary>Federated authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthFederationService</literal></para>
+   <para><command>ssoadm</command> attribute:
+   <literal>sunAMAuthFederationAuthLevel</literal></para>
   </section>
   
   <section xml:id="hotp-module-conf-hints">
@@ -891,13 +1119,19 @@
    a valid email address, or the Telephone Number must contain a valid
    SMS telephone number such as <literal>18285551212@txt.att.net</literal>.</para>
    <indexterm><primary>HMAC One-Time Password (HOTP) authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthHOTPService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>SMS Gateway Implementation Class</term>
      <listitem>
       <para>Change this if you must customize the SMS gateway implementation.
-      The default class sends an SMS or email, depending on the configuration.
-      </para>
+      The default class sends an SMS or email, depending on the
+      configuration.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMSGatewayImplClassName</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -905,24 +1139,32 @@
      <listitem>
       <para>Host name of the mail server supporting Simple Message Transfer
       Protocol for electronic mail.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPHostName</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>SMTP Host Port</term>
      <listitem>
       <para>The default SMTP port is 25, 465 (when connecting over SSL).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPHostPort</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>SMTP User Name</term>
      <listitem>
       <para>User name for OpenAM to connect to the mail server.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPUserName</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>SMTP User Password</term>
      <listitem>
       <para>Password for OpenAM to connect to the mail server.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPUserPassword</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -930,6 +1172,8 @@
      <listitem>
       <para>If OpenAM connects to the mail server securely, OpenAM must be able
       to trust the server certificate.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPSSLEnabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -937,6 +1181,8 @@
      <listitem>
       <para>The <literal>From:</literal> address when sending a one-time
       password by mail.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPFromAddress</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -944,18 +1190,31 @@
      <listitem>
       <para>One-time passwords are valid for 5 minutes after they are generated
       by default.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPPasswordValidityDuration</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>One Time Password Length (in digits)</term>
      <listitem>
       <para>Set the length of the one-time password to 6 or 8 digits.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPPasswordLength</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>One Time Password Delivery</term>
      <listitem>
       <para>Send the one-time password by SMS, by mail, or both.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPasswordDelivery</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPAuthLevel</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -967,6 +1226,27 @@
    authentication and tries authentication against the backend module in OpenAM,
    depending on what you configure as the Backend Module Name.</para>
    <indexterm><primary>HTTP authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthHTTPBasicService</literal></para>
+   
+   <variablelist>
+    <varlistentry>
+     <term>Backend Module Name</term>
+     <listitem>
+      <para>Specifies the module that checks the user credentials.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-http-basic-module-configured</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-httpbasic-auth-level</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
   </section>
   
   <section xml:id="jdbc-module-conf-hints">
@@ -974,6 +1254,10 @@
    <para>The Java Database Connectivity (JDBC) module lets OpenAM connect to
    a database such as MySQL or Oracle DB to authenticate users.</para>
    <indexterm><primary>JDBC authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthJDBCService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Connection Type</term>
@@ -982,6 +1266,8 @@
       Java Naming and Diretory Interface connection pool supported by the web
       container in which OpenAM runs. Choose Non-persistent JDBC connection to
       connect directly through the JDBC driver.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCConnectionType</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -991,6 +1277,8 @@
       the pool. How you configure connection pooling depends on the web
       container where you run OpenAM. Refer to the documentation for your
       web container for instructions on setting up connection pooling.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCJndiName</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1002,6 +1290,8 @@
       <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
       instance, and so you should add it to a custom OpenAM .war file that you
       deploy.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCDriver</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1009,24 +1299,32 @@
      <listitem>
       <para>When using Non-persistent JDBC connection, this specifies the URL
       to connect to the database.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCUrl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Connect This User to Database</term>
      <listitem>
       <para>Specify the user name to open the database connection.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCDbuser</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Password for Connecting to Database</term>
      <listitem>
       <para>Specify the password for the user opening the database connection.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCDbpassword</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Password Column String</term>
      <listitem>
       <para>Specify the database column name where passwords are stored.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCPasswordColumn</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1034,6 +1332,8 @@
      <listitem>
       <para>Specify the SQL query to return the password corresponding to the
       user to authenticate.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCStatement</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1044,7 +1344,14 @@
       <para>The default class expects the password in clear text. Custom
       classes must implement the
       <literal>JDBCPasswordSyntaxTransform</literal> interface.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthJDBCPasswordSyntaxTransformPlugin</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>sunAMAuthJDBCAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1056,6 +1363,10 @@
    Java, open source directory service, try
    <link xlink:href="http://opendj.org">OpenDJ</link> directory services.</para>
    <indexterm><primary>LDAP authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthLDAPService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Primary LDAP Server</term>
@@ -1078,6 +1389,10 @@
       <para>If you want to use SSL or TLS for security, then scroll down to
       enable SSL/TLS Access to LDAP Server. Make sure that OpenAM
       can trust the servers' certificates when using this option.</para>
+      <para><command>ssoadm</command> attributes:
+      primary is <literal>iplanet-am-auth-ldap-server</literal>,
+      secondary is <literal>iplanet-am-auth-ldap-server2</literal>, and
+      <literal>iplanet-am-auth-ldap-ssl-enabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1091,6 +1406,8 @@
       <literal>ou=sales,dc=example,dc=com</literal>.</para>
       <para>If multiple entries exist with identical search attribute values,
       make this value specific enough to return only one entry.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal> iplanet-am-auth-ldap-base-dn</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1107,6 +1424,9 @@
       <literal>uid=amAdmin,ou=People,<replaceable>OpenAM-deploy-base</replaceable></literal>,
       where <replaceable>OpenAM-deploy-base</replaceable> you set during
       OpenAM configuration.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-bind-dn</literal>,
+      <literal>iplanet-am-auth-ldap-bind-passwd</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1135,6 +1455,31 @@
       Start User Search, whereas ONELEVEL means search only the entries
       that are directly children of that object. SUBTREE means search the
       entry specified and every entry under it.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-user-naming-attribute</literal>,
+      <literal>iplanet-am-auth-ldap-user-search-attributes</literal>,
+      <literal>iplanet-am-auth-ldap-search-filter</literal>, and
+      <literal>iplanet-am-auth-ldap-search-scope</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Return User DN to Authenticate</term>
+     <listitem>
+      <para>When enabled, and OpenAM uses the directory service as the user
+      store, the module returns the DN rather than the rather than the User ID,
+      so the bind for authentication can be completed without a search to
+      retrieve the DN.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-return-user-dn</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Server Check Interval</term>
+     <listitem>
+      <para>Specifies the number of minutes between checks that the primary
+      LDAP server continues to respond.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-server-check</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1142,13 +1487,22 @@
      <listitem>
       <para>This list lets you map (external) attribute names from Active
       Directory to (internal) attribute names used by OpenAM.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-ldap-user-creation-attr-list</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Minimum Password Length</term>
      <listitem>
       <para>Specify the minimum acceptable password length.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-min-password-length</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-ldap-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1159,12 +1513,18 @@
    can then have OpenAM create new user profiles in the identity
    repository.</para>
    <indexterm><primary>Membership (&amp; self-registration) authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthMembershipService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Minimum Password Length</term>
      <listitem>
       <para>Specify the minimum acceptable number of characters in the password
       provided during self-registration.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-membership-min-password-length</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1178,6 +1538,8 @@
       be a filtered role. If you wish to automatically assign specific services
       to the user, you have to configure the Required Services attribute in
       the User Profile.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-membership-default-roles</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1185,7 +1547,14 @@
      <listitem>
       <para>If you choose Inactive, then the new user has no access to services
       until an administrator activates the account.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-membership-default-user-status</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-membership-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1198,6 +1567,10 @@
    The module checks the subscriber ISDN against the value found on a user's
    entry in an LDAP directory service.</para>
    <indexterm><primary>MSISDN authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthMSISDNService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Trusted Gateway IP Address</term>
@@ -1208,6 +1581,8 @@
       If you leave the list empty, then all clients are allowed.
       If you specify the value <literal>none</literal>, no clients are
       allowed.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNTrustedGatewayList</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1218,6 +1593,8 @@
       For example, if you define x-Cookie-Param, AM_NUMBER, and COOKIE-ID,
       the MSISDN authentication service checks those parameters for the
       MSISDN number.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNParameterNameList</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1228,6 +1605,8 @@
       <para>If you want to use SSL or TLS for security, then scroll down to
       enable SSL/TLS Access to LDAP. Make sure that OpenAM can trust the
       servers' certificates when using this option.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNLdapProviderUrl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1235,6 +1614,8 @@
      <listitem>
       <para>Specify the DN of the entry where the search for the user's MSISDN
       number should start.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNBaseDn</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1243,6 +1624,8 @@
       <para>Specify the name of the attribute in the user's profile that
       contains the MSISDN number to search for the user. The default is
       <literal>sunIdentityMSISDNNumber</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNUserSearchAttribute</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1251,12 +1634,16 @@
       <para>If OpenAM must authenticate to the directory server in order to
       search, then specify the bind DN. The default is
       <literal>cn=amldapuser,ou=DSAME Users,dc=example,dc=com</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNPrincipalUser</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>LDAP Server Principal Password</term>
      <listitem>
       <para>Specify the password corresponding to the bind DN.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNPrincipalPasswd</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1264,6 +1651,8 @@
      <listitem>
       <para>If you choose to use SSL or TLS for security, then make sure that
       OpenAM can trust the servers' certificates.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNUseSsl</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1282,6 +1671,8 @@
         <para>Request Parameter tells OpenAM to search the request parameters.</para>
        </listitem>
       </itemizedlist>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNHeaderSearch</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1290,6 +1681,8 @@
       <para>Specify the LDAP attribute that is used during a search to return
       the user profile for MSISDN authentication service. The default is
       <literal>uid</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNUserNamingAttribute</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1300,7 +1693,14 @@
       allows the authentication module to return the DN instead of the User ID.
       OpenAM thus does not need to perform an additional search with the user
       ID to find the user's entry.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthMSISDNReturnUserDN</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>sunAMAuthMSISDNAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1310,6 +1710,10 @@
    <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
    OpenAM authenticate users against RADIUS servers.</para>
    <indexterm><primary>RADIUS authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthRadiusService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Server 1</term>
@@ -1317,6 +1721,8 @@
       <para>Specify the IP address or fully qualified domain name of the
       primary RADIUS server. The default is <literal>127.0.0.1</literal>
       (localhost loopback).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-radius-server1</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1324,6 +1730,8 @@
      <listitem>
       <para>Specify the IP address or fully qualified domain name of the
       secondary RADIUS server. The default is <literal>127.0.0.1</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-radius-server2</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1331,12 +1739,16 @@
      <listitem>
       <para>Specify the shared secret for RADIUS authentication. The shared
       secret should be as secure as a well-chosen password.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-radius-secret</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Port Number</term>
      <listitem>
       <para>Specify the RADIUS server port. Default is 1645.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-radius-server-port</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1344,7 +1756,14 @@
      <listitem>
       <para>Specify how many seconds to wait for the RADIUS server to respond.
       The default value is 3 seconds.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-radius-timeout</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-radius-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1358,6 +1777,11 @@
    instructs the local OpenAM instance to use federation protocols to transfer
    authentication and attribute information to a partner application.</para>
    <indexterm><primary>Secure Attribute Exchange (SAE) authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthSAEService</literal></para>
+   <para><command>ssoadm</command> attribute:
+   <literal>sunAMAuthSAEAuthLevel</literal></para>
   </section>
   
   <section xml:id="securid-module-conf-hints">
@@ -1365,6 +1789,10 @@
    <para>The SecurID module lets OpenAM authenticate users with RSA
    Authentication Manager software and RSA SecurID authenticators.</para>
    <indexterm><primary>SecurID authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthSecurIDService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>ACE/Server Configuration Path</term>
@@ -1374,7 +1802,14 @@
       expected under the configuration directory for OpenAM, such as
       <filename>$HOME/openam/openam/auth/ace/data</filename>. The directory
       must exist before OpenAM can use SecurID authentication.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-securid-server-config-path</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-securid-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1392,6 +1827,10 @@
    a Windows desktop.</para>
    <indexterm><primary>Kerberos authentication</primary></indexterm>
    <indexterm><primary>Windows Desktop SSO authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthWindowsDesktopSSOService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Service Principal</term>
@@ -1408,6 +1847,8 @@
       <para>You set up the account on the Windows domain controller, creating
       a computer account for OpenAM and associating the new account with a
       service provider name.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-windowsdesktopsso-principal-name</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1416,6 +1857,8 @@
       <para>Specify the full path of the keytab file for the Service Principal.
       You generate the keytab file using the Windows <command>ktpass</command>
       utility.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-windowsdesktopsso-keytab-file</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1424,6 +1867,8 @@
       <para>Specify the Kerberos Key Distribution Center realm. For the
       Windows Kerberos service this is the domain controller server domain
       name.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-windowsdesktopsso-kerberos-realm</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1432,6 +1877,8 @@
       <para>Specify the fully qualified domain name of the Kerberos Key
       Distribution Center server, such as that of the domain controller
       server.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-windowsdesktopsso-kdc</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1439,7 +1886,14 @@
      <listitem>
       <para>When enabled, OpenAM automatically returns the Kerberos principal
       with the domain controller's domain name during authentication.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-windowsdesktopsso-returnRealm</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-windowsdesktopsso-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1452,11 +1906,17 @@
    <filename>bin</filename> directory under the OpenAM configuration directory
    such as <filename>$HOME/openam/openam/bin</filename>.</para>
    <indexterm><primary>Windows NT authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthNTService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>Authentication Domain</term>
      <listitem>
       <para>Specify the Windows domain name to which users belong.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-nt-domain</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1464,13 +1924,22 @@
      <listitem>
       <para>Specify the NetBIOS name of the Windows NT host to which to
       authenticate users.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-nt-host</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Samba Configuration File Name</term>
      <listitem>
       <para>Specify the full path to the Samba configuration file.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-samba-config-file-name</literal></para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-nt-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -1481,12 +1950,18 @@
    user name, password combination received as an authentication token in
    a request from a Web Service Client to a Web Service Provider.</para>
    <indexterm><primary>WSSAuth authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthWSSAuthModuleService</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>User search attribute</term>
      <listitem>
       <para>Specify a user attribute to search for a user. Default is
       <literal>uid</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunWebservicesUserSearchAttribute</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1494,6 +1969,8 @@
      <listitem>
       <para>Specify the realm to which users belong. For the OpenAM Security
       Token Service, this is <literal>/</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunWebServicesUserRealm</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1501,6 +1978,15 @@
      <listitem>
       <para>Specify the password attribute or that of the password equivalent.
       The default is <literal>userPassword</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunWebservicesUserPasswordAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunWebservicesAuthenticationLevel</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1510,6 +1996,10 @@
    <title>Hints For the YubiKey Authentication Module</title>
    <para>Use the following hints to configure the module.</para>
    <indexterm><primary>YubiKey authentication</primary></indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>TODO</literal></para>
+   
    <variablelist>
     <varlistentry>
      <term>TODO</term>
