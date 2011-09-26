@@ -29,12 +29,14 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.idsvcs.rest;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
@@ -68,6 +70,7 @@ import java.io.StringWriter;
 public class IdentityServicesHandler extends HttpServlet {
 
     private static final long serialVersionUID = 2774677132209419157L;
+    private static Debug debug = Debug.getInstance("amIdentityServices");
 
     // =======================================================================
     // Constants
@@ -702,6 +705,8 @@ public class IdentityServicesHandler extends HttpServlet {
                             || e instanceof UserInactive || e instanceof AccountExpired
                             || e instanceof MaximumSessionReached){
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, sw.toString());
+                    } else if (e instanceof InvocationTargetException) {
+                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     } else {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     }
@@ -775,6 +780,10 @@ public class IdentityServicesHandler extends HttpServlet {
             } catch (IllegalAccessException e) {
                 throw new GeneralFailure(e.getMessage());
             } catch (InvocationTargetException e) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Exception during invocation", e);
+                }
+                
                 throw (e.getTargetException());
             }
 
