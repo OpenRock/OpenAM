@@ -38,6 +38,8 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
 
     private static final String TXT = ".txt";
     private static final String URI = ".uri";
+    private static final String HELP_TXT = ".help.txt";
+    private static final String HELP_URI = ".help.uri";
     private static final String CONTEXT_ROOT =
             SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
     private static final String HELP_TEMPLATE =
@@ -57,8 +59,15 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
 
     @Override
     protected String getMessage(String key) {
-        String txtKey = key + TXT;
-        String uriKey = key + URI;
+        String txtKey;
+        String uriKey;
+        if (key.endsWith(".help")) {
+            txtKey = key + TXT;
+            uriKey = key + URI;
+        } else {
+            txtKey = key + HELP_TXT;
+            uriKey = key + HELP_URI;
+        }
         String helpTxt = super.getMessage(txtKey);
         if (helpTxt.equals(txtKey)) {
             //There is no such property, so let's just render the content as usual
