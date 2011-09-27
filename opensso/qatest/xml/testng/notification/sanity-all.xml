@@ -23,30 +23,6 @@
  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
 -->
 
-
-    <test name="Usernotification">
-    <parameter name="idtype" value="USER"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.notification.ConfigUnconfig"/> 
-            <class name="com.sun.identity.qatest.notification.IDRepoNotificationTests"/> 
-        </classes>
-    </test> 
-    <test name="Agentnotification">
-    <parameter name="idtype" value="AGENT"/>
-        <groups>
-            <run>
-                <include name="@mode@"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.qatest.notification.IDRepoNotificationTests"/> 
-        </classes>
-    </test> 
     <test name="SMNotification">
         <groups>
             <run>
