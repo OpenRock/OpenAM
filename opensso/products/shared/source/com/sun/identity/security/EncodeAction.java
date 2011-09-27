@@ -25,7 +25,9 @@
  * $Id: EncodeAction.java,v 1.4 2008/08/19 19:14:56 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.security;
 
 import java.security.PrivilegedAction;
@@ -61,7 +63,7 @@ import com.iplanet.services.util.Crypt;
  *
  * @supported.all.api
  */
-public class EncodeAction implements PrivilegedAction {
+public class EncodeAction implements PrivilegedAction<String> {
     protected String value;
 
     protected boolean useSpecifiedKey = false;
@@ -102,7 +104,7 @@ public class EncodeAction implements PrivilegedAction {
      * 
      * @see java.security.PrivilegedAction#run()
      */
-    public Object run() {
+    public String run() {
         if (useSpecifiedKey) {
             return Crypt.encode(value, encr);
         } else {

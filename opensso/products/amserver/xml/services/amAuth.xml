@@ -68,6 +68,7 @@
                         <Value>com.sun.identity.authentication.modules.radius.RADIUS</Value>
                         <Value>com.sun.identity.authentication.modules.hotp.HOTP</Value>
                         <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>
+                        <Value>org.forgerock.openam.authentication.modules.adaptive.Adaptive</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"

@@ -130,6 +130,9 @@
 ./WEB-INF/classes/amAuthAD_ko.properties
 ./WEB-INF/classes/amAuthAD_zh.properties
 ./WEB-INF/classes/amAuthAD_zh_TW.properties
+./WEB-INF/classes/amAuthAdaptive.properties
+./WEB-INF/classes/amAuthAdaptive.xml
+./WEB-INF/classes/amAuthAdaptive_en.properties
 ./WEB-INF/classes/amAuthAnonymous.properties
 ./WEB-INF/classes/amAuthAnonymous.xml
 ./WEB-INF/classes/amAuthAnonymous_de.properties
@@ -1878,6 +1881,7 @@
 ./config/agent/created.htm
 ./config/agent/deploy.htm
 ./config/auth/default/AD.xml
+./config/auth/default/Adaptive.xml
 ./config/auth/default/Anonymous.xml
 ./config/auth/default/Application.xml
 ./config/auth/default/Cert.xml
@@ -1936,6 +1940,7 @@
 ./config/auth/default/user_inactive.jsp
 ./config/auth/default/wrongPassword.jsp
 ./config/auth/default_de/AD.xml
+./config/auth/default_de/Adaptive.xml
 ./config/auth/default_de/Anonymous.xml
 ./config/auth/default_de/Application.xml
 ./config/auth/default_de/Cert.xml
@@ -1954,6 +1959,7 @@
 ./config/auth/default_de/WindowsDesktopSSO.xml
 ./config/auth/default_de/amAuthUnix.xml
 ./config/auth/default_en/AD.xml
+./config/auth/default_en/Adaptive.xml
 ./config/auth/default_en/Anonymous.xml
 ./config/auth/default_en/Application.xml
 ./config/auth/default_en/Cert.xml
@@ -1972,6 +1978,7 @@
 ./config/auth/default_en/WindowsDesktopSSO.xml
 ./config/auth/default_en/amAuthUnix.xml
 ./config/auth/default_es/AD.xml
+./config/auth/default_es/Adaptive.xml
 ./config/auth/default_es/Anonymous.xml
 ./config/auth/default_es/Application.xml
 ./config/auth/default_es/Cert.xml
@@ -1990,6 +1997,7 @@
 ./config/auth/default_es/WindowsDesktopSSO.xml
 ./config/auth/default_es/amAuthUnix.xml
 ./config/auth/default_fr/AD.xml
+./config/auth/default_fr/Adaptive.xml
 ./config/auth/default_fr/Anonymous.xml
 ./config/auth/default_fr/Application.xml
 ./config/auth/default_fr/Cert.xml
@@ -2008,6 +2016,7 @@
 ./config/auth/default_fr/WindowsDesktopSSO.xml
 ./config/auth/default_fr/amAuthUnix.xml
 ./config/auth/default_ja/AD.xml
+./config/auth/default_ja/Adaptive.xml
 ./config/auth/default_ja/Anonymous.xml
 ./config/auth/default_ja/Application.xml
 ./config/auth/default_ja/Cert.xml
@@ -2026,6 +2035,7 @@
 ./config/auth/default_ja/WindowsDesktopSSO.xml
 ./config/auth/default_ja/amAuthUnix.xml
 ./config/auth/default_ko/AD.xml
+./config/auth/default_ko/Adaptive.xml
 ./config/auth/default_ko/Anonymous.xml
 ./config/auth/default_ko/Application.xml
 ./config/auth/default_ko/Cert.xml
@@ -2044,6 +2054,7 @@
 ./config/auth/default_ko/WindowsDesktopSSO.xml
 ./config/auth/default_ko/amAuthUnix.xml
 ./config/auth/default_zh/AD.xml
+./config/auth/default_zh/Adaptive.xml
 ./config/auth/default_zh/Anonymous.xml
 ./config/auth/default_zh/Application.xml
 ./config/auth/default_zh/Cert.xml
@@ -2062,6 +2073,7 @@
 ./config/auth/default_zh/WindowsDesktopSSO.xml
 ./config/auth/default_zh/amAuthUnix.xml
 ./config/auth/default_zh_CN/AD.xml
+./config/auth/default_zh_CN/Adaptive.xml
 ./config/auth/default_zh_CN/Anonymous.xml
 ./config/auth/default_zh_CN/Application.xml
 ./config/auth/default_zh_CN/Cert.xml
@@ -2080,6 +2092,7 @@
 ./config/auth/default_zh_CN/WindowsDesktopSSO.xml
 ./config/auth/default_zh_CN/amAuthUnix.xml
 ./config/auth/default_zh_TW/AD.xml
+./config/auth/default_zh_TW/Adaptive.xml
 ./config/auth/default_zh_TW/Anonymous.xml
 ./config/auth/default_zh_TW/Application.xml
 ./config/auth/default_zh_TW/Cert.xml

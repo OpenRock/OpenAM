@@ -108,6 +108,9 @@
 ./WEB-INF/classes/amAuthAD_ko.properties
 ./WEB-INF/classes/amAuthAD_zh.properties
 ./WEB-INF/classes/amAuthAD_zh_TW.properties
+./WEB-INF/classes/amAuthAdaptive.properties
+./WEB-INF/classes/amAuthAdaptive_en.properties
+./WEB-INF/classes/amAuthAdaptive.properties
 ./WEB-INF/classes/amAuthAnonymous.properties
 ./WEB-INF/classes/amAuthAnonymous_de.properties
 ./WEB-INF/classes/amAuthAnonymous_en.properties

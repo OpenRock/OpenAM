@@ -36,7 +36,8 @@ import org.forgerock.openam.upgrade.UpgradeException;
  * @author steve
  */
 public class AuthServiceHelper extends AbstractUpgradeHelper {    
-    private final static String attrAdded = "com.sun.identity.authentication.modules.securid.SecurID";
+    private final static String SECURID = "com.sun.identity.authentication.modules.securid.SecurID";
+    private final static String ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
     private final static String ATTR = "iplanet-am-auth-authenticators";
     
     static {
@@ -55,7 +56,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         }
         
         Set<String> defaultValues = existingAttr.getDefaultValues();
-        defaultValues.add(attrAdded);
+        defaultValues.add(SECURID);
+        defaultValues.add(ADAPTIVE);
         newAttr = updateDefaultValues(newAttr, defaultValues);
         
         return newAttr;
