@@ -1770,7 +1770,8 @@ am_status_t set_headers_in_context(IHttpContext *pHttpContext,
 
 			ConstructReqCookieValue(tmpCookieString, value);
 
-                        if (value[value.length()-1] != ';') {
+                        if (header.compare("Set-Cookie") == 0 && value[value.length()-1] != ';') {
+                            /*append ; only to 'Set-Cookie' header value*/
                             value.append(";");
                         }
                         
