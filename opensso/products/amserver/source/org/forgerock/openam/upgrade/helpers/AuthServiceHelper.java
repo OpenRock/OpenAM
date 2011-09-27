@@ -50,13 +50,14 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
     throws UpgradeException {
-            if (!(newAttr.getName().equals(ATTR))) {
+        if (!(newAttr.getName().equals(ATTR))) {
             return newAttr;
         }
         
         Set<String> defaultValues = existingAttr.getDefaultValues();
         defaultValues.add(attrAdded);
+        newAttr = updateDefaultValues(newAttr, defaultValues);
         
-        return existingAttr;
+        return newAttr;
     }    
 }
