@@ -331,18 +331,388 @@
   </section>
   
   <section xml:id="adaptive-auth-module-conf-hints">
-   <title>Hints For the Adaptive Authentication Module</title>
-   <para>Use the following hints to configure the module.</para>
-   <indexterm><primary>Adaptive authentication</primary></indexterm>
+   <title>Hints For the Adaptive Risk Authentication Module</title>
+   <para>The Adaptive Risk module is designed to assess risk during
+   authentication so that OpenAM can determine whether to require the
+   user to complete further authentication steps. After configuring the
+   Adaptive Risk module, insert it in your authentication chain with criteria
+   set to sufficient as shown in the following example.</para>
+   <mediaobject>
+    <alt>Including the Adaptive Risk module in an authentication chain</alt>
+    <imageobject>
+     <imagedata fileref="images/adaptive-auth-module.png" format="PNG" />
+    </imageobject>
+    <textobject><para>With the Adaptive Risk module as sufficient, OpenAM
+    continues to the next module in the chain should the Adaptive Risk module
+    return failure.</para></textobject>
+   </mediaobject>
+   <para>In the example authentication chain shown, OpenAM has users
+   authenticate first using the LDAP module providing a user ID and password
+   combination. Upon success, OpenAM calls the Adaptive Risk module. The
+   Adaptive Risk module assesses the risk based on your configured parameters.
+   If the Adaptive Risk module calculates a total score above the threshold you
+   set, the module returns success, and OpenAM finishes authentication
+   processing without requiring further credentials. Otherwise the Adaptive
+   Risk module evaluates the score to be below the threshold, and returns
+   failure. OpenAM then calls the HOTP module, requiring the user to
+   authenticate with a one-time password delivered to her by email or by SMS
+   to her mobile phone.</para>
+   <para>When you configure the Adaptive Risk module to save cookies and
+   profile attributes after successful authentication, OpenAM performs the
+   save as post-authentication processing, only after the entire authentication
+   chain returns success.</para>
+   <indexterm><primary>Adaptive risk authentication</primary></indexterm>
    
    <para><command>ssoadm</command> service name:
-   <literal>TODO</literal></para>
+   <literal>sunAMAuthAdaptiveService</literal></para>
    
    <variablelist>
     <varlistentry>
-     <term>TODO</term>
+     <term>Authentication Level</term>
      <listitem>
-      <para>TODO</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-auth-level</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Adaptive Threshold</term>
+     <listitem>
+      <para>Minimum score required to pass the risk assessment successfully.
+      In other words, if the sum of the Scores is less than the threshold, the
+      Adaptive Risk module returns failure.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-auth-threshold</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Failed Authentication Check</term>
+     <listitem>
+      <para>When enabled, check the user profile for authentication failures
+      since the last successful login. This check therefore requires that
+      OpenAM have access to the user profile, and that Account Lockout be
+      enabled (otherwise OpenAM does not record authentication
+      failures).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-failure-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Failed
+      Authentication Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-failure-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Failed Authentication Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-failure-invert</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>IP Range Check</term>
+     <listitem>
+      <para>When enabled, check whether the client IP address is within one
+      of the specified IP Ranges.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-range-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>IP Range</term>
+     <listitem>
+      <para>Specifies a list of IP ranges either in CIDR-style notation
+      (<literal><replaceable>x.x.x.x</replaceable>/<replaceable>YY</replaceable></literal>)
+      or as a range from one address to another
+      (<literal><replaceable>x.x.x.x</replaceable>:<replaceable>y.y.y.y</replaceable></literal>,
+      meaning from <replaceable>x.x.x.x</replaceable> to
+      <replaceable>y.y.y.y</replaceable>).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-range-range</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the IP Range
+      Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-range-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the IP Range Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-range-invert</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>IP History Check</term>
+     <listitem>
+      <para>When enabled, check whether the client IP address matches one of
+      the known values stored on the profile attribute you specify. This check
+      therefore requires that OpenAM have access to the user profile.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-history-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Count to save</term>
+     <listitem>
+      <para>Specifies how many IP address values to retain on the profile
+      attribute you specify. Default: 5</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-ip-adaptive-history-count</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Profile Attribute Name</term>
+     <listitem>
+      <para>Name of the user profile attribute on which to store known IP
+      addresses. Default: <literal>iphistory</literal></para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-history-attribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Save Successful IP Address</term>
+     <listitem>
+      <para>When enabled, save new client IP addresses to the known IP address
+      list following successful authentication.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-history-save</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the IP History
+      Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-history-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the IP History Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-ip-history-invert</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Cookie Value Check</term>
+     <listitem>
+      <para>When enabled, check whether the client browser request has the
+      specified cookie and optional cookie value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-known-cookie-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Cookie Name</term>
+     <listitem>
+      <para>Specifies the name of the cookie for which OpenAM checks when
+      you enable the Cookie Value Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-known-cookie-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Cookie Value</term>
+     <listitem>
+      <para>Specifies the value of the cookie for which OpenAM checks. If
+      no value is specified, OpenAM does not check the cookie value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-known-cookie-value</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Save Cookie Value on Successful Login</term>
+     <listitem>
+      <para>When enabled, save the cookie as specified in the client's browser
+      following successful authentication. If no Cookie Value is specified,
+      the value is set to 1.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-known-cookie-save</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if user passes the Cookie Value
+      Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-known-cookie-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Cookie Value Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-known-cookie-invert</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Time since Last login check</term>
+     <listitem>
+      <para>When enabled, check whether the client browser request has the
+      specified cookie that holds the encrypted last login time, and check
+      that the last login time is more recent than a maximum number of days you
+      specify.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Cookie Name</term>
+     <listitem>
+      <para>Specifies the name of the cookie holding the encrypted last login
+      time value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-cookie-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Max Time since Last Login</term>
+     <listitem>
+      <para>Specifies a threshold age of the last login time in days. If the
+      client's last login time is more recent than the number of days specified,
+      then the client successfully passes the check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-value</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Save time of Successful Login</term>
+     <listitem>
+      <para>When enabled, save the specified cookie with the current time
+      encrypted as the last login value in the client's browser following
+      successful authentication.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-save</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Time Since
+      Last Login Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Time Since Last Login Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-invert</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Profile Risk Attribute check</term>
+     <listitem>
+      <para>When enabled, check whether the user profile contains the specified
+      attribute and value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute Name</term>
+     <listitem>
+      <para>Specifies the attribute to check on the user profile for the
+      specified value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute Value</term>
+     <listitem>
+      <para>Specifies the value to match on the profile attribute. If the
+      attribute is multi-valued, a single match is sufficient to pass the
+      check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-value</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Profile Risk
+      Attribute Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Profile Risk Attribute Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-invert</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Device Registration Cookie Check</term>
+     <listitem>
+      <para>When enabled, check whether the client browser request has the
+      specified cookie with the correct device registration identifier as
+      the value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-device-cookie-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Cookie Name</term>
+     <listitem>
+      <para>Specifies the name of the cookie for the Device Registration Cookie
+      Check. Default: Device</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-device-cookie-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Save Device Registration on Successful Login</term>
+     <listitem>
+      <para>When enabled, save the specified cookie with a hashed device
+      identifier value in the client's browser following successful
+      authentication.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-device-cookie-save</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Device
+      Registration Cookie Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-device-cookie-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Device Registration Cookie Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-device-cookie-invert</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1497,6 +1867,27 @@
       <para>Specify the minimum acceptable password length.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-ldap-min-password-length</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Behera Password Policy Support</term>
+     <listitem>
+      <para>When enabled, support interoperability with servers that implement
+      the Internet-Draft, <link
+      xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+      >Password Policy for LDAP Directories</link>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-ssl-trust-all</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Trust All Server Certificates</term>
+     <listitem>
+      <para>When enabled, do not check that the certificate presented by the
+      LDAP server has be signed by a known Certificate Authority. Useful when
+      testing with self-signed certificates.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-auth-level</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>

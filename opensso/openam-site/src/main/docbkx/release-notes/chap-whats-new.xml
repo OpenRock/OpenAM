@@ -79,6 +79,16 @@
    touch of a button on the YubiKey, and without the need of any client
    software or drivers.</para>
   </listitem>
+  <listitem>
+   <para>OpenAM now supports adaptive risk authentication. You configure the
+   adaptive risk authentication module to assess risks, and then you add the
+   module into an authentication chain. The module determines whether to
+   require further authentication processing based on assessment of the risk
+   involved during authentication. Adaptive risk authentication lets you
+   require more from users when they login from an unfamiliar location, from
+   a new device, after a long period during which the account remained idle,
+   and so forth.</para>
+  </listitem>
  </itemizedlist>
  
 </chapter>
