@@ -103,7 +103,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String TIME_OF_DAY_RANGE = "openam-auth-time-of-day-range";
     private static final String TIME_OF_DAY_INVERT = "openam-auth-time-of-day-invert";
     private static final String TIME_SINCE_LAST_LOGIN_CHECK = "openam-auth-adaptive-time-since-last-login-check";
-    private static final String TIME_SINCE_LAST_LOGIN_ATTRIBUTE = "openam-auth-adaptive-time-since-last-login-attribute";
+    private static final String TIME_SINCE_LAST_LOGIN_ATTRIBUTE = "openam-auth-adaptive-time-since-last-login-cookie-name";
     private static final String TIME_SINCE_LAST_LOGIN_VALUE = "openam-auth-adaptive-time-since-last-login-value";
     private static final String TIME_SINCE_LAST_LOGIN_SAVE = "openam-auth-adaptive-time-since-last-login-save";
     private static final String TIME_SINCE_LAST_LOGIN_SCORE = "openam-auth-adaptive-time-since-last-login-score";
