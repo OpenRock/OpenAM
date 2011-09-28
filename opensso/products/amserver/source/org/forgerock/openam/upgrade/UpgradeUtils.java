@@ -109,6 +109,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -267,7 +268,7 @@ public class UpgradeUtils {
         String currentVersion = stripVersionText(getCurrentVersion());
         String warVersion = stripVersionText(getWarFileVersion());
         
-        SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT);
+        SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT, Locale.UK);
         Date currentVersionDate = null;
         Date warVersionDate = null;
         

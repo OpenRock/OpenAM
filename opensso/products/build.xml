@@ -258,7 +258,7 @@
     
     <target name="create-version"> 
         <tstamp>
-            <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm"/>
+            <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />
         </tstamp>       
         <property name="version.set" value="${opensso.version}"/>    
             
