@@ -117,3 +117,16 @@
             <class name="com.sun.identity.qatest.authentication.AuthTest"/>
         </classes>
     </test>
+   <test name="AuthTestLDAPUser">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+   </test>
