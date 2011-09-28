@@ -990,13 +990,9 @@ am_status_t Utils::parseCookie(std::string cookie,
                 cleanup_cookie_info(cookie_data);
                 return AM_NO_MEMORY;
             }
-            if (loc[0] == '.') {
-                strcpy(cookie_data->domain, loc+1);
-                cookie_data->domain[len-1] = '\0';
-            } else {
-                strcpy(cookie_data->domain, loc);
-                cookie_data->domain[len] = '\0';
-            }
+            /*use domain value exactly as set in a configuration (do not remove leading '.')*/
+            strcpy(cookie_data->domain, loc);
+            cookie_data->domain[len] = '\0';
         } else  {
             loc = strstr(token, "Max-Age=");
             if (loc != NULL) {

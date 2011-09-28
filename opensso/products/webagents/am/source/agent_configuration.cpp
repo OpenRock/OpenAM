@@ -722,7 +722,6 @@ am_status_t AgentConfiguration::populateAgentProperties()
                     cookie_str != NULL && '\0' != cookie_str[0]) {
                 am_web_log_max_debug("%s: cookies to be reset: %s",
                         thisfunc, cookie_str);
-                //status = Utils::parseCookieList(
                 status = Utils::parseCookieList(
                         cookie_str, ',', &this->cookie_list);
                 if ( AM_SUCCESS == status) {
