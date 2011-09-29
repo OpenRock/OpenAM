@@ -1547,7 +1547,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>SMTP From Address</term>
+     <term>Email From Address</term>
      <listitem>
       <para>The <literal>From:</literal> address when sending a one-time
       password by mail.</para>
