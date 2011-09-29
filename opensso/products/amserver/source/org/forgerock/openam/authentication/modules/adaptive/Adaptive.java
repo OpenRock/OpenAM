@@ -48,6 +48,7 @@ import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -1022,7 +1023,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             if (lookupService == null) {
                 lookupService = new LookupService(dbLocation, LookupService.GEOIP_MEMORY_CACHE);
             }
-        } catch (Exception e) {
+        } catch (IOException ioe) {
+            //don't log the stacktrace, since it will occur on any module invocation
+            debug.message(ADAPTIVE + "Unable to initialize GeoDB service" + ioe.getMessage());
         }
         return lookupService;
     }
