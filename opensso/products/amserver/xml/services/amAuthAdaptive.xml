@@ -436,6 +436,45 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-check"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a539">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-database"
+					cosQualifier="default" type="single" syntax="string" i18nKey="a540">
+					<DefaultValues>
+						<Value></Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-values"
+					cosQualifier="default" type="single" syntax="string" i18nKey="a541">
+					<DefaultValues>
+						<Value></Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-score"
+					cosQualifier="default" type="single" syntax="number" i18nKey="a542">
+					<DefaultValues>
+						<Value>1</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-invert"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a543">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+                
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="openam-auth-adaptive-auth-level"
                     cosQualifier="default"
@@ -842,6 +881,44 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-check"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a539">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-database"
+					cosQualifier="default" type="single" syntax="string" i18nKey="a540">
+					<DefaultValues>
+						<Value></Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-values"
+					cosQualifier="default" type="single" syntax="string" i18nKey="a541">
+					<DefaultValues>
+						<Value></Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-score"
+					cosQualifier="default" type="single" syntax="number" i18nKey="a542">
+					<DefaultValues>
+						<Value>1</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="forgerock-am-auth-adaptive-geo-location-invert"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a543">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

@@ -24,10 +24,12 @@
  */
 package org.forgerock.openam.authentication.modules.adaptive;
 
+import org.forgerock.openam.utils.FR_GeoDB;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.maxmind.geoip.LookupService;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
@@ -57,6 +59,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -113,6 +116,16 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String RISK_ATTRIBUTE_VALUE = "openam-auth-adaptive-risk-attribute-value";
     private static final String RISK_ATTRIBUTE_SCORE = "openam-auth-adaptive-risk-attribute-score";
     private static final String RISK_ATTRIBUTE_INVERT = "openam-auth-adaptive-risk-attribute-invert";
+	private static final String GEO_LOCATION_CHECK = "forgerock-am-auth-adaptive-geo-location-check";
+	private static final String GEO_LOCATION_DATABASE	= "forgerock-am-auth-adaptive-geo-location-database";
+	private static final String GEO_LOCATION_VALUES = "forgerock-am-auth-adaptive-geo-location-values";
+	private static final String GEO_LOCATION_SCORE = "forgerock-am-auth-adaptive-geo-location-score";
+	private static final String GEO_LOCATION_INVERT = "forgerock-am-auth-adaptive-geo-location-invert";
+	private static final String REQ_HEADER_CHECK = "forgerock-am-auth-adaptive-req-header-check";
+	private static final String REQ_HEADER_NAME	= "forgerock-am-auth-adaptive-req-header-name";
+	private static final String REQ_HEADER_VALUE = "forgerock-am-auth-adaptive-req-header-value";
+	private static final String REQ_HEADER_SCORE = "forgerock-am-auth-adaptive-req-header-score";
+	private static final String REQ_HEADER_INVERT = "forgerock-am-auth-adaptive-req-header-invert";
     private static Debug debug = Debug.getInstance(ADAPTIVE);
     private String userUUID = null;
     private String userName = null;
@@ -159,6 +172,16 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private String riskAttributeValue = null;
     private int riskAttributeScore = 1;
     private boolean riskAttributeInvert = false;
+    private boolean geoLocationCheck = false;
+    private String geoLocationDatabase = null;
+    private String geoLocationValues = null;
+    private int geoLocationScore = 1;
+    private boolean geoLocationInvert = false;
+    private boolean reqHeaderCheck = false;
+    private String reqHeaderName = null;
+    private String reqHeaderValue = null;
+    private int reqHeaderScore = 1;
+    private boolean reqHeaderInvert = false;
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -218,7 +241,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     throw new AuthLoginException("amAuth", "noUserName", null);
                 }
             } catch (SSOException e) {
-                debug.message("amAdaptiveAuth: amAuthIdentity NULL : " + userName);
+                debug.message("amAdaptiveAuth: amAuthIdentity NULL " );
                 throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
             }
         }
@@ -255,7 +278,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
         if (deviceCookieCheck) {
             currentScore += checkRegisteredClient();
-        }
+        }		
+        if (geoLocationCheck) {
+			currentScore += checkGeoLocation();
+		}
+        if (reqHeaderCheck) {
+			currentScore += checkRequestHeader();
+		}
+
 
         setPostAuthNParams();
 
@@ -389,6 +419,35 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         return retVal;
     }
+    
+	protected int checkGeoLocation() {
+		int	   retVal = 0;
+		String countryCode = "";
+
+		LookupService db = FR_GeoDB.getInstance(geoLocationDatabase);
+		
+		if (db != null) {
+			countryCode = db.getCountry(clientIP).getCode();
+			debug.message("amAdaptiveAuth.Do_IP_Country_check: "+clientIP+" returns "+countryCode);
+
+			
+			if (geoLocationValues != null) {
+				StringTokenizer st = new StringTokenizer(geoLocationValues,"|");
+				if (st.hasMoreTokens()) {
+
+					if (countryCode.equalsIgnoreCase((String)st.nextToken())) {
+						debug.message("Found Country Code : " + countryCode);
+						retVal = geoLocationScore;
+					}
+				}
+			}
+		}
+
+		if (geoLocationInvert) retVal = geoLocationScore - retVal;
+		debug.message("amAdaptiveAuth.Do_IP_Country_check: returns "+retVal);
+		return retVal;
+	};
+
 
     /**
      * Check to see if the client has a cookie with optional value
@@ -435,6 +494,47 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      *
      * @return score achieved with this test
      */
+    protected int checkRequestHeader() {
+        int retVal = 0;
+        debug.message(ADAPTIVE + ".checkRequestHeader: ");
+
+        HttpServletRequest req = getHttpServletRequest();
+        if (req != null) {
+        	Enumeration eHdrs = req.getHeaderNames();
+        	while (eHdrs.hasMoreElements()) {
+            	String header = (String) eHdrs.nextElement();
+                if (reqHeaderName.equalsIgnoreCase(header)) {
+                	debug.message(ADAPTIVE + ".checkRequestHeader: Found header: " + header);
+                    if (reqHeaderValue != null) {
+                    	Enumeration eVals = req.getHeaders(header);
+                    	while (eVals.hasMoreElements()) {
+                    		String val = (String) eVals.nextElement();
+                            if (reqHeaderValue.equalsIgnoreCase(val)) {
+                            	debug.message(ADAPTIVE + ".checkRequestHeader: Found header Value: " + val);
+                                retVal = reqHeaderScore;
+                            }
+                    	}
+                    } else {
+                        retVal = reqHeaderScore;
+                    }
+                    break;
+                }
+            }
+        }
+
+
+        if (reqHeaderInvert) {
+            retVal = reqHeaderScore - retVal;
+        }
+        debug.message(ADAPTIVE + ".checkRequestHeader: returns " + retVal);
+        return retVal;
+    }
+
+    /**
+     * Check to see if the client has a cookie with optional value
+     *
+     * @return score achieved with this test
+     */
     protected int checkRegisteredClient() {
         int retVal = 0;
         String deviceID = null;
@@ -445,8 +545,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         if (req != null) {
             deviceID = (String) req.getHeader("User-Agent");
-            deviceID = deviceID + "|" + clientIP;
-            deviceHash = Hash.hash(deviceID);
+            deviceID = deviceID + "|" + clientIP + "|" + userName;
+            deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(deviceID)));
 
             for (Cookie cookie : req.getCookies()) {
                 if (deviceCookieName.equalsIgnoreCase(cookie.getName())) {
@@ -772,6 +872,19 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         riskAttributeValue = CollectionHelper.getMapAttr(options, RISK_ATTRIBUTE_VALUE);
         riskAttributeScore = getOptionAsInteger(options, RISK_ATTRIBUTE_SCORE);
         riskAttributeInvert = getOptionAsBoolean(options, RISK_ATTRIBUTE_INVERT);
+        
+		geoLocationCheck = getOptionAsBoolean(options, GEO_LOCATION_CHECK);
+		geoLocationDatabase = CollectionHelper.getMapAttr(options, GEO_LOCATION_DATABASE);
+		geoLocationValues = CollectionHelper.getMapAttr(options, GEO_LOCATION_VALUES);
+		geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
+		geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
+
+		reqHeaderCheck = getOptionAsBoolean(options, REQ_HEADER_CHECK);
+		reqHeaderName = CollectionHelper.getMapAttr(options, REQ_HEADER_NAME);
+		reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
+		reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
+		reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
+
     }
 
     protected boolean getOptionAsBoolean(Map m, String i) {
@@ -852,6 +965,19 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         riskAttributeValue = null;
         riskAttributeScore = 1;
         riskAttributeInvert = false;
+        
+		geoLocationCheck =  false;
+		geoLocationDatabase =	null;
+		geoLocationValues = 	null;
+		geoLocationScore =      1;
+		geoLocationInvert = 	false;
+
+		reqHeaderCheck =  false;
+		reqHeaderName =	null;
+		reqHeaderValue = 	null;
+		reqHeaderScore =      1;
+		reqHeaderInvert = 	false;
+
     }
 
     public static String mapToString(Map<String, String> map) {
