@@ -730,7 +730,7 @@
       <para>Path to GeoIP data file used to convert IP addresses to
       country locations.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>forgerock-am-auth-adaptive-geo-location-database</literal></para>
+      <literal>openam-auth-adaptive-geo-location-database</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -738,7 +738,7 @@
      <listitem>
       <para>Specifies the list of country codes to match.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>forgerock-am-auth-adaptive-geo-location-values</literal>. Use
+      <literal>openam-auth-adaptive-geo-location-values</literal>. Use
       <literal>|</literal> to separate multiple values.</para>
      </listitem>
     </varlistentry>
@@ -748,7 +748,7 @@
       <para>Value to add to the total score if the user passes the Geolocation
       Country Code Check.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>forgerock-am-auth-adaptive-geo-location-score</literal></para>
+      <literal>openam-auth-adaptive-geo-location-score</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -757,7 +757,7 @@
       <para>When selected, add the Score to the total score if the user
       fails the Geolocation Country Code Check.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>forgerock-am-auth-adaptive-geo-location-invert</literal></para>
+      <literal>openam-auth-adaptive-geo-location-invert</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>

@@ -24,7 +24,6 @@
  */
 package org.forgerock.openam.authentication.modules.adaptive;
 
-import org.forgerock.openam.utils.FR_GeoDB;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -116,17 +115,18 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String RISK_ATTRIBUTE_VALUE = "openam-auth-adaptive-risk-attribute-value";
     private static final String RISK_ATTRIBUTE_SCORE = "openam-auth-adaptive-risk-attribute-score";
     private static final String RISK_ATTRIBUTE_INVERT = "openam-auth-adaptive-risk-attribute-invert";
-	private static final String GEO_LOCATION_CHECK = "forgerock-am-auth-adaptive-geo-location-check";
-	private static final String GEO_LOCATION_DATABASE	= "forgerock-am-auth-adaptive-geo-location-database";
-	private static final String GEO_LOCATION_VALUES = "forgerock-am-auth-adaptive-geo-location-values";
-	private static final String GEO_LOCATION_SCORE = "forgerock-am-auth-adaptive-geo-location-score";
-	private static final String GEO_LOCATION_INVERT = "forgerock-am-auth-adaptive-geo-location-invert";
-	private static final String REQ_HEADER_CHECK = "forgerock-am-auth-adaptive-req-header-check";
-	private static final String REQ_HEADER_NAME	= "forgerock-am-auth-adaptive-req-header-name";
-	private static final String REQ_HEADER_VALUE = "forgerock-am-auth-adaptive-req-header-value";
-	private static final String REQ_HEADER_SCORE = "forgerock-am-auth-adaptive-req-header-score";
-	private static final String REQ_HEADER_INVERT = "forgerock-am-auth-adaptive-req-header-invert";
+    private static final String GEO_LOCATION_CHECK = "openam-auth-adaptive-geo-location-check";
+    private static final String GEO_LOCATION_DATABASE = "openam-auth-adaptive-geo-location-database";
+    private static final String GEO_LOCATION_VALUES = "openam-auth-adaptive-geo-location-values";
+    private static final String GEO_LOCATION_SCORE = "openam-auth-adaptive-geo-location-score";
+    private static final String GEO_LOCATION_INVERT = "openam-auth-adaptive-geo-location-invert";
+    private static final String REQ_HEADER_CHECK = "openam-auth-adaptive-req-header-check";
+    private static final String REQ_HEADER_NAME = "openam-auth-adaptive-req-header-name";
+    private static final String REQ_HEADER_VALUE = "openam-auth-adaptive-req-header-value";
+    private static final String REQ_HEADER_SCORE = "openam-auth-adaptive-req-header-score";
+    private static final String REQ_HEADER_INVERT = "openam-auth-adaptive-req-header-invert";
     private static Debug debug = Debug.getInstance(ADAPTIVE);
+    private static LookupService lookupService = null;
     private String userUUID = null;
     private String userName = null;
     private AMIdentity amAuthIdentity = null;
@@ -241,7 +241,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     throw new AuthLoginException("amAuth", "noUserName", null);
                 }
             } catch (SSOException e) {
-                debug.message("amAdaptiveAuth: amAuthIdentity NULL " );
+                debug.message(ADAPTIVE + ": amAuthIdentity NULL ");
                 throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
             }
         }
@@ -251,7 +251,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         clientIP = AuthClientUtils.getClientIPAddress(getHttpServletRequest());
 
         if (amAuthIdentity == null) {
-            debug.message("amAdaptiveAuth: amAuthIdentity NULL : " + userName);
+            debug.message(ADAPTIVE + ": amAuthIdentity NULL : " + userName);
             throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
         }
 
@@ -278,23 +278,23 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
         if (deviceCookieCheck) {
             currentScore += checkRegisteredClient();
-        }		
+        }
         if (geoLocationCheck) {
-			currentScore += checkGeoLocation();
-		}
+            currentScore += checkGeoLocation();
+        }
         if (reqHeaderCheck) {
-			currentScore += checkRequestHeader();
-		}
+            currentScore += checkRequestHeader();
+        }
 
 
         setPostAuthNParams();
 
         if (currentScore >= adaptiveThreshold) {
-            debug.message("amAdaptiveAuth: Returning Success : " + userName);
+            debug.message(ADAPTIVE + ": Returning Success : " + userName);
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
-            debug.message("amAdaptiveAuth: Returning FAIL : " + userName);
-            throw new AuthLoginException("amAdaptiveAuth - Risk determined.");
+            debug.message(ADAPTIVE + ": Returning FAIL : " + userName);
+            throw new AuthLoginException(ADAPTIVE + " - Risk determined.");
         }
     }
 
@@ -419,35 +419,35 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         return retVal;
     }
-    
-	protected int checkGeoLocation() {
-		int	   retVal = 0;
-		String countryCode = "";
 
-		LookupService db = FR_GeoDB.getInstance(geoLocationDatabase);
-		
-		if (db != null) {
-			countryCode = db.getCountry(clientIP).getCode();
-			debug.message("amAdaptiveAuth.Do_IP_Country_check: "+clientIP+" returns "+countryCode);
+    protected int checkGeoLocation() {
+        int retVal = 0;
+        String countryCode = "";
 
-			
-			if (geoLocationValues != null) {
-				StringTokenizer st = new StringTokenizer(geoLocationValues,"|");
-				if (st.hasMoreTokens()) {
+        LookupService db = getLookupService(geoLocationDatabase);
 
-					if (countryCode.equalsIgnoreCase((String)st.nextToken())) {
-						debug.message("Found Country Code : " + countryCode);
-						retVal = geoLocationScore;
-					}
-				}
-			}
-		}
+        if (db != null) {
+            countryCode = db.getCountry(clientIP).getCode();
+            debug.message(ADAPTIVE + ".checkGeoLocation: " + clientIP + " returns " + countryCode);
 
-		if (geoLocationInvert) retVal = geoLocationScore - retVal;
-		debug.message("amAdaptiveAuth.Do_IP_Country_check: returns "+retVal);
-		return retVal;
-	};
+            if (geoLocationValues != null) {
+                StringTokenizer st = new StringTokenizer(geoLocationValues, "|");
+                if (st.hasMoreTokens()) {
 
+                    if (countryCode.equalsIgnoreCase(st.nextToken())) {
+                        debug.message("Found Country Code : " + countryCode);
+                        retVal = geoLocationScore;
+                    }
+                }
+            }
+        }
+
+        if (geoLocationInvert) {
+            retVal = geoLocationScore - retVal;
+        }
+        debug.message(ADAPTIVE + ".checkGeoLocation: returns " + retVal);
+        return retVal;
+    }
 
     /**
      * Check to see if the client has a cookie with optional value
@@ -500,20 +500,20 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         HttpServletRequest req = getHttpServletRequest();
         if (req != null) {
-        	Enumeration eHdrs = req.getHeaderNames();
-        	while (eHdrs.hasMoreElements()) {
-            	String header = (String) eHdrs.nextElement();
+            Enumeration<String> eHdrs = req.getHeaderNames();
+            while (eHdrs.hasMoreElements()) {
+                String header = eHdrs.nextElement();
                 if (reqHeaderName.equalsIgnoreCase(header)) {
-                	debug.message(ADAPTIVE + ".checkRequestHeader: Found header: " + header);
+                    debug.message(ADAPTIVE + ".checkRequestHeader: Found header: " + header);
                     if (reqHeaderValue != null) {
-                    	Enumeration eVals = req.getHeaders(header);
-                    	while (eVals.hasMoreElements()) {
-                    		String val = (String) eVals.nextElement();
+                        Enumeration eVals = req.getHeaders(header);
+                        while (eVals.hasMoreElements()) {
+                            String val = (String) eVals.nextElement();
                             if (reqHeaderValue.equalsIgnoreCase(val)) {
-                            	debug.message(ADAPTIVE + ".checkRequestHeader: Found header Value: " + val);
+                                debug.message(ADAPTIVE + ".checkRequestHeader: Found header Value: " + val);
                                 retVal = reqHeaderScore;
                             }
-                    	}
+                        }
                     } else {
                         retVal = reqHeaderScore;
                     }
@@ -521,7 +521,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 }
             }
         }
-
 
         if (reqHeaderInvert) {
             retVal = reqHeaderScore - retVal;
@@ -872,18 +871,18 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         riskAttributeValue = CollectionHelper.getMapAttr(options, RISK_ATTRIBUTE_VALUE);
         riskAttributeScore = getOptionAsInteger(options, RISK_ATTRIBUTE_SCORE);
         riskAttributeInvert = getOptionAsBoolean(options, RISK_ATTRIBUTE_INVERT);
-        
-		geoLocationCheck = getOptionAsBoolean(options, GEO_LOCATION_CHECK);
-		geoLocationDatabase = CollectionHelper.getMapAttr(options, GEO_LOCATION_DATABASE);
-		geoLocationValues = CollectionHelper.getMapAttr(options, GEO_LOCATION_VALUES);
-		geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
-		geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
 
-		reqHeaderCheck = getOptionAsBoolean(options, REQ_HEADER_CHECK);
-		reqHeaderName = CollectionHelper.getMapAttr(options, REQ_HEADER_NAME);
-		reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
-		reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
-		reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
+        geoLocationCheck = getOptionAsBoolean(options, GEO_LOCATION_CHECK);
+        geoLocationDatabase = CollectionHelper.getMapAttr(options, GEO_LOCATION_DATABASE);
+        geoLocationValues = CollectionHelper.getMapAttr(options, GEO_LOCATION_VALUES);
+        geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
+        geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
+
+        reqHeaderCheck = getOptionAsBoolean(options, REQ_HEADER_CHECK);
+        reqHeaderName = CollectionHelper.getMapAttr(options, REQ_HEADER_NAME);
+        reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
+        reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
+        reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
 
     }
 
@@ -965,18 +964,18 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         riskAttributeValue = null;
         riskAttributeScore = 1;
         riskAttributeInvert = false;
-        
-		geoLocationCheck =  false;
-		geoLocationDatabase =	null;
-		geoLocationValues = 	null;
-		geoLocationScore =      1;
-		geoLocationInvert = 	false;
 
-		reqHeaderCheck =  false;
-		reqHeaderName =	null;
-		reqHeaderValue = 	null;
-		reqHeaderScore =      1;
-		reqHeaderInvert = 	false;
+        geoLocationCheck = false;
+        geoLocationDatabase = null;
+        geoLocationValues = null;
+        geoLocationScore = 1;
+        geoLocationInvert = false;
+
+        reqHeaderCheck = false;
+        reqHeaderName = null;
+        reqHeaderValue = null;
+        reqHeaderScore = 1;
+        reqHeaderInvert = false;
 
     }
 
@@ -1016,5 +1015,15 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
 
         return map;
+    }
+
+    private static synchronized LookupService getLookupService(String dbLocation) {
+        try {
+            if (lookupService == null) {
+                lookupService = new LookupService(dbLocation, LookupService.GEOIP_MEMORY_CACHE);
+            }
+        } catch (Exception e) {
+        }
+        return lookupService;
     }
 }
