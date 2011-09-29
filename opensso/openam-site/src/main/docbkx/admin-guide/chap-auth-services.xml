@@ -715,6 +715,51 @@
       <literal>openam-auth-adaptive-device-cookie-invert</literal></para>
      </listitem>
     </varlistentry>
+    <varlistentry>
+     <term>Geolocation Country Code Check</term>
+     <listitem>
+      <para>When enabled, check whether the client IP address location matches
+      a country specified in the Valid Country Codes list.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerock-am-auth-adaptive-geo-location-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Geolocation Database location</term>
+     <listitem>
+      <para>Path to GeoIP data file used to convert IP addresses to
+      country locations.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerock-am-auth-adaptive-geo-location-database</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Valid Country Codes</term>
+     <listitem>
+      <para>Specifies the list of country codes to match.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerock-am-auth-adaptive-geo-location-values</literal>. Use
+      <literal>|</literal> to separate multiple values.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Geolocation
+      Country Code Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerock-am-auth-adaptive-geo-location-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Geolocation Country Code Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerock-am-auth-adaptive-geo-location-invert</literal></para>
+     </listitem>
+    </varlistentry>
    </variablelist>
   </section>
   
