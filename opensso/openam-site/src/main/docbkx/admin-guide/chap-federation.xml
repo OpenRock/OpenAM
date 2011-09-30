@@ -85,7 +85,7 @@
   
   <para>In federation deployments where not all providers support SAML 2.0,
   OpenAM can act as a multi-protocol hub, translating for providers who rely
-  on other and older standards such SAML 1.x, Liberty Alliance Project
+  on other and older standards such as SAML 1.x, Liberty Alliance Project
   frameworks, and WS-Federation (for integration with Active Directory
   Federation Services, for example).</para>
  </section>
