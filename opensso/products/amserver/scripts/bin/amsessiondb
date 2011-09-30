@@ -25,8 +25,10 @@
 #
 # $Id: amsessiondb,v 1.5 2008/06/25 05:41:16 qcheng Exp $
 #
+# Portions Copyrighted 2011 ForgeRock AS
 #
 
+AWK=`which awk`
 AM_HOME=/opt/SUNWam
 AM_HOME_LINUX=/opt/sun/identity
 
@@ -57,7 +59,7 @@ elif [ "$OS_ARCH" = "HP-UX" ]; then
 	BDB_SO_PATH=/opt/sun/private/lib
 ### CR 6233176.Sets AM installation path at runtime to support AM
 ### relocatability
-	INSTALL_HOME=`/usr/sbin/swlist -a software_spec sun-identity-sfodb |grep -v "#" | tr -sd "\n" "" | awk -F ',' '{print $2}'| sed 's/l\=//'`
+	INSTALL_HOME=`/usr/sbin/swlist -a software_spec sun-identity-sfodb |grep -v "#" | tr -sd "\n" "" | ${AWK} -F ',' '{print $2}'| sed 's/l\=//'`
 	AM_HOME=$INSTALL_HOME/identity
 fi
 

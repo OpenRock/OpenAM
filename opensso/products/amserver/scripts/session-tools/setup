@@ -24,8 +24,12 @@
 #
 # $Id: setup,v 1.3 2008/06/25 05:41:17 qcheng Exp $
 #
+# Portions Copyrighted 2011 ForgeRock AS
+#
 
-JAVA_VER=`${JAVA_HOME}/bin/java -version 2>&1 | /bin/awk -F'"' '{print $2}'`
+AWK=`which awk`
+
+JAVA_VER=`${JAVA_HOME}/bin/java -version 2>&1 | ${AWK} -F'"' '{print $2}'`
 
 case $JAVA_VER in
 1.0* | 1.1* | 1.2* | 1.3*)
