@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * ShutdownManager is a static instance which is used to trigger all the
@@ -43,29 +44,22 @@ import java.util.Set;
 
 public class ShutdownManager {
     
-    protected static ShutdownManager instance;
+    private volatile static ShutdownManager instance;
     
     protected Set[] listeners;
 
     protected boolean shutdownCalled;
 
-    protected Object currentOwner;
-
-    protected int acquireCount;
-
-    protected int waitCount;
-
     private ShutdownListener appSSOTokenDestroyer;
+
+    private static ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
 
     /**
      * Constructor of ShutdownManager.
      */
     
-    protected ShutdownManager() {
+    private ShutdownManager() {
         shutdownCalled = false;
-        currentOwner = null;
-        acquireCount = 0;
-        waitCount = 0;
         int size = ShutdownPriority.HIGHEST.getIntValue();
         listeners = new HashSet[size];
         for (int i = 0; i < size; i++) {
@@ -99,32 +93,11 @@ public class ShutdownManager {
      *
      * @return a boolean to indicate whether it success.
      */
-    public synchronized boolean acquireValidLock() {
+    public boolean acquireValidLock() {
         if (shutdownCalled) {
             return false;
         } else {
-            if (currentOwner == null) {
-                currentOwner = Thread.currentThread();
-                acquireCount = 1;
-            } else {
-                if (currentOwner == Thread.currentThread()) {
-                    acquireCount++;
-                } else {
-                    try {
-                        waitCount++;
-                        this.wait();
-                        waitCount--;
-                    } catch (InterruptedException ex) {
-                        //ignored
-                    }
-                    if (shutdownCalled) {
-                        return false;
-                    } else {
-                        currentOwner = Thread.currentThread();
-                        acquireCount = 1;
-                    }
-                }
-            }
+    	    rwlock.writeLock().lock();
         }
         return true;
     }
@@ -133,26 +106,9 @@ public class ShutdownManager {
      * Release the lock of this ShutdownManager. IllegalMonitorStateException
      * will be thrown if the current thread is not holding the lock.
      */
-    public synchronized void releaseLockAndNotify() throws
+    public void releaseLockAndNotify() throws
         IllegalMonitorStateException {
-        if (currentOwner == Thread.currentThread()) {
-            if (acquireCount > 1) {
-                acquireCount--;
-            } else {
-                currentOwner = null;
-                acquireCount = 0;
-                if (waitCount > 0) {
-                    if (shutdownCalled) {
-                        this.notifyAll();
-                    } else {
-                        this.notify();
-                    }
-                }
-            }
-        } else {
-            throw new IllegalMonitorStateException(
-                "The calling thread is not the owner of the lock!");
-        }
+    	rwlock.writeLock().unlock();
     }
     
     /**
@@ -188,7 +144,7 @@ public class ShutdownManager {
     
     public void addShutdownListener(ShutdownListener listener,
         ShutdownPriority priority) throws IllegalMonitorStateException {
-        if (currentOwner == Thread.currentThread()) {
+    	if(rwlock.isWriteLockedByCurrentThread()) {
             removeShutdownListener(listener);
             listeners[priority.getIntValue() - 1].add(listener);
         } else {
@@ -205,7 +161,7 @@ public class ShutdownManager {
     
     public void removeShutdownListener(ShutdownListener listener) throws 
         IllegalMonitorStateException {
-        if (currentOwner == Thread.currentThread()) {
+        if(rwlock.isWriteLockedByCurrentThread()) {
             List priorities = ShutdownPriority.getPriorities();
             for (Iterator i = priorities.iterator(); i.hasNext();) {
                 int index = ((ShutdownPriority) i.next()).getIntValue();
@@ -224,7 +180,7 @@ public class ShutdownManager {
      */
     
     public void shutdown() throws IllegalMonitorStateException {
-        if (currentOwner == Thread.currentThread()) {
+        if(rwlock.isWriteLockedByCurrentThread()) {
             shutdownCalled = true;
             List priorities = ShutdownPriority.getPriorities();
             for (Iterator i = priorities.iterator(); i.hasNext();) {
