@@ -35,7 +35,7 @@
  <para>This chapter covers how to get debugging information and troubleshoot
  issues in OpenAM deployments.</para>
  
- <qandaset xml:id="solutions-to-common-issues">
+ <qandaset xml:id="solutions-to-common-issues" defaultlabel="qanda">
   <title>Solutions to Common Issues</title>
   
   <para>This section offers solutions to common problems when working with
@@ -43,7 +43,7 @@
   
   <qandadiv xml:id="troubleshooting-openam-installation">
    <title>OpenAM Installation</title>
-   <qandaentry>
+   <qandaentry xml:id="cannot-write-to-config-directory">
     <question>
      <para>OpenAM configuration could not write to the configuration directory.
      Where must I change permissions, and what permissions are required?</para>
@@ -77,7 +77,7 @@ configuration.dir=/my/readwrite/config/dir
 $ jar cf ../openam.war *</screen>
     </answer>
    </qandaentry>
-   <qandaentry>
+   <qandaentry xml:id="deploy-failed-lack-of-memory">
     <question>
      <para>Deployment failed due to lack of memory. What do I do?</para>
     </question>
@@ -98,7 +98,7 @@ $ jar cf ../openam.war *</screen>
      run OpenAM to avoid running out of memory.</para>
     </answer>
    </qandaentry>
-   <qandaentry>
+   <qandaentry xml:id="deploy-failed-invalid-hostname">
     <question>
      <para>Deployment failed due to invalid hostname configuration. What do
      I do?</para>
@@ -118,6 +118,44 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
 192.168.56.2 openam openam.example.com
 192.168.56.3 openam-bis openam-bis.example.com
 192.168.56.5 openam-ter openam-ter.example.com</screen>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="who-deleted-my-config">
+    <question>
+     <para>I configured OpenAM, and now am seeing the configuration screen
+     again. Who deleted my configuration?</para>
+    </question>
+    <answer>
+     <para>OpenAM uses a file in <filename>$HOME/.openssocfg/</filename> to
+     bootstrap and find its configuration. The file is named after the path
+     to OpenAM and contains the path to the configuration. The following
+     example shows what the file looks like for OpenAM deployed in Apache
+     Tomcat under <filename>/path/to/tomcat/webapps/openam</filename>, and
+     running as user <literal>amuser</literal> with <literal>$HOME</literal>
+     <filename>/home/amuser</filename>.</para>
+     <screen>$ cat .openssocfg/AMConfig_path_to_tomcat_webapps_openam_ 
+/home/amuser/openam</screen>
+     <para>If OpenAM cannot find its configuration, then it displays the
+     configuration screen.</para>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+  
+  <qandadiv xml:id="troubleshooting-openam-administration">
+   <title>OpenAM Administration</title>
+   <qandaentry xml:id="cannot-use-ssoadm-jsp">
+    <question>
+     <para>I cannot use the browser-based equivalent of
+     <command>ssoadm</command>,
+     <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>. Why
+     not?</para>
+    </question>
+    <answer>
+     <para>For security reasons, <literal>ssoadm.jsp</literal> is not activated
+     by default. To activate it, browse to Configuration &gt; Servers and Sites
+     &gt; Servers &gt; <replaceable>ServerName</replaceable> &gt; Advanced,
+     and then add a property named <literal>ssoadm.disabled</literal> with
+     value <literal>false</literal>.</para>
     </answer>
    </qandaentry>
   </qandadiv>
