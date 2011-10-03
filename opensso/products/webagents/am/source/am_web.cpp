@@ -116,6 +116,7 @@ typedef unsigned __int32 uint32_t;
 #endif
 
 #include "sdk.hpp"
+#include "agent_configuration.h"
 
 USING_PRIVATE_NAMESPACE
 
@@ -592,42 +593,104 @@ static am_bool_t is_server_alive(const Utils::url_info_t *info_ptr,
     return status;
 }
 
-static Utils::url_info_t *find_active_login_server(void* agent_config) 
-{
+static void freeUrlInfo(Utils::url_info_t *ur) {
+    if (ur->url_len > 0) {
+        if (ur->url != NULL) {
+            free((void*) ur->url);
+            ur->url = NULL;
+        }
+        if (ur->host != NULL) {
+            free((void*) ur->host);
+            ur->host = NULL;
+        }
+        if (ur->protocol != NULL) {
+            free((void*) ur->protocol);
+            ur->protocol = NULL;
+        }
+    }
+    if (ur) free(ur);
+    ur = URL_INFO_PTR_NULL;
+}
+
+static slist_t match_conditional_url(const char *request_url, smap_t& vm) {
+    slist_t ret;
+    std::string rurl(request_url);
+    for (smap_t::iterator it = vm.begin(); it != vm.end(); ++it) {
+        std::string key = (*it).first;
+        /*simple string match => try to find given pattern in request url*/
+        if (rurl.find(key) != std::string::npos) {
+            ret = (*it).second;
+        }
+    }
+    return ret;
+}
+
+static Utils::url_info_t *find_active_login_server(const char *request_url, void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
 
 
     Utils::url_info_t *result = URL_INFO_PTR_NULL;
     unsigned int i = 0;
     Utils::url_info_list_t *url_list = NULL;
 
-    if(initialized == AM_TRUE) {
-	PR_Lock((*agentConfigPtr)->lock);
+    if (initialized == AM_TRUE) {
+        PR_Lock((*agentConfigPtr)->lock);
 
-	if((*agentConfigPtr)->cdsso_enable) {
-	    url_list = &(*agentConfigPtr)->cdsso_server_url_list;
-	} else {
-	    url_list = &(*agentConfigPtr)->login_url_list;
-	}
+        if ((*agentConfigPtr)->cdsso_enable) {
+            url_list = &(*agentConfigPtr)->cdsso_server_url_list;
+        } else {
+            url_list = &(*agentConfigPtr)->login_url_list;
+        }
 
-	if ((*agentConfigPtr)->ignore_server_check == AM_FALSE) {
-	    for (i = 0; i < url_list->size; ++i) {
-		    am_web_log_max_debug("find_active_login_server(): "
-		    "Trying server: %s", url_list->list[i].url);
-		    if (is_server_alive(&url_list->list[i], agent_config)) {
-			    result = &url_list->list[i];
-			    break;
-		    }
-	    }
-	} else {
-	    result = &url_list->list[i];
-	}
+        if (!(*agentConfigPtr)->cond_login_url.empty()) {
+            am_web_log_max_debug("find_active_login_server(): conditional login url is available, will try to match request URL: %s", request_url);
+            if (request_url != NULL) {
+                slist_t cond_login_url_l = match_conditional_url(request_url, (*agentConfigPtr)->cond_login_url);
+                for (slist_t::const_iterator ur = cond_login_url_l.begin(); ur != cond_login_url_l.end(); ++ur) {
+                    std::string const& str = *ur;
+                    am_web_log_max_debug("find_active_login_server(): conditional login found matching server: %s", str.c_str());
+                    result = (Utils::url_info_t*)malloc(sizeof (Utils::url_info_t));
+                    if (Utils::parse_url(str.c_str(), str.length(), result, AM_TRUE) == AM_SUCCESS) {
+                        if ((*agentConfigPtr)->ignore_server_check == AM_FALSE) {
+                            am_web_log_max_debug("find_active_login_server(): conditional login trying server: %s", str.c_str());
+                            if (is_server_alive(result, agent_config)) {
+                                break;
+                            } else {
+                                freeUrlInfo(result);
+                            }
+                        } else {
+                            break;
+                        }
+                    } else {
+                        am_web_log_error("find_active_login_server(): conditional login failed to parse server URL");
+                        freeUrlInfo(result);
+                    }
+                }
+                if (cond_login_url_l.empty()) {
+                    am_web_log_max_debug("find_active_login_server(): conditional login didn't find any matching URL");
+                }
+            }
+        }
+        if ((*agentConfigPtr)->cond_login_url.empty() || result == URL_INFO_PTR_NULL) {
+            am_web_log_max_debug("find_active_login_server(): conditional login url is not available");
+            if ((*agentConfigPtr)->ignore_server_check == AM_FALSE) {
+                for (i = 0; i < url_list->size; ++i) {
+                    am_web_log_max_debug("find_active_login_server(): trying server: %s", url_list->list[i].url);
+                    if (is_server_alive(&url_list->list[i], agent_config)) {
+                        result = &url_list->list[i];
+                        break;
+                    }
+                }
+            } else {
+                result = &url_list->list[i];
+            }
+        } 
 
-	PR_Unlock((*agentConfigPtr)->lock);
+        PR_Unlock((*agentConfigPtr)->lock);
     } else {
-	am_web_log_error("find_active_login_server(): "
-			 "Library not initialized.");
+        am_web_log_error("find_active_login_server(): "
+                "Library not initialized.");
     }
 
     return result;
@@ -2876,7 +2939,7 @@ am_web_get_url_to_redirect(am_status_t status,
                     Utils::url_info_t *url_info_ptr;
                     std::string encoded_url;
                     std::string retVal;
-                    url_info_ptr = find_active_login_server(agent_config);
+                    url_info_ptr = find_active_login_server(goto_url, agent_config);
                     if (NULL == url_info_ptr) {
                         am_web_log_warning("%s: unable to find active Access "
                                      "Manager Auth server.", thisfunc);

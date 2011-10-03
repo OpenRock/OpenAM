@@ -33,7 +33,6 @@
 
 #ifndef _AGENT_CONFIGURATION_H_
 #define _AGENT_CONFIGURATION_H_
-
 #include "am_web.h"
 #include "am_properties.h"
 #include "ref_cnt_ptr.h"
@@ -65,6 +64,30 @@
 #endif /* WINNT */
 BEGIN_PRIVATE_NAMESPACE
 #define AGENT_CONFIGURATION "AgentConfiguration"
+
+typedef std::list<std::string> slist_t;
+typedef std::multimap<std::string, slist_t> smap_t;
+typedef std::pair<std::string, slist_t> spair_t;
+
+template <class ContainerT >
+void tokenize(const std::string& str, ContainerT& tokens, const std::string& delimiters = " ", const bool trimEmpty = false) {
+    std::string::size_type pos, lastPos = 0;
+    while (true) {
+        pos = str.find_first_of(delimiters, lastPos);
+        if (pos == std::string::npos) {
+            pos = str.length();
+            if (pos != lastPos || !trimEmpty)
+                tokens.push_back(ContainerT::value_type(str.data() + lastPos,
+                    (ContainerT::value_type::size_type)pos - lastPos));
+            break;
+        } else {
+            if (pos != lastPos || !trimEmpty)
+                tokens.push_back(ContainerT::value_type(str.data() + lastPos,
+                    (ContainerT::value_type::size_type)pos - lastPos));
+        }
+        lastPos = pos + 1;
+    }
+};
         
 /**
 * Data Structure to hold Cookie information passed to set_cookie function.
@@ -175,6 +198,8 @@ public:
     const char *notenforcedIPmode;
     PRBool use_redirect_for_advice;	// use redirect instead of POST for advice
     am_status_t error;
+    
+    smap_t cond_login_url;
     
     AgentConfiguration();
     AgentConfiguration(am_properties_t properties);

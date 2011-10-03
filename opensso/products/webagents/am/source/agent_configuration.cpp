@@ -97,6 +97,30 @@ AgentConfiguration::~AgentConfiguration()
     cleanup_properties();
 }
 
+smap_t conditional_login_url(const char *pv) {
+    smap_t cond_v_m;
+    slist_t cond_login_url_l, url_l;
+    std::string prms(pv);
+    size_t found;
+    /*tokenize multi-value parameter*/
+    tokenize(prms, cond_login_url_l, " ", true);
+    for (slist_t::const_iterator ur = cond_login_url_l.begin(); ur != cond_login_url_l.end(); ++ur) {
+        std::string const& str = *ur;
+        /* get configured request url (first) and associated login url value (second)
+         * first - string value to match
+         * second - comma separated login url value list
+         */
+        if ((found = str.find_last_of("|")) != std::string::npos) {
+            /*create a list of login url values*/
+            if (found > 0) tokenize(str.substr(found + 1), url_l, ",", true);
+            if (!url_l.empty()) cond_v_m.insert(spair_t(str.substr(0, found), url_l));
+        }
+        url_l.clear();
+        found = std::string::npos;
+    }
+    return cond_v_m;
+}
+
 am_status_t AgentConfiguration::populateAgentProperties() 
 {
     
@@ -425,7 +449,17 @@ am_status_t AgentConfiguration::populateAgentProperties()
                     &this->login_url_list, AM_TRUE);
         }
     }
-
+    
+    /* Get conditional login URL*/
+    if (AM_SUCCESS == status) {
+        const char *property_str;
+        am_properties_set_list(this->properties, "com.forgerock.agents.conditional.login.url", " ");
+        am_properties_get(this->properties, "com.forgerock.agents.conditional.login.url", &property_str);
+        if (property_str != NULL) {
+            this->cond_login_url = conditional_login_url(property_str);
+        }
+    }
+    
     /* Get the notification.enable */
     if (AM_SUCCESS == status) {
         parameter = AM_COMMON_NOTIFICATION_ENABLE_PROPERTY;
@@ -1382,6 +1416,8 @@ void AgentConfiguration::cleanup_properties()
     }
     
     this->notenforcedIPmode = NULL;
+    
+    this->cond_login_url.clear();
 
     try {
         unload_fqdn_handler();
