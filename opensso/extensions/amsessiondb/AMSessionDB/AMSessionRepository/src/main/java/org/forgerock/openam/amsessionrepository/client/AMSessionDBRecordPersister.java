@@ -33,15 +33,12 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
-import org.forgerock.openam.amsessionstore.resources.ReadResource;
-import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
-import org.restlet.resource.ClientResource;
 
 /**
  * This is an implementation of the FAMRecordPersister interface. It uses REST
@@ -59,11 +56,10 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
     
     private ExecutorService threadPool = null;
             
-    
     public AMSessionDBRecordPersister() {
         resourceURL = SessionService.getJdbcURL();
-        userName =   SessionService.getSessionStoreUserName();
-        password =   SessionService.getSessionStorePassword();
+        userName = SessionService.getSessionStoreUserName();
+        password = SessionService.getSessionStorePassword();
         readTimeOut = SessionService.getConnectionMaxWaitTime();
         
         threadPool = Executors.newCachedThreadPool();
@@ -88,6 +84,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
      * @return Some operations return their results in a FAMRecord
      * @throws Exception If something goes wrong
      */
+    @Override
     public FAMRecord send(FAMRecord famRecord)
     throws Exception {
         String op =  famRecord.getOperation();
@@ -105,8 +102,9 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 throw new Exception("Unable to delete without a primary key");
             }
             
-            Runnable deleteTask = new DeleteTask(resourceURL, recordToDelete);
-            threadPool.execute(deleteTask);
+            Callable<AMRecord> deleteTask = 
+                    new DeleteTask(resourceURL, userName, password, recordToDelete);
+            threadPool.submit(deleteTask);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: DeleteTasks queued");
@@ -122,8 +120,9 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 throw new IllegalArgumentException("Invalid expiration time" + expTime);
             }
 
-            Runnable deleteByDateTask = new DeleteByDateTask(resourceURL, expTime);
-            threadPool.execute(deleteByDateTask);
+            Callable<AMRecord> deleteByDateTask = 
+                    new DeleteByDateTask(resourceURL, userName, password, expTime);
+            threadPool.submit(deleteByDateTask);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: DeleteByDateTasks queued");
@@ -181,7 +180,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
                
             // Write extra bytes 
-            Map<String, byte[]> extraByteAttrs = famRecord.getExtraByteAttributes();
+            Map<String, byte[]> extraByteAttrs = (Map<String, byte[]>) famRecord.getExtraByteAttributes();
 
             if (extraByteAttrs != null) {
                for (Map.Entry<String, byte[]> entry : extraByteAttrs.entrySet()) {
@@ -193,8 +192,9 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             // Write extra String 
             record.setExtraStringAttrs(famRecord.getExtraStringAttributes());
             
-            Runnable writeTask = new WriteTask(resourceURL, record);
-            threadPool.execute(writeTask);
+            Callable<AMRecord> writeTask = 
+                    new WriteTask(resourceURL, userName, password, record);
+            threadPool.submit(writeTask);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: WriteTask queued");
@@ -204,8 +204,9 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 debug.message("AMSessionDBRecordPersister: " + FAMRecord.SHUTDOWN);
             }
             
-            Runnable shutdownTask = new ShutdownTask(resourceURL);
-            threadPool.execute(shutdownTask);
+            Callable<AMRecord> shutdownTask = 
+                    new ShutdownTask(resourceURL, userName, password);
+            threadPool.submit(shutdownTask);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: ShutdownTask queued");
@@ -222,14 +223,18 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                 throw new IllegalArgumentException("Unable to delete without a primary key");
             }
             
-            ClientResource resource = new ClientResource(resourceURL + ReadResource.URI);
-            ReadResource readResource = resource.wrap(ReadResource.class);
-
-            AMRecord record = readResource.read(recordToRead);
-            record.setOperation(FAMRecord.READ);
+            Callable<AMRecord> readTask = 
+                    new ReadTask(resourceURL, userName, password, recordToRead);
+            Future<AMRecord> result = threadPool.submit(readTask);
             
             if (debug.messageEnabled()) {
-                debug.message("Message read: " + record);
+                debug.message("AMSessionDBRecordPersister: ReadTask queued");
+            }
+            
+            AMRecord record = result.get();
+            
+            if (debug.messageEnabled()) {
+                debug.message("AMSessionDBRecordPersister: ReadTask received: " + record);
             }
             
             return toFAMRecord(record);
@@ -240,28 +245,18 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             
             String pKey = famRecord.getPrimaryKey();
             String sKey = famRecord.getSecondarykey();
-            ClientResource resource = new ClientResource(resourceURL + GetRecordCountResource.URI);
-            GetRecordCountResource getRecordCountResource = resource.wrap(GetRecordCountResource.class);
-
-            Map<String, Long> sessions = getRecordCountResource.getRecordCount(sKey);
-            AMRecord record = new AMRecord();
-            record.setOperation(FAMRecord.GET_RECORD_COUNT);
-            record.setPrimaryKey(pKey);
-            
-            Map<String, String> newMap = new HashMap<String, String>();
-            
-            for (Map.Entry<String, Long> entry : sessions.entrySet()) {
-                newMap.put(entry.getKey(), entry.getValue().toString());
-            }
-            
-            record.setExtraStringAttrs(newMap);
+            Callable<AMRecord> getRecordCountTask = 
+                    new GetRecordCountTask(resourceURL, userName, password, pKey, sKey);
+            Future<AMRecord> result = threadPool.submit(getRecordCountTask);
             
             if (debug.messageEnabled()) {
-                if (sessions != null) {
-                    debug.message("Get Record Count for " + sKey + " size " + sessions.size());
-                } else {
-                    debug.message("Get Record Count for " + sKey + " no results");
-                }
+                debug.message("AMSessionDBRecordPersister: GetRecordCountTask queued");
+            }
+                       
+            AMRecord record = result.get();
+            
+            if (debug.messageEnabled()) {
+                debug.message("AMSessionDBRecordPersister: GetRecordCountTask received: " + record);
             }
             
             return toFAMRecord(record);
@@ -272,26 +267,21 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             
             String pKey = famRecord.getPrimaryKey();
             String sKey = famRecord.getSecondarykey();
-            ClientResource resource = new ClientResource(resourceURL + ReadWithSecKeyResource.URI);
-            ReadWithSecKeyResource secReadResource = resource.wrap(ReadWithSecKeyResource.class);
-
-            Set<String> records = secReadResource.readWithSecKey(sKey);
-            AMRecord record = new AMRecord();
-            record.setOperation(FAMRecord.READ_WITH_SEC_KEY);
-            record.setPrimaryKey(pKey);
-
-            @SuppressWarnings("UseOfObsoleteCollectionType")
-            Vector<String> blobs = new Vector<String>();
-            
-            for (String session : records) {
-                blobs.add(session);
-            }
+            Callable<AMRecord> readWithSecKeyTask = 
+                    new ReadWithSecKeyTask(resourceURL, userName, password, pKey, sKey);
+            Future<AMRecord> result = threadPool.submit(readWithSecKeyTask);
             
             if (debug.messageEnabled()) {
-                debug.message("read with sec key: " + sKey + " found: " + blobs);
+                debug.message("AMSessionDBRecordPersister: ReadWithSecKeyTask queued");
             }
             
-            return toFAMRecord(record, blobs);
+            AMRecord record = result.get();
+            
+            if (debug.messageEnabled()) {
+                debug.message("AMSessionDBRecordPersister: ReadWithSecKeyTask received: " + record);
+            }
+            
+            return toFAMRecord(record);
         } 
         
         return null;
@@ -314,20 +304,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
         threadPool.shutdown();
     }
     
-    //Cumbersome code, read TODO on AMRecord
-    /**
-     * For a set of operations turns an AMRecord into a FAMRecord
-     * 
-     * @param record The AMRecord to convert
-     * @param blobs The Vector of sessions
-     * @return The FAMRecord object
-     * @throws Exception If the incoming record is invalid
-     */
-    protected FAMRecord toFAMRecord(AMRecord record)
-    throws Exception {
-        return toFAMRecord(record, null);
-    }
-    
+    //Cumbersome code, read TODO on AMRecord    
     /**
      * For a set of operations turns an AMRecord into a FAMRecord
      * 
@@ -337,7 +314,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
      * @throws Exception If the incoming record is invalid
      */
     @SuppressWarnings("UseOfObsoleteCollectionType")
-    protected FAMRecord toFAMRecord(AMRecord record, Vector sessions)
+    protected FAMRecord toFAMRecord(AMRecord record)
     throws Exception {
         FAMRecord result = null;
         
@@ -374,9 +351,12 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             result = new FAMRecord(service, operation, pKey, 0, null, 0, null, null);
             result.setStringAttrs(new HashMap(record.getExtraStringAttributes()));
         } else if (operation.equals(FAMRecord.READ_WITH_SEC_KEY)) {
+            Vector<String> sessions = record.getRecords();
+            
             if (sessions == null) {
                 throw new Exception("blobs cannot be null");
             }
+            
             result = new FAMRecord(service, operation, pKey, 0, null, 0, null, null);
             HashMap<String, Vector<String>> blobs = new HashMap<String, Vector<String>>();
             blobs.put(BLOBS, sessions);

@@ -47,7 +47,8 @@ import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 public class DeleteResourceImpl extends ServerResource implements DeleteResource {
     @Delete
     @Override
-    public void remove(String id) {
+    public void remove() {
+        String id = (String) getRequest().getAttributes().get(DeleteResource.PKEY_PARAM);
         long startTime = 0;
         
         if (Statistics.isEnabled()) {

@@ -25,8 +25,11 @@
 
 package org.forgerock.openam.amsessionrepository.client;
 
+import com.sun.identity.ha.FAMRecord;
+import java.util.HashMap;
+import java.util.Map;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
+import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -34,27 +37,38 @@ import org.restlet.resource.ClientResource;
  *
  * @author steve
  */
-public class ShutdownTask extends AbstractTask {
-    public ShutdownTask(String resourceURL, 
-                        String username, 
-                        String password) {
+public class GetRecordCountTask extends AbstractTask {
+    private String pKey = null;
+    private String sKey = null;
+    
+    public GetRecordCountTask(String resourceURL, 
+                              String username, 
+                              String password, 
+                              String pKey, 
+                              String recordToRead) {
         super(resourceURL, username, password);
+        
+        this.pKey = pKey;
+        this.sKey = recordToRead;
     }
     
     @Override
-    public AMRecord call()
+    public AMRecord call() 
     throws Exception {
         ChallengeResponse response = getAuth();
-        ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
+        ClientResource resource = 
+                new ClientResource(resourceURL + GetRecordCountResource.URI + SLASH + sKey);
         resource.setChallengeResponse(response);
-        ShutdownResource shutdownResource = resource.wrap(ShutdownResource.class);
+        GetRecordCountResource getRecordCountResource = resource.wrap(GetRecordCountResource.class);
+
+        Map<String, Long> sessions = null;
         
         try {
-            shutdownResource.shutdown();
+            sessions = getRecordCountResource.getRecordCount();
         } catch (Exception ex) {
             if (resource.getStatus().getCode() != 401) {
                 if (debug.warningEnabled()) {
-                    debug.warning("Unable to call shutdown on amsessiondb", ex);
+                    debug.warning("Unable to get record count from amsessiondb", ex);
                 }
                 
                 throw ex;
@@ -65,35 +79,51 @@ public class ShutdownTask extends AbstractTask {
             resource.setChallengeResponse(response);
             
             try {
-                shutdownResource.shutdown();
+                sessions = getRecordCountResource.getRecordCount();
             } catch (Exception ex2) {
                 if (resource.getStatus().getCode() == 401) {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to call shutdown on amsessiondb; unauthorized", ex2);
+                        debug.warning("Unable to get record count from amsessiondb; unauthorized", ex2);
                     }
                     
                     throw new UnauthorizedException(ex2.getMessage());
                 } else {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to call shutdown on amsessiondb", ex2);
+                        debug.warning("Unable to get record count from amsessiondb", ex2);
                     }
                     throw ex2;
                 }
             }
         }
 
+        AMRecord record = new AMRecord();
+        record.setOperation(FAMRecord.GET_RECORD_COUNT);
+        record.setPrimaryKey(pKey);
+
+        Map<String, String> newMap = new HashMap<String, String>();
+
+        for (Map.Entry<String, Long> entry : sessions.entrySet()) {
+            newMap.put(entry.getKey(), entry.getValue().toString());
+        }
+
+        record.setExtraStringAttrs(newMap);
+
         if (debug.messageEnabled()) {
-            debug.message("Shutdown message sent");
+            if (sessions != null) {
+                debug.message("Get Record Count for " + sKey + " size " + sessions.size());
+            } else {
+                debug.message("Get Record Count for " + sKey + " no results");
+            }
         }
         
-        return null;
+        return record;
     }
     
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append(ShutdownTask.class);
+        output.append(GetRecordCountTask.class).append(": pkey=").append(sKey);
         
-        return output.toString();        
+        return output.toString();
     }
 }

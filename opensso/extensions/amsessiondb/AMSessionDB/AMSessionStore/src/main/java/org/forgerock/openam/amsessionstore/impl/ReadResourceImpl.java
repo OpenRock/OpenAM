@@ -48,7 +48,8 @@ import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
 public class ReadResourceImpl extends ServerResource implements ReadResource {
     @Get
     @Override
-    public AMRecord read(String id) {
+    public AMRecord read() {
+        String id = (String) getRequest().getAttributes().get(ReadResource.PKEY_PARAM);
         AMRecord record = null;
         long startTime = 0;
         

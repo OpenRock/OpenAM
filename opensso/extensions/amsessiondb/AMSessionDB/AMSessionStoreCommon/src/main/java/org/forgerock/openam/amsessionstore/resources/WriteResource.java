@@ -34,6 +34,7 @@ import org.restlet.resource.Put;
  */
 public interface WriteResource {
     public final static String URI = "/write";
+
     @Put
     public void write(AMRecord record) throws Exception;
 }

@@ -14,7 +14,9 @@ import org.restlet.resource.Get;
  */
 public interface ReadWithSecKeyResource {
     public static final String URI = "/readwithseckey";
+    public static final String UUID_PARAM = "uuid";
+    public static final String UUID = "/{" + UUID_PARAM + "}";
     
     @Get
-    public Set<String> readWithSecKey(String id);
+    public Set<String> readWithSecKey();
 }

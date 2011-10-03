@@ -46,7 +46,9 @@ import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
  */
 public class ReadWithSecKeyResourceImpl extends ServerResource implements ReadWithSecKeyResource {
     @Get
-    public Set<String> readWithSecKey(String id) {
+    @Override
+    public Set<String> readWithSecKey() {
+        String id = (String) getRequest().getAttributes().get(ReadWithSecKeyResource.UUID_PARAM);
         Set<String> records = null;
         
         try {

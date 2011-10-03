@@ -27,6 +27,13 @@ package org.forgerock.openam.amsessionrepository.client;
 
 import com.sun.identity.ha.FAMRecordUtils;
 import com.sun.identity.shared.debug.Debug;
+import java.util.concurrent.Callable;
+import org.forgerock.openam.amsessionstore.common.AMRecord;
+import org.forgerock.openam.amsessionstore.resources.ConfigResource;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
+import org.restlet.resource.ClientResource;
 
 /**
  * Abstract class to the session persister tasks
@@ -36,9 +43,14 @@ import com.sun.identity.shared.debug.Debug;
  * 
  * @author steve
  */
-public abstract class AbstractTask implements Runnable {
+public abstract class AbstractTask implements Callable<AMRecord> {
     protected static Debug debug = null;
     protected String resourceURL = null;
+    protected String username = null;
+    protected String password = null;
+    protected static ChallengeResponse authResponse = null;
+    
+    public static final String SLASH = "/";
     
     static {
         initialize();
@@ -48,14 +60,59 @@ public abstract class AbstractTask implements Runnable {
         debug = FAMRecordUtils.debug;
     }
     
-    @Override
-    public void run() {
-        try {
-            doTask();
-        } catch (Exception ex) {
-            debug.warning("Unable to execute task: " + toString());
+    protected AbstractTask(String resourceUrl, String username, String password) {
+        this.resourceURL = resourceUrl;
+        this.username = username;
+        this.password = password;
+    }
+        
+    protected synchronized ChallengeResponse getAuth() {
+        if (authResponse != null) {
+            return authResponse;
         }
+                
+        ClientResource authRes = new ClientResource(resourceURL + ConfigResource.URI);
+        authRes.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "login", "test");
+        
+        try {
+            authRes.get();
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+        
+        if (debug.messageEnabled()) {
+            debug.message("Fetching Authentication Context; Initial Request: " + authRes.getStatus());
+        }
+        
+        ChallengeRequest c1 = null;
+        
+        for (ChallengeRequest challengeRequest : authRes.getChallengeRequests()) {
+            if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
+                c1 = challengeRequest;
+                break;
+            }
+        }
+        
+        authResponse = new ChallengeResponse(c1, authRes.getResponse(), username, password.toCharArray());
+        authRes.setChallengeResponse(authResponse);
+        
+        try {
+            authRes.get();
+        } catch (Exception ex) {
+            debug.error("Unable to establish authentication", ex);
+        }
+        
+        if (debug.messageEnabled()) {
+            debug.message("Fetching Authentication Context; Second Request: " + authRes.getStatus());
+        }
+                
+        return authResponse;
     }
     
-    public abstract void doTask() throws Exception;
+    public synchronized void clearAuth() {
+        authResponse = null;
+    }
+    
+    @Override
+    public abstract AMRecord call() throws Exception;
 }

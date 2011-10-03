@@ -28,6 +28,7 @@ package org.forgerock.openam.amsessionstore.common;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * @author peter.major
@@ -64,6 +65,7 @@ public class AMRecord implements Serializable {
     private String secondaryKey = null;
     private int state = 0;
     private String auxdata = null;
+    private Vector<String> records = null;
     
     // byte[] encoded as Base64
     private String data = null;    
@@ -200,6 +202,16 @@ public class AMRecord implements Serializable {
     
     public String getBytes(String key) {
        return extraByteAttrs.get(key);
+    }
+    
+    @SuppressWarnings("UseOfObsoleteCollectionType")
+    public Vector<String> getRecords() {
+        return records;
+    }
+    
+    @SuppressWarnings("UseOfObsoleteCollectionType")
+    public void setRecords(Vector<String> records) {
+        this.records = records;
     }
     
     @Override

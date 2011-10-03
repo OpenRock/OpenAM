@@ -25,7 +25,9 @@
 
 package org.forgerock.openam.amsessionrepository.client;
 
+import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.DeleteResource;
+import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
 /**
@@ -35,22 +37,62 @@ import org.restlet.resource.ClientResource;
 public class DeleteTask extends AbstractTask {
     private String primaryKey = null;
     
-    public DeleteTask(String resourceURL, String recordToDelete) {
+    public DeleteTask(String resourceURL, 
+                      String username, 
+                      String password, 
+                      String recordToDelete) {
+        super(resourceURL, username, password);
+        
         this.primaryKey = recordToDelete;
-        this.resourceURL = resourceURL;
     }
 
     @Override
-    public void doTask() 
+    public AMRecord call() 
     throws Exception {
-        ClientResource resource = new ClientResource(resourceURL + DeleteResource.URI);
+        ChallengeResponse response = getAuth();
+        ClientResource resource = 
+                new ClientResource(resourceURL + DeleteResource.URI + SLASH + primaryKey);
+        resource.setChallengeResponse(response);
         DeleteResource deleteResource = resource.wrap(DeleteResource.class);
 
-        deleteResource.remove(primaryKey);
+        try {
+            deleteResource.remove();
+        } catch (Exception ex) {
+            if (resource.getStatus().getCode() != 401) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Unable to delete record from amsessiondb", ex);
+                }
+                
+                throw ex;
+            }
+            
+            clearAuth();
+            response = getAuth();
+            resource.setChallengeResponse(response);
+            
+            try {
+                deleteResource.remove();
+            } catch (Exception ex2) {
+                if (resource.getStatus().getCode() == 401) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Unable to delete record from amsessiondb; unauthorized", ex2);
+                    }
+                    
+                    throw new UnauthorizedException(ex2.getMessage());
+                } else {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Unable to delete record from amsessiondb", ex2);
+                    }
+                    throw ex2;
+                }
+            }
+        }
 
         if (debug.messageEnabled()) {
             debug.message("record: " + primaryKey + " deleted");
         }
+        
+        return null;
     }
     
     @Override

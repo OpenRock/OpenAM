@@ -27,6 +27,7 @@ package org.forgerock.openam.amsessionrepository.client;
 
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.WriteResource;
+import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
 /**
@@ -36,20 +37,62 @@ import org.restlet.resource.ClientResource;
 public class WriteTask extends AbstractTask {
     protected AMRecord record = null;
     
-    public WriteTask(String resourceURL, AMRecord record) {
-        this.resourceURL = resourceURL;
+    public WriteTask(String resourceURL, 
+                     String username, 
+                     String password, 
+                     AMRecord record) {
+        super(resourceURL, username, password);
+        
         this.record = record;
     }
     
-    public void doTask() 
+    @Override
+    public AMRecord call() 
     throws Exception {
+        ChallengeResponse response = getAuth();
+        
         ClientResource resource = new ClientResource(resourceURL + WriteResource.URI);
+        resource.setChallengeResponse(response);
         WriteResource writeResource = resource.wrap(WriteResource.class);
-        writeResource.write(record);
+        
+        try {
+            writeResource.write(record);
+        } catch (Exception ex) {
+            if (resource.getStatus().getCode() != 401) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Unable to write to amsessiondb", ex);
+                }
+                
+                throw ex;
+            }
+            
+            clearAuth();
+            response = getAuth();
+            resource.setChallengeResponse(response);
+            
+            try {
+                writeResource.write(record);
+            } catch (Exception ex2) {
+                if (resource.getStatus().getCode() == 401) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Unable to write to amsessiondb; unauthorized", ex2);
+                    }
+                    
+                    throw new UnauthorizedException(ex2.getMessage());
+                } else {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Unable to write to amsessiondb", ex2);
+                    }
+                    throw ex2;
+                }
+            }
+        }
 
         if (debug.messageEnabled()) {
             debug.message("Message written to store: " + record);
         }        
+        
+        return null;
     }
     
     @Override

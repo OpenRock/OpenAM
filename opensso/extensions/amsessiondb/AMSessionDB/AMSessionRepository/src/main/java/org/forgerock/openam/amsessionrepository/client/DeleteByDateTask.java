@@ -25,7 +25,9 @@
 
 package org.forgerock.openam.amsessionrepository.client;
 
+import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.DeleteByDateResource;
+import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
 /**
@@ -35,21 +37,62 @@ import org.restlet.resource.ClientResource;
 public class DeleteByDateTask extends AbstractTask {
     protected long expTime;
     
-    public DeleteByDateTask(String resourceURL, long expTime) {
-        this.resourceURL = resourceURL;
+    public DeleteByDateTask(String resourceURL, 
+                            String username, 
+                            String password, 
+                            long expTime) {
+        super(resourceURL, username, password);
+        
         this.expTime = expTime;
     }
 
-    public void doTask() 
+    @Override
+    public AMRecord call() 
     throws Exception {
-        ClientResource resource = new ClientResource(resourceURL + DeleteByDateResource.URI);
+        ChallengeResponse response = getAuth();
+        ClientResource resource = 
+                new ClientResource(resourceURL + DeleteByDateResource.URI + SLASH + expTime);
+        resource.setChallengeResponse(response);
         DeleteByDateResource purgeResource = resource.wrap(DeleteByDateResource.class);
 
-        purgeResource.remove(expTime);
+        try {
+            purgeResource.remove();
+        } catch (Exception ex) {
+            if (resource.getStatus().getCode() != 401) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Unable to deletebydate  from amsessiondb", ex);
+                }
+                
+                throw ex;
+            }
+            
+            clearAuth();
+            response = getAuth();
+            resource.setChallengeResponse(response);
+            
+            try {
+                purgeResource.remove();
+            } catch (Exception ex2) {
+                if (resource.getStatus().getCode() == 401) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Unable to deletebydate from amsessiondb; unauthorized", ex2);
+                    }
+                    
+                    throw new UnauthorizedException(ex2.getMessage());
+                } else {
+                    if (debug.warningEnabled()) {
+                        debug.warning("Unable to deletebydate from amsessiondb", ex2);
+                    }
+                    throw ex2;
+                }
+            }
+        }
 
         if (debug.messageEnabled()) {
             debug.message("records deleted by exp data: " + expTime);
         }
+        
+        return null;
     }
     
     @Override

@@ -34,7 +34,9 @@ import org.restlet.resource.Get;
  */
 public interface ReadResource {
     public static final String URI = "/read";
+    public static final String PKEY_PARAM = "pkey";
+    public static final String PKEY = "/{" + PKEY_PARAM + "}";
     
     @Get
-    public AMRecord read(String id);
+    public AMRecord read();
 }

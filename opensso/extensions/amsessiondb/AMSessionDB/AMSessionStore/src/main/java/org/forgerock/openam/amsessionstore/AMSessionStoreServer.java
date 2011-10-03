@@ -85,8 +85,7 @@ public class AMSessionStoreServer {
         
         if (username != null && password != null 
                 && !username.isEmpty() && !password.isEmpty()) {
-
-            DigestAuthenticator guard = new DigestAuthenticator(null, "amsessiondb", password);
+            DigestAuthenticator guard = new DigestAuthenticator(null, username, password);
             MapVerifier mapVerifier = new MapVerifier();
             mapVerifier.getLocalSecrets().put(username, password.toCharArray());
             guard.setWrappedVerifier(mapVerifier);

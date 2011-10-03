@@ -23,19 +23,25 @@
  *
  */
 
-package org.forgerock.openam.amsessionstore.resources;
-
-import org.restlet.resource.Delete;
+package org.forgerock.openam.amsessionrepository.client;
 
 /**
  *
  * @author steve
  */
-public interface DeleteResource {
-    public static final String URI = "/delete";
-    public static final String PKEY_PARAM = "pkey";
-    public static final String PKEY = "/{" + PKEY_PARAM + "}";
-    
-    @Delete
-    public void remove();
+public class UnauthorizedException extends Exception {
+
+    /**
+     * Creates a new instance of <code>UnauthorizedException</code> without detail message.
+     */
+    public UnauthorizedException() {
+    }
+
+    /**
+     * Constructs an instance of <code>UnauthorizedException</code> with the specified detail message.
+     * @param msg the detail message.
+     */
+    public UnauthorizedException(String msg) {
+        super(msg);
+    }
 }

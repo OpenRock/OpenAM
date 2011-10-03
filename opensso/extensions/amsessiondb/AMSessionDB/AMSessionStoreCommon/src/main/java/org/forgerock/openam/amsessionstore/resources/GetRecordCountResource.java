@@ -34,6 +34,8 @@ import org.restlet.resource.Get;
  */
 public interface GetRecordCountResource {
     public static final String URI = "/getrecordcount";
+    public static final String UUID = "/{uuid}";
+    
     @Get
-    public Map<String, Long> getRecordCount(String uuid);
+    public Map<String, Long> getRecordCount();
 }

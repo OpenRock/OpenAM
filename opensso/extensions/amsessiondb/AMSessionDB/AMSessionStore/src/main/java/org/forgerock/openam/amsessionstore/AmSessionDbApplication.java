@@ -65,13 +65,13 @@ public class AmSessionDbApplication extends Application {
         Router router = new Router(getContext());
 
         // Define the routes
-        router.attach(ReadResource.URI, ReadResourceImpl.class);
+        router.attach(ReadResource.URI + ReadResource.PKEY, ReadResourceImpl.class);
         router.attach(WriteResource.URI, WriteResourceImpl.class);
-        router.attach(DeleteByDateResource.URI, DeleteByDateResourceImpl.class);
-        router.attach(DeleteResource.URI, DeleteResourceImpl.class);
+        router.attach(DeleteByDateResource.URI + DeleteByDateResource.DATE, DeleteByDateResourceImpl.class);
+        router.attach(DeleteResource.URI + DeleteResource.PKEY, DeleteResourceImpl.class);
         router.attach(ShutdownResource.URI, ShutdownResourceImpl.class);
-        router.attach(ReadWithSecKeyResource.URI, ReadWithSecKeyResourceImpl.class);
-        router.attach(GetRecordCountResource.URI, GetRecordCountResourceImpl.class);
+        router.attach(ReadWithSecKeyResource.URI + ReadWithSecKeyResource.UUID, ReadWithSecKeyResourceImpl.class);
+        router.attach(GetRecordCountResource.URI + GetRecordCountResource.UUID, GetRecordCountResourceImpl.class);
         router.attach(StatsResource.URI, StatsResourceImpl.class);
         router.attach(ConfigResource.URI, ConfigResourceImpl.class);
         router.attach(ReplicationResource.URI, ReplicationResourceImpl.class);

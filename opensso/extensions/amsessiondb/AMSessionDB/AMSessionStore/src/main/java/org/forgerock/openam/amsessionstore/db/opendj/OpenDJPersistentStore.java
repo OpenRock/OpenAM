@@ -25,6 +25,8 @@
 
 package org.forgerock.openam.amsessionstore.db.opendj;
 
+import java.util.Iterator;
+import org.opends.server.types.AttributeValue;
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,13 +72,14 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     private final static String ID = "OpenDJPersistentStore"; 
     private static InternalClientConnection icConn;
     
-    private final static String PKEY_FILTER_PRE = "(pKey=";
-    private final static String PKEY_FILTER_POST = ")";
     private final static String SKEY_FILTER_PRE = "(sKey=";
     private final static String SKEY_FILTER_POST = ")";
     private final static String EXPDATE_FILTER_PRE = "(expirationDate<=";
     private final static String EXPDATE_FILTER_POST = ")";
+    private final static String NUM_SUB_ORD_ATTR = "numSubordinates";
+    private final static String ALL_ATTRS = "(" + NUM_SUB_ORD_ATTR + "=*)";
     private static LinkedHashSet<String> returnAttrs;
+    private static LinkedHashSet<String> numSubOrgAttrs;
     
     static {
         initialize();
@@ -95,6 +98,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         returnAttrs.add(AMRecordDataEntry.OPERATION);
         returnAttrs.add(AMRecordDataEntry.SERVICE);
         returnAttrs.add(AMRecordDataEntry.STATE);
+        
+        numSubOrgAttrs = new LinkedHashSet<String>();
+        numSubOrgAttrs.add(NUM_SUB_ORD_ATTR);
     }
     
     @SuppressWarnings("CallToThreadStartDuringObjectConstruction")
@@ -332,6 +338,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                             }
                         }   
                     }
+
+                    final LocalizableMessage message = DB_R_SEC_KEY_OK.get(id, Integer.toString(result.size()));
+                    Log.logger.log(Level.FINE, message.toString());
                     
                     return result;
                 } else {
@@ -474,6 +483,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
                         result.put(key, expDate);
                     }
                     
+                    final LocalizableMessage message = DB_GET_REC_CNT_OK.get(id, Integer.toString(result.size()));
+                    Log.logger.log(Level.FINE, message.toString());
+                    
                     return result;
                 } else {
                     return null;
@@ -503,7 +515,17 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
     
     @Override
     public DBStatistics getDBStatistics() {
-        return null;
+        DBStatistics stats = DBStatistics.getInstance();
+        
+        try {
+            stats.setNumRecords(getNumSubordinates());
+        } catch (StoreException se) {
+            final LocalizableMessage message = DB_STATS_FAIL.get(se.getMessage());
+            Log.logger.log(Level.WARNING, message.toString());
+            stats.setNumRecords(-1);
+        }
+        
+        return stats;
     }
     
     protected void internalShutdown() {
@@ -515,5 +537,61 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         } catch (Exception ex) {
             Log.logger.log(Level.WARNING, DB_AM_SHUT_FAIL.get().toString(), ex);
         }
+    }
+    
+    protected int getNumSubordinates() 
+    throws StoreException {
+        int recordCount = -1;
+        StringBuilder baseDN = new StringBuilder();
+        baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
+        
+        try {
+            InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
+                SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
+                0, 0, false, ALL_ATTRS , numSubOrgAttrs);
+            ResultCode resultCode = iso.getResultCode();
+            
+            if (resultCode == ResultCode.SUCCESS) {
+                LinkedList<SearchResultEntry> searchResult = iso.getSearchEntries();
+                
+                if (!searchResult.isEmpty()) {                    
+                    for (SearchResultEntry entry : searchResult) {
+                        List<Attribute> attributes = entry.getAttributes();
+
+                        for (Attribute attr : attributes) {
+                            if (attr.isVirtual() && attr.getName().equals(NUM_SUB_ORD_ATTR)) {
+                                Iterator<AttributeValue> values = attr.iterator();
+                                
+                                while (values.hasNext()) {
+                                    AttributeValue value = values.next();
+                                    
+                                    try {
+                                        recordCount = Integer.parseInt(value.toString());
+                                    } catch (NumberFormatException nfe) {
+                                        final LocalizableMessage message = DB_STATS_NFS.get(nfe.getMessage());
+                                        Log.logger.log(Level.INFO, message.toString());
+                                        throw new StoreException(message.toString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
+                final LocalizableMessage message = DB_ENT_NOT_P.get(OpenDJConfig.getSessionDBSuffix());
+                Log.logger.log(Level.FINE, message.toString());
+                throw new StoreException(message.toString());
+            } else {
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(OpenDJConfig.getSessionDBSuffix(), resultCode.toString());
+                Log.logger.log(Level.WARNING, message.toString());
+                throw new StoreException(message.toString());
+            }
+        } catch (DirectoryException dex) {
+            final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(OpenDJConfig.getSessionDBSuffix());
+            Log.logger.log(Level.WARNING, message.toString(), dex);
+            throw new StoreException(message.toString(), dex);
+        }
+        
+        return recordCount;
     }
 }

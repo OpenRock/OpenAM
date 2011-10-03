@@ -43,7 +43,10 @@ import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
  */
 public class DeleteByDateResourceImpl extends ServerResource implements DeleteByDateResource {
     @Delete
-    public void remove(long expDate) {
+    @Override
+    public void remove() {
+        long expDate = Long.parseLong((String) getRequest().getAttributes().get(DeleteByDateResource.DATE_PARAM));
+        
         try {
             PersistentStoreFactory.getPersistentStore().deleteExpired(expDate);
         } catch (Exception ex) {

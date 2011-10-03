@@ -33,6 +33,9 @@ import org.restlet.resource.Delete;
  */
 public interface DeleteByDateResource {
     public static final String URI = "/deletebydate";
+    public static final String DATE_PARAM = "date";
+    public static final String DATE = "/{" + DATE_PARAM + "}";
+    
     @Delete
-    public void remove(long expDate);
+    public void remove();
 }
