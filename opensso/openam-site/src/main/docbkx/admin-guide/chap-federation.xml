@@ -170,9 +170,15 @@
     <para>Click Configure to save your configuration.</para>
    </step>
    <step>
-    <para>Share metadata from your provider with other providers in your circle
-    of trust, for example by sharing the URL
-    <literal>http://idp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
+    <para>Export the XML-based metadata from your provider to share
+    with other providers in your circle of trust.</para>
+    <screen>$ curl -o metadata.xml
+ http://idp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
+ http://idp.example.com:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+    <para>When you have configured only the top-level realm,
+    <literal>/</literal>, you can omit the query string.</para>
+    <para>Alternatively, provide the URL, to other providers so they can load
+    the metadata.</para>
    </step>
   </procedure>
   
@@ -194,10 +200,10 @@
     <para>Either add the provider to the circle of trust you already created,
     or select Add to new and provide a New Circle of Trust name.</para>
    </step>
-   <step>
-    <para>For the attributes you share, map identity provider attribute names
-    (Name in Assertion), to user profile names from your identity repository
-    (Local Attribute Name).</para>
+   <step performance="optional">
+    <para>If the identity provider has not already mapped the attributes you
+    share, map identity provider attribute names (Name in Assertion), to user
+    profile names from your identity repository (Local Attribute Name).</para>
    </step>
    <step>
     <para>Click Configure to save your configuration.</para>
@@ -206,9 +212,12 @@
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
     <screen>$ curl -o metadata.xml
- http://sp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp</screen>
-    <para>Alternatively, provide the URL to other providers so they can
-    load the metadata.</para>
+ http://sp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
+ http://sp.example.com:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+    <para>When you have configured only the top-level realm,
+    <literal>/</literal>, you can omit the query string.</para>
+    <para>Alternatively, provide the URL, to other providers so they can load
+    the metadata.</para>
    </step>
   </procedure>
   
@@ -217,8 +226,7 @@
    
    <step>
     <para>Obtain the identity provider metadata, or the URL where you can
-    obtain it, such as
-    <literal>http://idp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
+    obtain it.</para>
    </step>
    <step>
     <para>On the OpenAM console Common Tasks page, click Register Remote
@@ -242,8 +250,7 @@
    
    <step>
     <para>Obtain the service provider metadata, or the URL where you can
-    obtain it, such as
-    <literal>http://sp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
+    obtain it.</para>
    </step>
    <step>
     <para>On the OpenAM console Common Tasks page, click Register Remote Service
@@ -253,10 +260,10 @@
     <para>Provide the identity provider metadata or link to obtain
     metadata.</para>
    </step>
-   <step>
-    <para>For the attributes you share, map service provider attribute names
-    (Name in Assertion), to user profile names from your identity repository
-    (Local Attribute Name).</para>
+   <step performance="optional">
+    <para>If the identity provider has not already mapped the attributes you
+    share, map identity provider attribute names (Name in Assertion), to user
+    profile names from your identity repository (Local Attribute Name).</para>
    </step>
    <step>
     <para>Either add the provider to the circle of trust you already created,
@@ -481,7 +488,32 @@ WAR file was created.</screen>
     <step>
      <para>Obtain metadata for both the identity provider and service
      provider.</para>
-     <screen>TODO</screen>
+     <screen>$ ssh idp.example.com
+...
+$ ssoadm create-metadata-templ -y "http://idp.example.com:8080/openam"
+ -u amadmin -f /tmp/pwd.txt -i /idp -m idp-standard.xml -x idp-extended.xml
+
+Hosted entity configuration was written to idp-extended.xml.
+Hosted entity descriptor was written to idp-standard.xml.
+$ ssh sp.example.com
+...
+$ ssoadm create-metadata-templ -y "http://sp.example.com:8080/openam"
+ -u amadmin -f /tmp/pwd.txt -i /sp -m sp-standard.xml -x sp-extended.xml
+
+Hosted entity configuration was written to idp-extended.xml.
+Hosted entity descriptor was written to idp-standard.xml.</screen>
+    </step>
+    <step>
+     <para>On the identity provider console, create a remote service provider
+     in the circle of trust using the service provider metadata.</para>
+    </step>
+    <step>
+     <para>Adjust the identity provider metadata.</para>
+     <para>TODO</para>
+    </step>
+    <step>
+     <para>On the service provider console, create a remote identity provider
+     in the circle of trust using the identity provider metadata.</para>
     </step>
    </procedure>
   </section>
