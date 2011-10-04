@@ -517,7 +517,6 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 						(cookieValue[i] != '\0'); i++) {
 							length++;
 					}
-					cookieValue[length]='\0';
 					if (length < URL_SIZE_MAX-1) {
 						if (length > 0) {
 							dpro_cookie = (CHAR *) malloc(length+1);
