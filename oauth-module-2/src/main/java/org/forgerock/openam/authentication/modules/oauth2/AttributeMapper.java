@@ -32,9 +32,9 @@ import org.json.JSONObject;
 
 public interface AttributeMapper {
 
-    public java.util.Map getAttributes(
-        Set attributeMapConfiguration,
-        Object svcProfileResponse
+    public java.util.Map<String, Set<String>>  getAttributes(
+        Set<String> attributeMapConfiguration,
+        String svcProfileResponse
     ) throws AuthLoginException;
 
 }

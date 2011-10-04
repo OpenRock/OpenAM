@@ -27,7 +27,7 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-interface OAuthParam {
+public class OAuthParam {
     
     static final String MODULE_NAME = "OAuth";
     static final String BUNDLE_NAME = "amAuthOAuth";
@@ -60,8 +60,9 @@ interface OAuthParam {
     static final String KEY_SMTP_PORT = "org-forgerock-auth-oauth-smtp-port";
     static final String KEY_SMTP_USERNAME = "org-forgerock-auth-oauth-smtp-username";
     static final String KEY_SMTP_PASSWORD = "org-forgerock-auth-oauth-smtp-password";
-    static final String KEY_SMTP_SSL_ENABLED = "org-forgerock-auth-oauth-smtp-ssl_enabled";
-    
+    static final String KEY_SMTP_SSL_ENABLED = "org-forgerock-auth-oauth-smtp-ssl_enabled"; 
+    static final String KEY_EMAIL_FROM = "org-forgerock-auth-oauth-smtp-email-from";
+            
     // openam parameters
     final static String PARAM_GOTO = "goto";
     final static String PARAM_REALM = "realm";
@@ -83,7 +84,6 @@ interface OAuthParam {
 
     // Session parameters set by the module
     final static String SESSION_OAUTH_TOKEN = "OAuthToken";
-    final static String SESSION_OAUTH2 = "OAUTH2";
     final static String SESSION_LOGOUT_BEHAVIOUR = "OAuth2logoutBehaviour";
     
     // Cookies used by the module

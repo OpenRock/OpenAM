@@ -28,10 +28,9 @@ package org.forgerock.openam.authentication.modules.oauth2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import org.owasp.esapi.ESAPI;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
 /*
@@ -41,32 +40,31 @@ import org.owasp.esapi.ESAPI;
  * that did not work. OAuthProxy may not be needed with future
  * versions of OpenAM.
  */
-public class OAuthProxy implements OAuthParam {
+public class OAuthProxy  {
 
-    private static Debug debug = Debug.getInstance("amAuth");
 
     public static String toPostForm(HttpServletRequest req,
             HttpServletResponse res) {
-        if (debug.messageEnabled()) {
-            debug.message("toPostForm: started");
-        }
+
+            OAuthUtil.debugMessage("toPostForm: started");
+
  
-        String action = OAuthUtil.findCookie(req, OAuth.COOKIE_ORIG_URL);
+        String action = OAuthUtil.findCookie(req, COOKIE_ORIG_URL);
         
         if (OAuthUtil.isEmpty(action)) {
             return getError("Request not valid !");
         }
 
-        Map params = req.getParameterMap();
+        Map<String, String> params = req.getParameterMap();
         if (params.size() != 1) {
-            debug.error("OAuthProxy.toPostForm: More or less "
+            OAuthUtil.debugError("OAuthProxy.toPostForm: More or less "
                     + "than 1 parameters in the request");
             return getError("Request not valid");
         }
         
         if (!params.keySet().contains(PARAM_CODE)
                 && !params.keySet().contains(PARAM_ACTIVATION)) {
-            debug.error("OAuthProxy.toPostForm: Parameters " + PARAM_CODE
+            OAuthUtil.debugError("OAuthProxy.toPostForm: Parameters " + PARAM_CODE
                     + " or " + PARAM_ACTIVATION + " were not present in the request");
             return getError("Request not valid, perhaps a permission problem");
         }
@@ -88,8 +86,7 @@ public class OAuthProxy implements OAuthParam {
                         "HTTPParameterValue", 512, true)) {
                     html.append(input(PARAM_CODE, code));
                 } else {
-
-                    debug.error("OAuthProxy.toPostForm: Parameter " + PARAM_CODE
+                    OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_CODE
                             + " is not valid!! : " + code);
                     return getError("Request not valid");
                 }
@@ -101,7 +98,7 @@ public class OAuthProxy implements OAuthParam {
                         "HTTPParameterValue", 512, true)) {
                     html.append(input(PARAM_ACTIVATION, activation));
                 } else {
-                    debug.error("OAuthProxy.toPostForm: Parameter " + PARAM_ACTIVATION
+                    OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_ACTIVATION
                             + " is not valid!! : " + activation);
                     return getError("Request not valid");
                 }
@@ -118,7 +115,7 @@ public class OAuthProxy implements OAuthParam {
         html.append("</center>\n</noscript>\n");
         html.append("</form>\n").append("</body>\n").append("</html>\n");
 
-        debug.message("form html:\n" + html);
+        OAuthUtil.debugMessage("OAuthProxy.toPostForm: form html:\n" + html);
 
         return html.toString();
     }

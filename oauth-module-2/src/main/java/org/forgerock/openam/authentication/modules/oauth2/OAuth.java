@@ -26,10 +26,8 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
@@ -52,7 +50,6 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -64,8 +61,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
+import org.apache.commons.io.IOUtils;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
-public class OAuth extends AMLoginModule implements OAuthParam {
+public class OAuth extends AMLoginModule {
 
     private String authenticatedUser = null;
     private Map sharedState;
@@ -84,15 +83,8 @@ public class OAuth extends AMLoginModule implements OAuthParam {
     public void init(Subject subject, Map sharedState, Map config) {
         this.sharedState = sharedState;
         this.config = new OAuthConf(config);
-        bundle = amCache.getResBundle(OAuthConf.BUNDLE_NAME, getLoginLocale());
-        String authLevel = CollectionHelper.getMapAttr(config, OAuthConf.KEY_AUTH_LEVEL);
-        if (authLevel != null) {
-            try {
-                setAuthLevel(Integer.parseInt(authLevel));
-            } catch (Exception e) {
-                OAuthUtil.debugError("Unable to set auth level " + authLevel, e);
-            }
-        }
+        bundle = amCache.getResBundle(BUNDLE_NAME, getLoginLocale());
+        setAuthLevel(this.config.getAuthnLevel());    
     }
 
     
@@ -102,6 +94,12 @@ public class OAuth extends AMLoginModule implements OAuthParam {
         HttpServletRequest request = getHttpServletRequest();
         HttpServletResponse response = getHttpServletResponse();
 
+        if (request == null) {
+            OAuthUtil.debugError("OAuth.process(): The request was null, this is "
+                    + "an interactive module");
+            return ISAuthConstants.LOGIN_IGNORE;
+        }
+        
         switch (state) {
             case ISAuthConstants.LOGIN_START: {
                 serverName = request.getServerName();
@@ -111,24 +109,27 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                 if (requestedQuery != null) {
                     requestedURL += "?" + requestedQuery;
                 }
-
+                
+                // The Proxy is used to return with a POST to the module
+                proxyURL = config.getProxyURL();
+                
                 // Set the return URL Cookie
                 // Note: The return URL cookie from the RedirectCallback can not
                 // be used because the framework changes the order of the 
                 // parameters in the query. OAuth2 requires an identical URL 
                 // when retrieving the token
-                response.addCookie(OAuthUtil.setCookie(OAuth.COOKIE_ORIG_URL,
+                response.addCookie(OAuthUtil.setCookie(COOKIE_PROXY_URL,
+                        proxyURL, serverName, "/"));                
+                response.addCookie(OAuthUtil.setCookie(COOKIE_ORIG_URL,
                         requestedURL, serverName, "/"));
-
                 // The Proxy is used to return with a POST to the module
-                proxyURL = config.getProxyURL();
                 setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL,
                         requestedURL);
 
-                setUserSessionProperty(OAuth.SESSION_LOGOUT_BEHAVIOUR,
+                setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
 
-                String authServiceUrl = config.getAuthServiceUrl(config.getProxyURL());
+                String authServiceUrl = config.getAuthServiceUrl(proxyURL);
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
                 Callback[] callbacks1 = getCallback(2);
@@ -163,11 +164,11 @@ public class OAuth extends AMLoginModule implements OAuthParam {
 
                     String logoutURL = config.getLogoutServiceUrl();
                     if (logoutURL != null && !logoutURL.isEmpty()) {
-                        response.addCookie(OAuthUtil.setCookie(OAuth.COOKIE_LOGOUT_URL,
+                        response.addCookie(OAuthUtil.setCookie(COOKIE_LOGOUT_URL,
                                 logoutURL, serverName, "/"));
                     }
 
-                    setUserSessionProperty(OAuth.SESSION_OAUTH_TOKEN, token);
+                    setUserSessionProperty(SESSION_OAUTH_TOKEN, token);
 
                     String profileSvcResponse = getContent(
                             config.getProfileServiceUrl(token));
@@ -182,7 +183,8 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                     }
 
                     AccountMapper accountMapper = instantiateAccountMapper();
-                    Map userNames = new HashMap();
+                    Map<String, Set<String>> userNames = 
+                            new HashMap<String, Set<String>>();
 
                     userNames = accountMapper.getAccount(
                             config.getAccountMapperConfig(),
@@ -195,8 +197,8 @@ public class OAuth extends AMLoginModule implements OAuthParam {
 
                         if (authenticatedUser != null) {
                             if (config.getSaveAttributesToSessionFlag()) {
-                                Map attributes = getAttributesMap(
-                                        profileSvcResponse);
+                                Map <String, Set<String>> attributes = 
+                                        getAttributesMap(profileSvcResponse);
                                 saveAttributes(attributes);
                             }
                             OAuthUtil.debugMessage("OAuth.process(): LOGIN_SUCCEED "
@@ -229,7 +231,7 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                         OAuthUtil.debugMessage("OAuth.process(): LOGIN_SUCCEED "
                                 + "with user " + authenticatedUser);
                         if (config.getSaveAttributesToSessionFlag()) {
-                            Map attributes = getAttributesMap(
+                            Map<String, Set<String>> attributes = getAttributesMap(
                                     profileSvcResponse);
                             saveAttributes(attributes);
                         }
@@ -239,18 +241,15 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                 } catch (JSONException je) {
                     OAuthUtil.debugError("OAuth.process(): JSONException: "
                             + je.getMessage());
-                    throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                            "json", null, je);
+                    throw new AuthLoginException(BUNDLE_NAME, "json", null, je);
                 } catch (SSOException ssoe) {
                     OAuthUtil.debugError("OAuth.process(): SSOException: "
                             + ssoe.getMessage());
-                    throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                            "ssoe", null, ssoe);
+                    throw new AuthLoginException(BUNDLE_NAME, "ssoe", null, ssoe);
                 } catch (IdRepoException ire) {
                     OAuthUtil.debugError("OAuth.process(): IdRepoException: "
                             + ire.getMessage());
-                    throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                            "ire", null, ire);
+                    throw new AuthLoginException(BUNDLE_NAME, "ire", null, ire);
                 }
                 break;
             }
@@ -268,6 +267,7 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                 
                 
                 if (!userPassword.equals(userPassword2)) {
+                    OAuthUtil.debugWarning("OAuth.process(): Passwords did not match!");
                     return SET_PASSWORD_STATE;
                 }
                 
@@ -275,16 +275,18 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                 if (!terms.equalsIgnoreCase("accept")) {
                     return SET_PASSWORD_STATE;
                 }
+                
                 String profileSvcResponse = getUserSessionProperty("ATTRIBUTES");
                 data = getRandomData();
                 String mail = getMail(profileSvcResponse, config.getMailAttribute());
                 OAuthUtil.debugMessage("Mail found = " + mail);
                 try {
-                    OAuthUtil.sendEmail("", mail, data, config.getSMTPConfig(), 
-                            bundle, proxyURL);
+                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data, 
+                            config.getSMTPConfig(), bundle, proxyURL);
                 } catch (NoEmailSentException ex) {
                     OAuthUtil.debugError("No mail sent due to error", ex);
-                    return ISAuthConstants.LOGIN_IGNORE;
+                    throw new AuthLoginException("Aborting authentication, because "
+                            + "the mail could not be sent due to a mail sending error");
                 }
                 OAuthUtil.debugMessage("User to be created, we need to activate: " + data);
                 return CREATE_USER_STATE;
@@ -323,17 +325,15 @@ public class OAuth extends AMLoginModule implements OAuthParam {
             }
         }
         
-        throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                            "unknownState", null);
+        throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
     }
 
     // Search for the user in the realm, using the instantiated account mapper
     private String getUser(String realm, AccountMapper accountMapper, 
-            Map userNames)
+            Map<String, Set<String>> userNames)
             throws AuthLoginException, JSONException, SSOException, IdRepoException {
 
         String user = null;
-
         if (userNames != null) {
             AMIdentity userIdentity = accountMapper.searchUser(
                     getAMIdentityRepository(realm), userNames);
@@ -353,32 +353,32 @@ public class OAuth extends AMLoginModule implements OAuthParam {
      }
 
     // Create an instance of the pluggable account mapper
-    private AccountMapper instantiateAccountMapper () {
+    private AccountMapper instantiateAccountMapper () 
+    throws AuthLoginException {
                 
         try {
             AccountMapper accountMapper =
-                    (AccountMapper) Class.forName(config.getAccountMapper()).
+                    Class.forName(config.getAccountMapper()).asSubclass(AccountMapper.class).
                     newInstance();
             return accountMapper;
         } catch (Exception ex) {
-            OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the "
-                    + "Account Mapper", ex);
-            return null;
+            throw new AuthLoginException("Problem when trying to instantiate "
+                    + "the account mapper", ex);
         }
     }
     
     // Obtain the attributes configured for the module, by using the pluggable
     // Attribute mapper
-    private Map getAttributesMap (String svcPRofileResponse) {
+    private Map<String, Set<String>> getAttributesMap (String svcProfileResponse) {
         
-        Map attributes = new HashMap();
+        Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
 
         try {
             AttributeMapper attributeMapper =
-                    (AttributeMapper) Class.forName(config.getAttributeMapper()).
-                    newInstance();
+                    Class.forName(config.getAttributeMapper()).
+                    asSubclass(AttributeMapper.class).newInstance();
             attributes = attributeMapper.getAttributes(
-                    config.getAttributeMapperConfig(), svcPRofileResponse);
+                    config.getAttributeMapperConfig(), svcProfileResponse);
         } catch (Exception ex) {
             OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the "
                     + "Attribute Mapper", ex);
@@ -390,29 +390,25 @@ public class OAuth extends AMLoginModule implements OAuthParam {
     
     
     // Save the attributes configured for the attribute mapper as session attributes
-    public void saveAttributes(Map attributes) throws AuthLoginException {
+    public void saveAttributes(Map<String, Set<String>> attributes) throws AuthLoginException {
 
-                if (attributes != null && !attributes.isEmpty()) {
-                    Iterator attrsIt = attributes.keySet().iterator();
-                    while (attrsIt.hasNext()) {
-                        String attributeName = (String) attrsIt.next();
-                        String attributeValue =
-                                ((Set) attributes.get(attributeName)).iterator().next().toString();
-                        setUserSessionProperty(attributeName,
-                                attributeValue);
-
-                        OAuthUtil.debugMessage("OAuth.saveAttributes: Attribute set: " +
-                                attributeName + " Attribute Value: " + attributeValue);
-                    }
-                } else {
-                    OAuthUtil.debugMessage("OAuth.saveAttributes: NO attributes to set");
-                }
+        if (attributes != null && !attributes.isEmpty()) {
+            for (String attributeName : attributes.keySet()) {
+                String attributeValue = attributes.get(attributeName).
+                        iterator().next().toString();
+                setUserSessionProperty(attributeName, attributeValue);
+                OAuthUtil.debugMessage("OAuth.saveAttributes: "
+                        + attributeName + "=" + attributeValue);
+            }
+        } else {
+            OAuthUtil.debugMessage("OAuth.saveAttributes: NO attributes to set");
+        }
     }
     
     // Generate a user name, either using the anonymous user if configured or by
-    // extracting the first entry of the attribute configured in the account mapper
-    // or return null, if nothing was found
-    private String getDynamicUser(Map userNames)
+    // extracting the user from the userName map.
+    // Return null, if nothing was found
+    private String getDynamicUser(Map<String, Set<String>> userNames)
             throws AuthLoginException {
 
         String dynamicUser = null;
@@ -423,49 +419,29 @@ public class OAuth extends AMLoginModule implements OAuthParam {
             }
         } else { // Do not use anonymous
             if (userNames != null && !userNames.isEmpty()) {
-                Iterator usersIt = userNames.values().iterator();
-                dynamicUser = ((Set) usersIt.next()).iterator().next().toString();
+                Iterator<Set<String>> usersIt = userNames.values().iterator();
+                dynamicUser = usersIt.next().iterator().next();
             }
 
         }
         return dynamicUser;
     }
     
-
-//    private Set addToSet(Set set, String attribute) {
-//	set.add(attribute);
-//	return set;
-//    }
-
     
     // Obtain the user profile information from the OAuth 2.0 Identity Provider
     // Profile service configured for this module, either using first GET and
     // POST as a fall back
     private String getContent(String serviceUrl) throws LoginException {
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(
-                getContentStreamByGET(serviceUrl)));
-
-        StringBuffer buf = new StringBuffer();
-
+        
+        InputStream is = getContentStreamByGET(serviceUrl);       
         try {
-            for (String str; (str = in.readLine()) != null;) {
-                buf.append(str);
-            }
+            return IOUtils.toString(is);
         } catch (IOException ioe) {
             OAuthUtil.debugError("getContent: IOException: " + ioe.getMessage());
-            throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                    "ioe", null, ioe);
+                throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
         } finally {
-            try {
-                in.close();
-            } catch (IOException ioe) {
-                throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                        "ioe", null, ioe);
-            }
+                    IOUtils.closeQuietly(is);
         }
-        return buf.toString();
     }
 
     // Create the account in the realm, by using the pluggable account mapper and
@@ -475,13 +451,14 @@ public class OAuth extends AMLoginModule implements OAuthParam {
             throws AuthLoginException {
 
             AccountMapper accountMapper = instantiateAccountMapper();
-            Map attributes = getAttributesMap(profileSvcResponse);
+            Map<String, Set<String>> attributes = getAttributesMap(profileSvcResponse);
             if (config.getSaveAttributesToSessionFlag()) {
                 saveAttributes(attributes);
             }
             attributes.put("userPassword",
-                    OAuthUtil.addToSet(new HashSet(), userPassword));
-            attributes.put("inetuserstatus", OAuthUtil.addToSet(new HashSet(), "Active"));
+                    OAuthUtil.addToSet(new HashSet<String>(), userPassword));
+            attributes.put("inetuserstatus", 
+                    OAuthUtil.addToSet(new HashSet<String>(), "Active"));
             AMIdentity userIdentity =
                     accountMapper.provisionUser(getAMIdentityRepository(realm),
                     attributes);
@@ -503,26 +480,23 @@ public class OAuth extends AMLoginModule implements OAuthParam {
             URL urlC = new URL(serviceUrl);
 
             String OAuthToken = OAuthUtil.getParamValue(urlC.getQuery(),
-                    OAuth.PARAM_ACCESS_TOKEN);
+                   PARAM_ACCESS_TOKEN);
             
-            OAuthUtil.debugMessage("OAUTHTOKEN = " + OAuthToken);
+            OAuthUtil.debugMessage("OAuth.getContentStreamByGET: "
+                    + "OAUTHTOKEN = " + OAuthToken);
 
             HttpURLConnection connection = (HttpURLConnection) urlC.openConnection();
             connection.setDoOutput(true);
-
             if (!OAuthToken.isEmpty()) {
                 connection.setRequestProperty("Authorization", "OAuth "
                         + OAuthToken);
             }
-
             connection.setRequestMethod("GET");
-
             connection.connect();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 OAuthUtil.debugMessage("OAuth.getContentStreamByGET: IT was OK");
                 is = connection.getInputStream();
-                // OK
             } else if (connection.getResponseCode() == HttpURLConnection.HTTP_BAD_METHOD) {
                 // GET method not accepted by the Identity Provider
                 OAuthUtil.debugMessage("OAuth.getContentStreamByGET: IT was NOT-OK: " + 
@@ -531,21 +505,20 @@ public class OAuth extends AMLoginModule implements OAuthParam {
             } else {
                 // Server returned HTTP error code.
                 String data[] = {String.valueOf(connection.getResponseCode())};
-                throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                        "httpErrorCode", data);
+                throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data);
             }
 
             return is;
 
         } catch (MalformedURLException mfe) {
-            throw new AuthLoginException(OAuthConf.BUNDLE_NAME,"malformedURL", null, mfe);
+            throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, mfe);
         } catch (IOException ioe) {
-            throw new AuthLoginException(OAuthConf.BUNDLE_NAME,"ioe", null, ioe);
+            throw new AuthLoginException(BUNDLE_NAME,"ioe", null, ioe);
         }
     }
     
     
-    // Obtain the Profile Service information using GET
+    // Obtain the Profile Service information using POST
     public InputStream getContentStreamByPOST(String serviceUrl)
             throws LoginException {
 
@@ -562,7 +535,6 @@ public class OAuth extends AMLoginModule implements OAuthParam {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
-
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(query);
             writer.close();
@@ -574,13 +546,12 @@ public class OAuth extends AMLoginModule implements OAuthParam {
                 OAuthUtil.debugError("OAuth.getContentStreamByPOST: IT was NOT-OK: " + 
                         connection.getResponseCode());
                 String data[] = {String.valueOf(connection.getResponseCode())};
-                throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                        "httpErrorCode", data);
+                throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data);
             }
         } catch (MalformedURLException e) {
-            throw new AuthLoginException(OAuthConf.BUNDLE_NAME,"malformedURL", null, e);
+            throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, e);
         } catch (IOException e) {
-            throw new AuthLoginException(OAuthConf.BUNDLE_NAME,"ioe", null, e);
+            throw new AuthLoginException(BUNDLE_NAME,"ioe", null, e);
         }
 
         return is;
@@ -595,8 +566,8 @@ public class OAuth extends AMLoginModule implements OAuthParam {
         try {
             JSONObject jsonToken = new JSONObject(response);
             if (jsonToken != null
-                    && !jsonToken.isNull(OAuth.PARAM_ACCESS_TOKEN)) {
-                token = jsonToken.getString(OAuth.PARAM_ACCESS_TOKEN);
+                    && !jsonToken.isNull(PARAM_ACCESS_TOKEN)) {
+                token = jsonToken.getString(PARAM_ACCESS_TOKEN);
                 OAuthUtil.debugMessage("access_token: " + token);
             }
         } catch (JSONException je) {
@@ -637,8 +608,7 @@ public class OAuth extends AMLoginModule implements OAuthParam {
         if (!ESAPI.validator().isValidInput(tag, inputField, rule, maxLength, allowNull)) {
             OAuthUtil.debugError("OAuth.process(): OAuth 2.0 Not valid input !");
             String msgdata[] = {tag, inputField};
-            throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
-                    "invalidField", msgdata);
+            throw new AuthLoginException(BUNDLE_NAME, "invalidField", msgdata);
         };
     }
     

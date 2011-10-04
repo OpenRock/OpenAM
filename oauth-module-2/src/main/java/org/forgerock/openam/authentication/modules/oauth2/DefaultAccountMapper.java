@@ -41,46 +41,37 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.UUID;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
-public class defaultAccountMapper implements AccountMapper, OAuthParam {
+public class DefaultAccountMapper implements AccountMapper {
 
-    public defaultAccountMapper() {
+    public DefaultAccountMapper() {
     }
-    private static Debug debug = Debug.getInstance("amAuth");
-    private static final SecureRandom random = new SecureRandom();
-    private ResourceBundle bundle = null;
-    
-    @Override
-    public Map getAccount(Set accountMapConfiguration, Object responseObtained)
-            throws AuthLoginException {
 
-        Map attr = new HashMap();
+    @Override
+    public Map<String, Set<String>> getAccount(Set<String> accountMapConfiguration, 
+            String responseObtained) throws AuthLoginException {
+
+        Map<String, Set<String>> attr = new HashMap<String, Set<String>>();
         JSONObject json;
         try {
             json = new JSONObject((String)responseObtained);
         } catch (JSONException ex) {
-            debug.error("OAuth.process(): JSONException: " + ex.getMessage());
-                    throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
+            OAuthUtil.debugError("OAuth.process(): JSONException: " + ex.getMessage());
+                    throw new AuthLoginException(BUNDLE_NAME,
                             ex.getMessage(), null);
         }
 
-        Iterator it = accountMapConfiguration.iterator();
-        while (it.hasNext()) {
+        for (String entry : accountMapConfiguration) {
             try {
-                String entry = (String) it.next();
                 if (entry.indexOf("=") == -1) {
-                    if (debug.messageEnabled()) {
-                        debug.message("defaultAccountMapper.getAttributes: " + 
+                    OAuthUtil.debugMessage("DefaultAccountMapper.getAttributes: " + 
                                 "Invalid entry." + entry);
-                    }
                     continue;
                 }
                 StringTokenizer st = new StringTokenizer(entry, "=");
@@ -94,22 +85,21 @@ public class defaultAccountMapper implements AccountMapper, OAuthParam {
                 } else {
                     data = json.getString(responseName);
                 }
-                attr.put(localName, addToSet(new HashSet(), data));        
+                attr.put(localName, OAuthUtil.addToSet(new HashSet<String>(), data));        
             } catch (JSONException ex) {
-                debug.error("defaultAccountMapper.getAttributes: Error when "
+                OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Error when "
                         + "trying to get attributes from the response ", ex);
                 throw new AuthLoginException("Configuration problem, attribute ",ex);
             }
 
         }
-        if (debug.messageEnabled()) {
-            debug.message("defaultAccountMapper.getAttributes: " + 
+        OAuthUtil.debugMessage("DefaultAccountMapper.getAttributes: " + 
                                 "Attribute Map obtained=" + attr);
-        }
+        
         return attr;
     }
 
-    public AMIdentity searchUser(AMIdentityRepository idrepo, Map attr) {
+    public AMIdentity searchUser(AMIdentityRepository idrepo, Map<String, Set<String>> attr) {
         AMIdentity identity = null;
         IdSearchControl ctrl = getSearchControl(IdSearchOpModifier.OR, attr);
 
@@ -117,44 +107,39 @@ public class defaultAccountMapper implements AccountMapper, OAuthParam {
         try {
             results = idrepo.searchIdentities(IdType.USER, "*", ctrl);
         } catch (IdRepoException ex) {
-            debug.error("defaultAccountMapper.getAttributes: Problem while  "
+            OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Problem while  "
                     + "searching  for the user. IdRepo", ex);
         } catch (SSOException ex) {
-            debug.error("defaultAccountMapper.getAttributes: Problem while  "
+            OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Problem while  "
                     + "searching  for the user. SSOExc", ex);
         }
 
         Iterator iter = results.getSearchResults().iterator();
         if (iter.hasNext()) {
             identity = (AMIdentity) iter.next();
-            if (debug.messageEnabled()) {
-                debug.message("getUser: user found : " + identity.getName());
-            }
+            OAuthUtil.debugMessage("getUser: user found : " + identity.getName());
+
         }
 
         return identity;
     }
 
-    public AMIdentity provisionUser(AMIdentityRepository idrepo, Map attributes) 
+    public AMIdentity provisionUser(AMIdentityRepository idrepo, Map<String, Set<String>> attributes) 
       throws AuthLoginException {
-        // Create the account if it was configured to allow creation for non
-        // mapped users
 
         AMIdentity identity = null;
             try {
                 String userId = UUID.randomUUID().toString();
-                // attributes.put("userPassword",addToSet(new HashSet(), getRandomPassword()));
-                // attributes.put("inetuserstatus",addToSet(new HashSet(), "Active"));
                 identity = idrepo.createIdentity(IdType.USER, userId, attributes);
 
             } catch (IdRepoException ire) {
-                debug.error("defaultAccountMapper.getAccount: IRE ", ire);
-                debug.message("LDAPERROR Code = " + ire.getLDAPErrorCode());
+                OAuthUtil.debugError("DefaultAccountMapper.getAccount: IRE ", ire);
+                OAuthUtil.debugError("LDAPERROR Code = " + ire.getLDAPErrorCode());
                 if (ire.getLDAPErrorCode() != null && !ire.getLDAPErrorCode().equalsIgnoreCase("68")) {
                     throw new AuthLoginException("Failed to create user");
                 }
             } catch (SSOException ex) {
-                debug.error("defaultAccountMapper.getAttributes: Problem while  "
+                OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Problem while  "
                     + "creating the user. SSOExc", ex);
                 throw new AuthLoginException("Failed to create user");
             }
@@ -162,18 +147,13 @@ public class defaultAccountMapper implements AccountMapper, OAuthParam {
         return identity;
   }
 
-    private Set addToSet(Set set, String attribute) {
-	set.add(attribute);
-	return set;
-    }
 
     private IdSearchControl getSearchControl(
-            IdSearchOpModifier modifier, Map avMap) {
+            IdSearchOpModifier modifier, Map<String, Set<String>> avMap) {
+        
     	IdSearchControl control = new IdSearchControl();
-
     	control.setMaxResults(1);
         control.setSearchModifiers(modifier, avMap);
-
     	return control;
     }
 

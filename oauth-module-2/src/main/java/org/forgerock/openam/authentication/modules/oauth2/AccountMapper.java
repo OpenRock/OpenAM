@@ -30,30 +30,20 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import java.util.Map;
 import java.util.Set;
-import org.json.JSONObject;
 
-public interface AccountMapper  {
-    final static String MESSAGE_FROM = "messageFrom";
-    final static String MESSAGE_SUBJECT = "messageSubject";
-    final static String MESSAGE_CONTENT = "messageContent";
-    final static String MESSAGE_SUBJECT_RESET_PASSWD = "messageSubjectFp";
-    final static String MESSAGE_CONTENT_RESET_PASSWD = "messageContentFp";
-    final static String TANDC_NOT_ACCEPTED = "tandcNotAccepted";
-    final static String LINK_TEXT = "#LINK#";
-    final static String USERNAME_TEXT = "#USERNAME#";
+public interface AccountMapper  {  
     
-    
-    public Map getAccount(
-        Set accountMapConfiguration,
-        Object responseObtained
+    public Map<String, Set<String>> getAccount(
+        Set<String> accountMapConfiguration,
+        String responseObtained
     ) throws AuthLoginException;
     
     
     public AMIdentity searchUser(
-            AMIdentityRepository idrepo, Map attr);
+            AMIdentityRepository idrepo, Map<String, Set<String>> attr);
     
     public AMIdentity provisionUser(
-            AMIdentityRepository idrepo, Map attributes) 
+            AMIdentityRepository idrepo, Map<String, Set<String>> attributes) 
       throws AuthLoginException;
     
 }

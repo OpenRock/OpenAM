@@ -22,6 +22,7 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                               
 --%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -29,10 +30,33 @@
 <%@ page import="org.owasp.esapi.*" %>
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
-
+<%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*" %>
+<%@ page import="java.io.IOException" %>
+<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="java.util.MissingResourceException" %>
+<%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
 
 
 <%
+   // Internationalization stuff
+   String lang = request.getParameter("lang");
+   ResourceBundle resources;
+   Locale locale = null;
+   try {
+        if (lang != null && lang.length() != 0) {
+           locale = new Locale(lang);
+        } else {
+           locale = request.getLocale();
+        }
+        resources = ResourceBundle.getBundle("amAuthOAuth", locale);
+        OAuthUtil.debugMessage("OAuthLogout: obtained resource bundle with locale " + locale);
+   } catch (MissingResourceException mr) {
+        OAuthUtil.debugError("OAuthLogout: Resource Bundle not found", mr);
+        resources = ResourceBundle.getBundle("amAuthOAuth");
+   } 
+   
+   // Getting params
    String gotoURL = request.getParameter("goto");
    String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR); 
    if (gotoURL == null || gotoURL.isEmpty() ) {
@@ -46,8 +70,6 @@
            gotoURL = "wronggotoURL";
        }
    }
-   
-   System.out.println("gotoURL is: " + gotoURL);
    
    String logoutURL = request.getParameter("logoutURL"); 
    if (logoutURL == null) {
@@ -112,16 +134,15 @@
                         <td>
 
                             <% if (loggedout != null && loggedout.equalsIgnoreCase("logmeout")) {
-                                System.out.println("logmeout was selected");
                             %>
-                            <p> Logging you out from the IdP </p>
+                            <p><%= resources.getString("loggingYouOut") %></p>
                             <div style="display:none">
                                 <iframe border="0" width="0" height="0" src="<%= logoutURL %>" onload="adios()" >
-                                    <p>Your browser does not support iframes</p>
+                                    <p><%= resources.getString("noSupportIFrames") %></p>
                                 </iframe>
                             </div>
                             <noscript>
-                                <p>You have been loggedout from the OAuth IdP</p>
+                                <p><%= resources.getString("youVeBeenLogedOut") %></p>
                                 Click <a href="<%= ESAPI.encoder().encodeForHTMLAttribute(gotoURL) %>">here</a> to continue
                             </noscript>
                             <%                         
@@ -136,7 +157,7 @@
                             if (loggedout == null) {
                             %>
                             <form name="signedForm" method="POST" action="">
-                                <p>Do you want to logout from the OAuth 2.0 Service?</p>
+                                <p><%= resources.getString("doYouWantToLogout") %></p>
                                 <input name="<%= ESAPI.encoder().encodeForHTML("loggedout") %>" type="submit" 
                                        value="<%= ESAPI.encoder().encodeForHTML("logmeout") %>">
                                 <Input name="<%= ESAPI.encoder().encodeForHTML("loggedout") %>" type="submit" 

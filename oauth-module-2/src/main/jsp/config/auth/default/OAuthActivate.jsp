@@ -31,9 +31,28 @@
 <%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
+<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.util.MissingResourceException" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
 
 <%
-   String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);   
+   String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR); 
+   String lang = request.getParameter("lang");
+   ResourceBundle resources;
+   Locale locale = null;
+   try {
+        if (lang != null && lang.length() != 0) {
+           locale = new Locale(lang);
+        } else {
+           locale = request.getLocale();
+        }
+        resources = ResourceBundle.getBundle("amAuthOAuth", locale);
+        OAuthUtil.debugMessage("OAuthActivate: obtained resource bundle with locale " + locale);
+   } catch (MissingResourceException mr) {
+        OAuthUtil.debugError("OAuthActivate:: Resource Bundle not found", mr);
+        resources = ResourceBundle.getBundle("amAuthOAuth");
+   } 
 %>
 
 <html>
@@ -46,59 +65,98 @@
         <script language="JavaScript">
             writeCSS('<%= ServiceURI %>');
         </script>
+        
         <script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
             //-->
         </script>
-        <title>Activate code</title>
+        
+        <script language="JavaScript">
+            
+        function validateEntry(form, activation, submit) {
+            form.output.value = "";
+            if(form.elements[submit].value == 'Cancel') {
+                    return false;
+            }
+            if(form.elements[activation].value == '') {
+                form.output.value = "<%= ESAPI.encoder().encodeForHTML(resources.getString("emptyCode")) %>";
+                form.elements[activation].valueOf();
+                form.elements[activation].focus();
+                return false;
+            }
+            var re = /^[a-zA-Z0-9.\\-\\/+=_ ]*$/
+            if(!re.test(form.elements[activation].value)) {
+                form.output.value = "<%= ESAPI.encoder().encodeForHTML(resources.getString("errInvalidCode")) %>";
+                form.elements[token1].focus();
+                return false;
+           }
+           form.output.value = "<%= ESAPI.encoder().encodeForHTML("") %>";
+           return true;
+        }
+        
+        function adios() { 
+             window.location = "<%= ServiceURI %>";
+        }
+        
+        </script>
+        
+        <title><%= resources.getString("activationTitle")%></title>
 
     </head>
 
-<body>
-
-
-    <div style="height: 50px; width: 100%;">
-
-    </div>
-    <center>
-        <div style="background-image:url('<%= ServiceURI%>/images/login-backimage.jpg'); background-repeat:no-repeat; 
+    <body>
+    
+    
+        <div style="height: 50px; width: 100%;">
+        
+        </div>
+        <center>
+            <div style="background-image:url('<%= ServiceURI%>/images/login-backimage.jpg'); background-repeat:no-repeat; 
              height: 435px; width: 728px; vertical-align: middle; text-align: center;">
-
-            <table>
-                <tr height="100px">
-                    <td width="295px"></td>
-                    <td></td>
-                </tr>
-                <tr><td width="295px"></td>
-                <form name="Login" method="POST" action="">
-
-                    <td align="left"><img src="<%= ServiceURI %>/images/PrimaryProductName.png" /></td></tr>    
+                 
+                <table>
+                    <form name="Login" method="POST" action="<%= ESAPI.encoder().encodeForHTML("") %>" 
+                          onSubmit="return validateEntry(this, 'activation', 'Submit');" >
+                    <tr height="100px"><td width="295px"></td><td>perse</td></tr>
+                    <tr><td width="295px"></td>                          
+                        <td align="left"><img src="<%= ServiceURI %>/images/PrimaryProductName.png" /></td>
+                    </tr>    
                     <tr><td width="295px"></td>
                         <td>
-                            <p>You were sent an activation code to the email address configured in your profile. 
-                                Please check your mail and click the link provided. 
-                                If you have a problem when clicking the link, 
-                                then copy and paste the activation code here and hit Enter. 
-                                Thanks
+                            <p><%=resources.getString("activationCodeMsg")%>
                             </p>
                             <table align="center" border="0" cellpadding="2" cellspacing="2" >
-
-                                <tr><td>
-                                        <label for="activation" >Activation Code:</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" size="30" 
-                                               name="<%= ESAPI.encoder().encodeForHTML("activation") %>">
-                                    </td>
-                                </tr>
-
-
-                            </table>
-                </form> 
-                </td>
-                </tr>
-
-            </table>
-        </div>
-    </center>
-</body>
+                                
+                                    <tr><td>
+                                            <label for="activation" >
+                                                <%=resources.getString("activationLabel")%>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" size="30" 
+                                                   name="<%= ESAPI.encoder().encodeForHTML("activation") %>">
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="2">
+                                            <input type="submit" name="<%= ESAPI.encoder().encodeForHTML("Submit")%>" 
+                                                   value="<%= ESAPI.encoder().encodeForHTML("Submit") %>" >
+                                            <input type="submit" name="<%= ESAPI.encoder().encodeForHTML("Submit")%>"
+                                                   value="<%= ESAPI.encoder().encodeForHTML("Cancel") %>" onClick="adios()">
+                                        </td>                                
+                                    </tr>                                 
+                                    
+                                </table>
+                    </td>
+                    </tr>
+                    <tr><td width="295px"></td>
+                        <td align="center">
+                           <input type="text" name="<%= ESAPI.encoder().encodeForHTML("output") %>" 
+                                style="border: 0; font-family: verdana; color: blue; text-align: center;" 
+                                value="<%= ESAPI.encoder().encodeForHTML("") %>" size="60" readonly>
+                        </td>
+                   </tr>
+                  </form>   
+                </table>
+            </div>
+        </center>
+    </body>
 </html>

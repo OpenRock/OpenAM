@@ -71,13 +71,13 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
                                  type="single" syntax="string" i18nKey="a108">
                         <DefaultValues>
-                                <Value>https://openam.server.name/openam/config/auth/default/oauthproxy.jsp</Value>
+                                <Value>https://openam.server.name/openam/OAuthProxy.jsp</Value>
                         </DefaultValues>
                 </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
                                  type="single" syntax="string" i18nKey="a109">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.defaultAccountMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration" 
@@ -92,7 +92,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
 		<AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
                                  type="single" syntax="string" i18nKey="a111">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.defaultAttributeMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
@@ -172,9 +172,9 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
 		<AttributeSchema name="org-forgerock-auth-oauth-logout-behaviour"
                                  type="single_choice" syntax="string" i18nKey="a130">
                         <ChoiceValues>
-				<ChoiceValue i18nKey="Prompt">prompt</ChoiceValue>
-				<ChoiceValue i18nKey="Logout">logout</ChoiceValue>
-				<ChoiceValue i18nKey="Do not logout">donotlogout</ChoiceValue>
+				<ChoiceValue i18nKey="prompt">prompt</ChoiceValue>
+				<ChoiceValue i18nKey="logout">logout</ChoiceValue>
+				<ChoiceValue i18nKey="donotlogout">donotlogout</ChoiceValue>
 			</ChoiceValues>
 	                <DefaultValues>
                            <Value>prompt</Value>
@@ -195,7 +195,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-port"
                                  type="single" syntax="string" i18nKey="a136">
                         <DefaultValues>
-                                <Value>localhost</Value>
+                                <Value>25</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-username"
@@ -217,7 +217,12 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
 			</BooleanValues>
                 </AttributeSchema>
-		
+		<AttributeSchema name="org-forgerock-auth-oauth-smtp-email-from"
+                                 type="single" syntax="string" i18nKey="a144">
+                        <DefaultValues>
+                                <Value>info@forgerock.com</Value>
+                        </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                  type="single" syntax="number_range" rangeStart="0"
 				 rangeEnd="2147483647" i18nKey="a500">
@@ -260,13 +265,13 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
                                  type="single" syntax="string" i18nKey="a108">
                         <DefaultValues>
-                                <Value>https://openam.server.name/openam/config/auth/default/oauthproxy.jsp</Value>
+                                <Value>https://openam.server.name/openam/OAuthProxy.jsp</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
                                  type="single" syntax="string" i18nKey="a109">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.defaultAccountMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration" 
@@ -281,7 +286,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
 		<AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
                                  type="single" syntax="string" i18nKey="a111">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.defaultAttributeMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
@@ -360,9 +365,9 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
 		<AttributeSchema name="org-forgerock-auth-oauth-logout-behaviour"
                                  type="single_choice" syntax="string" i18nKey="a130">
                         <ChoiceValues>
-				<ChoiceValue i18nKey="Prompt">prompt</ChoiceValue>
-				<ChoiceValue i18nKey="Logout">logout</ChoiceValue>
-				<ChoiceValue i18nKey="Do not logout">donotlogout</ChoiceValue>
+				<ChoiceValue i18nKey="prompt">prompt</ChoiceValue>
+				<ChoiceValue i18nKey="logout">logout</ChoiceValue>
+				<ChoiceValue i18nKey="donotlogout">donotlogout</ChoiceValue>
 			</ChoiceValues>
 	                <DefaultValues>
                         <Value>prompt</Value>
@@ -383,7 +388,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-port"
                                  type="single" syntax="string" i18nKey="a136">
                         <DefaultValues>
-                                <Value>localhost</Value>
+                                <Value>25</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-username"
@@ -405,7 +410,12 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
 			</BooleanValues>
                 </AttributeSchema>
-
+		<AttributeSchema name="org-forgerock-auth-oauth-smtp-email-from"
+                                 type="single" syntax="string" i18nKey="a144">
+                        <DefaultValues>
+                                <Value>info@forgerock.com</Value>
+                        </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                  type="single" syntax="number_range" rangeStart="0"
 				 rangeEnd="2147483647" i18nKey="a500">

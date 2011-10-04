@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -9,26 +9,24 @@
  * compliance with the License.
  *
  * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.iplanet.am.util.AMSendMail;
 
 public class DefaultEmailGatewayImpl implements EmailGateway {
@@ -65,7 +63,7 @@ public class DefaultEmailGatewayImpl implements EmailGateway {
     * module
     */
     public void sendEmail(String from, String to, String subject,
-                          String message, Map options)
+                          String message, Map<String, String> options)
     throws NoEmailSentException {
         if (to == null) {
             if (debug.messageEnabled()) {
@@ -79,20 +77,21 @@ public class DefaultEmailGatewayImpl implements EmailGateway {
             setOptions(options);
             String tos[] = new String[] { to };
             AMSendMail sendMail = new AMSendMail();
-
+            
             if (smtpHostName == null || smtpHostPort == null ||
                     smtpUserName == null || smtpUserPassword == null ||
-                    smtpSSLEnabled == null) {
+                    smtpSSLEnabled == null) {        
                 sendMail.postMail(tos, subject, message, from);
+                OAuthUtil.debugWarning("DefaultEmailGatewayImpl.sendEmail() :" +
+                        "sending email using the defaults localhost and port 25");
             } else {
                 sendMail.postMail(tos, subject, message, from, "UTF-8", smtpHostName,
                         smtpHostPort, smtpUserName, smtpUserPassword,
                         sslEnabled);
             }
-            if (debug.messageEnabled()) {
-                debug.message("DefaultEmailGatewayImpl.sendEmail() : " +
+            OAuthUtil.debugMessage("DefaultEmailGatewayImpl.sendEmail() : " +
                     "email sent to : " + to + ".");
-            }
+
         } catch (Exception ex) {
             debug.error("DefaultEmailGatewayImpl.sendEmail() : " +
                 "Exception in sending email : " , ex);
@@ -101,18 +100,14 @@ public class DefaultEmailGatewayImpl implements EmailGateway {
 
     }
 
-    private void setOptions(Map options) {
-        smtpHostName = (String) options.get(KEY_SMTP_HOSTNAME);
-        smtpHostPort = (String) options.get(KEY_SMTP_PORT);
-        smtpUserName = (String) options.get(KEY_SMTP_USERNAME);
-        smtpUserPassword = (String) options.get(KEY_SMTP_PASSWORD);
-        smtpSSLEnabled = (String) options.get(KEY_SMTP_SSL_ENABLED);
-        
-        if (smtpSSLEnabled != null) {
-
-            
+    private void setOptions(Map<String, String> options) {
+        smtpHostName = options.get(KEY_SMTP_HOSTNAME);
+        smtpHostPort = options.get(KEY_SMTP_PORT);
+        smtpUserName = options.get(KEY_SMTP_USERNAME);
+        smtpUserPassword = options.get(KEY_SMTP_PASSWORD);
+        smtpSSLEnabled = options.get(KEY_SMTP_SSL_ENABLED);       
+        if (smtpSSLEnabled != null) {         
                 sslEnabled = smtpSSLEnabled.equalsIgnoreCase("true");
- 
         }
     }
 }

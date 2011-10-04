@@ -39,49 +39,42 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
-/**
- *
- * @author victor
- */
-public class defaultAttributeMapper implements AttributeMapper {
 
-    public defaultAttributeMapper() {
+public class DefaultAttributeMapper implements AttributeMapper {
+
+    public DefaultAttributeMapper() {
     }
-    private static Debug debug = Debug.getInstance("amAuth");
 
     @Override
-    public Map getAttributes(Set attributeMapConfiguration, 
-                   Object svcProfileResponse) 
+    public Map<String, Set<String>> getAttributes(Set<String> attributeMapConfiguration, 
+                   String svcProfileResponse) 
             throws AuthLoginException {
 
-        debug.message("defaultAttributeMapper.getAttributes: " +
+        OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " +
                         attributeMapConfiguration);
         JSONObject json;
         try {
             json = new JSONObject((String) svcProfileResponse);
         } catch (JSONException ex) {
-            debug.error("OAuth.process(): JSONException: " + ex.getMessage());
-                    throw new AuthLoginException(OAuthConf.BUNDLE_NAME,
+            OAuthUtil.debugError("OAuth.process(): JSONException: " + ex.getMessage());
+                    throw new AuthLoginException(BUNDLE_NAME,
                             ex.getMessage(), null);
         }
-        Map attr = new HashMap();
+        Map<String, Set<String>> attr = new HashMap<String, Set<String>>();
         String responseName = "";
         String localName = "";
-        Iterator it = attributeMapConfiguration.iterator();
-        while (it.hasNext()) {
+        for(String entry : attributeMapConfiguration) {
             try {
-                String entry = (String) it.next();
                 if (entry.indexOf("=") == -1) {
-                    if (debug.messageEnabled()) {
-                        debug.message("defaultAttributeMapper.getAttributes: " + "Invalid entry." + entry);
-                    }
+                    OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " + "Invalid entry." + entry);
                     continue;
                 }
                 StringTokenizer st = new StringTokenizer(entry, "=");
                 responseName = st.nextToken();
                 localName = st.nextToken();
-                debug.message("defaultAttributeMapper.getAttributes: " +
+                OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " +
                         responseName + ":" + localName);
 
                 String data = "";
@@ -92,9 +85,9 @@ public class defaultAttributeMapper implements AttributeMapper {
                     data = json.getString(responseName);
                 }
 
-                attr.put(localName, addToSet(new HashSet(), data));
+                attr.put(localName, OAuthUtil.addToSet(new HashSet<String>(), data));
             } catch (JSONException ex) {
-                debug.error("defaultAttributeMapper.getAttributes: Could not "
+                OAuthUtil.debugError("defaultAttributeMapper.getAttributes: Could not "
                         + "get the attribute" + responseName, ex);
             }
         }
@@ -102,12 +95,4 @@ public class defaultAttributeMapper implements AttributeMapper {
 	return attr;
 
     }
-
-    private Set addToSet(Set set, String attribute) {
-	set.add(attribute);
-	return set;
-    }
-
-
-
 }

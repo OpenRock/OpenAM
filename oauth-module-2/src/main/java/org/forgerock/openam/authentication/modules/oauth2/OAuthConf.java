@@ -28,13 +28,12 @@ package org.forgerock.openam.authentication.modules.oauth2;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import java.util.HashMap;
 import java.util.Set;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
 /* 
@@ -44,27 +43,17 @@ import java.util.Set;
  * - authentication service URL;
  * - token service URL;
  * - profile service URL.
- *
- * This is first of all necessary for customized Login.jsp, which needs
- * to have the correct link that will lead a user to authentication service.
- * Otherwise, the links should be hardcoded (and hardcoded correctly), what
- * would lead to extra code and complexity of Login.jsp.
  */
-public class OAuthConf implements OAuthParam {
-    
+public class OAuthConf {
+
     static final String CLIENT = "genericHTML";
-
-    private static Debug debug = Debug.getInstance("amAuth");
-
+   // private static Debug debug = Debug.getInstance("amAuth");
     private String clientId = null;
     private String clientSecret = null;
-
     private String scope = null;
-
     private String authServiceUrl = null;
     private String tokenServiceUrl = null;
     private String profileServiceUrl = null;
-    // private String ssoLoginUrl;
     private String ssoProxyUrl = null;
     private String accountMapper = null;
     private String attributeMapper = null;
@@ -72,8 +61,8 @@ public class OAuthConf implements OAuthParam {
     private String promptPasswordFlag = null;
     private String useAnonymousUserFlag = null;
     private String anonymousUser = null;
-    private Set accountMapperConfig = null;
-    private Set attributeMapperConfig = null;
+    private Set<String> accountMapperConfig = null;
+    private Set<String> attributeMapperConfig = null;
     private String saveAttributesToSessionFlag = null;
     private String mailAttribute = null;
     private String logoutServiceUrl = null;
@@ -84,7 +73,8 @@ public class OAuthConf implements OAuthParam {
     private String smtpUserName = null;
     private String smtpUserPassword = null;
     private String smtpSSLEnabled = "false";
-    
+    private String emailFrom = null;
+    private String authLevel = "0";
 
     OAuthConf() {
     }
@@ -102,34 +92,48 @@ public class OAuthConf implements OAuthParam {
         accountMapperConfig = (Set) config.get(KEY_ACCOUNT_MAPPER_CONFIG);
         attributeMapper = CollectionHelper.getMapAttr(config, KEY_ATTRIBUTE_MAPPER);
         attributeMapperConfig = (Set) config.get(KEY_ATTRIBUTE_MAPPER_CONFIG);
-        saveAttributesToSessionFlag = CollectionHelper.getMapAttr(config, 
+        saveAttributesToSessionFlag = CollectionHelper.getMapAttr(config,
                 KEY_SAVE_ATTRIBUTES_TO_SESSION);
         mailAttribute = CollectionHelper.getMapAttr(config, KEY_MAIL_ATTRIBUTE);
         createAccountFlag = CollectionHelper.getMapAttr(config, KEY_CREATE_ACCOUNT);
-        promptPasswordFlag = CollectionHelper.getMapAttr(config,KEY_PROMPT_PASSWORD);
-        useAnonymousUserFlag = CollectionHelper.getMapAttr(config, 
+        promptPasswordFlag = CollectionHelper.getMapAttr(config, KEY_PROMPT_PASSWORD);
+        useAnonymousUserFlag = CollectionHelper.getMapAttr(config,
                 KEY_MAP_TO_ANONYMOUS_USER_FLAG);
         anonymousUser = CollectionHelper.getMapAttr(config, KEY_ANONYMOUS_USER);
         logoutServiceUrl = CollectionHelper.getMapAttr(config, KEY_LOGOUT_SERVICE_URL);
         logoutBehaviour = CollectionHelper.getMapAttr(config, KEY_LOGOUT_BEHAVIOUR);
         // Email parameters
-        gatewayEmailImplClass =  CollectionHelper.getMapAttr(config, KEY_EMAIL_GWY_IMPL);
-        smtpHostName =  CollectionHelper.getMapAttr(config, KEY_SMTP_HOSTNAME);
+        gatewayEmailImplClass = CollectionHelper.getMapAttr(config, KEY_EMAIL_GWY_IMPL);
+        smtpHostName = CollectionHelper.getMapAttr(config, KEY_SMTP_HOSTNAME);
         smtpPort = CollectionHelper.getMapAttr(config, KEY_SMTP_PORT);
         smtpUserName = CollectionHelper.getMapAttr(config, KEY_SMTP_USERNAME);
         smtpUserPassword = CollectionHelper.getMapAttr(config, KEY_SMTP_PASSWORD);
-        smtpSSLEnabled = CollectionHelper.getMapAttr(config, KEY_SMTP_SSL_ENABLED);    
+        smtpSSLEnabled = CollectionHelper.getMapAttr(config, KEY_SMTP_SSL_ENABLED);
+        emailFrom = CollectionHelper.getMapAttr(config, KEY_EMAIL_FROM);
+        authLevel = CollectionHelper.getMapAttr(config, KEY_AUTH_LEVEL);
     }
-    
-    public String  getGatewayImplClass()
+
+    public int getAuthnLevel() {
+        int authLevelInt = 0;
+        if (authLevel != null) {
+            try {
+                authLevelInt = Integer.parseInt(authLevel);
+            } catch (Exception e) {
+                OAuthUtil.debugError("Unable to find a valid auth level " + authLevel
+                        + ", defaulting to 0", e);
+            }
+        }
+        return authLevelInt;
+    }
+
+    public String getGatewayImplClass()
             throws AuthLoginException {
 
         return gatewayEmailImplClass;
     }
-    
-    
-    public Map getSMTPConfig() {
-        HashMap config = new HashMap();
+
+    public Map<String, String> getSMTPConfig() {
+        Map<String, String> config = new HashMap<String, String>();
         config.put(KEY_EMAIL_GWY_IMPL, gatewayEmailImplClass);
         config.put(KEY_SMTP_HOSTNAME, smtpHostName);
         config.put(KEY_SMTP_PORT, smtpPort);
@@ -137,121 +141,79 @@ public class OAuthConf implements OAuthParam {
         config.put(KEY_SMTP_PASSWORD, smtpUserPassword);
         config.put(KEY_SMTP_SSL_ENABLED, smtpSSLEnabled);
         return config;
-        
-    }
-    
-    
-    public String  getSMTPHostName()
-            throws AuthLoginException {
 
-        return smtpHostName;
     }
-    
-    public String  getSMTPPort()
-            throws AuthLoginException {
 
-        return smtpPort;
-    }
-    
-    public String  getSMTPUserName()
-            throws AuthLoginException {
-
-        return smtpUserName;
-    }
-    
-    public String  getSMTPUserPassword()
-            throws AuthLoginException {
-
-        return smtpUserPassword;
-    }
-    
-    public boolean  getSMTPSSLEnabled()
-            throws AuthLoginException {
-
-        return smtpSSLEnabled.equalsIgnoreCase("true");
-    }
-    
-    public String  getLogoutServiceUrl()
-            throws AuthLoginException {
+    public String getLogoutServiceUrl() {
 
         return logoutServiceUrl;
     }
 
-    public String  getLogoutBhaviour()
-            throws AuthLoginException {
+    public String getLogoutBhaviour() {
 
         return logoutBehaviour;
     }
+
+    public String getEmailFrom() {
+
+        return emailFrom;
+    }
     
-    public String  getAccountMapper()
-            throws AuthLoginException {
+    public String getAccountMapper() {
 
         return accountMapper;
     }
 
-    
-    public String  getAttributeMapper()
-            throws AuthLoginException {
+    public String getAttributeMapper() {
 
         return attributeMapper;
     }
 
-    public Set  getAccountMapperConfig()
-            throws AuthLoginException {
+    public Set<String> getAccountMapperConfig() {
 
         return accountMapperConfig;
     }
 
-        
-    public Set  getAttributeMapperConfig()
-            throws AuthLoginException {
+    public Set<String> getAttributeMapperConfig() {
 
         return attributeMapperConfig;
     }
- 
-    public boolean  getSaveAttributesToSessionFlag()
-            throws AuthLoginException {
+
+    public boolean getSaveAttributesToSessionFlag() {
 
         return saveAttributesToSessionFlag.equalsIgnoreCase("true");
     }
-    
-    public String  getMailAttribute()
-            throws AuthLoginException {
+
+    public String getMailAttribute() {
 
         return mailAttribute;
     }
-    
-    public boolean  getCreateAccountFlag()
-            throws AuthLoginException {
+
+    public boolean getCreateAccountFlag() {
 
         return createAccountFlag.equalsIgnoreCase("true");
     }
-    
-    public boolean  getPromptPasswordFlag()
-            throws AuthLoginException {
+
+    public boolean getPromptPasswordFlag() {
 
         return promptPasswordFlag.equalsIgnoreCase("true");
     }
-    
-    public boolean  getUseAnonymousUserFlag()
-            throws AuthLoginException {
+
+    public boolean getUseAnonymousUserFlag() {
 
         return useAnonymousUserFlag.equalsIgnoreCase("true");
     }
-    
-    public String  getAnonymousUser()
-            throws AuthLoginException {
+
+    public String getAnonymousUser() {
 
         return anonymousUser;
     }
-    
-    public String  getProxyURL()
-            throws AuthLoginException {
+
+    public String getProxyURL() {
 
         return ssoProxyUrl;
     }
-    
-    
+
     public String getAuthServiceUrl(String originalUrl) throws AuthLoginException {
 
         if (authServiceUrl.indexOf("?") == -1) {
@@ -268,20 +230,15 @@ public class OAuthConf implements OAuthParam {
                 OAuthUtil.encodeUriToRedirect(originalUrl));
     }
 
-
-    String getTokenServiceUrl(String code,
-            String authServiceURL) throws AuthLoginException {
+    String getTokenServiceUrl(String code, String authServiceURL) 
+            throws AuthLoginException {
 
         if (code == null) {
-            debug.error("process: code == null");
+            OAuthUtil.debugError("process: code == null");
             throw new AuthLoginException(BUNDLE_NAME,
                     "authCode == null", null);
         }
-
-        if (debug.messageEnabled()) {
-            debug.message("authentication code: " + code);
-        }
-
+        OAuthUtil.debugMessage("authentication code: " + code);
         if (tokenServiceUrl.indexOf("?") == -1) {
             tokenServiceUrl = tokenServiceUrl + "?"
                     + PARAM_CLIENT_ID + "=" + clientId;
@@ -298,21 +255,20 @@ public class OAuthConf implements OAuthParam {
                 + param(PARAM_CODE, code);
 
     }
-  
+
     String getProfileServiceUrl(String token) {
-        
+
         if (profileServiceUrl.indexOf("?") == -1) {
-                return profileServiceUrl + "?" + OAuth.PARAM_ACCESS_TOKEN +
-                        "=" + token;
-            } else {
-                return profileServiceUrl + "&" + OAuth.PARAM_ACCESS_TOKEN +
-                        "=" + token;
+            return profileServiceUrl + "?" + PARAM_ACCESS_TOKEN
+                    + "=" + token;
+        } else {
+            return profileServiceUrl + "&" + PARAM_ACCESS_TOKEN
+                    + "=" + token;
         }
-        
+
     }
 
     private String param(String key, String value) {
         return "&" + key + "=" + value;
     }
-
 }

@@ -27,13 +27,15 @@ package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import java.util.*;
+import java.util.Map;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 /**
  * The <code>OAuth2PostAuthnPlugin</code> implements
@@ -44,8 +46,6 @@ import javax.servlet.http.HttpServletResponse;
  * The post processing class can be assigned per ORGANIZATION or SERVICE
  */
 public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
-
-    private static Debug debug = Debug.getInstance("amAuth");
 
     /** Post processing on successful authentication.
      * @param requestParamsMap - map contains HttpServletRequest parameters
@@ -60,24 +60,8 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
             SSOToken ssoToken)
             throws AuthenticationException {
 
-        debug.message("OAuth2PostAuthnPlugin:onLoginSuccess called");
-        try {
-            
-            String oauth2 = ssoToken.getProperty("OAUTH2");
+        OAuthUtil.debugMessage("OAuth2PostAuthnPlugin:onLoginSuccess called");
 
-            debug.message("OAuth2PostAuthnPlugin: OAUTH2 is: " + oauth2);
-
-            if (oauth2.equalsIgnoreCase("1")) {
-                String orig_url = OAuthUtil.findCookie(request, OAuth.COOKIE_ORIG_URL);
-                ssoToken.setProperty(ISAuthConstants.FULL_LOGIN_URL,orig_url );
-                debug.message("OAuth2PostAuthnPlugin: Proprety ISAuthConstants.FULL_LOGIN_URL "
-                        + "set to " + orig_url);
-                OAuthUtil.deleteCookie(OAuth.COOKIE_ORIG_URL, 
-                        request.getServerName(), "/");
-            }
-        } catch (Exception ex) {
-            debug.message("OAuth2PostAuthnPlugin: onLoginSuccess exception while setting properties :", ex);
-        }
     }
 
     /** Post processing on failed authentication.
@@ -90,7 +74,8 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
             HttpServletRequest req,
             HttpServletResponse res)
             throws AuthenticationException {
-        debug.message("OAuth2PostAuthnPlugin:onLoginFailure called");
+        
+        OAuthUtil.debugMessage("OAuth2PostAuthnPlugin:onLoginFailure called");
 
     }
 
@@ -105,34 +90,31 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
             SSOToken ssoToken)
             throws AuthenticationException {
         
-        debug.message("OAuth2PostAuthnPlugin:onLogout called " + request.getRequestURL());
+        OAuthUtil.debugMessage("OAuth2PostAuthnPlugin:onLogout called " + request.getRequestURL());
         String gotoParam = request.getParameter("goto");
+        String serviceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR); 
 
         try {
-//            String oauth2 = ssoToken.getProperty(OAuth.SESSION_OAUTH2);
-//            debug.message("OAuth2PostAuthnPlugin: OAUTH2 is: " + oauth2);
-            String loginURL = ssoToken.getProperty(
-                    ISAuthConstants.FULL_LOGIN_URL);
-            String accessToken = ssoToken.getProperty(OAuth.SESSION_OAUTH_TOKEN);
+            String loginURL = OAuthUtil.findCookie(request, COOKIE_PROXY_URL);
+            String accessToken = ssoToken.getProperty(SESSION_OAUTH_TOKEN);
 
-            debug.message("OAuth2PostAuthnPlugin: OAUTH2 Token is: " + accessToken);
-            String logoutBehaviour = ssoToken.getProperty(OAuth.SESSION_LOGOUT_BEHAVIOUR);
+            OAuthUtil.debugMessage("OAuth2PostAuthnPlugin: OAUTH2 Token is: " + accessToken);
+            String logoutBehaviour = ssoToken.getProperty(SESSION_LOGOUT_BEHAVIOUR);
             if (logoutBehaviour.equalsIgnoreCase("donotlogout")) {
                 return;
             }
             
             if (accessToken != null && !accessToken.isEmpty()) {
-                debug.message("OAuth2PostAuthnPlugin: OAuth2 logout");
+                OAuthUtil.debugMessage("OAuth2PostAuthnPlugin: OAuth2 logout");
 
                 String logoutURL =
-                        OAuthUtil.findCookie(request, OAuth.COOKIE_LOGOUT_URL);
+                        OAuthUtil.findCookie(request, COOKIE_LOGOUT_URL);
 
                 if (logoutURL.toLowerCase().contains("facebook")) {
-                    debug.message("OAuth2PostAuthnPlugin: facebook");
-                    String origUrl = OAuthUtil.encodeUriToRedirect(loginURL);
+                    OAuthUtil.debugMessage("OAuth2PostAuthnPlugin: facebook");
+                    String origUrl = URLEncoder.encode(loginURL, "UTF-8");
                     String query = "";
-                    // Non encrypted token ?
-                    if (accessToken.contains("\\|")) {
+                    if (accessToken.contains("\\|")) { // Non encrypted token
                         String[] tokenParts = accessToken.split("\\|");
                         String api_key = tokenParts[0];
                         String session_key = tokenParts[1];
@@ -144,25 +126,25 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
                     logoutURL = URLEncoder.encode(logoutURL + "?" + query, "UTF-8");
                 }
 
-                logoutURL = "/openam/logoutOAuth.jsp?logoutURL=" + logoutURL;
+                logoutURL = serviceURI + "/OAuthLogout.jsp?logoutURL=" + logoutURL;
                 
                 if (logoutBehaviour.equalsIgnoreCase("logout")) {
                     logoutURL += "&loggedout=logmeout";
                 }
                 
                 if (gotoParam != null && !gotoParam.isEmpty()) {
-                    logoutURL = logoutURL + "&goto=" + gotoParam;
+                    logoutURL = logoutURL + "&goto=" + URLEncoder.encode(gotoParam, "UTF-8");
                 } 
                 
-                debug.message("OAuth2PostAuthnPlugin: redirecting to: "
+                OAuthUtil.debugMessage("OAuth2PostAuthnPlugin: redirecting to: "
                         + logoutURL);
 
                 request.setAttribute(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL,
                         logoutURL);
             }
         } catch (Exception ex) {
-            debug.message("OAuth2PostAuthnPlugin: onLogout exception "
-                    + "while setting properties :", ex);
+            OAuthUtil.debugError("OAuth2PostAuthnPlugin: onLogout exception "
+                    + "while setting the logout property :", ex);
         }
 
     }

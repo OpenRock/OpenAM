@@ -39,8 +39,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.servlet.http.Cookie;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
-public class OAuthUtil implements OAuthParam {
+public class OAuthUtil  {
 
     private static Debug debug = Debug.getInstance("amAuth");
 
@@ -49,9 +50,9 @@ public class OAuthUtil implements OAuthParam {
         Cookie returnCookie = null;
         String value = "";
         if (cookies != null) {
-            for (int k = 0; k < cookies.length; k++) {
-                if (cookieName.equalsIgnoreCase(cookies[k].getName())) {
-                    returnCookie = cookies[k];
+            for(Cookie cookie : cookies) {
+                if (cookieName.equalsIgnoreCase(cookie.getName())) {
+                    returnCookie = cookie;
                     value = returnCookie.getValue();
                     debugMessage("OAuth.findCookie()" + "Cookie "
                                 + cookieName
@@ -91,18 +92,21 @@ public class OAuthUtil implements OAuthParam {
                     if (i < countParams - 1) {
                         encodedQueryValues.append("&");
                     }
-                    debugMessage("encodedQueryValues=" + encodedQueryValues);
+                    debugMessage("OAuthUtil.encodeUriToRedirect: "
+                            + "encodedQueryValues=" + encodedQueryValues);
                 }
 
                 originalUrl = url_URL.getScheme() + "://" + url_URL.getHost()
                         + url_URL.getPath() + "?" + encodedQueryValues;
-                debugMessage("RED URL: " + originalUrl);
+                debugMessage("OAuthUtil.encodeUriToRedirect: Redirect URL: " + 
+                        originalUrl);
                 originalUrl = URLEncoder.encode(originalUrl,"UTF-8");
             }
         } catch (URISyntaxException ex) {
-            debugError("URI manipulation", ex);
+            debugError("OAuthUtil.encodeUriToRedirect: URI manipulation", ex);
         } catch (UnsupportedEncodingException ex) {
-            debugError("Problem encoding the originalUrl" + originalUrl, ex);
+            debugError("OAuthUtil.encodeUriToRedirect: Problem encoding the "
+                    + "originalUrl" + originalUrl, ex);
             throw new AuthLoginException("Problem encoding the originalUrl");
         }   
         return originalUrl;
@@ -135,18 +139,18 @@ public class OAuthUtil implements OAuthParam {
         return value == null || "".equals(value);
     }
     
-    public static Set addToSet(Set set, String attribute) {
+    public static Set addToSet(Set<String> set, String attribute) {
 	set.add(attribute);
 	return set;
     }
     
-    public static void sendEmail(String uid, String emailAddress, String activCode,
-              Map SMTPConfig, ResourceBundle bundle, String linkURL)
+    public static void sendEmail(String from, String emailAddress, String activCode,
+              Map<String, String> SMTPConfig, ResourceBundle bundle, String linkURL)
     throws NoEmailSentException {
         try {
-            String gatewayEmailImplClass = (String) SMTPConfig.get(KEY_EMAIL_GWY_IMPL);
-            if (uid != null || emailAddress != null) {
-                String from = bundle.getString(MESSAGE_FROM);
+            String gatewayEmailImplClass = SMTPConfig.get(KEY_EMAIL_GWY_IMPL);
+            if (from != null || emailAddress != null) {
+                // String from = bundle.getString(MESSAGE_FROM);
                 String subject = bundle.getString(MESSAGE_SUBJECT);
                 String message = bundle.getString(MESSAGE_BODY);
                 message = message.replace("#ACTIVATION_CODE#", activCode);
@@ -156,27 +160,27 @@ public class OAuthUtil implements OAuthParam {
                      link = linkURL + "?" + PARAM_ACTIVATION + "=" +
                      URLEncoder.encode(activCode, "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
-                   debugError("Error while encoding", ex);
+                   debugError("OAuthUtil.sendEmail(): Error while encoding", ex);
                 }
 
                 message = message.replace("#ACTIVATION_LINK#", link.toString());
-                EmailGateway gateway = (EmailGateway)
-                            Class.forName(gatewayEmailImplClass).newInstance();
+                EmailGateway gateway =  Class.forName(gatewayEmailImplClass).
+                        asSubclass(EmailGateway.class).newInstance();
                 gateway.sendEmail(from, emailAddress, subject, message, SMTPConfig);
-                debugMessage("OAuthUtil.sendEmail() : sent email to " +
+                debugMessage("OAuthUtil.sendEmail(): sent email to " +
                             emailAddress);
             } else {
-                  debugMessage("OAuthUtil.sendEmail() : unable to send email");
+                  debugMessage("OAuthUtil.sendEmail(): unable to send email");
 
             }
         } catch (ClassNotFoundException cnfe) {
-            debugError("CommunityRegisterAuth.sendEmail() : " + "class not found " +
+            debugError("OAuthUtil.sendEmail(): " + "class not found " +
                         "EmailGateway class", cnfe);
         } catch (InstantiationException ie) {
-            debugError("CommunityRegisterAuth.sendEmail() : " + "can not instantiate " +
+            debugError("OAuthUtil.sendEmail(): " + "can not instantiate " +
                         "EmailGateway class", ie);
         } catch (IllegalAccessException iae) {
-            debugError("CommunityRegisterAuth.sendEmail() : " + "can not access " +
+            debugError("OAuthUtil.sendEmail(): " + "can not access " +
                         "EmailGateway class", iae);
         }
     }
@@ -195,7 +199,7 @@ public class OAuthUtil implements OAuthParam {
     
     public static void debugError(String message, Throwable t) {
         if (debug.errorEnabled()) {
-            debug.error(message, null);
+            debug.error(message, t);
         }
     }
     
