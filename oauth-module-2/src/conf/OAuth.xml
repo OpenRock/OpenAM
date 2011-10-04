@@ -40,7 +40,7 @@
     </Callbacks>
 
   <Callbacks length="1" order="3" timeout="300" 
-  header="Please change your password" template="OauthPwd.jsp">
+  header="Please change your password" template="OAuthPwd.jsp">
   </Callbacks>
 
   <Callbacks length="1" order="4" timeout="300"
