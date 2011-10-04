@@ -28,6 +28,7 @@ package org.forgerock.openam.amsessionrepository.client;
 import com.sun.identity.ha.FAMRecord;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.ReadResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -38,11 +39,12 @@ import org.restlet.resource.ClientResource;
 public class ReadTask extends AbstractTask {
     private String primaryKey = null;
     
-    public ReadTask(String resourceURL, 
+    public ReadTask(Client client,
+                    String resourceURL, 
                     String username, 
                     String password, 
                     String recordToRead) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
         this.primaryKey = recordToRead;
     }
     
@@ -52,6 +54,7 @@ public class ReadTask extends AbstractTask {
         ChallengeResponse response = getAuth();
         ClientResource resource = 
                 new ClientResource(resourceURL + ReadResource.URI + SLASH + primaryKey);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         ReadResource readResource = resource.wrap(ReadResource.class);
 
@@ -90,10 +93,16 @@ public class ReadTask extends AbstractTask {
             }
         }
         
-        record.setOperation(FAMRecord.READ);
+        if (record != null) {
+            record.setOperation(FAMRecord.READ);
 
-        if (debug.messageEnabled()) {
-            debug.message("Message read: " + record);
+            if (debug.messageEnabled()) {
+                debug.message("Message read: " + record);
+            }
+        } else {
+            if (debug.warningEnabled()) {
+                debug.warning("amrecord is null");
+            }
         }
         
         return record;

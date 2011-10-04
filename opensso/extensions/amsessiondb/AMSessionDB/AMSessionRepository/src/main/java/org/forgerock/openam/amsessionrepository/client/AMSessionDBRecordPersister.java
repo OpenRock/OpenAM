@@ -38,7 +38,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
+import org.restlet.Client;
+import org.restlet.Context;
+import org.restlet.data.Protocol;
 
 /**
  * This is an implementation of the FAMRecordPersister interface. It uses REST
@@ -55,6 +60,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
     private final static Debug debug = FAMRecordUtils.debug;
     
     private ExecutorService threadPool = null;
+    private Client client = null;
             
     public AMSessionDBRecordPersister() {
         resourceURL = SessionService.getJdbcURL();
@@ -70,6 +76,8 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
                     password + " readTimeOut: " + readTimeOut);
         }
         
+        client = new Client(new Context(), Protocol.HTTP);
+        
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -79,6 +87,9 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
     }
     
     /**
+     * This method is called by OpenAM to send the message to the amsessiondb
+     * server. This class makes use of a thread pool to decouple the sending of
+     * the messages from the authentication process.
      * 
      * @param famRecord The record to persist
      * @return Some operations return their results in a FAMRecord
@@ -103,7 +114,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
             
             Callable<AMRecord> deleteTask = 
-                    new DeleteTask(resourceURL, userName, password, recordToDelete);
+                    new DeleteTask(client, resourceURL, userName, password, recordToDelete);
             threadPool.submit(deleteTask);
             
             if (debug.messageEnabled()) {
@@ -121,7 +132,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
 
             Callable<AMRecord> deleteByDateTask = 
-                    new DeleteByDateTask(resourceURL, userName, password, expTime);
+                    new DeleteByDateTask(client, resourceURL, userName, password, expTime);
             threadPool.submit(deleteByDateTask);
             
             if (debug.messageEnabled()) {
@@ -193,7 +204,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             record.setExtraStringAttrs(famRecord.getExtraStringAttributes());
             
             Callable<AMRecord> writeTask = 
-                    new WriteTask(resourceURL, userName, password, record);
+                    new WriteTask(client, resourceURL, userName, password, record);
             threadPool.submit(writeTask);
             
             if (debug.messageEnabled()) {
@@ -205,7 +216,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
             
             Callable<AMRecord> shutdownTask = 
-                    new ShutdownTask(resourceURL, userName, password);
+                    new ShutdownTask(client, resourceURL, userName, password);
             threadPool.submit(shutdownTask);
             
             if (debug.messageEnabled()) {
@@ -224,14 +235,15 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
             
             Callable<AMRecord> readTask = 
-                    new ReadTask(resourceURL, userName, password, recordToRead);
-            Future<AMRecord> result = threadPool.submit(readTask);
+                    new ReadTask(client, resourceURL, userName, password, recordToRead);
+            FutureTask<AMRecord> result = new FutureTask<AMRecord>(readTask);
+            threadPool.execute(result);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: ReadTask queued");
             }
             
-            AMRecord record = result.get();
+            AMRecord record = result.get(readTimeOut, TimeUnit.MILLISECONDS);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: ReadTask received: " + record);
@@ -246,14 +258,15 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             String pKey = famRecord.getPrimaryKey();
             String sKey = famRecord.getSecondarykey();
             Callable<AMRecord> getRecordCountTask = 
-                    new GetRecordCountTask(resourceURL, userName, password, pKey, sKey);
-            Future<AMRecord> result = threadPool.submit(getRecordCountTask);
+                    new GetRecordCountTask(client, resourceURL, userName, password, pKey, sKey);
+            FutureTask<AMRecord> result = new FutureTask<AMRecord>(getRecordCountTask);
+            threadPool.execute(result);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: GetRecordCountTask queued");
             }
                        
-            AMRecord record = result.get();
+            AMRecord record = result.get(readTimeOut, TimeUnit.MILLISECONDS);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: GetRecordCountTask received: " + record);
@@ -268,14 +281,15 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             String pKey = famRecord.getPrimaryKey();
             String sKey = famRecord.getSecondarykey();
             Callable<AMRecord> readWithSecKeyTask = 
-                    new ReadWithSecKeyTask(resourceURL, userName, password, pKey, sKey);
-            Future<AMRecord> result = threadPool.submit(readWithSecKeyTask);
+                    new ReadWithSecKeyTask(client, resourceURL, userName, password, pKey, sKey);
+            FutureTask<AMRecord> result = new FutureTask<AMRecord>(readWithSecKeyTask);
+            threadPool.execute(result);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: ReadWithSecKeyTask queued");
             }
             
-            AMRecord record = result.get();
+            AMRecord record = result.get(readTimeOut, TimeUnit.MILLISECONDS);
             
             if (debug.messageEnabled()) {
                 debug.message("AMSessionDBRecordPersister: ReadWithSecKeyTask received: " + record);

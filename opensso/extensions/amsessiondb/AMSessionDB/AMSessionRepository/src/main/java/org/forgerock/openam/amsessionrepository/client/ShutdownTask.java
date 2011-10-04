@@ -27,6 +27,7 @@ package org.forgerock.openam.amsessionrepository.client;
 
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -35,10 +36,11 @@ import org.restlet.resource.ClientResource;
  * @author steve
  */
 public class ShutdownTask extends AbstractTask {
-    public ShutdownTask(String resourceURL, 
+    public ShutdownTask(Client client,
+                        String resourceURL, 
                         String username, 
                         String password) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
     }
     
     @Override
@@ -46,6 +48,7 @@ public class ShutdownTask extends AbstractTask {
     throws Exception {
         ChallengeResponse response = getAuth();
         ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         ShutdownResource shutdownResource = resource.wrap(ShutdownResource.class);
         

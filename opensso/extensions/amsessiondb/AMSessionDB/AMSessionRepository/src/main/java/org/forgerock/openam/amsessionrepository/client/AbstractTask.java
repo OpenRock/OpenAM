@@ -30,6 +30,7 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.Callable;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.ConfigResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
@@ -46,6 +47,7 @@ import org.restlet.resource.ClientResource;
 public abstract class AbstractTask implements Callable<AMRecord> {
     protected static Debug debug = null;
     protected String resourceURL = null;
+    protected Client client = null;
     protected String username = null;
     protected String password = null;
     protected static ChallengeResponse authResponse = null;
@@ -60,7 +62,11 @@ public abstract class AbstractTask implements Callable<AMRecord> {
         debug = FAMRecordUtils.debug;
     }
     
-    protected AbstractTask(String resourceUrl, String username, String password) {
+    protected AbstractTask(Client client, 
+                           String resourceUrl, 
+                           String username, 
+                           String password) {
+        this.client = client;
         this.resourceURL = resourceUrl;
         this.username = username;
         this.password = password;

@@ -269,7 +269,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             baseDN.append(id).append(Constants.COMMA).append(Constants.BASE_DN);
             baseDN.append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
-                SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
+                SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
                 0, 0, false, Constants.FAMRECORD_FILTER , returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
@@ -283,7 +283,7 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
 
                     Map<String, Set<String>> results = 
                             EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
-                    AMRecordDataEntry dataEntry = new AMRecordDataEntry("pkey=" + id + "," + baseDN, results);
+                    AMRecordDataEntry dataEntry = new AMRecordDataEntry("pkey=" + id + "," + baseDN, AMRecord.READ, results);
                     return dataEntry.getAMRecord();
                 } else {
                     return null;

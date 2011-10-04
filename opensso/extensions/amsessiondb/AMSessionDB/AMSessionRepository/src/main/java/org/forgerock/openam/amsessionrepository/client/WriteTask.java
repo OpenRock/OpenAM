@@ -27,6 +27,7 @@ package org.forgerock.openam.amsessionrepository.client;
 
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.WriteResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -37,11 +38,12 @@ import org.restlet.resource.ClientResource;
 public class WriteTask extends AbstractTask {
     protected AMRecord record = null;
     
-    public WriteTask(String resourceURL, 
+    public WriteTask(Client client,
+                     String resourceURL, 
                      String username, 
                      String password, 
                      AMRecord record) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
         
         this.record = record;
     }
@@ -52,6 +54,7 @@ public class WriteTask extends AbstractTask {
         ChallengeResponse response = getAuth();
         
         ClientResource resource = new ClientResource(resourceURL + WriteResource.URI);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         WriteResource writeResource = resource.wrap(WriteResource.class);
         

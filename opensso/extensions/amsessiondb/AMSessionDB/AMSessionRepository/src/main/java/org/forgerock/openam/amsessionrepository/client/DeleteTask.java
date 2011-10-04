@@ -27,6 +27,7 @@ package org.forgerock.openam.amsessionrepository.client;
 
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.DeleteResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -37,11 +38,12 @@ import org.restlet.resource.ClientResource;
 public class DeleteTask extends AbstractTask {
     private String primaryKey = null;
     
-    public DeleteTask(String resourceURL, 
+    public DeleteTask(Client client,
+                      String resourceURL, 
                       String username, 
                       String password, 
                       String recordToDelete) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
         
         this.primaryKey = recordToDelete;
     }
@@ -52,6 +54,7 @@ public class DeleteTask extends AbstractTask {
         ChallengeResponse response = getAuth();
         ClientResource resource = 
                 new ClientResource(resourceURL + DeleteResource.URI + SLASH + primaryKey);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         DeleteResource deleteResource = resource.wrap(DeleteResource.class);
 

@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.Vector;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -41,12 +42,13 @@ public class ReadWithSecKeyTask extends AbstractTask {
     private String pKey = null;
     private String sKey = null;
     
-    public ReadWithSecKeyTask(String resourceURL, 
+    public ReadWithSecKeyTask(Client client,
+                              String resourceURL, 
                               String username, 
                               String password, 
                               String pKey, 
                               String recordToRead) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
         
         this.pKey = pKey;
         this.sKey = recordToRead;
@@ -58,6 +60,7 @@ public class ReadWithSecKeyTask extends AbstractTask {
         ChallengeResponse response = getAuth();
         ClientResource resource = 
                 new ClientResource(resourceURL + ReadWithSecKeyResource.URI + SLASH + sKey);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         ReadWithSecKeyResource secReadResource = resource.wrap(ReadWithSecKeyResource.class);
 

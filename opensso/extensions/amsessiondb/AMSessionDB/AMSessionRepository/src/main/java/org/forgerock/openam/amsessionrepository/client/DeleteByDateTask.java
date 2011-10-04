@@ -27,6 +27,7 @@ package org.forgerock.openam.amsessionrepository.client;
 
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.DeleteByDateResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -37,11 +38,12 @@ import org.restlet.resource.ClientResource;
 public class DeleteByDateTask extends AbstractTask {
     protected long expTime;
     
-    public DeleteByDateTask(String resourceURL, 
+    public DeleteByDateTask(Client client,
+                            String resourceURL, 
                             String username, 
                             String password, 
                             long expTime) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
         
         this.expTime = expTime;
     }
@@ -52,6 +54,7 @@ public class DeleteByDateTask extends AbstractTask {
         ChallengeResponse response = getAuth();
         ClientResource resource = 
                 new ClientResource(resourceURL + DeleteByDateResource.URI + SLASH + expTime);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         DeleteByDateResource purgeResource = resource.wrap(DeleteByDateResource.class);
 

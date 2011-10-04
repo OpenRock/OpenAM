@@ -84,7 +84,7 @@ public class AMRecordDataEntry {
         formatter = new SimpleDateFormat("yyyyMMddHHmmss'Z'");
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
-
+    
     /**
      * Constructs an instance.
      *
@@ -92,6 +92,17 @@ public class AMRecordDataEntry {
      * @param attributeValues attribute values.
      */
     public AMRecordDataEntry(String dn, Map<String, Set<String>> attributeValues) 
+    throws StoreException {
+        this(dn, null, attributeValues);
+    }
+
+    /**
+     * Constructs an instance.
+     *
+     * @param dn Distinguished name.
+     * @param attributeValues attribute values.
+     */
+    public AMRecordDataEntry(String dn, String op, Map<String, Set<String>> attributeValues) 
     throws StoreException {
         this.dn = dn;
         this.attributeValues = attributeValues;
@@ -115,7 +126,7 @@ public class AMRecordDataEntry {
         if (attributeValues.get(PRI_KEY) != null) {
             Set<String> values = attributeValues.get(PRI_KEY);
             for (String value : values) {
-                record.setData(value);
+                record.setPrimaryKey(value);
             }
         }
         
@@ -140,10 +151,14 @@ public class AMRecordDataEntry {
             }
         }
         
-        if (attributeValues.get(OPERATION) != null) {
-            Set<String> values = attributeValues.get(OPERATION);
-            for (String value : values) {
-                record.setOperation(value);
+        if (op != null) {
+            record.setOperation(op);
+        } else {
+            if (attributeValues.get(OPERATION) != null) {
+                Set<String> values = attributeValues.get(OPERATION);
+                for (String value : values) {
+                    record.setOperation(value);
+                }
             }
         }
         

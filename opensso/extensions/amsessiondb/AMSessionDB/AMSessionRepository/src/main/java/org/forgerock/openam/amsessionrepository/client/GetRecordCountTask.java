@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
+import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
 
@@ -41,12 +42,13 @@ public class GetRecordCountTask extends AbstractTask {
     private String pKey = null;
     private String sKey = null;
     
-    public GetRecordCountTask(String resourceURL, 
+    public GetRecordCountTask(Client client,
+                              String resourceURL, 
                               String username, 
                               String password, 
                               String pKey, 
                               String recordToRead) {
-        super(resourceURL, username, password);
+        super(client, resourceURL, username, password);
         
         this.pKey = pKey;
         this.sKey = recordToRead;
@@ -58,6 +60,7 @@ public class GetRecordCountTask extends AbstractTask {
         ChallengeResponse response = getAuth();
         ClientResource resource = 
                 new ClientResource(resourceURL + GetRecordCountResource.URI + SLASH + sKey);
+        resource.setNext(client);
         resource.setChallengeResponse(response);
         GetRecordCountResource getRecordCountResource = resource.wrap(GetRecordCountResource.class);
 
@@ -102,12 +105,18 @@ public class GetRecordCountTask extends AbstractTask {
 
         Map<String, String> newMap = new HashMap<String, String>();
 
-        for (Map.Entry<String, Long> entry : sessions.entrySet()) {
-            newMap.put(entry.getKey(), entry.getValue().toString());
+        if (sessions != null) {
+            for (Map.Entry<String, Long> entry : sessions.entrySet()) {
+                newMap.put(entry.getKey(), entry.getValue().toString());
+            }
+
+            record.setExtraStringAttrs(newMap);
+        } else {
+            if (debug.warningEnabled()) {
+                debug.warning("unable to get record count");
+            }
         }
-
-        record.setExtraStringAttrs(newMap);
-
+        
         if (debug.messageEnabled()) {
             if (sessions != null) {
                 debug.message("Get Record Count for " + sKey + " size " + sessions.size());
