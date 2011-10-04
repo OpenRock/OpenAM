@@ -77,13 +77,13 @@ void tokenize(const std::string& str, ContainerT& tokens, const std::string& del
         if (pos == std::string::npos) {
             pos = str.length();
             if (pos != lastPos || !trimEmpty)
-                tokens.push_back(ContainerT::value_type(str.data() + lastPos,
-                    (ContainerT::value_type::size_type)pos - lastPos));
+                tokens.push_back(typename ContainerT::value_type(str.data() + lastPos,
+                    (typename ContainerT::value_type::size_type)pos - lastPos));
             break;
         } else {
             if (pos != lastPos || !trimEmpty)
-                tokens.push_back(ContainerT::value_type(str.data() + lastPos,
-                    (ContainerT::value_type::size_type)pos - lastPos));
+                tokens.push_back(typename ContainerT::value_type(str.data() + lastPos,
+                    (typename ContainerT::value_type::size_type)pos - lastPos));
         }
         lastPos = pos + 1;
     }
