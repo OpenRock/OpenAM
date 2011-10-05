@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
+import org.forgerock.openam.amsessionstore.resources.ConfigResource;
 import org.forgerock.openam.amsessionstore.resources.DeleteByDateResource;
 import org.forgerock.openam.amsessionstore.resources.DeleteResource;
 import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
@@ -37,13 +38,14 @@ import org.forgerock.openam.amsessionstore.resources.ReadResource;
 import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
 import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
 import org.forgerock.openam.amsessionstore.resources.WriteResource;
+import org.restlet.Client;
+import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Reference;
+import org.restlet.data.Protocol;
 import org.restlet.engine.util.Base64;
 import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
 
 /**
  * 
@@ -97,10 +99,10 @@ public class AMSessionDBClient {
             "AB0FNQ3R4SWR0ABJmOGM3YTAwNWZiNGQxMDUzMDF0AAthdXRoSW5zdGFudHQAFDIwMTEtMDUtMDRUMjA6MTY6MTRadAAJUHJpbmNpcGFscQB+AAh4cHEAfgAI";
     
     private String resourceUrl = null;
-    private Map<String, String> config = null;
+    private static ChallengeResponse authResponse = null;
     private SecureRandom secureRandom = null;
     private static ThreadGroup threadPool = new ThreadGroup("TestGroup");
-    private ChallengeResponse challengeResponse = null;
+    private Client client = null;
     
     public static void main(String[] args) {
         System.out.println("AMSessionDBClient");
@@ -134,7 +136,6 @@ public class AMSessionDBClient {
     
     public AMSessionDBClient(String url) {
         resourceUrl = url;
-        config = new HashMap<String, String>();
         
         try { 
             secureRandom = SecureRandom.getInstance("SHA1PRNG");
@@ -143,43 +144,26 @@ public class AMSessionDBClient {
             System.exit(1);
         }
         
-        ClientResource resource = new ClientResource(url);
-        resource.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "amsessiondb", "password");
+        Context restletContext = new Context();	 
+        restletContext.getParameters().set("maxTotalConnections", "16");	 
+        restletContext.getParameters().set("maxConnectionsPerHost", "8");
         
-        try {
-            resource.get();
-        } catch (ResourceException re) {
-            System.err.println(re.getMessage());
-        }
-
-        if (resource.getStatus().getCode() == 401) {
-            ChallengeRequest c1 = null;
-
-            for (ChallengeRequest challengeRequest : resource.getChallengeRequests()) {
-                if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
-                    c1 = challengeRequest;
-                    break;
-                }
-            }
-
-            challengeResponse = new ChallengeResponse(c1, resource.getResponse(),
-                                                        "amsessiondb",
-                                                        "password".toCharArray());
-            System.out.println("Authentication setup");
-        } else {
-            System.out.println("Authentication not required");
-        }
+        client = new Client(restletContext, Protocol.HTTP);
     }
     
     public void executeTest(int threadCount, int runCount) {
         for (int j = 0; j < runCount; j++) {
             for (int i = 0; i < threadCount; i++) {
-                SessionTask stt = new SessionTask(generateConfig(i + "" + j), resourceUrl);
-                //FailoverTask ft = new FailoverTask(generateConfig(i + "" + j), resourceUrl);
+                Map<String, String> configMap = generateConfig(i + "" + j);
+                SessionTask stt = new SessionTask(configMap, resourceUrl);
+                FailoverTask ft = new FailoverTask(configMap, resourceUrl);
                 //ReadSecKeyTask rskt = new ReadSecKeyTask(generateConfig(i + "" + j), resourceUrl);
                 new Thread(threadPool, stt).start();
-                //new Thread(threadPool, ft).start();
+                new Thread(threadPool, ft).start();
                 //new Thread(threadPool, rskt).start();
+                //DeleteByDateTask dtt = new DeleteByDateTask(generateConfig(i + "" + j), resourceUrl);
+                //new Thread(threadPool, dtt).start();
+                
             }
         }
     }
@@ -222,56 +206,44 @@ public class AMSessionDBClient {
             this.resourceURL = resourceURL;
         }
         
+        @Override
         public void run() {
-            read();
+            try {
+                read();
+            } catch (UnauthorizedException ue) {
+                // first failure retry
+                authResponse = null;
+                
+                try {
+                    read();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                }
+            }
         }
         
-        protected void read() {
-            ChallengeResponse c2 = null;
-
-            ClientResource r1 = new ClientResource(resourceUrl + ReadResource.URI);
-            r1.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "amsessiondb", "password");
-            ReadResource readResource = r1.wrap(ReadResource.class);
-
-            try {
-                readResource.read(taskConfig.get(PRIMARY_KEY));
-            } catch (Exception re) {
-                System.err.println(re.getMessage());
-            }
-
-            if (r1.getStatus().getCode() == 401) {
-                ChallengeRequest c1 = null;
-
-                for (ChallengeRequest challengeRequest : r1.getChallengeRequests()) {
-                    if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
-                        c1 = challengeRequest;
-                        break;
-                    }
-                }
-
-                c2 = new ChallengeResponse(c1, r1.getResponse(),
-                                                            "amsessiondb",
-                                                            "password".toCharArray());
-                System.out.println("Authentication setup");
-            } else {
-                System.out.println("Authentication not required");
-            }
-            
-            r1.setChallengeResponse(c2);
+        protected void read() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceURL);
                 
+            ClientResource resource = new ClientResource(resourceURL + ReadResource.URI + "/" + taskConfig.get(PRIMARY_KEY));
+            resource.setChallengeResponse(response);
             AMRecord record = null;
+            ReadResource readResource = resource.wrap(ReadResource.class);
             
             try {
-                record = readResource.read(taskConfig.get(PRIMARY_KEY));
+                record = readResource.read();
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             } 
             
             System.out.println(record);
         }
     }    
-
-    
 
     class DeleteByDateTask implements Runnable {
         protected Map<String, String> taskConfig = null;
@@ -282,25 +254,38 @@ public class AMSessionDBClient {
             this.resourceURL = resourceURL;
         }
         
+        @Override
         public void run() {
-            deleteByDate();
+            try {
+                deleteByDate();
+            } catch (UnauthorizedException ue) {
+                authResponse = null;
+            
+                try {
+                    deleteByDate();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                }
+            }
         }
         
-        protected void deleteByDate() {
-            ClientResource resource = new ClientResource(resourceUrl + DeleteByDateResource.URI);
+        protected void deleteByDate() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceUrl); 
+            
+            ClientResource resource = new ClientResource(resourceURL + DeleteByDateResource.URI + "/" + taskConfig.get(EXP_DATE));
+            resource.setChallengeResponse(response);
             DeleteByDateResource purgeResource = resource.wrap(DeleteByDateResource.class);
-
-            if (challengeResponse != null) {
-                Reference ref = challengeResponse.getDigestRef();
-                ref.setPath("/amsessiondb" + DeleteByDateResource.URI);
-                challengeResponse.setDigestRef(ref);
-                resource.setChallengeResponse(challengeResponse);
-            }
             
             try {
-                purgeResource.remove(Long.parseLong(taskConfig.get(EXP_DATE)));
+                purgeResource.remove();
+                System.out.println("Removed: " + taskConfig.get(EXP_DATE));
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             }
         } 
     }
@@ -314,49 +299,39 @@ public class AMSessionDBClient {
             this.resourceURL = resourceURL;
         }
         
+        @Override
         public void run() {
-            readSecKey();
+            try {
+                readSecKey();
+            } catch (UnauthorizedException ue) {
+                authResponse = null;
+            
+                try {
+                    readSecKey();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                }
+            }
         }
         
-        protected void readSecKey() {
-            ChallengeResponse c2 = null;
-
-            ClientResource r1 = new ClientResource(resourceUrl + ReadWithSecKeyResource.URI);
-            r1.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "amsessiondb", "password");
-            ReadWithSecKeyResource secReadResource = r1.wrap(ReadWithSecKeyResource.class);
-
-            try {
-                secReadResource.readWithSecKey(taskConfig.get(SEC_KEY));
-            } catch (Exception re) {
-                System.err.println(re.getMessage());
-            }
-
-            if (r1.getStatus().getCode() == 401) {
-                ChallengeRequest c1 = null;
-
-                for (ChallengeRequest challengeRequest : r1.getChallengeRequests()) {
-                    if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
-                        c1 = challengeRequest;
-                        break;
-                    }
-                }
-
-                c2 = new ChallengeResponse(c1, r1.getResponse(),
-                                                            "amsessiondb",
-                                                            "password".toCharArray());
-                System.out.println("Authentication setup");
-            } else {
-                System.out.println("Authentication not required");
-            }
-
-            r1.setChallengeResponse(c2);
+        protected void readSecKey() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceURL);
+            
+            ClientResource resource = new ClientResource(resourceURL + ReadWithSecKeyResource.URI + "/" + taskConfig.get(SEC_KEY));
+            resource.setChallengeResponse(response);
+            ReadWithSecKeyResource secReadResource = resource.wrap(ReadWithSecKeyResource.class);
 
             Set<String> records = null;
             
             try {
-                records = secReadResource.readWithSecKey(taskConfig.get(SEC_KEY));
+                records = secReadResource.readWithSecKey();
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             }
             
             System.out.println(records.size());
@@ -373,18 +348,36 @@ public class AMSessionDBClient {
         }
         
         public void run() {
-            shutdown();
+            try {
+                shutdown();
+            } catch (UnauthorizedException ue) {
+                authResponse = null;
+            
+                try {
+                    shutdown();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                }
+            }
         }
         
-        protected void shutdown() {
-            ClientResource resource = new ClientResource(resourceUrl + ShutdownResource.URI);
+        protected void shutdown() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceURL);
+            
+            ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
+            resource.setChallengeResponse(response);
             ShutdownResource shutdown = resource.wrap(ShutdownResource.class);
             
-            if (challengeResponse != null) {
-                resource.setChallengeResponse(challengeResponse);
+            try {
+                shutdown.shutdown();
+            } catch (Exception ex) {
+                System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             }
-            
-            shutdown.shutdown();
         }
     }
     
@@ -397,47 +390,58 @@ public class AMSessionDBClient {
             this.resourceURL = resourceURL;
         }
         
+        @Override
         public void run() {
-            write();
-            write();
-            getRecordCount();
+            try {
+                write();
+            } catch (UnauthorizedException ue) {
+                authResponse = null;
+            
+                try {
+                    write();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                    return;
+                }
+            }
+            
+            try {
+                write();
+            } catch (UnauthorizedException ue) {
+                authResponse = null;
+            
+                try {
+                    write();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                    return;
+                }
+            }
+            
+            try {
+                getRecordCount();
+            } catch (UnauthorizedException ue) {
+                authResponse = null;
+            
+                try {
+                    getRecordCount();
+                } catch (UnauthorizedException ue2) {
+                    System.err.println("Unsuccessful retry");
+                    return;
+                }
+            }
+
             sleep();
             //delete();
         }
         
-        protected void write() {
-            ChallengeResponse c2 = null;
+        protected void write() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceURL);
             
-            ClientResource r1 = new ClientResource(resourceUrl + WriteResource.URI);
-            r1.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "amsessiondb", "password");
-            WriteResource writeResource = r1.wrap(WriteResource.class);
-
-            try {
-                //r1.get();
-                writeResource.write(null);
-            } catch (Exception re) {
-                System.err.println(re.getMessage());
-            }
-
-            if (r1.getStatus().getCode() == 401) {
-                ChallengeRequest c1 = null;
-
-                for (ChallengeRequest challengeRequest : r1.getChallengeRequests()) {
-                    if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
-                        c1 = challengeRequest;
-                        break;
-                    }
-                }
-
-                c2 = new ChallengeResponse(c1, r1.getResponse(),
-                                                            "amsessiondb",
-                                                            "password".toCharArray());
-                System.out.println("Authentication setup");
-            } else {
-                System.out.println("Authentication not required");
-            }
-            
-            r1.setChallengeResponse(c2);
+            ClientResource resource = new ClientResource(resourceURL + WriteResource.URI);
+            resource.setChallengeResponse(response);
+            WriteResource writeResource = resource.wrap(WriteResource.class);
             
             AMRecord record = new AMRecord(SESSION, 
                                            AMRecord.WRITE, 
@@ -460,47 +464,32 @@ public class AMSessionDBClient {
                 System.out.println("Write complete: " + record.getPrimaryKey());
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             }
         }
         
-        protected void getRecordCount() {
-            ChallengeResponse c2 = null;
+        protected void getRecordCount() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceURL);
             
-            ClientResource r1 = new ClientResource(resourceUrl + GetRecordCountResource.URI);
-            r1.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "amsessiondb", "password");
-            GetRecordCountResource getRecordCountResource = r1.wrap(GetRecordCountResource.class);
-
-            try {
-                getRecordCountResource.getRecordCount(taskConfig.get(SEC_KEY));
-            } catch (Exception re) {
-                System.err.println(re.getMessage());
-            }
-
-            if (r1.getStatus().getCode() == 401) {
-                ChallengeRequest c1 = null;
-
-                for (ChallengeRequest challengeRequest : r1.getChallengeRequests()) {
-                    if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
-                        c1 = challengeRequest;
-                        break;
-                    }
-                }
-
-                c2 = new ChallengeResponse(c1, r1.getResponse(),
-                                                            "amsessiondb",
-                                                            "password".toCharArray());
-                System.out.println("Authentication setup");
-            } else {
-                System.out.println("Authentication not required");
-            }
-            
-            r1.setChallengeResponse(c2);
+            ClientResource resource = new ClientResource(resourceURL + GetRecordCountResource.URI + "/" + taskConfig.get(SEC_KEY));
+            resource.setChallengeResponse(response);
+            GetRecordCountResource getRecordCountResource = resource.wrap(GetRecordCountResource.class);
             
             try {
-                Map<String, Long> sessions = getRecordCountResource.getRecordCount(taskConfig.get(SEC_KEY));
+                System.out.println("Getting session count for: " + taskConfig.get(SEC_KEY));
+                Map<String, Long> sessions = getRecordCountResource.getRecordCount();
+                System.out.println("Found: " + sessions.size());
                 System.out.println("Sessions are: " + sessions);
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             }
         }
         
@@ -512,45 +501,63 @@ public class AMSessionDBClient {
             }
         }
         
-        public void delete() {
-            ChallengeResponse c2 = null;
+        protected void delete() 
+        throws UnauthorizedException {
+            ChallengeResponse response = getAuth(resourceURL);
             
-            ClientResource r1 = new ClientResource(resourceUrl + DeleteResource.URI);
-            r1.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "amsessiondb", "password");
-            DeleteResource deleteResource = r1.wrap(DeleteResource.class);
+            ClientResource resource = new ClientResource(resourceURL + DeleteResource.URI + "/" + taskConfig.get(PRIMARY_KEY));
+            resource.setChallengeResponse(response);
+            DeleteResource deleteResource = resource.wrap(DeleteResource.class);
 
             try {
-                deleteResource.remove(taskConfig.get(PRIMARY_KEY));
-            } catch (Exception re) {
-                System.err.println(re.getMessage());
-            }
-
-            if (r1.getStatus().getCode() == 401) {
-                ChallengeRequest c1 = null;
-
-                for (ChallengeRequest challengeRequest : r1.getChallengeRequests()) {
-                    if (ChallengeScheme.HTTP_DIGEST.equals(challengeRequest.getScheme())) {
-                        c1 = challengeRequest;
-                        break;
-                    }
-                }
-
-                c2 = new ChallengeResponse(c1, r1.getResponse(),
-                                                            "amsessiondb",
-                                                            "password".toCharArray());
-                System.out.println("Authentication setup");
-            } else {
-                System.out.println("Authentication not required");
-            }
-            
-            r1.setChallengeResponse(c2);
-
-            try {
-                deleteResource.remove(taskConfig.get(PRIMARY_KEY));
+                deleteResource.remove();
                 System.out.println("Deleted: " + taskConfig.get(PRIMARY_KEY));
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
+                
+                if (resource.getStatus().getCode() == 401) {
+                    throw new UnauthorizedException();
+                }
             }
         }
+    }
+    
+    public static ChallengeResponse getAuth(String resourceUrl) {
+        if (authResponse != null) {
+            return authResponse;
+        }
+                
+        ClientResource authRes = new ClientResource(resourceUrl + ConfigResource.URI);
+        authRes.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "login", "test");
+        
+        try {
+            authRes.get();
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+        
+        System.out.println(authRes.getStatus());
+        
+        ChallengeRequest c1 = null;
+        for (ChallengeRequest challengeRequest : authRes.getChallengeRequests()) {
+            if (ChallengeScheme.HTTP_DIGEST
+                    .equals(challengeRequest.getScheme())) {
+                c1 = challengeRequest;
+                break;
+            }
+        }
+        
+        authResponse = new ChallengeResponse(c1, authRes.getResponse(), "amsessiondb", "password".toCharArray());
+        authRes.setChallengeResponse(authResponse);
+        
+        try {
+            authRes.get();
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+        
+        System.out.println(authRes.getStatus());
+                
+        return authResponse;
     }
 }
