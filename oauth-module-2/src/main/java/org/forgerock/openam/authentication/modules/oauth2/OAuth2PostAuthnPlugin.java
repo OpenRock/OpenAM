@@ -26,7 +26,6 @@
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
@@ -123,10 +122,11 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
                     } else { // Encrypted token
                         query = "next=" + origUrl + "&access_token=" + accessToken;
                     }
-                    logoutURL = URLEncoder.encode(logoutURL + "?" + query, "UTF-8");
+                    logoutURL += "?" + query;
                 }
 
-                logoutURL = serviceURI + "/OAuthLogout.jsp?logoutURL=" + logoutURL;
+                logoutURL = serviceURI + "/OAuthLogout.jsp?logoutURL=" + 
+                        URLEncoder.encode(logoutURL, "UTF-8");;
                 
                 if (logoutBehaviour.equalsIgnoreCase("logout")) {
                     logoutURL += "&loggedout=logmeout";

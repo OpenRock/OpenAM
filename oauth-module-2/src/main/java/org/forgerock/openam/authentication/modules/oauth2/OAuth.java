@@ -26,6 +26,8 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -44,6 +46,7 @@ import org.json.JSONObject;
 
 import com.iplanet.sso.SSOException;
 
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.RedirectCallback;
@@ -61,7 +64,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
-import org.apache.commons.io.IOUtils;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
@@ -113,15 +115,27 @@ public class OAuth extends AMLoginModule {
                 // The Proxy is used to return with a POST to the module
                 proxyURL = config.getProxyURL();
                 
+                // Find the domains for which we are configured
+                Set<String> domains = AuthClientUtils.getCookieDomains();
+                
+                String ProviderLogoutURL = config.getLogoutServiceUrl();
+                
                 // Set the return URL Cookie
                 // Note: The return URL cookie from the RedirectCallback can not
                 // be used because the framework changes the order of the 
                 // parameters in the query. OAuth2 requires an identical URL 
                 // when retrieving the token
-                response.addCookie(OAuthUtil.setCookie(COOKIE_PROXY_URL,
-                        proxyURL, serverName, "/"));                
-                response.addCookie(OAuthUtil.setCookie(COOKIE_ORIG_URL,
-                        requestedURL, serverName, "/"));
+                for (String domain : domains) {
+                   response.addCookie(OAuthUtil.setCookie(COOKIE_PROXY_URL,
+                        proxyURL, domain, "/"));                
+                   response.addCookie(OAuthUtil.setCookie(COOKIE_ORIG_URL,
+                        requestedURL, domain, "/")); 
+                   if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
+                        response.addCookie(OAuthUtil.setCookie(COOKIE_LOGOUT_URL,
+                                ProviderLogoutURL, domain, "/"));
+                   }
+                }
+
                 // The Proxy is used to return with a POST to the module
                 setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL,
                         requestedURL);
@@ -161,12 +175,6 @@ public class OAuth extends AMLoginModule {
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     String token = extractToken(tokenSvcResponse);
-
-                    String logoutURL = config.getLogoutServiceUrl();
-                    if (logoutURL != null && !logoutURL.isEmpty()) {
-                        response.addCookie(OAuthUtil.setCookie(COOKIE_LOGOUT_URL,
-                                logoutURL, serverName, "/"));
-                    }
 
                     setUserSessionProperty(SESSION_OAUTH_TOKEN, token);
 
@@ -432,16 +440,26 @@ public class OAuth extends AMLoginModule {
     // Profile service configured for this module, either using first GET and
     // POST as a fall back
     private String getContent(String serviceUrl) throws LoginException {
-        
-        InputStream is = getContentStreamByGET(serviceUrl);       
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                getContentStreamByGET(serviceUrl)));
+        StringBuilder buf = new StringBuilder();
         try {
-            return IOUtils.toString(is);
+            for (String str; (str = in.readLine()) != null;) {
+                buf.append(str);
+            }
         } catch (IOException ioe) {
-            OAuthUtil.debugError("getContent: IOException: " + ioe.getMessage());
-                throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
+            OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
+            throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
         } finally {
-                    IOUtils.closeQuietly(is);
+            try {
+                in.close();
+            } catch (IOException ioe) {
+                OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
+                throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
+            }
         }
+        return buf.toString();
     }
 
     // Create the account in the realm, by using the pluggable account mapper and

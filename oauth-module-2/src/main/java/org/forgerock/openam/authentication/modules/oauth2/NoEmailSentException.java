@@ -27,14 +27,14 @@ package org.forgerock.openam.authentication.modules.oauth2;
 
 
 public class NoEmailSentException extends Exception {
-    private Exception nestedException;
+    // private Exception nestedException;
 
-    public NoEmailSentException(
-              Exception nestedException,
-              String exceptionMessage) {
-        this(exceptionMessage);
-        this.nestedException = nestedException;
-    }
+//    public NoEmailSentException(
+//              Exception nestedException,
+//              String exceptionMessage) {
+//        this(exceptionMessage);
+//        this.nestedException = nestedException;
+//    }
 
     public NoEmailSentException(String message) {
         super(message);

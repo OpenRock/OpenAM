@@ -128,13 +128,15 @@ public class OAuthUtil  {
     }
     
     public static Cookie setCookie(String cookieName, String cookieValue, 
-            String serverName, String path) {
+            String domainName, String path) {
                 Cookie returnURLCookie = new Cookie(cookieName, cookieValue);
-                returnURLCookie.setDomain(serverName);
+                returnURLCookie.setDomain(domainName);
                 returnURLCookie.setPath(path);
+                debugMessage("OAuthUtil.setCookie: Cookie " + cookieName + " set " +
+                        "in the domain " + domainName + " and path " + path);
                 return returnURLCookie;
     }
-
+    
     static boolean isEmpty(String value) {
         return value == null || "".equals(value);
     }
