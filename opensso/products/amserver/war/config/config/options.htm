@@ -246,37 +246,35 @@
         <h4>$page.getLocalizedString("configuration.options.subtitle")</h4>
         #end
 
-        <div class="borderRight">
-            #if ($upgrade)
+        #if ($upgrade)
+        <div style="width: 100%">
             <h3>$page.getLocalizedString("upgrade.title")</h3>
 	    $page.getLocalizedString("upgrade.description")
             <a id="upgradeLink" class="blue pointer">$page.getLocalizedString("upgrade.link")</a>
-            #else
+        #else
+        <div class="borderRight">
             <h3>$page.getLocalizedString("configuration.options.option1.title")</h3>
             $page.getLocalizedString("configuration.options.option1.description")
 	    <br>
             <p>
             <a id="DemoConfiguration" class="blue pointer" onclick="setOption(1);">$page.getLocalizedString("configuration.options.option1.link")</a>
             </p>
-            #end
+        #end
         </div>
 	<!-- enable if adding third option
         <div class="borderRight">
 	-->
-        <div>
             #if($upgrade)
-            <h3>$page.getLocalizedString("upgrade.existing.title")</h3>
-	    $page.getLocalizedString("upgrade.existing.description")
-            <a id="coexistLink" class="blue pointer">$page.getLocalizedString("upgrade.existing.link")</a>
             #else
+        <div>
             <h3>$page.getLocalizedString("configuration.options.option2.title")</h3>
 	    $page.getLocalizedString("configuration.options.option2.description")
 	    <br>
             <p>
             <a id="CreateNewConf" class="blue pointer" onclick="setOption(2);">$page.getLocalizedString("configuration.options.option2.link")</a>
             </p>
-            #end
         </div>
+            #end
     </div>
 </div>
 #if ( $upgrade )
