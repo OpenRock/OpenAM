@@ -45,6 +45,7 @@ public class Options extends TemplatedPage {
 
     protected boolean passwordUpdateRequired = true;
     protected boolean upgrade = false;
+    protected boolean upgradeCompleted = false;
     protected boolean isOpenDS1x = false;
     protected boolean debugOn = false;
     
@@ -59,6 +60,8 @@ public class Options extends TemplatedPage {
         addModel("passwordUpdateRequired",
             Boolean.valueOf( passwordUpdateRequired ) );
         upgrade = !getConfigurator().isNewInstall();
+        upgradeCompleted = AMSetupServlet.getUpgradeCompleted();
+        addModel("upgradeCompleted", Boolean.valueOf(upgradeCompleted));
         addModel( "upgrade", Boolean.valueOf( upgrade ) );
 
         isOpenDS1x = EmbeddedOpenDS.isOpenDSVer1Installed();

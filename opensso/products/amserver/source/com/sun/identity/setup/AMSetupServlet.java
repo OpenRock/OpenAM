@@ -150,6 +150,7 @@ public class AMSetupServlet extends HttpServlet {
     private static ServletContext servletCtx = null;
     private static boolean isConfiguredFlag = false;
     private static boolean isVersionNewer = false;
+    private static boolean upgradeCompleted = false;
     private final static String SMS_STR = "sms";
     private static SSOToken adminToken = null;
     private final static String LEGACY_PROPERTIES = "legacy";
@@ -216,7 +217,7 @@ public class AMSetupServlet extends HttpServlet {
             isVersionNewer = UpgradeUtils.isVersionNewer();    
         }
         
-        return isConfiguredFlag && !isVersionNewer;
+        return isConfiguredFlag && !isVersionNewer && !upgradeCompleted;
     } 
     
     static public boolean isConfigured() {
@@ -250,7 +251,15 @@ public class AMSetupServlet extends HttpServlet {
             isVersionNewer = UpgradeUtils.isVersionNewer();
         }       
     }
-    
+
+    public static void upgradeCompleted() {
+        upgradeCompleted = true;
+    }
+
+    public static boolean getUpgradeCompleted() {
+        return upgradeCompleted;
+    }
+
     public static void enableDebug() {
         Collection<Debug> debugInstances = Debug.getInstances();
         

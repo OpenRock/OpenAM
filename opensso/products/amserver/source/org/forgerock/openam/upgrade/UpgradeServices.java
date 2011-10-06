@@ -173,7 +173,9 @@ public class UpgradeServices {
         }
         
         // reset the version is newer flag
-        AMSetupServlet.isVersionNewer();
+        // reenable this after the CLI upgrade notifies the console correctly
+        //AMSetupServlet.isVersionNewer();
+        AMSetupServlet.upgradeCompleted();
     }
             
     public String generateDetailedUpgradeReport(SSOToken adminToken, ServiceUpgradeWrapper serviceChanges, boolean html) 

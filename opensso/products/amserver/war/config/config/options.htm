@@ -16,7 +16,7 @@
         document.location = "$context/UI/Login";
     }
 
-    #if ( $upgrade )
+    #if ( $upgrade || $upgradeCompleted)
 
     function downloadInstructions() {
         /* TODO - enable download - where does this file reside? */
@@ -205,11 +205,13 @@
         YAHOO.sun.identity.config.options.confComplete.render();
         YAHOO.sun.identity.config.options.confComplete.center();
 
-        #if ( $upgrade )
+        #if ( $upgrade || $upgradeCompleted)
         AjaxUtils.load('upgradeContainer', "$context/config/upgrade/upgrade.htm?" + getLocale(), renderUpgradePanel);
         YAHOO.sun.identity.config.options.upgradeComplete = new YAHOO.widget.Panel("upgradeComplete", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
         YAHOO.sun.identity.config.options.upgradeComplete.render();
-
+         #if ($upgradeCompleted)
+        YAHOO.sun.identity.config.options.confComplete.show();
+         #end
         YAHOO.sun.identity.config.options.upgrading = new YAHOO.widget.Panel("upgrading", { width:"240px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
         YAHOO.sun.identity.config.options.upgrading.setHeader("Upgrading configuration.  Please wait...");
         YAHOO.sun.identity.config.options.upgrading.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
@@ -238,7 +240,7 @@
 <div id="container" align="center">
     
     <div id="options" align="left" style="width:600px">
-        #if ( $upgrade )
+        #if ( $upgrade || $upgradeCompleted)
         <h1>$page.getLocalizedString("upgrade.available")</h1>
         <h4>$page.getLocalizedString("upgrade.available.option")</h4>
         #else
@@ -246,7 +248,7 @@
         <h4>$page.getLocalizedString("configuration.options.subtitle")</h4>
         #end
 
-        #if ($upgrade)
+        #if ($upgrade || $upgradeCompleted)
         <div style="width: 100%">
             <h3>$page.getLocalizedString("upgrade.title")</h3>
 	    $page.getLocalizedString("upgrade.description")
@@ -264,7 +266,7 @@
 	<!-- enable if adding third option
         <div class="borderRight">
 	-->
-            #if($upgrade)
+            #if($upgrade || $upgradeCompleted)
             #else
         <div>
             <h3>$page.getLocalizedString("configuration.options.option2.title")</h3>
@@ -277,7 +279,7 @@
             #end
     </div>
 </div>
-#if ( $upgrade )
+#if ( $upgrade || $upgradeCompleted)
 <style type="text/css">
 	div.colum{
 		width:280px;
@@ -305,7 +307,7 @@
         <div class="bd">
             <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
                 <br/>
-                #if ($upgrade)
+                #if ($upgrade || $upgradeCompleted)
                 <h2>$page.getLocalizedString("upgrade.progress")</h2>
                 #else
                 <h2>$page.getLocalizedString("configurator.progress")</h2>
@@ -332,13 +334,15 @@
     </div>
     
     <div id="confComplete" style="visibility:hidden">
-        #if ($upgrade)
+        #if ($upgrade || $upgradeCompleted)
             <div class="header">$page.getLocalizedString("upgrade.complete.header")</div>
             <div class="bd">
                 <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
 
                     <br>
                     <h1>$page.getLocalizedString("upgrade.complete.message")</h1>
+                    <br/>
+                    <p align="center" class="blueSmall">$page.getLocalizedString("upgrade.restart.container")</p>
         #else
             <div class="header">$page.getLocalizedString("configuration.option1.complete.header")</div>
             <div class="bd">
@@ -346,10 +350,11 @@
 
                     <br>
                     <h1>$page.getLocalizedString("configuration.option1.complete.message")</h1>
-        #end
                     <br/>
                     <p align="center" class="blueSmall">
                         <a href="#" onclick="launchConsole(); return false">$page.getLocalizedString("go.to.login.screen")</a>
+                    </p>
+        #end
                     </div>
              </div>
     </div>
