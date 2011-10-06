@@ -98,11 +98,11 @@
         <os family="windows" arch="amd64"/>
     </condition>
 
-    <condition property="winnt.ext" value="_x64" else="">
+    <condition property="winnt.ext" value="_64" else="">
         <os family="windows" arch="amd64"/>
     </condition>
 
-    <condition property="build.type.suffix" value="_x64" else="">
+    <condition property="build.type.suffix" value="_64" else="">
         <os family="windows" arch="amd64"/>
     </condition>
 
@@ -171,11 +171,13 @@
         <antcall target="iis6" />
         <antcall target="iis7" />
         <!-- <antcall target="domino" /> -->
+        <antcall target="jsFiles" />
     </target>
         
     <target name="all64" depends="get-arch" unless="is64bit">
         <antcall target="iis6" />
         <antcall target="iis7" />
+        <antcall target="jsFiles64" />
     </target>
    
     <target name="apache" depends="preparebuild">
@@ -307,10 +309,9 @@
         </copy>
     </target>
 
-    <target name="nightly">
+    <target name="jsFiles">
         <filter token="DATE" value="${nightly.date}" />
         <filter token="OS" value="${build.os}" />
-        <filter token="BIT" value="${build.type.suffix}" />
         <filter token="ARCH" value="${build.type.suffix}" />
         <filter token="BUILD_DATE" value="${nightly.date}" />
         <copy file="${webagents.basedir}/agents/source/apache/build_date.js.template"
@@ -325,10 +326,17 @@
             tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
             tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
-        <antcall target="prenightly" inheritRefs="true"/> 
-        <antcall target="all" inheritRefs="true"/>
-        <antcall target="all64" inheritRefs="true"/>
-        <antcall target="postnightly" inheritRefs="true"/> 
+    </target>
+
+    <target name="jsFiles64">
+        <filter token="DATE" value="${nightly.date}" />
+        <filter token="OS" value="${build.os}" />
+        <filter token="ARCH" value="${build.type.suffix}" />
+        <filter token="BUILD_DATE" value="${nightly.date}" />
+        <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
+            tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
+            tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
     </target>
 
     <target name="prenightly" depends="preparebuild">
