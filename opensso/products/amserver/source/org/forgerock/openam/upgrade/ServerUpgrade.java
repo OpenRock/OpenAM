@@ -42,6 +42,7 @@ public class ServerUpgrade {
     private static final String SERVER_UPGRADE = "serverupgrade";
     private static final String ATTR_UPGRADE_HELPER = "upgrade.helper";
     private static final String ATTR_DEFAULT_UPGRADE = "defaults.to.upgrade";
+    private static final String SERVICES_TO_DELETE = "services.to.delete";
     private static ResourceBundle res = null;
     private static UpgradeException initializationException = null;
     
@@ -64,6 +65,28 @@ public class ServerUpgrade {
         }
         
         String attrValues = res.getString(ATTR_DEFAULT_UPGRADE);
+        
+        if (attrValues != null) {
+            StringTokenizer st = new StringTokenizer(attrValues, ",");
+            
+            while (st.hasMoreTokens()) {
+                values.add(st.nextToken());
+            }
+        }
+        
+        return values;
+    }
+    
+    public static Set<String> getServicesToDelete()
+    throws UpgradeException {
+        assertInitialized();
+        Set<String> values = new HashSet<String>();
+        
+        if (!res.containsKey(SERVICES_TO_DELETE)) {
+            throw new UpgradeException("Unable to find " + SERVICES_TO_DELETE + " in " + SERVER_UPGRADE);
+        }
+        
+        String attrValues = res.getString(SERVICES_TO_DELETE);
         
         if (attrValues != null) {
             StringTokenizer st = new StringTokenizer(attrValues, ",");

@@ -442,8 +442,7 @@ public class UpgradeServices {
                 new HashMap<String, Map<String, ServiceSchemaUpgradeWrapper>>();
         Map<String, Map<String, SubSchemaUpgradeWrapper>> ssMod =
                 new HashMap<String, Map<String, SubSchemaUpgradeWrapper>>();
-        Set<String> deletedServices = 
-                listDeletedServices(serviceDefinitions.keySet(), UpgradeUtils.getExistingServiceNames(adminToken));; 
+        Set<String> deletedServices = listDeletedServices();
         
         for (Map.Entry<String, Document> service : serviceDefinitions.entrySet()) { 
             // service is new, skip modification check
@@ -481,12 +480,9 @@ public class UpgradeServices {
         return Collections.EMPTY_SET;
     }
     
-    protected Set<String> listDeletedServices(Set<String> newServiceNames, Set<String> existingServiceNames) {
-        if (existingServiceNames.removeAll(newServiceNames)) {
-            return existingServiceNames;
-        }
-        
-        return Collections.EMPTY_SET;
+    protected Set<String> listDeletedServices()
+    throws UpgradeException {
+        return ServerUpgrade.getServicesToDelete();
     }
     
     protected Document fetchDocumentSchema(String xmlContent, SSOToken adminToken) 
