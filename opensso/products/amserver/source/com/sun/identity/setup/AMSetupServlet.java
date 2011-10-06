@@ -308,6 +308,7 @@ public class AMSetupServlet extends HttpServlet {
                 }
             } catch (ConfiguratorException e) {
                 //ignore, WAR may not be configured yet.
+            	System.out.println("checkConfigProperties :" +e);
             } catch (Exception e) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                     "AMSetupServlet.checkConfigProperties", e);

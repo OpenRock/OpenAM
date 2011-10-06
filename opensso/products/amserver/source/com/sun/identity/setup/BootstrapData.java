@@ -222,6 +222,7 @@ public class BootstrapData {
                     SetupProgress.reportEnd("emb.success", null);
                 } catch (Exception ex) {
                     //ignore, it maybe started.
+                	System.out.println("BootstrapData.startEmbeddedDS: "+ex);
                 }
             }
         }

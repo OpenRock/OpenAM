@@ -270,6 +270,7 @@ public class Bootstrap {
             }
         } catch (SMSException e) {
             //ignore. product is not configured yet.
+        	System.out.println("Bootstrap.getConfiguration :" + e);
             properties = null;
         }
         return properties;
