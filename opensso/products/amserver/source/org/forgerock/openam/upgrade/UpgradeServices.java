@@ -33,6 +33,9 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
+import com.sun.identity.password.plugins.PasswordGenerator;
+import com.sun.identity.password.plugins.RandomPasswordGenerator;
+import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.IHttpServletRequest;
 import com.sun.identity.setup.ServicesDefaultValues;
@@ -52,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,8 +80,8 @@ import org.w3c.dom.Document;
 public class UpgradeServices {
     protected static Debug debug = Debug.getInstance("amUpgrade");
     protected String fileName = null;
+    private final static String DEFAULT_PASSWORD = "f7e2lu!l3d";
     protected static final List<String> serviceNames = new ArrayList<String>();
-    private final static String BACKUP_PASSWORD = "fjdksljfdklszjfhiekahfjkdshafkjds";
         
     static {
         ResourceBundle rb = ResourceBundle.getBundle(
@@ -207,7 +211,10 @@ public class UpgradeServices {
         String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
         String backupDir = baseDir + "/backups/";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        File backupFile = new File(backupDir + "servicebackup." + dateFormat.format(new Date()));
+        String dateStamp = dateFormat.format(new Date());
+        File backupFile = new File(backupDir + "servicebackup." + dateStamp);
+        File backupPasswdFile = new File(backupDir + "servicebackup.password." + dateStamp);
+        String backupPassword = generateBackupPassword();
         
         if (backupFile.exists()) {
             debug.error("Upgrade cannot continue as backup file exists! " + backupFile.getName());
@@ -218,10 +225,10 @@ public class UpgradeServices {
             fout = new FileOutputStream(backupFile);
             ServiceManager sm = new ServiceManager(adminToken);
             AMEncryption encryptObj = new JCEEncryption();
-            ((ConfigurableKey)encryptObj).setPassword(BACKUP_PASSWORD);
+            ((ConfigurableKey)encryptObj).setPassword(backupPassword);
 
             String resultXML = sm.toXML(encryptObj);
-            resultXML += "<!-- " + Hash.hash(BACKUP_PASSWORD) + " -->";
+            resultXML += "<!-- " + Hash.hash(backupPassword) + " -->";
         
             fout.write(resultXML.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException uee) {
@@ -246,6 +253,29 @@ public class UpgradeServices {
                 } catch (IOException ioe) {
                     //ignored
                 }
+            }
+        }
+        
+        if (backupPasswdFile.exists()) {
+            debug.error("Upgrade cannot continue as backup password file exists! " + backupPasswdFile.getName());
+            throw new UpgradeException("Upgrade cannot continue as backup password file exists");
+        }
+        
+        PrintWriter out = null;
+        
+        try {
+            out = new PrintWriter(new FileOutputStream(backupPasswdFile));
+            out.println("backup.password=" + backupPassword);
+            out.flush();
+        } catch (IOException ioe) {
+            debug.error("Unable to write backup: ", ioe);
+            throw new UpgradeException("Unable to write backup: " + ioe.getMessage());
+        } catch (Exception ex) {
+            debug.error("Unable to write backup: ", ex);
+            throw new UpgradeException("Unable to write backup: " + ex.getMessage());
+        } finally {
+            if (out != null) {
+                out.close();
             }
         }
     }
@@ -536,5 +566,19 @@ public class UpgradeServices {
         }
         
         return content;
+    }
+    
+    private String generateBackupPassword() {
+        PasswordGenerator passwordGenerator = new RandomPasswordGenerator();
+        String password = null;
+        
+        try {
+            password = passwordGenerator.generatePassword(null);
+        } catch (PWResetException pre) {
+            // default implementation will not do this
+            password = DEFAULT_PASSWORD;
+        }
+        
+        return password;
     }
 }
