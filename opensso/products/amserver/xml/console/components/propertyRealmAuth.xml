@@ -46,6 +46,7 @@
                 labelFor="iplanet-am-auth-org-config" />
             <cc name="iplanet-am-auth-org-config"
                 tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+            <fieldhelp name="help-iplanet-am-auth-org-config" defaultValue="a121.help" />
         </property>
 
         <property>
@@ -54,6 +55,7 @@
                labelFor="iplanet-am-auth-admin-auth-module" />
             <cc name="iplanet-am-auth-admin-auth-module"
                 tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+            <fieldhelp name="help-iplanet-am-auth-admin-auth-module" defaultValue="a104.help" />
         </property>
 
         <subsection name="successURL" defaultValue="" >
@@ -69,6 +71,7 @@
                     <attribute name="listboxLabel" value="label.current.value" />
                     <attribute name="textboxLabel" value="label.new.value" />
                 </cc>
+                <fieldhelp name="help-iplanet-am-auth-login-success-url" defaultValue="a133.help" />
                 </property>
                 </ccgroup>
             </property>
@@ -93,6 +96,7 @@
                 <attribute name="showSelectionSortIcon" value="false" />
                 <attribute name="showSortingRow" value="true" />
             </cc>
+            <fieldhelp name="help-authenticationModuleInstanceTable" defaultValue="authentication.module.instances.help" />
         </property>
         
     </section>
