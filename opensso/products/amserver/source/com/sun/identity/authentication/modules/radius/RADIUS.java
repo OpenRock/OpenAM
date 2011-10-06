@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  */
-
 package com.sun.identity.authentication.modules.radius;
 
 import com.sun.identity.authentication.modules.radius.client.ChallengeException;
@@ -41,11 +40,11 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.Locale;
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -53,35 +52,28 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
 public class RADIUS extends AMLoginModule {
+    private static final String DEFAULT_TIMEOUT = "5";
+    private static final String DEFAULT_SERVER_PORT = "1645";
+    private static final String DEFAULT_INTERVAL = "5";
+    private static final String amAuthRadius = "amAuthRadius";
     // initial state
     private Map sharedState;
     private String userTokenId = null;
-
     private String challengeID; 
     
     // the authentication status
     private boolean succeeded = false;
     private RADIUSPrincipal userPrincipal = null;
-
     private String username;
-    private static final int MSG_INFORMATION = 0;
-    private static final int MSG_WARNING = 1;
-    private static final int MSG_ERROR = 2;
-
-    private static Locale locale = null;
-    private ResourceBundle bundle = null;
     private static Debug debug = null;
 
-    private static final String DEFAULT_TIMEOUT = "5";
-    private static final String  DEFAULT_SERVER_PORT = "1645";
-
-    private String server1;
-    private String server2;
+    private Set<RADIUSServer> primaryServers;
+    private Set<RADIUSServer> secondaryServers;
     private String sharedSecret;
     private int iServerPort = 1645;
     private int iTimeOut = 5;
+    private int healthCheckInterval = 5;
     private RadiusConn _radiusConn = null;
-    private static final String amAuthRadius = "amAuthRadius";
     private boolean getCredentialsFromSharedState;
     private ChallengeException cException = null;
 
@@ -100,10 +92,9 @@ public class RADIUS extends AMLoginModule {
      *		<code>Configuration</code> for this particular
      *		<code>LoginModule</code>.
      */
+    @Override
     public void init(Subject subject, Map sharedState, Map options) {
         try {
-	    bundle = amCache.getResBundle(amAuthRadius, getLoginLocale());
-            
 	    if (debug.messageEnabled()) {
 		debug.message("Radius resbundle locale="+getLoginLocale());
 	    }
@@ -112,39 +103,61 @@ public class RADIUS extends AMLoginModule {
 
             if(options != null) {
                 try {
-                    server1 = CollectionHelper.getServerMapAttr(options, 
-                        "iplanet-am-auth-radius-server1");
-                    
-                    if (server1 == null) {
-                        server1 = "localhost";
-                        debug.error("Error: primary server attribute " + 
-                            "misconfigured using localhost");
-                    }
-                    
-                    server2 = CollectionHelper.getServerMapAttr(options, 
-                        "iplanet-am-auth-radius-server2");
-                    
-                    if (server1 == null) {
-                        server1 = "localhost";
-                        debug.error("Error: primary server attribute " + 
-                            "misconfigured using localhost");
-                    }
-                    
-                    sharedSecret = CollectionHelper.getMapAttr(options, 
-                        "iplanet-am-auth-radius-secret");
-                    
                     String serverPort = CollectionHelper.getMapAttr(options,
                         "iplanet-am-auth-radius-server-port",
                         DEFAULT_SERVER_PORT);
-                    
                     iServerPort = Integer.parseInt(serverPort);
+
+                    primaryServers = new LinkedHashSet<RADIUSServer>();
+                    Set<String> tmp;
+                    tmp = CollectionHelper.getServerMapAttrs(options, "iplanet-am-auth-radius-server1");
+                    if (tmp.isEmpty()) {
+                        primaryServers.add(new RADIUSServer("localhost", iServerPort));
+                        debug.error("Error: primary server attribute " + 
+                            "misconfigured using localhost");
+                    }
+                    for (String server : tmp) {
+                        int idx = server.indexOf(':');
+                        if (idx == -1) {
+                            primaryServers.add(new RADIUSServer(server, iServerPort));
+                        } else {
+                            primaryServers.add(new RADIUSServer(server.substring(0, idx),
+                                    Integer.parseInt(server.substring(idx + 1))));
+                        }
+                    }
+
+                    secondaryServers = new LinkedHashSet<RADIUSServer>();
+                    tmp = CollectionHelper.getServerMapAttrs(options, "iplanet-am-auth-radius-server2");
+                    
+                    if (tmp == null) {
+                        secondaryServers.add(new RADIUSServer("localhost", iServerPort));
+                        debug.error("Error: primary server attribute " + 
+                            "misconfigured using localhost");
+                    }
+                    for (String server : tmp) {
+                        int idx = server.indexOf(':');
+                        if (server.indexOf(':') == -1) {
+                            secondaryServers.add(new RADIUSServer(server, iServerPort));
+                        } else {
+                            secondaryServers.add(new RADIUSServer(server.substring(0, idx),
+                                    Integer.parseInt(server.substring(idx + 1))));
+                        }
+                    }
+
+                    sharedSecret = CollectionHelper.getMapAttr(options, 
+                        "iplanet-am-auth-radius-secret");
+
                     String timeOut = CollectionHelper.getMapAttr(options, 
                         "iplanet-am-auth-radius-timeout", 
                         DEFAULT_TIMEOUT);
                     iTimeOut = Integer.parseInt(timeOut);
                     String authLevel = CollectionHelper.getMapAttr(options, 
                         "iplanet-am-auth-radius-auth-level");
-                    
+
+                    String interval = CollectionHelper.getMapAttr(options,
+                                             "openam-auth-radius-healthcheck-interval", DEFAULT_INTERVAL);
+                    healthCheckInterval = Integer.parseInt(interval);
+
                     if (authLevel != null) {
                         try {
                             setAuthLevel(Integer.parseInt(authLevel));
@@ -155,8 +168,8 @@ public class RADIUS extends AMLoginModule {
                     }
                     
                     if (debug.messageEnabled()) {
-                        debug.message("server1: "+server1
-			    +" server2: " + server2 
+                        debug.message("server1: "+primaryServers
+			    +" server2: " + secondaryServers 
                             + " serverPort: " + serverPort 
 			    + " timeOut: "+ timeOut 
                             + " authLevel: " + authLevel );
@@ -205,6 +218,7 @@ public class RADIUS extends AMLoginModule {
      *		LoginModule should be ignored.
      * @throws AuthLoginException
      */
+    @Override
     public int process(Callback[] callbacks, int state) 
 	throws AuthLoginException {
 	String tmp_passwd = null;
@@ -213,8 +227,8 @@ public class RADIUS extends AMLoginModule {
         switch (state) {
           case ISAuthConstants.LOGIN_START:  
               try {
-                  _radiusConn = new RadiusConn(server1, server2, 
-                      iServerPort, sharedSecret, iTimeOut);
+                  _radiusConn = new RadiusConn(primaryServers, secondaryServers,
+                          sharedSecret, iTimeOut, healthCheckInterval);
               } catch (SocketException se) {
                   debug.error ("RADIUS login failure; Socket Exception se == ",
                       se);
@@ -426,6 +440,7 @@ public class RADIUS extends AMLoginModule {
      *
      * @return <code>java.security.Principal</code>
      */
+    @Override
     public java.security.Principal getPrincipal() {
         if (userPrincipal != null) {
             return userPrincipal;
@@ -440,6 +455,7 @@ public class RADIUS extends AMLoginModule {
     /**
      * Destroy the module state
      */
+    @Override
     public void destroyModuleState(){
 	userTokenId = null;
         userPrincipal = null;
@@ -448,12 +464,12 @@ public class RADIUS extends AMLoginModule {
     /**
      * Set all the used variables to null
      */
+    @Override
     public void nullifyUsedVars() {
         sharedState = null;
         challengeID = null;
-        bundle = null;
-        server1 = null;
-        server2 = null;
+        primaryServers = null;
+        secondaryServers = null;
         sharedSecret = null;
     }
 
@@ -500,4 +516,3 @@ public class RADIUS extends AMLoginModule {
     }
 
 } 
-

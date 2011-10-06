@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
-
 package com.sun.identity.shared.datastruct;
 
 import com.sun.identity.shared.debug.Debug;
@@ -38,6 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.sun.identity.shared.Constants;
+import java.util.LinkedHashSet;
 
 /**
  * This class contains various Collection manipulation methods.
@@ -167,5 +167,47 @@ public class CollectionHelper {
             }
         }
         return result;
+    }
+
+    /**
+     * This convenience method is for getting server specific attributes from a
+     * list attribute. Server specific is determined by prefixing a list
+     * attribute value with DSAME local server name followed by the | character.
+     * If the list has more than one entry but no matching local server prefixes
+     * than an empty Set is returned as this is an invalid configuration for 
+     * these type of attributes. This allows services like authentication to
+     * support a geographic directory configuration.
+     *
+     * @param map Map of String of Set of String.
+     * @param attrName Key of the map entry of interest.
+     * @return attributes belonging to this server, or if there is only one
+     * attribute, then that
+     */
+    public static Set<String> getServerMapAttrs(Map<String, Set<?>> map, String attrName) {
+        Set<String> ret = new LinkedHashSet<String>();
+        Set<String> attrValues = (Set<String>) map.get(attrName);
+
+        if (attrValues.size() == 1) {
+            Iterator<String> iter = attrValues.iterator();
+            String strServer = iter.next();
+            if (strServer != null) {
+                strServer = strServer.trim();
+            }
+            ret.add(strServer);
+            return ret;
+        }
+        for (String attr : attrValues) {
+            if (attr != null) {
+                attr = attr.trim();
+                if (attr.startsWith(localDsameServer)) {
+                    int index = attr.indexOf("|");
+                    if (index != -1) {
+                        attr = attr.substring(index + 1);
+                        ret.add(attr);
+                    }
+                }
+            }
+        }
+        return ret;
     }
 }

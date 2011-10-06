@@ -27,7 +27,9 @@
     $Id: amAuthRadius.xml,v 1.2 2008/06/25 05:45:41 qcheng Exp $
 
 -->
-
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -88,6 +90,14 @@
                         <Value>3</Value>
 		    </DefaultValues>
 		</AttributeSchema>
+	        <AttributeSchema name="openam-auth-radius-healthcheck-interval"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a106">
+		    <DefaultValues>
+                        <Value>5</Value>
+		    </DefaultValues>
+		</AttributeSchema>
 		<SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="iplanet-am-auth-radius-server1"
                         type="list"
@@ -136,6 +146,14 @@
                             <Value>3</Value>
     		    </DefaultValues>
     		    </AttributeSchema>
+	            <AttributeSchema name="openam-auth-radius-healthcheck-interval"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a106">
+	            <DefaultValues>
+                        <Value>5</Value>
+		    </DefaultValues>
+                    </AttributeSchema>
 		</SubSchema>
             </Organization>
         </Schema>
