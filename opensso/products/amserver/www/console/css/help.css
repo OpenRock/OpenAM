@@ -38,7 +38,7 @@ div.helpPanel p {
     margin: 16px 18px;
     min-height: 60%;
 }
-span.helpHeader { color:#666666; }
+div.helpHeader { color:#666666; }
 a.helpFooter {
     float: right;
     margin-right: 18px;

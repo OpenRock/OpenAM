@@ -43,8 +43,8 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
     private static final String HELP_TEMPLATE =
             "<div id=\"help{0}\" class=\"helpPanel\">"
             + "<div><a href=\"#\" id=\"close{0}\" onclick=\"hideHelp({0}); event.cancelBubble = true;return false;\">"
-            + "<img alt=\"Close help\" src=\"" + CONTEXT_ROOT + "/console/images/tasks/close.gif\" border=\"0\" /></a></div><p>"
-            + "<span class=\"helpHeader\">{2}</span></p>{3}</div>"
+            + "<img alt=\"Close help\" src=\"" + CONTEXT_ROOT + "/console/images/tasks/close.gif\" border=\"0\" /></a></div>"
+            + "<div class=\"helpHeader\">{2}</div>{3}</div>"
             + "<a href=\"#\" onclick=\"showHelp({0}); event.cancelBubble = true; return false;\" "
             + "onmouseover=\"hoverHelp({0}); event.cancelBubble = true;\" "
             + "onmouseout=\"outHelp({0}); event.cancelBubble = true;\" "
