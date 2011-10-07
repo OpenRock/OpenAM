@@ -2141,6 +2141,209 @@
    </variablelist>
   </section>
   
+  <section xml:id="oauth2-module-conf-hints">
+   <title>Hints For the OAuth 2.0 Authentication Module</title>
+   <para>The OAuth 2.0 authentication module lets OpenAM authenticated users
+   against OAuth providers. References in this section are to the Internet-Draft
+   <link xlink:href="http://tools.ietf.org/pdf/draft-ietf-oauth-v2-12.pdf">The
+   OAuth 2.0 Authorization Protocol</link>.</para>
+   <indexterm><primary>OAuth 2.0 authentication</primary></indexterm>
+   
+   <variablelist>
+    <varlistentry>
+     <term>Client ID</term>
+     <listitem>
+      <para>OAuth <literal>client_id</literal> as described in section 2.1 of
+      the Internet-Draft.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Client Secret</term>
+     <listitem>
+      <para>OAuth <literal>client_secret</literal> as described in section 2.1
+      of the Internet-Draft.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authnentication Endpoint URL</term>
+     <listitem>
+      <para>URL to the end point handling OAuth authentication.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Access Token Endpoint URL</term>
+     <listitem>
+      <para>URL to the end point handling access tokens as described in section
+      3.2 of the Internet-Draft.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>User Profile Service URL</term>
+     <listitem>
+      <para>User profile URL that returns profile information in JSON
+      format.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Scope</term>
+     <listitem>
+      <para>Comma separated list of user profile attributes that the application
+      requires.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Proxy URL</term>
+     <listitem>
+      <para>URL to the <filename>oauthproxy.jsp</filename> file, by default
+      part of OpenAM.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Account Mapper</term>
+     <listitem>
+      <para>Class implementing account mapping. Default:
+      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Account Mapper Configuration</term>
+     <listitem>
+      <para>Map of OAuth Provider user account attributes used to find the
+      local profile of the authenticated user, with values in the form
+      <literal><replaceable>provider-attr</replaceable>=<replaceable>local-attr</replaceable></literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute Mapper</term>
+     <listitem>
+      <para>Class implementing attribute mapping. Default:
+      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute Mapper Configuration</term>
+     <listitem>
+      <para>Map of OAuth Provider user account attributes to local user profile
+      attributes, with values in the form
+      <literal><replaceable>provider-attr</replaceable>=<replaceable>local-attr</replaceable></literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Save attributes in the session</term>
+     <listitem>
+      <para>When enabled, add the mapped attributes to the session saved.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Email attribute in OAuth2 Response</term>
+     <listitem>
+      <para>Specifies the attribute identifying email address in the response
+      from the profile service in the OAuth provider. This setting is used to
+      send an email address with an activation code for accounts created
+      dynamically.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Create account if it does not exist</term>
+     <listitem>
+      <para>When enabled, if the user profile does not exist, optionally
+      retrieve a password and activation code from the user, and then create
+      the profile.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Prompt for password setting and activation code</term>
+     <listitem>
+      <para>When enabled, the user sets a password, receives an activation code
+      by email. The user must correctly set both in order for the account to
+      be created.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Map to anonymous user</term>
+     <listitem>
+      <para>When enabled, map the OAuth authenticated user to the anoymous
+      user you specify. No account is created, even if Create account if it
+      does not exist is enabled.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Anonymous User</term>
+     <listitem>
+      <para>Specifies an anonymous user that exists in the current realm.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>OAuth 2.0 Provider logout service</term>
+     <listitem>
+      <para>Specifies the optional URL of the OAuth Provider.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Logout behaviour</term>
+     <listitem>
+      <para>Specifies whether not to log the user out without prompting from
+      the OAuth Provider on logout, to log the user out without prompting, or
+      to prompt the user regarding whether to logout from the OAuth
+      provider.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP Gateway Implementation class</term>
+     <listitem>
+      <para>Class to interact with the mail server. Default:
+      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP host</term>
+     <listitem>
+      <para>Host name of the mail server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP port</term>
+     <listitem>
+      <para>SMTP port number for the mail server.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP User Name</term>
+     <listitem>
+      <para>If the mail server requires authentication to send mail, specifies
+      the user name.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP User Password</term>
+     <listitem>
+      <para>If the mail server requires authentication to send mail, specifies
+      the password.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP SSL Enabled</term>
+     <listitem>
+      <para>When enabled, connect to the mail server over SSL. OpenAM must be
+      able to trust the SMTP server certificate.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMTP From address</term>
+     <listitem>
+      <para>Specifies the message sender address, such as
+      <literal>no-reply@example.com</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para>Authentication level assigned to the OAuth 2.0 module.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
   <section xml:id="radius-module-conf-hints">
    <title>Hints For the RADIUS Authentication Module</title>
    <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
