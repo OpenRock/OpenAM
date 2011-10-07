@@ -73,7 +73,7 @@
  </reference>
  
  <xinclude:include href='../../../../target/generated-resources/chap-log-messages.xml' />
- <xinclude:include href='chap-error-codes.xml' />
+ <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />
  <xinclude:include href='chap-file-layout.xml' />
