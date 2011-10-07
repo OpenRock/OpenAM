@@ -5029,7 +5029,7 @@ public class LDAPv3Repo extends IdRepo {
                              " username" + username);
                     }
                     throw new AuthLoginException(amAuthLDAP,
-                        "AcctInactive", null);
+                        "FConnect", null);
                 case LDAPUtilException.INAPPROPRIATE_AUTHENTICATION:
                     if (debug.messageEnabled()) {
                         debug.message("LDAPv3Repo:authenticateIt. " +

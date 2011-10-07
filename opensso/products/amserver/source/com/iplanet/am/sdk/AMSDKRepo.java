@@ -2272,7 +2272,7 @@ public class AMSDKRepo extends IdRepo {
                              " username" + username);
                     }
                     throw new AuthLoginException(amAuthLDAP,
-                        "AcctInactive", null);
+                        "FConnect", null);
                 case LDAPUtilException.INAPPROPRIATE_AUTHENTICATION:
                     if (debug.messageEnabled()) {
                         debug.message("AMSDKRepo:authenticateIt. " +

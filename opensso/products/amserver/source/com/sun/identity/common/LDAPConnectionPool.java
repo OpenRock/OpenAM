@@ -589,6 +589,29 @@ public class LDAPConnectionPool {
                 
             }
         }
+        
+        // remove conn from pool if err=53
+        if (errCode == LDAPException.UNWILLING_TO_PERFORM ) {
+        	synchronized(this) {
+        	    try {
+        	    	// this is a special case where ldap was in 
+    	    		// the process of closing client connection
+    	    		// we will try to remove connection from the pool, 
+        	    	// decrease busy/current count 
+                    currentPool.remove(ld);
+                    backupPool.remove(ld);
+                    ld.disconnect();
+                } catch (LDAPException e) {
+                    debug.error("LDAPConnection pool:" + name +
+                        ":Error during disconnect.", e);
+                }
+                localConn.returnsLocalConnection();
+                currentConnectionCount--;
+                busyConnectionCount--;
+        	}
+        	return;
+        }
+        
         // need to check failover.
         close(ld);
     }

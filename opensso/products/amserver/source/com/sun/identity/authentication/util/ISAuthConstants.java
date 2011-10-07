@@ -659,6 +659,9 @@ public interface ISAuthConstants {
     // Key in locale file for exceeding auth retry limit error
     public static final String EXCEED_RETRY_LIMIT = "ExceedRetryLimit";
 
+    // Key in locale file for server unwilling error (mapped to Connection Failed)
+    public static final String SERVER_UNWILLING = "FConnect";
+
     // Property to store the Distributed Authentication Login URL in SSOToken
     public static final String DISTAUTH_LOGINURL = "DistAuthLoginURL";
 

@@ -713,6 +713,9 @@ public class AMLoginContext {
                 loginState.setErrorMessage(exceedRetryLimit);
                 loginState.setErrorCode(
                         AMAuthErrorCode.AUTH_USER_LOCKED_IN_DS);
+            } else if (ISAuthConstants.SERVER_UNWILLING.equals(le.getErrorCode())) {
+                loginState.setErrorCode(
+                        AMAuthErrorCode.AUTH_ERROR);
             }
             authContext.setLoginException(le);
         } catch (AuthException e) {
