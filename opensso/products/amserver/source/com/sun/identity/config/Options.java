@@ -60,7 +60,7 @@ public class Options extends TemplatedPage {
         addModel("passwordUpdateRequired",
             Boolean.valueOf( passwordUpdateRequired ) );
         upgrade = !getConfigurator().isNewInstall();
-        upgradeCompleted = AMSetupServlet.getUpgradeCompleted();
+        upgradeCompleted = AMSetupServlet.isUpgradeCompleted();
         addModel("upgradeCompleted", Boolean.valueOf(upgradeCompleted));
         addModel( "upgrade", Boolean.valueOf( upgrade ) );
 

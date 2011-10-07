@@ -256,7 +256,7 @@ public class AMSetupServlet extends HttpServlet {
         upgradeCompleted = true;
     }
 
-    public static boolean getUpgradeCompleted() {
+    public static boolean isUpgradeCompleted() {
         return upgradeCompleted;
     }
 
