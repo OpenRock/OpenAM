@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.authentication.server;
@@ -138,13 +138,12 @@ public class AuthXMLHandler implements RequestHandler {
      * @return <code>ResponseSet</code> object for the processed request.
      */
     public ResponseSet process(
-        Vector requests,
+        Set<Request> requests,
         HttpServletRequest servletRequest,
         HttpServletResponse servletResponse,
         ServletContext servletContext) {
         ResponseSet rset = new ResponseSet(AuthXMLTags.AUTH_SERVICE);
-        for (int i = 0; i < requests.size(); i++) {
-            Request req = (Request)requests.elementAt(i);
+        for (Request req : requests) {
             Response res = processRequest(req,servletRequest, servletResponse);
             rset.addResponse(res);
         }

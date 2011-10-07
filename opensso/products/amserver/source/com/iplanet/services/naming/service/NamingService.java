@@ -355,13 +355,12 @@ public class NamingService implements RequestHandler, ServiceListener {
         return sb.toString();
     }
 
-    public ResponseSet process(Vector requests,
+    public ResponseSet process(Set<Request> requests,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext)
     {
         ResponseSet rset = new ResponseSet(NAMING_SERVICE);
-        for (int i = 0; i < requests.size(); i++) {
-            Request req = (Request) requests.elementAt(i);
+        for (Request req : requests) {
             Response res = processRequest(req);
             rset.addResponse(res);
         }

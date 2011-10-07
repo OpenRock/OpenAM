@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2010-2011 ForgeRock AS
  */
+
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
@@ -66,6 +67,10 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.security.AccessController;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -284,14 +289,16 @@ public class Session extends GeneralTaskRunnable {
     private static Hashtable sessionServiceURLTable = new Hashtable();
 
     /**
-     * Vector of session event listeners for THIS session only
+     * Set of session event listeners for THIS session only
      */
-    private Vector sessionEventListeners = new Vector();
+    private Set<SessionListener> sessionEventListeners = 
+            new HashSet<SessionListener>();
 
     /**
-     * Vector of session event listeners for ALL sessions
+     * Set of session event listeners for ALL sessions
      */
-    private static Vector allSessionEventListeners = new Vector();
+    private static Set<SessionListener> allSessionEventListeners = 
+            new HashSet<SessionListener>();
 
     /**
      * This is used only in polling mode to find the polling state of this
@@ -990,7 +997,6 @@ public class Session extends GeneralTaskRunnable {
      * @param sid Session ID.
      */
     public static void removeSID(SessionID sid) {
-
         Session session = null;
         session = (Session) sessionTable.remove(sid);
 
@@ -1010,20 +1016,16 @@ public class Session extends GeneralTaskRunnable {
     */
    protected static void invokeListeners(SessionEvent evt) {
         Session session = evt.getSession();
-        Vector sess_listeners = session.getSessionEventListeners();
-        Vector all_listeners = Session.getAllSessionEventListeners();
+        Set<SessionListener> sess_listeners = session.getSessionEventListeners();
+        Set<SessionListener> all_listeners = Session.getAllSessionEventListeners();
 
         // THIS SESSION FIRST ...
-        for (int i = 0; i < sess_listeners.size(); i++) {
-            SessionListener listener = (SessionListener) sess_listeners
-                    .elementAt(i);
+        for (SessionListener listener : sess_listeners) {
             listener.sessionChanged(evt);
         }
 
         // ALL SESSIONS
-        for (int i = 0; i < all_listeners.size(); i++) {
-            SessionListener listener = (SessionListener) all_listeners
-                    .elementAt(i);
+        for (SessionListener listener : all_listeners) {
             listener.sessionChanged(evt);
         }
     }
@@ -1035,12 +1037,13 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException if the session state is not valid.
      */
     public void addSessionListener(SessionListener listener)
-            throws SessionException {
+    throws SessionException {
         if (sessionState != Session.VALID) {
             throw new SessionException(SessionBundle.rbName,
                     "invalidSessionState", null);
         }
-        sessionEventListeners.addElement(listener);
+        
+        sessionEventListeners.add(listener);
     }
 
     /**
@@ -1208,7 +1211,7 @@ public class Session extends GeneralTaskRunnable {
      * 
      * @return SessionEventListener vector
      */
-    Vector getSessionEventListeners() {
+    Set<SessionListener> getSessionEventListeners() {
         return sessionEventListeners;
     }
 
@@ -1217,7 +1220,7 @@ public class Session extends GeneralTaskRunnable {
      * 
      * @return SessionEventListener vector
      */
-    static Vector getAllSessionEventListeners() {
+    static Set<SessionListener> getAllSessionEventListeners() {
         return allSessionEventListeners;
     }
 
@@ -1327,41 +1330,38 @@ public class Session extends GeneralTaskRunnable {
             throws SessionException {
         try {
             int status[] = { 0 };
-            Vector infos = null;
+            Set<SessionInfo> infos = null;
 
-            if (sessionService != null
-                    && sessionService.isLocalSessionService(svcurl)) {
+            if (sessionService != null && sessionService.isLocalSessionService(svcurl)) {
                 infos = sessionService.getValidSessions(this, pattern, status);
             } else {
-                SessionRequest sreq = new SessionRequest(
-                        SessionRequest.GetValidSessions, sessionID.toString(),
-                        false);
+                SessionRequest sreq = 
+                        new SessionRequest(SessionRequest.GetValidSessions, sessionID.toString(), false);
+                
                 if (pattern != null) {
                     sreq.setPattern(pattern);
                 }
-                SessionResponse sres = getSessionResponseWithoutRetry(svcurl,
-                        sreq);
-                infos = sres.getSessionInfoVector();
+                
+                SessionResponse sres = getSessionResponseWithoutRetry(svcurl, sreq);
+                infos = sres.getSessionInfoSet();
                 status[0] = sres.getStatus();
             }
 
-            Hashtable sessions = new Hashtable();
-            int infoSize = infos.size();
+            Map<String, Session> sessions = new HashMap<String, Session>();
             Session session = null;
-            for (int i = 0; i < infoSize; i++) {
-                SessionInfo info = (SessionInfo) infos.elementAt(i);
+            
+            for (SessionInfo info : infos) {
                 SessionID sid = new SessionID(info.sid);
                 session = new Session(sid);
                 session.sessionServiceURL = svcurl;
                 session.update(info);
                 sessions.put(info.sid, session);
             }
-            return new SearchResults(sessions.size(), sessions.keySet(),
-                    status[0], sessions);
-        } catch (Exception e) {
-            sessionDebug.error("Session:getValidSession : ", e);
-            throw new SessionException(SessionBundle.rbName,
-                    "getValidSessionsError", null);
+            
+            return new SearchResults(sessions.size(), sessions.keySet(), status[0], sessions);
+        } catch (Exception ex) {
+            sessionDebug.error("Session:getValidSession : ", ex);
+            throw new SessionException(SessionBundle.rbName, "getValidSessionsError", null);
         }
     }
 
@@ -1374,7 +1374,7 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException if there was an error.
      */
     public void addSessionListenerOnAllSessions(SessionListener listener)
-            throws SessionException {
+    throws SessionException {
         if (!isPollingEnabled()) {
             try {
                 String url = WebtopNaming.getNotificationURL().toString();
@@ -1388,7 +1388,8 @@ public class Session extends GeneralTaskRunnable {
                 throw new SessionException(e);
             }
         }
-        allSessionEventListeners.addElement(listener);
+        
+        allSessionEventListeners.add(listener);
     }
 
     /**
@@ -1455,12 +1456,13 @@ public class Session extends GeneralTaskRunnable {
                 throw new SessionException(SessionBundle.rbName,
                         "invalidSessionState", null);
             }
-            Vector infos = sres.getSessionInfoVector();
+            Set<SessionInfo> infos = sres.getSessionInfoSet();
             if (infos.size() != 1) {
                 throw new SessionException(SessionBundle.rbName,
                         "unexpectedSession", null);
             }
-            info = (SessionInfo) infos.elementAt(0);
+            
+            info = infos.toArray(new SessionInfo[1])[0];
         }
         long oldMaxCachingTime = maxCachingTime;
         long oldMaxIdleTime = maxIdleTime;
@@ -2029,8 +2031,11 @@ public class Session extends GeneralTaskRunnable {
                     return;
                 }
 
-                Vector infos = sres.getSessionInfoVector();
-                info = (SessionInfo) infos.elementAt(0);
+                Set<SessionInfo> infos = sres.getSessionInfoSet();
+                
+                if (infos.size() == 1) {
+                    info = infos.toArray(new SessionInfo[1])[0];
+                }
             } catch (Exception ex) {
                 Session.removeSID(sid);
                 if (debug.messageEnabled())

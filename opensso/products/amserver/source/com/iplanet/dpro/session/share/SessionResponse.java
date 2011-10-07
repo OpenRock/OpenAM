@@ -26,19 +26,20 @@
  *
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.iplanet.dpro.session.share;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import com.iplanet.dpro.session.SessionException;
 import com.sun.identity.common.SearchResults;
+import java.util.HashSet;
 
 /**
  * This <code>SessionResponse</code> class represents a
@@ -115,7 +116,7 @@ public class SessionResponse {
     private Map allSessionsforGivenUUID = new HashMap();
 
     // For GetSession and GetValidSessions
-    private Vector sessionInfoVector = new Vector();
+    private Set<SessionInfo> sessionInfoSet = new HashSet<SessionInfo>();
 
     // For DestroySession, Logout, AddSessionListener and
     // AddSessionListenerOnAllSessions
@@ -216,24 +217,24 @@ public class SessionResponse {
      * Adds a <code>SessionInfo</code> object.
      */
     public void addSessionInfo(SessionInfo info) {
-        sessionInfoVector.add(info);
+        sessionInfoSet.add(info);
     }
 
     /**
      * Returns the <code>SessionInfo</code>.
      *
-     * @return vector containing the session information
+     * @return Set containing the session information
      */
-    public Vector getSessionInfoVector() {
-        return sessionInfoVector;
+    public Set<SessionInfo> getSessionInfoSet() {
+        return sessionInfoSet;
     }
 
     /**
      * Sets the <code>SessionInfo</code>.
-     * @param infos vector containing the session information.
+     * @param infos set containing the session information.
      */
-    public void setSessionInfoVector(Vector infos) {
-        sessionInfoVector = infos;
+    public void setSessionInfoSet(Set<SessionInfo> infos) {
+        sessionInfoSet = infos;
     }
 
     /**
@@ -334,11 +335,12 @@ public class SessionResponse {
             if (exception != null) {
                 xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
-                if (sessionInfoVector.size() != 1) {
+                if (sessionInfoSet.size() != 1) {
                     return null;
                 }
-                SessionInfo info = (SessionInfo) sessionInfoVector.elementAt(0);
-                xml.append(info.toXMLString());
+                for (SessionInfo info : sessionInfoSet) {
+                    xml.append(info.toXMLString());
+                }
             }
             xml.append("</GetSession>").append(NL);
             break;
@@ -348,9 +350,7 @@ public class SessionResponse {
                 xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
             } else {
                 xml.append("<SessionList>").append(NL);
-                for (int i = 0; i < sessionInfoVector.size(); i++) {
-                    SessionInfo info = (SessionInfo) sessionInfoVector
-                            .elementAt(i);
+                for (SessionInfo info : sessionInfoSet) {
                     xml.append(info.toXMLString());
                 }
                 xml.append("</SessionList>").append(NL);

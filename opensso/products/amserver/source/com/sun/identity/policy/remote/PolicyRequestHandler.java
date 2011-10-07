@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.policy.remote;
@@ -62,7 +62,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.Vector;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -111,7 +110,7 @@ public class PolicyRequestHandler implements RequestHandler {
      *  @return the set of the response
      */ 
     public ResponseSet process(
-        Vector requests,
+        Set<Request> requests,
         HttpServletRequest servletRequest, 
         HttpServletResponse servletResponse,
         ServletContext servletContext
@@ -119,8 +118,8 @@ public class PolicyRequestHandler implements RequestHandler {
  
         ResponseSet resSet = new ResponseSet(PolicyService.POLICY_SERVICE);
         int size = requests.size();
-        for (int i = 0; i < size; i++) {
-            Request req = (Request)requests.elementAt(i);
+        
+        for (Request req : requests) {
             Response res = null;
             try {
                 res = processRequest(req);
@@ -166,8 +165,7 @@ public class PolicyRequestHandler implements RequestHandler {
      * @return the corresponding response.
      */
     private Response processRequest(Request req)
-        throws PolicyEvaluationException
-    {
+    throws PolicyEvaluationException {
         String content = req.getContent();
        
         if (debug.messageEnabled()) {

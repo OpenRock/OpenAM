@@ -1019,8 +1019,8 @@ public class SessionService {
      * Get all valid Internal Sessions.
      * 
      */
-    private Vector getValidInternalSessions() {
-        Vector sessions = new Vector();
+    private Set<InternalSession> getValidInternalSessions() {
+        Set<InternalSession> sessions = new HashSet<InternalSession>();
         synchronized (sessionTable) {
             Enumeration enumerator = sessionTable.elements();
             while (enumerator.hasMoreElements()) {
@@ -1028,7 +1028,7 @@ public class SessionService {
                         .nextElement();
                 if (sess.getState() == Session.VALID) {
                     if (!sess.isAppSession() || returnAppSession) {
-                        sessions.addElement(sess);
+                        sessions.add(sess);
                     }
                 }
             }
@@ -1040,9 +1040,9 @@ public class SessionService {
      * Get all valid Internal Sessions matched with pattern.
      * 
      */
-    private Vector getValidInternalSessions(String pattern, int[] status)
-            throws SessionException {
-        Vector sessions = new Vector();
+    private Set<InternalSession> getValidInternalSessions(String pattern, int[] status)
+    throws SessionException {
+        Set<InternalSession> sessions = new HashSet<InternalSession>();
 
         if (pattern == null) {
             pattern = "*";
@@ -1052,14 +1052,10 @@ public class SessionService {
             long startTime = System.currentTimeMillis();
 
             pattern = pattern.toLowerCase();
-            Vector allValidSessions = getValidInternalSessions();
-            Enumeration enumerator = allValidSessions.elements();
+            Set<InternalSession> allValidSessions = getValidInternalSessions();
             boolean matchAll = pattern.equals("*");
 
-            while (enumerator.hasMoreElements()) {
-                InternalSession sess = (InternalSession) enumerator
-                        .nextElement();
-
+            for (InternalSession sess : sessions) {
                 if (!matchAll) {
                     // For application sessions, the client ID
                     // will not be in the DN format but just uid.
@@ -1082,7 +1078,7 @@ public class SessionService {
                     status[0] = IdSearchResults.SIZE_LIMIT_EXCEEDED;
                     break;
                 }
-                sessions.addElement(sess);
+                sessions.add(sess);
 
                 if ((System.currentTimeMillis() - startTime) >= 
                     SessionConfigListener.getTimeout()) {
@@ -1282,7 +1278,8 @@ public class SessionService {
      * @param s
      * @exception SessionException
      */
-    public Vector getValidSessions(Session s) throws SessionException {
+    public Set<SessionInfo> getValidSessions(Session s) 
+    throws SessionException {
         int status[] = { 0 };
         return getValidSessions(s, null, status);
     }
@@ -1294,13 +1291,14 @@ public class SessionService {
      * @param s
      * @exception SessionException
      */
-    public Vector getValidSessions(Session s, String pattern, int[] status)
-            throws SessionException {
+    public Set<SessionInfo> getValidSessions(Session s, String pattern, int[] status)
+    throws SessionException {
         if (s.getState(false) != Session.VALID) {
             throw new SessionException(SessionBundle
                     .getString("invalidSessionState")
                     + s.getID().toString());
         }
+        
         try {
             AMIdentity user = getUser(s);
             Set orgList = user.getAttribute(
@@ -1308,21 +1306,15 @@ public class SessionService {
             if (orgList == null) {
                 orgList = Collections.EMPTY_SET;
             }
-            Vector sessions = sessionService.getValidInternalSessions(pattern,
-                    status);
-
-            int size = sessions.size();
-            Vector infos = new Vector(size);
+            
+            Set<InternalSession> sessions = sessionService.getValidInternalSessions(pattern, status);
+            Set<SessionInfo> infos = new HashSet<SessionInfo>(sessions.size());
 
             // top level admin gets all sessions
             boolean isTopLevelAdmin = hasTopLevelAdminRole(s);
 
-            for (int i = 0; i < size; i++) {
-                InternalSession sess = (InternalSession) sessions.elementAt(i);
-
-                if (isTopLevelAdmin || orgList.contains(sess.getClientDomain()))
-                {
-
+            for (InternalSession sess : sessions) {
+                if (isTopLevelAdmin || orgList.contains(sess.getClientDomain())) {
                     SessionInfo info = sess.toSessionInfo();
                     // replace session id with session handle to prevent from
                     // impersonation

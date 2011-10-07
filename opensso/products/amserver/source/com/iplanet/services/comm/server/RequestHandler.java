@@ -26,15 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.iplanet.services.comm.server;
 
-import java.util.Vector;
+import com.iplanet.services.comm.share.Request;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.services.comm.share.ResponseSet;
+import java.util.Set;
 
 /**
  * The <code>RequestHandler</code> interface needs to be implemented by high
@@ -55,7 +60,7 @@ public interface RequestHandler {
      * API.
      * 
      * @param requests
-     *            A Vector of Request objects.
+     *            A Set<Request> of Request objects.
      * @param servletRequest
      *            Reference to HttpServletRequest object.
      * @param servletResponse
@@ -63,7 +68,7 @@ public interface RequestHandler {
      * @param servletContext
      *            Reference to ServletContext object.
      */
-    public ResponseSet process(Vector requests,
+    public ResponseSet process(Set<Request> requests,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext);
 }

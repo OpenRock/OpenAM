@@ -29,11 +29,11 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.log.service;
 
 import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +54,7 @@ import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.session.util.SessionUtils;
+import java.util.Set;
 
 /**
  * This class parses the xml/http(s) log requests and executes the corresponding
@@ -106,21 +107,20 @@ public class LogService implements RequestHandler {
      * @param servletResponse
      * @return The response set which contains the result of the log operation.
      */
-    public ResponseSet process(Vector requests,
+    public ResponseSet process(Set<Request> requests,
     HttpServletRequest servletRequest,
     HttpServletResponse servletResponse,
     ServletContext servletContext) {
         if (Debug.messageEnabled()) {
             Debug.message("LogService.process() called :requests are");
-            for (int i=0; i<requests.size(); i++) {
-                Debug.message("xml = " 
-                    + ((Request)requests.elementAt(i)).getContent());
+            
+            for (Request req : requests) {
+                Debug.message("xml = " + req.getContent());
             }
         }
         
         ResponseSet rset = new ResponseSet(LOG_SERVICE);
-        for (int i = 0; i < requests.size(); i++) {
-            Request   req = (Request)requests.elementAt(i);
+        for (Request req : requests) {
             // remember sid string is the last item in the log tag
             String xmlRequestString = req.getContent();
             Response res;

@@ -26,12 +26,14 @@
  *
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.iplanet.services.comm.share;
 
-import java.util.Vector;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This <code>RequestSet</code> class represents a RequestSet XML document.
@@ -82,7 +84,7 @@ public class RequestSet {
 
     private String requestSetID = null;
 
-    private Vector requestVector = new Vector();
+    private Set<Request> requestSet = new HashSet<Request>();
 
     private static int requestCount = 0;
 
@@ -154,8 +156,8 @@ public class RequestSet {
      * 
      * @return A Vector of Request objects.
      */
-    public Vector getRequests() {
-        return requestVector;
+    public Set<Request> getRequests() {
+        return requestSet;
     }
 
     /**
@@ -165,7 +167,7 @@ public class RequestSet {
      *            A reference to a Request object.
      */
     public void addRequest(Request request) {
-        requestVector.addElement(request);
+        requestSet.add(request);
     }
 
     /**
@@ -188,9 +190,7 @@ public class RequestSet {
                 .append(QUOTE).append(requestSetID).append(QUOTE).append('>')
                 .append(NL);
 
-        int numRequests = requestVector.size();
-        for (int i = 0; i < numRequests; i++) {
-            Request req = (Request) requestVector.elementAt(i);
+        for (Request req : requestSet) {
             xml.append("<Request");
             if (req.getDtdID() != null) {
                 xml.append(" dtdid=").append(QUOTE).append(req.getDtdID())
