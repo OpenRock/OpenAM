@@ -193,6 +193,63 @@ boolean=true</screen>
   
   <para>To indicate access denied, OpenAM returns
   <literal>boolean=false</literal>.</para>
+  
+  <para>Additionally, you can access entitlements and entitlement policy
+  decisions using the REST interface. In order to access the entitlements
+  interface, you cannot however use the authentication token as is.
+  Instead you must encode the token as performed in
+  <link
+  xlink:href="http://sources.forgerock.org/browse/~raw,r=6/openam/trunk/opensso/www/public/use/docs/fampdf/Encoder.java"
+  ><filename>Encoder.java</filename></link>, and then URL-encode the
+  result.</para>
+  
+  <para>The entitlements REST interface uses the following path suffixes and
+  query string parameters.</para>
+  
+  <itemizedlist>
+   <para>Path suffixes for entitlements include the following.</para>
+   <listitem>
+    <para><literal>ws/1/entitlement/decision</literal>: request a decision
+    pertaining to a single resource</para>
+   </listitem>
+   <listitem>
+    <para><literal>ws/1/entitlement/decisions</literal>: request decisions
+    pertaining to multiple resources</para>
+   </listitem>
+   <listitem>
+    <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
+    for a specified resource URL and all resources underneath</para>
+   </listitem>
+  </itemizedlist>
+  
+  <itemizedlist>
+   <para>Query string parameters for entitlements include the following.</para>
+   <listitem>
+    <para><literal>subject=<replaceable>encoded-token</replaceable></literal>,
+    where the encoded token is as describe above.</para>
+   </listitem>
+   <listitem>
+    <para><literal>action=get</literal>, or <literal>action=post</literal>,
+    which identifies the user agent action when requesting a decision.</para>
+   </listitem>
+   <listitem>
+    <para><literal>application=iPlanetAMWebAgentService</literal></para>
+   </listitem>
+   <listitem>
+    <para><literal>resource=<replaceable>resource-url</replaceable></literal>,
+    or multiple <literal>resources=<replaceable>resource-url</replaceable></literal>
+    parameters for multiple decisions.</para>
+   </listitem>
+   <listitem>
+    <para><literal>env=<replaceable>requestDnsName%3Dfqdn</replaceable></literal>,
+    <literal>env=<replaceable>requestIP%3Ddotted-quads</replaceable></literal>,
+    <literal>env=<replaceable>requestTime%3Dseconds-since-epoch</replaceable></literal>,
+    and <literal>env=<replaceable>requestDnsName%3Dtime-zone</replaceable></literal>
+    where <replaceable>time-zone</replaceable> is from Java
+    <literal>TimeZone.getTimeZone().getID()</literal>. The
+    <literal>env</literal> parameters thus express conditions.</para>
+   </listitem>
+  </itemizedlist>
  </section>
  
  <section xml:id="rest-api-logging">

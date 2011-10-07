@@ -155,6 +155,7 @@
    <title>Entitlements</title>
    <itemizedlist>
     <listitem><para><command>add-app-priv</command></para></listitem>
+    <listitem><para><command>create-appl</command></para></listitem>
     <listitem><para><command>create-xacml</command></para></listitem>
     <listitem><para><command>delete-appls</command></para></listitem>
     <listitem><para><command>delete-xacml</command></para></listitem>
