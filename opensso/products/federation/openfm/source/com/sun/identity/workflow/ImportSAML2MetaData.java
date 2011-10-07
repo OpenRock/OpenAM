@@ -138,6 +138,7 @@ public class ImportSAML2MetaData {
         SAML2MetaSecurityUtils.verifySignature(doc);
         workaroundAbstractRoleDescriptor(doc);
         Object obj = SAML2MetaUtils.convertNodeToJAXB(doc);
+        obj = workaroundJAXBBug(obj);
 
         return (obj instanceof EntityDescriptorElement) ?
             (EntityDescriptorElement)obj : null;
@@ -182,5 +183,16 @@ public class ImportSAML2MetaData {
             }
         }
     }
+
+    private static Object workaroundJAXBBug(Object obj) throws JAXBException {
+        String metadata = SAML2MetaUtils.convertJAXBToString(obj);
+        String replaced = metadata.replaceAll("<(.*:)?Extensions/>", "");
+        if (metadata.equalsIgnoreCase(replaced)) {
+            return obj;
+        } else {
+            return SAML2MetaUtils.convertStringToJAXB(replaced);
+        }
+    }
+
 }
 
