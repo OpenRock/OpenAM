@@ -97,11 +97,6 @@ public class ImportSAML2MetaData {
                 descriptor = getEntityDescriptorElement(metadata); 
                 if (descriptor != null) {
                     entityID = descriptor.getEntityID();
-                    if (descriptor.getExtensions() != null
-                            && (descriptor.getExtensions().getAny() == null
-                            || descriptor.getExtensions().getAny().isEmpty())) {
-                        descriptor.setExtensions(null);
-                    }
                 }
             } 
             metaManager.createEntity(realm, descriptor, configElt);
