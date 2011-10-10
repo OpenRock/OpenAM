@@ -69,6 +69,7 @@ import java.util.Vector;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
@@ -1330,7 +1331,7 @@ public class Session extends GeneralTaskRunnable {
             throws SessionException {
         try {
             int status[] = { 0 };
-            Set<SessionInfo> infos = null;
+            List<SessionInfo> infos = null;
 
             if (sessionService != null && sessionService.isLocalSessionService(svcurl)) {
                 infos = sessionService.getValidSessions(this, pattern, status);
@@ -1343,7 +1344,7 @@ public class Session extends GeneralTaskRunnable {
                 }
                 
                 SessionResponse sres = getSessionResponseWithoutRetry(svcurl, sreq);
-                infos = sres.getSessionInfoSet();
+                infos = sres.getSessionInfo();
                 status[0] = sres.getStatus();
             }
 
@@ -1456,13 +1457,13 @@ public class Session extends GeneralTaskRunnable {
                 throw new SessionException(SessionBundle.rbName,
                         "invalidSessionState", null);
             }
-            Set<SessionInfo> infos = sres.getSessionInfoSet();
+            
+            List<SessionInfo> infos = sres.getSessionInfo();
             if (infos.size() != 1) {
                 throw new SessionException(SessionBundle.rbName,
                         "unexpectedSession", null);
             }
-            
-            info = infos.toArray(new SessionInfo[1])[0];
+            info = infos.get(0);
         }
         long oldMaxCachingTime = maxCachingTime;
         long oldMaxIdleTime = maxIdleTime;
@@ -2031,10 +2032,10 @@ public class Session extends GeneralTaskRunnable {
                     return;
                 }
 
-                Set<SessionInfo> infos = sres.getSessionInfoSet();
+                List<SessionInfo> infos = sres.getSessionInfo();
                 
                 if (infos.size() == 1) {
-                    info = infos.toArray(new SessionInfo[1])[0];
+                    info = infos.get(0);
                 }
             } catch (Exception ex) {
                 Session.removeSID(sid);

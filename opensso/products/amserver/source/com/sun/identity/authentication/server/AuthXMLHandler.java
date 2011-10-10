@@ -138,7 +138,7 @@ public class AuthXMLHandler implements RequestHandler {
      * @return <code>ResponseSet</code> object for the processed request.
      */
     public ResponseSet process(
-        Set<Request> requests,
+        List<Request> requests,
         HttpServletRequest servletRequest,
         HttpServletResponse servletResponse,
         ServletContext servletContext) {

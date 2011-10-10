@@ -52,8 +52,8 @@ import com.sun.identity.shared.Constants;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,7 +72,7 @@ public class SessionRequestHandler implements RequestHandler {
         sessionService = SessionService.getSessionService();
     }
 
-    public ResponseSet process(Set<Request> requests,
+    public ResponseSet process(List<Request> requests,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext) {
         ResponseSet rset = new ResponseSet(SessionService.SESSION_SERVICE);
@@ -355,11 +355,11 @@ public class SessionRequestHandler implements RequestHandler {
 
             case SessionRequest.GetValidSessions:
                 String pattern = req.getPattern();
-                Set<SessionInfo> infos = null;
+                List<SessionInfo> infos = null;
                 int status[] = { 0 };
                 infos = sessionService.getValidSessions(requesterSession, pattern, status);
                 res.setStatus(status[0]);
-                res.setSessionInfoSet(infos);
+                res.setSessionInfo(infos);
                 break;
 
             case SessionRequest.DestroySession:

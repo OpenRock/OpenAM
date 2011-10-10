@@ -39,7 +39,8 @@ import java.util.Set;
 
 import com.iplanet.dpro.session.SessionException;
 import com.sun.identity.common.SearchResults;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This <code>SessionResponse</code> class represents a
@@ -116,7 +117,7 @@ public class SessionResponse {
     private Map allSessionsforGivenUUID = new HashMap();
 
     // For GetSession and GetValidSessions
-    private Set<SessionInfo> sessionInfoSet = new HashSet<SessionInfo>();
+    private List<SessionInfo> sessionInfoSet = new ArrayList<SessionInfo>();
 
     // For DestroySession, Logout, AddSessionListener and
     // AddSessionListenerOnAllSessions
@@ -225,7 +226,7 @@ public class SessionResponse {
      *
      * @return Set containing the session information
      */
-    public Set<SessionInfo> getSessionInfoSet() {
+    public List<SessionInfo> getSessionInfo() {
         return sessionInfoSet;
     }
 
@@ -233,7 +234,7 @@ public class SessionResponse {
      * Sets the <code>SessionInfo</code>.
      * @param infos set containing the session information.
      */
-    public void setSessionInfoSet(Set<SessionInfo> infos) {
+    public void setSessionInfo(List<SessionInfo> infos) {
         sessionInfoSet = infos;
     }
 

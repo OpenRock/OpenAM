@@ -32,7 +32,8 @@
 
 package com.iplanet.services.comm.share;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -84,7 +85,7 @@ public class RequestSet {
 
     private String requestSetID = null;
 
-    private Set<Request> requestSet = new HashSet<Request>();
+    private List<Request> requestSet = new ArrayList<Request>();
 
     private static int requestCount = 0;
 
@@ -156,7 +157,7 @@ public class RequestSet {
      * 
      * @return A Vector of Request objects.
      */
-    public Set<Request> getRequests() {
+    public List<Request> getRequests() {
         return requestSet;
     }
 

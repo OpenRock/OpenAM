@@ -1019,8 +1019,8 @@ public class SessionService {
      * Get all valid Internal Sessions.
      * 
      */
-    private Set<InternalSession> getValidInternalSessions() {
-        Set<InternalSession> sessions = new HashSet<InternalSession>();
+    private List<InternalSession> getValidInternalSessions() {
+        List<InternalSession> sessions = new ArrayList<InternalSession>();
         synchronized (sessionTable) {
             Enumeration enumerator = sessionTable.elements();
             while (enumerator.hasMoreElements()) {
@@ -1040,9 +1040,9 @@ public class SessionService {
      * Get all valid Internal Sessions matched with pattern.
      * 
      */
-    private Set<InternalSession> getValidInternalSessions(String pattern, int[] status)
+    private List<InternalSession> getValidInternalSessions(String pattern, int[] status)
     throws SessionException {
-        Set<InternalSession> sessions = new HashSet<InternalSession>();
+        List<InternalSession> sessions = new ArrayList<InternalSession>();
 
         if (pattern == null) {
             pattern = "*";
@@ -1052,7 +1052,7 @@ public class SessionService {
             long startTime = System.currentTimeMillis();
 
             pattern = pattern.toLowerCase();
-            Set<InternalSession> allValidSessions = getValidInternalSessions();
+            List<InternalSession> allValidSessions = getValidInternalSessions();
             boolean matchAll = pattern.equals("*");
 
             for (InternalSession sess : sessions) {
@@ -1278,7 +1278,7 @@ public class SessionService {
      * @param s
      * @exception SessionException
      */
-    public Set<SessionInfo> getValidSessions(Session s) 
+    public List<SessionInfo> getValidSessions(Session s) 
     throws SessionException {
         int status[] = { 0 };
         return getValidSessions(s, null, status);
@@ -1291,7 +1291,7 @@ public class SessionService {
      * @param s
      * @exception SessionException
      */
-    public Set<SessionInfo> getValidSessions(Session s, String pattern, int[] status)
+    public List<SessionInfo> getValidSessions(Session s, String pattern, int[] status)
     throws SessionException {
         if (s.getState(false) != Session.VALID) {
             throw new SessionException(SessionBundle
@@ -1307,8 +1307,8 @@ public class SessionService {
                 orgList = Collections.EMPTY_SET;
             }
             
-            Set<InternalSession> sessions = sessionService.getValidInternalSessions(pattern, status);
-            Set<SessionInfo> infos = new HashSet<SessionInfo>(sessions.size());
+            List<InternalSession> sessions = sessionService.getValidInternalSessions(pattern, status);
+            List<SessionInfo> infos = new ArrayList<SessionInfo>(sessions.size());
 
             // top level admin gets all sessions
             boolean isTopLevelAdmin = hasTopLevelAdminRole(s);

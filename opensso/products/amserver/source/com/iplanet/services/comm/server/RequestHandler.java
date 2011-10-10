@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.services.comm.share.ResponseSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * The <code>RequestHandler</code> interface needs to be implemented by high
@@ -47,7 +47,7 @@ import java.util.Set;
  * the Platform Low Level API.
  * </p>
  * High level services and applications shall return Response objects filled
- * with ecxeption classes and exception messages if there is an exception during
+ * with exception classes and exception messages if there is an exception during
  * the request processing.
  * 
  * @see com.iplanet.services.comm.share.Request
@@ -68,7 +68,7 @@ public interface RequestHandler {
      * @param servletContext
      *            Reference to ServletContext object.
      */
-    public ResponseSet process(Set<Request> requests,
+    public ResponseSet process(List<Request> requests,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext);
 }

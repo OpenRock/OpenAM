@@ -54,7 +54,7 @@ import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.session.util.SessionUtils;
-import java.util.Set;
+import java.util.List;
 
 /**
  * This class parses the xml/http(s) log requests and executes the corresponding
@@ -107,7 +107,7 @@ public class LogService implements RequestHandler {
      * @param servletResponse
      * @return The response set which contains the result of the log operation.
      */
-    public ResponseSet process(Set<Request> requests,
+    public ResponseSet process(List<Request> requests,
     HttpServletRequest servletRequest,
     HttpServletResponse servletResponse,
     ServletContext servletContext) {

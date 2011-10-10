@@ -59,6 +59,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -110,7 +111,7 @@ public class PolicyRequestHandler implements RequestHandler {
      *  @return the set of the response
      */ 
     public ResponseSet process(
-        Set<Request> requests,
+        List<Request> requests,
         HttpServletRequest servletRequest, 
         HttpServletResponse servletResponse,
         ServletContext servletContext
