@@ -789,7 +789,7 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="openam-auth-adaptive-time-since-last-login-attribute"
+                    <AttributeSchema name="openam-auth-adaptive-time-since-last-login-cookie-name"
                     cosQualifier="default"
                     type="single"
                     syntax="string"
