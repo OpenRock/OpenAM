@@ -2319,7 +2319,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Logout behaviour</term>
+     <term>Logout options</term>
      <listitem>
       <para>Specifies whether not to log the user out without prompting from
       the OAuth Provider on logout, to log the user out without prompting, or
