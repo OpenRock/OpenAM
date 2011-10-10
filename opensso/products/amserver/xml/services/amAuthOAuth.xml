@@ -42,7 +42,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  type="single" syntax="string" i18nKey="a101">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
-                                 type="single" syntax="string" i18nKey="a102">
+                                 type="single" syntax="password" i18nKey="a102">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-service"
                                  type="single" syntax="string" i18nKey="a103">
@@ -236,7 +236,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  type="single" syntax="string" i18nKey="a101">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
-                                 type="single" syntax="string" i18nKey="a102">
+                                 type="single" syntax="password" i18nKey="a102">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-service"
                                  type="single" syntax="string" i18nKey="a103">
