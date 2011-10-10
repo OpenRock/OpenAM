@@ -96,7 +96,7 @@ public class VersionCheck implements SetupConstants {
                 System.out.println(bundle.getString("message.error.version.am")
                         + " " + amExpectedVersion + " .");
             }
-            getValidationResult();
+            return getValidationResult();
         }
         
         if (!versionCompatible(configVersion, amExpectedVersion)) {
@@ -108,7 +108,7 @@ public class VersionCheck implements SetupConstants {
                 System.out.println(bundle.getString("message.error.version.am")
                         + " " + amExpectedVersion + " .");
             }
-            getValidationResult();
+            return getValidationResult();
         }
         return 0;
     }
