@@ -174,7 +174,6 @@
             </zipfileset>
             <zipfileset dir="${war.xml.dir}" prefix="WEB-INF">
                 <include name="jaxrpc-ri-runtime.xml" />
-                <include name="configurator.tld" />
             </zipfileset>
             <zipfileset dir="${amserver.built.res.dir}" prefix="WEB-INF/classes">
                 <include name="*.properties" />

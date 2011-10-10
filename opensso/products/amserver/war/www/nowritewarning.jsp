@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010 ForgeRock AS
+   Portions Copyrighted 2010-2011 ForgeRock AS
 --%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -38,8 +38,6 @@
 <%@ page import="java.text.MessageFormat"%>
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page import="javax.servlet.ServletContext"%>
-
-<%@taglib uri="/WEB-INF/configurator.tld" prefix="config" %>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

@@ -143,7 +143,6 @@
             <zipfileset dir="${amserver.dtd.xml.dir}" prefix="WEB-INF" />
             <zipfileset dir="${war.xml.dir}" prefix="WEB-INF">
                 <include name="jaxrpc-ri-runtime.xml" />
-                <include name="configurator.tld" />
             </zipfileset>
             <zipfileset dir="${amserver.classes.dir}/jaxrpc" prefix="WEB-INF/wsdl">
                 <include name="IdentityManagementServices.wsdl" />

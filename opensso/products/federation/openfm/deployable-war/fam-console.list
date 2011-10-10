@@ -1269,7 +1269,6 @@
 ./WEB-INF/auth.tld
 ./WEB-INF/cc.tld
 ./WEB-INF/click.xml
-./WEB-INF/configurator.tld
 ./WEB-INF/debug.dtd
 ./WEB-INF/distUI_auth.tld
 ./WEB-INF/jato.tld

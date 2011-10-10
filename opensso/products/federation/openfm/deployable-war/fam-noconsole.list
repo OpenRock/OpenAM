@@ -1379,7 +1379,6 @@
 ./WEB-INF/auth.tld
 ./WEB-INF/cc.tld
 ./WEB-INF/click.xml
-./WEB-INF/configurator.tld
 ./WEB-INF/debug.dtd
 ./WEB-INF/distUI_auth.tld
 ./WEB-INF/jato.tld
@@ -2358,7 +2357,6 @@
 ./wsfederation/jsp/realmSelection.jsp
 ./xml/LoginModuleSample.xml
 ./Debug.jsp
-./configurator.jsp
 ./encode.jsp
 ./getServerInfo.jsp
 ./index.html
@@ -2366,7 +2364,6 @@
 ./nowritewarning.jsp
 ./showServerConfig.jsp
 ./side-bg.gif
-./success.jsp
 ./sunLogo.gif
 ./validateWait.jsp
 ./validator.jsp
@@ -2375,4 +2372,3 @@
 ./validatorMain.jsp
 ./validatorRpt.jsp
 ./validatorStatus.jsp
-./welcome.jsp

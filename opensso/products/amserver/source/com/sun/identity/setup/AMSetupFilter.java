@@ -83,8 +83,7 @@ public final class AMSetupFilter implements Filter {
         try {
             if (AMSetupServlet.isCurrentConfigurationValid()) {
                 String incomingURL = httpRequest.getRequestURI();
-                if (incomingURL.endsWith("configurator.jsp") ||
-                    incomingURL.endsWith("/config/options.htm")
+                if (incomingURL.endsWith("/config/options.htm")
                         || incomingURL.endsWith("/config/upgrade/upgrade.htm"))
                 {
                     String url = httpRequest.getScheme() + "://" +

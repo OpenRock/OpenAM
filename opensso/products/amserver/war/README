@@ -27,6 +27,8 @@ your own identifying information:
 $Id: README,v 1.3 2008/06/25 05:44:24 qcheng Exp $
 
 ------------------------------------------------------------------------------
+Portions Copyrighted 2011 ForgeRock AS
+------------------------------------------------------------------------------
 
 %% Contents:
     %% 1. About this WAR
@@ -36,16 +38,17 @@ $Id: README,v 1.3 2008/06/25 05:44:24 qcheng Exp $
 
 %% 1. About this WAR
 
-This WAR contains all the implementations for opensso server. 
-After the WAR is built, there will be a WAR file, opensso.war under the
+This WAR contains all the implementations for OpenAM server.
+After the WAR is built, there will be a WAR file, openam.war under the
 distribution directory, opensso/products/amserver/built/war/dist. Deploy it
 on a J2EE compliant web container. Visit a configuration page with a web
 browser, click on a button to configure opensso server. Then server is
-ready for use. 
+ready for use.
 
 After you have authenticated to the server, you will be brought to an
 administrator console. where you can further configure/administer the
-server.  Refer to http://docs.sun.com/source/817-7647/user.html#wp25953 for
+server.  Refer to
+http://openam.forgerock.org/doc/admin-guide/OpenAM-Admin-Guide.html for
 more information
 
 %% 2. Building the WAR
@@ -70,24 +73,25 @@ The shell commands are
 
 The war build process does the followings
 
-2.1.1 Compile the opensso source code under opensso/products/amserver/source
+2.1.1 Compile the OpenAM source code under opensso/products/amserver/source
 2.1.2 Compile the war source code under opensso/products/amserver/war/source
 2.1.3 Create a WAR file that contains all the necessary resources. This WAR
       file is created at opensso/products/amserver/built/war/dist/opensso.war.
 
 %% 3. Deploying the WAR
 Deploy the web application, opensso/products/amserver/built/war/dist/opensso.war
-with the deployment URI of /opensso in the web container designated for the
+with the deployment URI of <deploy-uri> in the web container designated for the
 server host on the machine.
 
 %% 4. Configuring the web application
 Open a web browser (with Javascript and cookie enabled), visit
-<protocol>://<hostname>:<port>/opensso where <protocol>, <hostname>
+<protocol>://<hostname>:<port>/<deploy-uri> where <protocol>, <hostname>
 and <port> are the protocol, hostname and port number of the web server
 respectively.
 
 You will be redirected to a configuration page,
-<protocol>://<hostname>:<port>/opensso/configurator.jsp where the fields on
+<protocol>://<hostname>:<port>/<deploy-uri>/config/options.htm where you need to
+go through the wizard and fill in the required fields
 the page are already pre-popuplate with defaults values.
 
 Click on the "Configure" button to start the configuration process.

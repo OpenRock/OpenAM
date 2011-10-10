@@ -17,7 +17,7 @@
 
              To ensure there are no interference with them, they have also been
              added to the list of excludes. -->
-        <excludes pattern="/Debug.jsp, /amadm.jsp, /com_sun_web_ui/*, /config/auth/default/*, /config/federation/*, /configurator.jsp, /console/*, /encode.jsp, /ssoadm.jsp, /isAlive.jsp, /password/*, /saml2/*, /samples/*, /success.jsp, /welcome.jsp, /wsfederation/*"/>
+        <excludes pattern="/Debug.jsp, /amadm.jsp, /com_sun_web_ui/*, /config/auth/default/*, /config/federation/*, /console/*, /encode.jsp, /ssoadm.jsp, /isAlive.jsp, /password/*, /saml2/*, /samples/*, /success.jsp, /wsfederation/*"/>
     </pages>
     <mode value="production"/>
 </click-app>
