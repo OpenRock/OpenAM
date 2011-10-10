@@ -314,6 +314,7 @@
                 <include name="*.js" />
                 <include name="index.html" />
             </zipfileset>
+            <zipfileset dir="${amserver.oauth2c.dir}" prefix="oauth2c" />
         </war>
 
         <delete file="${amserver.dist.dir}/web.xml"/>
