@@ -262,6 +262,10 @@
 ./WEB-INF/classes/amAuthNT_ko.properties
 ./WEB-INF/classes/amAuthNT_zh.properties
 ./WEB-INF/classes/amAuthNT_zh_TW.properties
+./WEB-INF/classes/amAuthOAuth.properties
+./WEB-INF/classes/amAuthOAuth.xml
+./WEB-INF/classes/amAuthOAuth_en.properties
+./WEB-INF/classes/amAuthOAuth_es.properties
 ./WEB-INF/classes/amAuthRadius.properties
 ./WEB-INF/classes/amAuthRadius.xml
 ./WEB-INF/classes/amAuthRadius_de.properties
