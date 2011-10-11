@@ -261,15 +261,6 @@
 ./WEB-INF/classes/amAuthUI_ko.properties
 ./WEB-INF/classes/amAuthUI_zh.properties
 ./WEB-INF/classes/amAuthUI_zh_TW.properties
-./WEB-INF/classes/amAuthUnix.properties
-./WEB-INF/classes/amAuthUnix_de.properties
-./WEB-INF/classes/amAuthUnix_en.properties
-./WEB-INF/classes/amAuthUnix_es.properties
-./WEB-INF/classes/amAuthUnix_fr.properties
-./WEB-INF/classes/amAuthUnix_ja.properties
-./WEB-INF/classes/amAuthUnix_ko.properties
-./WEB-INF/classes/amAuthUnix_zh.properties
-./WEB-INF/classes/amAuthUnix_zh_TW.properties
 ./WEB-INF/classes/amAuthWindowsDesktopSSO.properties
 ./WEB-INF/classes/amAuthWindowsDesktopSSO_de.properties
 ./WEB-INF/classes/amAuthWindowsDesktopSSO_en.properties

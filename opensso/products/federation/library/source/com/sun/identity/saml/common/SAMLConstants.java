@@ -48,7 +48,6 @@ public final class SAMLConstants
         passwordAuthMethods.add("nt");
         passwordAuthMethods.add("ldap");
         passwordAuthMethods.add("membership");
-        passwordAuthMethods.add("unix");
         passwordAuthMethods.add("anonymous");
         tokenAuthMethods = new HashSet();
         tokenAuthMethods.add("radius");

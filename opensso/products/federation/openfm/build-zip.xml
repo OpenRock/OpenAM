@@ -45,8 +45,7 @@
     <property name="zip.temp.dir1" value="${openfm.built.dir}/.zip" />
     <property name="zip.temp.dir" value="${zip.temp.dir1}/opensso" />
 
-    <target name="all" depends="consoleonlywebxml, noconsolewebxml, unixhelper,
-            patchtools">
+    <target name="all" depends="consoleonlywebxml, noconsolewebxml, patchtools">
         <copy todir="${zip.temp.dir}">
             <fileset dir="${products.license.dir}" includes="*.txt" />
         </copy>
@@ -265,17 +264,6 @@
         </copy>
     </target>
 
-    <target name="unixhelper" if="enterprise.authmodules.present">
-        <!-- include the doUnix daemon -->
-        <mkdir dir="${zip.temp.dir}/tools/helpers/bin" />
-        <copy todir="${zip.temp.dir}/tools/helpers">
-            <fileset dir="${products.basedir}/extlib/helpers"/>
-        </copy>
-        <copy todir="${zip.temp.dir}/tools/helpers/bin">
-            <fileset dir="${amserver.src.dir}/com/sun/identity/authentication/modules/unix" includes="am*" />
-        </copy>
-    </target>
-    
     <target name="consoleonlywebxml">
         <delete dir="${zip.temp.dir}" />
         <mkdir dir="${zip.temp.dir}" />

@@ -295,16 +295,6 @@
 ./WEB-INF/classes/amAuthUI_ko.properties
 ./WEB-INF/classes/amAuthUI_zh.properties
 ./WEB-INF/classes/amAuthUI_zh_TW.properties
-./WEB-INF/classes/amAuthUnix.properties
-./WEB-INF/classes/amAuthUnix.xml
-./WEB-INF/classes/amAuthUnix_de.properties
-./WEB-INF/classes/amAuthUnix_en.properties
-./WEB-INF/classes/amAuthUnix_es.properties
-./WEB-INF/classes/amAuthUnix_fr.properties
-./WEB-INF/classes/amAuthUnix_ja.properties
-./WEB-INF/classes/amAuthUnix_ko.properties
-./WEB-INF/classes/amAuthUnix_zh.properties
-./WEB-INF/classes/amAuthUnix_zh_TW.properties
 ./WEB-INF/classes/amAuthWindowsDesktopSSO.properties
 ./WEB-INF/classes/amAuthWindowsDesktopSSO.xml
 ./WEB-INF/classes/amAuthWindowsDesktopSSO_de.properties
@@ -1905,10 +1895,8 @@
 ./config/auth/default/Redirect.jsp
 ./config/auth/default/SAE.xml
 ./config/auth/default/SecurID.xml
-./config/auth/default/Unix.xml
 ./config/auth/default/WindowsDesktopSSO.xml
 ./config/auth/default/account_expired.jsp
-./config/auth/default/amAuthUnix.xml
 ./config/auth/default/authException.jsp
 ./config/auth/default/auth_error_template.jsp
 ./config/auth/default/configuration.jsp
@@ -1958,9 +1946,7 @@
 ./config/auth/default_de/RADIUS.xml
 ./config/auth/default_de/SAE.xml
 ./config/auth/default_de/SecurID.xml
-./config/auth/default_de/Unix.xml
 ./config/auth/default_de/WindowsDesktopSSO.xml
-./config/auth/default_de/amAuthUnix.xml
 ./config/auth/default_en/AD.xml
 ./config/auth/default_en/Adaptive.xml
 ./config/auth/default_en/Anonymous.xml
@@ -1977,9 +1963,7 @@
 ./config/auth/default_en/RADIUS.xml
 ./config/auth/default_en/SAE.xml
 ./config/auth/default_en/SecurID.xml
-./config/auth/default_en/Unix.xml
 ./config/auth/default_en/WindowsDesktopSSO.xml
-./config/auth/default_en/amAuthUnix.xml
 ./config/auth/default_es/AD.xml
 ./config/auth/default_es/Adaptive.xml
 ./config/auth/default_es/Anonymous.xml
@@ -1996,9 +1980,7 @@
 ./config/auth/default_es/RADIUS.xml
 ./config/auth/default_es/SAE.xml
 ./config/auth/default_es/SecurID.xml
-./config/auth/default_es/Unix.xml
 ./config/auth/default_es/WindowsDesktopSSO.xml
-./config/auth/default_es/amAuthUnix.xml
 ./config/auth/default_fr/AD.xml
 ./config/auth/default_fr/Adaptive.xml
 ./config/auth/default_fr/Anonymous.xml
@@ -2015,9 +1997,7 @@
 ./config/auth/default_fr/RADIUS.xml
 ./config/auth/default_fr/SAE.xml
 ./config/auth/default_fr/SecurID.xml
-./config/auth/default_fr/Unix.xml
 ./config/auth/default_fr/WindowsDesktopSSO.xml
-./config/auth/default_fr/amAuthUnix.xml
 ./config/auth/default_ja/AD.xml
 ./config/auth/default_ja/Adaptive.xml
 ./config/auth/default_ja/Anonymous.xml
@@ -2034,9 +2014,7 @@
 ./config/auth/default_ja/RADIUS.xml
 ./config/auth/default_ja/SAE.xml
 ./config/auth/default_ja/SecurID.xml
-./config/auth/default_ja/Unix.xml
 ./config/auth/default_ja/WindowsDesktopSSO.xml
-./config/auth/default_ja/amAuthUnix.xml
 ./config/auth/default_ko/AD.xml
 ./config/auth/default_ko/Adaptive.xml
 ./config/auth/default_ko/Anonymous.xml
@@ -2053,9 +2031,7 @@
 ./config/auth/default_ko/RADIUS.xml
 ./config/auth/default_ko/SAE.xml
 ./config/auth/default_ko/SecurID.xml
-./config/auth/default_ko/Unix.xml
 ./config/auth/default_ko/WindowsDesktopSSO.xml
-./config/auth/default_ko/amAuthUnix.xml
 ./config/auth/default_zh/AD.xml
 ./config/auth/default_zh/Adaptive.xml
 ./config/auth/default_zh/Anonymous.xml
@@ -2072,9 +2048,7 @@
 ./config/auth/default_zh/RADIUS.xml
 ./config/auth/default_zh/SAE.xml
 ./config/auth/default_zh/SecurID.xml
-./config/auth/default_zh/Unix.xml
 ./config/auth/default_zh/WindowsDesktopSSO.xml
-./config/auth/default_zh/amAuthUnix.xml
 ./config/auth/default_zh_CN/AD.xml
 ./config/auth/default_zh_CN/Adaptive.xml
 ./config/auth/default_zh_CN/Anonymous.xml
@@ -2091,9 +2065,7 @@
 ./config/auth/default_zh_CN/RADIUS.xml
 ./config/auth/default_zh_CN/SAE.xml
 ./config/auth/default_zh_CN/SecurID.xml
-./config/auth/default_zh_CN/Unix.xml
 ./config/auth/default_zh_CN/WindowsDesktopSSO.xml
-./config/auth/default_zh_CN/amAuthUnix.xml
 ./config/auth/default_zh_TW/AD.xml
 ./config/auth/default_zh_TW/Adaptive.xml
 ./config/auth/default_zh_TW/Anonymous.xml
@@ -2108,9 +2080,7 @@
 ./config/auth/default_zh_TW/NT.xml
 ./config/auth/default_zh_TW/RADIUS.xml
 ./config/auth/default_zh_TW/SecurID.xml
-./config/auth/default_zh_TW/Unix.xml
 ./config/auth/default_zh_TW/WindowsDesktopSSO.xml
-./config/auth/default_zh_TW/amAuthUnix.xml
 ./config/authc/HTTP.htm
 ./config/authc/JDBC.htm
 ./config/authc/LDAP.htm

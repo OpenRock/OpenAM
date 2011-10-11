@@ -505,12 +505,6 @@ public interface Constants {
         "com.sun.identity.security.x509.impl";
 
     /**
-     * property string for UNIX helper port
-     */
-    public static final String UNIX_HELPER_PORT = 
-        "unixHelper.port";
-
-    /**
      * property string for <code>securid</code> authentication module and
      * helper port
      */

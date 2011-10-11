@@ -91,7 +91,6 @@ public class ConfiguredModuleInstances extends ChoiceValues {
             getInstanceNames(orgDN,"AD", answer);
             getInstanceNames(orgDN,"Anonymous", answer);
             getInstanceNames(orgDN,"JDBC", answer);
-            getInstanceNames(orgDN,"Unix", answer);
         } catch (Exception e) {
             // do nothing as instanceNames will be empty.
         }
