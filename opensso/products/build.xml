@@ -38,7 +38,6 @@
     <import file="federation/openfm/openfm.xml" />
     <import file="installtools/installtools.xml" />
     <import file="j2eeagents/j2eeagents.xml" />
-    <import file="upgrade/upgrade.xml" />
 
     <loadfile property="build.number.set" srcFile="${products.basedir}/.svn/entries" failonerror="false">
     	<filterchain>
@@ -72,7 +71,6 @@
         <antcall target="fedlibrary-nightly" />
         <antcall target="oauth-nightly" />
         <antcall target="openfm-nightly" />
-        <antcall target="upgrade-nightly" />
         <antcall target="remove-amserver-bits" />
         <antcall target="create-manifest" />
         <antcall target="create-checksum" />
@@ -195,12 +193,6 @@
 
     </target>
 
-    <target name="upgrade-nightly">
-        <ant antfile="${upgrade.basedir}/build.xml" inheritRefs="true" target="nightly" />
-        <copy file="${upgrade.dist.dir}/opensso.zip"
-	    todir="${prd.nightly.dist.dir}/openfm" />
-    </target>        
-    
     <target name="create-checksum" depends="set-zipname">         
         <checksum file="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
             algorithm="SHA" fileext=".sha" />
@@ -229,12 +221,6 @@
        <zip destfile="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
             whenempty="create">
             <zipfileset dir="${prd.nightly.dist.dir}/opensso">
-               <exclude name="**/**/ssoupgrade*"/>
-               <exclude name="**/**/ssopre80upgrade*"/>                
-            </zipfileset>
-            <zipfileset dir="${prd.nightly.dist.dir}/opensso" filemode="755">
-                <include name="**/**/ssoupgrade*"/>
-                <include name="**/**/ssopre80upgrade*"/>
             </zipfileset>                 
 	</zip>        
         <filter token="ZIPNAME" value="${zipname.set}" />
@@ -286,8 +272,6 @@
         <ant antfile="${j2eeagents.basedir}/build.xml" inheritRefs="true"
             target="clean" />
         <ant antfile="${sharedlib.dir}/build.xml" inheritRefs="true"
-            target="clean" />
-        <ant antfile="${upgrade.base.dir}/build.xml" inheritRefs="true"
             target="clean" />
         <ant antfile="${wssagents.base.dir}/build.xml" inheritRefs="true"
             target="clean" />
