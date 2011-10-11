@@ -1055,7 +1055,7 @@ public class SessionService {
             List<InternalSession> allValidSessions = getValidInternalSessions();
             boolean matchAll = pattern.equals("*");
 
-            for (InternalSession sess : sessions) {
+            for (InternalSession sess : allValidSessions) {
                 if (!matchAll) {
                     // For application sessions, the client ID
                     // will not be in the DN format but just uid.
