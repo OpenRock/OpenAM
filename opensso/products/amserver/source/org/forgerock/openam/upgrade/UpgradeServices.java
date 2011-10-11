@@ -37,7 +37,9 @@ import com.sun.identity.password.plugins.PasswordGenerator;
 import com.sun.identity.password.plugins.RandomPasswordGenerator;
 import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.BootstrapData;
 import com.sun.identity.setup.IHttpServletRequest;
+import com.sun.identity.setup.JCECrypt;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
@@ -304,10 +306,18 @@ public class UpgradeServices {
         
         // need to reinitialize the tag swap property map with original install params
         IHttpServletRequest requestFromFile = new UpgradeHttpServletRequest(basedir);
+        String dsPwd = getDSPwd(basedir);
         
         try {
             Properties foo = ServerConfiguration.getServerInstance(adminToken, WebtopNaming.getLocalServer());
             requestFromFile.addParameter(SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, foo.getProperty(Constants.ENC_PWD_PROPERTY));
+            
+            String dbOption = (String) requestFromFile.getParameterMap().get(SetupConstants.CONFIG_VAR_DATA_STORE);
+            boolean embedded = dbOption.equals(SetupConstants.SMS_EMBED_DATASTORE);
+            
+            if (!embedded) {
+                requestFromFile.addParameter(SetupConstants.CONFIG_VAR_DS_MGR_PWD, dsPwd);
+            }
         } catch (Exception ex) {
             debug.error("Unable to initialise services defaults", ex);
             throw new UpgradeException("Unable to initialise services defaults: " + ex.getMessage());
@@ -580,6 +590,31 @@ public class UpgradeServices {
             // default implementation will not do this
             password = DEFAULT_PASSWORD;
         }
+        
+        return password;
+    }
+    
+    private String getDSPwd(String basedir)
+    throws UpgradeException {
+        String password = null;
+        BootstrapData bootStrap = null;
+        
+        try {
+            bootStrap = new BootstrapData(basedir);
+        } catch (IOException ioe) {
+            debug.error("Unable to load bootstrap file", ioe);
+            throw new UpgradeException("Unable to load bootstrap file: " + ioe.getMessage());
+        }
+        
+        String data = (String) bootStrap.getData().get(0);
+        
+        if (data == null) {
+            debug.error("Bootstrap file is invalid");
+            throw new UpgradeException("Bootstrap file is invalid");
+        }
+        
+        String encDSPwd = data.substring(data.indexOf(BootstrapData.DS_PWD), data.indexOf('&', data.indexOf(BootstrapData.DS_PWD)));
+        password = JCECrypt.decode(encDSPwd.substring(BootstrapData.DS_PWD.length() + 1));
         
         return password;
     }
