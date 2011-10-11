@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.cli;
 
 
@@ -42,13 +46,13 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
+import java.util.Map;
 
 /**
  * Displays active sessions.
@@ -266,7 +270,7 @@ public class SessionCommand extends AuthenticatedCommand {
                 output.printlnMessage(warning);
             }
 
-            Hashtable sessions = (Hashtable)result.getResultAttributes();
+            Map<String, Session> sessions = (Map<String, Session>) result.getResultAttributes();
             boolean isCurrentSession = false;
             int i = 0;
                                                                                 

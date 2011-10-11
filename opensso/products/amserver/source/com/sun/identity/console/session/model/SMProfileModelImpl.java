@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.console.session.model;
 
 import com.iplanet.dpro.session.Session;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +111,7 @@ public class SMProfileModelImpl extends AMModelBase
                 new SessionID(getUserSSOToken().getTokenID().toString()));
             SearchResults result = session.getValidSessions(
                 serverName, pattern);
-             Hashtable sessions = (Hashtable)result.getResultAttributes();
+            Map<String, Session> sessions = (Map<String, Session>) result.getResultAttributes();
             String errorMessage =
                 AMAdminUtils.getSearchResultWarningMessage(result, this);
             sessionCache = new SMSessionCache(
@@ -148,7 +148,7 @@ public class SMProfileModelImpl extends AMModelBase
         try {
             SearchResults result = session.getValidSessions(
                 serverName, pattern);
-            Hashtable validSessions = (Hashtable)result.getResultAttributes();
+            Map<String, Session> validSessions = (Map<String, Session>) result.getResultAttributes();
 
             if ((validSessions != null) && !validSessions.isEmpty()) {
                 sessions = new HashMap(validSessions.size());
