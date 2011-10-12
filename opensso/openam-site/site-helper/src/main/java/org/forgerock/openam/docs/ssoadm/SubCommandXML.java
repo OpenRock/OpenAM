@@ -31,24 +31,26 @@ import java.util.Collection;
  * Each ssoadm subcommand annotation is transformed to a DocBook 5 XML
  * fragment for inclusion in the ssoadm refentry.
  *
- *<![CDATA[
-  <refsect2 xml:id="ssoadm-subcommand">
-   <title>ssoadm subcommand</title>
-   <para>description</para>
-   <para>Usage: <literal>ssoadm subcommand --options [--global-options]</literal></para>
-   <variablelist>
-    <title>Options</title>
-    <varlistentry>
-     <term><option>--adminid, -u</option></term><!-- Mandatory -->
-     <listitem><para>Administrator ID of running the command.</para></listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>[--adminid, -u]</option></term><!-- Optional -->
-     <listitem><para>Administrator ID of running the command.</para></listitem>
-    </varlistentry>
-   </variablelist>
-  </refsect2>
-  ]]>
+ * <pre>
+ * {@code
+ * <refsect2 xml:id="ssoadm-subcommand">
+ *  <title>ssoadm subcommand</title>
+ *  <para>description</para>
+ *  <para>Usage: <literal>ssoadm subcommand --options [--global-options]</literal></para>
+ *  <variablelist>
+ *   <title>Options</title>
+ *   <varlistentry>
+ *    <term><option>--adminid, -u</option></term><!-- Mandatory -->
+ *    <listitem><para>Administrator ID of running the command.</para></listitem>
+ *   </varlistentry>
+ *   <varlistentry>
+ *    <term><option>[--adminid, -u]</option></term><!-- Optional -->
+ *    <listitem><para>Administrator ID of running the command.</para></listitem>
+ *   </varlistentry>
+ *  </variablelist>
+ * </refsect2>
+ * }
+ * </pre>
  */
 
 public class SubCommandXML
