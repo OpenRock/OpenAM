@@ -102,227 +102,227 @@
   <refsect2>
    <title>Agent Configuration</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-agent-to-grp" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-agent-remove-props" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-agent" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-agent-grp" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-agent-grps" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-agents" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-agent-grp-members" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-agent-grps" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-agents" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-agent-from-grp" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-agent" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-agent-grp" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-agent-membership" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-agent-types" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-agent" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-agent-grp" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-agent-to-grp"><command>add-agent-to-grp</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-agent-remove-props"><command>agent-remove-props</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-agent"><command>create-agent</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-agent-grp"><command>create-agent-grp</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-agent-grps"><command>delete-agent-grps</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-agents"><command>delete-agents</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-agent-grp-members"><command>list-agent-grp-members</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-agent-grps"><command>list-agent-grps</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-agents"><command>list-agents</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-agent-from-grp"><command>remove-agent-from-grp</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-agent"><command>show-agent</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-agent-grp"><command>show-agent-grp</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-agent-membership"><command>show-agent-membership</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-agent-types"><command>show-agent-types</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-agent"><command>update-agent</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-agent-grp"><command>update-agent-grp</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Authentication Service Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-auth-cfg-entr" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-auth-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-auth-instance" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-auth-cfgs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-auth-instances" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-auth-cfg-entr" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-auth-instance" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-auth-cfgs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-auth-instances" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-register-auth-module" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-unregister-auth-module" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-auth-cfg-entr" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-auth-cfg-props" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-auth-instance" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-auth-cfg-entr"><command>add-auth-cfg-entr</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-auth-cfg"><command>create-auth-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-auth-instance"><command>create-auth-instance</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-auth-cfgs"><command>delete-auth-cfgs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-auth-instances"><command>delete-auth-instances</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-auth-cfg-entr"><command>get-auth-cfg-entr</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-auth-instance"><command>get-auth-instance</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-auth-cfgs"><command>list-auth-cfgs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-auth-instances"><command>list-auth-instances</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-register-auth-module"><command>register-auth-module</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-unregister-auth-module"><command>unregister-auth-module</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-auth-cfg-entr"><command>update-auth-cfg-entr</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-auth-cfg-props"><command>update-auth-cfg-props</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-auth-instance"><command>update-auth-instance</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Data Store Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-amsdk-idrepo-plugin" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-datastore" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-datastores" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-datastore-types" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-datastores" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-datastore" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-datastore" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-amsdk-idrepo-plugin"><command>add-amsdk-idrepo-plugin</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-datastore"><command>create-datastore</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-datastores"><command>delete-datastores</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-datastore-types"><command>list-datastore-types</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-datastores"><command>list-datastores</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-datastore"><command>show-datastore</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-datastore"><command>update-datastore</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Entitlements</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-app-priv" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-appl" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-xacml" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-appls" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-xacml" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-appls" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-xacml" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-appl" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-entitlement-conf" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-app-priv" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-appl" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-entitlement-conf" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-app-priv" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-app-priv-resources" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-app-priv-subjects" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-app-priv"><command>add-app-priv</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-appl"><command>create-appl</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-xacml"><command>create-xacml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-appls"><command>delete-appls</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-xacml"><command>delete-xacml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-appls"><command>list-appls</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-xacml"><command>list-xacml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-appl"><command>set-appl</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-entitlement-conf"><command>set-entitlement-conf</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-app-priv"><command>show-app-priv</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-appl"><command>show-appl</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-entitlement-conf"><command>show-entitlement-conf</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-app-priv"><command>update-app-priv</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-app-priv-resources"><command>update-app-priv-resources</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-app-priv-subjects"><command>update-app-priv-subjects</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Federation Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-cot-member" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-cot" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-metadata-templ" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-cot" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-entity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-do-bulk-federation" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-export-entity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-import-bulk-fed-data" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-import-entity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-cot-members" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-cots" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-entities" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-cot-member" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-entity-keyinfo" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-cot-member"><command>add-cot-member</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-cot"><command>create-cot</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-metadata-templ"><command>create-metadata-templ</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-cot"><command>delete-cot</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-entity"><command>delete-entity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-do-bulk-federation"><command>do-bulk-federation</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-export-entity"><command>export-entity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-import-bulk-fed-data"><command>import-bulk-fed-data</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-import-entity"><command>import-entity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-cot-members"><command>list-cot-members</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-cots"><command>list-cots</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-entities"><command>list-entities</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-cot-member"><command>remove-cot-member</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-entity-keyinfo"><command>update-entity-keyinfo</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Identity Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-member" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-privileges" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-svc-identity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-identity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-identities" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-identity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-identity-svcs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-identities" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-identity-assignable-svcs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-member" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-privileges" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-svc-identity" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-identity-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-identity-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-identity-ops" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-identity-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-identity-types" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-members" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-memberships" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-privileges" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-member"><command>add-member</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-privileges"><command>add-privileges</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-svc-identity"><command>add-svc-identity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-identity"><command>create-identity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-identities"><command>delete-identities</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-identity"><command>get-identity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-identity-svcs"><command>get-identity-svcs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-identities"><command>list-identities</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-identity-assignable-svcs"><command>list-identity-assignable-svcs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-member"><command>remove-member</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-privileges"><command>remove-privileges</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-svc-identity"><command>remove-svc-identity</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-identity-attrs"><command>set-identity-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-identity-svc-attrs"><command>set-identity-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-identity-ops"><command>show-identity-ops</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-identity-svc-attrs"><command>show-identity-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-identity-types"><command>show-identity-types</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-members"><command>show-members</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-memberships"><command>show-memberships</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-privileges"><command>show-privileges</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Policy Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-create-policies" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-policies" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-policies" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-policies" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-policies"><command>create-policies</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-policies"><command>delete-policies</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-policies"><command>list-policies</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-policies"><command>update-policies</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Realm Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-svc-realm" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-realm" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-realm" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-realm-attr" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-realm" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-realm-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-realm-assignable-svcs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-realms" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-svc-realm" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-realm-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-realm-svc-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-auth-modules" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-data-types" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-realm-svcs" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-svc-attrs"><command>add-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-svc-realm"><command>add-svc-realm</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-realm"><command>create-realm</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-realm"><command>delete-realm</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-realm-attr"><command>delete-realm-attr</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-realm"><command>get-realm</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-realm-svc-attrs"><command>get-realm-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-realm-assignable-svcs"><command>list-realm-assignable-svcs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-realms"><command>list-realms</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-svc-attrs"><command>remove-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-svc-realm"><command>remove-svc-realm</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-realm-attrs"><command>set-realm-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-svc-attrs"><command>set-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-realm-svc-attrs"><command>set-realm-svc-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-auth-modules"><command>show-auth-modules</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-data-types"><command>show-data-types</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-realm-svcs"><command>show-realm-svcs</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Server Configuration</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-site-members" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-site-sec-urls" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-clone-server" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-server" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-site" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-server" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-site" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-export-server" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-svrcfg-xml" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-import-server" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-server-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-servers" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-sites" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-server-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-site-members" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-site-sec-urls" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-site-pri-url" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-site-sec-urls" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-svrcfg-xml" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-site" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-show-site-members" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-server-cfg" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-site-members"><command>add-site-members</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-site-sec-urls"><command>add-site-sec-urls</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-clone-server"><command>clone-server</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-server"><command>create-server</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-site"><command>create-site</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-server"><command>delete-server</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-site"><command>delete-site</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-export-server"><command>export-server</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-svrcfg-xml"><command>get-svrcfg-xml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-import-server"><command>import-server</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-server-cfg"><command>list-server-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-servers"><command>list-servers</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-sites"><command>list-sites</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-server-cfg"><command>remove-server-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-site-members"><command>remove-site-members</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-site-sec-urls"><command>remove-site-sec-urls</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-site-pri-url"><command>set-site-pri-url</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-site-sec-urls"><command>set-site-sec-urls</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-svrcfg-xml"><command>set-svrcfg-xml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-site"><command>show-site</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-show-site-members"><command>show-site-members</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-server-cfg"><command>update-server-cfg</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Service Management</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-attr-defs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-attrs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-plugin-interface" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-add-sub-schema" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-sub-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-svc" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-create-svrcfg-xml" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-attr" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-sub-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-delete-svc" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-export-svc-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-attr-defs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-get-revision-number" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-import-svc-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-attr-choicevals" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-attr-defs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-sub-schema" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-any" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-bool-values" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-choicevals" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-defs" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-end-range" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-i18n-key" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-start-range" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-syntax" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-type" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-ui-type" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-validator" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-attr-view-bean-url" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-inheritance" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-plugin-viewbean-url" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-revision-number" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-sub-cfg" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-svc-i18n-key" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-set-svc-view-bean-url" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-update-svc" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-attr-defs"><command>add-attr-defs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-attrs"><command>add-attrs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-plugin-interface"><command>add-plugin-interface</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-sub-schema"><command>add-sub-schema</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-sub-cfg"><command>create-sub-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-svc"><command>create-svc</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-svrcfg-xml"><command>create-svrcfg-xml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-attr"><command>delete-attr</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-sub-cfg"><command>delete-sub-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-svc"><command>delete-svc</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-export-svc-cfg"><command>export-svc-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-attr-defs"><command>get-attr-defs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-revision-number"><command>get-revision-number</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-import-svc-cfg"><command>import-svc-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-attr-choicevals"><command>remove-attr-choicevals</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-attr-defs"><command>remove-attr-defs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-sub-schema"><command>remove-sub-schema</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-any"><command>set-attr-any</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-bool-values"><command>set-attr-bool-values</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-choicevals"><command>set-attr-choicevals</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-defs"><command>set-attr-defs</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-end-range"><command>set-attr-end-range</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-i18n-key"><command>set-attr-i18n-key</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-start-range"><command>set-attr-start-range</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-syntax"><command>set-attr-syntax</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-type"><command>set-attr-type</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-ui-type"><command>set-attr-ui-type</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-validator"><command>set-attr-validator</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-attr-view-bean-url"><command>set-attr-view-bean-url</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-inheritance"><command>set-inheritance</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-plugin-viewbean-url"><command>set-plugin-viewbean-url</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-revision-number"><command>set-revision-number</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-sub-cfg"><command>set-sub-cfg</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-svc-i18n-key"><command>set-svc-i18n-key</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-set-svc-view-bean-url"><command>set-svc-view-bean-url</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-update-svc"><command>update-svc</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
    <title>Other</title>
    <itemizedlist>
-    <listitem><para><xref linkend="ssoadm-add-res-bundle" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-do-batch" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-do-migration70" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-res-bundle" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-list-sessions" /></para></listitem>
-    <listitem><para><xref linkend="ssoadm-remove-res-bundle" /></para></listitem>
+    <listitem><para><link linkend="ssoadm-add-res-bundle"><command>add-res-bundle</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-do-batch"><command>do-batch</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-do-migration70"><command>do-migration70</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-res-bundle"><command>list-res-bundle</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-sessions"><command>list-sessions</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-remove-res-bundle"><command>remove-res-bundle</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
  </refsect1>
@@ -332,7 +332,7 @@
   <para>See also <command>ssoadm <replaceable>subcommand</replaceable>
   --help</command>.</para>
   <refsect2 xml:id="ssoadm-add-agent-to-grp">
-   <title><command>ssoadm add-agent-to-grp</command></title>
+   <title>ssoadm add-agent-to-grp</title>
    <para>Add agents to a agent group.</para>
    <para>Usage: <literal>ssoadm add-agent-to-grp --options [--global-options]</literal></para>
    <variablelist>
@@ -360,7 +360,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-amsdk-idrepo-plugin">
-   <title><command>ssoadm add-amsdk-idrepo-plugin</command></title>
+   <title>ssoadm add-amsdk-idrepo-plugin</title>
    <para>Create AMSDK IdRepo Plug-in</para>
    <para>Usage: <literal>ssoadm add-amsdk-idrepo-plugin --options [--global-options]</literal></para>
    <variablelist>
@@ -408,7 +408,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-app-priv">
-   <title><command>ssoadm add-app-priv</command></title>
+   <title>ssoadm add-app-priv</title>
    <para>Add an application privilege to delegate resources of a given application.</para>
    <para>Usage: <literal>ssoadm add-app-priv --options [--global-options]</literal></para>
    <variablelist>
@@ -456,7 +456,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-attr-defs">
-   <title><command>ssoadm add-attr-defs</command></title>
+   <title>ssoadm add-attr-defs</title>
    <para>Add default attribute values in schema.</para>
    <para>Usage: <literal>ssoadm add-attr-defs --options [--global-options]</literal></para>
    <variablelist>
@@ -492,7 +492,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-attrs">
-   <title><command>ssoadm add-attrs</command></title>
+   <title>ssoadm add-attrs</title>
    <para>Add attribute schema to an existing service.</para>
    <para>Usage: <literal>ssoadm add-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -524,7 +524,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-auth-cfg-entr">
-   <title><command>ssoadm add-auth-cfg-entr</command></title>
+   <title>ssoadm add-auth-cfg-entr</title>
    <para>Add authentication configuration entry</para>
    <para>Usage: <literal>ssoadm add-auth-cfg-entr --options [--global-options]</literal></para>
    <variablelist>
@@ -564,7 +564,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-cot-member">
-   <title><command>ssoadm add-cot-member</command></title>
+   <title>ssoadm add-cot-member</title>
    <para>Add a member to a circle of trust.</para>
    <para>Usage: <literal>ssoadm add-cot-member --options [--global-options]</literal></para>
    <variablelist>
@@ -596,7 +596,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-member">
-   <title><command>ssoadm add-member</command></title>
+   <title>ssoadm add-member</title>
    <para>Add an identity as member of another identity</para>
    <para>Usage: <literal>ssoadm add-member --options [--global-options]</literal></para>
    <variablelist>
@@ -632,7 +632,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-plugin-interface">
-   <title><command>ssoadm add-plugin-interface</command></title>
+   <title>ssoadm add-plugin-interface</title>
    <para>Add Plug-in interface to service.</para>
    <para>Usage: <literal>ssoadm add-plugin-interface --options [--global-options]</literal></para>
    <variablelist>
@@ -664,7 +664,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-plugin-schema">
-   <title><command>ssoadm add-plugin-schema</command></title>
+   <title>ssoadm add-plugin-schema</title>
    <para>Add Plug-in schema to service.</para>
    <para>Usage: <literal>ssoadm add-plugin-schema --options [--global-options]</literal></para>
    <variablelist>
@@ -704,7 +704,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-privileges">
-   <title><command>ssoadm add-privileges</command></title>
+   <title>ssoadm add-privileges</title>
    <para>Add privileges to an identity</para>
    <para>Usage: <literal>ssoadm add-privileges --options [--global-options]</literal></para>
    <variablelist>
@@ -736,7 +736,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-res-bundle">
-   <title><command>ssoadm add-res-bundle</command></title>
+   <title>ssoadm add-res-bundle</title>
    <para>Add resource bundle to data store.</para>
    <para>Usage: <literal>ssoadm add-res-bundle --options [--global-options]</literal></para>
    <variablelist>
@@ -764,7 +764,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-site-members">
-   <title><command>ssoadm add-site-members</command></title>
+   <title>ssoadm add-site-members</title>
    <para>Add members to a site.</para>
    <para>Usage: <literal>ssoadm add-site-members --options [--global-options]</literal></para>
    <variablelist>
@@ -788,7 +788,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-site-sec-urls">
-   <title><command>ssoadm add-site-sec-urls</command></title>
+   <title>ssoadm add-site-sec-urls</title>
    <para>Add Site Secondary URLs.</para>
    <para>Usage: <literal>ssoadm add-site-sec-urls --options [--global-options]</literal></para>
    <variablelist>
@@ -812,7 +812,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-sub-schema">
-   <title><command>ssoadm add-sub-schema</command></title>
+   <title>ssoadm add-sub-schema</title>
    <para>Add sub schema.</para>
    <para>Usage: <literal>ssoadm add-sub-schema --options [--global-options]</literal></para>
    <variablelist>
@@ -844,7 +844,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-svc-attrs">
-   <title><command>ssoadm add-svc-attrs</command></title>
+   <title>ssoadm add-svc-attrs</title>
    <para>Add service attribute values in a realm.</para>
    <para>Usage: <literal>ssoadm add-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -876,7 +876,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-svc-identity">
-   <title><command>ssoadm add-svc-identity</command></title>
+   <title>ssoadm add-svc-identity</title>
    <para>Add Service to an identity</para>
    <para>Usage: <literal>ssoadm add-svc-identity --options [--global-options]</literal></para>
    <variablelist>
@@ -916,7 +916,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-add-svc-realm">
-   <title><command>ssoadm add-svc-realm</command></title>
+   <title>ssoadm add-svc-realm</title>
    <para>Add service to a realm.</para>
    <para>Usage: <literal>ssoadm add-svc-realm --options [--global-options]</literal></para>
    <variablelist>
@@ -948,7 +948,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-agent-remove-props">
-   <title><command>ssoadm agent-remove-props</command></title>
+   <title>ssoadm agent-remove-props</title>
    <para>Remove agent's properties.</para>
    <para>Usage: <literal>ssoadm agent-remove-props --options [--global-options]</literal></para>
    <variablelist>
@@ -976,7 +976,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-clone-server">
-   <title><command>ssoadm clone-server</command></title>
+   <title>ssoadm clone-server</title>
    <para>Clone a server instance.</para>
    <para>Usage: <literal>ssoadm clone-server --options [--global-options]</literal></para>
    <variablelist>
@@ -1000,7 +1000,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-agent">
-   <title><command>ssoadm create-agent</command></title>
+   <title>ssoadm create-agent</title>
    <para>Create a new agent configuration.</para>
    <para>Usage: <literal>ssoadm create-agent --options [--global-options]</literal></para>
    <variablelist>
@@ -1044,7 +1044,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-agent-grp">
-   <title><command>ssoadm create-agent-grp</command></title>
+   <title>ssoadm create-agent-grp</title>
    <para>Create a new agent group.</para>
    <para>Usage: <literal>ssoadm create-agent-grp --options [--global-options]</literal></para>
    <variablelist>
@@ -1084,7 +1084,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-appl">
-   <title><command>ssoadm create-appl</command></title>
+   <title>ssoadm create-appl</title>
    <para>Create application.</para>
    <para>Usage: <literal>ssoadm create-appl --options [--global-options]</literal></para>
    <variablelist>
@@ -1120,7 +1120,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-auth-cfg">
-   <title><command>ssoadm create-auth-cfg</command></title>
+   <title>ssoadm create-auth-cfg</title>
    <para>Create authentication configuration</para>
    <para>Usage: <literal>ssoadm create-auth-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -1144,7 +1144,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-auth-instance">
-   <title><command>ssoadm create-auth-instance</command></title>
+   <title>ssoadm create-auth-instance</title>
    <para>Create authentication instance</para>
    <para>Usage: <literal>ssoadm create-auth-instance --options [--global-options]</literal></para>
    <variablelist>
@@ -1172,7 +1172,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-cot">
-   <title><command>ssoadm create-cot</command></title>
+   <title>ssoadm create-cot</title>
    <para>Create circle of trust.</para>
    <para>Usage: <literal>ssoadm create-cot --options [--global-options]</literal></para>
    <variablelist>
@@ -1204,7 +1204,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-datastore">
-   <title><command>ssoadm create-datastore</command></title>
+   <title>ssoadm create-datastore</title>
    <para>Create data store under a realm</para>
    <para>Usage: <literal>ssoadm create-datastore --options [--global-options]</literal></para>
    <variablelist>
@@ -1240,7 +1240,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-identity">
-   <title><command>ssoadm create-identity</command></title>
+   <title>ssoadm create-identity</title>
    <para>Create identity in a realm</para>
    <para>Usage: <literal>ssoadm create-identity --options [--global-options]</literal></para>
    <variablelist>
@@ -1276,7 +1276,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-metadata-templ">
-   <title><command>ssoadm create-metadata-templ</command></title>
+   <title>ssoadm create-metadata-templ</title>
    <para>Create new metadata template.</para>
    <para>Usage: <literal>ssoadm create-metadata-templ --options [--global-options]</literal></para>
    <variablelist>
@@ -1412,7 +1412,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-policies">
-   <title><command>ssoadm create-policies</command></title>
+   <title>ssoadm create-policies</title>
    <para>Create policies in a realm.</para>
    <para>Usage: <literal>ssoadm create-policies --options [--global-options]</literal></para>
    <variablelist>
@@ -1436,7 +1436,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-realm">
-   <title><command>ssoadm create-realm</command></title>
+   <title>ssoadm create-realm</title>
    <para>Create realm.</para>
    <para>Usage: <literal>ssoadm create-realm --options [--global-options]</literal></para>
    <variablelist>
@@ -1456,7 +1456,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-server">
-   <title><command>ssoadm create-server</command></title>
+   <title>ssoadm create-server</title>
    <para>Create a server instance.</para>
    <para>Usage: <literal>ssoadm create-server --options [--global-options]</literal></para>
    <variablelist>
@@ -1488,7 +1488,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-site">
-   <title><command>ssoadm create-site</command></title>
+   <title>ssoadm create-site</title>
    <para>Create a site.</para>
    <para>Usage: <literal>ssoadm create-site --options [--global-options]</literal></para>
    <variablelist>
@@ -1516,7 +1516,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-sub-cfg">
-   <title><command>ssoadm create-sub-cfg</command></title>
+   <title>ssoadm create-sub-cfg</title>
    <para>Create a new sub configuration.</para>
    <para>Usage: <literal>ssoadm create-sub-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -1560,7 +1560,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-svc">
-   <title><command>ssoadm create-svc</command></title>
+   <title>ssoadm create-svc</title>
    <para>Create a new service in server.</para>
    <para>Usage: <literal>ssoadm create-svc --options [--global-options]</literal></para>
    <variablelist>
@@ -1584,7 +1584,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-svrcfg-xml">
-   <title><command>ssoadm create-svrcfg-xml</command></title>
+   <title>ssoadm create-svrcfg-xml</title>
    <para>Create serverconfig.xml file. No options are required for flat file configuration data store.</para>
    <para>Usage: <literal>ssoadm create-svrcfg-xml --options [--global-options]</literal></para>
    <variablelist>
@@ -1624,7 +1624,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-create-xacml">
-   <title><command>ssoadm create-xacml</command></title>
+   <title>ssoadm create-xacml</title>
    <para>Create policies in a realm with XACML input.</para>
    <para>Usage: <literal>ssoadm create-xacml --options [--global-options]</literal></para>
    <variablelist>
@@ -1648,7 +1648,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-agent-grps">
-   <title><command>ssoadm delete-agent-grps</command></title>
+   <title>ssoadm delete-agent-grps</title>
    <para>Delete agent groups.</para>
    <para>Usage: <literal>ssoadm delete-agent-grps --options [--global-options]</literal></para>
    <variablelist>
@@ -1676,7 +1676,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-agents">
-   <title><command>ssoadm delete-agents</command></title>
+   <title>ssoadm delete-agents</title>
    <para>Delete agent configurations.</para>
    <para>Usage: <literal>ssoadm delete-agents --options [--global-options]</literal></para>
    <variablelist>
@@ -1704,7 +1704,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-appls">
-   <title><command>ssoadm delete-appls</command></title>
+   <title>ssoadm delete-appls</title>
    <para>Delete applications.</para>
    <para>Usage: <literal>ssoadm delete-appls --options [--global-options]</literal></para>
    <variablelist>
@@ -1728,7 +1728,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-attr">
-   <title><command>ssoadm delete-attr</command></title>
+   <title>ssoadm delete-attr</title>
    <para>Delete attribute schemas from a service</para>
    <para>Usage: <literal>ssoadm delete-attr --options [--global-options]</literal></para>
    <variablelist>
@@ -1760,7 +1760,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-attr-def-values">
-   <title><command>ssoadm delete-attr-def-values</command></title>
+   <title>ssoadm delete-attr-def-values</title>
    <para>Delete attribute schema default values.</para>
    <para>Usage: <literal>ssoadm delete-attr-def-values --options [--global-options]</literal></para>
    <variablelist>
@@ -1796,7 +1796,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-auth-cfgs">
-   <title><command>ssoadm delete-auth-cfgs</command></title>
+   <title>ssoadm delete-auth-cfgs</title>
    <para>Delete authentication configurations</para>
    <para>Usage: <literal>ssoadm delete-auth-cfgs --options [--global-options]</literal></para>
    <variablelist>
@@ -1820,7 +1820,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-auth-instances">
-   <title><command>ssoadm delete-auth-instances</command></title>
+   <title>ssoadm delete-auth-instances</title>
    <para>Delete authentication instances</para>
    <para>Usage: <literal>ssoadm delete-auth-instances --options [--global-options]</literal></para>
    <variablelist>
@@ -1844,7 +1844,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-cot">
-   <title><command>ssoadm delete-cot</command></title>
+   <title>ssoadm delete-cot</title>
    <para>Delete circle of trust.</para>
    <para>Usage: <literal>ssoadm delete-cot --options [--global-options]</literal></para>
    <variablelist>
@@ -1868,7 +1868,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-datastores">
-   <title><command>ssoadm delete-datastores</command></title>
+   <title>ssoadm delete-datastores</title>
    <para>Delete data stores under a realm</para>
    <para>Usage: <literal>ssoadm delete-datastores --options [--global-options]</literal></para>
    <variablelist>
@@ -1892,7 +1892,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-entity">
-   <title><command>ssoadm delete-entity</command></title>
+   <title>ssoadm delete-entity</title>
    <para>Delete entity.</para>
    <para>Usage: <literal>ssoadm delete-entity --options [--global-options]</literal></para>
    <variablelist>
@@ -1924,7 +1924,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-identities">
-   <title><command>ssoadm delete-identities</command></title>
+   <title>ssoadm delete-identities</title>
    <para>Delete identities in a realm</para>
    <para>Usage: <literal>ssoadm delete-identities --options [--global-options]</literal></para>
    <variablelist>
@@ -1956,7 +1956,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-policies">
-   <title><command>ssoadm delete-policies</command></title>
+   <title>ssoadm delete-policies</title>
    <para>Delete policies from a realm.</para>
    <para>Usage: <literal>ssoadm delete-policies --options [--global-options]</literal></para>
    <variablelist>
@@ -1984,7 +1984,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-realm">
-   <title><command>ssoadm delete-realm</command></title>
+   <title>ssoadm delete-realm</title>
    <para>Delete realm.</para>
    <para>Usage: <literal>ssoadm delete-realm --options [--global-options]</literal></para>
    <variablelist>
@@ -2008,7 +2008,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-realm-attr">
-   <title><command>ssoadm delete-realm-attr</command></title>
+   <title>ssoadm delete-realm-attr</title>
    <para>Delete attribute from a realm.</para>
    <para>Usage: <literal>ssoadm delete-realm-attr --options [--global-options]</literal></para>
    <variablelist>
@@ -2036,7 +2036,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-server">
-   <title><command>ssoadm delete-server</command></title>
+   <title>ssoadm delete-server</title>
    <para>Delete a server instance.</para>
    <para>Usage: <literal>ssoadm delete-server --options [--global-options]</literal></para>
    <variablelist>
@@ -2056,7 +2056,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-site">
-   <title><command>ssoadm delete-site</command></title>
+   <title>ssoadm delete-site</title>
    <para>Delete a site.</para>
    <para>Usage: <literal>ssoadm delete-site --options [--global-options]</literal></para>
    <variablelist>
@@ -2076,7 +2076,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-sub-cfg">
-   <title><command>ssoadm delete-sub-cfg</command></title>
+   <title>ssoadm delete-sub-cfg</title>
    <para>Remove Sub Configuration.</para>
    <para>Usage: <literal>ssoadm delete-sub-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -2104,7 +2104,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-svc">
-   <title><command>ssoadm delete-svc</command></title>
+   <title>ssoadm delete-svc</title>
    <para>Delete service from the server.</para>
    <para>Usage: <literal>ssoadm delete-svc --options [--global-options]</literal></para>
    <variablelist>
@@ -2132,7 +2132,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-delete-xacml">
-   <title><command>ssoadm delete-xacml</command></title>
+   <title>ssoadm delete-xacml</title>
    <para>Delete XACML policies from a realm.</para>
    <para>Usage: <literal>ssoadm delete-xacml --options [--global-options]</literal></para>
    <variablelist>
@@ -2160,7 +2160,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-do-batch">
-   <title><command>ssoadm do-batch</command></title>
+   <title>ssoadm do-batch</title>
    <para>Do multiple requests in one command.</para>
    <para>Usage: <literal>ssoadm do-batch --options [--global-options]</literal></para>
    <variablelist>
@@ -2188,7 +2188,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-do-bulk-federation">
-   <title><command>ssoadm do-bulk-federation</command></title>
+   <title>ssoadm do-bulk-federation</title>
    <para>Perform bulk federation.</para>
    <para>Usage: <literal>ssoadm do-bulk-federation --options [--global-options]</literal></para>
    <variablelist>
@@ -2224,7 +2224,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-do-migration70">
-   <title><command>ssoadm do-migration70</command></title>
+   <title>ssoadm do-migration70</title>
    <para>Migrate organization to realm.</para>
    <para>Usage: <literal>ssoadm do-migration70 --options [--global-options]</literal></para>
    <variablelist>
@@ -2244,7 +2244,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-embedded-status">
-   <title><command>ssoadm embedded-status</command></title>
+   <title>ssoadm embedded-status</title>
    <para>Status of embedded store.</para>
    <para>Usage: <literal>ssoadm embedded-status --options [--global-options]</literal></para>
    <variablelist>
@@ -2268,7 +2268,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-export-entity">
-   <title><command>ssoadm export-entity</command></title>
+   <title>ssoadm export-entity</title>
    <para>Export entity.</para>
    <para>Usage: <literal>ssoadm export-entity --options [--global-options]</literal></para>
    <variablelist>
@@ -2308,7 +2308,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-export-server">
-   <title><command>ssoadm export-server</command></title>
+   <title>ssoadm export-server</title>
    <para>Export a server instance.</para>
    <para>Usage: <literal>ssoadm export-server --options [--global-options]</literal></para>
    <variablelist>
@@ -2332,7 +2332,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-export-svc-cfg">
-   <title><command>ssoadm export-svc-cfg</command></title>
+   <title>ssoadm export-svc-cfg</title>
    <para>Export service configuration.</para>
    <para>Usage: <literal>ssoadm export-svc-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -2356,7 +2356,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-attr-choicevals">
-   <title><command>ssoadm get-attr-choicevals</command></title>
+   <title>ssoadm get-attr-choicevals</title>
    <para>Get choice values of attribute schema.</para>
    <para>Usage: <literal>ssoadm get-attr-choicevals --options [--global-options]</literal></para>
    <variablelist>
@@ -2388,7 +2388,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-attr-defs">
-   <title><command>ssoadm get-attr-defs</command></title>
+   <title>ssoadm get-attr-defs</title>
    <para>Get default attribute values in schema.</para>
    <para>Usage: <literal>ssoadm get-attr-defs --options [--global-options]</literal></para>
    <variablelist>
@@ -2420,7 +2420,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-auth-cfg-entr">
-   <title><command>ssoadm get-auth-cfg-entr</command></title>
+   <title>ssoadm get-auth-cfg-entr</title>
    <para>Get authentication configuration entries</para>
    <para>Usage: <literal>ssoadm get-auth-cfg-entr --options [--global-options]</literal></para>
    <variablelist>
@@ -2444,7 +2444,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-auth-instance">
-   <title><command>ssoadm get-auth-instance</command></title>
+   <title>ssoadm get-auth-instance</title>
    <para>Get authentication instance values</para>
    <para>Usage: <literal>ssoadm get-auth-instance --options [--global-options]</literal></para>
    <variablelist>
@@ -2468,7 +2468,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-identity">
-   <title><command>ssoadm get-identity</command></title>
+   <title>ssoadm get-identity</title>
    <para>Get identity property values</para>
    <para>Usage: <literal>ssoadm get-identity --options [--global-options]</literal></para>
    <variablelist>
@@ -2500,7 +2500,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-identity-svcs">
-   <title><command>ssoadm get-identity-svcs</command></title>
+   <title>ssoadm get-identity-svcs</title>
    <para>Get the service in an identity</para>
    <para>Usage: <literal>ssoadm get-identity-svcs --options [--global-options]</literal></para>
    <variablelist>
@@ -2528,7 +2528,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-realm">
-   <title><command>ssoadm get-realm</command></title>
+   <title>ssoadm get-realm</title>
    <para>Get realm property values.</para>
    <para>Usage: <literal>ssoadm get-realm --options [--global-options]</literal></para>
    <variablelist>
@@ -2552,7 +2552,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-realm-svc-attrs">
-   <title><command>ssoadm get-realm-svc-attrs</command></title>
+   <title>ssoadm get-realm-svc-attrs</title>
    <para>Get realm's service attribute values.</para>
    <para>Usage: <literal>ssoadm get-realm-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -2576,7 +2576,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-revision-number">
-   <title><command>ssoadm get-revision-number</command></title>
+   <title>ssoadm get-revision-number</title>
    <para>Get service schema revision number.</para>
    <para>Usage: <literal>ssoadm get-revision-number --options [--global-options]</literal></para>
    <variablelist>
@@ -2596,7 +2596,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-get-svrcfg-xml">
-   <title><command>ssoadm get-svrcfg-xml</command></title>
+   <title>ssoadm get-svrcfg-xml</title>
    <para>Get server configuration XML from centralized data store</para>
    <para>Usage: <literal>ssoadm get-svrcfg-xml --options [--global-options]</literal></para>
    <variablelist>
@@ -2620,7 +2620,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-import-bulk-fed-data">
-   <title><command>ssoadm import-bulk-fed-data</command></title>
+   <title>ssoadm import-bulk-fed-data</title>
    <para>Import bulk federation data which is generated by 'do-bulk-federation' sub command.</para>
    <para>Usage: <literal>ssoadm import-bulk-fed-data --options [--global-options]</literal></para>
    <variablelist>
@@ -2648,7 +2648,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-import-entity">
-   <title><command>ssoadm import-entity</command></title>
+   <title>ssoadm import-entity</title>
    <para>Import entity.</para>
    <para>Usage: <literal>ssoadm import-entity --options [--global-options]</literal></para>
    <variablelist>
@@ -2684,7 +2684,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-import-server">
-   <title><command>ssoadm import-server</command></title>
+   <title>ssoadm import-server</title>
    <para>Import a server instance.</para>
    <para>Usage: <literal>ssoadm import-server --options [--global-options]</literal></para>
    <variablelist>
@@ -2708,7 +2708,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-import-svc-cfg">
-   <title><command>ssoadm import-svc-cfg</command></title>
+   <title>ssoadm import-svc-cfg</title>
    <para>Import service configuration.</para>
    <para>Usage: <literal>ssoadm import-svc-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -2732,7 +2732,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-agent-grp-members">
-   <title><command>ssoadm list-agent-grp-members</command></title>
+   <title>ssoadm list-agent-grp-members</title>
    <para>List agents in agent group.</para>
    <para>Usage: <literal>ssoadm list-agent-grp-members --options [--global-options]</literal></para>
    <variablelist>
@@ -2760,7 +2760,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-agent-grps">
-   <title><command>ssoadm list-agent-grps</command></title>
+   <title>ssoadm list-agent-grps</title>
    <para>List agent groups.</para>
    <para>Usage: <literal>ssoadm list-agent-grps --options [--global-options]</literal></para>
    <variablelist>
@@ -2788,7 +2788,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-agents">
-   <title><command>ssoadm list-agents</command></title>
+   <title>ssoadm list-agents</title>
    <para>List agent configurations.</para>
    <para>Usage: <literal>ssoadm list-agents --options [--global-options]</literal></para>
    <variablelist>
@@ -2816,7 +2816,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-app-privs">
-   <title><command>ssoadm list-app-privs</command></title>
+   <title>ssoadm list-app-privs</title>
    <para>List application privileges in a realm.</para>
    <para>Usage: <literal>ssoadm list-app-privs --options [--global-options]</literal></para>
    <variablelist>
@@ -2836,7 +2836,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-appl-types">
-   <title><command>ssoadm list-appl-types</command></title>
+   <title>ssoadm list-appl-types</title>
    <para>List application types.</para>
    <para>Usage: <literal>ssoadm list-appl-types --options [--global-options]</literal></para>
    <variablelist>
@@ -2852,7 +2852,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-appls">
-   <title><command>ssoadm list-appls</command></title>
+   <title>ssoadm list-appls</title>
    <para>List applications in a realm.</para>
    <para>Usage: <literal>ssoadm list-appls --options [--global-options]</literal></para>
    <variablelist>
@@ -2872,7 +2872,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-auth-cfgs">
-   <title><command>ssoadm list-auth-cfgs</command></title>
+   <title>ssoadm list-auth-cfgs</title>
    <para>List authentication configurations</para>
    <para>Usage: <literal>ssoadm list-auth-cfgs --options [--global-options]</literal></para>
    <variablelist>
@@ -2892,7 +2892,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-auth-instances">
-   <title><command>ssoadm list-auth-instances</command></title>
+   <title>ssoadm list-auth-instances</title>
    <para>List authentication instances</para>
    <para>Usage: <literal>ssoadm list-auth-instances --options [--global-options]</literal></para>
    <variablelist>
@@ -2912,7 +2912,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-cot-members">
-   <title><command>ssoadm list-cot-members</command></title>
+   <title>ssoadm list-cot-members</title>
    <para>List the members in a circle of trust.</para>
    <para>Usage: <literal>ssoadm list-cot-members --options [--global-options]</literal></para>
    <variablelist>
@@ -2940,7 +2940,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-cots">
-   <title><command>ssoadm list-cots</command></title>
+   <title>ssoadm list-cots</title>
    <para>List circles of trust.</para>
    <para>Usage: <literal>ssoadm list-cots --options [--global-options]</literal></para>
    <variablelist>
@@ -2960,7 +2960,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-datastore-types">
-   <title><command>ssoadm list-datastore-types</command></title>
+   <title>ssoadm list-datastore-types</title>
    <para>List the supported data store types</para>
    <para>Usage: <literal>ssoadm list-datastore-types --options [--global-options]</literal></para>
    <variablelist>
@@ -2976,7 +2976,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-datastores">
-   <title><command>ssoadm list-datastores</command></title>
+   <title>ssoadm list-datastores</title>
    <para>List data stores under a realm</para>
    <para>Usage: <literal>ssoadm list-datastores --options [--global-options]</literal></para>
    <variablelist>
@@ -2996,7 +2996,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-entities">
-   <title><command>ssoadm list-entities</command></title>
+   <title>ssoadm list-entities</title>
    <para>List entities under a realm.</para>
    <para>Usage: <literal>ssoadm list-entities --options [--global-options]</literal></para>
    <variablelist>
@@ -3020,7 +3020,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-identities">
-   <title><command>ssoadm list-identities</command></title>
+   <title>ssoadm list-identities</title>
    <para>List identities in a realm</para>
    <para>Usage: <literal>ssoadm list-identities --options [--global-options]</literal></para>
    <variablelist>
@@ -3048,7 +3048,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-identity-assignable-svcs">
-   <title><command>ssoadm list-identity-assignable-svcs</command></title>
+   <title>ssoadm list-identity-assignable-svcs</title>
    <para>List the assignable service to an identity</para>
    <para>Usage: <literal>ssoadm list-identity-assignable-svcs --options [--global-options]</literal></para>
    <variablelist>
@@ -3076,7 +3076,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-policies">
-   <title><command>ssoadm list-policies</command></title>
+   <title>ssoadm list-policies</title>
    <para>List policy definitions in a realm.</para>
    <para>Usage: <literal>ssoadm list-policies --options [--global-options]</literal></para>
    <variablelist>
@@ -3108,7 +3108,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-realm-assignable-svcs">
-   <title><command>ssoadm list-realm-assignable-svcs</command></title>
+   <title>ssoadm list-realm-assignable-svcs</title>
    <para>List the assignable services to a realm.</para>
    <para>Usage: <literal>ssoadm list-realm-assignable-svcs --options [--global-options]</literal></para>
    <variablelist>
@@ -3128,7 +3128,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-realms">
-   <title><command>ssoadm list-realms</command></title>
+   <title>ssoadm list-realms</title>
    <para>List realms by name.</para>
    <para>Usage: <literal>ssoadm list-realms --options [--global-options]</literal></para>
    <variablelist>
@@ -3156,7 +3156,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-res-bundle">
-   <title><command>ssoadm list-res-bundle</command></title>
+   <title>ssoadm list-res-bundle</title>
    <para>List resource bundle in data store.</para>
    <para>Usage: <literal>ssoadm list-res-bundle --options [--global-options]</literal></para>
    <variablelist>
@@ -3180,7 +3180,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-server-cfg">
-   <title><command>ssoadm list-server-cfg</command></title>
+   <title>ssoadm list-server-cfg</title>
    <para>List server configuration.</para>
    <para>Usage: <literal>ssoadm list-server-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -3204,7 +3204,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-servers">
-   <title><command>ssoadm list-servers</command></title>
+   <title>ssoadm list-servers</title>
    <para>List all server instances.</para>
    <para>Usage: <literal>ssoadm list-servers --options [--global-options]</literal></para>
    <variablelist>
@@ -3220,7 +3220,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-sessions">
-   <title><command>ssoadm list-sessions</command></title>
+   <title>ssoadm list-sessions</title>
    <para>List Sessions.</para>
    <para>Usage: <literal>ssoadm list-sessions --options [--global-options]</literal></para>
    <variablelist>
@@ -3248,7 +3248,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-sites">
-   <title><command>ssoadm list-sites</command></title>
+   <title>ssoadm list-sites</title>
    <para>List all sites.</para>
    <para>Usage: <literal>ssoadm list-sites --options [--global-options]</literal></para>
    <variablelist>
@@ -3264,7 +3264,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-list-xacml">
-   <title><command>ssoadm list-xacml</command></title>
+   <title>ssoadm list-xacml</title>
    <para>export policies in realm as XACML.</para>
    <para>Usage: <literal>ssoadm list-xacml --options [--global-options]</literal></para>
    <variablelist>
@@ -3296,7 +3296,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-register-auth-module">
-   <title><command>ssoadm register-auth-module</command></title>
+   <title>ssoadm register-auth-module</title>
    <para>Registers authentication module.</para>
    <para>Usage: <literal>ssoadm register-auth-module --options [--global-options]</literal></para>
    <variablelist>
@@ -3316,7 +3316,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-agent-from-grp">
-   <title><command>ssoadm remove-agent-from-grp</command></title>
+   <title>ssoadm remove-agent-from-grp</title>
    <para>Remove agents from a agent group.</para>
    <para>Usage: <literal>ssoadm remove-agent-from-grp --options [--global-options]</literal></para>
    <variablelist>
@@ -3344,7 +3344,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-app-priv-resources">
-   <title><command>ssoadm remove-app-priv-resources</command></title>
+   <title>ssoadm remove-app-priv-resources</title>
    <para>Remove application privilege resources.</para>
    <para>Usage: <literal>ssoadm remove-app-priv-resources --options [--global-options]</literal></para>
    <variablelist>
@@ -3376,7 +3376,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-app-priv-subjects">
-   <title><command>ssoadm remove-app-priv-subjects</command></title>
+   <title>ssoadm remove-app-priv-subjects</title>
    <para>Remove application privilege subjects.</para>
    <para>Usage: <literal>ssoadm remove-app-priv-subjects --options [--global-options]</literal></para>
    <variablelist>
@@ -3408,7 +3408,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-app-privs">
-   <title><command>ssoadm remove-app-privs</command></title>
+   <title>ssoadm remove-app-privs</title>
    <para>Remove an application privileges.</para>
    <para>Usage: <literal>ssoadm remove-app-privs --options [--global-options]</literal></para>
    <variablelist>
@@ -3432,7 +3432,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-attr-choicevals">
-   <title><command>ssoadm remove-attr-choicevals</command></title>
+   <title>ssoadm remove-attr-choicevals</title>
    <para>Remove choice values from attribute schema.</para>
    <para>Usage: <literal>ssoadm remove-attr-choicevals --options [--global-options]</literal></para>
    <variablelist>
@@ -3468,7 +3468,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-attr-defs">
-   <title><command>ssoadm remove-attr-defs</command></title>
+   <title>ssoadm remove-attr-defs</title>
    <para>Remove default attribute values in schema.</para>
    <para>Usage: <literal>ssoadm remove-attr-defs --options [--global-options]</literal></para>
    <variablelist>
@@ -3500,7 +3500,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-cot-member">
-   <title><command>ssoadm remove-cot-member</command></title>
+   <title>ssoadm remove-cot-member</title>
    <para>Remove a member from a circle of trust.</para>
    <para>Usage: <literal>ssoadm remove-cot-member --options [--global-options]</literal></para>
    <variablelist>
@@ -3532,7 +3532,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-member">
-   <title><command>ssoadm remove-member</command></title>
+   <title>ssoadm remove-member</title>
    <para>Remove membership of identity from another identity</para>
    <para>Usage: <literal>ssoadm remove-member --options [--global-options]</literal></para>
    <variablelist>
@@ -3568,7 +3568,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-plugin-schema">
-   <title><command>ssoadm remove-plugin-schema</command></title>
+   <title>ssoadm remove-plugin-schema</title>
    <para>Add Plug-in interface to service.</para>
    <para>Usage: <literal>ssoadm remove-plugin-schema --options [--global-options]</literal></para>
    <variablelist>
@@ -3596,7 +3596,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-privileges">
-   <title><command>ssoadm remove-privileges</command></title>
+   <title>ssoadm remove-privileges</title>
    <para>Remove privileges from an identity</para>
    <para>Usage: <literal>ssoadm remove-privileges --options [--global-options]</literal></para>
    <variablelist>
@@ -3628,7 +3628,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-res-bundle">
-   <title><command>ssoadm remove-res-bundle</command></title>
+   <title>ssoadm remove-res-bundle</title>
    <para>Remove resource bundle from data store.</para>
    <para>Usage: <literal>ssoadm remove-res-bundle --options [--global-options]</literal></para>
    <variablelist>
@@ -3652,7 +3652,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-server-cfg">
-   <title><command>ssoadm remove-server-cfg</command></title>
+   <title>ssoadm remove-server-cfg</title>
    <para>Remove server configuration.</para>
    <para>Usage: <literal>ssoadm remove-server-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -3676,7 +3676,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-site-members">
-   <title><command>ssoadm remove-site-members</command></title>
+   <title>ssoadm remove-site-members</title>
    <para>Remove members from a site.</para>
    <para>Usage: <literal>ssoadm remove-site-members --options [--global-options]</literal></para>
    <variablelist>
@@ -3700,7 +3700,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-site-sec-urls">
-   <title><command>ssoadm remove-site-sec-urls</command></title>
+   <title>ssoadm remove-site-sec-urls</title>
    <para>Remove Site Secondary URLs.</para>
    <para>Usage: <literal>ssoadm remove-site-sec-urls --options [--global-options]</literal></para>
    <variablelist>
@@ -3724,7 +3724,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-sub-schema">
-   <title><command>ssoadm remove-sub-schema</command></title>
+   <title>ssoadm remove-sub-schema</title>
    <para>Remove sub schema.</para>
    <para>Usage: <literal>ssoadm remove-sub-schema --options [--global-options]</literal></para>
    <variablelist>
@@ -3756,7 +3756,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-svc-attrs">
-   <title><command>ssoadm remove-svc-attrs</command></title>
+   <title>ssoadm remove-svc-attrs</title>
    <para>Remove service attribute values in a realm.</para>
    <para>Usage: <literal>ssoadm remove-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -3788,7 +3788,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-svc-identity">
-   <title><command>ssoadm remove-svc-identity</command></title>
+   <title>ssoadm remove-svc-identity</title>
    <para>Remove Service from an identity</para>
    <para>Usage: <literal>ssoadm remove-svc-identity --options [--global-options]</literal></para>
    <variablelist>
@@ -3820,7 +3820,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-remove-svc-realm">
-   <title><command>ssoadm remove-svc-realm</command></title>
+   <title>ssoadm remove-svc-realm</title>
    <para>Remove service from a realm.</para>
    <para>Usage: <literal>ssoadm remove-svc-realm --options [--global-options]</literal></para>
    <variablelist>
@@ -3844,7 +3844,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-appl">
-   <title><command>ssoadm set-appl</command></title>
+   <title>ssoadm set-appl</title>
    <para>Set application attributes.</para>
    <para>Usage: <literal>ssoadm set-appl --options [--global-options]</literal></para>
    <variablelist>
@@ -3876,7 +3876,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-any">
-   <title><command>ssoadm set-attr-any</command></title>
+   <title>ssoadm set-attr-any</title>
    <para>Set any member of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-any --options [--global-options]</literal></para>
    <variablelist>
@@ -3912,7 +3912,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-bool-values">
-   <title><command>ssoadm set-attr-bool-values</command></title>
+   <title>ssoadm set-attr-bool-values</title>
    <para>Set boolean values of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-bool-values --options [--global-options]</literal></para>
    <variablelist>
@@ -3960,7 +3960,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-choicevals">
-   <title><command>ssoadm set-attr-choicevals</command></title>
+   <title>ssoadm set-attr-choicevals</title>
    <para>Set choice values of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-choicevals --options [--global-options]</literal></para>
    <variablelist>
@@ -4004,7 +4004,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-defs">
-   <title><command>ssoadm set-attr-defs</command></title>
+   <title>ssoadm set-attr-defs</title>
    <para>Set default attribute values in schema.</para>
    <para>Usage: <literal>ssoadm set-attr-defs --options [--global-options]</literal></para>
    <variablelist>
@@ -4040,7 +4040,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-end-range">
-   <title><command>ssoadm set-attr-end-range</command></title>
+   <title>ssoadm set-attr-end-range</title>
    <para>Set attribute schema end range.</para>
    <para>Usage: <literal>ssoadm set-attr-end-range --options [--global-options]</literal></para>
    <variablelist>
@@ -4076,7 +4076,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-i18n-key">
-   <title><command>ssoadm set-attr-i18n-key</command></title>
+   <title>ssoadm set-attr-i18n-key</title>
    <para>Set i18nKey member of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-i18n-key --options [--global-options]</literal></para>
    <variablelist>
@@ -4112,7 +4112,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-start-range">
-   <title><command>ssoadm set-attr-start-range</command></title>
+   <title>ssoadm set-attr-start-range</title>
    <para>Set attribute schema start range.</para>
    <para>Usage: <literal>ssoadm set-attr-start-range --options [--global-options]</literal></para>
    <variablelist>
@@ -4148,7 +4148,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-syntax">
-   <title><command>ssoadm set-attr-syntax</command></title>
+   <title>ssoadm set-attr-syntax</title>
    <para>Set syntax member of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-syntax --options [--global-options]</literal></para>
    <variablelist>
@@ -4184,7 +4184,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-type">
-   <title><command>ssoadm set-attr-type</command></title>
+   <title>ssoadm set-attr-type</title>
    <para>Set type member of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-type --options [--global-options]</literal></para>
    <variablelist>
@@ -4220,7 +4220,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-ui-type">
-   <title><command>ssoadm set-attr-ui-type</command></title>
+   <title>ssoadm set-attr-ui-type</title>
    <para>Set UI type member of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-ui-type --options [--global-options]</literal></para>
    <variablelist>
@@ -4256,7 +4256,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-validator">
-   <title><command>ssoadm set-attr-validator</command></title>
+   <title>ssoadm set-attr-validator</title>
    <para>Set attribute schema validator.</para>
    <para>Usage: <literal>ssoadm set-attr-validator --options [--global-options]</literal></para>
    <variablelist>
@@ -4292,7 +4292,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-attr-view-bean-url">
-   <title><command>ssoadm set-attr-view-bean-url</command></title>
+   <title>ssoadm set-attr-view-bean-url</title>
    <para>Set properties view bean URL member of attribute schema.</para>
    <para>Usage: <literal>ssoadm set-attr-view-bean-url --options [--global-options]</literal></para>
    <variablelist>
@@ -4328,7 +4328,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-entitlement-conf">
-   <title><command>ssoadm set-entitlement-conf</command></title>
+   <title>ssoadm set-entitlement-conf</title>
    <para>Set entitlements service configuration</para>
    <para>Usage: <literal>ssoadm set-entitlement-conf --options [--global-options]</literal></para>
    <variablelist>
@@ -4352,7 +4352,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-identity-attrs">
-   <title><command>ssoadm set-identity-attrs</command></title>
+   <title>ssoadm set-identity-attrs</title>
    <para>Set attribute values of an identity</para>
    <para>Usage: <literal>ssoadm set-identity-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -4388,7 +4388,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-identity-svc-attrs">
-   <title><command>ssoadm set-identity-svc-attrs</command></title>
+   <title>ssoadm set-identity-svc-attrs</title>
    <para>Set service attribute values of an identity</para>
    <para>Usage: <literal>ssoadm set-identity-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -4428,7 +4428,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-inheritance">
-   <title><command>ssoadm set-inheritance</command></title>
+   <title>ssoadm set-inheritance</title>
    <para>Set Inheritance value of Sub Schema.</para>
    <para>Usage: <literal>ssoadm set-inheritance --options [--global-options]</literal></para>
    <variablelist>
@@ -4460,7 +4460,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-plugin-viewbean-url">
-   <title><command>ssoadm set-plugin-viewbean-url</command></title>
+   <title>ssoadm set-plugin-viewbean-url</title>
    <para>Set properties view bean URL of plug-in schema.</para>
    <para>Usage: <literal>ssoadm set-plugin-viewbean-url --options [--global-options]</literal></para>
    <variablelist>
@@ -4492,7 +4492,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-realm-attrs">
-   <title><command>ssoadm set-realm-attrs</command></title>
+   <title>ssoadm set-realm-attrs</title>
    <para>Set attribute values of a realm.</para>
    <para>Usage: <literal>ssoadm set-realm-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -4528,7 +4528,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-realm-svc-attrs">
-   <title><command>ssoadm set-realm-svc-attrs</command></title>
+   <title>ssoadm set-realm-svc-attrs</title>
    <para>Set attribute values of a service that is assigned to a realm.</para>
    <para>Usage: <literal>ssoadm set-realm-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -4564,7 +4564,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-revision-number">
-   <title><command>ssoadm set-revision-number</command></title>
+   <title>ssoadm set-revision-number</title>
    <para>Set service schema revision number.</para>
    <para>Usage: <literal>ssoadm set-revision-number --options [--global-options]</literal></para>
    <variablelist>
@@ -4588,7 +4588,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-site-id">
-   <title><command>ssoadm set-site-id</command></title>
+   <title>ssoadm set-site-id</title>
    <para>Set the ID of a site.</para>
    <para>Usage: <literal>ssoadm set-site-id --options [--global-options]</literal></para>
    <variablelist>
@@ -4612,7 +4612,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-site-pri-url">
-   <title><command>ssoadm set-site-pri-url</command></title>
+   <title>ssoadm set-site-pri-url</title>
    <para>Set the primary URL of a site.</para>
    <para>Usage: <literal>ssoadm set-site-pri-url --options [--global-options]</literal></para>
    <variablelist>
@@ -4636,7 +4636,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-site-sec-urls">
-   <title><command>ssoadm set-site-sec-urls</command></title>
+   <title>ssoadm set-site-sec-urls</title>
    <para>Set Site Secondary URLs.</para>
    <para>Usage: <literal>ssoadm set-site-sec-urls --options [--global-options]</literal></para>
    <variablelist>
@@ -4660,7 +4660,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-sub-cfg">
-   <title><command>ssoadm set-sub-cfg</command></title>
+   <title>ssoadm set-sub-cfg</title>
    <para>Set sub configuration.</para>
    <para>Usage: <literal>ssoadm set-sub-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -4700,7 +4700,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-svc-attrs">
-   <title><command>ssoadm set-svc-attrs</command></title>
+   <title>ssoadm set-svc-attrs</title>
    <para>Set service attribute values in a realm.</para>
    <para>Usage: <literal>ssoadm set-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -4732,7 +4732,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-svc-i18n-key">
-   <title><command>ssoadm set-svc-i18n-key</command></title>
+   <title>ssoadm set-svc-i18n-key</title>
    <para>Set service schema i18n key.</para>
    <para>Usage: <literal>ssoadm set-svc-i18n-key --options [--global-options]</literal></para>
    <variablelist>
@@ -4756,7 +4756,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-svc-view-bean-url">
-   <title><command>ssoadm set-svc-view-bean-url</command></title>
+   <title>ssoadm set-svc-view-bean-url</title>
    <para>Set service schema properties view bean URL.</para>
    <para>Usage: <literal>ssoadm set-svc-view-bean-url --options [--global-options]</literal></para>
    <variablelist>
@@ -4780,7 +4780,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-set-svrcfg-xml">
-   <title><command>ssoadm set-svrcfg-xml</command></title>
+   <title>ssoadm set-svrcfg-xml</title>
    <para>Set server configuration XML to centralized data store</para>
    <para>Usage: <literal>ssoadm set-svrcfg-xml --options [--global-options]</literal></para>
    <variablelist>
@@ -4804,7 +4804,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-agent">
-   <title><command>ssoadm show-agent</command></title>
+   <title>ssoadm show-agent</title>
    <para>Show agent profile.</para>
    <para>Usage: <literal>ssoadm show-agent --options [--global-options]</literal></para>
    <variablelist>
@@ -4836,7 +4836,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-agent-grp">
-   <title><command>ssoadm show-agent-grp</command></title>
+   <title>ssoadm show-agent-grp</title>
    <para>Show agent group profile.</para>
    <para>Usage: <literal>ssoadm show-agent-grp --options [--global-options]</literal></para>
    <variablelist>
@@ -4864,7 +4864,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-agent-membership">
-   <title><command>ssoadm show-agent-membership</command></title>
+   <title>ssoadm show-agent-membership</title>
    <para>List agent's membership.</para>
    <para>Usage: <literal>ssoadm show-agent-membership --options [--global-options]</literal></para>
    <variablelist>
@@ -4888,7 +4888,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-agent-types">
-   <title><command>ssoadm show-agent-types</command></title>
+   <title>ssoadm show-agent-types</title>
    <para>Show agent types.</para>
    <para>Usage: <literal>ssoadm show-agent-types --options [--global-options]</literal></para>
    <variablelist>
@@ -4904,7 +4904,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-app-priv">
-   <title><command>ssoadm show-app-priv</command></title>
+   <title>ssoadm show-app-priv</title>
    <para>Show application privilege.</para>
    <para>Usage: <literal>ssoadm show-app-priv --options [--global-options]</literal></para>
    <variablelist>
@@ -4928,7 +4928,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-appl">
-   <title><command>ssoadm show-appl</command></title>
+   <title>ssoadm show-appl</title>
    <para>Show application attributes.</para>
    <para>Usage: <literal>ssoadm show-appl --options [--global-options]</literal></para>
    <variablelist>
@@ -4952,7 +4952,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-auth-modules">
-   <title><command>ssoadm show-auth-modules</command></title>
+   <title>ssoadm show-auth-modules</title>
    <para>Show the supported authentication modules in the system.</para>
    <para>Usage: <literal>ssoadm show-auth-modules --options [--global-options]</literal></para>
    <variablelist>
@@ -4968,7 +4968,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-data-types">
-   <title><command>ssoadm show-data-types</command></title>
+   <title>ssoadm show-data-types</title>
    <para>Show the supported data type in the system.</para>
    <para>Usage: <literal>ssoadm show-data-types --options [--global-options]</literal></para>
    <variablelist>
@@ -4984,7 +4984,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-datastore">
-   <title><command>ssoadm show-datastore</command></title>
+   <title>ssoadm show-datastore</title>
    <para>Show data store profile.</para>
    <para>Usage: <literal>ssoadm show-datastore --options [--global-options]</literal></para>
    <variablelist>
@@ -5008,7 +5008,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-entitlement-conf">
-   <title><command>ssoadm show-entitlement-conf</command></title>
+   <title>ssoadm show-entitlement-conf</title>
    <para>Display entitlements service configuration</para>
    <para>Usage: <literal>ssoadm show-entitlement-conf --options [--global-options]</literal></para>
    <variablelist>
@@ -5024,7 +5024,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-identity-ops">
-   <title><command>ssoadm show-identity-ops</command></title>
+   <title>ssoadm show-identity-ops</title>
    <para>Show the allowed operations of an identity a realm</para>
    <para>Usage: <literal>ssoadm show-identity-ops --options [--global-options]</literal></para>
    <variablelist>
@@ -5048,7 +5048,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-identity-svc-attrs">
-   <title><command>ssoadm show-identity-svc-attrs</command></title>
+   <title>ssoadm show-identity-svc-attrs</title>
    <para>Show the service attribute values of an identity</para>
    <para>Usage: <literal>ssoadm show-identity-svc-attrs --options [--global-options]</literal></para>
    <variablelist>
@@ -5080,7 +5080,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-identity-types">
-   <title><command>ssoadm show-identity-types</command></title>
+   <title>ssoadm show-identity-types</title>
    <para>Show the supported identity type in a realm</para>
    <para>Usage: <literal>ssoadm show-identity-types --options [--global-options]</literal></para>
    <variablelist>
@@ -5100,7 +5100,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-members">
-   <title><command>ssoadm show-members</command></title>
+   <title>ssoadm show-members</title>
    <para>Show the members of an identity. For example show the members of a role</para>
    <para>Usage: <literal>ssoadm show-members --options [--global-options]</literal></para>
    <variablelist>
@@ -5132,7 +5132,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-memberships">
-   <title><command>ssoadm show-memberships</command></title>
+   <title>ssoadm show-memberships</title>
    <para>Show the memberships of an identity. For sample show the memberships of an user.</para>
    <para>Usage: <literal>ssoadm show-memberships --options [--global-options]</literal></para>
    <variablelist>
@@ -5164,7 +5164,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-privileges">
-   <title><command>ssoadm show-privileges</command></title>
+   <title>ssoadm show-privileges</title>
    <para>Show privileges assigned to an identity</para>
    <para>Usage: <literal>ssoadm show-privileges --options [--global-options]</literal></para>
    <variablelist>
@@ -5192,7 +5192,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-realm-svcs">
-   <title><command>ssoadm show-realm-svcs</command></title>
+   <title>ssoadm show-realm-svcs</title>
    <para>Show services in a realm.</para>
    <para>Usage: <literal>ssoadm show-realm-svcs --options [--global-options]</literal></para>
    <variablelist>
@@ -5216,7 +5216,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-site">
-   <title><command>ssoadm show-site</command></title>
+   <title>ssoadm show-site</title>
    <para>Show site profile.</para>
    <para>Usage: <literal>ssoadm show-site --options [--global-options]</literal></para>
    <variablelist>
@@ -5236,7 +5236,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-show-site-members">
-   <title><command>ssoadm show-site-members</command></title>
+   <title>ssoadm show-site-members</title>
    <para>Display members of a site.</para>
    <para>Usage: <literal>ssoadm show-site-members --options [--global-options]</literal></para>
    <variablelist>
@@ -5256,7 +5256,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-unregister-auth-module">
-   <title><command>ssoadm unregister-auth-module</command></title>
+   <title>ssoadm unregister-auth-module</title>
    <para>Unregisters authentication module.</para>
    <para>Usage: <literal>ssoadm unregister-auth-module --options [--global-options]</literal></para>
    <variablelist>
@@ -5276,7 +5276,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-agent">
-   <title><command>ssoadm update-agent</command></title>
+   <title>ssoadm update-agent</title>
    <para>Update agent configuration.</para>
    <para>Usage: <literal>ssoadm update-agent --options [--global-options]</literal></para>
    <variablelist>
@@ -5312,7 +5312,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-agent-grp">
-   <title><command>ssoadm update-agent-grp</command></title>
+   <title>ssoadm update-agent-grp</title>
    <para>Update agent group configuration.</para>
    <para>Usage: <literal>ssoadm update-agent-grp --options [--global-options]</literal></para>
    <variablelist>
@@ -5348,7 +5348,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-app-priv">
-   <title><command>ssoadm update-app-priv</command></title>
+   <title>ssoadm update-app-priv</title>
    <para>Update an application privilege.</para>
    <para>Usage: <literal>ssoadm update-app-priv --options [--global-options]</literal></para>
    <variablelist>
@@ -5380,7 +5380,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-app-priv-resources">
-   <title><command>ssoadm update-app-priv-resources</command></title>
+   <title>ssoadm update-app-priv-resources</title>
    <para>Set application privilege resources.</para>
    <para>Usage: <literal>ssoadm update-app-priv-resources --options [--global-options]</literal></para>
    <variablelist>
@@ -5416,7 +5416,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-app-priv-subjects">
-   <title><command>ssoadm update-app-priv-subjects</command></title>
+   <title>ssoadm update-app-priv-subjects</title>
    <para>Set application privilege subjects.</para>
    <para>Usage: <literal>ssoadm update-app-priv-subjects --options [--global-options]</literal></para>
    <variablelist>
@@ -5452,7 +5452,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-auth-cfg-entr">
-   <title><command>ssoadm update-auth-cfg-entr</command></title>
+   <title>ssoadm update-auth-cfg-entr</title>
    <para>Set authentication configuration entries</para>
    <para>Usage: <literal>ssoadm update-auth-cfg-entr --options [--global-options]</literal></para>
    <variablelist>
@@ -5484,7 +5484,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-auth-cfg-props">
-   <title><command>ssoadm update-auth-cfg-props</command></title>
+   <title>ssoadm update-auth-cfg-props</title>
    <para>Set authentication configuration properties</para>
    <para>Usage: <literal>ssoadm update-auth-cfg-props --options [--global-options]</literal></para>
    <variablelist>
@@ -5516,7 +5516,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-auth-instance">
-   <title><command>ssoadm update-auth-instance</command></title>
+   <title>ssoadm update-auth-instance</title>
    <para>Update authentication instance values</para>
    <para>Usage: <literal>ssoadm update-auth-instance --options [--global-options]</literal></para>
    <variablelist>
@@ -5548,7 +5548,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-datastore">
-   <title><command>ssoadm update-datastore</command></title>
+   <title>ssoadm update-datastore</title>
    <para>Update data store profile.</para>
    <para>Usage: <literal>ssoadm update-datastore --options [--global-options]</literal></para>
    <variablelist>
@@ -5580,7 +5580,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-entity-keyinfo">
-   <title><command>ssoadm update-entity-keyinfo</command></title>
+   <title>ssoadm update-entity-keyinfo</title>
    <para>Update XML signing and encryption key information in hosted entity metadata.</para>
    <para>Usage: <literal>ssoadm update-entity-keyinfo --options [--global-options]</literal></para>
    <variablelist>
@@ -5624,7 +5624,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-policies">
-   <title><command>ssoadm update-policies</command></title>
+   <title>ssoadm update-policies</title>
    <para>Update policies in a realm.</para>
    <para>Usage: <literal>ssoadm update-policies --options [--global-options]</literal></para>
    <variablelist>
@@ -5648,7 +5648,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-server-cfg">
-   <title><command>ssoadm update-server-cfg</command></title>
+   <title>ssoadm update-server-cfg</title>
    <para>Update server configuration.</para>
    <para>Usage: <literal>ssoadm update-server-cfg --options [--global-options]</literal></para>
    <variablelist>
@@ -5676,7 +5676,7 @@
    </variablelist>
   </refsect2>
   <refsect2 xml:id="ssoadm-update-svc">
-   <title><command>ssoadm update-svc</command></title>
+   <title>ssoadm update-svc</title>
    <para>Update service.</para>
    <para>Usage: <literal>ssoadm update-svc --options [--global-options]</literal></para>
    <variablelist>
