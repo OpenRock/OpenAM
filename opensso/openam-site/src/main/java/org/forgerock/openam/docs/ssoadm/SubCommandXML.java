@@ -33,7 +33,7 @@ import java.util.Collection;
  *
  *<![CDATA[
   <refsect2 xml:id="ssoadm-subcommand">
-   <title><command>ssoadm subcommand</command></title>
+   <title>ssoadm subcommand</title>
    <para>description</para>
    <para>Usage: <literal>ssoadm subcommand --options [--global-options]</literal></para>
    <variablelist>
@@ -72,7 +72,7 @@ public class SubCommandXML
     for (String o : optional) opt += OptionXML.parseOption(o, true);
     return
         "  <refsect2 xml:id=\"ssoadm-" + name + "\">\n" +
-        "   <title><command>ssoadm " + name + "</command></title>\n" +
+        "   <title>ssoadm " + name + "</title>\n" +
         "   <para>" + description + "</para>\n" +
         "   <para>Usage: <literal>ssoadm " + name +
           " --options [--global-options]</literal></para>\n" +
