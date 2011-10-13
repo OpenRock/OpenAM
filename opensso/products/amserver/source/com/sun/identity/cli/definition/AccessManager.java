@@ -1926,7 +1926,7 @@ public class AccessManager {
         optionalOptions={
             "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
             "agenturl|g|s|Agent URL. e.g. http://www.agent.com:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.com:8080. This option is valid for J2EEAgent and WebAgent.",
-            "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/.",
+            "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={
             "server-url-missing=Server URL is needed.",
