@@ -127,7 +127,7 @@ a:hover{text-decoration:underline}
           </tr>
           <tr>
             <td style="vertical-align: top;">
-            <a href="http://docs.sun.com/app/docs">J2EE Agents Guide</a><br>
+            <a href="http://openam.forgerock.org/docs.html">J2EE Agents Guide</a><br>
             <hr class="faint">
             <a href="http://java.sun.com/j2ee">J2EE Documentation<br></a>
             <hr class="faint"> 
