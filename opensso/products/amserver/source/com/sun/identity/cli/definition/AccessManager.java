@@ -153,8 +153,8 @@ public class AccessManager {
         resourceStrings={
             "resourcebundle-returned=Resource Bundle was returned."})
     private String list_res_bundle;
-    
- 
+
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.DeleteResourceBundle",
         description="Remove resource bundle from data store.",
@@ -373,7 +373,7 @@ public class AccessManager {
             "get-attr-values-of-realm-no-values={0} had no attributes.",
             "get-attr-values-of-realm-result={0}={1}"})
     private String get_realm;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.realm.RealmGetServiceAttributeValues",
         description="Get realm's service attribute values.",
@@ -680,7 +680,7 @@ public class AccessManager {
         resourceStrings={
             "attribute-schema-set-boolean-values-succeed=Boolean Values were set."})
     private String set_attr_bool_values;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.RemoveAttributeSchemaChoiceValues",
         description="Remove choice values from attribute schema.",
@@ -714,7 +714,7 @@ public class AccessManager {
         resourceStrings={
             "attribute-schema-modify-type-succeed=Attribute Schema, {3} was modified."})
     private String set_attr_type;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.ModifyAttributeSchemaUIType",
         description="Set UI type member of attribute schema.",
@@ -748,7 +748,7 @@ public class AccessManager {
         resourceStrings={
             "attribute-schema-modify-syntax-succeed=Attribute Schema, {3} was modified."})
     private String set_attr_syntax;
-   
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.ModifyAttributeSchemaI18nKey",
         description="Set i18nKey member of attribute schema.",
@@ -833,7 +833,7 @@ public class AccessManager {
         resourceStrings={
             "attribute-schema-set-validator-succeed=Attribute Schema, {3} was modified."})
     private String set_attr_validator;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.SetAttributeSchemaStartRange",
         description="Set attribute schema start range.",
@@ -850,7 +850,7 @@ public class AccessManager {
         resourceStrings={
             "attribute-schema-set-start-range-succeed=Attribute Schema, {3} was modified."})
     private String set_attr_start_range;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.SetAttributeSchemaEndRange",
         description="Set attribute schema end range.",
@@ -867,7 +867,7 @@ public class AccessManager {
         resourceStrings={
             "attribute-schema-set-end-range-succeed=Attribute Schema, {3} was modified."})
     private String set_attr_end_range;
-     
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.RemoveAttributeSchemas",
         description="Delete attribute schemas from a service",
@@ -925,7 +925,7 @@ public class AccessManager {
         resourceStrings={
             "service-schema-set-revision-number-succeed=Service Schema, {0} was modified."})
     private String set_revision_number;
-     
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.GetServiceRevisionNumber",
         description="Get service schema revision number.",
@@ -938,7 +938,7 @@ public class AccessManager {
         resourceStrings={
             "service-schema-get-revision-number-succeed=Revision number of service {0} was {1}."})
     private String get_revision_number;
-     
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.AddSubConfiguration",
         description="Create a new sub configuration.",
@@ -1466,7 +1466,7 @@ public class AccessManager {
             "idrepo-remove-privileges-succeed=Privileges were removed from identity, {2} of type, {1} in realm, {0}.",
             "delegation-does-not-have-privilege={0} did not have privilege, {1}"})
     private String remove_privileges;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.authentication.ListAuthInstances",
         description="List authentication instances",
@@ -1640,7 +1640,7 @@ public class AccessManager {
             "authentication-add-auth-config-entry-not-found=Authentication Configuration {0} was not found."}
     )
     private String add_auth_cfg_entr;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.authentication.UpdateAuthConfigurationEntries",
         description="Set authentication configuration entries",
@@ -1926,7 +1926,7 @@ public class AccessManager {
         optionalOptions={
             "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
             "agenturl|g|s|Agent URL. e.g. http://www.agent.com:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.com:8080. This option is valid for J2EEAgent and WebAgent.",
-            "attributevalues|a|m|Properties e.g. homeaddress=here.",
+            "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/.",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={
             "server-url-missing=Server URL is needed.",
@@ -1958,7 +1958,7 @@ public class AccessManager {
         }
     )
     private String delete_agents;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.agentconfig.UpdateAgent",
         description="Update agent configuration.",
@@ -1995,7 +1995,7 @@ public class AccessManager {
         }
     )
     private String agent_remove_props;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.agentconfig.ListAgents",
         description="List agent configurations.",
@@ -2258,7 +2258,7 @@ public class AccessManager {
         }
     )
     private String update_server_cfg;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.serverconfig.RemoveServerConfig",
         description="Remove server configuration.",
@@ -2275,7 +2275,7 @@ public class AccessManager {
         }
     )
     private String remove_server_cfg;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.serverconfig.CreateServer",
         description="Create a server instance.",
@@ -2911,7 +2911,7 @@ public class AccessManager {
             "get-policy-in-realm-succeed=Policy definitions were returned under realm, {0}.",
             "get-policy-in-realm-no-policies=There were not matching policies under realm, {0}."})
     private String list_xacml;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.entitlement.CreateXACML",
         description="Create policies in a realm with XACML input.",
