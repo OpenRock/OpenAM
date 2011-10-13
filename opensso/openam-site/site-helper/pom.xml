@@ -86,4 +86,14 @@
    </plugin>
   </plugins>
  </build>
+ <properties>
+  <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs/openam-site</siteDistributionURL>
+ </properties>
+ <distributionManagement>
+  <site>
+   <id>forgerock.org</id>
+   <name>OpenAM Project</name>
+   <url>${siteDistributionURL}</url>
+  </site>
+ </distributionManagement>
 </project>
