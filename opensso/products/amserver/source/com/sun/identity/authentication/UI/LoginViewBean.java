@@ -325,6 +325,10 @@ public class LoginViewBean extends AuthViewBeanBase {
                 } else {
                     loginDebug.message("Old Session is Active.");
                     newOrgExist = checkNewOrg(ssoToken);
+                    if (logIntoDiffOrg) {
+                        response.sendRedirect(AuthUtils.constructOrigURL(request));
+                        return;
+                    }
                     if (!newOrgExist && !dontLogIntoDiffOrg) {
                         if (isPost) {
                             isBackPost = canGetOrigCredentials(ssoToken);
@@ -733,15 +737,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
         }
         
-        if ((param != null) && (param.length() != 0)) {
-            if (jsp_page.indexOf("?") != -1) {
-                jsp_page = jsp_page + "&amp;org=" + param;
-            } else {
-                jsp_page = jsp_page + "?org=" + param;
-            }
-        }
         return AuthUtils.encodeURL(jsp_page,ac,response);
-        
     }
     
     
@@ -1649,6 +1645,7 @@ public class LoginViewBean extends AuthViewBeanBase {
         loginDebug.message("Check New Organization!");
         boolean checkNewOrg = false;
         dontLogIntoDiffOrg = false;
+        logIntoDiffOrg = false;
 
         try {
             // always make sure the orgName is the same
@@ -1685,8 +1682,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                     rb =  rbCache.getResBundle(bundleName, fallbackLocale);
                     
                     if (strButton.trim().equals(rb.getString("Yes").trim())) {
+                        logIntoDiffOrg = true;
                         loginDebug.message("Submit with YES. Destroy session.");
-                        param = queryOrg;
                         clearCookie(AuthUtils.getCookieName());
                         AuthUtils.clearHostUrlCookie(response);
                         AuthUtils.clearlbCookie(request, response);
@@ -1698,7 +1695,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                 } else {
                     newOrg = true;
-                    param = queryOrg;
                     errorTemplate = "new_org.jsp";
                 }
                 checkNewOrg = true;
@@ -2359,6 +2355,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     private boolean bHttpBasic = false;
     private boolean newOrgExist = false;
     private boolean dontLogIntoDiffOrg = false;
+    private boolean logIntoDiffOrg = false;
     HttpServletRequest request;
     HttpServletResponse response;
     Cookie cookie;
@@ -2375,7 +2372,6 @@ public class LoginViewBean extends AuthViewBeanBase {
     /** Default button index */
     public int defaultButtonIndex = 0;
     String jsp_page=null;
-    String param=null;   
     private boolean forceAuth;
     
     /** Default parameter name for old token */

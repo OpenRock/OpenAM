@@ -549,7 +549,18 @@ public class AuthUtils extends AuthClientUtils {
             return false;
         }
     }
-    
+
+    public static String constructOrigURL(HttpServletRequest request) {
+        StringBuilder loginURL = new StringBuilder(serviceURI);
+        String queryParams = request.getParameter("SunQueryParamsString");
+        if ((queryParams != null) && (queryParams.length() > 0)) {
+            queryParams = getBase64DecodedValue(queryParams);
+            loginURL.append('?').append(queryParams);
+        }
+
+        return loginURL.toString();
+    }
+
     /* return the successful login url */
     public static String getLoginSuccessURL(AuthContextLocal authContext) {
         String successURL = null;

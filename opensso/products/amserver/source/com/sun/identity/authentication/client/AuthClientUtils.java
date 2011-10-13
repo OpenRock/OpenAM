@@ -1803,11 +1803,10 @@ public class AuthClientUtils {
      * SunQueryParamsString and URL encodes all the parameters
      * included in its value
      */
-      private static String URLencodedSunQueryParamsString(String queryParams,
+      protected static String URLencodedSunQueryParamsString(String queryParams,
               String encoding){
           StringBuilder sb = new StringBuilder(400);
           StringTokenizer st = new StringTokenizer(queryParams, "&");
-          String adviceString = null;
           while (st.hasMoreTokens()) {
               String str = st.nextToken();
               if (str.indexOf("=") != -1 ) {
