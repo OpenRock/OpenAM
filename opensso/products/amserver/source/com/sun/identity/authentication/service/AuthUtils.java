@@ -94,6 +94,7 @@ import com.sun.identity.policy.plugins.AuthenticateToServiceCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
+import com.sun.identity.shared.encode.Base64;
 
 public class AuthUtils extends AuthClientUtils {
     
@@ -551,14 +552,13 @@ public class AuthUtils extends AuthClientUtils {
     }
 
     public static String constructOrigURL(HttpServletRequest request) {
-        StringBuilder loginURL = new StringBuilder(serviceURI);
-        String queryParams = request.getParameter("SunQueryParamsString");
-        if ((queryParams != null) && (queryParams.length() > 0)) {
-            queryParams = getBase64DecodedValue(queryParams);
-            loginURL.append('?').append(queryParams);
+        String requestURI = (String) request.getAttribute("javax.servlet.forward.request_uri");
+        if (requestURI != null) {
+            String queryString = (String) request.getAttribute("javax.servlet.forward.query_string");
+            return Base64.encode((requestURI + '?' + queryString).getBytes());
+        } else {
+            return Base64.encode((request.getRequestURI() + '?' + request.getQueryString()).getBytes());
         }
-
-        return loginURL.toString();
     }
 
     /* return the successful login url */

@@ -65,6 +65,7 @@ import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import java.util.Hashtable;
@@ -104,6 +105,7 @@ public class LoginViewBean extends AuthViewBeanBase {
         super.registerChildren();
         registerChild(PAGE_STATE, StaticTextField.class);
         registerChild(LOGIN_URL, StaticTextField.class);
+        registerChild(AM_ORIG_URL, StaticTextField.class);
         registerChild(DEFAULT_LOGIN_URL, StaticTextField.class);
         registerChild(REDIRECT_URL, StaticTextField.class);
         registerChild(TILED_CALLBACKS, CallBackTiledView.class);
@@ -155,6 +157,9 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
             loginURL = AuthUtils.encodeURL(loginURL, ac, response);
             return new StaticTextField(this, name, loginURL);
+        } else if (name.equals(AM_ORIG_URL)) { //only used by new_org.jsp
+            origLoginURL = AuthUtils.constructOrigURL(request);
+            return new StaticTextField(this, name, origLoginURL);
         } else if (name.equals(PAGE_STATE)) {
             return new StaticTextField(this, name, pageState);
         } else if (name.equals("Image")) {
@@ -326,7 +331,15 @@ public class LoginViewBean extends AuthViewBeanBase {
                     loginDebug.message("Old Session is Active.");
                     newOrgExist = checkNewOrg(ssoToken);
                     if (logIntoDiffOrg) {
-                        response.sendRedirect(AuthUtils.constructOrigURL(request));
+                        String origURL = request.getParameter(AM_ORIG_URL);
+                        if (origURL != null) {
+                            String tmp = new String(Base64.decode(origURL));
+                            response.sendRedirect(tmp);
+                        } else {
+                            errorCode = "102";
+                            setErrorMessage(null);
+                            super.forwardTo(requestContext);
+                        }
                         return;
                     }
                     if (!newOrgExist && !dontLogIntoDiffOrg) {
@@ -2346,6 +2359,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     private Hashtable reqDataHash = new Hashtable();
     private static String LOGINURL = "";
     private String loginURL = "";
+    private String origLoginURL = "";
     private static final String LOGOUTCOOKIEVALUE = "LOGOUT";
     private static final String bundleName = "amAuthUI";
     private boolean onePageLogin = false;
@@ -2387,6 +2401,8 @@ public class LoginViewBean extends AuthViewBeanBase {
     public static final String PAGE_STATE = "PageState";
     /** Default parameter name for login url */
     public static final String LOGIN_URL = "LoginURL";
+    /** Original login URL used on first access */
+    public static final String AM_ORIG_URL = "AMOrigURL";
     /** Default parameter name for default login url */
     public static final String DEFAULT_LOGIN_URL = "DefaultLoginURL";
     /** Default parameter name for redirect url */
