@@ -170,6 +170,33 @@
    <literal>openam.forbidden.to.copy.headers</literal>.</para>
   </listitem>
   <listitem>
+   <para>The OpenAM session service now lets you extend quota exhaustion
+   actions with a plugin (OPENAM-433).</para>
+   <para>To add a new plugin, update the
+   <filename>amSession.properties</filename> files with the appropriate
+   internationalization keys, and place your plugin class either in
+   <filename>WEB-INF/classes</filename> or <filename>WEB-INF/lib</filename>
+   where you deployed OpenAM. Next, add your implementation using the
+   <command>ssoadm</command> command.</para>
+   <screen>$ ssoadm
+ set-attr-choicevals
+ --servicename iPlanetAMSessionService
+ --schematype Global
+ --attributename iplanet-am-session-constraint-resulting-behavior
+ --adminid amadmin
+ --password-file .pass
+ --add
+ --choicevalues mykey=demo.Clazz</screen>
+   <para>Here, <replaceable>mykey</replaceable> is the internationalization
+   key you added to <filename>amSession.properties</filename> files, and
+   <replaceable>demo.Clazz</replaceable> is the fully qualified class name
+   for your plugin class.</para>
+   <para>You can remove the plugin using the <command>ssoadm
+   remove-attr-choicevals</command> command, and list quota exhaustion
+   actions using the <command>ssoadm get-attr-choicevals</command>
+   command.</para>
+  </listitem>
+  <listitem>
    <!-- Fix for OPENAM-795: Document the new monitorable values -->
    <para>OpenAM now tracks monitoring information for LDAP connection pools
    (OPENAM-410). OpenAM monitoring exposes the minimum size of the pool, the
