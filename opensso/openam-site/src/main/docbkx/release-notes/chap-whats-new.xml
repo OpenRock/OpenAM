@@ -48,29 +48,7 @@
    gateway, enabling federation capabilities for applications that cannot be
    modified to use the Fedlet and SAML 2.0.</para>
   </listitem>
-  <listitem>
-   <para>OpenAM now handles Active Directory password expiration responses
-   properly. Setup wizards make it easier to use OpenLDAP and OpenDJ as
-   the identity repository.</para>
-  </listitem>
-  <listitem>
-   <para>SAML 2.0 extensions let the system handle situations more flexibly.
-   For example, the extensions let the system handle situations that arise
-   when the identity provider receives failed an authentication request and so
-   must skip some processing, or when there remains additional interaction
-   with the user after a completed assertion but before providing
-   authorization.</para>
-  </listitem>
-  <listitem>
-   <para>A new, beta session failover mechanism introduces a replacement for
-   the existing implementation that relies on Message Queue and Berkeley DB
-   with a highly scalable, pure Java implementation.</para>
-  </listitem>
-  <listitem>
-   <para>Improvements in the upgrade process streamline the move to the
-   new version.</para>
-  </listitem>
-  <listitem>
+<!--   <listitem>
    <para>OpenAM now supports YubiKey authentication. The YubiKey simplifies
    the process of logging in with a One Time Password token as it does not
    require the user to re-type long pass codes from a display device into the
@@ -78,16 +56,148 @@
    computer and the OTP is generated and automatically entered with a simple
    touch of a button on the YubiKey, and without the need of any client
    software or drivers.</para>
+  </listitem> -->
+  <listitem>
+   <!-- OPENAM-??? -->
+   <para>Setup wizards make it easier to use OpenLDAP and OpenDJ as
+   the identity repository.</para>
   </listitem>
   <listitem>
-   <para>OpenAM now supports adaptive risk authentication. You configure the
-   adaptive risk authentication module to assess risks, and then you add the
-   module into an authentication chain. The module determines whether to
-   require further authentication processing based on assessment of the risk
-   involved during authentication. Adaptive risk authentication lets you
-   require more from users when they login from an unfamiliar location, from
-   a new device, after a long period during which the account remained idle,
-   and so forth.</para>
+   <!-- OPENAM-??? -->
+   <para>A new session failover mechanism introduces a replacement for
+   the existing implementation that relies on Message Queue and Berkeley DB
+   with a highly scalable, pure Java implementation.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports adaptive risk authentication (OPENAM-846). You
+   configure the adaptive risk authentication module to assess risks, and then
+   you add the module into an authentication chain. The module determines
+   whether to require further authentication processing based on assessment of
+   the risk involved during authentication. Adaptive risk authentication lets
+   you require more from users when they login from an unfamiliar location,
+   from a new device, after a long period during which the account remained
+   idle, and so forth.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now lets you fetch maximum session time, time remaining, and
+   idle time when querying attributes over the REST interface
+   (OPENAM-801).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports a <literal>refresh</literal> parameter to reset
+   session idle time to 0 when querying attributes over the REST interface
+   (OPENAM-800).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports time zone policy settings using the RFC 822
+   format, +/-0000 (OPENAM-791).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM session service now lets you set the maximum session time,
+   maximum idle time, and maximum caching time when assigning service to
+   the user through the console (OPENAM-785).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now returns a load balancer cookie, if configured, to an
+   authentication request over the REST interface (OPENAM-766).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM ClusterStateService now works with HTTPS endpoints
+   (OPENAM-759). When using HTTPS endpoints, set
+   <literal>com.sun.identity.urlchecker.dorequest=false</literal>.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now lets you set the SAML 2.0 IDP Adapter class through
+   the console (OPENAM-700).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides an OAuth 2.0 service provider authentication
+   module (OPENAM-679).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides additional statistics related to session failover
+   (OPENAM-641).</para>
+  </listitem>
+  <listitem>
+   <para>Multiple improvements in the OpenAM upgrade process streamline the
+   move to the new version (OPENAM-626).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports interoperability with LDAP servers that implement
+   the (Behera) Internet-Draft, <link
+   xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+   >Password Policy for LDAP Directories</link> (OPENAM-613).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM .NET fedlets now support encrypted assertions
+   (OPENAM-604).</para>
+  </listitem>
+  <listitem>
+   <para>The <command>ssoadm</command> can now decode an encrypted password
+   stored in the password file (OPENAM-569).</para>
+  </listitem>
+  <listitem>
+   <para>You can now configure the HOTP authentication module email from
+   address using OpenAM console (OPENAM-513).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM console page <filename>Debug.jsp</filename> (such as
+   <literal>http://openam.example.com:8080/openam/Debug.jsp</literal>) now
+   can set the log level for any debug instance (OPENAM-511). See the
+   Debug instances drop-down list at the top of the page.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides a property,
+   <literal>openam.authentication.ignore_goto_during_logout</literal>, to
+   set whether to ignore logout <literal>goto</literal> URLs, and instead
+   display the Logout page (OPENAM-494).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides support for multiple failover servers in the 
+   RADIUS authentication module (OPENAM-477).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides a mechanism to control which session properties
+   are copied during session upgrade (OPENAM-462).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides session timeout notification (OPENAM-457).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM distributed authentication service now can map HTTP headers
+   when forwarding requests (OPENAM-453). See configuration properties
+   <literal>openam.retained.http.headers</literal> and
+   <literal>openam.forbidden.to.copy.headers</literal>.</para>
+  </listitem>
+  <listitem>
+   <!-- Fix for OPENAM-795: Document the new monitorable values -->
+   <para>OpenAM now tracks monitoring information for LDAP connection pools
+   (OPENAM-410). OpenAM monitoring exposes the minimum size of the pool, the
+   maximum size of the pool, the high water mark of the pool, the current size
+   of the pool, the number of connections retrieved, the number of connections
+   created, and the number of connections destroyed.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now handles Active Directory password expiration responses
+   properly. (OPENAM-258)</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM password reset now uses realm aliases to find realms for
+   end users, eliminating the need to add a realm parameter to the URL
+   (OPENAM-192).</para>
+  </listitem>
+  <listitem>
+   <!-- Full implementation related to OPENAM-129 -->
+   <para>OpenAM supports SAML 2.0 extensions for additional flexibility.
+   For example, the extensions let the system handle situations
+   that arise when the identity provider receives failed an authentication
+   request and so must skip some processing, or when there remains additional
+   interaction with the user after a completed assertion but before providing
+   authorization.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now allows time-based rotation, and also file name prefixes and
+   suffixes for regular and debug logs. (OPENAM-41, OPENAM-42)</para>
   </listitem>
   <listitem>
    <!-- Fix for OpenAM-796: Document the login progressbar template functionality -->

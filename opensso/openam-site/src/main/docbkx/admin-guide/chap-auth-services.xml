@@ -1915,6 +1915,15 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Trust All Server Certificates</term>
+     <listitem>
+      <para>When enabled, blindly trust server certificates, including
+      self-signed test certificates.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-ssl-trust-all</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>LDAP Behera Password Policy Support</term>
      <listitem>
       <para>When enabled, support interoperability with servers that implement
@@ -1922,7 +1931,7 @@
       xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
       >Password Policy for LDAP Directories</link>.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-ldap-ssl-trust-all</literal></para>
+      <literal>iplanet-am-auth-ldap-behera-password-policy-enabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
