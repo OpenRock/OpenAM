@@ -2465,6 +2465,16 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Health check interval</term>
+     <listitem>
+      <para>Specify often OpenAM checks offline RADIUS servers by sending an
+      invalid authentication request. OpenAM only starts using RADIUS servers
+      once the health check has been successful. Default: 5 minutes</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-radius-healthcheck-interval</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>Authentication Level</term>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-radius-auth-level</literal></para></listitem>
@@ -2696,7 +2706,7 @@
    </variablelist>
   </section>
   
-  <section xml:id="yubikey-module-conf-hints">
+<!--   <section xml:id="yubikey-module-conf-hints">
    <title>Hints For the YubiKey Authentication Module</title>
    <para>Use the following hints to configure the module.</para>
    <indexterm><primary>YubiKey authentication</primary></indexterm>
@@ -2712,7 +2722,7 @@
      </listitem>
     </varlistentry>
    </variablelist>
-  </section>
+  </section> -->
  </section>
  
  <section xml:id="configure-authn-chains">
