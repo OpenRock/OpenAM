@@ -89,7 +89,31 @@
    a new device, after a long period during which the account remained idle,
    and so forth.</para>
   </listitem>
+  <listitem>
+   <!-- Fix for OpenAM-796: Document the login progressbar template functionality -->
+   <para>For cross domain single sign on and SAML 2.0 authentication, users
+   were presented with a blank login page during authentication, in fact a
+   page containing forms with hidden fields used to process authentication.
+   OpenAM now provides templates so you can show users something besides
+   than blank pages, such as for example a page with an animated .gif progress
+   bar (OPENAM-9).</para>
+   <para>For cross domain single sign on, edit a copy of the file
+   <filename>config/federation/default/cdclogin.jsp</filename> where you
+   unpacked the OpenAM web application (for example
+   <filename>/path/to/tomcat/webapps/openam/config/federation/default/cdclogin.jsp</filename>).
+   You can change the presentation as appropriate for your deployment. Make
+   sure you retain the form and JavaScript to ensure requests are processed
+   properly. Then replace
+   <filename>config/federation/default/cdclogin.jsp</filename> with your
+   version.</para>
+   <para>For SAML 2.0, modify the templates
+   <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/opensso/products/federation/library/resources/saml2login.template?r=HEAD"><filename>saml2login.template</filename></link>
+   and
+   <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/opensso/products/federation/library/resources/saml2loginwithrelay.template?r=HEAD"><filename>saml2loginwithrelay.template</filename></link>
+   to change the presentation, retaining the form and JavaScript. Then copy
+   your templates under the <filename>WEB-INF/classes/</filename> directory
+   where you unpacked the OpenAM web application (for example
+   <filename>/path/to/tomcat/webapps/openam/WEB-INF/classes/</filename>).</para>
+  </listitem>
  </itemizedlist>
- 
 </chapter>
-
