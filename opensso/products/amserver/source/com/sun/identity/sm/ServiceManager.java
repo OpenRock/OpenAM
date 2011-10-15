@@ -1103,6 +1103,11 @@ public class ServiceManager {
                         Node valueNode = (Node) items.next();
                         String value = XMLUtils.getValueOfValueNode(valueNode);
                         String encValue;
+                        
+                        // skip empty passwords
+                        if (value.equals("null")) {
+                            continue;
+                        }
 
                         if (encrypt) {
                             if (encryptObj != null) {
@@ -1124,7 +1129,7 @@ public class ServiceManager {
                         } else {
                             encValue = (String)AccessController.doPrivileged(
                                 new DecodeAction(value));
-
+                            
                             try {
                                 //this is catch the whitespace for password
                                 byte[] b = encValue.getBytes("ISO-8859-1");
