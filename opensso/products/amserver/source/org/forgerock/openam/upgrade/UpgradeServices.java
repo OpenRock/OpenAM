@@ -46,6 +46,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
@@ -614,7 +615,7 @@ public class UpgradeServices {
         }
         
         String encDSPwd = data.substring(data.indexOf(BootstrapData.DS_PWD), data.indexOf('&', data.indexOf(BootstrapData.DS_PWD)));
-        password = JCECrypt.decode(encDSPwd.substring(BootstrapData.DS_PWD.length() + 1));
+        password = JCECrypt.decode(URLEncDec.decode(encDSPwd.substring(BootstrapData.DS_PWD.length() + 1)));
         
         return password;
     }
