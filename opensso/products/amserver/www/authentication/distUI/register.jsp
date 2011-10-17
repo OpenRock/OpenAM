@@ -168,10 +168,15 @@ String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI)
         <td><div class="logInp">
             <input type="text" name="IDToken<jato:text name="txtIndex" />"
                 id="IDToken<jato:text name="txtIndex" />"
-                value="" class="TxtFld"></div>
+                value="<jato:text name="txtValue" />" class="TxtFld"></div>
         </td>
         </form>
-        </tr>        
+        </tr>  
+        <jato:content name="hasInfoText">
+            <tr><td nowrap="nowrap"></td><td><div class="logInp"><jato:text name="txtInfo" />
+                    </div></td></tr>
+        </jato:content>
+
         <!-- end of textBox -->
         </jato:content>
 
@@ -200,6 +205,11 @@ String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI)
         </td>
         </form>
         </tr>        
+        <jato:content name="hasInfoText">
+            <tr><td nowrap="nowrap"></td><td><div class="logInp"><jato:text name="txtInfo" />
+                    </div></td></tr>
+        </jato:content>
+
         <!-- end of password -->
         </jato:content>
 
@@ -245,6 +255,11 @@ String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI)
         </td>
         </form>
         </tr>
+        <jato:content name="hasInfoText">
+            <tr><td nowrap="nowrap"></td><td><div class="logInp"><jato:text name="txtInfo" />
+                    </div></td></tr>
+        </jato:content>
+
         <tr></tr>
         <!-- end of choice -->
         </jato:content>

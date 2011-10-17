@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+Portions Copyrighted 2011 ForgeRock AS
+-->
+
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
@@ -50,56 +54,12 @@
              </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
+    
+    <Callbacks length="0" order="2" timeout="120" template="disclaimerDeclined.jsp" error="true" />
+    
+    <Callbacks length="0" order="3" timeout="120" template="profileError.jsp" error="true" />
 
-    <Callbacks length="4" order="2" timeout="240" header="비밀번호 만료, 변경해야 함&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
-        <PasswordCallback echoPassword="false" >
-            <Prompt> 현재 비밀번호: </Prompt>
-        </PasswordCallback>
-        <PasswordCallback echoPassword="false" >
-            <Prompt> 새 비밀번호: </Prompt>
-        </PasswordCallback>
-        <PasswordCallback echoPassword="false" >
-            <Prompt> 새 비밀번호 확인: </Prompt>
-        </PasswordCallback>
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value> 제출 </Value>
-                </OptionValue>
-                <OptionValue>
-                    <Value> 취소 </Value>
-                </OptionValue>
-            </OptionValues>
-        </ConfirmationCallback>
-    </Callbacks>
-    
-    <Callbacks length="0" order="3" timeout="120" template="wrongPassword.jsp" />
-    
-    <Callbacks length="0" order="4" timeout="120" template="noUserProfile.jsp" />
-    
-    <Callbacks length="0" order="5" timeout="120" template="noUserName.jsp" />
-    
-    <Callbacks length="0" order="6" timeout="120" template="noPassword.jsp" />
-    
-    <Callbacks length="0" order="7" timeout="120" template="noConfirmation.jsp" />
-    
-    <Callbacks length="0" order="8" timeout="120" template="passwordMismatch.jsp" />
-    
-    <Callbacks length="0" order="9" timeout="120" template="configuration.jsp" />
-    
-    <Callbacks length="0" order="10" timeout="120" template="userExists.jsp" />
-    
-    <Callbacks length="0" order="11" timeout="120" template="profileException.jsp" />
-    
-    <Callbacks length="0" order="12" timeout="120" template="missingReqField.jsp" />
-    
-    <Callbacks length="0" order="13" timeout="120" template="userPasswordSame.jsp" />
-
-    <Callbacks length="0" order="14" timeout="120" template="invalidPassword.jsp" />
-    
-    <Callbacks length="0" order="15" timeout="120" header="비밀번호가 만료되었습니다. 비밀번호를 재설정하려면 서비스 지원 센터에 문의하십시오." error="true"  />
-    
-    <Callbacks length="8" order="16" timeout="300" header="자동 등록" template="register.jsp" >
+    <Callbacks length="8" order="4" timeout="300" header="자동 등록" template="register.jsp" >
         <NameCallback isRequired="true" attribute="uid" >
             <Prompt> 사용자 이름: </Prompt>
         </NameCallback>
@@ -133,7 +93,7 @@
         </ConfirmationCallback>
     </Callbacks>
     
-    <Callbacks length="2" order="17" timeout="120" header="자동 등록" >
+    <Callbacks length="2" order="5" timeout="120" header="자동 등록" >
         <ChoiceCallback attribute="uid" >
             <Prompt>입력한 사용자 이름을 가진&lt;BR&gt;사용자가 이미 있습니다.&lt;BR&gt;다음 사용자 이름 중 하나를 &lt;BR&gt;선택하거나 새로 &lt;BR&gt;만드십시오.</Prompt>
             <ChoiceValues>
@@ -151,7 +111,7 @@
         </ConfirmationCallback>
     </Callbacks>
     
-    <Callbacks length="1" order="18" timeout="120" template="disclaimer.jsp" >
+    <Callbacks length="1" order="6" timeout="120" template="disclaimer.jsp" >
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>

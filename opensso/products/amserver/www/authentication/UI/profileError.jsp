@@ -22,7 +22,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
-   $Id: noUserName.jsp,v 1.5 2008/08/15 01:05:29 veiming Exp $
+   $Id: userExists.jsp,v 1.5 2008/08/15 01:05:30 veiming Exp $
                                                                                 
 --%>
 
@@ -34,6 +34,7 @@
 <%@page info="Self Registration Error" language="java"%>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
 <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
+
 <jato:useViewBean className="com.sun.identity.authentication.UI.LoginViewBean">
 
 
@@ -103,7 +104,7 @@ String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI)
             <div class="AlrtErrTxt"> 
             <img name="Login.AlertImage" src="<%= ServiceURI %>/images/error_large.gif" alt="Error" 
             height="21" width="21" />
-            <auth:resBundle bundleName="amAuthUI" resourceKey="nouser.name" />
+            <auth:resBundle bundleName="amAuthUI" resourceKey="profile.error" />
             </div>
             </td></tr></table></div></td>
             </tr>

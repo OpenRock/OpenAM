@@ -22,19 +22,20 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
-   $Id: noConfirmation.jsp,v 1.5 2008/08/15 01:05:29 veiming Exp $
+   $Id: profileException.jsp,v 1.5 2008/08/15 01:05:31 veiming Exp $
                                                                                 
 --%>
 
-
-
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <html>
 
 <%@page info="Self Registration Error" language="java"%>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
 <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
-<jato:useViewBean className="com.sun.identity.authentication.UI.LoginViewBean">
+<jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
 
 
 <%@ page contentType="text/html" %>
@@ -103,7 +104,7 @@ String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI)
             <div class="AlrtErrTxt"> 
             <img name="Login.AlertImage" src="<%= ServiceURI %>/images/error_large.gif" alt="Error" 
             height="21" width="21" />
-            <auth:resBundle bundleName="amAuthUI" resourceKey="missing.confirm.passwd" />
+            <auth:resBundle bundleName="amAuthUI" resourceKey="disclaimer.declined" />
             </div>
             </td></tr></table></div></td>
             </tr>

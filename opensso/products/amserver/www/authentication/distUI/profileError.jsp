@@ -22,25 +22,26 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
-   $Id: invalidPassword.jsp,v 1.5 2008/08/15 01:05:28 veiming Exp $
+   $Id: profileException.jsp,v 1.5 2008/08/15 01:05:31 veiming Exp $
                                                                                 
 --%>
 
-
-
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <html>
 
-<%@page info="Invalid Password" language="java"%>
+<%@page info="Self Registration Error" language="java"%>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
 <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
-<jato:useViewBean className="com.sun.identity.authentication.UI.LoginViewBean">
+<jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
 
 
 <%@ page contentType="text/html" %>
 
 <head>
-<title><jato:text name="htmlTitle_InvalidPassword" /></title>
+<title><jato:text name="htmlTitle_SelfRegError" /></title>
 
 <% 
 String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
@@ -103,7 +104,7 @@ String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI)
             <div class="AlrtErrTxt"> 
             <img name="Login.AlertImage" src="<%= ServiceURI %>/images/error_large.gif" alt="Error" 
             height="21" width="21" />
-            <auth:resBundle bundleName="amAuthUI" resourceKey="notenough.characters" />
+            <auth:resBundle bundleName="amAuthUI" resourceKey="profileError" />
             </div>
             </td></tr></table></div></td>
             </tr>
