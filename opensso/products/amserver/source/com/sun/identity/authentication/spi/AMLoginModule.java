@@ -645,6 +645,17 @@ public abstract class AMLoginModule implements LoginModule {
         }
     }
     
+    /**
+     * Allows you to set the info text for a specific callback. Info Text is shown
+     * under the element in the Login page. It is used in the membership module to
+     * implement in-line feedback.
+     * 
+     * @param state state in which the Callback[] to be reset
+     * @param callback the callback to associate the info text
+     * @param infoText the infotext for the callback
+     * @throws AuthLoginException if state/callback is out of bounds
+     * @supported.api
+     */
     public void substituteInfoText(int state, int callback, String infoText) 
     throws AuthLoginException {
         if (debug.messageEnabled()) {
@@ -675,6 +686,13 @@ public abstract class AMLoginModule implements LoginModule {
         }     
     }
     
+    /**
+     * Clears the info text for a given callback state
+     * 
+     * @param state The state to clear all infotexts
+     * @throws AuthLoginException Invalid state
+     * @supported.api
+     */
     public void clearInfoText(int state)
     throws AuthLoginException {
         if (debug.messageEnabled()) {
@@ -1811,6 +1829,14 @@ public abstract class AMLoginModule implements LoginModule {
         }
     }
     
+    /**
+     * Returns the info text associated with a specific callback
+     * 
+     * @param state The state to fetch the info text
+     * @param index The callback to fetch the info text
+     * @return The info text
+     * @supported.api
+     */
     public String getInfoText(int state, int index) {
         // check state
         if (state > stateLength) {
