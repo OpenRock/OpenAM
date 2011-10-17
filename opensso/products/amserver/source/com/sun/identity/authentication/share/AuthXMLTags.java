@@ -27,14 +27,13 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.authentication.share;
 
-public interface AuthXMLTags {
-    
-// Environment attributes
+public interface AuthXMLTags {    
+    // Environment attributes
     public static final String AUTH_SERVICE = "auth";
     public static final String SERVER_PASS_FILE =
         "com.iplanet.am.admin.cli.certdb.passfile";
@@ -279,6 +278,12 @@ public interface AuthXMLTags {
     public static final String HEADER_VALUE_END  ="</HeaderValue>";
     public static final String IMAGE_NAME_BEGIN="<ImageName>";
     public static final String IMAGE_NAME_END="</ImageName>";
+    public static final String REQUIRED_LIST_BEGIN="<RequiredList>";
+    public static final String REQUIRED_LIST_END="</RequiredList>";
+    public static final String ATTRIBUTE_LIST_BEGIN="<AttributeList>";
+    public static final String ATTRIBUTE_LIST_END="</AttributeList>";
+    public static final String INFOTEXT_LIST_BEGIN="<InfoTextList>";
+    public static final String INFOTEXT_LIST_END="</InfoTextList>";
     public static final String PAGE_TIMEOUT_BEGIN="<PageTimeOutValue>";
     public static final String PAGE_TIMEOUT_END  ="</PageTimeOutValue>";
     public static final String TEMPLATE_NAME_BEGIN="<TemplateName>";

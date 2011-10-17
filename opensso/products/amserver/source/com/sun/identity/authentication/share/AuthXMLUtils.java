@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.authentication.share;
@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
@@ -733,9 +734,15 @@ public class AuthXMLUtils {
             int timeOut = Integer.parseInt(
                 getValueOfChildNode(childNode, "PageTimeOutValue"));
             String template = getValueOfChildNode(childNode, "TemplateName");
+            List<String> required = stringToList(getValueOfChildNode(childNode, "RequiredList"));
+            List<String> attributes = stringToList(getValueOfChildNode(childNode, "AttributeList"));
+            List<String> infoText = stringToList(getValueOfChildNode(childNode, "InfoTextList"));
             pagePropertiesCallback = new PagePropertiesCallback(moduleName,
             header, image,timeOut, template, errState,
             pageState);
+            pagePropertiesCallback.setRequire(required);
+            pagePropertiesCallback.setAttribute(attributes);
+            pagePropertiesCallback.setInfoText(infoText);
         }
         return pagePropertiesCallback;
     }
@@ -1213,11 +1220,49 @@ public class AuthXMLUtils {
             .append(AuthXMLTags.TEMPLATE_NAME_END)
             .append(AuthXMLTags.PAGE_STATE_BEGIN)
             .append(pagePCallback.getPageState())
-            .append(AuthXMLTags.PAGE_STATE_END);
+            .append(AuthXMLTags.PAGE_STATE_END)
+            .append(AuthXMLTags.ATTRIBUTE_LIST_BEGIN)
+            .append(listToString(pagePCallback.getAttribute()))
+            .append(AuthXMLTags.ATTRIBUTE_LIST_END)
+            .append(AuthXMLTags.REQUIRED_LIST_BEGIN)
+            .append(listToString(pagePCallback.getRequire()))
+            .append(AuthXMLTags.REQUIRED_LIST_END)
+            .append(AuthXMLTags.INFOTEXT_LIST_BEGIN)
+            .append(listToString(pagePCallback.getInfoText()))
+            .append(AuthXMLTags.INFOTEXT_LIST_END);
         
         xmlString.append(AuthXMLTags.PAGEP_CALLBACK_END);
         return xmlString.toString();
     }    
+    
+    static String listToString(List<String> list) {
+        StringBuilder buffer = new StringBuilder();
+        Iterator<String> it = list.iterator();
+        
+        while (it.hasNext()) {
+            buffer.append(it.next());
+            
+            if (it.hasNext()) {
+                buffer.append(",");
+            }
+        }
+                
+        return buffer.toString();
+    }
+    
+    static List<String> stringToList(String text) {
+        int from = 0;
+        int idx;
+        List<String> ret = new ArrayList<String>();
+ 
+        while ((idx = text.indexOf(',', from)) != -1) {
+            ret.add(text.substring(from, idx));
+            from = idx + 1;
+        }
+        
+        ret.add(text.substring(from));
+        return ret;
+    }
 
     static String getX509CertificateCallbackXML(
         X509CertificateCallback certCallback) {

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 package com.sun.identity.authentication.spi;
 
@@ -51,6 +54,7 @@ public class PagePropertiesCallback implements Callback {
     private boolean error=false;
     private List attribute;
     private List require;
+    private List<String> infoText;
     private String page_state=null;
     
     /**
@@ -169,6 +173,15 @@ public class PagePropertiesCallback implements Callback {
     }
     
     /**
+     * Returns the list of infoText elements to display alongside the authentication
+     * module display attributes. 
+     * @return 
+     */
+    public List<String> getInfoText() {
+        return infoText;
+    }
+    
+    /**
      * Sets the authentication module header string display.
      *
      * @param header Header string display for the authentication module page.
@@ -196,6 +209,10 @@ public class PagePropertiesCallback implements Callback {
      */
     public void setRequire(List require) {
         this.require = require;
+    }
+    
+    public void setInfoText(List<String> infoText) {
+        this.infoText = infoText;
     }
     
     /**
