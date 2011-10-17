@@ -334,6 +334,8 @@ public abstract class AMLoginModule implements LoginModule {
                 ((PagePropertiesCallback) original[i]).getRequire());
                 ((PagePropertiesCallback) copy[i]).setAttribute(
                 ((PagePropertiesCallback) original[i]).getAttribute());
+                ((PagePropertiesCallback) copy[i]).setInfoText(
+                ((PagePropertiesCallback) original[i]).getInfoText());
                 if (debug.messageEnabled()) {
                     debug.message("clone #" + i + " is PagePropertiesCallback");
                 }
@@ -641,6 +643,68 @@ public abstract class AMLoginModule implements LoginModule {
                 pc.setHeader(newHeader);            	
             }
         }
+    }
+    
+    public void substituteInfoText(int state, int callback, String infoText) 
+    throws AuthLoginException {
+        if (debug.messageEnabled()) {
+            debug.message("setInfoText : state=" + state + ", infoText=" + infoText);
+        }
+        
+        // check state length
+        if (state > stateLength) {
+            throw new AuthLoginException(bundleName, "invalidState",
+                new Object[]{new Integer(state)});
+        }
+        
+        // check callback length for the state
+        Callback[] ext = getCallback(state);
+        if (ext.length<=0) {
+            throw new AuthLoginException(bundleName, "invalidCallbackIndex", null);
+        }
+
+        // in internal, first Callback is always PagePropertiesCallback
+        if ((infoText != null) && (infoText.length() != 0)) {
+            PagePropertiesCallback pc =
+            (PagePropertiesCallback)((Callback[]) internal.get(state - 1))[0];
+
+            // substitute string
+            List<String> infoTexts = pc.getInfoText();
+            infoTexts.set(callback, infoText);
+            pc.setInfoText(infoTexts);
+        }     
+    }
+    
+    public void clearInfoText(int state)
+    throws AuthLoginException {
+        if (debug.messageEnabled()) {
+            debug.message("clearInfoText : state=" + state);
+        }        
+        
+        // check state length
+        if (state > stateLength) {
+            throw new AuthLoginException(bundleName, "invalidState",
+                new Object[]{new Integer(state)});
+        }
+        
+        // check callback length for the state
+        Callback[] ext = getCallback(state);
+        if (ext.length<=0) {
+            throw new AuthLoginException(bundleName, "invalidCallbackIndex", null);
+        }
+        
+        // in internal, first Callback is always PagePropertiesCallback
+        PagePropertiesCallback pc =
+            (PagePropertiesCallback)((Callback[]) internal.get(state - 1))[0];
+
+        // clear info text
+        List<String> infoTexts = pc.getInfoText();
+        
+        for (int i = 0; i < infoTexts.size(); i++) {
+            infoTexts.set(i, EMPTY_STRING);
+        }
+        
+        pc.setInfoText(infoTexts);
     }
 
     /**
@@ -1747,6 +1811,32 @@ public abstract class AMLoginModule implements LoginModule {
         }
     }
     
+    public String getInfoText(int state, int index) {
+        // check state
+        if (state > stateLength) {
+            // invalid state, return empty string now
+            return EMPTY_STRING;
+        }
+        // get internal callbacks for the state
+        Callback[] callbacks = (Callback[]) internal.get(state - 1);
+        if (callbacks == null || callbacks.length == 0) {
+            // no callbacks defined for this state, return empty string
+            return EMPTY_STRING;
+        }
+        // check first Callback
+        Callback callback = callbacks[0];
+        if (callback instanceof PagePropertiesCallback) {
+            List<String> infoText = ((PagePropertiesCallback) callback).getAttribute();
+            if (infoText == null || infoText.isEmpty() || index >= infoText.size()) {
+                return EMPTY_STRING;
+            } else {
+                return infoText.get(index);
+            }
+        } else {
+            return EMPTY_STRING;
+        }
+    }
+    
     /**
      * Returns the attribute name for the specified callback in the
      * specified login state.
@@ -2016,7 +2106,7 @@ public abstract class AMLoginModule implements LoginModule {
     }
     
     /**
-     * Validate password for the distingished user , this will use validation 
+     * Validate password for the distinguished user, this will use validation 
      * plugin if exists to validate password
      *
      * @param userPassword source string which should be validated.
@@ -2025,27 +2115,33 @@ public abstract class AMLoginModule implements LoginModule {
      * @supported.api
      */
     public void validatePassword(String userPassword)
-            throws UserNamePasswordValidationException {
+    throws UserNamePasswordValidationException {
         AMUserPasswordValidation plugin = getUPValidationInstance();
         try {
             if (plugin != null) {
-                debug.message("Validating password...");
+                if (debug.messageEnabled()) {
+                    debug.message("Validating password...");
+                }
+                
                 plugin.validatePassword(userPassword);
             } else {
-                debug.message("No plugin found");
+                if (debug.messageEnabled()) {
+                    debug.message("No plugin found");
+                }
             }
         } catch (AMException ame) {
             if (debug.messageEnabled()) {
-                debug.message("Password validation Failed " +
-                ame.getMessage());
+                debug.message("Password validation Failed " + ame.getMessage());
             }
+            
             throw new UserNamePasswordValidationException(ame);
         } catch (Exception ex) {
-            debug.message(
-            "Unknown Exception occured during password validation");
+            if (debug.messageEnabled()) {
+                debug.message("Unknown Exception occured during password validation");
+            }
+            
             throw new UserNamePasswordValidationException(ex);
         }
-        
     }
     
     /*

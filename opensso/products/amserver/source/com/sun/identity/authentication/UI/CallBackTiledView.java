@@ -56,6 +56,7 @@ public class CallBackTiledView
 {
     private Callback[] callbacks = null;
     private List requiredList = null;
+    private List<String> infoText = null;
     private Callback curCallback = null;
     private int curTile = 0;
 
@@ -70,6 +71,9 @@ public class CallBackTiledView
 
     /** value for attribute */
     public static final String TXT_VALUE = "txtValue";
+    
+    /** info text value */
+    public static String TXT_INFO = "txtInfo";
 
     /**
      * constructs a tiled view of callbacks
@@ -91,6 +95,7 @@ public class CallBackTiledView
         registerChild(TILED_CHOICE, CallBackChoiceTiledView.class);
         registerChild(TXT_PROMPT, StaticTextField.class);
         registerChild(TXT_VALUE, StaticTextField.class);
+        registerChild(TXT_INFO, StaticTextField.class);
     }
 
 
@@ -112,6 +117,9 @@ public class CallBackTiledView
         }
         if (name.equals(TXT_VALUE)) {
             return new StaticTextField(this, TXT_VALUE, "");
+        }
+        if (name.equals(TXT_INFO)) {
+            return new StaticTextField(this, TXT_INFO, "");
         }
         throw new IllegalArgumentException("Invalid child name ["
             + name + "]");
@@ -165,6 +173,7 @@ public class CallBackTiledView
             } else {
                 setDisplayFieldValue(TXT_PROMPT, "");
                 setDisplayFieldValue(TXT_VALUE, "");
+                setDisplayFieldValue(TXT_INFO, "");
 
                 CallBackChoiceTiledView tView =
                     (CallBackChoiceTiledView) getChild(TILED_CHOICE);
@@ -174,6 +183,11 @@ public class CallBackTiledView
 
         return movedToRow;
     }
+    
+    public void setCallBackArray(Callback[] callbacks, List requiredList) {
+        this.callbacks = callbacks;
+        this.requiredList = requiredList;
+    }
 
     /**
      * set callback array
@@ -181,15 +195,23 @@ public class CallBackTiledView
      * @param callbacks array
      * @param requiredList - list of required attribute
      */
-    public void setCallBackArray(Callback[] callbacks, List requiredList) {
+    public void setCallBackArray(Callback[] callbacks, List requiredList, List<String> infoText) {
         this.callbacks = callbacks;
         this.requiredList = requiredList;
+        this.infoText = infoText;
     }
 
     private void setNameCallbackInfo(NameCallback nc) {
         setDisplayFieldValue(TXT_PROMPT, nc.getPrompt());
-        setDisplayFieldValue(TXT_VALUE, nc.getName());
-        setDisplayFieldValue(TXT_VALUE, nc.getDefaultName());
+        
+        String name = nc.getName();
+        
+        if ((name == null) || (name.equals(""))) {
+            name = nc.getDefaultName();
+        }
+        
+        setDisplayFieldValue(TXT_VALUE, name);
+        setDisplayFieldValue(TXT_INFO, getInfoText());
 
         CallBackChoiceTiledView tView =
             (CallBackChoiceTiledView) getChild(TILED_CHOICE);
@@ -206,6 +228,7 @@ public class CallBackTiledView
             setDisplayFieldValue(TXT_VALUE, new String(tmp));
         }
 
+        setDisplayFieldValue(TXT_INFO, getInfoText());
         CallBackChoiceTiledView tView =
             (CallBackChoiceTiledView) getChild(TILED_CHOICE);
         tView.setChoices(curTile, null, 0);
@@ -214,6 +237,7 @@ public class CallBackTiledView
     private void setChoiceCallbackInfo(ChoiceCallback cc) {
         setDisplayFieldValue(TXT_PROMPT, cc.getPrompt());
         setDisplayFieldValue(TXT_VALUE, "");
+        setDisplayFieldValue(TXT_INFO, getInfoText());
 
         CallBackChoiceTiledView tView =
             (CallBackChoiceTiledView) getChild(TILED_CHOICE);
@@ -269,5 +293,34 @@ public class CallBackTiledView
         }
 
         return required;
+    }
+    
+    public boolean beginHasInfoTextDisplay(ChildDisplayEvent event) {
+        boolean hasInfoText = false;
+
+        if ((infoText != null) && !infoText.isEmpty()) {
+            String s = infoText.get(curTile -1);
+
+            if ((s != null) && (s.length() > 0)) {
+                hasInfoText = true;
+            }
+        }
+
+        return hasInfoText;
+    }
+    
+    
+    private String getInfoText() {
+        String result = "";
+
+        if ((infoText != null) && !infoText.isEmpty()) {
+            String s = infoText.get(curTile -1);
+
+            if ((s != null) && (s.length() > 0)) {
+                result = s;
+            }
+        }
+
+        return result;
     }
 }

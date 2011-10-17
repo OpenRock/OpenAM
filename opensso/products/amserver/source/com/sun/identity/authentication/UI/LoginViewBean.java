@@ -769,7 +769,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     throws ModelControlException {
         setPageEncoding(request,response);
         CallBackTiledView tView = (CallBackTiledView) getChild(TILED_CALLBACKS);
-        tView.setCallBackArray(callbacks, requiredList);
+        tView.setCallBackArray(callbacks, requiredList, infoText);
         
         if ( rb != null ) {
             if (newOrg) {
@@ -1566,6 +1566,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                 pageImage = ppc.getImage();
                 requiredList = ppc.getRequire();
                 pageState = ppc.getPageState();
+                infoText = ppc.getInfoText();
                 
                 int lsize = 0;
                 
@@ -1579,6 +1580,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                         + TextHeaderVal + " template : " + pageTemplate
                         + " image : " + pageImage + " Required list : "
                         + requiredList + " List size : " + lsize
+                        + "Info Text : " + infoText 
                         + " Page State : " + pageState);
                 }
 
@@ -2355,6 +2357,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     public boolean isPost = false;
     /** Required list */
     public List requiredList = null;
+    public List<String> infoText = null;
     AuthContextLocal ac;
     private Hashtable reqDataHash = new Hashtable();
     private static String LOGINURL = "";

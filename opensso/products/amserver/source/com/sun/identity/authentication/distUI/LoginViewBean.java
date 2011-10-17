@@ -577,7 +577,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     throws ModelControlException {
         setPageEncoding(request,response);
         CallBackTiledView tView = (CallBackTiledView) getChild(TILED_CALLBACKS);
-        tView.setCallBackArray(callbacks, requiredList);
+        tView.setCallBackArray(callbacks, requiredList, infoText);
         
         if ( rb != null ) {
             if (newOrg) {
@@ -1321,6 +1321,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 pageImage = ppc.getImage();
                 requiredList = ppc.getRequire();
                 pageState = ppc.getPageState();
+                infoText = ppc.getInfoText();
                 
                 int lsize = 0;
                 
@@ -1334,6 +1335,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         + TextHeaderVal + " template : " + pageTemplate
                         + " image : " + pageImage + " Required list : "
                         + requiredList + " List size : " + lsize
+                        + "Info Text : " + infoText 
                         + " Page State : " + pageState);
                 }
 
@@ -2206,6 +2208,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     public boolean isPost = false;
     /** Required list */
     public List requiredList = null;
+    public List<String> infoText = null;
     private boolean cookieSupported = true;
     AuthContext ac = null;
     SSOToken ssoToken = null;

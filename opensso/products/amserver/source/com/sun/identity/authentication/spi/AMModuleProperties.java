@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.authentication.spi;
 
 import java.io.InputStream;
@@ -67,6 +68,7 @@ class AMModuleProperties {
     private List page = new ArrayList();
     private List attribute; // Attribute for each page
     private List require; // isRequire for each page
+    private List<String> infoText;
     private Hashtable rtable = new Hashtable();
     private Callback[] callbacks = null;
     private static Map moduleProps = new HashMap();
@@ -220,7 +222,7 @@ class AMModuleProperties {
 
                     attribute = new ArrayList();
                     require = new ArrayList();
-
+                    infoText = new ArrayList<String>();
                 } else if (nodeName.equals("NameCallback")) {
                         sub = node.getFirstChild();
                         sub = sub.getNextSibling();
@@ -252,6 +254,12 @@ class AMModuleProperties {
                         } else {
                             attribute.add("");
                         }
+                        tmp = getAttribute(node, "infoText");
+                        if (tmp!=null) {
+                            infoText.add(tmp);
+                        } else {
+                            infoText.add("");
+                        }
                         p++;
                 } else if (nodeName.equals("PasswordCallback")) {
                         String echo = getAttribute(node, "echoPassword");
@@ -275,6 +283,12 @@ class AMModuleProperties {
                             attribute.add(tmp);
                         } else {
                             attribute.add("");
+                        }
+                        tmp = getAttribute(node, "infoText");
+                        if (tmp!=null) {
+                            infoText.add(tmp);
+                        } else {
+                            infoText.add("");
                         }
                         p++;
                 } else if (nodeName.equals("ChoiceCallback")) {
@@ -332,6 +346,12 @@ class AMModuleProperties {
                             attribute.add(tmp);
                         } else {
                             attribute.add("");
+                        }
+                        tmp = getAttribute(node, "infoText");
+                        if (tmp!=null) {
+                            infoText.add(tmp);
+                        } else {
+                            infoText.add("");
                         }
                         p++;
                 } else if (nodeName.equals("ConfirmationCallback")) {
@@ -489,6 +509,7 @@ class AMModuleProperties {
             if (nodeName.equals("Callbacks")) {
                 ((PagePropertiesCallback) callbacks[0]).setAttribute(attribute);
                 ((PagePropertiesCallback) callbacks[0]).setRequire(require);
+                ((PagePropertiesCallback) callbacks[0]).setInfoText(infoText);
                 rtable.put(order, callbacks);
                 //attrtable.put(order, subAttr);
                 //requiretable.put(order, subRequire);
