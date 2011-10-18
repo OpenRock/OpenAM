@@ -74,6 +74,7 @@ import javax.security.auth.login.LoginException;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.util.LDIF;
+import java.io.FileReader;
 
 /**
  * Import service configuration data.
@@ -173,12 +174,11 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
     
     private String getEncKey(String xmlFile)
         throws IOException {
-        FileInputStream in = null;
         String encKey = null;
+        BufferedReader reader = null;
         
         try {
-            in = new FileInputStream(xmlFile);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            reader = new BufferedReader(new FileReader(xmlFile));
  
             String line = reader.readLine();
             String prefix = "<Value>" + Constants.ENC_PWD_PROPERTY + "=";
@@ -188,14 +188,17 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
                     encKey = line.substring(prefix.length());
                     encKey = encKey.substring(0, encKey.indexOf("</Value>"));
                     encKey = SMSSchema.unescapeName(encKey);
+                    if (encKey.equals("@AM_ENC_PWD@")) {
+                        //don't fall for tagswappable value
+                        encKey = null;
+                    }
                 }
                 line = reader.readLine();
             }
-            reader.close();
         } finally {
-            if (in != null) {
+            if (reader != null) {
                 try {
-                    in.close();
+                    reader.close();
                 } catch (IOException e) {
                     //ignore
                 }
