@@ -645,12 +645,16 @@ public class IDPSSOFederate {
 
                         // If there was no previous SAML2 session, there will be no
                         // sessionIndex
-                        if (sessionIndex != null && sessionIndex.length() != 0
-                                && (sessionUpgrade || !isValidSessionInRealm)) {
+                        if (sessionIndex != null && sessionIndex.length() != 0) {
                             // Save the original IDP Session
                             oldIDPSession = (IDPSession) IDPCache.
                                     idpSessionsByIndices.get(sessionIndex);
-                            IDPCache.oldIDPSessionCache.put(reqID, oldIDPSession);
+                            if (oldIDPSession != null) {
+                               IDPCache.oldIDPSessionCache.put(reqID, oldIDPSession);
+                            } else {
+                                SAML2Utils.debug.error(classMethod + "The old SAML2 session "
+                                        + " was not found in the idp session by indices cache");
+                            }
                         }
 
                         // Save the new requestId and AuthnRequest
