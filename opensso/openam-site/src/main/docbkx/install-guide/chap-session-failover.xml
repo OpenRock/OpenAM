@@ -33,108 +33,154 @@
  <title>Setting Up OpenAM Session Failover</title>
 
  <para>This chapter covers setting up session failover when using multiple
- instances of OpenAM for high availability.</para>
+ instances of OpenAM in a site configuration for high availability. The basic
+ idea followed here is that you configure load balancing to be sticky, based
+ on the value of an OpenAM cookie, <literal>amlbcookie</literal>, different
+ for each OpenAM server. Should that server become unavailable, the load
+ balancer fails client requests over to another OpenAM server. The other OpenAM
+ server must then fail over the user session associated with the client.</para>
  
- <section>
-  <title>Java EE Based Session Failover</title>
-  <para>OpenAM includes a beta version session failover mechanism designed to
-  replace the existing implementation that relies on Message Queue and Berkeley
-  DB with a highly scalable, pure Java implementation.</para>
+ <para>Session failover uses a highly available data store for OpenAM
+ session data, shared by OpenAM servers in a site configuration. When the
+ OpenAM server where a user authenticated goes down, other OpenAM servers can
+ read the user session information from the highly available store, so the
+ user does not have to authenticate again. When the original OpenAM server
+ becomes available again, it can also read session information from the
+ store, and carry on serving users with active sessions.</para>
+ 
+ <procedure xml:id="before-you-start-site-failover">
+  <title>Before You Start</title>
   
-  <!-- TODO: Incorporate README themes below, modulo integration of components:
+  <para>Before you set up session failover, first configure OpenAM in a site
+  configuration with a load balancer as the entry point to the site. The most
+  expedient way to configure the site is to set it up during initial OpenAM
+  configuration, where OpenAM can manage and replicate server configuration
+  for availability. If you did not set up the site during initial configuration,
+  then follow all the steps below.</para>
   
-  1. Overview
-
-amsessiondb is designed as a drop in replacement for the existing OpenAM session
-failover system that uses MQ and Berkley DB.
-
-2. Installation
-
-Copy the following files into your OpenAM webapp WEB-INF/lib directory and
-restart the container.
-
-* AMSessionRepository-0.1-SNAPSHOT.jar
-* AMSessionStoreCommon-0.1-SNAPSHOT.jar
-* org.restlet.lib.org.json-2.0.jar
-* commons-net-2.2.jar                   
-* jackson-core-asl-1.4.3.jar            
-* jackson-mapper-asl-1.4.3.jar          
-* org.osgi.core-4.0.0.jar               
-* org.restlet-2.0.6.jar                 
-* org.restlet.ext.jackson-2.0.6.jar     
-* org.restlet.ext.json-2.0.6.jar
-
-3. Configuration
-
-3.1. OpenAM Configuration
-
-For OpenAM session failover to be configured, OpenAM must be running in a site
-configuration. Please site this article to assist in configuring sites:
-
-https://wikis.forgerock.org/confluence/display/openam/5+Extending+to+a+Dual+Instance+Deployment
-
-When configuring the session service in OpenAM; the same procedure should be
-followed only with these configuration changes to the secondary session
-configuration instance.
-
-* Session Store User : admin
-* Session Store Password : <password>
-* Session Store Password (confirm) : <password>
-* Maximum Wait Time : 5000
-* Database Url : http://localhost:8182/amsessiondb
-* Session Failover Enabled : (True) Enabled
-
-3.2 amsessiondb configuration.
-
-amsessiondb is configured using the configuration files in the config directory:
-
-* amsessiondb.properties : General configuration; port number, URI et cetera
-* amsessiondblog.properties : Controls the log level of the components
-* dbconfig.xml : Configures the embedded OrientDB server
-
-4. Startup
-
-In the amsessiondb/bin directory, run the start.sh command.
-
-5. Operational
-
-When the amsessiondb server is running, there are two useful URLs:
-
-http://localhost:8182/amsessiondb/stats
-
-This returns the following information in JSON format.
-
-* uptime : The uptime of the server in ms
-* numSessions : The number of sessions in the database
-* totalRequests : The total number of requests received.
-* totalReads : The total number of read requests received.
-* totalWrites : The total number of write requests received.
-* totalDeletes : The total number of delete requests received.
-* totalReadSessionCount : The total number of read session count requests
-  received.
-
-http://localhost:8182/amsessiondb/config
-
-This returns the configuration of the amsessiondb server in JSON format. This is
-useful for debugging and support purposes.
-
-6. Troubleshooting
-
-amsessiondb logs its operations to the amsessiondb-0-0.log in the logs
-directory.
-
-To enable debugging change this entry amsessiondb.level in the
-amsessiondblog.properties configuration file to FINEST and restart.
+  <step>
+   <para>On each OpenAM server console in the site, select Configuration &gt;
+   Servers and Sites &gt; Sites &gt; New..., and then create a new site, using
+   the URL through the load balancer to OpenAM as the site URL.</para>
+   <para>For example, if your load balancer listens on host
+   <literal>lb.example.com</literal> and port <literal>8080</literal>,
+   with OpenAM under <literal>/openam</literal>, your site URL might be
+   <literal>http://lb.example.com:8080/openam</literal>.</para>
+  </step>
+  <step>
+   <para>On each OpenAM server console in the site, select Configuration &gt;
+   Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>,
+   and then set Parent Site to the site you created before saving your
+   work.</para>
+  </step>
+  <step>
+   <para>Set up your load balancer for sticky cookie load balancing, where
+   the load balancer inspects the value of the <literal>amlbcookie</literal>
+   to determine which OpenAM server should be preferred to handle a client
+   request.</para>
+   <para>As your load balancer depends on the <literal>amlbcookie</literal>
+   value, on each OpenAM server console in the site, select Configuration &gt;
+   Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>
+   &gt; Advanced, set <literal>com.iplanet.am.lbcookie.value</literal> to a
+   unique value, and save your work.</para>
+   <para>Restart OpenAM or the underlying web container to put your change
+   into effect. At this point, <literal>amlbcookie</literal> values from
+   OpenAM should be as you configured them. (To check, login to the console
+   and check the cookie value in your browser.)</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="prepare-site-session-data-service">
+  <title>To Prepare the Session Data Service</title>
   
- -->
+  <para>The session data service relies on Java Message Queue and Berkeley DB
+  Java Edition. You set up the session failover service in a site cluster to
+  serve as the highly available session data store.</para>
+  
+  <step>
+   <para>On each OpenAM server, install the session tools from
+   <filename>ssoSessionTools.zip</filename>, for example in the OpenAM
+   configuration directory.</para>
+   <screen>$ cd $HOME/openam
+$ unzip /path/to/OpenAM/tools/ssoSessionTools.zip
+...
+$ ./setup
+Name of the directory to install the scripts (example: sfoscripts):sfoscripts
+The scripts are properly setup under directory: /home/user/openam/sfoscripts
+JMQ is properly setup under directory /home/user/openam/jmq</screen>
+  </step>
+  <step>
+   <para>Create a password file for the session failover service.</para>
+   <screen>$ cd sfoscripts/bin/
+$ ./amsfopassword --passwordfile /home/user/openam/mqpwd.txt --encrypt password
+os.name=Linux
+SUCCESSFUL</screen>
+  </step>
+  <step>
+   <para>Configure the session failover service for the site.</para>
+   <para>For each session tools installation, edit the
+   <filename>/home/user/openam/sfoscripts/config/lib/amsfo.conf</filename>
+   configuration file to change at least the <literal>CLUSTER_LIST</literal>,
+   and <literal>PASSWORDFILE</literal> parameters.</para>
+   <para><literal>CLUSTER_LIST</literal> specifies the host:port combinations
+   for all the session failover services you configure for the site.</para>
+   <screen>CLUSTER_LIST=openam.example.com:7777,openam-bis.example.com:7777</screen>
+   <para><literal>PASSWORDFILE</literal> specifies the path to the password
+   file you created.</para>
+   <screen>PASSWORDFILE=/home/user/openam/mqpwd.txt</screen>
+   <para>You can optionally set <literal>AMSESSIONDB_ARGS="-v"</literal> to log
+   additional information.</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="enable-site-session-failover">
+  <title>To Enable Session Failover</title>
+  
+  <para>Enabling session failover at this point involves configuring OpenAM to
+  use the session data store, and then starting services. Examples in this
+  procedure show OpenAM running in Apache Tomcat.</para>
+  
+  <step>
+   <para>On each OpenAM server console in the site, select Configuration &gt;
+   Global &gt; Session &gt; Instances &gt; New... to set up session data store
+   access.</para>
+   <para>The Session Store User is <literal>guest</literal>, the password
+   the one you entered into the password file, and the Database Url is the
+   host:port you entered for the <literal>CLUSTER_LIST</literal>
+   parameter.</para>
+   <para>Be sure to Add the new instance, and then also Save your configuration
+   changes. The configuration changes take effect after you restart
+   OpenAM.</para>
+  </step>
+  <step>
+   <para>Stop each OpenAM server in the site.</para>
+   <screen>$ /etc/init.d/tomcat stop</screen>
+  </step>
+  <step>
+   <para>Start each session data service in the cluster.</para>
+   <screen>$ ./amsfo start</screen>
+   <para>By default, the log and session data store are located under
+   <filename>/tmp/amsession/</filename>.</para>
+  </step>
+  <step>
+   <para>Start each OpenAM server in the site.</para>
+   <screen>$ /etc/init.d/tomcat start</screen>
+   <para>After OpenAM has started, you should be able to test session
+   failover.</para>
+   <!-- TODO: Cover how to troubleshoot when things go wrong, either here
+   or in the Admin Guide troubleshooting chapter. -->
+  </step>
+ </procedure>
+
+<!--  <section xml:id="global-session-failover">
+  <title>Global Session Failover</title>
+  <para>OpenAM includes a new, multi-site session failover mechanism based on
+  OpenDJ.</para>
  </section>
  
- <section>
-  <title>Message Queue Based Session Failover</title>
-  
-  <para>OpenAM fully supports Message Queue based session failover.</para>
-  
-  <!-- TODO: Explain how to set it up. -->
- </section>
+ <section xml:id="site-based-session-failover">
+  <title>Site Based Session Failover</title>
+  <para>OpenAM also provides the site-based session failover service available
+  in earlier versions.</para>
+ </section> -->
 </chapter>
-

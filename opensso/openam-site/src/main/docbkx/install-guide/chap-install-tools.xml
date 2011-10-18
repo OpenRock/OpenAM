@@ -58,7 +58,10 @@
   <varlistentry>
    <term><filename>tools/ssoSessionTools.zip</filename></term>
    <listitem>
-    <para>Session failover utilities</para>
+    <!-- TODO: add olink -->
+    <para>Session failover utilities. Installation for these tools is
+    described in the chapter on <citetitle>Setting Up OpenAM Session
+    Failover</citetitle>.</para>
    </listitem>
   </varlistentry>
  </variablelist>
@@ -158,32 +161,6 @@ Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
  <para>You can start the graphical user interface by using the tools without
  options, or in console mode using the <command>ssodtool.sh --console</command>
  command.</para>
-  </step>
- </procedure>
- 
- <procedure xml:id="install-openam-session-tools">
-  <title>To Set Up Session Tools</title>
-  
-  <note>
-   <para>Expect this procedure to change as the new, OpenDJ-based session
-   failover capabilities are included in OpenAM.</para>
-  </note>
-  
-  <step>
-   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
-   is properly set.</para>
-   <screen>$ echo $JAVA_HOME
-/path/to/jdk1.6</screen>
-  </step>
-  <step>
-   <para>Install the necessary scripts for session failover.</para>
-   <screen>$ setup -p scripts
-The scripts are properly setup under directory: /path/to/session/tools/scripts
-...</screen>
-   <!-- TODO: Add olink when the machinery is available. -->
-   <para>For instructions on making sessions available across a site, see
-   the chapter on <citetitle>Setting Up OpenAM Session
-   Failover</citetitle>.</para>
   </step>
  </procedure>
 </chapter>

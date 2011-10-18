@@ -94,6 +94,13 @@
    </listitem>
   </varlistentry>
   <varlistentry>
+   <term>Session failover service, message queue: 7777</term>
+   <listitem>
+    <para>The session failover service communicates by default on port 7777.
+    You set up the session failover service separately from OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
    <term>Embedded configuration store, data replication: 8989</term>
    <listitem>
     <para>The embedded LDAP directory server replicates data with other
