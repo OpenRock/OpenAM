@@ -114,7 +114,6 @@
    additional functionality not available out of the box.</para>
   </partintro>
  
-  <xinclude:include href='chap-customize-gateway.xml' />
   <xinclude:include href='chap-auth-spi.xml' />
   <xinclude:include href='chap-policy-spi.xml' />
   <xinclude:include href='chap-delegation-spi.xml' />

@@ -47,17 +47,18 @@
  to set up policy agent profiles in OpenAM for centralized configuration.</para>
  
  <section xml:id="gateway-or-policy-agent">
-  <title>Universal Gateway or Policy Agent?</title>
-  <indexterm><primary>Universal Gateway</primary></indexterm>
-  <para>OpenAM includes both the Universal Gateway and also a variety of
-  policy agents. Both the Universal Gateway and also the policy agents
-  enforce policy, redirecting users to authenticate when necessary, and
-  policing access to protected resources. Yet the Universal Gateway runs
-  as a self-contained reverse proxy located between the users and the
-  protected applications. Policy agents are installed into the servers
+  <title>Identity Gateway or Policy Agent?</title>
+  <indexterm><primary>Identity Gateway</primary></indexterm>
+  <para>OpenAM includes both the <link
+  xlink:href="http://resources.apexidentity.com/projects/docs/wiki">Identity
+  Gateway</link> and also a variety of policy agents. Both the Identity Gateway
+  and also the policy agents enforce policy, redirecting users to authenticate
+  when necessary, and policing access to protected resources. Yet, the Identity
+  Gateway runs as a self-contained reverse proxy located between the users and
+  the protected applications. Policy agents are installed into the servers
   where applications run, intercepting requests in that context.</para>
   
-  <para>The Universal Gateway works well with applications where you
+  <para>The Identity Gateway works well with applications where you
   want to protect access but you cannot install a policy agent anywhere.
   For example, you might have a web application running in a server for
   which no policy agent has been developed. Or you might be protecting an
@@ -70,7 +71,7 @@
   
   <para>Of course, for organizations with both servers where you can install
   policy agents and also applications that you must protect without touching
-  the server, you can use policy agents on the former and the Universal
+  the server, you can use policy agents on the former and the Identity
   Gateway for the latter.</para>
  </section>
  

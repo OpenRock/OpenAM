@@ -56,13 +56,6 @@
       See http://en.wikipedia.org/wiki/Man_page#Manual_sections for details.
  -->
 
- <part label="A">
-  <title>OpenAM Core Services Reference</title>
-  <partintro>
-   <para>The following topics cover formats and tools for configuration
-   of OpenAM core services.</para>
-  </partintro>
-
  <reference>
   <title>OpenAM Command Line Tools</title>
   <xinclude:include href='man-agentadmin-1.xml' />
@@ -78,110 +71,7 @@
  <xinclude:include href='chap-l10n.xml' />
  <xinclude:include href='chap-file-layout.xml' />
  <xinclude:include href='chap-standards.xml' />
- </part>
 
- <part label="B">
-  <title>Gateway Reference</title>
-  <partintro>
-   <para>The following topics provide reference materials for all aspects of
-   gateway configuration.</para>
-  </partintro>
-
- <!-- TODO: port http://resources.apexidentity.com/projects/docs/wiki/Reference
-      modulo updates since that was last updated. -->
-
- <reference>
-  <title>Required Configuration</title>
-  <partintro>
-   <para>You must specify at least the entry point for incoming requests, 
-   the gateway servlet, and the heap objects that configure and initialize
-   objects, with dependency injection.</para>
-  </partintro>
-  <xinclude:include href='man-gateway-servlet-5.xml' />
-  <xinclude:include href='man-heap-objects-5.xml' />
- </reference>
-
- <reference>
-  <title>Servlets</title>
-  <partintro>
-   <para>The gateway includes objects that can create, initialize and dispatch
-   to Java Enterprise Edition servlets and servlet filters.</para>
-  </partintro>
-  <xinclude:include href='man-DispatchServlet-5.xml' />
-  <xinclude:include href='man-HandlerServlet-5.xml' />
-  <xinclude:include href='man-Servlet-5.xml' />
-  <xinclude:include href='man-Servlet-Filter-5.xml' />
- </reference>
-
- <reference>
-  <title>Handlers</title>
-  <partintro>
-   <para>Handler objects process an HTTP exchange request by producing an
-   associated response.</para>
-  </partintro>
-  <xinclude:include href='man-Chain-5.xml' />
-  <xinclude:include href='man-ClientHandler-5.xml' />
-  <xinclude:include href='man-DispatchHandler-5.xml' />
-  <xinclude:include href='man-SequenceHandler-5.xml' />
-  <xinclude:include href='man-StaticResponseHandler-5.xml' />
- </reference>
-
- <reference>
-  <title>Filters</title>
-  <partintro>
-   <para>Filter objects perform filtering of the request and response of an
-   HTTP exchange.</para>
-  </partintro>
-  <xinclude:include href='man-AssignmentFilter-5.xml' />
-  <xinclude:include href='man-CaptureFilter-5.xml' />
-  <xinclude:include href='man-CookieFilter-5.xml' />
-  <xinclude:include href='man-EntityExtractFilter-5.xml' />
-  <xinclude:include href='man-ExceptionFilter-5.xml' />
-  <xinclude:include href='man-FileAttributesFilter-5.xml' />
-  <xinclude:include href='man-HeaderFilter-5.xml' />
-  <xinclude:include href='man-CryptoFilter-5.xml' />
-  <xinclude:include href='man-HTTPBasicAuthFilter-5.xml' />
-  <xinclude:include href='man-SQLAttributesFilter-5.xml' />
-  <xinclude:include href='man-StaticRequestFilter-5.xml' />
-  <xinclude:include href='man-SwitchFilter-5.xml' />
- </reference>
-
- <reference>
-  <title>Miscellaneous Heap Objects</title>
-  <xinclude:include href='man-ConsoleLogSink-5.xml' />
-  <xinclude:include href='man-TemporaryStorage-5.xml' />
- </reference>
-
- <reference>
-  <title>Application Integration &amp; Provisioning</title>
-  <xinclude:include href='man-PBWorksLoginHandler-5.xml' />
- </reference>
-
- <reference>
-  <title>Expressions</title>
-  <partintro>
-   <para>Many configuration parameters support dynamic expressions.</para>
-  </partintro>
-  <xinclude:include href='man-Expressions-5.xml' />
-  <xinclude:include href='man-Functions-5.xml' />
-  <xinclude:include href='man-Patterns-5.xml' />
- </reference>
-
- <reference>
-  <title>Exchange Object Model</title>
-  <partintro>
-   <para>Expressions are evaluated within an exchange object model scope.</para>
-  </partintro>
-  <xinclude:include href='man-Exchange-5.xml' />
-  <xinclude:include href='man-Request-5.xml' />
-  <xinclude:include href='man-Principal-5.xml' />
-  <xinclude:include href='man-Response-5.xml' />
-  <xinclude:include href='man-URI-5.xml' />
- </reference>
- 
-  <xinclude:include href='chap-gateway-templates.xml' />
- </part>
- 
  <index />
  <?dbhtml-include href="../ga.html"?>
 </book>
