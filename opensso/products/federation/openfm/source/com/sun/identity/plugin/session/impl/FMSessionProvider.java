@@ -71,6 +71,7 @@ import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
@@ -587,7 +588,14 @@ public class FMSessionProvider implements SessionProvider {
                 retValues[0] = SAMLConstants.AUTH_METHOD_URI_PREFIX+values;
             }
             return retValues;
-        }            
+        }
+        
+        if (name.equals(SAML2Constants.ORGANIZATION)) {
+            String[] retValues = new String[1];
+            retValues[0] =  DNMapper.orgNameToRealmName(values);
+            return retValues;
+        }
+        
         String[] returnVals = values.split("\\"+PROPERTY_VALUES_SEPARATOR);
         for (int i= 0; i < returnVals.length; i++) {
             returnVals[i] = StringUtils.getUnescapedValue(returnVals[i]);

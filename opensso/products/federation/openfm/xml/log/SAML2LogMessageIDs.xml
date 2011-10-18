@@ -2196,4 +2196,21 @@
             <item>Check debug file for detailed info</item>
         </actions>
     </logmessage>
+    <logmessage name="INVALID_REALM_FOR_SESSION" id="167"
+        loglevel="LL_INFO"
+        description="Invalid realm for the user trying to get an assertion from the IdP.">
+        <datainfo>
+            <item>Realm of the authenticated user</item>
+            <item>Realm where the IdP is defined</item>
+            <item>Entity Id of the SP</item>
+            <item>IP Address of the requester</item>
+            <item>SAML2 Authentication Request</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On failed</item>
+        </triggers>
+        <actions>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
 </logmessages>

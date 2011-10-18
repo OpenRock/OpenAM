@@ -74,6 +74,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.MimeHeaders;
@@ -265,7 +266,8 @@ public class IDPSSOFederate {
 
             AuthnRequest authnReq = null;
             String relayState = null;
-            if (reqID == null) {
+            if (reqID == null) {  
+                // There is no reqID, this is the first time that we pass here.
                 String binding = SAML2Constants.HTTP_REDIRECT;
                 if (request.getMethod().equals("POST")) {
                     binding = SAML2Constants.HTTP_POST;
@@ -620,26 +622,31 @@ public class IDPSSOFederate {
                 } else {
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message(classMethod + 
-                            "Session is valid");
+                            "There is an existing session");
                     }
 
+                    // Let's verify that the realm is the same for the user and the IdP
+                    boolean isValidSessionInRealm = isValidSessionInRealm(
+                            realm, session);
                     IDPSession oldIDPSession = null;
                     String sessionIndex = IDPSSOUtil.getSessionIndex(session);
-                    boolean sessionUpgrade = isSessionUpgrade(
-                        idpAuthnContextInfo, session);        
-
-                    if (SAML2Utils.debug.messageEnabled()) {
-                        SAML2Utils.debug.message(classMethod +
-                            "IDP Session Upgrade is :" + sessionUpgrade);
+                    boolean sessionUpgrade = false;
+                    if (isValidSessionInRealm) {
+                        sessionUpgrade = isSessionUpgrade(idpAuthnContextInfo, 
+                                session);
+                        if (SAML2Utils.debug.messageEnabled()) {
+                            SAML2Utils.debug.message(classMethod
+                                    + "IDP Session Upgrade is :" + sessionUpgrade);
+                        }
                     }
-
-                    if (sessionUpgrade ||
+                    if (sessionUpgrade || !isValidSessionInRealm ||
                             ((Boolean.TRUE.equals(authnReq.isForceAuthn())) &&
                             (!Boolean.TRUE.equals(authnReq.isPassive()))) ) {
 
                         // If there was no previous SAML2 session, there will be no
                         // sessionIndex
-                        if (sessionIndex != null && sessionIndex.length() != 0) {
+                        if (sessionIndex != null && sessionIndex.length() != 0
+                                && (sessionUpgrade || !isValidSessionInRealm)) {
                             // Save the original IDP Session
                             oldIDPSession = (IDPSession) IDPCache.
                                     idpSessionsByIndices.get(sessionIndex);
@@ -665,6 +672,7 @@ public class IDPSSOFederate {
 
                         //IDP Proxy: Initiate proxying when session upgrade is requested
                         // Session upgrade could be requested by asking a greater AuthnContext
+                        if (isValidSessionInRealm) {
                         try {
                             boolean isProxy = IDPProxyUtil.isIDPProxyEnabled(
                                     authnReq, realm);
@@ -735,7 +743,8 @@ public class IDPSSOFederate {
                                     "during the session upgrade request: ", se2);
                         }
                         // End of block for IDP Adapter invocation
-
+                        }
+                        
                         try {
                             if (!Boolean.TRUE.equals(authnReq.isPassive())) {
                                 redirectAuthentication(request, response, reqID,
@@ -784,7 +793,7 @@ public class IDPSSOFederate {
                     // comes here if either no session upgrade or error
                     // redirecting to authentication url.
                     // generate assertion response
-                    if (!sessionUpgrade) {
+                    if (!sessionUpgrade && isValidSessionInRealm) {
                         // IDP Adapter invocation, to be sure that we can execute the logic
                         // even if there is a new request with the same session
                         
@@ -869,6 +878,33 @@ public class IDPSSOFederate {
                 }
 
                 relayState =(String)IDPCache.relayStateCache.get(reqID);
+                
+                // Let's verify if the session belongs to the proper realm
+                boolean isValidSessionInRealm = isValidSessionInRealm(
+                        realm, session);
+                if (!isValidSessionInRealm) {
+                    SAML2Utils.debug.error(classMethod + "The realm of the session"
+                            + " does not correspond to that of the IdP");
+                    String sessionRealm = sessionProvider.getProperty(session, 
+                            SAML2Constants.ORGANIZATION)[0];
+                    String IPAddress = request.getRemoteAddr();
+                    String authnReqString = "";;
+                    try {
+                        authnReqString = authnReq.toXMLString();
+                    } catch (SAML2Exception ex) {
+                        SAML2Utils.debug.error(classMethod + "Could not obtain the AuthnReq "
+                                + "to be logged");
+                    }
+                    String[] data = { sessionRealm, realm, idpEntityID, 
+                        IPAddress, authnReqString};
+                    LogUtil.error(Level.INFO, LogUtil.INVALID_REALM_FOR_SESSION, 
+                            data, session, null);
+                    sendError(request, response, 
+                                SAML2Constants.CLIENT_FAULT,
+                                "UnableToDOSSOOrFederation", null,
+                                isFromECP);
+                    return;
+                }
 
                 // Invoke the IDP Adapter after the user has been authenticated
                 try {
@@ -1287,6 +1323,43 @@ public class IDPSSOFederate {
         }
     }
 
+       
+    /**
+     * Check that the authenticated session belongs to the same realm where the 
+     * IDP is defined.
+     *
+     *
+     * @param realm the realm where the IdP is defined
+     * @param session The Session object of the authenticated user
+     * @return true if the session was initiated in the same realm as realm
+     */
+    private static boolean isValidSessionInRealm(String realm, Object session) {
+
+        String classMethod = "IDPSSOFederate.isValidSessionInRealm: ";
+        boolean isValidSessionInRealm = false;
+        try {
+            // A user can only be authenticated in one realm
+            String sessionRealm = SessionManager.getProvider().
+                    getProperty(session, SAML2Constants.ORGANIZATION)[0];
+            if (sessionRealm != null && !sessionRealm.isEmpty()) {
+                if (realm.equalsIgnoreCase(sessionRealm)) {
+                    isValidSessionInRealm = true;
+                } else {
+                    if (SAML2Utils.debug.warningEnabled()) {
+                        SAML2Utils.debug.warning(classMethod
+                                + "Invalid realm for the session:" + sessionRealm +
+                                ", while the realm of the IdP is:" + realm);
+                    }
+                }
+            }
+        } catch (SessionException ex) {
+            SAML2Utils.debug.error(classMethod + "Could not retrieve the session"
+                    + " information", ex);
+        }
+        return isValidSessionInRealm;
+    }
+      
+    
     /**
      * clean up the cache created for session upgrade.
      */

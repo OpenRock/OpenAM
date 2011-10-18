@@ -362,6 +362,8 @@ public class LogUtil {
     public static final String BINDING_NOT_SUPPORTED = "BINDING_NOT_SUPPORTED";
     public static final String SP_SSO_FAILED = "SP_SSO_FAILED";
                                           
+    // 
+    public static final String INVALID_REALM_FOR_SESSION = "INVALID_REALM_FOR_SESSION";
     private static final String SAML2_LOG = "SAML2";
     private static Logger logger = null;
 

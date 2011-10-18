@@ -796,6 +796,7 @@ public interface SAML2Constants {
     public String FALSE="false";
 
     public String AUTH_LEVEL="AuthLevel";
+    public String ORGANIZATION = "Organization";
     public String AUTH_LEVEL_ATTR="sunFMAuthContextComparison";
     public String AUTH_TYPE="authType";
     public String AUTH_LEVEL_ADVICE = "sunamcompositeadvice";
