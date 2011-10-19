@@ -44,6 +44,7 @@ element's characterics are the same as the section, see above.
 	name CDATA #REQUIRED
         defaultValue CDATA #IMPLIED
 	labelWidth CDATA #IMPLIED
+        spacer CDATA #IMPLIED	
 >
 
 <!--

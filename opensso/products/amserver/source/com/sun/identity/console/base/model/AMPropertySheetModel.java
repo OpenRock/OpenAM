@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.console.base.model;
 
 import com.iplanet.jato.view.ContainerView;
@@ -120,7 +124,7 @@ public class AMPropertySheetModel
     }
 
     public AMPropertySheetModel(String name) {
-            setDocument(new ByteArrayInputStream(name.getBytes()));
+        setDocument(new ByteArrayInputStream(name.getBytes()));
     }
 
     public AMPropertySheetModel(ServletContext sc, String file) {
@@ -165,7 +169,7 @@ public class AMPropertySheetModel
                     view.registerChild(name, CCGlobalMapList.class);
                 } else if (tagName.equals(EDITABLE_LIST)) {
                     view.registerChild(name, CCEditableList.class);
-                 }
+                }
             }
         }
         if (hasSubConfigTable) {
@@ -371,8 +375,7 @@ public class AMPropertySheetModel
                 if (m == null) {
                     setModel(name, new CCAddRemoveModel());
                 }
-            }
-
+            } 
         }
         
         if (view == null) {

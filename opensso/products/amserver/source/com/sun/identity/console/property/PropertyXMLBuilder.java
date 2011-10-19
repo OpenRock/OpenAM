@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.console.property;
 
 import com.iplanet.sso.SSOException;
@@ -36,17 +40,26 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
-public class PropertyXMLBuilder
-    extends PropertyXMLBuilderBase
-{
-    private Set schemaTypes;
+public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
+    private Set<SchemaType> schemaTypes;
+    private final static String FILENAME_SUFFIX = ".section.properties";
+    private Map<String, List<String>> sectionOrder = null;
+    private Map<SchemaType, List<String>> sectionForType = null;
 
     /**
      * Returns a XML for displaying attribute in property sheet.
@@ -69,6 +82,10 @@ public class PropertyXMLBuilder
         svcSchemaManager = new ServiceSchemaManager(
             serviceName, model.getUserSSOToken());
         getServiceResourceBundle();
+        if (getSectionOrder()) {
+            getSectionsForType();
+        }
+        
         if (serviceBundle != null) {
             mapTypeToAttributeSchema = getAttributeSchemas(serviceName);
         } 
@@ -96,6 +113,14 @@ public class PropertyXMLBuilder
                 serviceSchema.getAttributeSchemas());
         }
     }
+    
+    public PropertyXMLBuilder(
+        String serviceName,
+        AMModel model,
+        Set attributeSchemas
+    ) throws SMSException, SSOException {
+        this(serviceName, model, attributeSchemas, null); 
+    }
 
     /**
      * Constructs a XML builder.
@@ -109,12 +134,22 @@ public class PropertyXMLBuilder
     public PropertyXMLBuilder(
         String serviceName,
         AMModel model,
-        Set attributeSchemas
+        Set attributeSchemas,
+        SchemaType schemaType
     ) throws SMSException, SSOException {
         this.model = model;
         this.serviceName = serviceName;
         svcSchemaManager = new ServiceSchemaManager(
             serviceName, model.getUserSSOToken());
+        
+        if (schemaType != null) {
+            if (getSectionOrder()) {
+                schemaTypes = new HashSet<SchemaType>();
+                schemaTypes.add(schemaType);
+                getSectionsForType();
+            }
+        }
+        
         getServiceResourceBundle();
         if (serviceBundle != null) {
             mapTypeToAttributeSchema = new HashMap(attributeSchemas.size() *2);
@@ -237,23 +272,58 @@ public class PropertyXMLBuilder
                 "propertysheet.no.attributes.message"));
         }
 
-        Set attributeSchema = (Set)mapTypeToAttributeSchema.get(NULL_TYPE);
+        Set attributeSchema = (Set) mapTypeToAttributeSchema.get(NULL_TYPE);
         if ((attributeSchema != null) && !attributeSchema.isEmpty()) {
             String display = "blank.header";
-            buildSchemaTypeXML(display, attributeSchema, xml, model,
-                serviceBundle, readonly);
+            SchemaType type = null;
+            if (schemaTypes.size() == 1) {
+                Iterator<SchemaType> it = schemaTypes.iterator();
+                type = it.next();
+            }
+            
+            if (getSectionsForType(type) == null) {
+                buildSchemaTypeXML(display, attributeSchema, xml, model,
+                    serviceBundle, readonly);
+            } else {
+                String label = "lbl" + display.replace('.', '_');
+                Object[] params = { label, display};
+                xml.append(MessageFormat.format(SECTION_START_TAG, params));
+
+                for (String section : sectionForType.get(type)) {
+                    String sectionName = 
+                            model.getLocalizedString("section.label." + serviceName + "." + type.getType() + "." + section);
+                    buildSchemaTypeXML(sectionName, attributeSchema, xml,
+                        model, serviceBundle, readonly, sectionOrder.get(section));
+                }
+
+                xml.append(SECTION_END_TAG);                
+            }
         }
 
-        for (Iterator iter = orderDisplaySchemaType.iterator(); iter.hasNext();)
-        {
+        for (Iterator iter = orderDisplaySchemaType.iterator(); iter.hasNext();) {
             SchemaType type = (SchemaType)iter.next();
             attributeSchema = (Set)mapTypeToAttributeSchema.get(type);
 
             if ((attributeSchema != null) && !attributeSchema.isEmpty()) {
                 String display = model.getLocalizedString(
                     (String)mapSchemaTypeToName.get(type));
-                buildSchemaTypeXML(display, attributeSchema, xml,
-                    model, serviceBundle, readonly);
+                if (getSectionsForType(type) == null) {
+                    buildSchemaTypeXML(display, attributeSchema, xml,
+                        model, serviceBundle, readonly);
+                } else {
+                    String label = "lbl" + display.replace('.', '_');
+                    Object[] params = { label, display};
+                    xml.append(MessageFormat.format(SECTION_START_TAG, params));
+        
+                    for (String section : sectionForType.get(type)) {
+                        String sectionName = 
+                                model.getLocalizedString("section.label." + serviceName + "." + type.getType() + "." + section);
+                        buildSchemaTypeXML(sectionName, attributeSchema, xml,
+                            model, serviceBundle, readonly, sectionOrder.get(section));
+                    }
+                    
+                    xml.append(SECTION_END_TAG);
+                }
             }
         }
 
@@ -356,5 +426,96 @@ public class PropertyXMLBuilder
                 }
             }
         }
+    }
+    
+    /**
+     * Loads the section order (if available) for this service.
+     * 
+     * @return true if found, false other wise
+     */
+    private boolean getSectionOrder() {
+        InputStream is = 
+                getClass().getClassLoader().getResourceAsStream(serviceName + FILENAME_SUFFIX);
+        
+        if (is == null) {
+            if (debug.messageEnabled()) {
+                debug.message("getSectionOrder: no section for service" + serviceName);
+                return false;
+            } 
+        }
+        
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        
+        try {
+            String line = reader.readLine();
+            while (line != null) {
+                if (!line.startsWith("#") && (line.trim().length() > 0)) {
+                    int idx = line.indexOf('=');
+                    String key = line.substring(0, idx).trim();
+                    String value = line.substring(idx+1).trim();
+                    
+                    List<String> list = map.get(key);
+                    if (list == null) {
+                        list = new ArrayList<String>();
+                        map.put(key, list);
+                    }
+                    list.add(value);
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException ioe) {
+            if (debug.messageEnabled()) {
+                debug.message("PropertyXMLBuilder:getSectionOrder", ioe);
+            }
+        }
+        
+        sectionOrder = map;
+        
+        if (debug.messageEnabled()) {
+            debug.message("getSectionOrder: " + sectionOrder);
+        }
+        
+        return true;
+    }
+    
+    private void getSectionsForType() {
+        sectionForType = new HashMap<SchemaType, List<String>>();
+        
+        for (SchemaType schemaType : schemaTypes) {
+            String name = "sections." + serviceName + "." + schemaType.getType();
+            String section = model.getLocalizedString(name);
+            
+            if (section.equals(name)) {
+                continue;
+            }
+            
+            StringTokenizer st = new StringTokenizer(section, " ");
+            List<String> sections = new ArrayList<String>();
+            
+            while (st.hasMoreTokens()) {
+                sections.add(st.nextToken());
+            }
+            
+            sectionForType.put(schemaType, sections);
+        }        
+        
+        if (debug.messageEnabled()) {
+            debug.message("getSectionsForType: " + sectionForType);
+        }
+    }
+    
+    private List<String> getSectionsForType(SchemaType type) {
+        if (sectionForType == null) {
+            return null;
+        }
+        
+        List<String> result = sectionForType.get(type);
+        
+        if (result == null) {
+            return null;
+        }
+        
+        return result;
     }
 }

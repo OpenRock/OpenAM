@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.console.property;
 
 public interface PropertyTemplate {
@@ -83,7 +87,7 @@ public interface PropertyTemplate {
     String SECTION_END_TAG = "</section>\n";
     
     String SUBSECTION_DUMMY_START_TAG = "<subsection name=\"dummy\" defaultValue=\"\">";
-    String SUBSECTION_START_TAG = "<subsection name=\"{0}\" defaultValue=\"{1}\">";
+    String SUBSECTION_START_TAG = "<subsection name=\"{0}\" defaultValue=\"{1}\" spacer=\"{2}\">";
     String SUBSECTION_END_TAG = "</subsection>";
     
     String GROUP_START_TAG = "<ccgroup>";
@@ -151,5 +155,5 @@ public interface PropertyTemplate {
     String SUB_CONFIG_TABLE_XML =
         "<section name=\"subconfig\" defaultValue=\"subconfig.section.header\"><property span=\"true\"><cc name=\"tblSubConfig\" tagclass=\"com.sun.web.ui.taglib.table.CCActionTableTag\"><attribute name=\"title\" value=\"services.subconfig.table.title\" /><attribute name=\"empty\" value=\"services.subconfig.table.empty.message\" /><attribute name=\"showPaginationControls\" value=\"false\" /><attribute name=\"selectionType\" value=\"multiple\" /><attribute name=\"showAdvancedSortingIcon\" value=\"false\" /><attribute name=\"showLowerActions\" value=\"false\" /><attribute name=\"showPaginationControls\" value=\"false\" /><attribute name=\"showPaginationIcon\" value=\"false\" /><attribute name=\"showSelectionIcons\" value=\"true\" /><attribute name=\"showSelectionSortIcon\" value=\"false\" /><attribute name=\"showSortingRow\" value=\"true\" /><attribute name=\"selectionJavascript\" value=\"toggleTblButtonState('" + SUB_CONFIG_TABLE_VIEW_BEAN + "', '" + SUB_CONFIG_TABLE_VIEW_BEAN + ".tblSubConfig', 'tblButton', '" + SUB_CONFIG_TABLE_VIEW_BEAN + ".tblSubConfigButtonDelete', this)\" /></cc></property></section>";
 
-    String DEFAULT_TEXTFIELD_SIZE = "50";
+    String DEFAULT_TEXTFIELD_SIZE = "50";  
 }

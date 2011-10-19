@@ -25,17 +25,34 @@
 package org.forgerock.openam.console.ui.taglib.propertysheet;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.jato.util.NonSyncStringBuffer;
+import com.iplanet.jato.view.View;
+import com.iplanet.jato.view.html.OptionList;
+import com.iplanet.jato.view.html.SelectableGroup;
 import com.sun.identity.shared.Constants;
+import com.sun.web.ui.common.CCBodyContentImpl;
+import com.sun.web.ui.common.CCDebug;
+import com.sun.web.ui.common.CCImage;
+import com.sun.web.ui.common.CCJspWriterImpl;
+import com.sun.web.ui.model.CCPropertySheetModelInterface;
+import com.sun.web.ui.taglib.common.CCTagBase;
+import com.sun.web.ui.taglib.html.CCCheckBoxTag;
+import com.sun.web.ui.taglib.html.CCRadioButtonTag;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.BodyTag;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
  * @author Peter Major
+ * @author Steve Ferris
  */
 public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPropertySheetTag {
-
     private static final String TXT = ".txt";
     private static final String URI = ".uri";
     private static final String CONTEXT_ROOT =
@@ -73,6 +90,94 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
                 return MessageFormat.format(HELP_TEMPLATE, uniqueID++, super.getMessage(key), helpTxt, MessageFormat.format(URL_TEMPLATE, helpUri));
             }
         }
+    }
+    
+    @Override
+    protected String getValueHTML(Node valueNode, String labelId, boolean levelThree)
+    throws JspException, IllegalArgumentException {
+        if(valueNode == null) {
+            CCDebug.trace1("Property node missing value element");
+            return null;
+        }
+        
+        String viewName = getAttributeValue(valueNode, "name", "");
+        String tagclassName = getAttributeValue(valueNode, "tagclass", "com.sun.web.ui.taglib.html.CCStaticTextFieldTag");
+        View child = null;
+        
+        if(!tagclassName.equals("com.sun.web.ui.taglib.spacer.CCSpacerTag") &&
+                !tagclassName.equals("org.forgerock.openam.console.ui.taglib.spacer.CCSpacerTag")) {
+            child = containerView.getChild(viewName);
+        }
+        
+        CCTagBase tag = getCCTag(tagclassName);
+        tag.setName(viewName);
+        if (labelId != null) {
+            tag.setElementId(labelId);
+        }
+        
+        if (tagclassName.equals("com.sun.web.ui.taglib.html.CCCheckBoxTag")) {
+            CCCheckBoxTag cb = (CCCheckBoxTag)tag;
+            cb.setStyleLevel(levelThree ? "3" : "2");
+            cb.setElementId(getNextLabelId());
+        } else if(tagclassName.equals("com.sun.web.ui.taglib.html.CCRadioButtonTag")) {
+            CCRadioButtonTag rb = (CCRadioButtonTag)tag;
+            rb.setStyleLevel(levelThree ? "3" : "2");
+            rb.setElementId(getNextLabelId());
+        }
+        
+        if (valueNode.hasChildNodes()) {
+            NodeList childNodeList = valueNode.getChildNodes();
+            BodyContent bodyContent = null;
+            if (tag instanceof BodyTag) {
+                bodyContent = new CCBodyContentImpl(new CCJspWriterImpl(null, 100, false));   
+            }
+            
+            OptionList options = null;
+            
+            if (child != null && (child instanceof SelectableGroup)) {
+                options = new OptionList();
+            }
+                
+            for (int i = 0; i < childNodeList.getLength(); i++) {
+                parseValueChildNode(childNodeList.item(i), tag, bodyContent, options);
+            }
+
+            if (bodyContent != null) {
+                ((BodyTag)tag).setBodyContent(bodyContent);
+            }
+                
+            if (options != null && options.size() > 0) {
+                ((SelectableGroup)child).setOptions(options);
+            }
+        }
+        
+        if (tag.getBundleID() == null) {
+            tag.setBundleID(getBundleID());
+        }
+        
+        tag.setTabIndex(getTabIndex());
+        String html = null;
+        
+        if (fireBeginDisplayEvent(containerView, tag)) {
+            html = tag.getHTMLString(getParent(), pageContext, child);    
+        }
+        
+        return fireEndDisplayEvent(containerView, tag, html);
+    }
+    
+    @Override
+    protected void appendSubsection(NonSyncStringBuffer buffer, 
+                                    Node subsection, 
+                                    CCPropertySheetModelInterface model, 
+                                    int level, 
+                                    int labelWidth)
+    throws JspException {
+        super.appendSubsection(buffer, subsection, model, level, labelWidth);
+        buffer.append("\n<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" title=\"\"><tr><td>\n")
+              .append(getImageHTMLString(CCImage.DOT, "1", "10"))
+              .append("</td><td class=\"ConLin\" width=\"100%\">")
+              .append(getImageHTMLString(CCImage.DOT, "1", "1"))
+              .append("</td></tr></table>\n\n");  
     }
 
     public static String getDynamicHelp(ResourceBundle bundle, String key) {

@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS 
+ */
+
 package com.sun.identity.console.realm.model;
 
 import com.sun.identity.idm.IdRepoException;
@@ -47,6 +51,7 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.util.Collections;
@@ -190,7 +195,7 @@ public class IDRepoModelImpl
             PropertyXMLBuilder.removeAttributeSchemaWithoutI18nKey(
                 attributeSchemas);
             PropertyXMLBuilder builder = new PropertyXMLBuilder(
-                IdConstants.REPO_SERVICE, this, attributeSchemas);
+                IdConstants.REPO_SERVICE, this, attributeSchemas, SchemaType.ORGANIZATION);
             if (!bCreate && !canModify) {
                 builder.setAllAttributeReadOnly(true);
             }

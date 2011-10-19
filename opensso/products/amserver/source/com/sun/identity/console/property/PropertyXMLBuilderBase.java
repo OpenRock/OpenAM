@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.console.property;
 
 import com.sun.identity.console.base.model.AMModel;
@@ -459,7 +460,7 @@ public abstract class PropertyXMLBuilderBase
                 * create a subsection without a title to hold the 
                 * editable list component.
                 */
-                xml.append(SUBSECTION_DUMMY_START_TAG);
+                //xml.append(SUBSECTION_DUMMY_START_TAG);
             }
 
             if (needRequiredTag(as)) {
@@ -573,8 +574,8 @@ public abstract class PropertyXMLBuilderBase
             if (listTyped) {
                 xml.append(GROUP_END_TAG)
                     .append("&lt;p>")
-                    .append(PROPERTY_END_TAG)
-                    .append(SUBSECTION_END_TAG);
+                    .append(PROPERTY_END_TAG);
+                    //.append(SUBSECTION_END_TAG);
             }
         }
     }
@@ -972,7 +973,7 @@ public abstract class PropertyXMLBuilderBase
     public ServiceSchemaManager getServiceSchemaManager() {
         return svcSchemaManager;
     }
-
+    
     protected void buildSchemaTypeXML(
         String schemaTypeName,
         Set attributeSchemas,
@@ -981,9 +982,23 @@ public abstract class PropertyXMLBuilderBase
         ResourceBundle serviceBundle,
         Set readonly
     ) {
-        String label = "lbl" + schemaTypeName.replace('.', '_');
-        Object[] params = {label, schemaTypeName};
-        xml.append(MessageFormat.format(SECTION_START_TAG, params));
+        buildSchemaTypeXML(schemaTypeName, attributeSchemas, xml, model, serviceBundle, readonly, true);
+    }
+
+    protected void buildSchemaTypeXML(
+        String schemaTypeName,
+        Set attributeSchemas,
+        StringBuffer xml,
+        AMModel model,
+        ResourceBundle serviceBundle,
+        Set readonly,
+        boolean section
+    ) {
+        if (section) {
+            String label = "lbl" + schemaTypeName.replace('.', '_');
+            Object[] params = { label, schemaTypeName};
+            xml.append(MessageFormat.format(SECTION_START_TAG, params));
+        }        
 
         List sorted = new ArrayList(attributeSchemas);
         Collections.sort(sorted, new AttributeSchemaComparator(null));
@@ -1003,7 +1018,37 @@ public abstract class PropertyXMLBuilderBase
             }
         }
 
-        xml.append(SECTION_END_TAG);
+        xml.append((section ? SECTION_END_TAG : ""));
+    }
+    
+    protected void buildSchemaTypeXML(
+        String schemaTypeName,
+        Set<AttributeSchema> attributeSchemas,
+        StringBuffer xml,
+        AMModel model,
+        ResourceBundle serviceBundle,
+        Set readonly,
+        List<String> sectionList
+    ) {
+        Object[] params = { schemaTypeName, schemaTypeName, "true" };
+        xml.append(MessageFormat.format(SUBSECTION_START_TAG, params));
+        Set<AttributeSchema> as = getAttributeSchemaForSection(attributeSchemas, sectionList);
+        
+        buildSchemaTypeXML(schemaTypeName, as, xml, model, serviceBundle, readonly, false);
+        
+        xml.append(SUBSECTION_END_TAG);
+    } 
+    
+    protected Set<AttributeSchema> getAttributeSchemaForSection(Set<AttributeSchema> attributeSchemas, List<String> sectionList) {
+        Set<AttributeSchema> result = new HashSet<AttributeSchema>();
+        
+        for (AttributeSchema attribute : attributeSchemas) {
+            if (sectionList.contains(attribute.getName())) {
+                result.add(attribute);
+            }
+        }
+        
+        return result;
     }
 
     /**
