@@ -440,8 +440,8 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
         if (is == null) {
             if (debug.messageEnabled()) {
                 debug.message("getSectionOrder: no section for service" + serviceName);
-                return false;
             } 
+            return false;
         }
         
         Map<String, List<String>> map = new HashMap<String, List<String>>();
