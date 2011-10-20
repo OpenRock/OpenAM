@@ -107,12 +107,16 @@
    <literal>com.sun.identity.urlchecker.dorequest=false</literal>.</para>
   </listitem>
   <listitem>
-   <para>OpenAM now lets you set the SAML 2.0 IDP Adapter class through
-   the console (OPENAM-700).</para>
+   <para>OpenAM supports a new SAML 2.0 IdP Adapter plug-in for additional
+   flexibility. The adapter lets the system handle situations that arise when
+   the identity provider needs to perform additional processing before
+   releasing the assertion, or when interaction with the user is needed before
+   releasing it. The IdP Adapter class implementing the plugin can be
+   configured through the console (OPENAM-700).</para>
   </listitem>
   <listitem>
-   <para>OpenAM now provides an OAuth 2.0 service provider authentication
-   module (OPENAM-679).</para>
+   <para>OpenAM now provides an OAuth 2.0 Client authentication module
+   (OPENAM-679).</para>
   </listitem>
   <listitem>
    <para>OpenAM now provides additional statistics related to session failover
@@ -212,15 +216,6 @@
    <para>OpenAM password reset now uses realm aliases to find realms for
    end users, eliminating the need to add a realm parameter to the URL
    (OPENAM-192).</para>
-  </listitem>
-  <listitem>
-   <!-- Full implementation related to OPENAM-129 -->
-   <para>OpenAM supports SAML 2.0 extensions for additional flexibility.
-   For example, the extensions let the system handle situations
-   that arise when the identity provider receives failed an authentication
-   request and so must skip some processing, or when there remains additional
-   interaction with the user after a completed assertion but before providing
-   authorization.</para>
   </listitem>
   <listitem>
    <para>OpenAM now allows time-based rotation, and also file name prefixes and
