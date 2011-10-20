@@ -4333,6 +4333,10 @@ public class SAML2Utils extends SAML2SDKUtils {
                         getAuthnAuthorityDescriptor(realm, idpEntityID).
                         getAssertionIDRequestService();
             } else if (
+                SAML2Constants.ARTIFACT_RESOLUTION_SERVICE.equals(profile)) 
+            {
+                services = idpDescriptor.getArtifactResolutionService();
+            } else if (
                 SAML2Constants.SLO_SERVICE.equals(profile))
             {
                 services = idpDescriptor.getSingleLogoutService();
