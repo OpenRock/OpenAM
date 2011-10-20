@@ -4329,10 +4329,6 @@ public class SAML2Utils extends SAML2SDKUtils {
             } else if (
                 SAML2Constants.ASSERTION_ID_REQUEST_SERVICE.equals(profile)) 
             {
-                services = idpDescriptor.getAssertionIDRequestService();
-            } else if (
-                SAML2Constants.ARTIFACT_RESOLUTION_SERVICE.equals(profile)) 
-            {
                 services = saml2MetaManager.
                         getAuthnAuthorityDescriptor(realm, idpEntityID).
                         getAssertionIDRequestService();
