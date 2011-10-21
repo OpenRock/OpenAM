@@ -702,6 +702,7 @@ public class LoginState {
             Map attrs = svcConfig.getAttributes();
             aliasAttrNames = (Set) attrs.get(ISAuthConstants.AUTH_ALIAS_ATTR);
             // NEEDED FOR BACKWARD COMPATIBILITY SUPPORT - OPEN ISSUE
+            // TODO: Remove backward compat stuff
             if (AuthD.revisionNumber >=
             ISAuthConstants.AUTHSERVICE_REVISION7_0) {
                 identityTypes = (Set)attrs.get(ISAuthConstants.
