@@ -424,8 +424,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     protected int checkGeoLocation() {
         int retVal = 0;
         String countryCode = "";
+        
+        debug.message("GeoLocation database location = "+geoLocationDatabase);
 
         LookupService db = getLookupService(geoLocationDatabase);
+        
+        if (db == null) {
+        	debug.message("GeoLocation database lookup returns null");
+        }
 
         if (db != null) {
             countryCode = db.getCountry(clientIP).getCode();
@@ -542,10 +548,15 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         debug.message(ADAPTIVE + ".checkRegisteredClient: ");
         HttpServletRequest req = getHttpServletRequest();
-
+        
         if (req != null) {
             deviceID = (String) req.getHeader("User-Agent");
-            deviceID = deviceID + "|" + clientIP + "|" + userName;
+            deviceID = deviceID + "|" + (String) req.getHeader("accept");
+            deviceID = deviceID + "|" + (String) req.getHeader("accept-language");
+            deviceID = deviceID + "|" + (String) req.getHeader("accept-encoding");
+            deviceID = deviceID + "|" + (String) req.getHeader("accept-charset");
+            deviceID = deviceID + "|" + userName;
+            
             deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(deviceID)));
 
             for (Cookie cookie : req.getCookies()) {
