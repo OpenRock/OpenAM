@@ -367,6 +367,7 @@
    <literal>sunAMAuthAdaptiveService</literal></para>
    
    <variablelist>
+    <title>General</title>
     <varlistentry>
      <term>Authentication Level</term>
      <listitem>
@@ -414,6 +415,9 @@
       <literal>openam-auth-adaptive-failure-invert</literal></para>
      </listitem>
     </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>IP Address Range</title>
     <varlistentry>
      <term>IP Range Check</term>
      <listitem>
@@ -454,6 +458,9 @@
       <literal>openam-auth-adaptive-ip-range-invert</literal></para>
      </listitem>
     </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>IP Address History</title>
     <varlistentry>
      <term>IP History Check</term>
      <listitem>
@@ -465,7 +472,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Count to save</term>
+     <term>Count to Save</term>
      <listitem>
       <para>Specifies how many IP address values to retain on the profile
       attribute you specify. Default: 5</para>
@@ -509,6 +516,9 @@
       <literal>openam-auth-adaptive-ip-history-invert</literal></para>
      </listitem>
     </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Known Cookie</title>
     <varlistentry>
      <term>Cookie Value Check</term>
      <listitem>
@@ -564,110 +574,9 @@
       <literal>openam-auth-adaptive-known-cookie-invert</literal></para>
      </listitem>
     </varlistentry>
-    <varlistentry>
-     <term>Time since Last login check</term>
-     <listitem>
-      <para>When enabled, check whether the client browser request has the
-      specified cookie that holds the encrypted last login time, and check
-      that the last login time is more recent than a maximum number of days you
-      specify.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-time-since-last-login-check</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Cookie Name</term>
-     <listitem>
-      <para>Specifies the name of the cookie holding the encrypted last login
-      time value.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-time-since-last-login-cookie-name</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Max Time since Last Login</term>
-     <listitem>
-      <para>Specifies a threshold age of the last login time in days. If the
-      client's last login time is more recent than the number of days specified,
-      then the client successfully passes the check.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-time-since-last-login-value</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Save time of Successful Login</term>
-     <listitem>
-      <para>When enabled, save the specified cookie with the current time
-      encrypted as the last login value in the client's browser following
-      successful authentication.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-time-since-last-login-save</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Score</term>
-     <listitem>
-      <para>Value to add to the total score if the user passes the Time Since
-      Last Login Check.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-time-since-last-login-score</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Invert Result</term>
-     <listitem>
-      <para>When selected, add the Score to the total score if the user
-      fails the Time Since Last Login Check.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-time-since-last-login-invert</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Profile Risk Attribute check</term>
-     <listitem>
-      <para>When enabled, check whether the user profile contains the specified
-      attribute and value.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-risk-attribute-check</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Attribute Name</term>
-     <listitem>
-      <para>Specifies the attribute to check on the user profile for the
-      specified value.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-risk-attribute-name</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Attribute Value</term>
-     <listitem>
-      <para>Specifies the value to match on the profile attribute. If the
-      attribute is multi-valued, a single match is sufficient to pass the
-      check.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-risk-attribute-value</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Score</term>
-     <listitem>
-      <para>Value to add to the total score if the user passes the Profile Risk
-      Attribute Check.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-risk-attribute-score</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Invert Result</term>
-     <listitem>
-      <para>When selected, add the Score to the total score if the user
-      fails the Profile Risk Attribute Check.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-risk-attribute-invert</literal></para>
-     </listitem>
-    </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Device Cookie</title>
     <varlistentry>
      <term>Device Registration Cookie Check</term>
      <listitem>
@@ -715,6 +624,119 @@
       <literal>openam-auth-adaptive-device-cookie-invert</literal></para>
      </listitem>
     </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Time Since Last Login</title>
+    <varlistentry>
+     <term>Time Since Last Login Check</term>
+     <listitem>
+      <para>When enabled, check whether the client browser request has the
+      specified cookie that holds the encrypted last login time, and check
+      that the last login time is more recent than a maximum number of days you
+      specify.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Cookie Name</term>
+     <listitem>
+      <para>Specifies the name of the cookie holding the encrypted last login
+      time value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-cookie-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Max Time Since Last Login</term>
+     <listitem>
+      <para>Specifies a threshold age of the last login time in days. If the
+      client's last login time is more recent than the number of days specified,
+      then the client successfully passes the check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-value</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Save Time of Successful Login</term>
+     <listitem>
+      <para>When enabled, save the specified cookie with the current time
+      encrypted as the last login value in the client's browser following
+      successful authentication.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-save</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Time Since
+      Last Login Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Time Since Last Login Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-time-since-last-login-invert</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Profile Attribute</title>
+    <varlistentry>
+     <term>Profile Risk Attribute Check</term>
+     <listitem>
+      <para>When enabled, check whether the user profile contains the specified
+      attribute and value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute Name</term>
+     <listitem>
+      <para>Specifies the attribute to check on the user profile for the
+      specified value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Attribute Value</term>
+     <listitem>
+      <para>Specifies the value to match on the profile attribute. If the
+      attribute is multi-valued, a single match is sufficient to pass the
+      check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-value</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Profile Risk
+      Attribute Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Profile Risk Attribute Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-risk-attribute-invert</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Geo Location</title>
     <varlistentry>
      <term>Geolocation Country Code Check</term>
      <listitem>
@@ -758,6 +780,54 @@
       fails the Geolocation Country Code Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-geo-location-invert</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Request Header</title>
+    <varlistentry>
+     <term>Request Header Check</term>
+     <listitem>
+      <para>When enabled, check whether the client browser request has the
+      specified header with the correct value.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-req-header-check</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Request Header Name</term>
+     <listitem>
+      <para>Specifies the name of the request header for the Request Header
+      Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-req-header-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Request Header Value</term>
+     <listitem>
+      <para>Specifies the value of the request header for the Request Header
+      Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-req-header-value</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Score</term>
+     <listitem>
+      <para>Value to add to the total score if the user passes the Request
+      Header Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-req-header-score</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Invert Result</term>
+     <listitem>
+      <para>When selected, add the Score to the total score if the user
+      fails the Request Header Check.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-req-header-invert</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
