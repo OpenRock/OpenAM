@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
+
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
 <propertysheet>
@@ -119,6 +123,7 @@
                 <attribute name="showSelectionSortIcon" value="false" />
                 <attribute name="showSortingRow" value="true" />
             </cc>
+            <fieldhelp name="help-authenticationModuleConfigTable" defaultValue="authentication.module.configurations.help" />
         </property>
         
     </section>

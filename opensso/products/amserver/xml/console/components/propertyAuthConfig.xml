@@ -26,6 +26,9 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -47,6 +50,7 @@
                 <attribute name="showSelectionSortIcon" value="false" />
                 <attribute name="showSortingRow" value="true" />
             </cc>
+            <fieldhelp name="help-config-table" defaultValue="org-chain-list.help" />
         </property>
 
     <subsection name="successURLs" defaultValue="" >
@@ -62,6 +66,7 @@
                 <attribute name="listboxLabel" value="label.current.value" />
                 <attribute name="textboxLabel" value="label.new.value" />
             </cc>
+            <fieldhelp name="help-success-urls" defaultValue="a133.help" />
             </property>
             </ccgroup>
         </property>
@@ -80,6 +85,7 @@
                 <attribute name="listboxLabel" value="label.current.value" />
                 <attribute name="textboxLabel" value="label.new.value" />
             </cc>
+            <fieldhelp name="help-failure-urls" defaultValue="a134.help" />
             </property>
             </ccgroup>
         </property>
@@ -98,6 +104,7 @@
                 <attribute name="listboxLabel" value="label.current.value" />
                 <attribute name="textboxLabel" value="label.new.value" />
             </cc>
+            <fieldhelp name="help-pap-config" defaultValue="a135.help" />
             </property>
             </ccgroup>
         </property>

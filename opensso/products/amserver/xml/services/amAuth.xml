@@ -27,8 +27,9 @@
     $Id: amAuth.xml,v 1.16 2009/11/25 12:06:32 manish_rustagi Exp $
 
 -->
+
 <!--
-   "Portions Copyrighted 2011 [ForgeRock AS]"
+    Portions Copyrighted 2011 ForgeRock AS
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -140,8 +141,7 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-admin-auth-module" 
                     type="single_choice" 
-                    syntax="string"
-                    i18nKey="a104">
+                    syntax="string">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className=
@@ -312,8 +312,7 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-org-config"
                     type="single_choice" 
-                    syntax="string"
-                    i18nKey="a121">
+                    syntax="string">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className=
@@ -366,8 +365,7 @@
                  </AttributeSchema> 
                 <AttributeSchema name="sunAMIdentityType"
                     type="multiple_choice"
-                    syntax="string"
-                    i18nKey="a142">
+                    syntax="string">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className= "com.sun.identity.authentication.service.ConfiguredIdentityTypes" />
