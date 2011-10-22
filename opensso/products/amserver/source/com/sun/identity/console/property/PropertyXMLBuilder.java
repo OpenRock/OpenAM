@@ -441,6 +441,7 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
             if (debug.messageEnabled()) {
                 debug.message("getSectionOrder: no section for service" + serviceName);
             } 
+            
             return false;
         }
         

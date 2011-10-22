@@ -432,7 +432,8 @@ public abstract class PropertyXMLBuilderBase
         AttributeSchema as,
         StringBuffer xml,
         AMModel model,
-        ResourceBundle serviceBundle
+        ResourceBundle serviceBundle,
+        boolean addSubSection
     ) {
         String tagClassName = getTagClassName(as);
 
@@ -455,12 +456,12 @@ public abstract class PropertyXMLBuilderBase
             boolean listTyped = editableList || orderedList || unorderedList ||
                 mapList || globalMapList || addremovelist;
             
-            if (listTyped) {
+            if (listTyped && addSubSection) {
                 /*
                 * create a subsection without a title to hold the 
                 * editable list component.
                 */
-                //xml.append(SUBSECTION_DUMMY_START_TAG);
+                xml.append(SUBSECTION_DUMMY_START_TAG);
             }
 
             if (needRequiredTag(as)) {
@@ -575,7 +576,9 @@ public abstract class PropertyXMLBuilderBase
                 xml.append(GROUP_END_TAG)
                     .append("&lt;p>")
                     .append(PROPERTY_END_TAG);
-                    //.append(SUBSECTION_END_TAG);
+                if (addSubSection) {
+                    xml.append(SUBSECTION_END_TAG);
+                }
             }
         }
     }
@@ -982,7 +985,7 @@ public abstract class PropertyXMLBuilderBase
         ResourceBundle serviceBundle,
         Set readonly
     ) {
-        buildSchemaTypeXML(schemaTypeName, attributeSchemas, xml, model, serviceBundle, readonly, true);
+        buildSchemaTypeXML(schemaTypeName, attributeSchemas, xml, model, serviceBundle, readonly, true, true);
     }
 
     protected void buildSchemaTypeXML(
@@ -992,7 +995,8 @@ public abstract class PropertyXMLBuilderBase
         AMModel model,
         ResourceBundle serviceBundle,
         Set readonly,
-        boolean section
+        boolean section,
+        boolean addSubSection
     ) {
         if (section) {
             String label = "lbl" + schemaTypeName.replace('.', '_');
@@ -1009,7 +1013,7 @@ public abstract class PropertyXMLBuilderBase
             if (allAttributesReadonly || readonly.contains(as.getName())) {
                 buildReadonlyXML(as, xml, model, serviceBundle);
             } else {
-                buildAttributeSchemaTypeXML(as, xml, model, serviceBundle);
+                buildAttributeSchemaTypeXML(as, xml, model, serviceBundle, addSubSection);
                 String tagClassName = getTagClassName(as);
                                                                                 
                 if (tagClassName.equals(TAGNAME_PASSWORD)) {
@@ -1034,7 +1038,7 @@ public abstract class PropertyXMLBuilderBase
         xml.append(MessageFormat.format(SUBSECTION_START_TAG, params));
         Set<AttributeSchema> as = getAttributeSchemaForSection(attributeSchemas, sectionList);
         
-        buildSchemaTypeXML(schemaTypeName, as, xml, model, serviceBundle, readonly, false);
+        buildSchemaTypeXML(schemaTypeName, as, xml, model, serviceBundle, readonly, false, false);
         
         xml.append(SUBSECTION_END_TAG);
     } 
