@@ -69,7 +69,10 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             + "onblur=\"outHelp({0}); event.cancelBubble = true;\" id=\"i{0}\">"
             + "<img alt=\"{1}\" src=\"" + CONTEXT_ROOT + "/console/images/help/info.gif\" "
             + "id=\"helpImg{0}\" /></a><div class=\"helpText\">{1}</div>";
-    private static final String URL_TEMPLATE = "<a href=\"http://openam.forgerock.org/doc/{0}\" class=\"helpFooter\">Read more in the OpenAM online help</a>";
+    private static final String URL_TEMPLATE =
+            "<div class=\"helpFooter\"><img width=\"17px\" src=\""
+            + CONTEXT_ROOT + "/com_sun_web_ui/images/favicon/favicon.ico\" alt=\"logo\" />"
+            + "<a href=\"http://openam.forgerock.org/doc/{0}\">Read more in the OpenAM online help</a></div>";
     private static volatile int uniqueID = 0;
 
     @Override
