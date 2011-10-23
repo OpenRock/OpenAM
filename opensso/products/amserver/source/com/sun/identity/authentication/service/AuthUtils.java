@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2010-2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.service;
 
 import java.net.URL;
@@ -214,7 +216,7 @@ public class AuthUtils extends AuthClientUtils {
                 + authContext);
             }
 
-            if(!sid.isNull() && authContext == null) {
+            if(!sid.isNull() && authContext == null && !isSessionUpgrade) {
                 String authCookieValue = getAuthCookieValue(request);
                 if ((authCookieValue != null) && (authCookieValue.length() != 0)
                         && (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
