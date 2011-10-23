@@ -86,7 +86,7 @@
             source="${target.jdk.set}" target="${target.jdk.set}"
             debug="${build.debug}" debuglevel="${build.debuglevel}">
             <src path="${sharedlib.src.dir}"/>
-            <compilerarg value="-Xlint:none " />
+            <compilerarg value="-Xlint:none" />
             <classpath refid="build.class.path"/>
             <exclude name="**/package-info.java"/>
             <exclude name="**/com/sun/identity/shared/test/**"/>
