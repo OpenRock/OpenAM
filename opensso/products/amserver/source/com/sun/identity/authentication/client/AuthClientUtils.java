@@ -2575,7 +2575,25 @@ public class AuthClientUtils {
             }
             String redirect_url = conn.getHeaderField("Location");
             if (redirect_url != null) {
-                origRequestData.put("AM_REDIRECT_URL", redirect_url);
+                try {
+                    URL gotoURL = new URL(redirect_url);
+                    if (isSameServer(authURL, gotoURL)) {
+                        if (utilDebug.messageEnabled()) {
+                            utilDebug.message("Relative redirect detected");
+                        }
+                        //relative redirect happened
+                        String path = gotoURL.getPath();
+                        String query = gotoURL.getQuery();
+                        redirect_url = (path != null ? path : "") + (query != null ? "?" + gotoURL.getQuery() : "");
+                    }
+                    if (utilDebug.messageEnabled()) {
+                        utilDebug.message("sendAuthRequestToOrigServer(): Setting redirect URL to: " + redirect_url);
+                    }
+                    origRequestData.put("AM_REDIRECT_URL", redirect_url);
+                } catch (MalformedURLException murle) {
+                    //fallback to original handling
+                    origRequestData.put("AM_REDIRECT_URL", redirect_url);
+                }
             }
             String content_type = conn.getHeaderField("Content-Type");
             if (content_type != null) {
@@ -2608,6 +2626,14 @@ public class AuthClientUtils {
         }
 
         return (origRequestData);
+    }
+
+    private static boolean isSameServer(URL url1, URL url2) {
+        int port1 = url1.getPort() != -1 ? url1.getPort() : url1.getDefaultPort();
+        int port2 = url2.getPort() != -1 ? url2.getPort() : url2.getDefaultPort();
+        return url1.getProtocol().equals(url2.getProtocol())
+                && url1.getHost().equalsIgnoreCase(url2.getHost())
+                && port1 == port2;
     }
 
     private static void copyRequestHeaders(HttpServletRequest request, HttpURLConnection conn) {
