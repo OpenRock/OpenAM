@@ -67,9 +67,18 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
  /path/to/tomcat/bin/tomcat-juli.jar</screen>
   </step>
   <step>
+   <para>Make a copy of the OpenAM configuration directory.</para>
+   <screen>$ cd $HOME
+$ cp -r openam openam-orig</screen>
+  </step>
+  <step performance="optional">
+   <para>If you have an external configuration directory, make a backup copy
+   of the OpenAM configuration.</para>
+  </step>
+  <step>
    <para>Move the current OpenAM web application aside.</para>
    <screen>$ cd /path/to/tomcat/webapps
-$ mv openam openam-old ; mv openam.war openam-old.war</screen>
+$ mv openam openam-orig ; mv openam.war openam.war.orig</screen>
   </step>
   <step>
    <para>Deploy the new OpenAM in place of the old.</para>
