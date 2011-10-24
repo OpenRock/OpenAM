@@ -545,12 +545,12 @@ public class AuthXMLHandler implements RequestHandler {
                 }
                 break;
             case AuthXMLRequest.Logout:
-                Object loginContext = null;
-                InternalSession intSess = null;
-                SSOToken token = null;
-                boolean logoutCalled = false;
+                //Object loginContext = null;
+                //InternalSession intSess = null;
+                //SSOToken token = null;
+                //boolean logoutCalled = false;
                 if (sessionID != null && !sessionID.equals("0")) {
-                    intSess = AuthD.getSession(sessionID);
+                    /*intSess = AuthD.getSession(sessionID);
                     try {
                         token = SSOTokenManager.getInstance().
                             createSSOToken(sessionID);
@@ -564,9 +564,18 @@ public class AuthXMLHandler implements RequestHandler {
 		           debug.message("AuthXMLHandler.processAuthXMLRequest:"
                            + "SSOException checking validity of SSO Token");
                        }
-	            }
+	            }*/
+                    try {
+                        AuthUtils.logout(sessionID, servletRequest, servletResponse);
+                    } catch (com.iplanet.sso.SSOException ssoExp) {
+                        if (debug.messageEnabled()) {
+                            debug.message("AuthXMLHandler.processAuthXMLRequest:"
+                                + "SSOException checking validity of SSO Token");
+                        }
+                    }
                 }
-                if (intSess != null) {
+                
+                /*if (intSess != null) {
                     loginContext = intSess.getObject(ISAuthConstants.
                         LOGIN_CONTEXT);
                 }
@@ -659,7 +668,7 @@ public class AuthXMLHandler implements RequestHandler {
                             + "processAuthXMLRequest: SSOException "
                             + "checking validity of SSO Token");
                     }
-                }
+                }*/
                 authResponse.setLoginStatus(AuthContext.Status.COMPLETED);
                 break;
             case AuthXMLRequest.Abort:

@@ -33,10 +33,7 @@ package com.sun.identity.authentication.UI;
 
 import com.iplanet.am.util.SystemProperties;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -44,8 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.jato.RequestContext;
@@ -55,6 +50,7 @@ import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;
@@ -214,126 +210,44 @@ public class LogoutViewBean extends AuthViewBeanBase {
             super.forwardTo(requestContext);
             return;
         }
-        Object loginContext = null;
-        if (intSess != null) {
-            loginContext = intSess.getObject(ISAuthConstants.LOGIN_CONTEXT);
-        }
+        boolean wasTokenValid = false;
+        
         try {
-            if (loginContext != null) {
-                if (loginContext instanceof 
-                    javax.security.auth.login.LoginContext) {
-                    javax.security.auth.login.LoginContext lc = 
-                        (javax.security.auth.login.LoginContext) loginContext;
-                    lc.logout();
-                } else {
-                    com.sun.identity.authentication.jaas.LoginContext jlc =
-                        (com.sun.identity.authentication.jaas.LoginContext) 
-                        loginContext;
-                    jlc.logout();
-                }
-            }
-        } catch (javax.security.auth.login.LoginException loginExp) {
-            logoutDebug.error("LogoutViewBean.forwardTo: "
-                + " Cannot Execute module Logout", loginExp);
-        }
-        Set postAuthSet = null;
-        if (intSess != null) {
-            postAuthSet = (Set) intSess.getObject(ISAuthConstants.
-                POSTPROCESS_INSTANCE_SET);
-        }
-        if ((postAuthSet != null) && !(postAuthSet.isEmpty())) {
-            AMPostAuthProcessInterface postLoginInstance=null;
-            for(Iterator iter = postAuthSet.iterator();
-            iter.hasNext();) {
-                try {
-	            postLoginInstance =
-	 	        (AMPostAuthProcessInterface) iter.next();
-                     postLoginInstance.onLogout(request, response, token);
-                } catch (Exception exp) {
-                   logoutDebug.error("LogoutViewBean.forwardTo: "
-                       + "Failed in post logout.", exp);
-                }
-	    }
-        } else {
-            String plis = null;
-            if (intSess != null) {
-                plis = intSess.getProperty(
-                    ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
-            }
-            if (plis != null && plis.length() > 0) {
-                StringTokenizer st = new StringTokenizer(plis, "|");
-                if (token != null) {
-                    while (st.hasMoreTokens()) {
-                        String pli = (String)st.nextToken();
-                        try {
-                            AMPostAuthProcessInterface postProcess = 
-                                    (AMPostAuthProcessInterface)
-                                    Thread.currentThread().
-                                    getContextClassLoader().
-                                    loadClass(pli).newInstance();
-                             //Call utils method to clean up what exists in the request.
-                             //Just to make sure after any other redirects no residual values in
-                             //these redirect URL values in the request (safety check only)
-                             AuthUtils.resetPostProcessURLs(request);
-                            postProcess.onLogout(request, response, token);
+            wasTokenValid = AuthUtils.logout(intSess, token, request, response);
+            ResultVal = rb.getString("logout.successful");
+                                         
+            String postProcessURL =
+                AuthUtils.getPostProcessURL(request, AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
 
-                             String postProcessURL =
-                                 AuthUtils.getPostProcessURL(request,
-                                 AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
-
-                             if (postProcessURL != null) {
-                                 gotoUrl = postProcessURL;
-                             }
-
-                        } catch (Exception e) {
-                            logoutDebug.error("Failed in post logout process of " + pli, e);
-                        }
-                    }
-                }
+            if (postProcessURL != null) {
+                gotoUrl = postProcessURL;
             }
-        }
-        boolean isTokenValid = false;
-        try {
-            isTokenValid = SSOTokenManager.getInstance().isValidToken(token);
-        } catch (com.iplanet.sso.SSOException ssoExp) {
-            if (logoutDebug.messageEnabled()) {
-                logoutDebug.message("LogoutViewBean.forwardTo: "
-                    + " SSOException checking validity of SSO Token");
-            }
-        }
-            
-        if ((token != null) && isTokenValid) {
+        } catch (SSOException ssoe) {
             try {
-                AuthD.getAuth().logLogout(token);
-                Session session = Session.getSession(sessionID);
-                session.logout();
-                logoutDebug.message("logout successful.");
-                ResultVal = rb.getString("logout.successful");
-            } catch (SessionException se) {
-                try {
-                    if (logoutDebug.messageEnabled()) {
-                        logoutDebug.message("Exception during logout", se);
-                        logoutDebug.message("Goto Login URL : "+ LOGINURL);
-                    }
-                    if (doSendRedirect(LOGINURL)) {
-                        response.sendRedirect(appendLogoutCookie(LOGINURL));
-                        return;
-                    } else {
-                        jsp_page = appendLogoutCookie(
-                        getFileName(LOGIN_JSP));
-                    }
-                
-                } catch (Exception e) {
-                    if (logoutDebug.messageEnabled()) {
-                        logoutDebug.message(
-                            "Redirect failed:" + LOGINURL ,e);
-                    }
-                    ResultVal = e.getMessage();
+                if (logoutDebug.messageEnabled()) {
+                    logoutDebug.message("Exception during logout", ssoe);
+                    logoutDebug.message("Goto Login URL : " + LOGINURL);
                 }
-                super.forwardTo(requestContext);
-                return;
+                
+                if (doSendRedirect(LOGINURL)) {
+                    response.sendRedirect(appendLogoutCookie(LOGINURL));
+                    return;
+                } else {
+                    jsp_page = appendLogoutCookie(getFileName(LOGIN_JSP));
+                }
+            } catch (Exception ex) {
+                if (logoutDebug.messageEnabled()) {
+                    logoutDebug.message("Redirect failed:" + LOGINURL, ex);
+                }
+                
+                ResultVal = ex.getMessage();
             }
-        } else {
+            
+            super.forwardTo(requestContext);
+            return;
+        }
+
+        if (!wasTokenValid) {
             if (!isGotoSet()) {
                 String originalRedirectURL = AuthUtils.getOrigRedirectURL(
                     request,sessionID);

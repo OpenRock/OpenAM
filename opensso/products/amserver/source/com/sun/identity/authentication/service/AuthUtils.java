@@ -65,6 +65,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.Constants;
 
 import com.sun.identity.security.AdminTokenAction;
@@ -97,6 +98,7 @@ import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.shared.encode.Base64;
+import java.util.StringTokenizer;
 
 public class AuthUtils extends AuthClientUtils {
     
@@ -2086,4 +2088,128 @@ public class AuthUtils extends AuthClientUtils {
         return gotoUrl;	 
     }    
 
+    /**
+     * Performs a logout on a given token ensuring the post auth classes are called
+     * 
+     * @param sessionID The token id to logout
+     * @param request The HTTP request
+     * @param response The HTTP response
+     * @return true if the token was still valid before logout was called
+     * @throws SSOException If token is null or other SSO exceptions
+     */
+    public static boolean logout(String sessionID, HttpServletRequest request, HttpServletResponse response)
+    throws SSOException {
+        return logout(AuthD.getSession(sessionID), 
+                SSOTokenManager.getInstance().createSSOToken(sessionID), request, response);
+    }
+    
+    /**
+     * Performs a logout on a given token ensuring the post auth classes are called
+     * 
+     * @param intSession The <code>InternalSession</code> to logout
+     * @param token The <code>SSOToken</code> to logout
+     * @param request The HTTP request
+     * @param response The HTTP response
+     * @return true if the token was still valid before logout was called
+     * @throws SSOException If token is null or other SSO exceptions
+     */
+    public static boolean logout(InternalSession intSession, 
+                                 SSOToken token, 
+                                 HttpServletRequest request, 
+                                 HttpServletResponse response) 
+    throws SSOException {
+        if (token == null) {
+            throw new SSOException("token cannot be null");
+        }
+        Object loginContext = null;
+        
+        if (intSession != null) {
+            loginContext = intSession.getObject(ISAuthConstants.LOGIN_CONTEXT);
+        }
+        
+        try {
+            if (loginContext != null) {
+                if (loginContext instanceof 
+                    javax.security.auth.login.LoginContext) {
+                    javax.security.auth.login.LoginContext lc = 
+                        (javax.security.auth.login.LoginContext) 
+                         loginContext;
+                    lc.logout();
+                } else {
+                    com.sun.identity.authentication.jaas.LoginContext 
+                        jlc = (com.sun.identity.authentication.jaas.
+                        LoginContext) loginContext;
+                    jlc.logout();
+                }
+            }
+        } catch (javax.security.auth.login.LoginException loginExp) {
+            utilDebug.error("AuthUtils.logout: Cannot Execute module Logout", loginExp);
+        }
+        
+        Set<AMPostAuthProcessInterface> postAuthSet = null;
+        
+        if (intSession != null) {
+            postAuthSet = (Set<AMPostAuthProcessInterface>) intSession.getObject(ISAuthConstants.
+                POSTPROCESS_INSTANCE_SET);
+        }
+        
+        if ((postAuthSet != null) && !(postAuthSet.isEmpty())) {            
+            for (AMPostAuthProcessInterface postLoginInstance : postAuthSet) {
+                try {
+                    postLoginInstance.onLogout(request, response, token);
+                } catch (Exception exp) {
+                   utilDebug.error("AuthUtils.logout: Failed in post logout.", exp);
+                }
+            }
+        } else {
+            String plis = null;
+            
+            if (intSession != null) {
+                plis = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+            }
+            if (plis != null && plis.length() > 0) {
+                StringTokenizer st = new StringTokenizer(plis, "|");
+                
+                if (token != null) {
+                    while (st.hasMoreTokens()) {
+                        String pli = (String)st.nextToken();
+                        
+                        try {
+                            AMPostAuthProcessInterface postProcess = 
+                                    (AMPostAuthProcessInterface)
+                                    Thread.currentThread().
+                                    getContextClassLoader().
+                                    loadClass(pli).newInstance();
+                            postProcess.onLogout(request, response, token);
+                        } catch (Exception ex) {
+                            utilDebug.error("AuthUtils.logout:" + pli, ex);
+                        }
+                    }
+                }
+            }
+        }
+        
+        boolean isTokenValid = false;
+        
+        try {
+            isTokenValid = SSOTokenManager.getInstance().isValidToken(token);
+            
+            if ((token != null) && isTokenValid) {
+                AuthD.getAuth().logLogout(token);
+                Session session = Session.getSession(new SessionID(token.getTokenID().toString()));
+                session.logout();
+                
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("AuthUtils.logout: logout successful.");
+                }
+            }
+        } catch (SessionException se) {
+            if (utilDebug.warningEnabled()) {
+                utilDebug.warning("AuthUtils.logout: SessionException"
+                    + " checking validity of SSO Token", se);
+            }
+        }
+        
+        return isTokenValid;
+    }
 }
