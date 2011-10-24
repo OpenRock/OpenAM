@@ -606,7 +606,7 @@ public class LoginState {
      */
     public String getOrgName() {
         if (orgName == null) {
-            orgName = DNUtils.DNtoName(getOrgDN());
+            orgName = DNMapper.orgNameToRealmName(getOrgDN());
         }
         return orgName;
     }
