@@ -394,9 +394,6 @@ public interface ISAuthConstants {
     public static final String AUTHENTICATORS = AUTH_ATTR_PREFIX
             + "authenticators";
 
-    public static final String SUPPORTED_AUTH_MODULES = AUTH_ATTR_PREFIX
-            + "supported-auth-modules";
-
     public static final String SLEEP_INTERVAL = AUTH_ATTR_PREFIX
             + "sleep-interval";
 

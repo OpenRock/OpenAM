@@ -44,11 +44,6 @@
             revisionNumber="60"
             i18nKey="iplanet-am-auth-service-description">
             <Global>
-                <AttributeSchema name="iplanet-am-auth-supported-auth-modules"
-                    type="list"
-                    syntax="string"
-                    i18nKey="a124">
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-authenticators" 
                     type="list"
                     syntax="string" 
