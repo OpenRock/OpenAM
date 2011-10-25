@@ -61,6 +61,13 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         }
         
         Set<String> defaultValues = existingAttr.getDefaultValues();
+        
+        if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) &&
+            !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
+            // nothing to do
+            return null;
+        }
+        
         defaultValues.add(SECURID);
         defaultValues.add(ADAPTIVE);
         defaultValues.remove(SAFEWORD);

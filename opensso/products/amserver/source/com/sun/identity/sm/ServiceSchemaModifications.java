@@ -401,8 +401,11 @@ public class ServiceSchemaModifications {
                 try {
                     if (ServerUpgrade.getServiceHelper(serviceName) != null) {
                         UpgradeHelper helper = ServerUpgrade.getServiceHelper(serviceName);
-                        newAttr = helper.upgradeAttribute(existingAttr, newAttr);
-                        attrMods.add(newAttr);
+                        AttributeSchemaImpl upgradedAttr = helper.upgradeAttribute(existingAttr, newAttr);
+                        
+                        if (upgradedAttr != null) {
+                            attrMods.add(upgradedAttr);
+                        }
                     }
                 } catch (UpgradeException ue) {
                     UpgradeUtils.debug.error("Unable to process upgrade helper", ue);

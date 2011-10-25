@@ -56,6 +56,8 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
             "org.forgerock.openam.session.service.DenyAccessAction";
     private final static String DESTROY_ALL_SESSIONS_CLASS = 
             "org.forgerock.openam.session.service.DestroyAllAction";
+    private final static String DESTROY_OLDEST_SESSIONS_CLASS = 
+            "org.forgerock.openam.session.service.DestroyOldestAction";
     private static final String DESTROY_ALL_SESSIONS =
             "openam.session.destroy_all_sessions";
     
@@ -74,6 +76,13 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
         }
         
         Set<String> defaultValues = existingAttr.getDefaultValues();
+        
+        if (defaultValues.contains(DESTROY_ALL_SESSIONS_CLASS) || 
+            defaultValues.contains(NEW_DENY_ACCESS) ||
+            defaultValues.contains(DESTROY_OLDEST_SESSIONS_CLASS)) {
+            // nothing to do
+            return null;
+        }
         
         if (destroyAllSessionsSet() && defaultValues.contains(DESTROY_OLD_SESSION)) {
             Set<String> newDefaultValues = new HashSet<String>();
