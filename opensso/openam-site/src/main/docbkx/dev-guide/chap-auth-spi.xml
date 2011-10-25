@@ -769,7 +769,11 @@ $ jar cf ../sampleauth.jar .</screen>
  --xmlfile amAuthSampleAuth.xml 
 
 Service was added.
-$ ssoadm register-auth-module --adminid amadmin --password-file /tmp/pwd.txt --authmodule com.forgerock.openam.examples.SampleAuth
+$ ssoadm
+ register-auth-module
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --authmodule com.forgerock.openam.examples.SampleAuth
 
 Authentication module was registered.</screen>
    <!-- TODO: Add olink to ssoadm-1 for a full list of Authentication Service
