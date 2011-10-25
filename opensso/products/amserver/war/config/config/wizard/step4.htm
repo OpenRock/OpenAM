@@ -190,29 +190,39 @@
         setType(document.getElementById("ldapv3adforDomainName").value);
         document.getElementById("activeDirectoryConfigSettings").style.display = "";
         document.getElementById("embeddedConfigSettings").style.display = "none";
-        document.getElementById("externalConfigSettings").style.display = "none";        
+        document.getElementById("userStoreSettings").style.display = "none";
         ie7fix++;
         AjaxUtils.call("$context$path?actionLink=resetUMEmbedded&ie7fix=" + ie7fix);
     }
 
     function setAD() {
         setType(document.getElementById("ldapv3ad").value);
+        document.getElementById("userStoreSettings").style.display = "";
+        document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
 
     function setADAM() {
         setType(document.getElementById("ldapv3adam").value);
+        document.getElementById("userStoreSettings").style.display = "";
+        document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
 
     function setSUNDS() {
         setType(document.getElementById("ldapv3sunds").value);
+        document.getElementById("userStoreSettings").style.display = "";
+        document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
 
     function setOpenDS() {
         setType(document.getElementById("ldapv3opends").value);
+        document.getElementById("userStoreSettings").style.display = "";
+        document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
 
     function setTivoli() {
         setType(document.getElementById("ldapv3tivoli").value);
+        document.getElementById("userStoreSettings").style.display = "";
+        document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
 
     function setType(type) {
@@ -238,6 +248,7 @@
         userStoreChoice = "external";
         document.getElementById("ldapv3sunds").checked=true;
         document.getElementById("externalConfigSettings").style.display = "";
+        document.getElementById("userStoreSettings").style.display = "";
         document.getElementById("activeDirectoryConfigSettings").style.display = "none";
         document.getElementById("embeddedConfigSettings").style.display = "none";
         allValid();
@@ -279,7 +290,7 @@
             <b class="xt4"></b>
         </b>
         <div class="headerBox">$page.getLocalizedString("step4.sub.title")</div>
-        <div class="bodyBox" style="height:250px;">	
+        <div class="bodyBox" style="height:270px;">
             <div id="embeddedConfigSettings"
                 style="margin-left:10px; display:none">
                 <br>
@@ -287,7 +298,7 @@
                 <b>$page.getLocalizedString("embedded.user.message")</b>
             </div>
             <span id="externalConfigSettings" style="display:none">
-                <table class="temp">
+                <table class="temp" style="margin-bottom: 0">
                     <tr>
                         <td valign="top"><label for="userStoreType"><em>*&nbsp;</em>$page.getLocalizedString("store.type.label")</label></td>
                         <td>
@@ -299,6 +310,8 @@
                             <input type="radio" id="ldapv3tivoli" name="userStoreType" style="margin-left:1em" value="LDAPv3ForTivoli" $selectLDAPv3tivoli onclick="setTivoli();"/>&nbsp;$page.getLocalizedString("tivoli.ldap.schema")
                         </td>
                     </tr>            
+                </table>
+                <table class="temp" id="userStoreSettings" style="display:none">
                     <tr>
                         <td><label for="userStoreSSL"><em>*&nbsp;</em>$page.getLocalizedString("directory.ssl.label")</label></td>
                         <td>
