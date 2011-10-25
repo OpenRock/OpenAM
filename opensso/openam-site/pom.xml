@@ -276,9 +276,44 @@
          <include name="**/**/*.html" />
         </replace>
         <replace dir="${basedir}/target/docbkx/html/"
-                 token="&lt;/head&gt;"
-                 value='&lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;&lt;/head&gt;'>
+                 token="&lt;/head&gt;">
          <include name="**/**/*.html" />
+         <replacevalue>
+&lt;script  src="http://code.jquery.com/jquery-1.6.4.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+// On double-click, reformat &lt;pre class="screen"&gt; for easy copying.
+$(document).ready(function() {
+  $(".screen").attr("title", "Double-click to unwrap lines.");
+});
+$(".screen").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"flat\" title=\"Double-click to wrap long lines.\"&gt;" +
+    $(this).text().replace(/\n /g," ") + "\n&lt;!--" + $(this).text() + "--&gt;" +
+    "&lt;/pre&gt;");
+});
+$(".flat").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"screen\" title=\"Double-click to unwrap lines.\"&gt;" +
+    $(this).html().replace(/(.|\n)+&lt;!\-\-/m,"").replace(/\-\-\&gt;/,"") +
+    "&lt;/pre&gt;");
+});
+&lt;/script&gt;
+&lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;
+&lt;/head&gt;</replacevalue>
+        </replace>
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="&lt;/body&gt;">
+         <include name="**/**/*.html" />
+         <replaceValue>&lt;script type="text/javascript"&gt;
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23412190-4']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+&lt;/script&gt;&lt;/body&gt;</replaceValue>
         </replace>
        </postProcess>
       </configuration>
@@ -343,9 +378,30 @@
          <include name="**/**/**/*.html" />
         </replace>
         <replace dir="${basedir}/target/docbkx/html/"
-                 token="&lt;/head&gt;"
-                 value='&lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;&lt;/head&gt;'>
+                 token="&lt;/head&gt;">
          <include name="**/**/**/*.html" />
+         <replacevalue>
+&lt;script  src="http://code.jquery.com/jquery-1.6.4.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+// On double-click, reformat &lt;pre class="screen"&gt; for easy copying.
+$(document).ready(function() {
+  $(".screen").attr("title", "Double-click to unwrap lines.");
+});
+$(".screen").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"flat\" title=\"Double-click to wrap long lines.\"&gt;" +
+    $(this).text().replace(/\n /g," ") + "\n&lt;!--" + $(this).text() + "--&gt;" +
+    "&lt;/pre&gt;");
+});
+$(".flat").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"screen\" title=\"Double-click to unwrap lines.\"&gt;" +
+    $(this).html().replace(/(.|\n)+&lt;!\-\-/m,"").replace(/\-\-\&gt;/,"") +
+    "&lt;/pre&gt;");
+});
+&lt;/script&gt;
+&lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;
+&lt;/head&gt;</replacevalue>
         </replace>
         <replace dir="${basedir}/target/docbkx/html/"
                  token="&lt;/body&gt;">
