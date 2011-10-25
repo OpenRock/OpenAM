@@ -276,7 +276,8 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
         if ((attributeSchema != null) && !attributeSchema.isEmpty()) {
             String display = "blank.header";
             SchemaType type = null;
-            if (schemaTypes.size() == 1) {
+
+            if ((schemaTypes != null) && (schemaTypes.size() == 1)) {
                 Iterator<SchemaType> it = schemaTypes.iterator();
                 type = it.next();
             }
