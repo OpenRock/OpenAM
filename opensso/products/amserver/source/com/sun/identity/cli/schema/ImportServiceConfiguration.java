@@ -95,6 +95,11 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
 
         String xmlFile = getStringOptionValue(IArgument.XML_FILE);
         String encryptSecret = getStringOptionValue(IArgument.ENCRYPT_SECRET);
+        try {
+            encryptSecret = CLIUtil.getFileContent(getCommandManager(), encryptSecret).trim();
+        } catch (CLIException clie) {
+            //There is no encryptSecret file
+        }
         validateEncryptSecret(xmlFile, encryptSecret);
         
         // disable notification

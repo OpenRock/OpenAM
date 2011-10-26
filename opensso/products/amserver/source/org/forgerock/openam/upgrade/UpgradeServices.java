@@ -270,7 +270,7 @@ public class UpgradeServices {
         
         try {
             out = new PrintWriter(new FileOutputStream(backupPasswdFile));
-            out.println("backup.password=" + backupPassword);
+            out.println(backupPassword);
             out.flush();
         } catch (IOException ioe) {
             debug.error("Unable to write backup: ", ioe);
