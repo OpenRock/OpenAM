@@ -30,7 +30,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <title>OpenAM <?eval ${project.version}?> Administration Guide</title>
+  <title>OpenAM <?eval ${serverDocTargetVersion}?> Administration Guide</title>
   <copyright>
    <year>2011</year>
    <holder>ForgeRock AS</holder>

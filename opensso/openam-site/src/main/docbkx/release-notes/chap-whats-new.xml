@@ -29,9 +29,9 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>What's New in OpenAM <?eval ${project.version}?></title>
+ <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
 
- <para>OpenAM <?eval ${project.version}?> fixes a number of issues, and
+ <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
  provides the following additional features.</para>
  
  <itemizedlist>

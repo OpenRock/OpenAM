@@ -35,7 +35,7 @@
  xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
  >https://bugster.forgerock.org/jira/browse/OPENAM</link>. This chapter
  covers the status of key issues and limitations at release
- <?eval ${project.version}?>.</para>
+ <?eval ${serverDocTargetVersion}?>.</para>
 
  <section>
   <title>Fixes Since Last Release</title>
@@ -53,10 +53,10 @@
  </section>
  
  <section>
-  <title>Known Issues At Release <?eval ${project.version}?></title>
+  <title>Known Issues At Release <?eval ${serverDocTargetVersion}?></title>
 
   <para>The following known issues remained open at the time
-  release <?eval ${project.version}?> became available.</para>
+  release <?eval ${serverDocTargetVersion}?> became available.</para>
   
   <para>TODO: build the known issues list based on
   https://bugster.forgerock.org/jira/browse/OPENAM</para>

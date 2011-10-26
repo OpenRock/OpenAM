@@ -98,7 +98,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
   <step>
    <para>In your browser, visit the location where OpenAM is deployed, such
    as <literal>http://openam.example.com:8080/openam</literal>, and then
-   click Upgrade to OpenAM <?eval ${project.version}?>.</para>
+   click Upgrade to OpenAM <?eval ${serverDocTargetVersion}?>.</para>
    <mediaobject>
     <alt>Initial OpenAM upgrade screen</alt>
     <imageobject>
