@@ -115,6 +115,26 @@ http://openam.example.com:8080/openam</screen>
    <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
    <!-- TODO add admin guide link here -->
   </step>
+  <step performance="optional">
+   <para>If you have deployed OpenAM in a site configuration, edit the
+   <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows) to
+   map the site name to servers.</para>
+   <para>You add a <literal>com.iplanet.am.naming.map.site.to.server</literal>
+   property to the <command>java</command> command in the script.</para>
+   <literallayout class="monospaced">-D"com.iplanet.am.naming.map.site.to.server=
+<replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable>[,<replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable> ...]"</literallayout>
+   <para>Notice that the mapping is a comma separated list of server URLs,
+   <replaceable>openam-url</replaceable>, in the site with the load balancer
+   URL, <replaceable>lb-url</replaceable>. For example, if your site is behind
+   <literal>https://lb.example.com:443/openam</literal>, and the OpenAM servers
+   are at <literal>http://openam1.example.com:8080/openam</literal> and
+   <literal>http://openam2.example.com:8080/openam</literal>, then you add
+   the following property to the <command>java</command> command (without
+   line breaks).</para>
+   <literallayout class="monospaced">-D"com.iplanet.am.naming.map.site.to.server=
+   https://lb.example.com:443/openam=http://openam1.example.com:8080/openam,
+   https://lb.example.com:443/openam=http://openam2.example.com:8080/openam"</literallayout>
+  </step>
  </procedure>
 
  <procedure xml:id="install-openam-config-tools">
