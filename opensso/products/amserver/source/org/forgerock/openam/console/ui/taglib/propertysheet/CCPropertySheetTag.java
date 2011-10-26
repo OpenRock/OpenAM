@@ -56,7 +56,7 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
     private static final String TXT = ".txt";
     private static final String URI = ".uri";
     private static final String CONTEXT_ROOT =
-            SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+            SystemProperties.get(Constants.AM_CONSOLE_DEPLOYMENT_DESCRIPTOR);
     private static final String HELP_TEMPLATE =
             "<div id=\"help{0}\" class=\"helpPanel\">"
             + "<div><a href=\"#\" id=\"close{0}\" onclick=\"hideHelp({0}); event.cancelBubble = true;return false;\">"

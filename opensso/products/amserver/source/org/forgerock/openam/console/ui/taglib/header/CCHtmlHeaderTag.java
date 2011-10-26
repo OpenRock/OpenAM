@@ -39,7 +39,7 @@ import org.forgerock.openam.utils.StringUtils;
 public class CCHtmlHeaderTag extends com.sun.web.ui.taglib.header.CCHtmlHeaderTag {
 
     private static final String CONTEXT_ROOT =
-            SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+            SystemProperties.get(Constants.AM_CONSOLE_DEPLOYMENT_DESCRIPTOR);
 
     @Override
     protected String getHTMLStringInternal(Tag parent, PageContext pageContext, View view) throws JspException {
