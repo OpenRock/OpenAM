@@ -33,8 +33,8 @@
         <filter-class>com.sun.identity.setup.ClientConfiguratorFilter</filter-class>
     </filter>
     <servlet>
-        <servlet-name>notificationservice</servlet-name>
         <description>notificationservice</description>
+        <servlet-name>notificationservice</servlet-name>
         <servlet-class>com.iplanet.services.comm.client.PLLNotificationServlet</servlet-class>
     </servlet>
     <filter-mapping>
