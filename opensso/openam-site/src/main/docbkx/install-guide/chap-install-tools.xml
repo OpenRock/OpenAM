@@ -45,7 +45,8 @@
   <varlistentry>
    <term><filename>tools/ssoConfiguratorTools.zip</filename></term>
    <listitem>
-    <para>Tools for command line installation and configuration</para>
+    <para>Tools for command line installation, upgrade, and
+    configuration</para>
    </listitem>
   </varlistentry>
   <varlistentry>
@@ -129,9 +130,11 @@ http://openam.example.com:8080/openam</screen>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ unzip /path/to/OpenAM/tools/ssoConfiguratorTools.zip 
 Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
-  inflating: README.setup            
-  inflating: configurator.jar        
-  inflating: sampleconfiguration</screen>
+  inflating: README.setup
+  inflating: configurator.jar
+  inflating: sampleconfiguration
+  inflating: sampleupgrade
+  inflating: upgrade.jar</screen>
    <para>Set up configuration files based on the
    <filename>sampleconfiguration</filename> example, and then apply the
    configuration to a deployed OpenAM .war file using the following

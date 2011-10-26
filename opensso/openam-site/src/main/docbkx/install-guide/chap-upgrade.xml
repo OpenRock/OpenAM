@@ -135,6 +135,23 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
   </step>
  </procedure>
  
+ <tip>
+  <para>You can use the <filename>upgrade.jar</filename> utility, installed
+  from <filename>ssoConfiguratorTools.zip</filename>, to perform the upgrade
+  configuration after you deploy the new OpenAM .war file.</para>
+  
+  <para>Instead of upgrading the new OpenAM deployment through OpenAM console
+  as described in the procedure above, edit the
+  <filename>sampleupgrade</filename> properties file next to
+  <filename>upgrade.jar</filename> to set the <literal>SERVER_URL</literal>
+  and <literal>DEPLOYMENT_URI</literal> for your environment, and then
+  run the <filename>upgrade.jar</filename> utility.</para>
+  
+  <screen>$ java -jar upgrade.jar --file sampleupgrade
+...
+Upgrade Complete.</screen>
+ </tip>
+ 
  <procedure xml:id="upgrade-from-earlier-products">
   <title>Upgrading From OpenAM 9.0 &amp; Earlier</title>
   
