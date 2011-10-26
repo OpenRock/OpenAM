@@ -77,11 +77,8 @@
     <a href="./doc/OpenAM-Reference.pdf">PDF</a>,
     <a href="./doc/OpenAM-Reference.rtf">RTF</a></dd>
     
-    <dt>Javadoc</dt>
+    <dt>Javadoc</dt> <!-- TODO: Link to regularly generated version -->
     <dd><a href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/">HTML</a></dd>
-    
-    <dt>Gateway Javadoc</dt>
-    <dd><a href="http://resources.apexidentity.com/javadoc/core/1.0/">HTML</a></dd>
    </dl>
   </section>
  </body>

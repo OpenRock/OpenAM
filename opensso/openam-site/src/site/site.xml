@@ -64,7 +64,6 @@
    <item name="Developer Guide" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
    <item name="Reference" href="./doc/reference/OpenAM-Reference.html" />
    <item name="Javadoc" href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/" alt="TODO: Generate with Maven" />
-   <item name="Gateway Javadoc" href="http://resources.apexidentity.com/javadoc/core/1.0/" alt="TODO: Move to Forgerock.org"/>
   </menu>
   
   <menu name="Project Information">
