@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 package com.sun.identity.authentication.service;
 
@@ -105,6 +105,7 @@ public class AuthD  {
     
     private static String superAdmin = DNUtils.normalizeDN(
         SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER,""));
+    private static AMIdentity superUserIdentity = null;
     private static String specialUser =
         SystemProperties.get(Constants.AUTHENTICATION_SPECIAL_USERS,"");
 
@@ -1113,7 +1114,26 @@ public class AuthD  {
         }
         return isAdmin;
     }
-    
+
+    /**
+     * Returns <code>true</code> if and only if the user name belongs to a
+     * super user
+     *
+     * @param dn DN of the user
+     * @return <code>true</code> if the user is an admin user.
+     */
+    public boolean isSuperUser(String dn) {
+        if (superUserIdentity == null) {
+            superUserIdentity = new AMIdentity(
+                    AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                    superAdmin,
+                    IdType.USER,
+                    "/",
+                    null);
+        }
+        return superUserIdentity.getUniversalId().equalsIgnoreCase(dn);
+    }
+
     /**
      * Returns <code>true</code> if distinguished user name is a special user
      * DN.

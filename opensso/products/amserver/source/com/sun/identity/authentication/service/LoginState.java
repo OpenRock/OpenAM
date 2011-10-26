@@ -1423,7 +1423,8 @@ public class LoginState {
         
         try {
             if ((isApplicationModule(authMethName) && 
-                ad.isSpecialUser(userDN)) || isAgent(amIdentityUser)) {
+                    (ad.isSuperUser(userDN) || ad.isSpecialUser(userDN)))
+                    || isAgent(amIdentityUser)) {
 
                 session.setClientID(token);
                 session.setType(Session.APPLICATION_SESSION);
