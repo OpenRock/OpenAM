@@ -172,6 +172,12 @@
         <copy todir='${docbkx-out}/epub/agent-install-guide/OpenAM-Agent-Install-Guide'>
          <fileset dir='${basedir}/src/main/resources' />
         </copy>
+        <copy todir='${docbkx-out}/epub/agent-release-notes/OpenAM-Agent-Release-Notes/images'>
+         <fileset dir='${docbkx-src}/agent-release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/agent-release-notes/OpenAM-Agent-Release-Notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
         <copy todir='${docbkx-out}/epub/dev-guide/OpenAM-Dev-Guide/images'>
          <fileset dir='${docbkx-src}/dev-guide/images' />
         </copy>
@@ -242,6 +248,12 @@
         <copy todir='${docbkx-out}/html/agent-install-guide'>
          <fileset dir='${basedir}/src/main/resources' />
         </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes/images'>
+         <fileset dir='${docbkx-src}/agent-release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
         <copy todir='${docbkx-out}/html/dev-guide/images'>
          <fileset dir='${docbkx-src}/dev-guide/images' />
         </copy>
@@ -270,6 +282,7 @@
        <postProcess>
         <copy file='${legalnotice}' todir='${docbkx-out}/html/admin-guide' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-install-guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-release-notes' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/dev-guide' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/install-guide' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/reference' />
@@ -344,6 +357,12 @@ $(".flat").live("dblclick", function() {
         <copy todir='${docbkx-out}/html/agent-install-guide/OpenAM-Agent-Install-Guide'>
          <fileset dir='${basedir}/src/main/resources' />
         </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes/images'>
+         <fileset dir='${docbkx-src}/agent-install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
         <copy todir='${docbkx-out}/html/dev-guide/OpenAM-Dev-Guide/images'>
          <fileset dir='${docbkx-src}/dev-guide/images' />
         </copy>
@@ -372,6 +391,7 @@ $(".flat").live("dblclick", function() {
        <postProcess>
         <copy file='${legalnotice}' todir='${docbkx-out}/html/admin-guide/OpenAM-Admin-Guide' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-install-guide/OpenAM-Agent-Install-Guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/dev-guide/OpenAM-Dev-Guide' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/install-guide/OpenAM-Install-Guide' />
         <copy file='${legalnotice}' todir='${docbkx-out}/html/reference/OpenAM-Reference' />
@@ -543,6 +563,12 @@ $(".flat").live("dblclick", function() {
         </resource>
         <resource>
          <directory>${docbkx-out}/epub/agent-install-guide</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/agent-release-notes</directory>
          <includes>
           <include>**/*.epub</include>
          </includes>

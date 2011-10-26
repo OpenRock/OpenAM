@@ -59,11 +59,12 @@
    <item name="All Formats" href="docs.html"/>
    <item name="Release Notes" href="./doc/release-notes/OpenAM-Release-Notes.html" />
    <item name="Installation Guide" href="./doc/install-guide/OpenAM-Install-Guide.html" />
-   <item name="Policy Agent Install Guide" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
    <item name="Administration Guide" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
    <item name="Developer Guide" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
    <item name="Reference" href="./doc/reference/OpenAM-Reference.html" />
    <item name="Javadoc" href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/" alt="TODO: Generate with Maven" />
+   <item name="Policy Agent Release Notes" href="./doc/agent-release-notes/OpenAM-Agent-Release-Notes.html" />
+   <item name="Policy Agent Install Guide" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
   </menu>
   
   <menu name="Project Information">
