@@ -82,7 +82,8 @@
  <section>
   <title>Deprecated Functionality</title>
   
-  <para>The following functionality is deprecated in OpenAM <?eval ${product.version}?>.</para>
+  <para>The following functionality is deprecated in OpenAM
+  <?eval ${serverDocTargetVersion}?>.</para>
   
   <itemizedlist>
    <listitem>
@@ -106,7 +107,8 @@
  <section>
   <title>Removed Functionality</title>
   
-  <para>No functionality has been removed in OpenAM <?eval ${product.version}?>.</para>
+  <para>No functionality has been removed in OpenAM
+  <?eval ${serverDocTargetVersion}?>.</para>
   
   <para>No functionality is planned to be removed at this time.</para>
  </section>
