@@ -59,7 +59,7 @@
    <item name="All Formats" href="docs.html"/>
    <item name="OpenAM Release Notes" href="./doc/release-notes/OpenAM-Release-Notes.html" />
    <item name="OpenAM Installation Guide" href="./doc/install-guide/OpenAM-Install-Guide.html" />
-   <item name="OpenAM Administration Guide" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
+   <item name="OpenAM Admin Guide" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
    <item name="OpenAM Developer Guide" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
    <item name="OpenAM Reference" href="./doc/reference/OpenAM-Reference.html" />
    <item name="OpenAM Javadoc" href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/" alt="TODO: Generate with Maven" />
