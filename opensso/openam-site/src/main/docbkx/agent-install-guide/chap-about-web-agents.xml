@@ -32,7 +32,9 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>OpenAM Web Policy Agents</title>
 
- <para>This chapter covers what web policy agents do and how they work.</para>
+ <para>OpenAM web policy agents provide light touch integration for web
+ applications running on supported web servers. This chapter covers what web
+ policy agents do and how they work.</para>
  
  <para>A <firstterm>policy agent</firstterm> enforces policy for OpenAM. A
  <firstterm>web policy agent</firstterm> installed in a web server intercepts

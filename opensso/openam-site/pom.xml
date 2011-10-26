@@ -112,6 +112,10 @@
   </license>
  </licenses>
  <properties>
+  <serverDocTargetVersion>10</serverDocTargetVersion>
+  <agentsDocTargetVersion>3</agentsDocTargetVersion>
+  <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
+  <javaEEAgentsDocTargetVersion>3.0.3</javaEEAgentsDocTargetVersion>
   <docbkx-src>${basedir}/src/main/docbkx</docbkx-src>
   <dbstyle-dir>${basedir}/src/main/docbkx-stylesheets</dbstyle-dir>
   <docbkx-out>${basedir}/target/docbkx</docbkx-out>

@@ -32,7 +32,11 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>About OpenAM Java EE Policy Agents</title>
  
- <para>This chapter covers what Java EE policy agents do and how they work.</para>
+ <para>OpenAM Java EE policy agents provide medium touch integration for
+ web applications running in supported web application containers. Java EE
+ policy agents require some configuration and code changes to deployed web
+ applications. This chapter covers what Java EE policy agents do and how they
+ work.</para>
  
  <para>A <firstterm>policy agent</firstterm> enforces policy for OpenAM. A
  <firstterm>J2EE policy agent</firstterm> installed in a web application
