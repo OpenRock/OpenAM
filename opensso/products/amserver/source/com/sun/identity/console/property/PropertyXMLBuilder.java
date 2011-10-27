@@ -470,6 +470,14 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
             if (debug.messageEnabled()) {
                 debug.message("PropertyXMLBuilder:getSectionOrder", ioe);
             }
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ioe) {
+                    // do nothing
+                }
+            }
         }
         
         sectionOrder = map;

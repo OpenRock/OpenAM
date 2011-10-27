@@ -241,6 +241,14 @@ public class AgentTabManager {
             }
         } catch (IOException e) {
             AMModelBase.debug.error("AgentTabManager.getTabProperties", e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ioe) {
+                    // do nothing
+                }
+            }
         }
         return map;
     }

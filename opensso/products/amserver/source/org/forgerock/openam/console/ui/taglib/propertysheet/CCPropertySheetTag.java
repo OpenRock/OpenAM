@@ -30,6 +30,7 @@ import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.html.OptionList;
 import com.iplanet.jato.view.html.SelectableGroup;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.web.ui.common.CCBodyContentImpl;
 import com.sun.web.ui.common.CCDebug;
 import com.sun.web.ui.common.CCImage;
@@ -176,11 +177,15 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
                                     int labelWidth)
     throws JspException {
         super.appendSubsection(buffer, subsection, model, level, labelWidth);
-        buffer.append("\n<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" title=\"\"><tr><td>\n")
-              .append(getImageHTMLString(CCImage.DOT, "1", "10"))
-              .append("</td><td class=\"ConLin\" width=\"100%\">")
-              .append(getImageHTMLString(CCImage.DOT, "1", "1"))
-              .append("</td></tr></table>\n\n");  
+        String spacer = XMLUtils.getNodeAttributeValue(subsection, "spacer");
+        
+        if (spacer != null && spacer.equalsIgnoreCase("true")) {
+            buffer.append("\n<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" title=\"\"><tr><td>\n")
+                  .append(getImageHTMLString(CCImage.DOT, "1", "10"))
+                  .append("</td><td class=\"ConLin\" width=\"100%\">")
+                  .append(getImageHTMLString(CCImage.DOT, "1", "1"))
+                  .append("</td></tr></table>\n\n");
+        }
     }
 
     public static String getDynamicHelp(ResourceBundle bundle, String key) {
