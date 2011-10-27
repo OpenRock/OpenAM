@@ -28,6 +28,10 @@
 
 -->
 
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
+
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -69,15 +73,26 @@
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
-
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-lookupUserInRealm"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a108">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>           
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a106">
+                    i18nKey="a111">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -115,10 +130,22 @@
                             <Value>false</Value>
                         </DefaultValues>
                         </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-lookupUserInRealm"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a108">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                        </AttributeSchema>                        
                     <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a106">
+                        i18nKey="a111">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

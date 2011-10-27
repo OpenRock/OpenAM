@@ -29,8 +29,10 @@
 /**
  * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.authentication.modules.windowsdesktopsso;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -39,6 +41,13 @@ import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.util.DerValue;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchOpModifier;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
@@ -46,8 +55,10 @@ import java.security.PrivilegedActionException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.Configuration;
@@ -69,6 +80,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
         "iplanet-am-auth-windowsdesktopsso-kerberos-realm",
         "iplanet-am-auth-windowsdesktopsso-kdc",
         "iplanet-am-auth-windowsdesktopsso-returnRealm",
+        "iplanet-am-auth-windowsdesktopsso-lookupUserInRealm",
         "iplanet-am-auth-windowsdesktopsso-auth-level",
         "serviceSubject" };
 
@@ -77,8 +89,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private static final int REALM     = 2;
     private static final int KDC       = 3;
     private static final int RETURNREALM = 4;
-    private static final int AUTHLEVEL = 5;
-    private static final int SUBJECT   = 6;
+    private static final int LOOKUPUSER = 5;
+    private static final int AUTHLEVEL = 6;
+    private static final int SUBJECT   = 7;
         
     private static Hashtable configTable = new Hashtable();
     private Principal userPrincipal = null;
@@ -91,7 +104,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private String authLevel  = null;
     private Map    options    = null;
     private String confIndex  = null;
-
+    private boolean lookupUserInRealm = false;
+    
     private Debug debug = Debug.getInstance(amAuthWindowsDesktopSSO);
 
     /**
@@ -144,7 +158,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
         }
 
         if (spnegoToken == null) {
-            debug.message("spnego token is not valid.");
+            debug.error("spnego token is not valid.");
             throw new AuthLoginException(amAuthWindowsDesktopSSO, "token",null);
         }
 
@@ -155,7 +169,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
         // parse the spnego token and extract the kerberos mech token from it
         final byte[] kerberosToken = parseToken(spnegoToken);
         if (kerberosToken == null) {
-            debug.message("kerberos token is not valid.");
+            debug.error("kerberos token is not valid.");
             throw new AuthLoginException(amAuthWindowsDesktopSSO, "token",null);
         }
         if (debug.messageEnabled()) {
@@ -166,7 +180,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
         // authenticate the user with the kerberos token
         try {
             authenticateToken(kerberosToken);
-            debug.message("WindowsDesktopSSO authentication succeeded.");
+            if (debug.messageEnabled()){
+                debug.message("WindowsDesktopSSO kerberos authentication passed succesfully.");
+            }
             result = ISAuthConstants.LOGIN_SUCCEED; 
          } catch (PrivilegedActionException pe) {
              Exception e = extractException(pe);	 
@@ -176,18 +192,20 @@ public class WindowsDesktopSSO extends AMLoginModule {
                          debug.message("Credential expired. Re-establish credential...");	 
                  serviceLogin();	 
                  try {	 
-                         authenticateToken(kerberosToken);	 
-                         debug.message("Authentication succeeded with new cred.");	 
-                         result = ISAuthConstants.LOGIN_SUCCEED;	 
+                      authenticateToken(kerberosToken);	 
+                      if (debug.messageEnabled()){
+                        debug.message("Authentication succeeded with new cred.");	 
+                            result = ISAuthConstants.LOGIN_SUCCEED;
+                      }
                   } catch (Exception ee) {	 
-                 debug.message("Authentication failed with new cred.");	 
-                 throw new AuthLoginException(amAuthWindowsDesktopSSO,	 
+                        debug.error("Authentication failed with new cred.");	 
+                        throw new AuthLoginException(amAuthWindowsDesktopSSO,	 
                                  "auth", null, ee);	 
                  }	 
                } else {	 
-                         debug.message("Authentication failed with GSSException.");	 
-                  throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth",	 
-                         null, e);	 
+                      debug.error("Authentication failed with GSSException.");	 
+                      throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth",	 
+                               null, e);	 
                }	 
              }	 
         } catch (GSSException e ){
@@ -197,22 +215,24 @@ public class WindowsDesktopSSO extends AMLoginModule {
                 serviceLogin();
                     try {
                     authenticateToken(kerberosToken);
-                    debug.message("Authentication succeeded with new cred.");
-                        result = ISAuthConstants.LOGIN_SUCCEED; 
+                    if (debug.messageEnabled()){
+                        debug.message("Authentication succeeded with new cred.");
+                            result = ISAuthConstants.LOGIN_SUCCEED; 
+                    }
                 } catch (Exception ee) {
-                        debug.message("Authentication failed with new cred.");
+                        debug.error("Authentication failed with new cred.");
                         throw new AuthLoginException(amAuthWindowsDesktopSSO, 
                         "auth", null, ee);
                 }
             } else {
-                debug.message("Authentication failed with GSSException.");
+                debug.error("Authentication failed with GSSException.");
                 throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth", 
                     null, e);
             }
         } catch (AuthLoginException e) {
             throw e;
         } catch (Exception e) {
-            debug.message("Authentication failed with generic exception.");
+            debug.error("Authentication failed with generic exception.");
             throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth", 
                 null, e);
         }
@@ -228,8 +248,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
                 GSSContext context =
                     GSSManager.getInstance().createContext(
                         (GSSCredential)null);
-                debug.message("Context created.");
-
+                if (debug.messageEnabled()){
+                    debug.message("Context created.");
+                }
                 byte[] outToken = context.acceptSecContext(
                     kerberosToken, 0,kerberosToken.length);
                 if (outToken != null) {
@@ -241,16 +262,36 @@ public class WindowsDesktopSSO extends AMLoginModule {
                     }
                 }
                 if (!context.isEstablished()) {
-                    debug.message("Cannot establish context !");
+                    debug.error("Cannot establish context !");
                     throw new AuthLoginException(amAuthWindowsDesktopSSO,
                         "context", null);
                 } else {
-                    debug.message("Context establised !");
+                    if (debug.messageEnabled()) {
+                        debug.message("Context established !");
+                    }
                     GSSName user = context.getSrcName();
-                    storeUsernamePasswd(user.toString(), null);
-
+                    
+                    // Check if the user account from the Kerberos ticket exists 
+                    // in the realm. The "Alias Search Attribute Names" will be used to
+                    // perform the search.
+                    if (lookupUserInRealm) {
+                        String org = getRequestOrg();
+                        String userValue = getUserName(user.toString());
+                        String userName = searchUserAccount(userValue, org);
+                        if (userName != null && !userName.isEmpty()) {
+                            storeUsernamePasswd(userValue, null);
+                        } else {
+                            String data[] = {userValue, org};
+                            debug.error("WindowsDesktopSSO.authenticateToken: "
+                                    + ": Unable to find the user " + userValue);
+                            throw new AuthLoginException(amAuthWindowsDesktopSSO,
+                                    "notfound", data);
+                        }
+                    }
+                    
                     if (debug.messageEnabled()){
-                        debug.message("User authenticated: " + user.toString());
+                        debug.message("WindowsDesktopSSO.authenticateToken:"
+                                + "User authenticated: " + user.toString());
                     }
                     if (user != null) {
                         setPrincipal(user.toString());
@@ -295,16 +336,20 @@ public class WindowsDesktopSSO extends AMLoginModule {
     }
 
     private void setPrincipal(String user) {
-        String principal = user;
+        userPrincipal = new WindowsDesktopSSOPrincipal(getUserName(user));
+    }
+
+    private String getUserName(String user) {
+        String userName = user;
         if (!returnRealm) {
             int index = user.indexOf("@");
             if (index != -1) {
-                principal = user.substring(0, index);
+                userName = user.toString().substring(0, index);
             }
         }
-        userPrincipal = new WindowsDesktopSSOPrincipal(principal);
+        return userName;
     }
-
+    
     private static byte[] spnegoOID = {
             (byte)0x06, (byte)0x06, (byte)0x2b, (byte)0x06, (byte)0x01,
             (byte)0x05, (byte)0x05, (byte)0x02 };
@@ -372,17 +417,23 @@ public class WindowsDesktopSSO extends AMLoginModule {
         byte[] oidArray = new byte[spnegoOID.length];
         tmpInput.read(oidArray, 0, oidArray.length);
         if (Arrays.equals(oidArray, spnegoOID)) {
-            debug.message("SPNEGO OID found in the Auth Token");
+            if (debug.messageEnabled()) {
+                debug.message("SPNEGO OID found in the Auth Token");
+            }
             tmpToken = new DerValue(tmpInput);
 
             // 0xa0 indicates an init token(NegTokenInit); 0xa1 indicates an 
             // response arg token(NegTokenTarg). no arg token is needed for us.
 
             if (tmpToken.getTag() == (byte)0xa0) {
-                debug.message("DerValue: found init token");
+                if (debug.messageEnabled()) {
+                    debug.message("DerValue: found init token");
+                }
                 tmpToken = new DerValue(tmpToken.getData());
                 if (tmpToken.getTag() == (byte)0x30) {
-                    debug.message("DerValue: 0x30 constructed token found");
+                    if (debug.messageEnabled()) {
+                        debug.message("DerValue: 0x30 constructed token found");
+                    }
                     tmpInput = new ByteArrayInputStream(tmpToken.getData());
                     tmpToken = new DerValue(tmpInput);
 
@@ -405,7 +456,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
                 }
             }
         } else {
-            debug.message("SPNEGO OID not found in the Auth Token");
+            if (debug.messageEnabled()) {
+                debug.message("SPNEGO OID not found in the Auth Token");
+            }
             byte[] krb5Oid = new byte[KERBEROS_V5_OID.length];
             int i = 0;
             for (; i < oidArray.length; i++) {
@@ -413,10 +466,14 @@ public class WindowsDesktopSSO extends AMLoginModule {
             }
             tmpInput.read(krb5Oid, i, krb5Oid.length - i);
             if (!Arrays.equals(krb5Oid, KERBEROS_V5_OID)) {
-                debug.message("Kerberos V5 OID not found in the Auth Token");
+                if (debug.messageEnabled()) {
+                    debug.message("Kerberos V5 OID not found in the Auth Token");
+                }
                 token = null;
             } else {
-                debug.message("Kerberos V5 OID found in the Auth Token");
+                if (debug.messageEnabled()) {
+                    debug.message("Kerberos V5 OID found in the Auth Token");
+                }
             }
         }
         return token;
@@ -431,6 +488,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
         authLevel = getMapAttr(options, AUTHLEVEL);
         returnRealm = 
             Boolean.valueOf(getMapAttr(options,RETURNREALM)).booleanValue();
+        lookupUserInRealm = 
+            Boolean.valueOf(getMapAttr(options,LOOKUPUSER)).booleanValue();    
 
         if (debug.messageEnabled()){
             debug.message("WindowsDesktopSSO params: \n" + 
@@ -439,6 +498,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                 "\nrealm : " + kdcRealm +
                 "\nkdc server: " + kdcServer +
                 "\ndomain principal: " + returnRealm +
+                "\nLookup user in realm:" + lookupUserInRealm +
                 "\nauth level: " + authLevel);
         }
 
@@ -469,16 +529,18 @@ public class WindowsDesktopSSO extends AMLoginModule {
         if (serviceSubject == null) {
             return false;
         }
-
-        debug.message("Retrieved config params from cache.");
+        if (debug.messageEnabled()){
+            debug.message("Retrieved config params from cache.");
+        }
         return true;
     }
 
     private void initWindowsDesktopSSOAuth(Map options) 
         throws AuthLoginException{
-
-        debug.message("Init WindowsDesktopSSO. This should not happen often.");
-
+        
+        if (debug.messageEnabled()){
+            debug.message("Init WindowsDesktopSSO. This should not happen often.");
+        }
         verifyAttributes();
         serviceLogin();
 
@@ -499,7 +561,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
     }
 
     private synchronized void serviceLogin() throws AuthLoginException{
-        debug.message("New Service Login ...");
+        if (debug.messageEnabled()){
+            debug.message("New Service Login ...");
+        }
         System.setProperty("java.security.krb5.realm", kdcRealm);
         System.setProperty("java.security.krb5.kdc", kdcServer); 
         System.setProperty("java.security.auth.login.config", "/dev/null");
@@ -523,7 +587,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
             lc.login();
 
             serviceSubject = lc.getSubject();
-            debug.message("Service login succeeded.");
+            if (debug.messageEnabled()){
+                debug.message("Service login succeeded.");
+            }
         } catch (Exception e) {
             debug.error("Service Login Error: ");
             if (debug.messageEnabled()) {
@@ -574,5 +640,113 @@ public class WindowsDesktopSSO extends AMLoginModule {
             throw new AuthLoginException(amAuthWindowsDesktopSSO, 
                 "authlevel", null, e);
         }
+    }
+
+
+     /**
+     * Searches for an account with user Id userID in the organization organization
+     * @param searchAttribute The attribute to be used to search for an identity
+     *  in the organization
+     * @param attributeValue The attributeValue to compare when searchinf for an 
+     *  identity in the organization
+     * @param organization organization or the organization name where the identity will be
+     *  looked up
+     * @return the attribute value for the identity searched. Empty string if not found or
+     *  null if an error occurs
+     */
+    private String searchUserAccount(String attributeValue, String organization) 
+            throws AuthLoginException {
+
+        String classMethod = "WindowsDesktopSSO.searchUserAccount: ";
+
+        if (organization.isEmpty()) {
+            organization = "/";
+        }
+        
+        if (debug.messageEnabled()) {
+            debug.message(classMethod + " searching for user " + attributeValue
+                    + " in the organization =" + organization);
+        }
+
+        // And the search criteria
+        IdSearchControl searchControl = new IdSearchControl();
+        searchControl.setMaxResults(1);
+        searchControl.setTimeOut(3000);
+
+        searchControl.setSearchModifiers(IdSearchOpModifier.OR, buildSearchControl(attributeValue));
+        searchControl.setAllReturnAttributes(false);
+
+        try {
+            AMIdentityRepository amirepo = new AMIdentityRepository(getSSOSession(), organization);
+
+            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, "*", searchControl);
+            if (searchResults.getErrorCode() == IdSearchResults.SUCCESS && searchResults != null) {
+                Set<AMIdentity> results = searchResults.getSearchResults();
+                if (!results.isEmpty()) {
+                    if (debug.messageEnabled()) {
+                        debug.message(classMethod + results.size() + " result(s) obtained");
+                    }
+                    AMIdentity userDNId = results.iterator().next();
+                    if (userDNId != null) {
+                        if (debug.messageEnabled()) {
+                             debug.message(classMethod + "user = " + userDNId.getUniversalId());
+                             debug.message(classMethod + "attrs =" + userDNId.getAttributes(
+                                     getUserAliasList()));
+                        }
+                        return attributeValue.trim();
+                    }
+                }
+            }
+        } catch (IdRepoException idrepoex) {
+            String data[] = {attributeValue, organization};
+            throw new AuthLoginException(amAuthWindowsDesktopSSO, 
+                "idRepoSearch", data, idrepoex);
+        } catch (SSOException ssoe) {
+            String data[] = {attributeValue, organization};
+            throw new AuthLoginException(amAuthWindowsDesktopSSO, 
+                "ssoSearch", data, ssoe);
+        }
+        if (debug.messageEnabled()) {
+                    debug.message(classMethod + " No results were found !");
+        }
+        return null;
+    }
+
+    private Map<String, Set<String>> buildSearchControl(String value)
+            throws AuthLoginException {     
+        Map<String, Set<String>> attr = new HashMap<String, Set<String>>();
+        Set<String> userAttrs = getUserAliasList();
+        for (String userAttr : userAttrs) {
+            attr.put(userAttr, addToSet(new HashSet<String>(), value));
+        }
+        return attr;
+    }
+
+    /**
+     * Provides the "Alias Search Attribute Name" list from the Authentication
+     * Service for the realm. If these attributes are not configured it falls
+     * back to the User Naming Attribute for the realm
+     * @return a set containing the attribute names configured 
+     */
+    private Set<String> getUserAliasList() throws AuthLoginException {
+        Map orgSvc = getOrgServiceTemplate(
+                getRequestOrg(), ISAuthConstants.AUTH_SERVICE_NAME);
+        Set aliasAttrNames = (Set<String>) orgSvc.get(ISAuthConstants.AUTH_ALIAS_ATTR);
+        if (debug.messageEnabled()) {
+            debug.message("WindowsDesktopSSO.getUserAliasList: aliasAttrNames=" + aliasAttrNames);
+        }
+        if (aliasAttrNames.isEmpty()) { 
+            aliasAttrNames = (Set<String>)orgSvc.get(ISAuthConstants.AUTH_NAMING_ATTR);
+            if (debug.messageEnabled()) {
+                debug.message("WindowsDesktopSSO.getUserAliasList trying AUTH_NAMING_ATTR:" +
+                    aliasAttrNames);
+            }
+        }
+        return aliasAttrNames;
+    }
+
+    private static Set<String> addToSet(Set<String> set, String attribute) {
+        set.add(attribute);
+        return set;
     }
 }
