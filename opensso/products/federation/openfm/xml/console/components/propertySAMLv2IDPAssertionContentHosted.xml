@@ -109,6 +109,7 @@
                         <attribute name="autoSubmit" value="false" />
                         <attribute name="localizeDisplayFieldValue" value="false" />
                     </cc>
+                    <fieldhelp name="signingCertAlias.help" defaultValue="signingCertAlias.help" />
                 </property>                
                 <property>
                     <label name="lblEncryptioncertAlias"
