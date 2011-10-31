@@ -26,6 +26,9 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -34,6 +37,7 @@
     <property>
 	<label name="lblLocale" defaultValue="globalization.service.table.SupportedCharsets.locale" labelFor="locale" />
 	<cc name="locale" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+        <fieldhelp name="helpLocale" defaultValue="globalization.service.table.SupportedCharsets.locale.help" />
     </property>
     <property>
 	<label name="lblCharsets" defaultValue="globalization.service.table.SupportedCharsets.charsets" labelFor="charsets" />

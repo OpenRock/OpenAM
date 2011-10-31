@@ -26,6 +26,9 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -37,6 +40,7 @@
 	    <attribute name="autoSubmit" value="false" />
             <attribute name="localizeDisplayFieldValue" value="false" />
         </cc>
+        <fieldhelp name="helpLocale" defaultValue="globalization.service.table.SupportedCharsets.locale.help" />
     </property>
     <property required="true">
 	<label name="lblCharsets" defaultValue="globalization.service.table.SupportedCharsets.charsets" labelFor="charsets" />

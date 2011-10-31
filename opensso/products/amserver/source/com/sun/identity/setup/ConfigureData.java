@@ -25,9 +25,11 @@
  * $Id: ConfigureData.java,v 1.11 2009/05/02 23:05:13 kevinserwin Exp $
  *
  */
+
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.setup;
 
 import com.iplanet.sso.SSOException;
@@ -95,7 +97,6 @@ public class ConfigureData {
         throws SMSException, SSOException, IOException, PolicyException
     {
         modifyClientDataService();
-        modifyClientDetectionService();
         createRealmAndPolicies();
         setRealmAttributes();
     }
@@ -108,22 +109,6 @@ public class ConfigureData {
             getFileContentInSet("SunAMClientData.xml"));
         modifySchemaDefaultValues("SunAMClientData", SchemaType.GLOBAL,
             null, map);
-    }
-
-    private void modifyClientDetectionService()
-        throws SMSException, SSOException, IOException
-    {
-        Map map = new HashMap();
-        Set set1 = new HashSet(2);
-        set1.add("Active");
-        map.put("iplanet-am-client-detection-enabled", set1);
-
-        Set set2 = new HashSet(2);
-        set2.add("com.sun.mobile.cdm.FEDIClientDetector");
-        map.put("iplanet-am-client-detection-class", set2);
-
-        modifySchemaDefaultValues("iPlanetAMClientDetection",
-            SchemaType.GLOBAL, null, map);
     }
 
     private void createRealmAndPolicies()
