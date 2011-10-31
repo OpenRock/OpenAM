@@ -25,7 +25,9 @@
  * $Id: IdRepoListener.java,v 1.16 2009/01/28 05:34:59 ww203982 Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.idm;
 
 import com.iplanet.sso.SSOException;
@@ -54,6 +56,8 @@ import com.sun.identity.shared.ldap.util.DN;
  * 
  * Additionally, this class maintains the configuration data for the IdRepo
  * plugin and also to store the SMS Service attributes for the organization.
+ *
+ * @supported.all.api
  */
 public final class IdRepoListener {
 
