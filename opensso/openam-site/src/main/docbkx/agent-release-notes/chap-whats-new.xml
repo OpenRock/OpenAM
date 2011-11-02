@@ -39,7 +39,17 @@
 
   <itemizedlist>
    <listitem>
-    <para>TODO</para>
+    <para>Policy agents can now conditionally redirect users based on the
+    incoming request URL (OPENAM-849).</para>
+   </listitem>
+   <listitem>
+    <para>Policy agents can now mark persistent cookies as HTTPOnly, to prevent
+    scripts and third-party programs from accessing the cookies
+    (OPENAM-804).</para>
+   </listitem>
+   <listitem>
+    <para>Policy agent file names now include the version number
+    (OPENAM-337).</para>
    </listitem>
   </itemizedlist>
  </section>
@@ -49,7 +59,12 @@
 
   <itemizedlist>
    <listitem>
-    <para>TODO</para>
+    <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
+    now parses as valid XML (OPENAM-674).</para>
+   </listitem>
+   <listitem>
+    <para>Policy agent file names now include the version number
+    (OPENAM-337).</para>
    </listitem>
   </itemizedlist>
  </section>
