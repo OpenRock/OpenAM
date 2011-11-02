@@ -780,20 +780,8 @@ Authentication module was registered.</screen>
               Management subcommands -->
    
    <para>Restart OpenAM, or the web applications container where it runs.</para>
-   <screen>$ /path/to/tomcat/bin/shutdown.sh 
-Using CATALINA_BASE:   /path/to/tomcat
-Using CATALINA_HOME:   /path/to/tomcat
-Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk1.6/jre
-Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
- /path/to/tomcat/bin/tomcat-juli.jar
-$ /path/to/tomcat/bin/startup.sh 
-Using CATALINA_BASE:   /path/to/tomcat
-Using CATALINA_HOME:   /path/to/tomcat
-Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk1.6/jre
-Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
- /path/to/tomcat/bin/tomcat-juli.jar
+   <screen>$ /path/to/tomcat/bin/shutdown.sh
+$ /path/to/tomcat/bin/startup.sh
 $ tail -1 /path/to/tomcat/logs/catalina.out
 INFO: Server startup in 32746 ms</screen>
   </section>
