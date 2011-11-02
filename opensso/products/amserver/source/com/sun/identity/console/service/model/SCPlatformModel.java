@@ -27,27 +27,11 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.console.service.model;
 
 import com.sun.identity.console.base.model.AMServiceProfileModel;
-import java.util.Set;
 
-public interface SCPlatformModel
-    extends AMServiceProfileModel
-{
-    /**
-     * Returns site information.
-     *
-     * @return site information.
-     */
-    Set getSiteInfo();
-    
-    /**
-     * Returns server information.
-     *
-     * @return server information.
-     */
-    Set getServerInfo();
+public interface SCPlatformModel extends AMServiceProfileModel {
 }

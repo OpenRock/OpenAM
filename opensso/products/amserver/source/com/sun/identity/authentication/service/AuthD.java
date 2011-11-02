@@ -169,7 +169,6 @@ public class AuthD  {
     private String defaultOrg;
     private String platformLocale;
     private String platformCharset;
-    private Set platformClientCharsets;
     /**
      * ResourceBundle for auth service
      */
@@ -452,12 +451,8 @@ public class AuthD  {
         platformLocale = CollectionHelper.getMapAttr(
             attrs, ISAuthConstants.PLATFORM_LOCALE_ATTR);
         
-        platformClientCharsets =
-        (Set)attrs.get(ISAuthConstants.PLATFORM_CLIENT_CHARSET_ATTR);
-        
         if (debug.messageEnabled()) {
-            debug.message("PlatformLocale = " + platformLocale +
-            "\nplatformClientCharsets = "  + platformClientCharsets);
+            debug.message("PlatformLocale = " + platformLocale);
         }
     }
     
@@ -973,116 +968,6 @@ public class AuthD  {
     boolean getInetDomainStatus(String orgName)
         throws IdRepoException, SSOException {
         return IdUtils.isOrganizationActive(ssoAuthSession,orgName);
-    }
-    
-    /**
-     * getClientPlatformCharset returns the valid Platform client charset
-     * check if charset for clientType is set in
-     * iplanet-am-platform-client-charsets
-     * check if iplanet-am-platform-html-char-set is present in the clientType
-     * data charsets
-     * return first value of client data charsets for the clientType
-     * @param charsetVector list of charset for all clients
-     * @param clientType name of client type
-     * @return name of Charset for client platform
-     */
-    public String getClientPlatformCharset(
-        Vector charsetVector,
-        String clientType) {
-        if (debug.messageEnabled()) {
-            debug.message("platform charset : " + platformCharset);
-        }
-        
-        // get charset for clientType from iplanet-am-platform-client-charsets
-        
-        String platformClientCharset = getClientCharsets(clientType);
-        
-        if ((platformClientCharset != null) &&
-        (platformClientCharset.length()> 0)) {
-            
-            return platformClientCharset;
-        }
-        
-        // check if iplanet-am-platform-html-char-set is present in the
-        // clientType data charsets list
-        
-        String plCharSet=null;
-        
-        try {
-            if (charsetVector.contains(platformCharset)) {
-                plCharSet = platformCharset;
-            }
-        }
-        catch (Exception ee) {
-            if (debug.warningEnabled()) {
-                debug.warning("Exception: getClientPlatformCharset :", ee);
-            }
-        }
-        
-        if ((plCharSet != null) && (plCharSet.length() > 0)) {
-            return plCharSet;
-        }
-        
-        // retreive the first value for clientType charsets list.
-        
-        try {
-            plCharSet=(String) charsetVector.firstElement();
-            if (debug.messageEnabled()) {
-                debug.message("Platform CharSet is.. :" + plCharSet);
-            }
-        }
-        catch (Exception ie) {
-            if (debug.warningEnabled()) {
-                debug.warning("Exception:getPlatformCharsets :", ie);
-            }
-        }
-        
-        if ((plCharSet != null) && (plCharSet.length() > 0)) {
-            return plCharSet;
-        }
-        
-        // else just return iplanet-am-platform-html-char-set
-        
-        return platformCharset;
-    }
-    
-    // get client charset from iwtPlatform-clientCharsets attribute based
-    // on the client type.
-    // iplanet-am-platform-client-charsets: <clientType>|<charset>
-    
-    String getClientCharsets(String clientType) {
-        String cliTypeCharset=null;
-        try {
-            if (platformClientCharsets != null) {
-                Iterator iter = platformClientCharsets.iterator();
-                while(iter.hasNext()) {
-                    String charsetElem = (String)iter.next();
-                    
-                    if ((charsetElem!= null) && (charsetElem.length() > 0)) {
-                        int i = charsetElem.indexOf("|");
-                        if (i != -1) {
-                            String cliType = charsetElem.substring(0,i);
-                            
-                            if (cliType.equals(clientType)) {
-                                cliTypeCharset = charsetElem.substring(i+1);
-                                if (debug.messageEnabled()) {
-                                    debug.message(
-                                        "clientCharset:"+cliTypeCharset);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ee) {
-            if (debug.warningEnabled()) {
-                debug.warning("Exception:getClientCharsets : ", ee);
-            }
-        }
-        
-        return cliTypeCharset;
     }
     
     /**

@@ -66,25 +66,6 @@
                         <Value>@COOKIE_DOMAIN@</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="sun-am-cookie-hex-encode"
-                    type="single"
-                    syntax="boolean"
-                    uitype="radio"
-		    i18nKey="a103a">
-		    <BooleanValues>
-			<BooleanTrueValue i18nKey="a103b">true</BooleanTrueValue>
-			<BooleanFalseValue i18nKey="a103c">false</BooleanFalseValue>
-		    </BooleanValues>
-		    <DefaultValues>
-			<Value>false</Value>
-		    </DefaultValues>
-		</AttributeSchema>
-
-                <AttributeSchema name="iplanet-am-platform-client-charsets"
-                    type="list"
-                    syntax="string"
-                    i18nKey="a107">
-                </AttributeSchema>
                 <SubSchema name="com-sun-identity-sites">
                     <SubSchema name="site" inheritance="multiple">
                         <SubSchema name="accesspoint">

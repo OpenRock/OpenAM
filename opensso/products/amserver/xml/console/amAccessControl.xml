@@ -268,22 +268,8 @@
     </viewbean>
 
     <!-- PLATFORM SERVICE -->
-    <viewbean classname="com.sun.identity.console.service.SCPlatformViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
-	<actionhandler name="button1,button2,Button3,tblSiteListButtonAdd,tblSiteListButtonDelete,tblServerListButtonAdd,tblServerListButtonDelete,tblClientCharSetsButtonAdd,tblClientCharSetsButtonDelete" />
-	<table name="iplanet-am-platform-site-list,iplanet-am-platform-server-list,iplanet-am-platform-client-charsets" />
-    </viewbean>
     <viewbean classname="com.sun.identity.console.service.SCPlatform30ViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
-	<actionhandler name="button1,button2,Button3,tblClientCharSetsButtonAdd,tblClientCharSetsButtonDelete" />
-	<table name="iplanet-am-platform-client-charsets" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.service.SCPlatformServerListEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
-	<actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.service.SCPlatformClientCharSetsEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
-	<actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.service.SCPlatformSiteListEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
-	<actionhandler name="button1,button2" />
+	<actionhandler name="button1,button2,Button3" />
     </viewbean>
 
     <!-- SUB CONFIG -->
