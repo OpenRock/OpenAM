@@ -74,9 +74,6 @@ namespace {
 	if (static_cast<void *>(NULL) != arg && ! retry) {
 	    password = PL_strdup(static_cast<char *>(arg));
 
-	    // This argument was allocated in the
-	    // Connection constructor.
-	    free(arg);
 	    if (static_cast<char *>(NULL) == password) {
 		Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
 			 "unable to copy password in SSL callback");
