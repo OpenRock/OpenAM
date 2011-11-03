@@ -48,6 +48,14 @@
  becomes available again, it can also read session information from the
  store, and carry on serving users with active sessions.</para>
  
+ <note>
+  <para>Session failover is supported within a site or data center with a
+  shared local area network. Session failover is not supported across sites
+  and data centers linked by wide area networks (WAN). Latency over the WAN
+  can cause issues with the underlying message queue, and therefore prevents
+  reliable session failover.</para>
+ </note>
+ 
  <procedure xml:id="before-you-start-site-failover">
   <title>Before You Start</title>
   

@@ -49,7 +49,12 @@
  <section>
   <title>Limitations</title>
   
-  <para>TODO</para>
+  <para>ForgeRock supports the stable software releases that you can download
+  from ForgeRock, not nightly builds or pre-release software. ForgeRock
+  OpenAM downloads do not include OpenAM extensions. Therefore, ForgeRock does
+  not support OpenAM extensions. If you have a special request for capabilities
+  not currently in a software release, contact ForgeRock at <link
+  xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
  </section>
  
  <section>
