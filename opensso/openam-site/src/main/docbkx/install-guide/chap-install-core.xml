@@ -338,8 +338,9 @@ Using CLASSPATH:
        /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar</screen>
    </step>
    <step>
-    <para>Delete OpenAM configuration files, by default under
-    <filename>$HOME</filename>.</para>
+    <para>Delete OpenAM configuration files, by default under the
+    <filename>$HOME</filename> of the user running the web application
+    container.</para>
     <screen>$ rm -rf $HOME/openam $HOME/.openssocfg</screen>
     <note>
      <para>When using the internal OpenAM configuration store, this step
