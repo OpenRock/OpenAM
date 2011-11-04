@@ -32,7 +32,171 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using the OpenAM Java SDK</title>
 
- <para>This chapter demonstrates common uses of the OpenAM Java SDK.</para>
+ <para></para>
+ 
+ <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
+ in the <filename>samples/opensso-client.zip</filename> where you unpacked
+ the full version of OpenAM, such as
+ <filename>/path/to/OpenAM/samples/opensso-client.zip</filename>. To prepare
+ to install the OpenAM Java SDK, first unzip
+ <filename>opensso-client.zip</filename>.</para>
+ 
+ <screen>$ mkdir -p /path/to/openam-client ; cd /path/to/openam-client
+$ unzip /path/to/OpenAM/samples/opensso-client.zip</screen>
 
+ <para>As a result, you have two directories that include the SDK and also
+ sample command-line and web-based client applications.</para>
+ <variablelist>
+  <varlistentry>
+   <term><filename>src/</filename></term>
+   <listitem>
+    <para>This directory contains the SDK and client sample commands.</para>
+    <itemizedlist>
+     <listitem>
+      <para><filename>classes/</filename>: compiled samples</para>
+     </listitem>
+     <listitem>
+      <para><filename>lib/</filename>: SDK and required libraries</para>
+     </listitem>
+     <listitem>
+      <para><filename>resources/</filename>: properties configuration for
+      the SDK and samples</para>
+     </listitem>
+     <listitem>
+      <para><filename>scripts/</filename>: installation scripts and scripts
+      to run the samples on UNIX, Linux, and Windows systems</para>
+     </listitem>
+     <listitem>
+      <para><filename>sources/</filename>: sample code</para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><filename>war/</filename></term>
+   <listitem>
+    <para>This directory contains a web application archive with client
+    samples accessible through the browser after you install the .war in a
+    web application container.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+
+ <procedure xml:id="install-openam-jdk-cli-client">
+  <title>To Install OpenAM SDK Command-Line Examples</title>
+
+  <para>The command-line samples access OpenAM over HTTP or HTTPS.</para>
+
+  <step>
+   <para>Compile the samples.</para>
+   <screen>$ cd sdk/
+$ chmod +x scripts/*.sh
+$ ./scripts/compile-samples.sh</screen>
+  </step>
+  <step>
+   <para>Set up the samples to connect to OpenAM.</para>
+   <screen>$ mkdir /path/to/openam-client/debug
+$ ./scripts/setup.sh
+Debug directory (make sure this directory exists): /path/to/openam-client/debug
+Application user (e.g. URLAccessAgent) password: secret12
+Protocol of the server: http
+Host name of the server: openam.example.com
+Port of the server: 8080
+Server's deployment URI: openam
+Naming URL (hit enter to accept default value,
+http://openam.example.com:8080/openam/namingservice):
+$</screen>
+   <para>This sets up the configuration file for the samples,
+   <filename>resources/AMConfig.properties</filename>.</para>
+  </step>
+  <step>
+   <para>Check that the login sample works.</para>
+   <screen>$ ./scripts/Login.sh
+Realm (e.g. /):
+Login module name (e.g. DataStore or LDAP): DataStore
+Login locale (e.g. en_US or fr_FR): en_US
+DataStore: Obtained login context
+User Name:amadmin
+Password:password
+Login succeeded.
+Logged Out!!</screen>
+  </step>
+ </procedure>
+
+ <procedure xml:id="install-openam-jdk-web-client">
+  <title>To Install OpenAM SDK Web-Based Samples</title>
+  
+  <para>The web-based samples also access OpenAM over HTTP or HTTPS.</para>
+  
+  <step>
+   <para>Deploy the web application.</para>
+   <screen>$ mv war/opensso-client-jdk15.war /path/to/tomcat/webapps/openam-client.war</screen>
+  </step>
+  <step>
+   <para>Browse to the application you deployed to configure access to
+   OpenAM.</para>
+   <mediaobject>
+    <alt>Configuring web-based samples to access OpenAM</alt>
+    <imageobject>
+     <imagedata fileref="images/web-samples.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>The web-based client samples must be able to access OpenAM.</para>
+    </textobject>
+   </mediaobject>
+   <variablelist>
+    <para>Use the following hints to complete the configuration.</para>
+    <varlistentry>
+     <term>Server Protocol</term>
+     <listitem>
+      <para>Protocol to access OpenAM (<literal>http</literal> or
+      <literal>https</literal>)</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server Host</term>
+     <listitem>
+      <para>Fully qualified domain name for OpenAM, such as
+      <literal>openam.example.com</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server Port</term>
+     <listitem>
+      <para>OpenAM port number such as 8080 or 8443</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server Deployment URI</term>
+     <listitem>
+      <para>URI entry point to OpenAM such as <literal>/openam</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Debug directory</term>
+     <listitem>
+      <para>Where to write the debug messages for the client samples</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application user name</term>
+     <listitem>
+      <para>An user agent configured to access OpenAM, such as
+      <literal>UrlAccessAgent</literal> set up when OpenAM was installed</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application user password</term>
+     <listitem>
+      <para>The user agent password</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </step>
+  <step>
+   <para>After successful configuration, click the link to return to the URL
+   where you deployed the application to view the available sample
+   clients.</para>
+  </step>
+ </procedure>
 </chapter>
-
