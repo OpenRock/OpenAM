@@ -32,8 +32,6 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using the OpenAM Java SDK</title>
 
- <para></para>
- 
  <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
  in the <filename>samples/opensso-client.zip</filename> where you unpacked
  the full version of OpenAM, such as
@@ -107,7 +105,9 @@ Naming URL (hit enter to accept default value,
 http://openam.example.com:8080/openam/namingservice):
 $</screen>
    <para>This sets up the configuration file for the samples,
-   <filename>resources/AMConfig.properties</filename>.</para>
+   <filename>resources/AMConfig.properties</filename>. Read the comments in
+   the file to see the configuration settings, many of which are similar
+   to those used by OpenAM on the server side.</para>
   </step>
   <step>
    <para>Check that the login sample works.</para>
