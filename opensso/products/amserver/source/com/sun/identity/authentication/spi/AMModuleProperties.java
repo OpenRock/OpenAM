@@ -87,12 +87,13 @@ class AMModuleProperties {
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             builder.setEntityResolver(new XMLHandler());
-            if (servletContext == null) {
+            if (servletContext != null) {
+                in = servletContext.getResourceAsStream(fileName);
+            }
+            if (in == null) {
                 in = Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream(fileName.substring(1));
                 // remove leading '/' from fileName
-            } else {
-                in = servletContext.getResourceAsStream(fileName);
             }
             Document doc = builder.parse(in);
             in.close();
@@ -140,13 +141,14 @@ class AMModuleProperties {
                         AuthD.getAuth().getServletContext();
         InputStream resStream = null;
         try {
-            if (servletContext == null) {
+            if (servletContext != null) {
+                resStream = servletContext.getResourceAsStream(fileName);
+            };
+            if (resStream == null) {
                 resStream = Thread.currentThread().getContextClassLoader()
 		  .getResourceAsStream(fileName.substring(1));
                 // remove leading '/' from fileName
-            } else {
-                resStream = servletContext.getResourceAsStream(fileName);
-            }
+            } 
             // file might be empty for modules like Cert,Anonymous etc.
             if (resStream !=null && resStream.read() == -1) {
                 if (debug.messageEnabled()) {

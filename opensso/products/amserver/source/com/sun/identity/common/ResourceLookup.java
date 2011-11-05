@@ -135,12 +135,13 @@ public class ResourceLookup {
             String resourceName) {
         URL resourceURL = null;
         try {
-            if (context == null) {
+        	if (context != null) {
+            resourceURL = context.getResource(resourceName);
+        	}
+            if (resourceURL == null) {
                 resourceURL = Thread.currentThread().getContextClassLoader()
                     .getResource(resourceName.substring(1));
                 // remove leading '/' from resourceName
-            } else {
-                resourceURL = context.getResource(resourceName);
             }
         } catch (Exception e) {
             debug.message("Error getting resource  : " + e.getMessage());
