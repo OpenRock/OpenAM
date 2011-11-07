@@ -1442,19 +1442,20 @@ am_web_get_token_from_assertion(char * enc_assertion,
 				    ELEMENT_NAME_IDENTIFIER, subElem)) {
 				am_web_log_debug(
 					"lib:IDPProvidedNameIdentifier found");
-			    if(subElem.getValue(elemValue)) {
-				    am_web_log_debug("Value found(elemVal)=%s",
-						     elemValue.c_str());
-                                    am_http_cookie_decode(elemValue.c_str(),
-                                                          buf, 1024);
-				    *token = strdup(buf);
-				    if(*token == NULL) {
-					status = AM_NO_MEMORY;
-				    }
-			    }else {
-				    am_web_log_debug("Element value for "
-					"IDPProvidedNameIdentifier not found");
-			    }
+			    if (subElem.getValue(elemValue)) {
+                                am_web_log_debug("Value found(elemVal)=%s", elemValue.c_str());
+                                if (((*agentConfigPtr)->cdsso_cookie_urlencode) == B_FALSE) {
+                                    am_http_cookie_decode(elemValue.c_str(), buf, 1024);
+                                    *token = strdup(buf);
+                                } else {
+                                    *token = strdup(elemValue.c_str());
+                                }
+                                if (*token == NULL) {
+                                    status = AM_NO_MEMORY;
+                                }
+                            } else {
+                                am_web_log_debug("Element value for IDPProvidedNameIdentifier not found");
+                            }
 			} else {
 				am_web_log_debug("Element "
 				    "lib:IDPProvidedNameIdentifier not found");

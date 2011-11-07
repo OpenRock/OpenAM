@@ -503,6 +503,15 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 reinterpret_cast<int *> (&this->use_redirect_for_advice));
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->use_redirect_for_advice ? "TRUE" : "FALSE"));
     }
+    
+    /* Get encode cookie value extracted from LARES response param */
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.cdsso.cookie.urlencode";
+        status = am_properties_get_boolean_with_default(this->properties,
+                parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->cdsso_cookie_urlencode));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cdsso_cookie_urlencode ? "TRUE" : "FALSE"));
+    }
 
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {

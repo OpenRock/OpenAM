@@ -197,6 +197,7 @@ public:
 
     const char *notenforcedIPmode;
     PRBool use_redirect_for_advice;	// use redirect instead of POST for advice
+    PRBool cdsso_cookie_urlencode;	// encode cookie value extracted from LARES response
     am_status_t error;
     
     smap_t cond_login_url;
@@ -295,6 +296,7 @@ public:
         this->encodeCookieSpecialChars = AM_FALSE;
         this->notenforcedIPmode = NULL;
         this->use_redirect_for_advice = AM_FALSE;
+        this->cdsso_cookie_urlencode = AM_FALSE;
         this->error = AM_SUCCESS;
 
     }
