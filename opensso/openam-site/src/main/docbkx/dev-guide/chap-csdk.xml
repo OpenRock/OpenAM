@@ -121,7 +121,9 @@ $ cd ../samples</screen>
    and <filename>OpenSSOAgentConfiguration.properties</filename> as appropriate
    for your environment.</para>
    <para>Base your work on the template files in the
-   <filename>config/</filename> directory.</para>
+   <filename>config/</filename> directory. You can find the Password Encryption
+   Key in the OpenAM console under Configuration &gt; Servers and Sites &gt;
+   <replaceable>Server Name</replaceable> &gt; Security.</para>
   </step>
   <step>
    <para>Try one of the samples you built to test your build.</para>
