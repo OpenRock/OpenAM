@@ -2659,6 +2659,47 @@ public class AccessManager {
     private String list_appl_types;
 
     @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.entitlement.ShowApplicationType",
+        description="Show application type details.",
+        webSupport="true",
+        mandatoryOptions={
+            "name|m|s|Application Type name"},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={},
+        resourceStrings={
+            "show-application-type-not-found=Application Type {0} did not exist."})
+    private String show_appl_type;
+ 
+    @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.entitlement.DeleteApplicationTypes",
+        description="Delete application types.",
+        webSupport="true",
+        mandatoryOptions={
+            "names|m|m|Application Type names"},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={},
+        resourceStrings={
+            "delete-application-types-succeeded=Application Types {0} were deleted."})
+    private String delete_appl_types;
+ 
+    @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.entitlement.CreateApplicationType",
+        description="Create application type.",
+        webSupport="true",
+        mandatoryOptions={
+            "name|m|s|Application Type name"},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={
+            "attributevalues|a|m|Application Type attribute values e.g. actions=enabled=true.",
+            "datafile|D|s|Name of file that contains attribute type values data. Mandatory attributes are actions, searchIndexImpl and saveIndexImpl. Optional are resourceComparator."},
+        resourceStrings={
+            "create-application-type-succeeded=Application Type {0} was created."})
+    private String create_appl_type;
+    
+    @SubCommandInfo(
         implClassName="com.sun.identity.cli.entitlement.ListApplications",
         description="List applications in a realm.",
         webSupport="true",

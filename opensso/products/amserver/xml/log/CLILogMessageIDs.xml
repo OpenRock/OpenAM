@@ -6910,6 +6910,89 @@
             <item>Look under debug file for more information.</item>
         </actions>
     </logmessage>
+        <logmessage name="ATTEMPT_SHOW_APPLICATION_TYPE" id="5553"
+        loglevel="LL_INFO"
+        description="Attempt to show application type details.">
+        <datainfo>
+            <item>Application Type name</item>
+        </datainfo>
+        <triggers>
+            <item>Execute show application type Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_SHOW_APPLICATION_TYPE" id="5554"
+        loglevel="LL_INFO"
+        description="Show application type details succeded.">
+        <datainfo>
+            <item>Application Type name</item>
+        </datainfo>
+        <triggers>
+            <item>Execute show application type Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ATTEMPT_DELETE_APPLICATION_TYPES" id="5555"
+        loglevel="LL_INFO"
+        description="Attempt to delete application types.">
+        <datainfo>
+            <item>Application Type names</item>
+        </datainfo>
+        <triggers>
+            <item>Execute delete application types Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_DELETE_APPLICATION_TYPES" id="5556"
+        loglevel="LL_INFO"
+        description="Delete application types succeeded.">
+        <datainfo>
+            <item>Application Type names</item>
+        </datainfo>
+        <triggers>
+            <item>Execute delete application types Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_DELETE_APPLICATION_TYPES" id="5557"
+        loglevel="LL_INFO"
+        description="Delete application types failed.">
+        <datainfo>
+            <item>Application Type names</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute delete application types Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SUCCEEDED_CREATE_APPLICATION_TYPE" id="5558"
+        loglevel="LL_INFO"
+        description="Create application type succeeded.">
+        <datainfo>
+            <item>Application Type name</item>
+        </datainfo>
+        <triggers>
+            <item>Execute create application type Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_CREATE_APPLICATION_TYPE" id="5559"
+        loglevel="LL_INFO"
+        description="Failed to create application type.">
+        <datainfo>
+            <item>Application Type name</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute create application type Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
 
     <logmessage name="ATTEMPT_SHOW_ENTITLEMENT_SVC" id="5600"
         loglevel="LL_INFO"
