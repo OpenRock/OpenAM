@@ -123,6 +123,7 @@
   <xinclude:include href='chap-custom-web-agent.xml' />
  </part>
 
+<!-- TODO: Add the C API Reference pages
  <reference label="D">
   <title>OpenAM C API Reference</title>
   
@@ -143,6 +144,7 @@
    </refsect1>
   </refentry>
  </reference>
+ -->
  
  <index />
  <?dbhtml-include href="../ga.html"?>
