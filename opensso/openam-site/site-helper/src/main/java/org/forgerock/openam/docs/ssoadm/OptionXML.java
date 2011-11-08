@@ -60,7 +60,8 @@ public class OptionXML
     String option = optional ?
         "[--" + tokens[0] + ", -" + tokens[1] +"]" :
         "--" + tokens[0] + ", -" + tokens[1];
-    String desc = tokens[3].replaceAll("\\&pipe;", "|").replaceAll("<","&lt;");
+    String desc = tokens[tokens.length - 1].replaceAll("\\&pipe;", "|")
+        .replaceAll("<","&lt;");
     return
         "    <varlistentry>\n" +
         "     <term><option>" + option + "</option></term>\n" +
