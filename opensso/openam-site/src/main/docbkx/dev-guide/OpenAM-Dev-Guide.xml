@@ -50,81 +50,35 @@
  
  <xinclude:include href="preface.xml" />
 
- <part label="A">
-  <title>Overview</title>
-  <partintro>
-   <para>Although policy agents and standards support make it possible for
-   applications to use OpenAM for access management without changing your
-   code, some deployments require tighter integration, or direct use of
-   supported protocols and OpenAM APIs.</para>
-   
-   <para>OpenAM supports a range of protocols and APIs that allow you not
-   only to define specifically how access is managed in your client
-   applications, but also to extend OpenAM capabilities to meet even
-   those deployment requirements not yet covered in OpenAM.</para>
-  </partintro>
-  
-  <xinclude:include href='chap-api-overview.xml' />
-  <xinclude:include href='chap-best-practices.xml' />
- </part>
- 
- <part label="B">
-  <title>Developing Client Applications</title>
-  <partintro>
-   <para>Client applications access OpenAM services for authentication,
-   authorization, and single sign on/single log out through the use of
-   sessions. Client applications can also be allowed to manage authorization
-   policies.</para>
-   
-   <para>Client application integration with OpenAM can be coupled loosely,
-   as in the case of an application running in a web server with an OpenAM
-   policy agent to handle interaction with OpenAM service, more directly,
-   as in the case where the client interacts with OpenAM over protocol, or
-   tightly, as in the case of an application using the OpenAM Java or C API
-   to interact with OpenAM services.</para>
-   
-   <para>This part of the guide covers client interaction with OpenAM
-   over supported protocols and using OpenAM APIs.</para>
-  </partintro>
- 
-  <xinclude:include href='chap-rest.xml' />
-  <xinclude:include href='chap-jdk.xml' />
-  <xinclude:include href='chap-authentication.xml' />
-  <xinclude:include href='chap-session.xml' />
-  <xinclude:include href='chap-fedlet-java.xml' />
-  <xinclude:include href='chap-fedlet-dotnet.xml' />
-  <xinclude:include href='chap-samlv2.xml' />
-  <xinclude:include href='chap-ws-federation.xml' />
-  <xinclude:include href='chap-xacml.xml' />
-  <xinclude:include href='chap-policy-management.xml' />  
-  <xinclude:include href='chap-oauth.xml' />
-  <xinclude:include href='chap-openid.xml' />
-  <xinclude:include href='chap-csdk.xml' />
- </part>
- 
- <part label="C">
-  <title>Extending OpenAM</title>
-  <partintro>
-   <para>OpenAM services solve a wide range of access and federation
-   management problems out of the box. Yet, OpenAM also exposes APIs and
-   SPIs that enable you extend OpenAM services when built-in functionality
-   does not fit your deployment.</para>
-   
-   <para>This part of the guide covers OpenAM mechanisms for plugging in
-   additional functionality not available out of the box.</para>
-  </partintro>
- 
-  <xinclude:include href='chap-auth-spi.xml' />
-  <xinclude:include href='chap-post-auth.xml' />
-  <xinclude:include href='chap-policy-spi.xml' />
-  <xinclude:include href='chap-delegation-spi.xml' />
-  <xinclude:include href='chap-identity-repo-spi.xml' />
-  <xinclude:include href='chap-sms-spi.xml' />
-  <xinclude:include href='chap-custom-web-agent.xml' />
- </part>
+ <xinclude:include href='chap-api-overview.xml' />
+ <xinclude:include href='chap-best-practices.xml' />
+
+ <xinclude:include href='chap-client-dev.xml' />
+ <xinclude:include href='chap-rest.xml' />
+ <xinclude:include href='chap-jdk.xml' />
+ <xinclude:include href='chap-authentication.xml' />
+ <xinclude:include href='chap-session.xml' />
+ <xinclude:include href='chap-fedlet-java.xml' />
+ <xinclude:include href='chap-fedlet-dotnet.xml' />
+ <xinclude:include href='chap-samlv2.xml' />
+ <xinclude:include href='chap-ws-federation.xml' />
+ <xinclude:include href='chap-xacml.xml' />
+ <xinclude:include href='chap-policy-management.xml' />  
+ <xinclude:include href='chap-oauth.xml' />
+ <xinclude:include href='chap-openid.xml' />
+ <xinclude:include href='chap-csdk.xml' />
+
+ <xinclude:include href='chap-extending.xml' />
+ <xinclude:include href='chap-auth-spi.xml' />
+ <xinclude:include href='chap-post-auth.xml' />
+ <xinclude:include href='chap-policy-spi.xml' />
+ <xinclude:include href='chap-delegation-spi.xml' />
+ <xinclude:include href='chap-identity-repo-spi.xml' />
+ <xinclude:include href='chap-sms-spi.xml' />
+ <xinclude:include href='chap-custom-web-agent.xml' />
 
 <!-- TODO: Add the C API Reference pages
- <reference label="D">
+ <reference>
   <title>OpenAM C API Reference</title>
   
   <refentry>

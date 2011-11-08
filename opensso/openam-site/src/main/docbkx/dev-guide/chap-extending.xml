@@ -23,26 +23,20 @@
   !      Copyright 2011 ForgeRock AS
   !    
 -->
-<chapter xml:id='chap-api-overview'
+<chapter xml:id='chap-extending'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>OpenAM APIs and Protocols</title>
+ <title>Extending OpenAM</title>
 
- <para>Although policy agents and standards support make it possible for
- applications to use OpenAM for access management without changing your
- code, some deployments require tighter integration, or direct use of
- supported protocols and OpenAM APIs.</para>
+ <para>OpenAM services solve a wide range of access and federation
+ management problems out of the box. Yet, OpenAM also exposes APIs and
+ SPIs that enable you extend OpenAM services when built-in functionality
+ does not fit your deployment.</para>
 
- <para>OpenAM supports a range of protocols and APIs that allow you not
- only to define specifically how access is managed in your client
- applications, but also to extend OpenAM capabilities to meet even
- those deployment requirements not yet covered in OpenAM.</para>
-
- <para>This chapter presents an overview of the APIs and protocols that
- OpenAM supports.</para>
-
+ <para>This part of the guide covers OpenAM mechanisms for plugging in
+ additional functionality not available out of the box.</para>
 </chapter>
