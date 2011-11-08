@@ -75,7 +75,9 @@
  <xinclude:include href='chap-delegation-spi.xml' />
  <xinclude:include href='chap-identity-repo-spi.xml' />
  <xinclude:include href='chap-sms-spi.xml' />
+ <!-- TODO: Chapter on building a custom web agent with the C SDK
  <xinclude:include href='chap-custom-web-agent.xml' />
+ -->
 
 <!-- TODO: Add the C API Reference pages
  <reference>
