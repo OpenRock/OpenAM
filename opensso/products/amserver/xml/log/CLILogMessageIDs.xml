@@ -6968,7 +6968,18 @@
             <item>Look under debug file for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="SUCCEEDED_CREATE_APPLICATION_TYPE" id="5558"
+    <logmessage name="ATTEMPT_CREATE_APPLICATION_TYPE" id="5558"
+        loglevel="LL_INFO"
+        description="Attempt to create application type.">
+        <datainfo>
+            <item>Application Type name</item>
+        </datainfo>
+        <triggers>
+            <item>Execute create application type Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_CREATE_APPLICATION_TYPE" id="5559"
         loglevel="LL_INFO"
         description="Create application type succeeded.">
         <datainfo>
@@ -6979,7 +6990,7 @@
         </triggers>
         <actions />
     </logmessage>
-    <logmessage name="FAILED_CREATE_APPLICATION_TYPE" id="5559"
+    <logmessage name="FAILED_CREATE_APPLICATION_TYPE" id="5560"
         loglevel="LL_INFO"
         description="Failed to create application type.">
         <datainfo>
