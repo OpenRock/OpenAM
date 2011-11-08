@@ -62,6 +62,12 @@
    <para>Setup wizards make it easier to use OpenLDAP and OpenDJ as
    the identity repository.</para>
   </listitem>
+  <listitem>
+   <para>The <command>ssoadm</command> command now provides subcommands to
+   manage entitlement application types: <command>create-appl-type</command>,
+   <command>delete-appl-types</command>, <command>list-appl-types</command>
+   (OPENAM-872).</para>
+  </listitem>
   <!-- TODO: reword this when the extension is integrated. -->
 <!--   <listitem>
    <para>A new session failover mechanism introduces a replacement for

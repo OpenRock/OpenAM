@@ -156,9 +156,12 @@
    <itemizedlist>
     <listitem><para><link linkend="ssoadm-add-app-priv"><command>add-app-priv</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-create-appl"><command>create-appl</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-create-appl-type"><command>create-appl-type</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-create-xacml"><command>create-xacml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-delete-appl-types"><command>delete-appl-types</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-delete-appls"><command>delete-appls</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-delete-xacml"><command>delete-xacml</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-list-appl-types"><command>list-appl-types</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-list-appls"><command>list-appls</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-list-xacml"><command>list-xacml</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-set-appl"><command>set-appl</command></link></para></listitem>
