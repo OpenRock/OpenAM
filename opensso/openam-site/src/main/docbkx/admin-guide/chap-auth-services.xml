@@ -360,7 +360,10 @@
    <para>When you configure the Adaptive Risk module to save cookies and
    profile attributes after successful authentication, OpenAM performs the
    save as post-authentication processing, only after the entire authentication
-   chain returns success.</para>
+   chain returns success. You must set up OpenAM to save the data as part of
+   post-authentication processing by editing the authentication chain to add
+   <literal>org.forgerock.openam.authentication.modules.adaptive.Adaptive</literal>
+   to the list of post authentication plugins.</para>
    <indexterm><primary>Adaptive risk authentication</primary></indexterm>
    
    <para><command>ssoadm</command> service name:
