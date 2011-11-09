@@ -2225,8 +2225,8 @@
    <para>The OAuth 2.0 authentication module lets OpenAM authenticate clients
    of OAuth resource servers. References in this section are to the
    Internet-Draft <link
-   xlink:href="http://tools.ietf.org/pdf/draft-ietf-oauth-v2-12.pdf">The OAuth
-   2.0 Authorization Protocol</link>.</para>
+   xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-v2-22">The OAuth 2.0
+   Authorization Protocol</link>.</para>
    <indexterm><primary>OAuth 2.0 authentication</primary></indexterm>
    
    <para><command>ssoadm</command> service name:
