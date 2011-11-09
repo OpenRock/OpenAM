@@ -65,7 +65,9 @@
  <xinclude:include href='chap-samlv2.xml' />
  <xinclude:include href='chap-ws-federation.xml' />
  <xinclude:include href='chap-oauth.xml' />
+ <!-- OpenID is currently an extension on trunk.
  <xinclude:include href='chap-openid.xml' />
+ -->
  <xinclude:include href='chap-csdk.xml' />
 
  <xinclude:include href='chap-extending.xml' />
