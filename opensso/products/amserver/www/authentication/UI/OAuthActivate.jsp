@@ -57,6 +57,19 @@
         resources = ResourceBundle.getBundle("amAuthOAuth");
    } 
 
+   String logoutURL = request.getParameter(PARAM_GOTO); 
+   if (logoutURL == null) {
+      logoutURL = ServiceURI;
+   } else {
+       boolean isValidURL = ESAPI.validator().
+               isValidInput("URLContext", logoutURL, "URL", 255, false); 
+       if (!isValidURL) {   
+           OAuthUtil.debugError("OAuthPwd: wrong logoutURL URL attempted to be used "
+                   + "in the OAuthPwd page: " + logoutURL);
+           logoutURL = ServiceURI;
+       } 
+   }
+   
    String activationTitle = resources.getString("activationTitle");
    String emptyCode = ESAPI.encoder().encodeForHTML(resources.getString("emptyCode"));
    String errInvalidCode = ESAPI.encoder().encodeForHTML(resources.getString("errInvalidCode"));
@@ -108,7 +121,7 @@
         }
         
         function adios() { 
-             window.location = "<%= ServiceURI %>";
+             window.location = "<%= logoutURL %>";
         }
         
         </script>

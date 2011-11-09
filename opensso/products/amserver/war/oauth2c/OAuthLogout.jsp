@@ -84,10 +84,7 @@
            OAuthUtil.debugError("OAuthLogout: wrong goto URL attempted to be used "
                    + "in the Logout page: " + gotoURL);
            gotoURL = "wronggotoURL";
-       } else {
-           gotoURL = ESAPI.encoder().encodeForHTML(gotoURL);
-           gotoURLencAttr = ESAPI.encoder().encodeForHTMLAttribute(gotoURL);
-       }
+       } 
    }
    
    String logoutURL = request.getParameter(PARAM_LOGOUT_URL); 
