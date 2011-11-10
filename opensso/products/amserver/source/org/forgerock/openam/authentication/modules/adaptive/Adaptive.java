@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.security.auth.Subject;
@@ -290,7 +291,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         setPostAuthNParams();
 
-        if (currentScore >= adaptiveThreshold) {
+        if (currentScore < adaptiveThreshold) {
             debug.message(ADAPTIVE + ": Returning Success : " + userName);
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
@@ -318,6 +319,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      * This relies on the Auth Failure framework with Account Lockout enabled.
      *
      * Post_Auth_Class:  Should failure count be reset if successful?
+     * 
+     * Returns authFailScore if AuthFailure
      *
      * @return score achieved with this test
      */
@@ -331,7 +334,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         } catch (AuthenticationException e) {
         }
 
-        if (authFailureInvert) {
+        if (!authFailureInvert) {
             retVal = authFailureScore - retVal;
         }
 
@@ -361,7 +364,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
         }
 
-        if (IPRangeInvert) {
+        if (!IPRangeInvert) {
             retVal = IPRangeScore - retVal;
         }
         debug.message(ADAPTIVE + ".checkIPRange: returns " + retVal);
@@ -408,14 +411,17 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         /*
          * How do we add this to the list of IPHistory???  A Post AuthN Class?
          */
+
+
         if (IPHistorySave && retVal == 0) {
             postAuthNMap.put("IPSAVE", newHistory);
             postAuthNMap.put("IPAttr", IPHistoryAttribute);
         }
 
-        if (IPHistoryInvert) {
+        if (!IPHistoryInvert) {
             retVal = IPHistoryScore - retVal;
         }
+        
         debug.message(ADAPTIVE + ".checkIPHistory: returns " + retVal);
 
         return retVal;
@@ -449,7 +455,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
         }
 
-        if (geoLocationInvert) {
+        if (!geoLocationInvert) {
             retVal = geoLocationScore - retVal;
         }
         debug.message(ADAPTIVE + ".checkGeoLocation: returns " + retVal);
@@ -489,7 +495,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             postAuthNMap.put("COOKIEVALUE", knownCookieValue);
         }
 
-        if (knownCookieInvert) {
+        if (!knownCookieInvert) {
             retVal = knownCookieScore - retVal;
         }
         debug.message(ADAPTIVE + ".checkKnownCookie: returns " + retVal);
@@ -529,7 +535,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
         }
 
-        if (reqHeaderInvert) {
+        if (!reqHeaderInvert) {
             retVal = reqHeaderScore - retVal;
         }
         debug.message(ADAPTIVE + ".checkRequestHeader: returns " + retVal);
@@ -575,7 +581,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             postAuthNMap.put("DEVICEVALUE", deviceHash);
         }
 
-        if (deviceCookieInvert) {
+        if (!deviceCookieInvert) {
             retVal = deviceCookieScore - retVal;
         }
         debug.message(ADAPTIVE + ".checkRegisteredClient: returns " + retVal);
@@ -604,6 +610,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         Date loginTime = null;
         String lastLoginEnc = null;
         String lastLogin = null;
+        String savedUserName = null;
         int retVal = 0;
 
         if (timeSinceLastLoginAttribute != null) {
@@ -619,6 +626,23 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     }
                 }
 
+                StringTokenizer st = new StringTokenizer(lastLogin, "|");
+                if (st.hasMoreTokens()) {
+                	String randomCode = st.nextToken();
+                };
+
+                if (st.hasMoreTokens()) {
+                	lastLogin = st.nextToken();
+                };
+
+                if (st.hasMoreTokens()) {
+                	savedUserName = st.nextToken();
+                };
+            
+                if (savedUserName != userName) {
+                	lastLogin = null;
+                }
+
                 if (lastLogin != null) {
                     try {
                         loginTime = formatter.parse(lastLogin); // "2002.01.29.08.36.33");
@@ -631,13 +655,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
             if (timeSinceLastLoginSave) {
                 postAuthNMap.put("LOGINNAME", timeSinceLastLoginAttribute);
-                lastLoginEnc = AccessController.doPrivileged(new EncodeAction(formatter.format(now)));
+                lastLogin =  formatter.format(now);
+                lastLogin = "" + Math.random() + "|" + lastLogin + "|" + userName;
+                lastLoginEnc = AccessController.doPrivileged(new EncodeAction(lastLogin));
                 postAuthNMap.put("LOGINVALUE", lastLoginEnc);
-                postAuthNMap.put("username", userName);
             }
         }
 
-        if (timeSinceLastLoginInvert) {
+        if (!timeSinceLastLoginInvert) {
             retVal = timeSinceLastLoginScore - retVal;
         }
 
@@ -670,7 +695,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
         }
 
-        if (riskAttributeInvert) {
+        if (!riskAttributeInvert) {
             retVal = riskAttributeScore - retVal;
         }
         debug.message(ADAPTIVE + ".checkRiskAttribute: returns " + retVal);
