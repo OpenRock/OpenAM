@@ -78,7 +78,6 @@
  <xinclude:include href='chap-auth-spi.xml' />
  <xinclude:include href='chap-post-auth.xml' />
  <xinclude:include href='chap-policy-spi.xml' />
- <xinclude:include href='chap-delegation-spi.xml' />
  <xinclude:include href='chap-identity-repo-spi.xml' />
  <xinclude:include href='chap-sms-spi.xml' />
  <!-- TODO: Chapter on building a custom web agent with the C SDK
