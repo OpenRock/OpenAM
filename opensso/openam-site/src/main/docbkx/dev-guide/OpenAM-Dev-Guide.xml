@@ -59,7 +59,9 @@
  <xinclude:include href='chap-authentication.xml' />
  <xinclude:include href='chap-session.xml' />
  <xinclude:include href='chap-policy-decisions.xml' />
+ <!-- TODO: Finish XACML request chapter after debugging sample client setup
  <xinclude:include href='chap-xacml.xml' />
+ -->
  <xinclude:include href='chap-fedlet-java.xml' />
  <xinclude:include href='chap-fedlet-dotnet.xml' />
  <xinclude:include href='chap-samlv2.xml' />
