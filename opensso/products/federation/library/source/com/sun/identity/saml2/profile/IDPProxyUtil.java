@@ -27,7 +27,7 @@
  */
 
  /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -89,6 +89,7 @@ import javax.xml.soap.SOAPException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.saml2.common.SAML2Repository;
 import org.w3c.dom.Element;
 
 /**
@@ -290,6 +291,15 @@ public class IDPProxyUtil {
         synchronized(SPCache.requestHash) {
             SPCache.requestHash.put(requestID, reqInfo);
         }
+        if (SAML2Utils.isSAML2FailOverEnabled()) {
+            // sessionExpireTime is counted in seconds
+            long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
+            SAML2Repository.getInstance().save(requestID, 
+                    new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
+            if (SAML2Utils.debug.messageEnabled()) {
+                SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);
+            }
+        }        
     }
 
     /**

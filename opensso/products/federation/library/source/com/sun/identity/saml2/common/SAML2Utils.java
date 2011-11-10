@@ -167,6 +167,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import com.sun.identity.saml2.plugins.JMQSAML2Repository;
+import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.owasp.esapi.ESAPI;
@@ -344,17 +345,40 @@ public class SAML2Utils extends SAML2SDKUtils {
         if (inRespToResp != null && inRespToResp.length() != 0) {
             reqInfo = (AuthnRequestInfo)SPCache.requestHash.get(inRespToResp);
             if (reqInfo == null) {
-                if (debug.messageEnabled()) {
-                    debug.message(method + "InResponseTo attribute in Response"
-                            + " is invalid: " + inRespToResp);
+                if (SAML2Utils.isSAML2FailOverEnabled()) {
+                    // Attempt to read AuthnRequestInfoCopy from SAML2 repository
+                    AuthnRequestInfoCopy reqInfoCopy = 
+                            (AuthnRequestInfoCopy)SAML2Repository.getInstance().retrieve(inRespToResp);
+                    if (reqInfoCopy != null) {
+                        // Get back the AuthnRequestInfo
+                        reqInfo = reqInfoCopy.getAuthnRequestInfo(httpRequest, httpResponse);
+                        if (debug.messageEnabled()) {
+                            debug.message(method + "AuthnRequestInfoCopy"
+                                + " retrieved from SAML2 repository for inResponseTo: " + inRespToResp);
+                        }
+                    } else {
+                        debug.error(method + "InResponseTo attribute in Response"
+                            + " is invalid: " + inRespToResp + ", SAML2 failover is enabled");
+                        String[] data = {respID};
+                        LogUtil.error(Level.INFO,
+                                LogUtil.INVALID_INRESPONSETO_RESPONSE,
+                                data,
+                                null);
+                        throw new SAML2Exception(bundle.getString(
+                                "invalidInResponseToInResponse"));
+                    }
+                } else {
+                    // !SAML2Utils.isSAML2FailOverEnabled()
+                    debug.error(method + "InResponseTo attribute in Response"
+                        + " is invalid: " + inRespToResp + ", SAML2 failover is disabled");
+                    String[] data = {respID};
+                    LogUtil.error(Level.INFO,
+                            LogUtil.INVALID_INRESPONSETO_RESPONSE,
+                            data,
+                            null);
+                    throw new SAML2Exception(bundle.getString(
+                            "invalidInResponseToInResponse"));
                 }
-                String[] data = {respID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.INVALID_INRESPONSETO_RESPONSE,
-                        data,
-                        null);
-                throw new SAML2Exception(bundle.getString(
-                        "invalidInResponseToInResponse"));
             }
         }
        

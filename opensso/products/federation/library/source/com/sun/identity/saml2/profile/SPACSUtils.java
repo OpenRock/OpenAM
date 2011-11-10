@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -1794,8 +1794,32 @@ public class SPACSUtils {
 
             if (cache != null) {
                 relayStateUrl = (String)cache.getObject();
+            } else if (SAML2Utils.isSAML2FailOverEnabled()) {
+                try {
+                    // Try and retrieve the value from the SAML2 repository
+                    // The key is this way to make it unique compared to when
+                    // the same key is used to store a copy of the AuthnRequestInfo
+                    String relayState = (String)SAML2Repository.getInstance().retrieve(relayStateID + relayStateID);
+                    if (relayState != null) {
+                        // Get back the relayState
+                        relayStateUrl = relayState;
+                        if (SAML2Utils.debug.messageEnabled()) {
+                            SAML2Utils.debug.message("SPACUtils.getRelayState: relayState"
+                                + " retrieved from SAML2 repository for relayStateID: " + relayStateID);
+                        }
+                    }
+                } catch (SAML2Exception ex) {                    
+                    SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
+                            + relayStateID, ex);                    
+                }
+            } else {
+                // !SAML2Utils.isSAML2FailOverEnabled()
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("SPACUtils.getRelayState: relayState"
+                        + " is null for relayStateID: " + relayStateID + ", SAML2 failover is disabled");
+                }
             }
-
+            
             if ((relayStateUrl == null) || (relayStateUrl.trim().length() == 0)
             ) {
                 relayStateUrl = relayStateID;

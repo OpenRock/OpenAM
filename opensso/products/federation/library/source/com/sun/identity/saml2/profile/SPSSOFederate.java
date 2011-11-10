@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.profile;
 
@@ -44,6 +47,7 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.common.QuerySignatureUtil;
+import com.sun.identity.saml2.common.SAML2Repository;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.ecp.ECPRequest;
@@ -360,7 +364,16 @@ public class SPSSOFederate {
                                      paramsMap);
             synchronized(SPCache.requestHash) {             
                 SPCache.requestHash.put(authnRequest.getID(),reqInfo);
-            } 
+            }
+            if (SAML2Utils.isSAML2FailOverEnabled()) {
+                // sessionExpireTime is counted in seconds
+                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
+                SAML2Repository.getInstance().save(authnRequest.getID(), new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("SPSSOFederate.initiateAuthnRequest:"
+                            + " SAVE AuthnRequestInfoCopy for requestID " + authnRequest.getID());
+                }
+            }
         } catch (IOException ioe) {
             SAML2Utils.debug.error("SPSSOFederate: Exception :",ioe);
             throw new SAML2Exception(
@@ -598,7 +611,17 @@ public class SPSSOFederate {
                                      paramsMap);
             synchronized(SPCache.requestHash) {             
                 SPCache.requestHash.put(authnRequest.getID(),reqInfo);
-            } 
+            }
+            if (SAML2Utils.isSAML2FailOverEnabled()) {
+                // sessionExpireTime is counted in seconds
+                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
+                SAML2Repository.getInstance().save(authnRequest.getID(), 
+                        new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("SPSSOFederate.initiateECPRequest:"
+                            + " SAVE AuthnRequestInfoCopy for requestID " + authnRequest.getID());
+                }
+            }
         } catch (SAML2MetaException sme) {
             SAML2Utils.debug.error("SPSSOFederate:Error retreiving metadata"
                                     ,sme);
@@ -1023,6 +1046,25 @@ public class SPSSOFederate {
     public static String getRelayStateID(String relayState, String requestID) {
         
         SPCache.relayStateHash.put(requestID, new CacheObject(relayState));
+        
+        if (SAML2Utils.isSAML2FailOverEnabled()) {
+            // sessionExpireTime is counted in seconds
+            long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
+            try {
+                // Need to make the key unique due to the requestID also being used to
+                // store a copy of the AuthnRequestInfo
+                SAML2Repository.getInstance().save(requestID + requestID, relayState, sessionExpireTime, null);
+            } catch (SAML2Exception ex) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("SPSSOFederate.getRelayStateID: Unable to SAVE relayState for requestID "
+                            + requestID, ex);
+                }
+            }
+            if (SAML2Utils.debug.messageEnabled()) {
+                SAML2Utils.debug.message("SPSSOFederate.getRelayStateID: SAVE relayState for requestID " + requestID);
+            }            
+        }
+        
         return requestID;
     }
 
