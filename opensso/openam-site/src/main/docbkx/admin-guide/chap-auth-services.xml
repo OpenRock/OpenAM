@@ -350,10 +350,10 @@
    authenticate first using the LDAP module providing a user ID and password
    combination. Upon success, OpenAM calls the Adaptive Risk module. The
    Adaptive Risk module assesses the risk based on your configured parameters.
-   If the Adaptive Risk module calculates a total score above the threshold you
+   If the Adaptive Risk module calculates a total score below the threshold you
    set, the module returns success, and OpenAM finishes authentication
    processing without requiring further credentials. Otherwise the Adaptive
-   Risk module evaluates the score to be below the threshold, and returns
+   Risk module evaluates the score to be abover the risk threshold, and returns
    failure. OpenAM then calls the HOTP module, requiring the user to
    authenticate with a one-time password delivered to her by email or by SMS
    to her mobile phone.</para>
@@ -381,9 +381,8 @@
     <varlistentry>
      <term>Adaptive Threshold</term>
      <listitem>
-      <para>Minimum score required to pass the risk assessment successfully.
-      In other words, if the sum of the Scores is less than the threshold, the
-      Adaptive Risk module returns failure.</para>
+      <para>Risk threshold score. If the sum of the Scores is greater than the
+      threshold, the Adaptive Risk module returns failure.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-auth-threshold</literal></para>
      </listitem>
@@ -403,7 +402,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the Failed
+      <para>Value to add to the total score if the user fails the Failed
       Authentication Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-failure-score</literal></para>
@@ -413,7 +412,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Failed Authentication Check.</para>
+      passes the Failed Authentication Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-failure-invert</literal></para>
      </listitem>
@@ -446,7 +445,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the IP Range
+      <para>Value to add to the total score if the user fails the IP Range
       Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-range-score</literal></para>
@@ -456,7 +455,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the IP Range Check.</para>
+      passes the IP Range Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-range-invert</literal></para>
      </listitem>
@@ -504,7 +503,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the IP History
+      <para>Value to add to the total score if the user fails the IP History
       Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-history-score</literal></para>
@@ -514,7 +513,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the IP History Check.</para>
+      passes the IP History Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-history-invert</literal></para>
      </listitem>
@@ -572,7 +571,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Cookie Value Check.</para>
+      passes the Cookie Value Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-known-cookie-invert</literal></para>
      </listitem>
@@ -612,7 +611,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the Device
+      <para>Value to add to the total score if the user fails the Device
       Registration Cookie Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-device-cookie-score</literal></para>
@@ -622,7 +621,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Device Registration Cookie Check.</para>
+      passes the Device Registration Cookie Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-device-cookie-invert</literal></para>
      </listitem>
@@ -673,7 +672,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the Time Since
+      <para>Value to add to the total score if the user fails the Time Since
       Last Login Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-time-since-last-login-score</literal></para>
@@ -683,7 +682,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Time Since Last Login Check.</para>
+      passes the Time Since Last Login Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-time-since-last-login-invert</literal></para>
      </listitem>
@@ -722,7 +721,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the Profile Risk
+      <para>Value to add to the total score if the user fails the Profile Risk
       Attribute Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-risk-attribute-score</literal></para>
@@ -732,7 +731,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Profile Risk Attribute Check.</para>
+      passes the Profile Risk Attribute Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-risk-attribute-invert</literal></para>
      </listitem>
@@ -770,7 +769,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the Geolocation
+      <para>Value to add to the total score if the user fails the Geolocation
       Country Code Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-geo-location-score</literal></para>
@@ -780,7 +779,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Geolocation Country Code Check.</para>
+      passes the Geolocation Country Code Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-geo-location-invert</literal></para>
      </listitem>
@@ -818,7 +817,7 @@
     <varlistentry>
      <term>Score</term>
      <listitem>
-      <para>Value to add to the total score if the user passes the Request
+      <para>Value to add to the total score if the user fails the Request
       Header Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-req-header-score</literal></para>
@@ -828,7 +827,7 @@
      <term>Invert Result</term>
      <listitem>
       <para>When selected, add the Score to the total score if the user
-      fails the Request Header Check.</para>
+      passes the Request Header Check.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-req-header-invert</literal></para>
      </listitem>
