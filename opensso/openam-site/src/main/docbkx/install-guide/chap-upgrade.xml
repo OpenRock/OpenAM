@@ -152,6 +152,47 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
 Upgrade Complete.</screen>
  </tip>
  
+ <procedure xml:id="revert-from-upgrade">
+  <title>To Revert From OpenAM Upgrade</title>
+  
+  <para>If you must revert from an upgraded version of OpenAM, then the
+  quickest way to return to the earlier version is to restore all the earlier
+  files. You also must return to an earlier version of the configuration store
+  data.</para>
+  <step>
+   <para>Stop OpenAM or the container where OpenAM is running.</para>
+  </step>
+  <step>
+   <para>Restore the old version of OpenAM files, including the .war and the
+   configuration directory.</para>
+  </step>
+  <step performance="optional">
+   <para>If you are using an external configuration store, restore the earlier
+   version of the configuration store data.</para>
+  </step>
+  <step performance="optional">
+   <para>If you run OpenAM in Tomcat, remove files from the working directory
+   where Tomcat has stored JSP files from the upgraded version.</para>
+   <screen>$ rm -fr /path/to/tomcat/work/Catalina/localhost/openam</screen>
+   <para>If you skip this step, you can see an error like the following when
+   logging into the console after reverting to the older version.</para>
+   <screen>amConsole:10/29/2011 05:42:51:812 PM BST: Thread[http-8080-3,5,main]
+ERROR: ConsoleServletBase.onUncaughtException
+javax.servlet.ServletException: java.lang.NoClassDefFoundError:
+ org/forgerock/openam/console/ui/taglib/header/CCHtmlHeaderTag
+        at org.apache.jasper.runtime.PageContextImpl.doHandlePageException
+         (PageContextImpl.java:862)
+        at org.apache.jasper.runtime.PageContextImpl.handlePageException
+         (PageContextImpl.java:791)
+        at org.apache.jsp.console.task.Home_jsp._jspService(Home_jsp.java:564)
+        at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)</screen>
+  </step>
+  <step>
+   <para>Start the earlier version of OpenAM or the container where OpenAM
+   runs.</para>
+  </step>
+ </procedure>
+
  <procedure xml:id="upgrade-from-earlier-products">
   <title>Upgrading From OpenAM 9.0 &amp; Earlier</title>
   
