@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.idsvcs.rest;
 
 import java.io.PrintWriter;
@@ -38,9 +41,8 @@ import java.util.Map;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-//import org.json.JSONArray;
-//import org.json.JSONObject;
-//import org.json.JSONWriter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
@@ -57,7 +59,7 @@ import java.util.HashMap;
 public class MarshallerFactory {
     // All the various marshallers..
     public static MarshallerFactory XML = new MarshallerFactory("XML");
-    // public static MarshallerFactory JSON = new MarshallerFactory("JSON");
+    public static MarshallerFactory JSON = new MarshallerFactory("JSON");
     public static MarshallerFactory PROPS = new MarshallerFactory("PROPS");
 
     // ===================================================================
@@ -70,13 +72,19 @@ public class MarshallerFactory {
     private MarshallerFactory(String protocol) {
         this.protocol = protocol;
         // No support for JSON yet
-        // if (protocol.equals("JSON")) {
-        //    _map.put(Token.class, JSONTokenMarshaller.class);
-        //    _map.put(UserDetails.class, JSONUserDetailsMarshaller.class);
-        //    _map.put(GeneralFailure.class,
-        // JSONGeneralFailureMarshaller.class);
-        // } else
-        if (protocol.equals("XML")) {
+        if (protocol.equals("JSON")) {
+            _map.put(Token.class, JSONTokenMarshaller.class);
+            _map.put(Boolean.class, JSONBooleanMarshaller.class);
+            _map.put(String.class, JSONStringMarshaller.class);
+            _map.put(String[].class, JSONStringArrayMarshaller.class);
+            _map.put(UserDetails.class, JSONUserDetailsMarshaller.class);
+            _map.put(IdentityDetails.class, JSONIdentityDetailsMarshaller.class);
+            _map.put(Throwable.class, JSONThrowableMarshaller.class);
+            _map.put(GeneralFailure.class, JSONThrowableMarshaller.class);
+            _map.put(Throwable.class, JSONThrowableMarshaller.class);
+            _map.put(ObjectNotFound.class, JSONThrowableMarshaller.class);
+            _map.put(GeneralFailure.class, JSONThrowableMarshaller.class);
+        } else if (protocol.equals("XML")) {
             _map.put(Token.class, XMLTokenMarshaller.class);
             _map.put(UserDetails.class, XMLUserDetailsMarshaller.class);
             _map.put(Boolean.class, XMLBooleanMarshaller.class);
@@ -553,104 +561,200 @@ public class MarshallerFactory {
     /**
      * Marshall the Token into JSON format.
      */
-//    static class JSONTokenMarshaller implements Marshaller {
-//        public void marshall(Writer wrt, Object value) throws Exception {
-//            assert wrt != null && value != null;
-//            marshall(wrt, (Token)value);
-//        }
-//
-//        public void marshall(Writer wrt, Token value) throws Exception {
-//            wrt.write(marshall(value).toString());
-//        }
-//        
-//        public JSONObject marshall(Token value) throws Exception {
-//            JSONObject token = new JSONObject();
-//            token.put("id", value.getId());
-//            return token;
-//        }
-//    }
-//
-//    static class JSONUserDetailsMarshaller implements Marshaller {
-//        public void marshall(Writer wrt, Object value) throws Exception {
-//            assert wrt != null && value != null;
-//            marshall(wrt, (UserDetails)value);
-//        }
-//        public void marshall(Writer wrt, UserDetails ud) throws Exception {
-//            wrt.write(marshall(ud).toString());
-//        }
-//        public JSONObject marshall(UserDetails ud) throws Exception {
-//            JSONObject obj = new JSONObject();
-//            // add token..
-//            JSONObject token = new JSONTokenMarshaller()
-//                .marshall(ud.getToken());
-//            obj.put("token", token);
-//            // add roles..
-//            JSONArray roles = new JSONArray();
-//            String[] rols = ud.getRoles();
-//            for (int i = 0; (rols != null && i < rols.length); i++) {
-//                String role = rols[i];
-//                roles.put(role);
-//            }
-//            obj.put("roles", roles);
-//            // add attributes..
-//            JSONArray attributes = new JSONArray();
-//            JSONAttributeMarshaller attrMar = new JSONAttributeMarshaller();
-//            Attribute[] ats = ud.getAttributes();
-//            for (int i = 0; (ats != null && i < ats.length); i++) {
-//                Attribute attr = ats[i];
-//                attributes.put(attrMar.marshall(attr));
-//            }
-//            obj.put("attributes", attributes);
-//            return obj;
-//        }
-//    }
-//
-//    /**
-//     * Marshall an Attribute object into JSON.
-//     */
-//    static class JSONAttributeMarshaller implements Marshaller {
-//        public void marshall(Writer wrt, Object value) throws Exception {
-//            assert wrt != null && value != null;
-//            marshall(wrt, (Attribute)value);
-//        }
-//
-//        public void marshall(Writer wrt, Attribute attr) throws Exception {
-//            wrt.write(marshall(attr).toString());
-//        }
-//        
-//        public JSONObject marshall(Attribute attr) throws Exception {
-//            JSONObject obj = new JSONObject();
-//            // add name..
-//            obj.put("name", attr.getName());
-//            // add values..
-//            JSONArray array = new JSONArray();
-//            String[] vals = attr.getValues();
-//            for (int i = 0; (vals != null && i < vals.length); i++) {
-//                String value = vals[i];
-//                array.put(value);
-//            }
-//            obj.put("values", array);
-//            return obj;
-//            
-//        }
-//    }
-//
-//    /**
-//     * Marshall an Exception class into JSON format.
-//     */
-//    static class JSONGeneralFailureMarshaller implements Marshaller {
-//        public void marshall(Writer wrt, Object value) throws Exception {
-//            assert wrt != null && value != null;
-//            marshall(new JSONWriter(wrt), (GeneralFailure)value);
-//        }
-//
-//        public void marshall(JSONWriter wrt, GeneralFailure gf)
-//                throws Exception {
-//            wrt.object().key("exception").value(gf.getClass()
-//                .getName()).endObject();
-//        }
-//    }
-//    
+    static class JSONTokenMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null && value != null;
+            wrt.write(getObject((Token) value).toString());
+        }
+
+        public JSONObject getObject(Token value) throws Exception {
+            JSONObject token = new JSONObject();
+            token.put("tokenId", value.getId());
+            return token;
+        }
+    }
+
+    static class JSONBooleanMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            wrt.write(getObject((Boolean) value).toString());
+        }
+
+        public JSONObject getObject(Boolean value) throws Exception {
+            JSONObject ret = new JSONObject();
+            ret.put("boolean", value.booleanValue());
+            return ret;
+        }
+    }
+
+    static class JSONStringMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            wrt.write(getObject((String) value).toString());
+        }
+
+        public JSONObject getObject(String value) throws Exception {
+            JSONObject ret = new JSONObject();
+            ret.put("string", value);
+            return ret;
+        }
+    }
+
+    static class JSONStringArrayMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            wrt.write(getObject((String[]) value).toString());
+        }
+
+        public JSONObject getObject(String[] strings) throws Exception {
+            JSONObject ret = new JSONObject();
+            JSONArray array = new JSONArray(strings);
+            ret.put("string", array);
+            return ret;
+        }
+    }
+
+    static class JSONUserDetailsMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null && value != null;
+            wrt.write(getObject((UserDetails) value).toString());
+        }
+
+        public JSONObject getObject(UserDetails ud) throws Exception {
+            JSONObject obj = new JSONObject();
+            // add token..
+            JSONObject token = new JSONTokenMarshaller()
+                .getObject(ud.getToken());
+            obj.put("token", token);
+            // add roles..
+            JSONArray roles = new JSONArray();
+            String[] rols = ud.getRoles();
+            if (rols != null) {
+                for (String role : rols) {
+                    roles.put(role);
+                }
+            }
+            obj.put("roles", roles);
+            // add attributes..
+            JSONArray attributes = new JSONArray();
+            JSONAttributeMarshaller attrMar = new JSONAttributeMarshaller();
+            Attribute[] ats = ud.getAttributes();
+            if (ats != null) {
+                for (Attribute attr : ats) {
+                    attributes.put(attrMar.getObject(attr));
+                }
+            }
+            obj.put("attributes", attributes);
+            return obj;
+        }
+    }
+
+    /**
+     * Marshall an Attribute object into JSON.
+     */
+    static class JSONAttributeMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null && value != null;
+            wrt.write(getObject((Attribute) value).toString());
+        }
+
+        public JSONObject getObject(Attribute attr) throws Exception {
+            JSONObject obj = new JSONObject();
+            // add name..
+            obj.put("name", attr.getName());
+            // add values..
+            JSONArray array = new JSONArray();
+            String[] vals = attr.getValues();
+            if (vals != null) {
+                for (String val : vals) {
+                    array.put(val);
+                }
+            }
+            obj.put("values", array);
+
+            return obj;
+        }
+    }
+
+    static class JSONIdentityDetailsMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            wrt.write(getObject((IdentityDetails) value).toString());
+        }
+
+        public JSONObject getObject(IdentityDetails id) throws Exception {
+            JSONObject obj = new JSONObject();
+            obj.put("name", id.getName());
+            obj.put("type", id.getType());
+            obj.put("realm", id.getRealm());
+            JSONArray roles = new JSONArray();
+            String[] values = id.getRoles();
+            if (values != null) {
+                for (String val : values) {
+                    roles.put(val);
+                }
+            }
+            obj.put("roles", roles);
+            JSONArray groups = new JSONArray();
+            values = id.getGroups();
+            if (values != null) {
+                for (String val : values) {
+                    groups.put(val);
+                }
+            }
+            obj.put("groups", groups);
+            JSONArray members = new JSONArray();
+            values = id.getMembers();
+            if (values != null) {
+                for (String val : values) {
+                    members.put(val);
+                }
+            }
+            obj.put("members", members);
+
+            JSONArray attributes = new JSONArray();
+            JSONAttributeMarshaller attrMar = new JSONAttributeMarshaller();
+            Attribute[] ats = id.getAttributes();
+            if (ats != null) {
+                for (Attribute attr : ats) {
+                    attributes.put(attrMar.getObject(attr));
+                }
+            }
+            obj.put("attributes", attributes);
+
+            return obj;
+        }
+    }
+
+    /**
+     * Marshall an Exception class into JSON format.
+     */
+    static class JSONThrowableMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null && value != null;
+            wrt.write(getObject((Throwable)value).toString());
+        }
+
+        public JSONObject getObject(Throwable t) throws Exception {
+            JSONObject obj = new JSONObject();
+            JSONObject ex = new JSONObject();
+            ex.put("name", t.getClass().getName());
+            ex.put("message", t.getMessage());
+            String msg = null;
+            Throwable cause = t.getCause();
+            if (cause != null) {
+                msg = cause.getMessage();
+            }
+            ex.put("initCause", msg);
+            obj.put("exception", ex);
+            return obj;
+        }
+    }
+
         
     //=======================================================================
     // Marshalling w/ Properties

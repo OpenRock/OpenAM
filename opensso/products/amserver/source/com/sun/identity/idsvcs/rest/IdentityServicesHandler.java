@@ -621,6 +621,8 @@ public class IdentityServicesHandler extends HttpServlet {
             // Set the respone content type
             if (mar.getProtocol().equalsIgnoreCase("XML")) {
                 response.setContentType("text/xml");
+            } else if (mar.getProtocol().equals("JSON")) {
+                response.setContentType("application/json");
             } else {
                 response.setContentType("text/plain");
             }
@@ -657,7 +659,7 @@ public class IdentityServicesHandler extends HttpServlet {
             try {
                 if (method == null) {
                     // Throw Unsupported Operation Exception
-                    response.sendError(501);
+                    response.setStatus(501);
                     mar.newInstance(Throwable.class).marshall(wrt,
                         new UnsupportedOperationException(path));
                     return;
@@ -677,9 +679,8 @@ public class IdentityServicesHandler extends HttpServlet {
                 // write out the proper ObjectNotFound exception.
                 // set the response error code
                 try {
-                    sw = new StringWriter(100);
-                    mar.newInstance(ObjectNotFound.class).marshall(sw, ex);
-                    response.sendError(401, sw.toString());
+                    mar.newInstance(ObjectNotFound.class).marshall(wrt, ex);
+                    response.setStatus(401);
                 } catch (Exception e) {
                     // something really went wrong so just give up..
                     throw new ServletException(e);
@@ -687,9 +688,8 @@ public class IdentityServicesHandler extends HttpServlet {
             } catch (GeneralFailure ex) {
                 // write out the proper security based exception..
                 try {
-                    sw = new StringWriter(100);
-                    mar.newInstance(GeneralFailure.class).marshall(sw, ex);
-                    response.sendError(500, sw.toString());
+                    mar.newInstance(GeneralFailure.class).marshall(wrt, ex);
+                    response.setStatus(500);
                 } catch (Exception e) {
                     // something really went wrong so just give up..
                     throw new ServletException(e);
@@ -697,18 +697,17 @@ public class IdentityServicesHandler extends HttpServlet {
             } catch (Throwable e) {
                 try {
                     // something really went wrong so just give up..
-                    sw = new StringWriter(100);
-                    mar.newInstance(Throwable.class).marshall(sw, e);
+                    mar.newInstance(Throwable.class).marshall(wrt, e);
                     if (e instanceof UnsupportedOperationException) {
-                        response.sendError(501, sw.toString());
+                        response.setStatus(501);
                     } else if (e instanceof OrgInactive || e instanceof UserLocked
                             || e instanceof UserInactive || e instanceof AccountExpired
                             || e instanceof MaximumSessionReached){
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN, sw.toString());
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     } else if (e instanceof InvocationTargetException) {
-                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     } else {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
                 } catch (Exception ex) {
                     throw new ServletException(ex);
@@ -728,7 +727,7 @@ public class IdentityServicesHandler extends HttpServlet {
             // default is properties format
             boolean xml = path.indexOf("xml/") != -1;
             boolean json = path.indexOf("json/") != -1;
-            return // (json) ? MarshallerFactory.JSON :
+            return (json) ? MarshallerFactory.JSON :
                 (xml) ? MarshallerFactory.XML : MarshallerFactory.PROPS;
         }
 
