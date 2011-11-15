@@ -660,6 +660,7 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
     int *apache_ret = NULL;
     am_status_t sts = AM_SUCCESS;
     int len = 0;
+    char *url = NULL;
     if (args == NULL || (r = (request_rec *) args[0]) == NULL,
             (apache_ret = (int *) args[1]) == NULL ||
             ((http_result == AM_WEB_RESULT_OK_DONE ||
@@ -686,8 +687,16 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 }
                 break;
             case AM_WEB_RESULT_REDIRECT:
-                ap_custom_response(r, HTTP_MOVED_TEMPORARILY, data);
-                *apache_ret = HTTP_MOVED_TEMPORARILY;
+                if ((url = (char*) apr_table_get(r->notes, "CDSSO_REPOST_URL"))) {
+                    r->method = "GET";
+                    r->method_number = M_GET;
+                    apr_table_unset(r->notes, "CDSSO_REPOST_URL");
+                    ap_internal_redirect(url, r);
+                    *apache_ret = DONE;
+                } else {
+                    ap_custom_response(r, HTTP_MOVED_TEMPORARILY, data);
+                    *apache_ret = HTTP_MOVED_TEMPORARILY;
+                }
                 break;
             case AM_WEB_RESULT_FORBIDDEN:
                 *apache_ret = HTTP_FORBIDDEN;
@@ -878,6 +887,24 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
             apr_table_add(r->err_headers_out, key, values);
             sts = AM_SUCCESS;
         }
+    }
+    return sts;
+}
+
+static am_status_t set_notes_in_request(void **args, const char *key, const char *values) {
+    const char *thisfunc = "set_notes_in_request()";
+    request_rec *r = NULL;
+    am_status_t sts = AM_SUCCESS;
+    if (args == NULL || (r = (request_rec *) args[0]) == NULL ||
+            key == NULL) {
+        am_web_log_error("%s: invalid argument passed.", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else {
+        apr_table_unset(r->notes, key);
+        if (values != NULL && *values != '\0') {
+            apr_table_set(r->notes, key, values);
+        }
+        sts = AM_SUCCESS;
     }
     return sts;
 }
@@ -1568,6 +1595,8 @@ int dsame_check_access(request_rec *r) {
         req_func.set_header_in_request.args = args;
         req_func.add_header_in_response.func = add_header_in_response;
         req_func.add_header_in_response.args = args;
+        req_func.set_notes_in_request.func = set_notes_in_request;
+        req_func.set_notes_in_request.args = args;
         req_func.render_result.func = render_result;
         req_func.render_result.args = args;
         // post data preservation (create shared cache table entry)

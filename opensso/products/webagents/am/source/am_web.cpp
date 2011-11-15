@@ -6201,19 +6201,21 @@ process_request(am_web_request_params_t *req_params,
                     result = AM_WEB_RESULT_OK_DONE;
                 } else if (post_data_cache == NULL && post_data != NULL && req_func->add_header_in_response.func != NULL) {
                     URL url(req_params->url);
-                    if (overrideProtoHostPort(url, agent_config)) {
-                        url.getURLString(request_url_str);
-                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", request_url_str.c_str());
-                        strcpy(data_buf, request_url_str.c_str());                   
+                    bool override = overrideProtoHostPort(url, agent_config);
+                    url.getURLString(request_url_str);
+                    if (strncmp(post_data, "LARES", 5) == 0
+                            && req_func->set_notes_in_request.func != NULL
+                            && (*agentConfigPtr)->cdsso_disable_redirect_on_post) {
+                        req_func->set_notes_in_request.func(req_func->set_notes_in_request.args, "CDSSO_REPOST_URL", (override ? request_url_str.c_str() : req_params->url));
                     } else {
-                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", req_params->url);
-                        strcpy(data_buf, req_params->url);
+                        req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Location", (override ? request_url_str.c_str() : req_params->url));
                     }
+                    strcpy(data_buf, (override ? request_url_str.c_str() : req_params->url));
                     result = AM_WEB_RESULT_REDIRECT;
                 } else {
-                    result = process_access_success(req_params->url, 
-                              policy_result, req_params, req_func,
-                              agent_config);
+                    result = process_access_success(req_params->url,
+                            policy_result, req_params, req_func,
+                            agent_config);
                 }
                 break;
             case AM_INVALID_SESSION:

@@ -512,6 +512,15 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 reinterpret_cast<int *> (&this->cdsso_cookie_urlencode));
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cdsso_cookie_urlencode ? "TRUE" : "FALSE"));
     }
+    
+    /* CDSSO: enable/disable extra-302-redirect on (after) LARES post */
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.cdsso.disable.redirect.on_post";
+        status = am_properties_get_boolean_with_default(this->properties,
+                parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->cdsso_disable_redirect_on_post));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cdsso_disable_redirect_on_post ? "TRUE" : "FALSE"));
+    }
 
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
