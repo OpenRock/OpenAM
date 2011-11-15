@@ -187,7 +187,7 @@ $ /etc/init.d/tomcat start</screen>
    <mediaobject>
     <alt>Saving Babs Jensen's profile with a custom attribute</alt>
     <imageobject>
-     <imagedata fileref="image/bjensen-with-custom-attribute.png" format="PNG"/>
+     <imagedata fileref="images/bjensen-with-custom-attribute.png" format="PNG"/>
     </imageobject>
     <textobject>
      <para>If all goes well, you can save the new custom attribute to the
