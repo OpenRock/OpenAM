@@ -25,7 +25,9 @@
  * $Id: AmWLAgentServiceResolver.java,v 1.3 2008/06/25 05:52:21 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.agents.weblogic.v10;
 
 import com.sun.identity.agents.arch.ServiceResolver;
@@ -36,39 +38,43 @@ import com.sun.identity.agents.realm.GenericExternalVerificationHandler;
  * This is a WebLogic specific ServiceResolver.
  */
 public class AmWLAgentServiceResolver extends ServiceResolver {
-    
+
     /* (non-Javadoc)
      * @see ServiceResolver#getGlobalJ2EEAuthHandlerImpl()
      */
     public String getGlobalJ2EEAuthHandlerImpl() {
         return AmWLJ2EEAuthHandler.class.getName();
     }
-    
+
     /* (non-Javadoc)
      * @see ServiceResolver#getSSOTaskHandlerImpl()
      */
     public String getSSOTaskHandlerImpl() {
         return AmWLSSOTaskHandler.class.getName();
     }
-    
+
     /* (non-Javadoc)
      * @see ServiceResolver#getCDSSOTaskHandlerImpl()
      */
     public String getCDSSOTaskHandlerImpl() {
         return AmWLCDSSOTaskHandler.class.getName();
     }
-    
+
     /* (non-Javadoc)
      * @see ServiceResolver#getGlobalJ2EELogoutHandlerImpl()
      */
     public String getGlobalJ2EELogoutHandlerImpl() {
         return GenericJ2EELogoutHandler.class.getName();
     }
-    
+
     /* (non-Javadoc)
      * @see ServiceResolver#getGlobalVerificationHandlerImpl()
      */
     public String getGlobalVerificationHandlerImpl() {
         return GenericExternalVerificationHandler.class.getName();
+    }
+
+    public boolean isLifeCycleMechanismAvailable() {
+        return true;
     }
 }
