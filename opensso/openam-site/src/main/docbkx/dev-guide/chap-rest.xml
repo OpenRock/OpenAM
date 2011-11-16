@@ -55,6 +55,11 @@
   OpenAM is deployed, such as
   <literal>https://openam.example.com:8080/openam/identity/</literal>.</para>
   
+  <para>You can select the output format returned by specifying
+  <literal>json/</literal> or <literal>xml/</literal> in the URL after
+  <literal>identity/</literal>. For example, to return JSON, specify
+  <literal>https://openam.example.com:8080/openam/identity/json/</literal>.</para>
+  
   <para>For the examples in this chapter, OpenAM has c66Encode for cookies
   activated. The encoding ensures that OpenAM tokens need not be percent
   encoded before being submitted with a request. Thus, an example token
