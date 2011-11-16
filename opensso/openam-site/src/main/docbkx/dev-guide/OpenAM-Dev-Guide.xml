@@ -66,8 +66,10 @@
  <!-- TODO: Learn enough .NET at least to deploy the SampleApp
  <xinclude:include href='chap-fedlet-dotnet.xml' />
  -->
+ <!-- TODO: Show some basic uses of the SAML 2.0 and WS-Federation APIs
  <xinclude:include href='chap-samlv2.xml' />
  <xinclude:include href='chap-ws-federation.xml' />
+  -->
  <!-- Nothing to do but configure an OAuth auth module per client
  <xinclude:include href='chap-oauth.xml' />
  -->
