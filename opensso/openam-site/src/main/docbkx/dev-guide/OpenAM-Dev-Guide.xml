@@ -63,7 +63,9 @@
  <xinclude:include href='chap-xacml.xml' />
  -->
  <xinclude:include href='chap-fedlet-java.xml' />
+ <!-- TODO: Learn enough .NET at least to deploy the SampleApp
  <xinclude:include href='chap-fedlet-dotnet.xml' />
+ -->
  <xinclude:include href='chap-samlv2.xml' />
  <xinclude:include href='chap-ws-federation.xml' />
  <!-- Nothing to do but configure an OAuth auth module per client

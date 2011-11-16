@@ -35,11 +35,11 @@
  <para>This chapter introduces OpenAM Fedlets, and shows how to use the Fedlet
  as part of your Java web application.</para>
 
- <para>An OpenAM Fedlet is a small web application that can do federation in
- your service provider application with OpenAM acting as the identity provider.
- The Fedlet does not require an entire OpenAM installation alongside your
- application, but instead can redirect to OpenAM for single sign on, and to
- retrieve SAML assertions.</para>
+ <para>An OpenAM <firstterm>Fedlet</firstterm> is a small web application that
+ can do federation in your service provider application with OpenAM acting as
+ the identity provider. The Fedlet does not require an entire OpenAM
+ installation alongside your application, but instead can redirect to OpenAM
+ for single sign on, and to retrieve SAML assertions.</para>
 
  <procedure xml:id="create-a-java-fedlet">
   <title>To Create a Fedlet</title>
