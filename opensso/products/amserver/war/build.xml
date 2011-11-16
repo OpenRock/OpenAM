@@ -283,7 +283,6 @@
             <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/agentconfig" />
             <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/help" />
             <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/federation" />
-            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/dm" />
             <zipfileset dir="${amserver.www.dir}/console/html/level3" prefix="console/images/tasks" />
             <zipfileset dir="${lockhart.dir}/css" prefix="css">
                 <exclude name="css_generic.css" />

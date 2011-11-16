@@ -23,10 +23,6 @@
         <param-value>../realm</param-value>
     </context-param>
     <context-param>
-        <param-name>jato:com.sun.identity.console.dm.*:moduleURL</param-name>
-        <param-value>../dm</param-value>
-    </context-param>
-    <context-param>
         <param-name>jato:com.sun.identity.console.policy.*:moduleURL</param-name>
         <param-value>../policy</param-value>
     </context-param>
@@ -191,10 +187,6 @@
         <servlet-class>com.sun.identity.console.session.SMServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>DMServlet</servlet-name>
-        <servlet-class>com.sun.identity.console.dm.DMServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>RMServlet</servlet-name>
         <servlet-class>com.sun.identity.console.realm.RMServlet</servlet-class>
     </servlet>
@@ -276,10 +268,6 @@
     <servlet-mapping>
         <servlet-name>SMServlet</servlet-name>
         <url-pattern>/session/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DMServlet</servlet-name>
-        <url-pattern>/dm/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RMServlet</servlet-name>

@@ -25,7 +25,9 @@
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
 -->
-
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
 <accesscontrols>
     <!-- REALM -->
     <viewbean classname="com.sun.identity.console.realm.RMRealmViewBean"
@@ -178,83 +180,6 @@
 	<actionhandler name="button1,button2" />
     </viewbean>
 
-    <!-- DIRECTORY MANAGER -->
-    <viewbean classname="com.sun.identity.console.dm.OrganizationViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.OrganizationGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.OrganizationServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAddDynamic,tblButtonDelete,tblButtonAddStatic" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button2,button1" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupMembersViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserGroupsViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserRolesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAddStatic,tblButtonAddDynamic,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button2,button1" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleMembersViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.ContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.ContainerGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.ContainerServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.EditServiceViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.PeopleContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.AgentViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-
     <!-- SERVICE MANAGEMENT -->
     <viewbean classname="com.sun.identity.console.service.SCServiceProfileViewBean" view="null" modify="null">
 	<actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
@@ -319,17 +244,6 @@
     <neednodealwith classname="com.sun.identity.console.base.AMPostViewBean" />
     <neednodealwith classname="com.sun.identity.console.base.AuthenticatedViewBean" />
     <neednodealwith classname="com.sun.identity.console.base.VersionViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewOrganizationViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewContainerViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewPeopleContainerViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewStaticGroupViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewUserViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewGroupContainerViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.SelectServicesViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewDynamicGroupViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.NewRoleViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.GroupContainerGeneralViewBean" />
-    <neednodealwith classname="com.sun.identity.console.dm.PeopleContainerGeneralViewBean" />
     <neednodealwith classname="com.sun.identity.console.realm.RealmResourceOfferingAddViewBean" />
     <neednodealwith classname="com.sun.identity.console.realm.RealmResourceOfferingEditViewBean" />
     <neednodealwith classname="com.sun.identity.console.realm.RealmResourceOfferingViewBean" />

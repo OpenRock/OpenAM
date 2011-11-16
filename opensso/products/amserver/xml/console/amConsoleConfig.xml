@@ -47,14 +47,6 @@
 	status="tab.realm.status"
 	permissions="sunAMRealmService,sunIdentityRepositoryService,iPlanetAMPolicyService,AgentService,sunIdentityRepositoryService/1.0/application/agent" />
 
-    <tab id="7" viewbean="com.sun.identity.console.dm.OrganizationViewBean"
-        url="../dm/Organization"
-        label="tab.dm.label"
-        tooltip="tab.dm.tooltip"
-        status="tab.dm.status"
-        controller="com.sun.identity.console.controller.DMTabController"
-        permissions="sunAMRealmService" />
-
     <tab id="4" 
         viewbean="com.sun.identity.console.service.SCConfigAuthViewBean"
 	url="none"
@@ -220,84 +212,6 @@
             tooltip="tab.serverconfiguration.showmenu.advanced.tooltip"
             status="tab.serverconfiguration.showmenu.advanced.tooltip"
             permissions="iPlanetAMPlatformService" />
-    </profile>
-
-    <profile id="organization">
-        <tab id="1"
-            viewbean="com.sun.identity.console.dm.OrganizationGeneralViewBean"
-            url="../dm/OrganizationGeneral"
-            label="realm.showmenu.label.properties"
-            tooltip="tab.sub.realm.tooltip"
-            status="tab.sub.realm.status"
-            permissions="sunAMRealmService" />
-    </profile>
-
-    <profile id="container">
-        <tab id="1"
-            viewbean="com.sun.identity.console.dm.ContainerGeneralViewBean"
-            url="../dm/ContainerGeneral"
-            label="container.showmenu.label.properties"
-            tooltip="tab.sub.container.tooltip"
-            status="tab.sub.container.status"
-            permissions="sunAMRealmService" />
-    </profile>
-
-    <profile id="roles">
-        <tab id="1"
-            viewbean="com.sun.identity.console.dm.RoleMembersViewBean"
-            url="../dm/RoleMembers"
-            tooltip="role.members.tooltip"
-            status="role.members.status"
-            label="role.members.label"
-            permissions="sunAMRealmService" />
-        <tab id="2"
-            viewbean="com.sun.identity.console.dm.RoleGeneralViewBean"
-            url="../dm/RoleGeneral"
-            label="role.general.label"
-            tooltip="role.general.tooltip"
-            status="role.general.status"
-            permissions="sunAMRealmService" />
-    </profile>
-
-    <profile id="groups">
-        <tab id="1"
-            viewbean="com.sun.identity.console.dm.GroupMembersViewBean"
-            url="../dm/GroupMembers"
-            tooltip="group.members.tooltip"
-            status="group.members.status"
-            label="group.members.label"
-            permissions="sunAMRealmService" />
-        <tab id="2"
-            viewbean="com.sun.identity.console.dm.GroupGeneralViewBean"
-            url="../dm/GroupGeneral"
-            label="group.general.label"
-            tooltip="group.general.tooltip"
-            status="group.general.status"
-            permissions="sunAMRealmService"/>
-    </profile>
-
-    <profile id="users">
-        <tab id="1"
-            viewbean="com.sun.identity.console.dm.UserGeneralViewBean"
-            url="../dm/UserGeneral"
-            label="user.general.label"
-            tooltip="user.general.tooltip"
-            status="user.general.status"
-            permissions="sunAMRealmService" />
-        <tab id="2"
-            viewbean="com.sun.identity.console.dm.UserRolesViewBean"
-            url="../dm/UserRoles"
-            label="user.roles.label"
-            tooltip="user.roles.tooltip"
-            status="user.roles.status"
-            permissions="sunAMRealmService" />
-        <tab id="3"
-            viewbean="com.sun.identity.console.dm.UserGroupsViewBean"
-            url="../dm/UserGroups"
-            label="user.groups.label"
-            tooltip="user.groups.tooltip"
-            status="user.groups.status"
-            permissions="sunAMRealmService" />
     </profile>
 
 </profiletabs>
