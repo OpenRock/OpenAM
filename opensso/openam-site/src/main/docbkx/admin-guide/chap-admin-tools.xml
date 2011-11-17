@@ -143,6 +143,9 @@
      configuration file, as in <command>java -jar configurator.jar -f
      config.file</command>. The .jar is provided with a sample configuration
      file.</para>
+     <para>The <replaceable>config.file</replaceable>, based on the
+     <filename>sampleconfiguration</filename> file provided with the tool,
+     must be adapted for your environment.</para>
      <para>Install this from <filename>tools/ssoConfiguratorTools.zip</filename>.</para>
     </listitem>
    </varlistentry>

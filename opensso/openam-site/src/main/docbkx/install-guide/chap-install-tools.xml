@@ -160,6 +160,11 @@ Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
    configuration to a deployed OpenAM .war file using the following
    command.</para>
    <screen>$ java -jar configurator.jar -f <replaceable>config.file</replaceable></screen>
+   <para>The <replaceable>config.file</replaceable> is set up by default to
+   use the embedded data store with OpenAM installed on
+   <literal>server1.example.com</literal>. You must edit the file before using
+   it, as described in the <citetitle>OpenAM Reference</citetitle>.</para>
+   <!-- TODO: Add olink to reference for the manual page -->
   </step>
  </procedure>
  
