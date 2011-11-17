@@ -65,6 +65,8 @@
  <xinclude:include href='chap-websphere.xml' />
  <xinclude:include href='chap-weblogic.xml' />
 
+ <xinclude:include href='chap-troubleshooting.xml' />
+
  <index />
  <?dbhtml-include href="../ga.html"?>
 </book>
