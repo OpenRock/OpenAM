@@ -51,7 +51,9 @@
  <xinclude:include href="preface.xml" />
 
  <xinclude:include href='chap-api-overview.xml' />
+ <!-- TODO: Build a full list of what to include in this chapter.
  <xinclude:include href='chap-best-practices.xml' />
+ -->
 
  <xinclude:include href='chap-client-dev.xml' />
  <xinclude:include href='chap-rest.xml' />

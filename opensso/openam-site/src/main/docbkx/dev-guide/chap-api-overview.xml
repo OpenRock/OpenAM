@@ -42,7 +42,82 @@
  applications, but also to extend OpenAM capabilities to meet even
  those deployment requirements not yet covered in OpenAM.</para>
 
- <para>This chapter presents an overview of the APIs and protocols that
+ <para>This short chapter presents an overview of the APIs and protocols that
  OpenAM supports.</para>
 
+ <mediaobject>
+  <alt>High-level view of OpenAM APIs and SPIs</alt>
+  <imageobject>
+   <imagedata fileref="images/openam-apis-overview.png" format="PNG" />
+  </imageobject>
+  <textobject>
+   <para>OpenAM APIs and SPIs are shown in this diagram in orange, and
+   briefly described in the following sections.</para>
+  </textobject>
+ </mediaobject>
+
+ <para>This guide primarily covers the OpenAM client APIs and SPIs, with
+ emphasis on the Java APIs.</para>
+
+ <section xml:id="openam-apis">
+  <title>OpenAM APIs</title>
+
+  <para>OpenAM provides client application programming interfaces for a variety
+  of needs.</para>
+  <itemizedlist>
+   <listitem>
+    <para>The OpenAM Java APIs provided through the OpenAM Java SDK let your
+    Java and Java EE applications call on OpenAM for authentication, and
+    authorization in both OpenAM and federated environments.</para>
+    <para>Detailed reference information is provided in the <citetitle>OpenAM
+    Java SDK API Specification</citetitle>.</para>
+    <!-- TODO: Olink to SDK Javadoc -->
+   </listitem>
+   <listitem>
+    <para>The C SDK also provides APIs for native applications, such as new
+    web server policy agents. The C SDK is delivered with OpenAM for Linux,
+    Solaris, and Windows platforms.</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM exposes a RESTful API that can return JSON or XML over HTTP,
+    allowing you to access authentication, authorization, and identity
+    services from your web applications using REST clients in the language of
+    your choice.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="openam-spis">
+  <title>OpenAM SPIs</title>
+
+  <para>OpenAM provides Java based service provider interfaces to let you
+  extend services for the requirements of your particular deployment.</para>
+  <itemizedlist>
+   <para>Some examples of the plugins you can write follow in the list below.
+   This guide demonstrates how to implement such plugins.</para>
+   <listitem>
+    <para>Custom authentication plugins let OpenAM authenticate users against
+    a new authentication service or an authentication service specific to your
+    deployment</para>
+   </listitem>
+   <listitem>
+    <para>Post authentication plugins perform additional processing at the end
+    of the authentication process, but before the subject is authenticated.
+    Post authentication plugins can for example store information about the
+    authentication in the user's profile, or call another system for audit
+    logging purposes.</para>
+   </listitem>
+   <listitem>
+    <para>Policy evaluation plugins implement new policy conditions, send
+    attributes from the user profile as part of a policy response, extend the
+    definition of the subjects to whom the policy applies, or customize how
+    policy management is delegated.</para>
+   </listitem>
+   <listitem>
+    <para>Identity repository plugins let OpenAM employ a new or custom user
+    data store, other than a directory server or JDBC-accessible
+    database.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
 </chapter>
