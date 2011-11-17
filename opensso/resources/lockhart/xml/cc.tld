@@ -83,7 +83,7 @@
   <tag>
     <name>hidden</name>
     <tagclass>com.sun.web.ui.taglib.html.CCHiddenTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -113,7 +113,7 @@
   <tag>
     <name>label</name>
     <tagclass>com.sun.web.ui.taglib.html.CCLabelTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -178,7 +178,7 @@
   <tag>
     <name>legend</name>
     <tagclass>com.sun.web.ui.taglib.legend.CCLegendTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>align</name>
       <required>false</required>
@@ -223,7 +223,7 @@
   <tag>
     <name>text</name>
     <tagclass>com.sun.web.ui.taglib.html.CCStaticTextFieldTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -263,7 +263,7 @@
   <tag>
     <name>textfield</name>
     <tagclass>com.sun.web.ui.taglib.html.CCTextFieldTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -428,7 +428,7 @@
   <tag>
     <name>password</name>
     <tagclass>com.sun.web.ui.taglib.html.CCPasswordTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -744,7 +744,7 @@
   <tag>
     <name>checkbox</name>
     <tagclass>com.sun.web.ui.taglib.html.CCCheckBoxTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -890,7 +890,7 @@
   <tag>
     <name>dropdownmenu</name>
     <tagclass>com.sun.web.ui.taglib.html.CCDropDownMenuTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -1035,7 +1035,7 @@
   <tag>
     <name>selectablelist</name>
     <tagclass>com.sun.web.ui.taglib.html.CCSelectableListTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -1190,7 +1190,7 @@
   <tag>
     <name>radiobutton</name>
     <tagclass>com.sun.web.ui.taglib.html.CCRadioButtonTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -1335,7 +1335,7 @@
   <tag>
     <name>image</name>
     <tagclass>com.sun.web.ui.taglib.html.CCImageTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -1955,7 +1955,7 @@
   <tag>
     <name>secondarymasthead</name>
     <tagclass>com.sun.web.ui.taglib.masthead.CCSecondaryMastheadTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -2019,7 +2019,7 @@
   <tag>
     <name>primarymasthead</name>
     <tagclass>org.forgerock.openam.console.ui.taglib.masthead.CCPrimaryMastheadTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -2148,7 +2148,7 @@
   <tag>
     <name>tabs</name>
     <tagclass>com.sun.web.ui.taglib.tabs.CCTabsTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -2227,7 +2227,7 @@
   <tag>
     <name>alarm</name>
     <tagclass>com.sun.web.ui.taglib.alarm.CCAlarmTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -2290,7 +2290,7 @@
   <tag>
     <name>alertinline</name>
     <tagclass>com.sun.web.ui.taglib.alert.CCAlertInlineTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -2330,7 +2330,7 @@
   <tag>
     <name>alerticon</name>
     <tagclass>com.sun.web.ui.taglib.alert.CCAlertTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -2375,7 +2375,7 @@
   <tag>
     <name>alert</name>
     <tagclass>com.sun.web.ui.taglib.alert.CCAlertFullPageTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -3072,7 +3072,7 @@
   <tag>
     <name>editablelist</name>
     <tagclass>com.sun.web.ui.taglib.editablelist.CCEditableListTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -3392,7 +3392,7 @@
   <tag>
     <name>topology</name>
     <tagclass>com.sun.web.ui.taglib.topology.CCTopologyTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -3419,7 +3419,7 @@
   <tag>
     <name>dtree</name>
     <tagclass>com.sun.web.ui.taglib.tree.CCDynamicTreeTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -3471,7 +3471,7 @@
   <tag>
     <name>ctree</name>
     <tagclass>com.sun.web.ui.taglib.tree.CCClientSideTreeTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -3528,7 +3528,7 @@
   <tag>
     <name>propertysheet</name>
     <tagclass>org.forgerock.openam.console.ui.taglib.propertysheet.CCPropertySheetTag</tagclass>
-    <bodycontent>EMPTY</bodycontent>
+    <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
       <required>true</required>

@@ -156,7 +156,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>getDisplayFieldValue</name>
 		<tagclass>com.iplanet.jato.taglib.GetFieldValueTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -181,7 +181,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>setDisplayFieldValue</name>
 		<tagclass>com.iplanet.jato.taglib.SetFieldValueTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -201,7 +201,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>getModelFieldValue</name>
 		<tagclass>com.iplanet.jato.taglib.GetModelFieldValueTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>modelClass</name>
 			<required>true</required>
@@ -236,7 +236,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>setModelFieldValue</name>
 		<tagclass>com.iplanet.jato.taglib.SetModelFieldValueTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>modelClass</name>
 			<required>true</required>
@@ -341,7 +341,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>text</name>
 		<tagclass>com.iplanet.jato.taglib.html.StaticTextFieldTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -376,7 +376,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>staticText</name>
 		<tagclass>com.iplanet.jato.taglib.html.StaticTextFieldTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -411,7 +411,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>textField</name>
 		<tagclass>com.iplanet.jato.taglib.html.TextFieldTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -577,7 +577,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>password</name>
 		<tagclass>com.iplanet.jato.taglib.html.PasswordTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -909,7 +909,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>checkbox</name>
 		<tagclass>com.iplanet.jato.taglib.html.CheckBoxTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1050,7 +1050,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>checkBox</name>
 		<tagclass>com.iplanet.jato.taglib.html.CheckBoxTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1191,7 +1191,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>combobox</name>
 		<tagclass>com.iplanet.jato.taglib.html.ComboBoxTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1327,7 +1327,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>comboBox</name>
 		<tagclass>com.iplanet.jato.taglib.html.ComboBoxTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1464,7 +1464,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 		<name>listbox</name>
 
 		<tagclass>com.iplanet.jato.taglib.html.ListBoxTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1610,7 +1610,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>listBox</name>
 		<tagclass>com.iplanet.jato.taglib.html.ListBoxTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1756,7 +1756,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>radioButtons</name>
 		<tagclass>com.iplanet.jato.taglib.html.RadioButtonsTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -1897,7 +1897,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>image</name>
 		<tagclass>com.iplanet.jato.taglib.html.ImageTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -2083,7 +2083,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>hidden</name>
 		<tagclass>com.iplanet.jato.taglib.html.HiddenTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -2103,7 +2103,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>frameSrc</name>
 		<tagclass>com.iplanet.jato.taglib.html.FrameSrcTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -2128,7 +2128,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>button</name>
 		<tagclass>com.iplanet.jato.taglib.html.ButtonTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -2658,7 +2658,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
         <name>validatingTextField</name>
         <tagclass>com.iplanet.jato.taglib.html.ValidatingTextFieldTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
@@ -3003,7 +3003,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<tag>
 		<name>fileUpload</name>
 		<tagclass>com.iplanet.jato.taglib.html.FileUploadTag</tagclass>
-		<bodycontent>EMPTY</bodycontent>
+		<bodycontent>empty</bodycontent>
 		<attribute>
 			<name>name</name>
 			<required>true</required>
