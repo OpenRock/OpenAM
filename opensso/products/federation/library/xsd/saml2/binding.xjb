@@ -138,12 +138,30 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
+  <jxb:bindings schemaLocation="sstc-saml-attribute-ext.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadataattrext">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadataattrext. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="sstc-saml-idp-discovery.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadataidpdiscovery">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadataidpdiscovery. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
 </jxb:bindings>
-
-
-
-
-
-
-
-
