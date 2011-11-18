@@ -45,7 +45,7 @@
     <varlistentry>
      <term><xsl:value-of select="@name" /></term>
      <listitem>
-      <para>ID: <xsl:value-of select="@id" /></para>
+      <para>ID: <xsl:value-of select="../@prefix"/>-<xsl:value-of select="@id" /></para>
       <para>Level: <xsl:value-of select="substring(@loglevel,4)" /></para>
       <para>Description: <xsl:value-of select="normalize-space(@description)" /></para>
       <xsl:if test="datainfo/item">
