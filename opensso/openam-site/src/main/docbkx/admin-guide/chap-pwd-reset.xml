@@ -211,7 +211,9 @@
       <term>Email Address to Send Lockout Notification</term>
       <listitem>
        <para>This specifies the administrator address(es) which receive(s)
-       notification on user account lockout.</para>
+       notification on user account lockout. Each address must be a full
+       email address such as <literal>admin@example.com</literal>, or
+       <literal>admin@host.domain</literal>.</para>
        <para>OpenAM must be able to send mail through an SMTP-capable service
        for this to work.</para>
       </listitem>
