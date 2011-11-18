@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing Profile Attributes</title>
-
+ <indexterm>
+  <primary>User data</primary>
+  <secondary>Custom profile attributes</secondary>
+ </indexterm>
  <para>You can extend user profiles by adding custom attributes. This chapter
  demonstrates how to add a custom attribute to a user profile when storing
  user profiles in the embedded LDAP directory.</para>

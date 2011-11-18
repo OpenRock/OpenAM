@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Troubleshooting</title>
-
+ <indexterm><primary>Troubleshooting</primary></indexterm>
  <para>This chapter covers how to get debugging information and troubleshoot
  issues in OpenAM deployments.</para>
  

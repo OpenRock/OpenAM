@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using Fedlets in .NET Applications</title>
-
+ <indexterm>
+  <primary>Fedlets</primary>
+  <secondary>.NET</secondary>
+ </indexterm>
  <para>This chapter explains how to use the Fedlet in your .NET application.
  You must configure the OpenAM .NET Fedlet to work with the identity provider.
  Before creating the Fedlet, therefore, set up a Hosted Identity Provider in

@@ -38,7 +38,7 @@
  
  <section xml:id="about-federation">
   <title>About Federation</title>
-  
+  <indexterm><primary>Federation</primary></indexterm>
   <para>Federation lets single sign on cross organizational boundaries.
   Federation helps organization share identities and services without giving
   away their identity information, or the services they provide.</para>
@@ -142,7 +142,10 @@
 
   <procedure xml:id="create-hosted-idp">
    <title>To Create a Hosted Identity Provider</title>
-   
+   <indexterm>
+    <primary>Federation</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
    <step>
     <para>On the OpenAM console Common Tasks page, click Create Hosted Identity
     Provider.</para>
@@ -184,7 +187,10 @@
   
   <procedure xml:id="create-hosted-sp">
    <title>To Create a Hosted Service Provider</title>
-   
+   <indexterm>
+    <primary>Federation</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
    <step>
     <para>On the OpenAM console Common Tasks page, click Create Hosted Service
     Provider.</para>
@@ -223,7 +229,10 @@
   
   <procedure xml:id="create-remote-idp">
    <title>To Create a Remote Identity Provider</title>
-   
+   <indexterm>
+    <primary>Federation</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
    <step>
     <para>Obtain the identity provider metadata, or the URL where you can
     obtain it.</para>
@@ -247,7 +256,10 @@
   
   <procedure xml:id="create-remote-sp">
    <title>To Create a Remote Service Provider</title>
-   
+   <indexterm>
+    <primary>Federation</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
    <step>
     <para>Obtain the service provider metadata, or the URL where you can
     obtain it.</para>
@@ -276,7 +288,10 @@
   
   <procedure xml:id="create-fedlet">
    <title>To Create a Fedlet for Service Providers</title>
-   
+   <indexterm>
+    <primary>Federation</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
    <para>When your organization acts as the identity provider, and you want
    quickly to enable service providers to federate their services with yours,
    you can provide them with a <firstterm>fedlet</firstterm>. A fedlet is
@@ -521,8 +536,11 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
  
  <section xml:id="configure-idp">
   <title>Configuring Identity Providers</title>
-  
-  <para>Once you have set up an identity provider, you can configure it
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+ <para>Once you have set up an identity provider, you can configure it
   through the OpenAM console under Federation &gt; Entity Providers &gt;
   <replaceable>Provider Name</replaceable>.</para>
   
@@ -869,7 +887,10 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
  
  <section xml:id="configure-sp">
   <title>Configuring Service Providers</title>
-  
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>Once you have set up a service provider, you can configure it
   through the OpenAM console under Federation &gt; Entity Providers &gt;
   <replaceable>Provider Name</replaceable>.</para>
@@ -1278,7 +1299,10 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
  
  <section xml:id="configure-cot">
   <title>Configuring Circles of Trust</title>
-  
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>Once you have set up a circle of trust, you can configure it
   through the OpenAM console under Federation &gt; Circle of Trust &gt;
   <replaceable>Circle of Trust Name</replaceable>.</para>

@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing the Microsoft IIS 7 Policy Agent</title>
-
+ <indexterm><primary>Microsoft IIS</primary></indexterm>
  <para>This chapter covers installation of the policy agent for Microsoft 
  Internet Information Services 7.</para>
  

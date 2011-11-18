@@ -32,6 +32,10 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing OpenAM Console Only</title>
  
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Console only</secondary>
+ </indexterm>
  <para>You can deploy OpenAM administration console alone, configuring the
  console-only application to point to an instance of OpenAM core services
  elsewhere.</para>

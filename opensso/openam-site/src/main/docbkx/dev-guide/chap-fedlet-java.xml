@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using Fedlets in Java Web Applications</title>
-
+ <indexterm>
+  <primary>Fedlets</primary>
+  <secondary>Java</secondary>
+ </indexterm>
  <para>This chapter introduces OpenAM Fedlets, and shows how to use the Fedlet
  as part of your Java web application.</para>
 

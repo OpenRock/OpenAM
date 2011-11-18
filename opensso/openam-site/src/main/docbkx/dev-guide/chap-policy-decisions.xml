@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Requesting Policy Decisions Using OpenAM Java SDK</title>
-
+ <indexterm>
+  <primary>Policy</primary>
+  <secondary>Java API</secondary>
+ </indexterm>
  <para>This chapter shows how to request policy decision by using OpenAM Java
  SDK. The chapter focuses on the sample client,
  <filename>PolicyEvaluationSample.java</filename>, which demonstrates making a

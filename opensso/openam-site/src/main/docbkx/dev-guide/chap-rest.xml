@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using RESTful Web Services</title>
-
+ <indexterm><primary>REST API</primary></indexterm>
  <para>This chapter shows how to use the OpenAM RESTful interfaces for direct
  integration between web client applications and OpenAM.</para>
  
@@ -81,7 +81,14 @@
  
  <section xml:id="rest-api-auth">
   <title>Authentication &amp; Logout</title>
-  
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Session tokens</primary>
+   <secondary>Java API</secondary>
+  </indexterm>
   <para>Simple authentication with a user name and password returns a
   token.</para>
   
@@ -108,7 +115,6 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
  
  <section xml:id="rest-api-tokens">
   <title>Token Validation &amp; Attribute Retrieval</title>
-  
   <para>You check whether a token is valid as follows.</para>
   
   <screen>$ curl "https://openam.example.com:8080/openam/identity/isTokenValid?
@@ -126,6 +132,10 @@ boolean=true</screen>
   OpenAM returns a series of <replaceable>name</replaceable>,
   <replaceable>value</replaceable> pairs.</para>
   
+  <indexterm>
+   <primary>User data</primary>
+   <secondary>REST access</secondary>
+  </indexterm>
   <screen>$ curl "https://openam.example.com:8080/openam/identity/attributes?
  subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
 userdetails.token.id=
@@ -186,6 +196,10 @@ userdetails.attribute.value=Barbara Jensen</screen>
  
  <section xml:id="rest-api-authz">
   <title>Authorization</title>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
   
   <para>You can call on OpenAM to decide whether to authorize access to a
   protected resource based on a valid token. Of course, you must percent
@@ -294,7 +308,10 @@ $ curl "https://openam.example.com:8080/openam/identity/log?
  
  <section xml:id="rest-api-crud">
   <title>Identity Management</title>
-  
+  <indexterm>
+   <primary>User data</primary>
+   <secondary>REST access</secondary>
+  </indexterm>
   <para>This section shows how you create, read (search), update, and delete
   identities using the RESTful API.</para>
   

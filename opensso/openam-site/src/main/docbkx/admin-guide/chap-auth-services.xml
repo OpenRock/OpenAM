@@ -81,8 +81,14 @@
   license. Customers withdrawing cash from an ATM authenticate with a
   card and a PIN. </para>
   
-  <indexterm><primary>Authentication modules</primary></indexterm>
-  <indexterm><primary>Authentication chaining</primary></indexterm>
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>Modules</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>Chains</secondary>
+  </indexterm>
   <para>As the authentication process depends on the situation, OpenAM allows
   you to configure authentication processes and then configure how they are
   applied depending on the situation. OpenAM uses <firstterm>authentication
@@ -98,7 +104,6 @@
   
   <itemizedlist>
    <listitem>
-    <indexterm><primary>Required authentication module</primary></indexterm>
     <para>When a <firstterm>required</firstterm> module fails, the rest of
     the chain is processed, but the authentication fails.</para>
     <para>A required module might be used for login with email and password,
@@ -106,20 +111,17 @@
     yet signed up.</para>
    </listitem>
    <listitem>
-    <indexterm><primary>Optional authentication module</primary><secondary>optional module</secondary></indexterm>
     <para>When an <firstterm>optional</firstterm> module fails,
     authentication continues.</para>
     <para>An optional module might be used to permit a higher level of access
     if the user can present a X.509 certificate for example.</para>
    </listitem>
    <listitem>
-    <indexterm><primary>Requisite authentication module</primary></indexterm>
     <para>When a <firstterm>requisite</firstterm> module fails, authentication
     fails and authentication processing stops.</para>
     <para>A requisite module might be used with exclusive SSO.</para>
    </listitem>
    <listitem>
-    <indexterm><primary>Sufficient authentication module</primary></indexterm>
     <para>When a <firstterm>sufficient</firstterm> succeeds, authentication
     is successful and later modules in the chain are skipped.</para>
     <para>You could set Windows Desktop SSO as sufficient, so authenticated
@@ -129,7 +131,10 @@
    </listitem>
   </itemizedlist>
   
-  <indexterm><primary>Authentication levels</primary></indexterm>
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>Levels</secondary>
+  </indexterm>
   <para>With OpenAM, you can further set <firstterm>authentication
   levels</firstterm> per module, with higher levels being used typically
   to allow access to more restricted resources. The OpenAM APIs also let you
@@ -177,7 +182,6 @@
   password during authentication.</para>
   
   <tip>
-   <indexterm><primary>Authentication levels</primary></indexterm>
    <para>One parameter shared by all modules is Authentication Level.
    You change Authentication Level from 0 to a positive integer in order to
    indicate those modules are seen as more secure. Then you configure
@@ -191,7 +195,10 @@
    Protocol (LDAP). OpenAM provides separate Active Directory and LDAP
    modules to make it easier for you to use both Active Directory and also
    another directory service in an authentication chain.</para>
-   <indexterm><primary>Active Directory authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Active Directory</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthADService</literal></para>
@@ -364,7 +371,10 @@
    post-authentication processing by editing the authentication chain to add
    <literal>org.forgerock.openam.authentication.modules.adaptive.Adaptive</literal>
    to the list of post authentication plugins.</para>
-   <indexterm><primary>Adaptive risk authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Adaptive risk</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthAdaptiveService</literal></para>
@@ -840,7 +850,10 @@
    <para>This module lets you track and manage anonymous users, perhaps
    forcing further authentication later when a user moves to access resources
    that require more protection.</para>
-   <indexterm><primary>Anonymous authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Anonymous</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthAnonymousService</literal></para>
@@ -907,7 +920,10 @@
    <literal>cn=Barbara Jensen</literal>, then you can use <literal>CN=Barbara
    Jensen</literal> from the Subject DN to search for the entry with
    <literal>cn=Barbara Jensen</literal> in the directory.</para>
-   <indexterm><primary>Certificate-based authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>X509 certificate based</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthCertService</literal></para>
@@ -1079,7 +1095,10 @@
    directory servers, and whether to retain objects used during authentication
    for use during logout. Furthermore, the Core module lets you set defaults
    used when configuring authentication in a particular realm.</para>
-   <indexterm><primary>Authentication modules global configuration</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Core</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthService</literal></para>
@@ -1569,7 +1588,10 @@
    against the same data store repository. Additionally, you do not need to
    write a custom authentication module where flat-file authentication is
    needed for the corresponding repository in that realm.</para>
-   <indexterm><primary>Data Store authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Data Store</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthDataStoreService</literal></para>
@@ -1584,7 +1606,10 @@
    to create a user session after validating single sign-on protocol messages.
    This authentication module is used by the SAML, SAMLv2, ID-FF, and
    WS-Federation protocols.</para>
-   <indexterm><primary>Federated authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Federation</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthFederationService</literal></para>
@@ -1605,7 +1630,10 @@
    For the HOTP module to use either attribute, the Email Address must contain
    a valid email address, or the Telephone Number must contain a valid
    SMS telephone number such as <literal>18285551212@txt.att.net</literal>.</para>
-   <indexterm><primary>HMAC One-Time Password (HOTP) authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>HMAC One-Time Password (HOTP)</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthHOTPService</literal></para>
@@ -1712,7 +1740,10 @@
    <para>HTTP basic authentication takes a user name and password from HTTP
    authentication and tries authentication against the backend module in OpenAM,
    depending on what you configure as the Backend Module Name.</para>
-   <indexterm><primary>HTTP authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>HTTP Basic</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthHTTPBasicService</literal></para>
@@ -1740,7 +1771,10 @@
    <title>Hints For the JDBC Authentication Module</title>
    <para>The Java Database Connectivity (JDBC) module lets OpenAM connect to
    a database such as MySQL or Oracle DB to authenticate users.</para>
-   <indexterm><primary>JDBC authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>JDBC</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthJDBCService</literal></para>
@@ -1849,7 +1883,10 @@
    Access Protocol (LDAP). To build an easy-to-manage, high performance, pure
    Java, open source directory service, try
    <link xlink:href="http://opendj.org">OpenDJ</link> directory services.</para>
-   <indexterm><primary>LDAP authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>LDAP</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthLDAPService</literal></para>
@@ -2029,7 +2066,10 @@
    <para>The Membership module permits self-registration for new users. You
    can then have OpenAM create new user profiles in the identity
    repository.</para>
-   <indexterm><primary>Membership (&amp; self-registration) authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Membership (&amp; self-registration)</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthMembershipService</literal></para>
@@ -2083,7 +2123,10 @@
    subscriber ISDN associated with a terminal such as a mobile phone.
    The module checks the subscriber ISDN against the value found on a user's
    entry in an LDAP directory service.</para>
-   <indexterm><primary>MSISDN authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>MSISDN</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthMSISDNService</literal></para>
@@ -2229,7 +2272,10 @@
    Internet-Draft <link
    xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-v2-22">The OAuth 2.0
    Authorization Protocol</link>.</para>
-   <indexterm><primary>OAuth 2.0 authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>OAuth 2.0</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthOAuthService</literal></para>
@@ -2486,7 +2532,10 @@
    <title>Hints For the RADIUS Authentication Module</title>
    <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
    OpenAM authenticate users against RADIUS servers.</para>
-   <indexterm><primary>RADIUS authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>RADIUS</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthRadiusService</literal></para>
@@ -2563,7 +2612,10 @@
    This module is useful in virtual federation, where an existing entity
    instructs the local OpenAM instance to use federation protocols to transfer
    authentication and attribute information to a partner application.</para>
-   <indexterm><primary>Secure Attribute Exchange (SAE) authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Secure Attribute Exchange (SAE)</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthSAEService</literal></para>
@@ -2575,7 +2627,10 @@
    <title>Hints For the SecurID Authentication Module</title>
    <para>The SecurID module lets OpenAM authenticate users with RSA
    Authentication Manager software and RSA SecurID authenticators.</para>
-   <indexterm><primary>SecurID authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>SecurID</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthSecurIDService</literal></para>
@@ -2612,8 +2667,14 @@
    again. Users might need to set up Integrated Windows Authentication in
    Internet Explorer to benefit from single sign on when logged on to
    a Windows desktop.</para>
-   <indexterm><primary>Kerberos authentication</primary></indexterm>
-   <indexterm><primary>Windows Desktop SSO authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Kerberos</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Windows Desktop SSO</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthWindowsDesktopSSOService</literal></para>
@@ -2692,7 +2753,10 @@
    <para>This module requires that you install a Samba client in a 
    <filename>bin</filename> directory under the OpenAM configuration directory
    such as <filename>$HOME/openam/openam/bin</filename>.</para>
-   <indexterm><primary>Windows NT authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Windows NT</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthNTService</literal></para>
@@ -2736,7 +2800,10 @@
    <para>The Web Service Security (WSSAuth) module lets OpenAM validate a
    user name, password combination received as an authentication token in
    a request from a Web Service Client to a Web Service Provider.</para>
-   <indexterm><primary>WSSAuth authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>WSSAuth</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthWSSAuthModuleService</literal></para>
@@ -2782,7 +2849,10 @@
 <!--   <section xml:id="yubikey-module-conf-hints">
    <title>Hints For the YubiKey Authentication Module</title>
    <para>Use the following hints to configure the module.</para>
-   <indexterm><primary>YubiKey authentication</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>YubiKey</secondary>
+   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>TODO</literal></para>
@@ -2800,7 +2870,10 @@
  
  <section xml:id="configure-authn-chains">
   <title>Configuring Authentication Chains</title>
-  <indexterm><primary>Authentication chaining</primary></indexterm>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Chains</secondary>
+   </indexterm>
   <para>Once you have configured authentication modules, and added the modules
   needed for you realm to the list of module instances, you can configure
   authentication chains. Authentication chains let you handle situations where

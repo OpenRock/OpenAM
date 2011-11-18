@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Upgrading OpenAM Core Services</title>
- 
+ <indexterm><primary>Upgrading</primary></indexterm>
  <para>This chapter shows you how to patch and to upgrade OpenAM core services.
  See the <citetitle>Policy Agent Installation Guide</citetitle> for instructions
  on upgrading OpenAM agents.</para>

@@ -32,6 +32,9 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing the OpenAM End User Pages</title>
  
+ <indexterm>
+  <primary>Custom end user pages</primary>
+ </indexterm>
  <para>When you deploy OpenAM to protect your web-based applications, users
  can be redirected to OpenAM pages for login and logout. ForgeRock provides
  pages localized for English, French, German, Spanish, Japanese, Korean,

@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing Identity Data Storage</title>
-
+ <indexterm>
+  <primary>User data</primary>
+  <secondary>Custom repository</secondary>
+ </indexterm>
  <!-- Another chapter based on Steve Ferris's work on the OpenAM wiki at
  https://wikis.forgerock.org/confluence/display/openam/Develop+and+Deploy+a+Custom+IdRepo+Plugin -->
 

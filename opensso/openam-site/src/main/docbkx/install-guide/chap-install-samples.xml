@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing OpenAM Client SDK Samples</title>
- 
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Java SDK samples</secondary>
+ </indexterm>
  <para>The full download of OpenAM comes with a Java Client SDK and samples
  located in <filename>samples/opensso-client.zip</filename> where you
  unpacked the

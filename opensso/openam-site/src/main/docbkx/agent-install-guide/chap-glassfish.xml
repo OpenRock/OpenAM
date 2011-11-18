@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing the GlassFish Policy Agent</title>
- 
+ <indexterm><primary>GlassFish Server</primary></indexterm>
  <para>This chapter covers installation of the policy agent for GlassFish.</para>
  
   <section xml:id="before-glassfish-agent-install">

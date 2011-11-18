@@ -59,7 +59,10 @@
  
  <procedure xml:id="create-new-realm">
   <title>To Create a New Realm</title>
-  <indexterm><primary>Create realms</primary></indexterm>
+  <indexterm>
+   <primary>Realms</primary>
+   <secondary>Creating</secondary>
+  </indexterm>
   
   <para>You can create a new realm through the OpenAM console as described
   below, or by using the <command>ssoadm create-realm</command> command.</para>
@@ -92,7 +95,7 @@
  
  <procedure xml:id="delegate-realm-administration">
   <title>To Delegate Administration</title>
-  <indexterm><primary>Delegate administration</primary></indexterm>
+  <indexterm><primary>Delegating administration</primary></indexterm>
   
   <para>You can delegate administration in a realm. OpenAM grants
   administrative capabilities to members of groups having administrative
@@ -118,7 +121,10 @@
  
  <procedure xml:id="delegate-policy-to-realm">
   <title>To Delegate Policy Management</title>
-  <indexterm><primary>Delegate policy</primary></indexterm>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Delegating</secondary>
+  </indexterm>
   
   <para>When you delegate access management for a realm, you might want to
   delegate policy management. You can delegate policy management by creating a

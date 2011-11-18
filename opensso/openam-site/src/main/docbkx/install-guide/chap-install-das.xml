@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing OpenAM Distributed Authentication</title>
- 
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Behind the firewall</secondary>
+ </indexterm>
  <para>When you need to prevent end users from having direct access to the
  service URLs OpenAM uses to manage access, you can deploy the distributed
  authentication service (DAS) in your DMZ, leaving OpenAM core services behind

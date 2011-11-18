@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Handling Single Sign On Using OpenAM Java SDK</title>
-
+ <indexterm>
+  <primary>Session tokens</primary>
+  <secondary>Java API</secondary>
+ </indexterm>
  <para>This chapter looks at handling session tokens with the OpenAM Java SDK
  using the sample client <filename>SSOTokenSample.java</filename>.</para>
 

@@ -74,8 +74,10 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
   
   <section xml:id="monitoring-jmx">
    <title>JMX Monitoring</title>
-   <indexterm><primary>JMX</primary></indexterm>
-   
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>JMX</secondary>
+   </indexterm>
    <para>By default OpenAM listens on port 9999 for JMX monitoring.</para>
    
    <para>You can then use <command>jconsole</command> or other JMX-enabled
@@ -93,7 +95,10 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
   
   <section xml:id="monitoring-snmp">
    <title>SNMP Monitoring</title>
-   <indexterm><primary>SNMP</primary></indexterm>
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>SNMP</secondary>
+   </indexterm>
    
    <para>By default OpenAM listens on port 8085 for SNMP monitoring.</para>
   </section>
@@ -101,7 +106,10 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
  
  <section xml:id="is-openam-alive">
   <title>Is OpenAM Up?</title>
-  <indexterm><primary>Health check</primary></indexterm>
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>Health check</secondary>
+   </indexterm>
   
   <para>You can check over HTTP whether OpenAM is up, using
   <filename>isAlive.jsp</filename>. Point your application to the file
@@ -174,7 +182,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
  
  <section xml:id="session-mgmt">
   <title>Session Management</title>
-  <indexterm><primary>Session management</primary></indexterm>
+  <indexterm><primary>Sessions</primary></indexterm>
   
   <para>OpenAM console lets the administrator view and manage current
   user sessions under the Sessions tab page.</para>

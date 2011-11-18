@@ -36,7 +36,7 @@
  typically used when you have multiple domains in a single organization. For
  single sign on across multiple organizations, typically federation is
  used.</para>
- 
+ <indexterm><primary>Cross-domain single sign on (CDSSO)</primary></indexterm>
  <para><firstterm>Cross-domain single sign on</firstterm> (CDSSO) provides
  a safe mechanism for managing access across multiple different domains that
  you control. CDSSO lets OpenAM set up in <literal>example.org</literal>

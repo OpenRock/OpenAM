@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing Policy Evaluation</title>
-
+ <indexterm>
+  <primary>Policy</primary>
+  <secondary>Plugins</secondary>
+ </indexterm>
  <para>OpenAM policies let you restrict access to resources based both on
  identity and group membership, and also on a range of conditions including
  session age, authentication chain or module used, authentication level, realm,

@@ -32,6 +32,10 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing OpenAM Core Only</title>
  
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>No console</secondary>
+ </indexterm>
  <para>You can deploy OpenAM core services without including the console if
  you install the console elsewhere, or if you plan to perform all
  configuration using <command>ssoadm</command> for example.</para>

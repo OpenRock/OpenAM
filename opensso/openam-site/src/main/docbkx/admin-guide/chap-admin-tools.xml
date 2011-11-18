@@ -216,7 +216,7 @@ http://server2.example.com:8080/openam"</literal></para>
   to prevent potential misuse.</para>
   <procedure xml:id="enable-ssoadm-jsp">
    <title>To Enable ssoadm.jsp</title>
-   <indexterm><primary>Enable ssoadm.jsp</primary></indexterm>
+   <indexterm><primary>Enabling ssoadm.jsp</primary></indexterm>
    <step>
     <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
    </step>

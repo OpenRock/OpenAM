@@ -33,7 +33,7 @@
  <title>Customizing Authentication Modules</title>
  <indexterm>
   <primary>Authentication</primary>
-  <secondary>Customizing</secondary>
+  <secondary>Custom module</secondary>
  </indexterm>
 
  <!-- Mostly purloined from Steve Ferris's work on the OpenAM wiki at

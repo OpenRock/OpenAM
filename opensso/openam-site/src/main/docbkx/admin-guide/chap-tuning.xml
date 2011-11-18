@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Tuning OpenAM</title>
- 
+ <indexterm><primary>Performance</primary></indexterm>
  <para>This chapter covers key OpenAM tunings to ensure smoothly performing
  access and federation management services, and to maximize throughput while
  minimizing response times.</para>

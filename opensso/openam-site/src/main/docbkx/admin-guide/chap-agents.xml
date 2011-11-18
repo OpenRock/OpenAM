@@ -80,7 +80,10 @@
   <para>When you open the OpenAM console to configure agents for the top level
   realm, you see a number of different kinds to choose. Web and J2EE policy
   agents are the most common, requiring the least integration effort.</para>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Profiles</secondary>
+  </indexterm>
   <variablelist>
    <varlistentry>
     <term>Web</term>
@@ -142,7 +145,6 @@
  
  <section xml:id="create-agent-profiles">
   <title>Creating Agent Profiles</title>
-  <indexterm><primary>Policy agent profile configuration</primary></indexterm>
   <para>This section concerns creating agent profiles, and creating groups
   that let agents inherit settings when you have many agents with nearly
   the same profile settings.</para>
@@ -180,8 +182,10 @@
   
   <procedure xml:id="create-agent-group">
    <title>To Create an Agent Profile Group &amp; Inherit Settings</title>
-   
-   <indexterm><primary>Inherit agent configuration</primary></indexterm>
+   <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Group inheritance</secondary>
+  </indexterm>
    <para>Agent profile groups let you set up multiple agents to inherit
    settings from the group. To create a new web or J2EE agent profile group,
    you need a name and the URL to the OpenAM server in which you store the
@@ -208,7 +212,10 @@
  
  <section xml:id="configure-web-policy-agent">
   <title>Configuring Web Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>When you create a web policy agent profile and install the agent,
   you can choose to store the agent configuration centrally and configure
   the agent through OpenAM console. Alternatively, you can choose to store
@@ -1469,7 +1476,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-j2ee-policy-agent">
   <title>Configuring J2EE Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>When you create a J2EE policy agent profile and install the agent,
   you can choose to store the agent configuration centrally and configure
   the agent through OpenAM console. Alternatively, you can choose to store
@@ -3020,7 +3030,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-wsp-policy-agent">
   <title>Configuring Web Service Provider Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>This section covers Web Service Provider (WSP) properties. WSPs
   both validate incoming web service requests from Web Service Clients (WSC),
   and also secure outgoing responses sent back to WSCs.</para>
@@ -3306,7 +3319,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-wsc-policy-agent">
   <title>Configuring Web Service Client Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>This section covers Web Service Client (WSC) properties. WSCs
   both secure outgoing requests sent to Web Service Providers (WSP),
   and also validate incoming from WSPs.</para>
@@ -3576,7 +3592,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-disco-policy-agent">
   <title>Configuring Discovery Service Client Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>This section covers Discover Service Client properties. Discovery
   Service clients get Liberty security tokens from a Liberty Discovery
   Service.</para>
@@ -3634,7 +3653,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-sts-policy-agent">
   <title>Configuring Security Token Service Client Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>This section covers Security Token Service (STS) Client properties. STS
   clients both secure outgoing requests to trust authorities, and also validate
   incoming requests from trust authorities. You can configure STS clients to
@@ -3899,7 +3921,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-22-policy-agent">
   <title>Configuring Version 2.2 Policy Agents</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>This section covers version 2.2 agent properties. Version 2.2 agents
   store their configurations locally, with a user name, password combination
   used to connect to OpenAM.</para>
@@ -3943,7 +3968,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  
  <section xml:id="configure-agent-auth">
   <title>Configuring Agent Authenticators</title>
-  
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>An <firstterm>agent authenticator</firstterm> has read-only access to
   multiple agent profiles defined in the same realm, typically allowing an
   agent to read web service agent profiles.</para>

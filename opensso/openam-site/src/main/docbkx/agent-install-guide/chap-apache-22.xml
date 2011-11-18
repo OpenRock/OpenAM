@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing the Apache 2.2 Policy Agent</title>
-
+ <indexterm><primary>Apache HTTP Server</primary></indexterm>
  <para>This chapter covers installation of the policy agent for Apache
  HTTP Server 2.2.x.</para>
  

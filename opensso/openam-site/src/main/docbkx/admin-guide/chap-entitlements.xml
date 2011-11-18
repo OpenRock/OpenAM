@@ -37,7 +37,9 @@
  
  <section xml:id="about-entitlements">
   <title>About Entitlements</title>
-  
+  <indexterm><primary>Authorization</primary></indexterm>
+  <indexterm><primary>Entitlements</primary></indexterm>
+  <indexterm><primary>Policy</primary></indexterm>
   <para>OpenAM <firstterm>entitlements</firstterm> serve much the same purpose
   as OpenAM policies, defining who has access to what, under what conditions.
   You can define entitlements through the OpenAM console, and OpenAM stores and
@@ -88,7 +90,18 @@
  
  <section xml:id="managing-entitlements-console">
   <title>Managing Entitlements in OpenAM Console</title>
-  
+  <indexterm>
+   <primary>Authorization</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Entitlements</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>Use the nascent console to manage entitlements. After you login as
   OpenAM Administrator to OpenAM Console, click Test Beta Console, then
   Entitlements. You can return to the Standard Console by using the link at
@@ -188,7 +201,18 @@
   
   <procedure xml:id="create-entitlements-delegation-gui">
    <title>To Create a Delegation</title>
-   
+   <indexterm>
+    <primary>Authorization</primary>
+    <secondary>Delegating</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Entitlements</primary>
+    <secondary>Delegating</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Policy</primary>
+    <secondary>Delegating</secondary>
+   </indexterm>
    <step>
     <para>Select Entitlements &gt; Delegations &gt; Create Delegations to
     start the new entitlement delegation wizard.</para>
@@ -219,7 +243,18 @@
  
  <section xml:id="managing-entitlements-cli">
   <title>Managing Entitlements on the Command Line</title>
-  
+  <indexterm>
+   <primary>Authorization</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Entitlements</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>To manage entitlements, you can use the <command>ssoadm</command>
   command. The <command>ssoadm</command> command provides several other
   subcommands for managing entitlements in addition to those shown here.</para>
@@ -254,7 +289,11 @@
    <step>
     <para>Use the <command>ssoadm create-xacml</command> command to import
     a policy.</para>
-    <screen>$ ssoadm create-xacml --realm / --xmlfile policy.xml --adminid amadmin
+    <screen>$ ssoadm
+ create-xacml
+ --realm /
+ --xmlfile policy.xml
+ --adminid amadmin
  --password-file /tmp/pwd.txt</screen>
    </step>
   </procedure>
@@ -281,9 +320,14 @@ conditions=com.sun.identity.admin.model.OrViewCondition
 conditions=com.sun.identity.admin.model.AndViewCondition
 conditions=com.sun.identity.admin.model.NotViewCondition
 entitlementCombiner=com.sun.identity.entitlement.DenyOverride
-$ ssoadm create-appl --realm / --applicationtype iPlanetAMWebAgentService
- --name myApp --adminid amadmin --password-file /tmp/pwd.txt
- --datafile application.txt 
+$ ssoadm
+ create-appl
+ --realm /
+ --applicationtype iPlanetAMWebAgentService
+ --name myApp
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --datafile application.txt
 
 myApp was created.</screen>
    </step>

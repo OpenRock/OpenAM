@@ -31,6 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Authenticating Using OpenAM Java SDK</title>
+ <indexterm>
+  <primary>Authentication</primary>
+  <secondary>Java API</secondary>
+ </indexterm>
 
  <para>This chapter looks at authentication with the OpenAM Java SDK and at the
  sample client, <filename>Login.java</filename>, which demonstrates

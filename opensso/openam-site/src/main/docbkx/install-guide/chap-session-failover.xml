@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Setting Up OpenAM Session Failover</title>
-
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Session failover</secondary>
+ </indexterm>
  <para>This chapter covers setting up session failover when using multiple
  instances of OpenAM in a site configuration for high availability. The basic
  idea followed here is that you configure load balancing to be sticky, based

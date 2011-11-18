@@ -31,12 +31,16 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Error Messages</title>
-
+ 
  <para>This chapter lists common error messages from OpenAM, with remedial
  actions where possible.</para>
  
  <variablelist xml:id="authentication-error-messages">
   <title>Common Authentication Errors</title>
+  <indexterm>
+   <primary>Error messages</primary>
+   <secondary>Authentication</secondary>
+  </indexterm>
   <varlistentry>
    <term>An error occurred while storing the user profile.</term>
    <listitem>
@@ -222,6 +226,10 @@
  
  <variablelist xml:id="console-error-messages">
   <title>Common Console Errors</title>
+  <indexterm>
+   <primary>Error messages</primary>
+   <secondary>Console</secondary>
+  </indexterm>
   <varlistentry>
    <term>Could not create identity object. User does not have sufficient
    access.</term>

@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using the OpenAM C API</title>
-
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>C SDK</secondary>
+ </indexterm>
  <para>This chapter introduces OpenAM C SDK. OpenAM C SDK is delivered for
  selected platforms in
  <filename>libraries/native/agent-csdk/agent-csdk.zip</filename> where you

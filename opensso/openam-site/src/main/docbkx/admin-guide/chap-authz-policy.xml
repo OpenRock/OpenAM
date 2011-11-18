@@ -150,7 +150,14 @@
   
   <procedure xml:id="configure-url-policy">
    <title>To Configure a Policy For a Web Site</title>
-   
+   <indexterm>
+    <primary>Authorization</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Policy</primary>
+    <secondary>Configuring</secondary>
+   </indexterm>
    <para>Once a policy is created, you can further specify rules, subjects,
    conditions, and response providers.</para>
    
@@ -394,7 +401,14 @@
  
  <section xml:id="script-policy">
   <title>Managing Policies Outside the Console</title>
-  
+  <indexterm>
+   <primary>Authorization</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
   <para>When you first create policies, the OpenAM console helps you to get
   started quickly. Yet, when you have many policies to manage you might find
   it easier to script operations, starting from policies originally created
@@ -408,7 +422,10 @@
    
    <step>
     <para>Use the <command>ssoadm list-policies</command> command.</para>
-    <screen>$ ssoadm list-policies --realm "/" --adminid amadmin
+    <screen>$ ssoadm
+ list-policies
+ --realm "/"
+ --adminid amadmin
  --password-file /tmp/pwd.txt 
 
 Policy definitions were returned under realm, /.
@@ -498,8 +515,12 @@ PUBLIC "-//OpenSSO Policy Administration DTD//EN"
    </step>
    <step>
     <para>Use the <command>ssoadm create-policies</command> command.</para>
-    <screen>$ ssoadm create-policies --realm "/" --adminid amadmin
- --password-file /tmp/pwd.txt --xmlfile policy.xml
+    <screen>$ ssoadm
+ create-policies
+ --realm "/"
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --xmlfile policy.xml
 
 Policies were created under realm, /.</screen>
    </step>
@@ -508,6 +529,14 @@ Policies were created under realm, /.</screen>
  
  <section xml:id="delegate-policy">
   <title>Delegating Policy Management &amp; Decisions</title>
+  <indexterm>
+   <primary>Authorization</primary>
+   <secondary>Delegating</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Delegating</secondary>
+  </indexterm>
   <para>You use a <firstterm>referral</firstterm> to delegate policy
   management, and to delegate policy decision making.</para>
   <!-- TODO: add an olink once that becomes possible. -->

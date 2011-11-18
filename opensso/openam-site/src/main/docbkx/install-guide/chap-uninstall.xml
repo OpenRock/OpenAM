@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Removing OpenAM Software</title>
-
+ <indexterm><primary>Uninstalling</primary></indexterm>
  <para>This chapter shows you how to uninstall OpenAM core software. See
  the <citetitle>Policy Agent Installation Guide</citetitle> for instructions
  on removing OpenAM agents.</para>

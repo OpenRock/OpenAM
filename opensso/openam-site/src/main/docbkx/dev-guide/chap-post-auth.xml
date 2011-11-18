@@ -31,6 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Creating a Post Authentication Plugin</title>
+ <indexterm>
+  <primary>Authentication</primary>
+  <secondary>Post authentication plugins</secondary>
+ </indexterm>
 
  <para>Post authentication plugins (PAP) let you include custom processing at
  the end of the authentication process, immediately before the subject is

@@ -31,7 +31,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuring Password Reset</title>
-
+ <indexterm><primary>Password reset</primary></indexterm>
  <para>This chapter focuses on how to enable users to reset their own
  passwords in secure fashion.</para>
  

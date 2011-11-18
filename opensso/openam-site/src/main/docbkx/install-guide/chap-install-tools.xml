@@ -31,7 +31,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing OpenAM Tools</title>
- 
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Tools (ssoadm, etc.)</secondary>
+ </indexterm>
  <para>OpenAM tools are found in the <filename>tools/</filename> directory
  where you unpacked the archive of the entire package.</para>
  <variablelist>
@@ -139,7 +142,10 @@ http://openam.example.com:8080/openam</screen>
 
  <procedure xml:id="install-openam-config-tools">
   <title>To Set Up Configuration Tools</title>
-  
+  <indexterm>
+   <primary>Installing</primary>
+   <secondary>Silent configuration</secondary>
+  </indexterm>
   <step>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>

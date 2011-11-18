@@ -32,6 +32,10 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing OpenAM Core Services</title>
 
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Full install</secondary>
+ </indexterm>
  <para>This chapter covers tasks required to install OpenAM core services,
  and to ensure they run properly. It includes instructions on preparing your
  application server to run OpenAM, preparing your identity repository to
@@ -48,7 +52,12 @@
  
  <section xml:id="prepare-prerequisites">
   <title>Preparing Prerequisite Software</title>
-
+  <indexterm>
+   <primary>Software requirements</primary>
+  </indexterm>
+  <indexterm>
+   <primary>Memory requirements</primary>
+  </indexterm>
   <itemizedlist>
    <para>OpenAM core services require the following prerequisite
    software installed before you begin OpenAM installation.</para>
@@ -174,7 +183,9 @@ esac
 
  <section xml:id="download-openam-software">
   <title>Obtaining OpenAM Software</title>
-  
+  <indexterm>
+   <primary>Downloading OpenAM</primary>
+  </indexterm>
   <para>Download OpenAM releases from <link
   xlink:href='http://forgerock.com/downloads.html'
   >http://forgerock.com/downloads.html</link>. At the download location you
@@ -322,7 +333,10 @@ esac
   
   <procedure xml:id="delete-config-start-over">
    <title>To Delete an OpenAM Configuration Before Redeploying</title>
-  
+   <indexterm>
+    <primary>Installing</primary>
+    <secondary>Starting over</secondary>
+   </indexterm>
    <step>
     <para>Stop the OpenAM web application to clear the configuration held
     in memory.</para>
@@ -365,7 +379,10 @@ Using CLASSPATH:
   
   <procedure xml:id="configure-openam-custom">
    <title>To Configure OpenAM</title>
-   
+   <indexterm>
+    <primary>Installing</primary>
+    <secondary>Interactive configuration</secondary>
+   </indexterm>
    <step>
     <para>In the initial configuration screen, click
     Create New Configuration under Custom Configuration.</para>

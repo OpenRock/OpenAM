@@ -38,7 +38,7 @@
  
  <procedure xml:id="backup-config-to-xml">
   <title>To Back Up OpenAM Configuration</title>
-  
+  <indexterm><primary>Backup</primary></indexterm>
   <para>OpenAM stores service configuration data in a directory. During normal
   production operations, you rely on directory replication to maintain multiple,
   current copies of OpenAM service configuration. For disaster recovery,
@@ -82,7 +82,7 @@ Service Configuration was exported.</screen>
  
  <procedure xml:id="restore-config-from-xml">
   <title>To Restore OpenAM Configuration</title>
-  
+  <indexterm><primary>Restoring</primary></indexterm>
   <para>The following steps restore OpenAM configuration data from
   backup as described in <xref linkend="backup-config-to-xml" />.</para>
   
