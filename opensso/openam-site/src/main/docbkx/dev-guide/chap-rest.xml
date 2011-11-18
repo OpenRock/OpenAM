@@ -87,7 +87,7 @@
   </indexterm>
   <indexterm>
    <primary>Session tokens</primary>
-   <secondary>Java API</secondary>
+   <secondary>REST API</secondary>
   </indexterm>
   <para>Simple authentication with a user name and password returns a
   token.</para>
