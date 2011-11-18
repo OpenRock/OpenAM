@@ -33,6 +33,11 @@
  <xsl:param name="fop1.extensions" select="1" />
  
  <xsl:param name="body.font.master">9</xsl:param>
+ <xsl:param name="body.font.family">DejaVuSerif</xsl:param>
+ <xsl:param name="dingbat.font.family">DejaVuSerif</xsl:param>
+ <xsl:param name="monospace.font.family">DejaVuSansMono</xsl:param>
+ <xsl:param name="sans.font.family">DejaVuSans</xsl:param>
+ <xsl:param name="title.font.family">DejaVuSans</xsl:param>
  
  <xsl:attribute-set name="section.title.level1.properties">
   <xsl:attribute name="font-size">14pt</xsl:attribute>
