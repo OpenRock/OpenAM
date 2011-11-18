@@ -53,6 +53,5 @@
  <xinclude:include href='chap-compatibility.xml' />
  <xinclude:include href='chap-issues.xml' />
 
- <index />
  <?dbhtml-include href="../ga.html"?>
 </book>
