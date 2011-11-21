@@ -41,7 +41,7 @@
   <varlistentry>
    <term><filename>tools/ssoAdminTools.zip</filename></term>
    <listitem>
-    <para>Administration tools: <command>ampassword</command>, <command>amtune</command>,
+    <para>Administration tools: <command>ampassword</command>,
     <command>ssoadm</command> and <command>amverifyarchive</command></para>
    </listitem>
   </varlistentry>
@@ -83,8 +83,7 @@
    <screen>$ cd /path/to/admin/tools
 $ unzip /path/to/OpenAM/tools/ssoAdminTools.zip
 ...
-  inflating: template/windows/bin/amtune/amtune.bat.template  
-  inflating: template/windows/bin/amverifyarchive.bat.template  
+  inflating: template/windows/bin/amverifyarchive.bat.template
   inflating: template/windows/bin/ssoadm.bat.template</screen>
   </step>
   <step>
@@ -104,7 +103,7 @@ The version of your server instance is: (2011-July-11 00:05)</screen>
    <para>After setup, the tools are located under a directory named after the
    instance of OpenAM.</para>
    <screen>$ ls openam/bin/
-ampassword  amtune/  amverifyarchive  ssoadm</screen>
+ampassword  amverifyarchive  ssoadm</screen>
   </step>
   <step>
    <para>Check that <command>ssoadm</command> works properly.</para>

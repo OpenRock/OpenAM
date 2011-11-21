@@ -121,14 +121,6 @@
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term><command>amtune</command></term>
-    <listitem>
-     <para>This tools helps you tune OpenAM, as well as some operating systems
-     and web containers to improve OpenAM performance.</para>
-     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
     <term><command>amverifyarchive</command></term>
     <listitem>
      <para>This tool checks log archives for tampering.</para>
