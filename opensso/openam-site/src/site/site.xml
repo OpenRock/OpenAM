@@ -62,7 +62,11 @@
    <item name="OpenAM Admin Guide" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
    <item name="OpenAM Developer Guide" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
    <item name="OpenAM Reference" href="./doc/reference/OpenAM-Reference.html" />
+<!-- Fix for OpenAM-959 works, but requires extlib. Currently there's an issue
+     getting this built with Jenkins, so I am commenting this out for now.
    <item name="OpenAM Javadoc" href="./doc/public-api/index.html" />
+-->
+   <item name="OpenAM Javadoc" href="./404.html" />
    <item name="Policy Agent Release Notes" href="./doc/agent-release-notes/OpenAM-Agent-Release-Notes.html" />
    <item name="Policy Agent Install Guide" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
   </menu>

@@ -648,6 +648,8 @@ $(".flat").live("dblclick", function() {
        </target>
       </configuration>
      </execution>
+<!-- Fix for OpenAM-959 works, but requires extlib. Currently there's an issue
+     getting this built with Jenkins, so I am commenting this out for now.
      <execution>
       <id>generate-javadoc</id>
       <phase>generate-resources</phase>
@@ -685,6 +687,22 @@ $(".flat").live("dblclick", function() {
        <goal>run</goal>
       </goals>
      </execution>
+     <execution>
+      <id>clean</id>
+      <phase>clean</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/build.xml">
+         <target name="clean" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+ -->
     </executions>
    </plugin>
    <plugin>
