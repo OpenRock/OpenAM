@@ -84,8 +84,8 @@
     <a href="./doc/OpenAM-Reference.pdf">PDF</a>,
     <a href="./doc/OpenAM-Reference.rtf">RTF</a></dd>
     
-    <dt>OpenAM Javadoc</dt> <!-- TODO: Link to regularly generated version -->
-    <dd><a href="http://download.forgerock.org/downloads/openam/javadocs/9.5.1/">HTML</a></dd>
+    <dt>OpenAM Javadoc</dt>
+    <dd><a href="./doc/public-api/index.html">HTML</a></dd>
    </dl>
   </section>
  </body>

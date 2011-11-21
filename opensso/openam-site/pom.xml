@@ -124,6 +124,7 @@
   <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
   <fonts-src>${basedir}/src/fonts</fonts-src>
   <fonts-gen>${basedir}/target/fonts</fonts-gen>
+  <products-basedir>${basedir}/../products</products-basedir>
  </properties>
  <distributionManagement>
   <site>
@@ -626,9 +627,11 @@ $(".flat").live("dblclick", function() {
     </dependencies>
    </plugin>
    <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-antrun-plugin</artifactId>
     <executions>
      <execution>
+      <id>generate-log-message-ref</id>
       <phase>generate-resources</phase>
       <inherited>false</inherited>
       <goals>
@@ -644,6 +647,58 @@ $(".flat").live("dblclick", function() {
         </concat>
        </target>
       </configuration>
+     </execution>
+     <execution>
+      <id>generate-javadoc</id>
+      <phase>generate-resources</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/shared/build.xml">
+         <target name="all" />
+        </ant>
+        <ant antfile="${products-basedir}/federation/library/build.xml">
+         <target name="build" />
+        </ant>
+        <ant antfile="${products-basedir}/federation/openfm/build.xml">
+         <target name="publicdoc" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>unpack-javadoc</id>
+      <phase>site</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <mkdir dir="${site-out}/doc/public-api" />
+        <unjar
+         src="${products-basedir}/federation/openfm/built/dist/opensso-public-javadocs.jar"
+         dest="${site-out}/doc/public-api" />
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>clean</id>
+      <phase>clean</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/build.xml">
+         <target name="clean" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
      </execution>
     </executions>
    </plugin>
