@@ -685,21 +685,6 @@ $(".flat").live("dblclick", function() {
        <goal>run</goal>
       </goals>
      </execution>
-     <execution>
-      <id>clean</id>
-      <phase>clean</phase>
-      <inherited>false</inherited>
-      <configuration>
-       <target>
-        <ant antfile="${products-basedir}/build.xml">
-         <target name="clean" />
-        </ant>
-       </target>
-      </configuration>
-      <goals>
-       <goal>run</goal>
-      </goals>
-     </execution>
     </executions>
    </plugin>
    <plugin>
