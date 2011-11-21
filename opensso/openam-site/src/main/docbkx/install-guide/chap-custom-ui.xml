@@ -41,8 +41,11 @@
  Simplified Chinese, and Traditional Chinese, but you might require additional
  language support for your organization.</para>
  
- <para>This chapter address how to get started customizing OpenAM end user
- pages for your supported locales.</para>
+ <para>Also, by default the end user pages have ForgeRock styling and branding.
+ You likely want to change at least the images to reflect your organization.
+ You might want to have different page customizations for different realms as
+ well. This chapter address how to get started customizing OpenAM end user
+ pages for your organizations and supported locales.</para>
  
  <para>First you copy the pages to customize to the proper location, then
  you customize the files themselves.</para>
@@ -53,8 +56,25 @@
  to modify images for your deployment, you can maintain the sizes to avoid
  having to customize page layout extensively.</para>
  
- <procedure xml:id="copy-ui-to-customize">
-  <title>To Copy the Pages to Customize</title>
+ <tip>
+  <para>The procedures below describe how to update a deployed version of
+  OpenAM, so that you can see your changes without redeploying the application.
+  This approach works for development. For production deployment, however,
+  you must package your changes in a custom OpenAM deployable .war file.</para>
+  <para>When developing with a web container that deploys OpenAM in a temporary
+  location, such as JBoss or Jetty, restarting the container can also overwrite
+  your changes with the deployable .war content. For those web containers, you
+  should also prepare a deployable .war containing your changes, and redeploy
+  that file to check your work.</para>
+  <para>To create a deployable .war, unpack the OpenAM .war file from
+  <filename>/path/to/OpenAM/deployable-war</filename> into a staging directory,
+  do your work in that staging directory, and then use the
+  <command>createwar.sh</command> or <command>createwar.bat</command>
+  script to prepare the deployable .war.</para>
+ </tip>
+ 
+ <procedure xml:id="copy-ui-to-customize-top-level-realm">
+  <title>To Copy the Pages to Customize For the Top-Level Realm</title>
   <para>Rather than change the default pages, customize your own copy.</para>
   <step>
    <para>Change to the <filename>config/auth</filename> directory where
@@ -62,32 +82,39 @@
    <screen>$ cd /path/to/tomcat/webapps/openam/config/auth</screen>
   </step>
   <step>
-   <para>Depending on which locale you want to customize, and whether you
-   are customizing files for the Top-Level Realm (/) or a sub-realm, copy the
-   files to the correct location.</para>
-   <stepalternatives>
-    <step>
-     <para>For the Top-Level Realm, copy the default files and optionally the
-     localized files to
-     <filename>openam[_<replaceable>locale</replaceable>]/html</filename>,
-     where the optional <replaceable>locale</replaceable> is, for example,
-     <literal>jp</literal> for Japanese, or <literal>zh_CN</literal> for
-     Simplified Chinese.
-     </para>
-    </step>
-    <step>
-     <para>For a sub-realm of the Top-Level Realm, <literal>realm</literal>,
-     copy the default files and optionally the localized files to
-     <filename>openam[_<replaceable>locale</replaceable
-     >]/services/realm/html</filename>.</para>
-    </step>
-   </stepalternatives>
-   <para>The following example copies the files for the Top-Level Realm for a
-   custom French locale location.</para>
+   <para>Copy the default files and optionally the localized files to
+   <filename>openam[_<replaceable>locale</replaceable>]/html</filename>,
+   where the optional <replaceable>locale</replaceable> is, for example,
+   <literal>jp</literal> for Japanese, or <literal>zh_CN</literal> for
+   Simplified Chinese.</para>
+   <para>The following example copies the files for the Top-Level Realm
+   (<literal>/</literal>) for a custom French locale.</para>
    <screen>$ mkdir -p openam/html
 $ cp -r default/* openam/html
 $ mkdir -p openam_fr/html
 $ cp -r default_fr/* openam_fr/html</screen>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="copy-ui-to-customize-subrealm">
+  <title>To Copy the Pages to Customize For Another Realm</title>
+  <para>As for the top-level realm, customize your copy rather than the
+  default pages.</para>
+  <step>
+   <para>Change to the <filename>config/auth</filename> directory where
+   you deployed OpenAM.</para>
+   <screen>$ cd /path/to/tomcat/webapps/openam/config/auth</screen>
+  </step>
+  <step>
+   <para>Depending on which locale you want to customize, copy the default
+   files and optionally the localized files to <filename>openam[_<replaceable>locale</replaceable
+     >]/services/<replaceable>realm</replaceable>/html</filename>.</para>
+   <para>The following example copies the files for a custom French locale and
+   a realm named <literal>ventes</literal>.</para>
+   <screen>$ mkdir -p openam/html
+$ cp -r default/* openam/services/ventes/html
+$ mkdir -p openam_fr/services/ventes/html
+$ cp -r default_fr/* openam_fr/services/ventes/html</screen>
   </step>
  </procedure>
  
@@ -107,7 +134,7 @@ $ cp -r default_fr/* openam_fr/html</screen>
    <para>Modify the localized text, using UTF-8 without escaped characters, by
    changing only the original text strings in the .xml files.</para>
    <para>For example, to change the text in the default OpenAM login screen in
-   the French locale, edit
+   the top-level realm for the French locale, edit
    <filename>openam_fr/html/DataStore.xml</filename>.</para>
   </step>
   <step>
@@ -130,4 +157,3 @@ $ cp -r default_fr/* openam_fr/html</screen>
   </step>
  </procedure>
 </chapter>
-
