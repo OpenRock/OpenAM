@@ -329,7 +329,7 @@
        <goal>generate-manpages</goal>
       </goals>
       <configuration>
-       <!-- No customizations, yet.-->
+       <manpagesCustomization>${dbstyle-dir}/man/manpages.xsl</manpagesCustomization>
       </configuration>
      </execution>
      <execution>
