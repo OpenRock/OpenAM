@@ -82,7 +82,7 @@
     </target>
 
     <target name="build" depends="preparebuild">
-        <javac destdir="${sharedlib.classes.dir}"
+        <javac destdir="${sharedlib.classes.dir}" fork="true"
             source="${target.jdk.set}" target="${target.jdk.set}"
             debug="${build.debug}" debuglevel="${build.debuglevel}">
             <src path="${sharedlib.src.dir}"/>
