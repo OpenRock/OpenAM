@@ -12,7 +12,7 @@ def getConfDefault():
 class Properties:
     """Whatever this class is for"""
 
-    REGEX_host = '^\w+(\.\w+)+$'
+    REGEX_host = '^[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)+$'
     REGEX_number = '^\d+$'
     REGEX_protocol = '^https?$'
     REGEX_bool = 'yes|no|y|n'
