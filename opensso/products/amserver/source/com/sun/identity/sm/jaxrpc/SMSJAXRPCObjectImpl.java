@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2011 ForgeRock AS
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -48,6 +48,7 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
+import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -67,6 +68,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.CachedSMSEntry;
 import com.sun.identity.sm.CachedSubEntries;
+import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSNotificationManager;
@@ -360,6 +362,37 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         }
         return (SMSEntry.search(getToken(tokenID), startDN, filter,
             numOfEntries, timeLimit, sortResults, ascendingOrder));
+    }
+
+    /**
+     * Searches the data store for objects that match the filter with an exclude set
+     */
+    public Set search3(String tokenID, String startDN, String filter,
+        int numOfEntries, int timeLimit, boolean sortResults,
+        boolean ascendingOrder, Set excludes)
+            throws SMSException, SSOException, RemoteException {
+        initialize();
+        if (debug.messageEnabled()) {
+            debug.message("SMSJAXRPCObjectImpl::search dn: " + startDN
+                    + " filter: " + filter + " excludes: " + excludes);
+        }
+        
+        Iterator i = SMSEntry.search(getToken(tokenID), startDN, filter,
+            numOfEntries, timeLimit, sortResults, ascendingOrder, excludes);
+        
+        Set<String> result = new HashSet<String>();
+        
+        while (i.hasNext()) {
+            SMSDataEntry e = (SMSDataEntry)i.next();
+            try {
+                result.add(e.toJSONString());
+            } catch (JSONException ex) {
+                debug.error("SMSJAXRPCObjectImpl::problem performing search dn: " + startDN
+                    + " filter: " + filter + " excludes: " + excludes, ex);
+            }
+        }
+        
+        return result;
     }
 
     /**

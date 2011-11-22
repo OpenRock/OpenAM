@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.sm.jaxrpc;
 
 import java.rmi.Remote;
@@ -70,7 +74,12 @@ public interface SMSObjectIF extends Remote {
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder)
             throws SMSException, SSOException, RemoteException;
-
+    
+    public Set search3(String tokenID, String startDN, String filter,
+        int numOfEntries, int timeLimit, boolean sortResults,
+        boolean ascendingOrder, Set excludes)
+            throws SMSException, SSOException, RemoteException;
+    
     public Set searchSubOrgNames(String token, String dn, String filter,
             int numOfEntries, boolean sortResults, boolean ascendingOrder,
             boolean recursive) throws SMSException, SSOException,

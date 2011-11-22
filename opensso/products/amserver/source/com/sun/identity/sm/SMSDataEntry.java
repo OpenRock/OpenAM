@@ -25,13 +25,20 @@
  * $Id: SMSDataEntry.java,v 1.1 2009/04/02 19:40:59 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
+
 package com.sun.identity.sm;
 
+import com.sun.identity.shared.JSONUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This class encapsulates a distinguished name and its attribute values.
@@ -50,6 +57,13 @@ public class SMSDataEntry {
         this.dn = dn;
         this.attributeValues = new HashMap();
         parseAttributeValues(attributeValues);
+    }
+
+    public SMSDataEntry(String jsonString) throws JSONException {
+        
+        JSONObject o = new JSONObject(jsonString);
+        this.dn = o.getString("dn");
+        this.attributeValues = JSONUtils.getMapStringSetString(o, "attributeValues");   
     }
 
     public String getDN() {
@@ -87,5 +101,15 @@ public class SMSDataEntry {
         Set val = (Set)attributeValues.get(attributeName);
         return ((val != null) && !val.isEmpty()) ?
             (String)val.iterator().next() : null;
+    }
+    
+    public String toJSONString() throws JSONException {
+        
+        JSONObject result = new JSONObject();
+        
+        result.put("dn", dn);
+        result.put("attributeValues", attributeValues);
+                
+        return result.toString();
     }
 }

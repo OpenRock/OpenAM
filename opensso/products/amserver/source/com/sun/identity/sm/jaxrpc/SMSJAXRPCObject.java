@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.sm.jaxrpc;
 
 import java.net.URL;
@@ -64,8 +65,10 @@ import com.sun.identity.sm.SMSObject;
 import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSNotificationManager;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
@@ -296,13 +299,42 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
     }
 
     /**
-     * Searchs the data store for objects that match the filter
+     * Searches the data store for objects that match the filter
      */
     public Iterator search(SSOToken token, String startDN, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder, Set excludes)
         throws SMSException, SSOException {
-        throw new UnsupportedOperationException("Not supported.");
+        try {
+            Object[] objs = { token.getTokenID().toString(), startDN, filter,
+                Integer.valueOf(numOfEntries), Integer.valueOf(timeLimit),
+                Boolean.valueOf(sortResults), Boolean.valueOf(ascendingOrder), excludes };
+            
+            Set<String> searchResults = ((Set<String>) client.send(client.encodeMessage("search3", objs),
+                    Session.getLBCookie(token.getTokenID().toString()),
+                    null));
+            
+            Iterator result = null;
+            
+            if (searchResults != null && !searchResults.isEmpty()) {
+                Set<SMSDataEntry> dataEntries = new HashSet<SMSDataEntry>(searchResults.size());
+                for (String jsonString : searchResults) {
+                    dataEntries.add(new SMSDataEntry(jsonString));
+                }
+                result = dataEntries.iterator();
+            } else {
+                result = Collections.EMPTY_SET.iterator();
+            }
+            
+            return result;
+        } catch (SSOException ssoe) {
+            throw ssoe;
+        } catch (SMSException smse) {
+            throw smse;
+        } catch (Exception re) {
+            debug.error("SMSJAXRPCObject:search -- Exception:", re);
+            throw (new SMSException(re, "sms-JAXRPC-error-in-searching"));
+        }
     }
 
     /**
