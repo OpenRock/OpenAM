@@ -85,11 +85,7 @@
     <a href="./doc/OpenAM-Reference.rtf">RTF</a></dd>
     
     <dt>OpenAM Javadoc</dt>
-<!-- Fix for OpenAM-959 works, but requires extlib. Currently there's an issue
-     getting this built with Jenkins, so I am commenting this out for now.
     <dd><a href="./doc/public-api/index.html">HTML</a></dd>
--->
-    <dd>OpenAM-959 in progress</dd>
    </dl>
   </section>
  </body>
