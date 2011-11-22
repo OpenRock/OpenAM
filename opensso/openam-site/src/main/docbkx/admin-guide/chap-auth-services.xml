@@ -1243,7 +1243,9 @@
       logs out. By default, the Authentication Service uses only memory cookies
       (expires when the browser is closed).</para>
       <para>The client must explicitly request a persistent cookie by adding
-      <literal>iPSPCookie=yes</literal> as a parameter to the login URL.</para>
+      <literal>iPSPCookie=yes</literal> as a parameter to the login URL. OpenAM
+      sets a <literal>DProPCookie</literal> as described in
+      <xref linkend="authn-from-browser" />.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-persistent-cookie-mode</literal></para>
      </listitem>
@@ -3015,6 +3017,26 @@
      configured persistent cookie mode for the realm where the user logs
      in.</para>
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?iPSPCookie=yes</literal></para>
+     <para>OpenAM sets an <literal>DProPCookie</literal> that persists until
+     expiry. The following screen shot shows an example.</para>
+     <mediaobject>
+      <alt>DProPCookie shown in the browser</alt>
+      <imageobject>
+       <imagedata fileref="images/persistent-dpropcookie.png" format="PNG" />
+      </imageobject>
+     </mediaobject>
+     <para>An alternative persistent cookie mechanism extends the lifetime of
+     the normal <literal>iPlanetDirectoryPro</literal> using the advanced
+     server settings, <literal>openam.session.allow_persist_am_cookie</literal>
+     and <literal>com.iplanet.am.cookie.timeToLive</literal>. To use this
+     mechanism, browse in the OpenAM console to Configuration &gt; Servers and
+     Sites &gt; <replaceable>Server Name</replaceable> &gt; Advanced, and then
+     set <literal>openam.session.allow_persist_am_cookie</literal> to
+     <literal>true</literal> and
+     <literal>com.iplanet.am.cookie.timeToLive</literal> to the cookie lifetime
+     in seconds. To request the cookie, use
+     <literal>openam.session.persist_am_cookie=Yes</literal> as one of the
+     query string parameters in the login URL.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
