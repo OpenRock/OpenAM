@@ -103,21 +103,20 @@ $ sh createwar.sh --staging /tmp/console --type console --warfile console.war</s
       System configuration on the <literal>am.encryption.pwd</literal>
       property.</para>
       <para>If the OpenAM instance already has a console, then go to the
-      Configuration &gt; Servers and Sites tab page, and click the server
-      to view its configuration.</para>
+      Configuration &gt; Servers and Sites &gt; <replaceable>Server
+      Name</replaceable> &gt; Security to view the encryption key.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <!-- TODO: Understand and explain what's behind this authentication. -->
      <term>Application User Name</term>
      <listitem>
-      <para>Name of the principal to connect through to OpenAM.</para>
+      <para>OpenAM administrator, <literal>amadmin</literal>.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Application User Password</term>
      <listitem>
-      <para>Password of the principal to connect through to OpenAM.</para>
+      <para>Password for the OpenAM administrator.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
