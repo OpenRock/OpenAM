@@ -3027,14 +3027,28 @@
      </mediaobject>
      <para>An alternative persistent cookie mechanism extends the lifetime of
      the normal <literal>iPlanetDirectoryPro</literal> using the advanced
-     server settings, <literal>openam.session.allow_persist_am_cookie</literal>
-     and <literal>com.iplanet.am.cookie.timeToLive</literal>. To use this
-     mechanism, browse in the OpenAM console to Configuration &gt; Servers and
+     server settings, <literal>openam.session.persist_am_cookie</literal>
+     or <literal>openam.session.allow_persist_am_cookie</literal>, and
+     <literal>com.iplanet.am.cookie.timeToLive</literal>.</para>
+     <para>To set the mechanism globally for the server, browse in the OpenAM
+     console to Configuration &gt; Servers and Sites &gt; <replaceable>Server
+     Name</replaceable> &gt; Advanced, and then set
+     <literal>openam.session.allow_persist_am_cookie</literal> to
+     <literal>true</literal> and
+     <literal>com.iplanet.am.cookie.timeToLive</literal> to the cookie lifetime
+     in seconds.</para>
+     <para>To allow users to use this mechanism on a per-session basis,
+     browse in the OpenAM console to Configuration &gt; Servers and
      Sites &gt; <replaceable>Server Name</replaceable> &gt; Advanced, and then
      set <literal>openam.session.allow_persist_am_cookie</literal> to
      <literal>true</literal> and
      <literal>com.iplanet.am.cookie.timeToLive</literal> to the cookie lifetime
-     in seconds. To request the cookie, use
+     in seconds. (If the OpenAM .war deployed does not include the console, set
+     these properties in the .properties configuration file.) Also configure
+     the session properties either globally under Configuration &gt; Global
+     &gt; Session &gt; Dynamic Attributes, or per realm under Access Control
+     &gt; <replaceable>Realm Name</replaceable> &gt; Services &gt; Session.
+     Then, to request the cookie, use
      <literal>openam.session.persist_am_cookie=Yes</literal> as one of the
      query string parameters in the login URL.</para>
     </listitem>
