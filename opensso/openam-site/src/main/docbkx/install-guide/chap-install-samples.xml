@@ -38,7 +38,11 @@
  <para>The full download of OpenAM comes with a Java Client SDK and samples
  located in <filename>samples/opensso-client.zip</filename> where you
  unpacked the
- <filename>openam_<replaceable>version</replaceable>.zip</filename> file.</para>
+ <filename>openam_<replaceable>version</replaceable>.zip</filename> file.
+ The <citetitle>Developer's Guide</citetitle> describes how to use the Java
+ SDK, and the <citetitle>API specification</citetitle> provides a reference to
+ the public APIs.</para>
+ <!-- TODO: Add olinks to dev guide and Javadoc -->
  
  <para>To install the Client SDK, unzip <filename>opensso-client.zip</filename>
  where you want to install the SDK and examples.</para>
@@ -50,7 +54,8 @@
   <para>The sample web application deploys in your container to show you
   the client SDK samples in action.</para>
   <step>
-   <para>Deploy the .war in your web application container.</para>
+   <para>Deploy the .war in your Java web application container such as
+   Apache Tomcat or JBoss.</para>
    <screen>$ cp war/opensso-client-jdk15.war /path/to/tomcat/webapps/client.war</screen>
   </step>
   <step>

@@ -39,6 +39,13 @@
  where you unpacked the archive of the entire package.</para>
  <variablelist>
   <varlistentry>
+   <term><filename>README</filename></term>
+   <listitem>
+    <para>Quick description of the tools .zip files. Each tools .zip also
+    includes a specific README.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
    <term><filename>tools/ssoAdminTools.zip</filename></term>
    <listitem>
     <para>Administration tools: <command>ampassword</command>,
@@ -104,18 +111,24 @@ The version of your server instance is: (2011-July-11 00:05)</screen>
    instance of OpenAM.</para>
    <screen>$ ls openam/bin/
 ampassword  amverifyarchive  ssoadm</screen>
+   <para>On Windows, these files are .bat scripts.</para>
   </step>
   <step>
    <para>Check that <command>ssoadm</command> works properly.</para>
    <screen>$ umask 366
-$  echo password > /tmp/pwd.txt
+$ echo password > /tmp/pwd.txt
 $ openam/bin/ssoadm list-servers -u amadmin -f /tmp/pwd.txt
 
 http://openam.example.com:8080/openam</screen>
    <para>The <command>ssoadm</command> commands can also be run from
    <filename>ssoadm.jsp</filename> in OpenAM, for example at
-   <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
-   <!-- TODO add admin guide link here -->
+   <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>,
+   once the page has been enabled (by setting
+   <literal>ssoadm.disabled</literal> to <literal>false</literal> in OpenAM
+   console under Configuration &gt; Servers and Sites &gt; <replaceable>Server
+   Name</replaceable> &gt; Advanced).</para>
+   <!-- TODO add admin guide link here, chap-admin-tools#openam-ssoadm-jsp-overview
+        and remove the parentheses. -->
   </step>
   <step performance="optional">
    <para>If you have deployed OpenAM in a site configuration, edit the
@@ -189,7 +202,7 @@ Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
    <screen>$ unzip /path/to/OpenAM/tools/ssoDiagnosticTools.zip
 ...
   inflating: services/webcontainer/service.xml
-  inflating: ssodtool.bat            
+  inflating: ssodtool.bat
   inflating: ssodtool.sh</screen>
  <para>You can start the graphical user interface by using the tools without
  options, or in console mode using the <command>ssodtool.sh --console</command>
