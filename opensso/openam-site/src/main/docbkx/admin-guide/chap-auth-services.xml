@@ -3033,7 +3033,7 @@
      <para>To set the mechanism globally for the server, browse in the OpenAM
      console to Configuration &gt; Servers and Sites &gt; <replaceable>Server
      Name</replaceable> &gt; Advanced, and then set
-     <literal>openam.session.allow_persist_am_cookie</literal> to
+     <literal>openam.session.persist_am_cookie</literal> to
      <literal>true</literal> and
      <literal>com.iplanet.am.cookie.timeToLive</literal> to the cookie lifetime
      in seconds.</para>
