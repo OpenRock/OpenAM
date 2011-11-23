@@ -29,7 +29,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>OpenAM Compatibility</title>
+ <title>OpenAM Changes &amp; Deprecated Functionality</title>
 
  <para>This chapter covers both major changes to existing functionality, and
  also deprecated and removed functionality.</para>
@@ -40,6 +40,10 @@
   <para>TODO</para>
   
   <itemizedlist>
+   <listitem>
+    <para>The following Policy Agents are compatible with OpenAM
+    <?eval ${serverDocTargetVersion}?>: TODO</para>
+   </listitem>
    <listitem>
     <!-- Fix for OpenAM-413 -->
     <para>Prior to OpenAM 9.5.2, trailing slashes (<literal>/</literal>) were

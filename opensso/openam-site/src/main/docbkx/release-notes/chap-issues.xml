@@ -29,7 +29,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>OpenAM Fixes, Limitations, and Known Issues</title>
+ <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
 
  <para>OpenAM issues are tracked at <link
  xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
@@ -55,6 +55,9 @@
   not support OpenAM extensions. If you have a special request for capabilities
   not currently in a software release, contact ForgeRock at <link
   xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
+  
+  <para>Do not run different versions of OpenAM together in the same OpenAM
+  site.</para>
  </section>
  
  <section>

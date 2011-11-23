@@ -40,10 +40,8 @@
    xlink:href="http://resources.apexidentity.com/projects/docs/wiki">Identity
    Gateway</link>, is a high-performance reverse proxy server with specialized
    session management and credential replay functionality. The Identity Gateway
-   may run as a standalone simple single sign-on solution, or be integrated
-   with an existing web access management system. With either method, there is
-   no need to modify the target application or the container in which it
-   runs.</para>
+   integrates well with OpenAM, and there is no need to modify the target
+   application or the container in which it runs.</para>
    <para>OpenIG also includes the Federation Gateway, which enables federation
    capabilities for applications that cannot be modified to use the Fedlet and
    SAML 2.0.</para>
@@ -59,8 +57,8 @@
   </listitem> -->
   <listitem>
    <!-- OPENAM-??? -->
-   <para>Setup wizards make it easier to use OpenLDAP and OpenDJ as
-   the identity repository.</para>
+   <para>Setup wizards make it easier to use OpenDJ as the identity
+   repository.</para>
   </listitem>
   <listitem>
    <para>The <command>ssoadm</command> command now provides subcommands to
