@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.click.control.ActionLink;
 import org.apache.click.Page;
+import org.publicsuffix.PSS;
 
 
 public abstract class AjaxPage extends Page {
@@ -268,30 +269,25 @@ public abstract class AjaxPage extends Page {
     }
     
     public String getCookieDomain() {
-        String cookieDomain = "";           
-        String subDomain;
-        String topLevelDomain;
         String hostname = getHostName();
         
-        int idx1 = hostname.lastIndexOf(".");
-        if ((idx1 != -1) && (idx1 != (hostname.length() -1))) {
-            topLevelDomain = hostname.substring(idx1+1);
-            int idx2 = hostname.lastIndexOf(".", idx1-1);
-            if ((idx2 != -1) && (idx2 != (idx1 -1))) {
-                subDomain = hostname.substring(idx2+1, idx1);
-                try {
-                    Integer.parseInt(topLevelDomain);  
-                } catch (NumberFormatException e) {
-                    try {
-                        Integer.parseInt(subDomain);  
-                    } catch (NumberFormatException e1) {
-                        cookieDomain = "." + subDomain + "." + topLevelDomain;
-                    }
+        try {
+            PSS pss = new PSS();
+            int idx = pss.getEffectiveTLDLength(hostname);
+            int lastidx = hostname.lastIndexOf('.', idx - 1);
+            if (lastidx == -1) {
+                if (hostname.indexOf('.', idx + 1) != -1) {
+                    return "." + hostname;
+                } else {
+                    return "";
                 }
+            } else {
+                return hostname.substring(lastidx);
             }
+        } catch (IOException ioe) {
+            debug.error("Unable to load public suffix database", ioe);
+            return "";
         }
-        
-        return cookieDomain;
     }
 
     public boolean validateInput() {
