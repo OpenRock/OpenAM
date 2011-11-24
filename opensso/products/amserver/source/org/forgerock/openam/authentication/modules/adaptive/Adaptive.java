@@ -30,6 +30,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.maxmind.geoip.LookupService;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -45,6 +46,7 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
@@ -64,7 +66,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.security.auth.Subject;
@@ -257,37 +258,42 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
         }
 
-        if (IPRangeCheck) {
-            currentScore += checkIPRange();
+        try {
+            if (IPRangeCheck) {
+                currentScore += checkIPRange();
+            }
+            if (IPHistoryCheck) {
+                currentScore += checkIPHistory();
+            }
+            if (knownCookieCheck) {
+                currentScore += checkKnownCookie();
+            }
+            if (timeOfDayCheck) {
+                currentScore += checkTimeDay();
+            }
+            if (timeSinceLastLoginCheck) {
+                currentScore += checkLastLogin();
+            }
+            if (riskAttributeCheck) {
+                currentScore += checkRiskAttribute();
+            }
+            if (authFailureCheck) {
+                currentScore += checkAuthFailure();
+            }
+            if (deviceCookieCheck) {
+                currentScore += checkRegisteredClient();
+            }
+            if (geoLocationCheck) {
+                currentScore += checkGeoLocation();
+            }
+            if (reqHeaderCheck) {
+                currentScore += checkRequestHeader();
+            }
+        } catch (Exception ex) {
+            currentScore = Integer.MAX_VALUE;
+            debug.error(ADAPTIVE + ".process() : Unknown exception occured while"
+                    + " executing checks, module will fail", ex);
         }
-        if (IPHistoryCheck) {
-            currentScore += checkIPHistory();
-        }
-        if (knownCookieCheck) {
-            currentScore += checkKnownCookie();
-        }
-        if (timeOfDayCheck) {
-            currentScore += checkTimeDay();
-        }
-        if (timeSinceLastLoginCheck) {
-            currentScore += checkLastLogin();
-        }
-        if (riskAttributeCheck) {
-            currentScore += checkRiskAttribute();
-        }
-        if (authFailureCheck) {
-            currentScore += checkAuthFailure();
-        }
-        if (deviceCookieCheck) {
-            currentScore += checkRegisteredClient();
-        }
-        if (geoLocationCheck) {
-            currentScore += checkGeoLocation();
-        }
-        if (reqHeaderCheck) {
-            currentScore += checkRequestHeader();
-        }
-
 
         setPostAuthNParams();
 
@@ -357,7 +363,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         int retVal = 0;
 
         for (String nextIP : IPRangeRange) {
-            debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
+            if (debug.messageEnabled()) {
+                debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
+            }
             IPRange theRange = new IPRange(nextIP);
             if (theRange.inRange(clientIP)) {
                 retVal = IPRangeScore;
@@ -390,8 +398,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (IPHistoryAttribute != null) {
             ipHistoryValues = getIdentityAttributeString(IPHistoryAttribute);
 
-            debug.message(ADAPTIVE + ".checkIPHistory: Client IP = " + clientIP);
-            debug.message(ADAPTIVE + ".checkIPHistory: History IP = " + ipHistoryValues);
+            debug.message(ADAPTIVE + ".checkIPHistory: Client IP = " + clientIP + " History IP = " + ipHistoryValues);
 
             if (ipHistoryValues != null) {
                 StringTokenizer st = new StringTokenizer(ipHistoryValues, "|");
@@ -408,11 +415,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 }
             }
         }
+
         /*
-         * How do we add this to the list of IPHistory???  A Post AuthN Class?
+         * retVal is 0, if there was no match with history
          */
-
-
         if (IPHistorySave && retVal == 0) {
             postAuthNMap.put("IPSAVE", newHistory);
             postAuthNMap.put("IPAttr", IPHistoryAttribute);
@@ -421,7 +427,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!IPHistoryInvert) {
             retVal = IPHistoryScore - retVal;
         }
-        
+
         debug.message(ADAPTIVE + ".checkIPHistory: returns " + retVal);
 
         return retVal;
@@ -430,22 +436,20 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     protected int checkGeoLocation() {
         int retVal = 0;
         String countryCode = "";
-        
-        debug.message("GeoLocation database location = "+geoLocationDatabase);
+
+        debug.message("GeoLocation database location = " + geoLocationDatabase);
 
         LookupService db = getLookupService(geoLocationDatabase);
-        
-        if (db == null) {
-        	debug.message("GeoLocation database lookup returns null");
-        }
 
-        if (db != null) {
+        if (db == null) {
+            debug.message("GeoLocation database lookup returns null");
+        } else {
             countryCode = db.getCountry(clientIP).getCode();
             debug.message(ADAPTIVE + ".checkGeoLocation: " + clientIP + " returns " + countryCode);
 
             if (geoLocationValues != null) {
                 StringTokenizer st = new StringTokenizer(geoLocationValues, "|");
-                if (st.hasMoreTokens()) {
+                while (st.hasMoreTokens()) {
 
                     if (countryCode.equalsIgnoreCase(st.nextToken())) {
                         debug.message("Found Country Code : " + countryCode);
@@ -519,9 +523,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 if (reqHeaderName.equalsIgnoreCase(header)) {
                     debug.message(ADAPTIVE + ".checkRequestHeader: Found header: " + header);
                     if (reqHeaderValue != null) {
-                        Enumeration eVals = req.getHeaders(header);
+                        Enumeration<String> eVals = req.getHeaders(header);
                         while (eVals.hasMoreElements()) {
-                            String val = (String) eVals.nextElement();
+                            String val = eVals.nextElement();
                             if (reqHeaderValue.equalsIgnoreCase(val)) {
                                 debug.message(ADAPTIVE + ".checkRequestHeader: Found header Value: " + val);
                                 retVal = reqHeaderScore;
@@ -549,24 +553,24 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkRegisteredClient() {
         int retVal = 0;
-        String deviceID = null;
         String deviceHash = null;
 
         debug.message(ADAPTIVE + ".checkRegisteredClient: ");
         HttpServletRequest req = getHttpServletRequest();
-        
+
         if (req != null) {
-            deviceID = (String) req.getHeader("User-Agent");
-            deviceID = deviceID + "|" + (String) req.getHeader("accept");
-            deviceID = deviceID + "|" + (String) req.getHeader("accept-language");
-            deviceID = deviceID + "|" + (String) req.getHeader("accept-encoding");
-            deviceID = deviceID + "|" + (String) req.getHeader("accept-charset");
-            deviceID = deviceID + "|" + userName;
-            
-            deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(deviceID)));
 
             for (Cookie cookie : req.getCookies()) {
                 if (deviceCookieName.equalsIgnoreCase(cookie.getName())) {
+                    StringBuilder sb = new StringBuilder(150);
+                    sb.append(req.getHeader("User-Agent"));
+                    sb.append("|").append(req.getHeader("accept"));
+                    sb.append("|").append(req.getHeader("accept-language"));
+                    sb.append("|").append(req.getHeader("accept-encoding"));
+                    sb.append("|").append(req.getHeader("accept-charset"));
+                    sb.append("|").append(userName);
+
+                    deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(sb.toString())));
                     debug.message(ADAPTIVE + ".checkRegisteredClient: Found Cookie :" + deviceCookieName);
                     if (deviceHash.equalsIgnoreCase(cookie.getValue())) {
                         retVal = deviceCookieScore;
@@ -625,22 +629,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                         break;
                     }
                 }
+                String[] tokens = lastLogin.split("\\|");
+                if (tokens.length == 3) {
+                    lastLogin = tokens[1];
+                    savedUserName = tokens[2];
+                }
 
-                StringTokenizer st = new StringTokenizer(lastLogin, "|");
-                if (st.hasMoreTokens()) {
-                	String randomCode = st.nextToken();
-                };
-
-                if (st.hasMoreTokens()) {
-                	lastLogin = st.nextToken();
-                };
-
-                if (st.hasMoreTokens()) {
-                	savedUserName = st.nextToken();
-                };
-            
-                if (savedUserName != userName) {
-                	lastLogin = null;
+                if (!userName.equalsIgnoreCase(savedUserName)) {
+                    lastLogin = null;
                 }
 
                 if (lastLogin != null) {
@@ -655,8 +651,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
             if (timeSinceLastLoginSave) {
                 postAuthNMap.put("LOGINNAME", timeSinceLastLoginAttribute);
-                lastLogin =  formatter.format(now);
-                lastLogin = "" + Math.random() + "|" + lastLogin + "|" + userName;
+                lastLogin = formatter.format(now);
+                lastLogin = Math.random() + "|" + lastLogin + "|" + userName;
                 lastLoginEnc = AccessController.doPrivileged(new EncodeAction(lastLogin));
                 postAuthNMap.put("LOGINVALUE", lastLoginEnc);
             }
@@ -764,14 +760,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     public void onLoginSuccess(Map requestParamsMap, HttpServletRequest request,
             HttpServletResponse response, SSOToken token)
             throws AuthenticationException {
-        Map<String, String> m = null;
+        Map<String, String> m = new HashMap<String, String>();
         Map<String, Set> attrMap = new HashMap<String, Set>();
 
         debug.message(ADAPTIVE + " executing PostProcessClass");
         try {
             String s = token.getProperty("ADAPTIVE");
             if (s != null && !s.isEmpty()) {
-                m = stringToMap(s);
+                stringToMap(s, m);
                 token.setProperty("ADAPTIVE", "");
             }
             if (m.containsKey("IPSAVE")) {
@@ -788,7 +784,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 try {
                     AMIdentity id = IdUtils.getIdentity(
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                            token.getPrincipal().getName());
+                            token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
                     id.setAttributes(attrMap);
                     id.store();
                 } catch (Exception e) {
@@ -802,34 +798,33 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 String value = m.get("LOGINVALUE");
                 String name = m.get("LOGINNAME");
 
-                Cookie nameCookie = new Cookie(name, value);
-                nameCookie.setMaxAge(autoLoginExpire);
-                nameCookie.setPath("/");
-
-                response.addCookie(nameCookie);
+                addCookieToResponse(response, name, value, autoLoginExpire);
             }
             if (m.containsKey("COOKIENAME")) {
                 String name = m.get("COOKIENAME");
                 String value = m.get("COOKIEVALUE");
 
-                Cookie nameCookie = new Cookie(name, value);
-                nameCookie.setMaxAge(autoLoginExpire);
-                nameCookie.setPath("/");
-
-                response.addCookie(nameCookie);
+                addCookieToResponse(response, name, value, autoLoginExpire);
             }
             if (m.containsKey("DEVICENAME")) {
                 String name = m.get("DEVICENAME");
                 String value = m.get("DEVICEVALUE");
 
-                Cookie nameCookie = new Cookie(name, value);
-                nameCookie.setMaxAge(autoLoginExpire);
-                nameCookie.setPath("/");
-
-                response.addCookie(nameCookie);
+                addCookieToResponse(response, name, value, autoLoginExpire);
             }
         } catch (Exception e) {
-            debug.message(ADAPTIVE + " Unable to Retreive PostAuthN Params" + e);
+            debug.message(ADAPTIVE + " Unable to Retreive PostAuthN Params", e);
+        }
+    }
+
+    private void addCookieToResponse(HttpServletResponse response, String name, String value, int expire) {
+        Set<String> domains = AuthUtils.getCookieDomains();
+        for (String domain : domains) {
+            Cookie cookie = new Cookie(name, value);
+            cookie.setMaxAge(expire);
+            cookie.setPath("/");
+            cookie.setDomain(domain);
+            response.addCookie(cookie);
         }
     }
 
@@ -920,7 +915,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
         reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
         reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
-
     }
 
     protected boolean getOptionAsBoolean(Map m, String i) {
@@ -1037,9 +1031,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         return stringBuilder.toString();
     }
 
-    public static Map<String, String> stringToMap(String input) {
-        Map<String, String> map = new HashMap<String, String>();
-
+    public static void stringToMap(String input, Map<String, String> map) {
         String[] nameValuePairs = input.split("&");
         for (String nameValuePair : nameValuePairs) {
             String[] nameValue = nameValuePair.split("=");
@@ -1050,8 +1042,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 throw new RuntimeException("This method requires UTF-8 encoding support", e);
             }
         }
-
-        return map;
     }
 
     private static synchronized LookupService getLookupService(String dbLocation) {
