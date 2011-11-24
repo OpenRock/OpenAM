@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.authentication.UI;
 
 import com.iplanet.jato.RequestHandler;
@@ -55,6 +56,9 @@ public class ButtonTiledView
     /** button name */
     public static final String TXT_BUTTON = "txtButton";
 
+    /** button class */
+    public static final String TXT_CLASS = "txtClass";
+
     /**
      * constructs a tiled view of buttons
      *
@@ -73,6 +77,7 @@ public class ButtonTiledView
     protected void registerChildren() {
         registerChild(TXT_INDEX, StaticTextField.class);
         registerChild(TXT_BUTTON, StaticTextField.class);
+        registerChild(TXT_CLASS, StaticTextField.class);
     }
 
 
@@ -85,9 +90,10 @@ public class ButtonTiledView
     protected View createChild(String name) {
         if (name.equals(TXT_INDEX)) {
             return new StaticTextField(this, TXT_INDEX, "");
-        }
-        if (name.equals(TXT_BUTTON)) {
+        } else if (name.equals(TXT_BUTTON)) {
             return new StaticTextField(this, TXT_BUTTON, "");
+        } else if (name.equals(TXT_CLASS)) {
+            return new StaticTextField(this, TXT_CLASS, "");
         }
         throw new IllegalArgumentException("Invalid child name ["
             + name + "]");
@@ -131,6 +137,7 @@ public class ButtonTiledView
             curTile = getTileIndex();
             setDisplayFieldValue(TXT_INDEX, Integer.toString(curTile));
             setDisplayFieldValue(TXT_BUTTON, buttons[curTile]);
+            setDisplayFieldValue(TXT_CLASS, curTile == 0 ? "button primary" : "button");
         }
 
         return movedToRow;
