@@ -74,6 +74,7 @@
         <antcall target="remove-amserver-bits" />
         <antcall target="create-manifest" />
         <antcall target="create-checksum" />
+        <antcall target="create-srczip" />
     </target>
 
     <target name="server-tools" depends="create-version">
@@ -195,6 +196,13 @@
 
     <target name="create-checksum" depends="set-zipname">         
         <checksum file="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="create-srczip" depends="set-zipname">
+        <mkdir dir="${prd.nightly.dist.dir}" />
+        <zip destfile="${prd.nightly.dist.dir}/openam_src_${time.stamp}.zip" basedir="${products.basedir}/.." includes="products/**,resources/**" excludes="**/built,**/built/**,**/extlib,**/extlib/**,products/webagents,products/webagents/**,**/tracker.properties" />
+        <checksum file="${prd.nightly.dist.dir}/openam_src_${time.stamp}.zip"
             algorithm="SHA" fileext=".sha" />
     </target>
 
