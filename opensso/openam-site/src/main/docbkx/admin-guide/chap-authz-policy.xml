@@ -539,7 +539,8 @@ Policies were created under realm, /.</screen>
   </indexterm>
   <para>You use a <firstterm>referral</firstterm> to delegate policy
   management, and to delegate policy decision making.</para>
-  <!-- TODO: add an olink once that becomes possible. -->
-  <para>Referrals are covered in the chapter on Realms.</para>
+  <para>Referrals are covered in the <link xlink:href="admin-guide#chap-realms"
+  xlink:role="http://docbook.org/xlink/role/olink">chapter on
+  Realms</link>.</para>
  </section>
 </chapter>

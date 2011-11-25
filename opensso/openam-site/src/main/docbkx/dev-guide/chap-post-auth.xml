@@ -55,7 +55,6 @@
   <para>Your post authentication plugin class implements the
   <literal>AMPostAuthProcessInterface</literal> interface, and in particular
   the following three methods.</para>
-  <!-- TODO: olink to Javadoc -->
   
   <programlisting language="java">public void onLoginSuccess(
   Map requestParamsMap, 
@@ -82,6 +81,11 @@ public void onLogout(
   <literal>onLogout()</literal> method only when the user actively logs out,
   not when a user's session times out.</para>
   
+  <para>See the <link
+  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
+  reference.</para>
+
   <para>These methods can perform whatever processing you require. Yet, know
   that OpenAM calls your methods synchronously as part of the authentication
   process. Therefore, if your methods take a long time to complete, you will

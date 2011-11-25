@@ -342,6 +342,8 @@
       <configuration>
        <chunkedOutput>false</chunkedOutput>
        <htmlCustomization>${dbstyle-dir}/html/coredoc.xsl</htmlCustomization>
+       <olinkDebug>true</olinkDebug>
+       <targetDatabaseDocument>${docbkx-src}/olinkdb-single-html-pages.xml</targetDatabaseDocument>
        <preProcess>
         <copy todir='${docbkx-out}/html/admin-guide/images'>
          <fileset dir='${docbkx-src}/admin-guide/images' />
@@ -550,6 +552,111 @@ $(".flat").live("dblclick", function() {
         </replace>
        </postProcess>
       </configuration>
+     </execution>
+     <execution>
+      <id>olinkdb-admin-guide</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Admin-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/admin-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/admin-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-agent-install-guide</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Agent-Install-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/agent-install-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/agent-install-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-agent-release-notes</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Agent-Release-Notes.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/agent-release-notes.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/agent-release-notes' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-dev-guide</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Dev-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/dev-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/dev-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-install-guide</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Install-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/install-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/install-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-reference</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Reference.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/reference.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/reference' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-release-notes</id>
+      <phase>process-resources</phase>
+      <configuration>
+       <includes>*/OpenAM-Release-Notes.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/release-notes.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/release-notes' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
      </execution>
     </executions>
     <dependencies>

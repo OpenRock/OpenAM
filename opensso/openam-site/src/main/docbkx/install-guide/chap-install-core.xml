@@ -43,12 +43,12 @@
  OpenAM administration tools, and performing post-installation
  configuration.</para>
  
- <!-- TODO: Add olink when the machinery is available. -->
  <para>To manage access to web resources on other servers, you can install
  policy agents that provide tight integration with OpenAM. See the
- <citetitle>Policy Agent Installation Guide</citetitle> for instructions
- on installing OpenAM agents in supported web servers and Java EE
- application containers.</para>
+ <link xlink:href="agent-install-guide"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Policy Agent
+ Installation Guide</citetitle></link> for instructions on installing OpenAM
+ agents in supported web servers and Java EE application containers.</para>
  
  <section xml:id="prepare-prerequisites">
   <title>Preparing Prerequisite Software</title>
@@ -69,9 +69,11 @@ Java(TM) SE Runtime Environment (build 1.6.0_26-b03)
 Java HotSpot(TM) Client VM (build 20.1-b02, mixed mode, sharing)</screen>
    </listitem>
    <listitem>
-    <!-- TODO: Add olink when the machinery is available. -->
+
     <para>A supported application server as the deployment container</para>
-    <para>See the <citetitle>Release Notes</citetitle> for a list.</para>
+    <para>See the <link xlink:href="release-notes#chap-before-you-install"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+    Notes</citetitle></link> for a list.</para>
     
     <para>OpenAM core services require a minimum JVM heap size of 1 GB,
     and a permanent generation size of 256 MB. Apply the following JVM options
@@ -121,12 +123,14 @@ esac
    </listitem>
    <listitem>
     <para>A supported identity repository for user identity data</para>
-     <!-- TODO: Add olink when the machinery is available. -->
-    <para>See the <citetitle>Release Notes</citetitle> for a list. If you
-    plan to use OpenAM for evaluation or testing, definitely use the embedded
-    LDAP server as a configuration store and identity repository. ForgeRock
-    also recommends using the embedded LDAP server as the configuration store
-    when you have four or fewer instances of OpenAM in production.</para>
+
+    <para>See the <link xlink:href="release-notes#chap-before-you-install"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+    Notes</citetitle></link> for a list. If you plan to use OpenAM for
+    evaluation or testing, definitely use the embedded LDAP server as a
+    configuration store and identity repository. ForgeRock also recommends
+    using the embedded LDAP server as the configuration store when you have
+    four or fewer instances of OpenAM in production.</para>
     
     <para>Examples here use OpenDJ as the identity repository. OpenDJ
     is installed on <literal>openam.example.com</literal>, and listens
@@ -199,9 +203,10 @@ esac
   <variablelist>
    <para>After you unzip the archive of the entire package, you get an
    <filename>opensso</filename> directory including a README, a set of license
-   files, and the following directories.</para>
-   <!-- TODO: Replace with olink when the machinery is available:
-              ref/chap-file-layout -->
+   files, and the following directories. See the <link
+   xlink:href="reference#chap-file-layout"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>File
+    Layout</citetitle> reference</link> for details.</para>
    <varlistentry>
     <term><filename>deployable-war</filename></term>
     <listitem><para>The deployable .war file as well as the tools and files

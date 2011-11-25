@@ -190,9 +190,17 @@
   <step>
    <para>In the second screen, provide information on how to connect
    to your data store, and then click Finish to save your work.</para>
-   <!-- TODO: add an olink once that becomes possible. -->
-   <para>See the chapter on authentication for hints on connecting to
-   Active Directory, LDAP directory, and JDBC data sources.</para>
+   
+   <para>See the <link xlink:href="admin-guide#chap-auth-services"
+   xlink:role="http://docbook.org/xlink/role/olink">chapter on
+   authentication</link> for hints on connecting to
+   <link xlink:href="admin-guide#ad-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink">Active Directory</link>,
+   <link xlink:href="admin-guide#ldap-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink">LDAP directory</link>, and
+   <link xlink:href="admin-guide#jdbc-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink">JDBC</link> data
+   sources.</para>
   </step>
   <step>
    <para>Click the Subjects tab, and make sure the connection to your
@@ -202,11 +210,12 @@
    <para>If you no longer need the connection to the inherited data store
    <emphasis>in this realm</emphasis>, then you can delete its entry in the
    Data Stores table.</para>
-   <!-- TODO: add an olink once that becomes possible. -->
+   
    <para>Also, once you change the data store for a realm, you might
-   opt to change the authentication module configuration as described
-   in the chapter on authentication to use your realm data store, rather
-   than the inherited settings.</para>
+   opt to change the <link xlink:href="admin-guide#configure-authn-modules"
+   xlink:role="http://docbook.org/xlink/role/olink">authentication module
+   configuration</link> as described in the chapter on authentication to use
+   your realm data store, rather than the inherited settings.</para>
   </step>
  </procedure>
  

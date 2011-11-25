@@ -160,8 +160,4 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
    </qandaentry>
   </qandadiv>
  </qandaset>
- 
- <!-- TODO: see also http://resources.apexidentity.com/projects/docs/wiki/Troubleshooting -->
-
 </chapter>
-

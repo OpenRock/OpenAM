@@ -189,7 +189,11 @@
   <literal>com.sun.identity.authentication.spi.AMLoginModule</literal> abstract
   class, and must implement the methods shown below.</para>
   
-  <!-- TODO: Including appropriate link to Javadoc -->
+  <para>See the <link
+  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
+  reference.</para>
+  
   <programlisting language="java">
 // OpenAM calls the init() method once when the module is created.
 public void init(Subject subject, Map sharedState, Map options)
@@ -776,8 +780,11 @@ $ ssoadm
  --authmodule com.forgerock.openam.examples.SampleAuth
 
 Authentication module was registered.</screen>
-   <!-- TODO: Add olink to ssoadm-1 for a full list of Authentication Service
-              Management subcommands -->
+
+  <para>See the <link xlink:href="reference#ssoadm-1"
+  xlink:role="http://docbook.org/xlink/role/olink"><command>ssoadm</command>
+  reference</link> a full list of Authentication Service Management
+  subcommands.</para>
    
    <para>Restart OpenAM, or the web applications container where it runs.</para>
    <screen>$ /path/to/tomcat/bin/shutdown.sh

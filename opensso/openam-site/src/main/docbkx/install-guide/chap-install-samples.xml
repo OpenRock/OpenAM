@@ -39,10 +39,12 @@
  located in <filename>samples/opensso-client.zip</filename> where you
  unpacked the
  <filename>openam_<replaceable>version</replaceable>.zip</filename> file.
- The <citetitle>Developer's Guide</citetitle> describes how to use the Java
- SDK, and the <citetitle>API specification</citetitle> provides a reference to
- the public APIs.</para>
- <!-- TODO: Add olinks to dev guide and Javadoc -->
+ The <link xlink:href="dev-guide"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Developer's
+ Guide</citetitle></link> describes how to use the Java SDK, and the <link
+ xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+ ><citetitle>OpenAM Java SDK API Specification</citetitle></link> provides a
+ reference to the public APIs.</para>
  
  <para>To install the Client SDK, unzip <filename>opensso-client.zip</filename>
  where you want to install the SDK and examples.</para>

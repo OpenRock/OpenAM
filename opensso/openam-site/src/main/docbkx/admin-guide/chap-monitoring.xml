@@ -144,8 +144,9 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <filename>amAuthentication.access</filename> and
    <filename>amAuthentication.error</filename>.</para>
    
-   <!-- TODO: When olinks become available, include a link to the log message
-        reference. -->
+   <para>See the <link xlink:href="reference#chap-log-messages"
+  xlink:role="http://docbook.org/xlink/role/olink">Log Messages</link>
+  reference for details.</para>
    
    <para>OpenAM lets you change the log level on the fly. OpenAM also supports
    log rotation, secure logging, and log message buffering.</para>

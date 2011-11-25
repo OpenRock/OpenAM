@@ -69,9 +69,10 @@
     <para>The OpenAM Java APIs provided through the OpenAM Java SDK let your
     Java and Java EE applications call on OpenAM for authentication, and
     authorization in both OpenAM and federated environments.</para>
-    <para>Detailed reference information is provided in the <citetitle>OpenAM
-    Java SDK API Specification</citetitle>.</para>
-    <!-- TODO: Olink to SDK Javadoc -->
+    <para>Detailed reference information is provided in the <link
+    xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+    ><citetitle>OpenAM Java SDK API Specification</citetitle></link>.</para>
+
    </listitem>
    <listitem>
     <para>The C SDK also provides APIs for native applications, such as new
