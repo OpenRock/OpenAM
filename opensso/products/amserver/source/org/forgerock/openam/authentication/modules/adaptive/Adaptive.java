@@ -559,18 +559,18 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         HttpServletRequest req = getHttpServletRequest();
 
         if (req != null) {
+            StringBuilder sb = new StringBuilder(150);
+            sb.append(req.getHeader("User-Agent"));
+            sb.append("|").append(req.getHeader("accept"));
+            sb.append("|").append(req.getHeader("accept-language"));
+            sb.append("|").append(req.getHeader("accept-encoding"));
+            sb.append("|").append(req.getHeader("accept-charset"));
+            sb.append("|").append(userName);
+
+            deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(sb.toString())));
 
             for (Cookie cookie : req.getCookies()) {
                 if (deviceCookieName.equalsIgnoreCase(cookie.getName())) {
-                    StringBuilder sb = new StringBuilder(150);
-                    sb.append(req.getHeader("User-Agent"));
-                    sb.append("|").append(req.getHeader("accept"));
-                    sb.append("|").append(req.getHeader("accept-language"));
-                    sb.append("|").append(req.getHeader("accept-encoding"));
-                    sb.append("|").append(req.getHeader("accept-charset"));
-                    sb.append("|").append(userName);
-
-                    deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(sb.toString())));
                     debug.message(ADAPTIVE + ".checkRegisteredClient: Found Cookie :" + deviceCookieName);
                     if (deviceHash.equalsIgnoreCase(cookie.getValue())) {
                         retVal = deviceCookieScore;
