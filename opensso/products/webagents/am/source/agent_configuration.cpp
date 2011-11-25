@@ -494,6 +494,12 @@ am_status_t AgentConfiguration::populateAgentProperties()
         status = am_properties_get_with_default(this->properties, "com.forgerock.agents.config.notenforced.ip.handler", NULL, &(this->notenforcedIPmode));
         am_web_log_max_debug("Property [com.forgerock.agents.config.notenforced.ip.handler] value set to [%s]", this->notenforcedIPmode);
     }
+    
+    /*  */
+    if (AM_SUCCESS == status) {
+        status = am_properties_get_with_default(this->properties, "com.forgerock.agents.config.pdpuri.prefix", NULL, &(this->dummyPostPrefixUri));
+        am_web_log_max_debug("Property [com.forgerock.agents.config.pdpuri.prefix] value set to [%s]", this->dummyPostPrefixUri);
+    }
 
     /* Get the redirect composite advice param */
     if (AM_SUCCESS == status) {
@@ -1434,6 +1440,7 @@ void AgentConfiguration::cleanup_properties()
     }
     
     this->notenforcedIPmode = NULL;
+    this->dummyPostPrefixUri = NULL;
     
     this->cond_login_url.clear();
 

@@ -203,6 +203,8 @@ public:
     
     smap_t cond_login_url;
     
+    const char *dummyPostPrefixUri;
+    
     AgentConfiguration();
     AgentConfiguration(am_properties_t properties);
     ~AgentConfiguration();
@@ -299,6 +301,7 @@ public:
         this->use_redirect_for_advice = AM_FALSE;
         this->cdsso_cookie_urlencode = AM_FALSE;
         this->cdsso_disable_redirect_on_post = AM_FALSE;
+        this->dummyPostPrefixUri = NULL;
         this->error = AM_SUCCESS;
 
     }

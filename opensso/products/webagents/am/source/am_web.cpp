@@ -1212,15 +1212,19 @@ am_bool_t in_not_enforced_list(URL &urlObj,
 
     // Check for dummy post url
     urlObj.getRootURL(dummyNotEnforcedUrl_str);
-    dummyNotEnforcedUrl_str.append(DUMMY_NOTENFORCED);
-        am_resource_match_t dummy_post_url_match;
-        dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
-                              dummyNotEnforcedUrl_str.c_str(),
-                                        baseURL, B_TRUE);
-        if ( (AM_EXACT_MATCH == dummy_post_url_match)  ||
-	     ( AM_EXACT_PATTERN_MATCH == dummy_post_url_match )) {
-            dummy_post_url_match_flag = AM_TRUE;
-        }
+    if ((*agentConfigPtr)->dummyPostPrefixUri != NULL) {
+        dummyNotEnforcedUrl_str.append("/").append((*agentConfigPtr)->dummyPostPrefixUri).append("*");
+    } else {
+        dummyNotEnforcedUrl_str.append(DUMMY_NOTENFORCED);
+    }
+    am_resource_match_t dummy_post_url_match;
+    dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
+            dummyNotEnforcedUrl_str.c_str(),
+            baseURL, B_TRUE);
+    if ((AM_EXACT_MATCH == dummy_post_url_match) ||
+            (AM_EXACT_PATTERN_MATCH == dummy_post_url_match)) {
+        dummy_post_url_match_flag = AM_TRUE;
+    }
 
     if (access_denied_url_match_flag == AM_TRUE) {
         am_web_log_debug("%s: The requested URL %s "
@@ -4193,7 +4197,11 @@ am_web_create_post_preserve_urls(const char *request_url,
         char *stickySessionFromUrl = NULL;
         URL urlObject(request_url);
         urlObject.getRootURL(dummyURL);
-        dummyURL.append(DUMMY_REDIRECT).append(MAGIC_STR).append(key);
+        if ((*agentConfigPtr)->dummyPostPrefixUri != NULL) {
+            dummyURL.append("/").append((*agentConfigPtr)->dummyPostPrefixUri).append(DUMMY_REDIRECT).append(MAGIC_STR).append(key);
+        } else {
+            dummyURL.append(DUMMY_REDIRECT).append(MAGIC_STR).append(key);
+        }
         // Add the sticky session parameter if a LB is used with sticky
         // session mode set to URL.
         if (am_web_get_postdata_preserve_URL_parameter(
