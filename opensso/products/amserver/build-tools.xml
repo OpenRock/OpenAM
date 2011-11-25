@@ -28,7 +28,7 @@
 
 -->
 <!--
-   "Portions Copyrighted [2010] [ForgeRock AS]"
+   Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
 <project name="amadm" default="createZipFile" basedir=".">
@@ -59,8 +59,6 @@
     <property name="amadm.unix.dir" value="${amadm.template.dir}/unix"/>
     <property name="amadm.unix.bin.dir" value="${amadm.unix.dir}/bin"/>
     <property name="amadm.classes.dir" value="${amadm.tools.dir}/classes"/>
-    <property name="amtune.built.dir" value="${amtune.base.dir}/built" />
-    <property name="amtune.dist.dir" value="${amtune.built.dir}/dist" />
     <property name="amadm.package.dir"
         value="${amadm.classes.dir}/${amadm.package.path}"/>
     <property name="amadm.tools.scripts.dir"
@@ -188,11 +186,7 @@
             </jar>
     </target>
 
-    <target name="makeTune" depends="prepareBuild">
-        <ant antfile="${amtune.base.dir}/build.xml" target="package" />
-    </target>
-
-    <target name="copyNeededFiles" depends="makeJar,makeManifestJar,makePatchJar,makeTune">
+    <target name="copyNeededFiles" depends="makeJar,makeManifestJar,makePatchJar">
         <copy todir="${amadm.lib.dir}"
             overwrite="yes" flatten="yes" encoding="UTF-8">
             <fileset dir="${extlib.dir}"
@@ -242,9 +236,6 @@
             <fileset dir="${amadm.unix.scripts.log.dir}"
                 includes="${amadm.unix.amverifyarchive.file}"/>
             <mapper type="glob" from="*" to="*.template"/>
-        </copy>
-        <copy todir="${amadm.tools.dir}">
-            <fileset dir="${amtune.dist.dir}" includes="**/*" />
         </copy>
         <antcall target="legacy-files" />
     </target>

@@ -309,7 +309,7 @@
               toFile="${amserver.classes.dir}/debugconfig.properties" />
     </target>
     
-    <target name="clean" depends="nightly-clean,war-clean,jars-clean,clientsdk-clean,samples-clean,distauth-clean,amtune-clean">
+    <target name="clean" depends="nightly-clean,war-clean,jars-clean,clientsdk-clean,samples-clean,distauth-clean">
         <delete dir="${amserver.built.publicapidocs.dir}"/>
         <delete dir="${amserver.built.apidocs.dir}"/>
         <delete dir="${amserver.built.docs.dir}"/>
@@ -398,10 +398,6 @@
     <target name="clientsdk-clean">
         <ant antfile="${amserver.clientsdkbase.dir}/build.xml"
              inheritRefs="true" target="clean"/>
-    </target>
-
-    <target name="amtune-clean">
-        <ant antfile="${amtune.base.dir}/build.xml" inheritRefs="true" target="clean"/>
     </target>
 
     <target name="am-mib" unless="amserver.mib.done">

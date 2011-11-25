@@ -57,12 +57,6 @@
                     <location>.</location>
                 </source-folder>
                 <source-folder>
-                    <label>amserver/amtune/source</label>
-                    <type>java</type>
-                    <location>amserver/amtune/source</location>
-                    <encoding>UTF-8</encoding>
-                </source-folder>
-                <source-folder>
                     <label>amserver/source</label>
                     <type>java</type>
                     <location>amserver/source</location>
@@ -110,10 +104,6 @@
                         <location>.</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>amserver/amtune/source</label>
-                        <location>amserver/amtune/source</location>
-                    </source-folder>
-                    <source-folder style="packages">
                         <label>amserver/source</label>
                         <location>amserver/source</location>
                     </source-folder>
@@ -156,12 +146,6 @@
             <subprojects/>
         </general-data>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
-            <compilation-unit>
-                <package-root>amserver/amtune/source</package-root>
-                <built-to>amserver/amtune/built/classes</built-to>
-                <built-to>amserver/amtune/built/dist/lib/amtune.jar</built-to>
-                <source-level>1.5</source-level>
-            </compilation-unit>
             <compilation-unit>
                 <package-root>amserver/source</package-root>
                 <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDS.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/publicsuffix-1.0.1.jar:extlib/opendj-ldap-sdk-3.0.0-SNAPSHOT.jar:extlib/geoip-1.2.5.jar</classpath>
