@@ -402,7 +402,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
             if (ipHistoryValues != null) {
                 StringTokenizer st = new StringTokenizer(ipHistoryValues, "|");
-                if (st.hasMoreTokens()) {
+                while (st.hasMoreTokens()) {
                     String theIP = st.nextToken();
                     historyCount += 1;
                     if (historyCount < IPHistoryCount) {
