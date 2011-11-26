@@ -629,23 +629,25 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                         break;
                     }
                 }
-                String[] tokens = lastLogin.split("\\|");
-                if (tokens.length == 3) {
-                    lastLogin = tokens[1];
-                    savedUserName = tokens[2];
-                }
-
-                if (!userName.equalsIgnoreCase(savedUserName)) {
-                    lastLogin = null;
-                }
-
                 if (lastLogin != null) {
-                    try {
-                        loginTime = formatter.parse(lastLogin); // "2002.01.29.08.36.33");
-                    } catch (ParseException pe) {
+                    String[] tokens = lastLogin.split("\\|");
+                    if (tokens.length == 3) {
+                        lastLogin = tokens[1];
+                        savedUserName = tokens[2];
                     }
-                    if ((now.getTime() - loginTime.getTime()) < timeSinceLastLoginValue * 1000 * 60 * 60 * 24L) {
-                        retVal = timeSinceLastLoginScore;
+
+                    if (!userName.equalsIgnoreCase(savedUserName)) {
+                        lastLogin = null;
+                    }
+
+                    if (lastLogin != null) {
+                        try {
+                            loginTime = formatter.parse(lastLogin); // "2002.01.29.08.36.33");
+                        } catch (ParseException pe) {
+                        }
+                        if ((now.getTime() - loginTime.getTime()) < timeSinceLastLoginValue * 1000 * 60 * 60 * 24L) {
+                            retVal = timeSinceLastLoginScore;
+                        }
                     }
                 }
             }
