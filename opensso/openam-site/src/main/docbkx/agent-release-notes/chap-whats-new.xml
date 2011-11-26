@@ -39,6 +39,10 @@
 
   <itemizedlist>
    <listitem>
+    <para>Policy agents now let you preserve POST data when working with
+    URI-based load balancing (OPENAM-980).</para>
+   </listitem>
+   <listitem>
     <para>Policy agents can now conditionally redirect users based on the
     incoming request URL (OPENAM-849).</para>
    </listitem>

@@ -66,6 +66,8 @@
  <xinclude:include href='chap-weblogic.xml' />
 
  <xinclude:include href='chap-troubleshooting.xml' />
+ <!-- TODO: Add reference for configuration parameters including new parameters
+      mentioned in the What's new section of the release notes -->
 
  <index />
  <?dbhtml-include href="../ga.html"?>
