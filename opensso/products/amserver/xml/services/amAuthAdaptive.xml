@@ -28,7 +28,7 @@
 <ServicesConfiguration>
     <Service name="sunAMAuthAdaptiveService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthAdaptiveService"
-			i18nFileName="amAuthAdaptive" revisionNumber="1.0"
+			i18nFileName="amAuthAdaptive" revisionNumber="1"
 			i18nKey="iplanet-am-auth-adaptive-service-description">
             <Organization>
                 <AttributeSchema name="openam-auth-adaptive-auth-level"
