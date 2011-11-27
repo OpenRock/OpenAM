@@ -30,9 +30,15 @@
     }
 </script>
 <div id="upgrade" style="width: 500px; background-color: #FFFFFF">
-    <!--    <div style="background-color: #FFFFFF;padding:0">-->
     <div class="header">$page.getLocalizedString("upgrade.main.title")</div>
-    <!--        <div id="title">$page.getLocalizedString("configurator.custom.title")</div>-->
+    #if ($error)
+    <div id="content" class="tabContent">
+        <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+            <p class="blueSmall">$page.getLocalizedString("upgrade.init.error")</p>
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+        </div>
+    </div>
+    #else
     <div id="content" class="tabContent">
         <div style="margin: 10px 23px">
             $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
@@ -56,5 +62,6 @@
             <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue">$page.getLocalizedString("save.report.button")</button>
         </div>
     </div>
+    #end
 </div>
 

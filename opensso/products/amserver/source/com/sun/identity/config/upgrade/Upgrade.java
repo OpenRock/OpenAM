@@ -61,7 +61,8 @@ public class Upgrade extends AjaxPage {
             addModel("currentVersion", UpgradeUtils.getCurrentVersion());
             addModel("newVersion", UpgradeUtils.getWarFileVersion());
             addModel("changelist", upgrade.generateShortUpgradeReport(adminToken, wrapper, true));
-        } catch (UpgradeException ue) {
+        } catch (Exception ue) {
+            addModel("error", true);
             debug.error("An error occured, while initializing Upgrade page", ue);
         }
     }
