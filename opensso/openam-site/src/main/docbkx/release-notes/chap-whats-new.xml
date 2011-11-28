@@ -190,7 +190,7 @@
  set-attr-choicevals
  --servicename iPlanetAMSessionService
  --schematype Global
- --attributename iplanet-am-session-constraint-resulting-behavior
+ --attributename iplanet-am-session-constraint-handler
  --adminid amadmin
  --password-file .pass
  --add
