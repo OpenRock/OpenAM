@@ -482,7 +482,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         throws IdRepoException, SSOException {
 
         if (debug.messageEnabled()) {
-            debug.message("AgentsRepo.getAgentAttrs() called: svcConfig=" + svcConfig +
+            debug.message("AgentsRepo.getAgentAttrs() called: svcConfig=" + svcConfig.getServiceName() +
                     "; agentName=" + agentName + "; type=" + type);
         }
         Map answer = new HashMap(2);
