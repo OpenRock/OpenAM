@@ -178,4 +178,78 @@ Property: County: SantaClara</screen>
  <para>Notice both the properties populated by OpenAM, and also the two
  properties, <literal>TimeZone</literal> and <literal>County</literal>, that
  are set by the sample client.</para>
+ 
+ <section xml:id="session-receiving-notifications">
+  <title>Receiving Notifications</title>
+
+  <para>If your application implements a listener for change notification, such
+  as a <literal>SessionListener</literal> to handle notification when a session
+  is invalidated, then you must configure the following settings in the
+  <filename>AMConfig.properties</filename> configuration file for your
+  application.</para>
+
+  <variablelist>
+   <varlistentry>
+    <term>com.iplanet.am.notification.url</term>
+    <listitem>
+     <para>Set this parameter to
+     <literal>http://<replaceable>host</replaceable>:<replaceable
+     >port</replaceable>/<replaceable>context</replaceable
+     >/notificationservice</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.iplanet.am.sdk.caching.enabled</term>
+    <listitem>
+     <para>Set this parameter to <literal>true</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.iplanet.am.serverMode</term>
+    <listitem>
+     <para>Set this parameter to <literal>false</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.sun.identity.client.notification.url</term>
+    <listitem>
+     <para>Set this parameter to
+     <literal>http://<replaceable>host</replaceable>:<replaceable
+     >port</replaceable>/<replaceable>context</replaceable
+     >/notificationservice</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.sun.identity.idm.cache.enabled</term>
+    <listitem>
+     <para>Set this parameter to <literal>true</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.sun.identity.idm.remote.notification.enabled</term>
+    <listitem>
+     <para>Set this parameter to <literal>true</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.sun.identity.sm.cache.enabled</term>
+    <listitem>
+     <para>Set this parameter to <literal>true</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>com.sun.identity.sm.enableDataStoreNotification</term>
+    <listitem>
+     <para>Set this parameter to <literal>true</literal>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>The above configuration to access the notification service also applies
+  for other types of listeners, such as <literal>ServiceListener</literal>, and
+  <literal>IdEventListener</literal> implementations. See the <link
+  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for details
+  on the available listener interfaces.</para>
+ </section>
 </chapter>
