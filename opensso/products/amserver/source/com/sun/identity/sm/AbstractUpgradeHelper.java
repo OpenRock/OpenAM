@@ -83,10 +83,15 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
        
         return node;
     }
+
+    public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
+            throws UpgradeException {
+        return newAttr;
+    }
     
     public abstract AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
     throws UpgradeException;
-    
+
     public Set<String> getAttributes() {
         return attributes;
     }

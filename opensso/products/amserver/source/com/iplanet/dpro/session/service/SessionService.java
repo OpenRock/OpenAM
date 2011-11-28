@@ -216,8 +216,8 @@ public class SessionService {
     private static final String BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS = 
         "iplanet-am-session-enable-session-constraint-bypass-topleveladmin";
 
-    private static final String CONSTRAINT_RESULTING_BEHAVIOR =
-        "iplanet-am-session-constraint-resulting-behavior";
+    private static final String CONSTRAINT_HANDLER =
+        "iplanet-am-session-constraint-handler";
 
     private static final String TOP_LEVEL_ADMIN_ROLE = 
         "Top-level Admin Role";
@@ -393,8 +393,8 @@ public class SessionService {
     
     private static boolean bypassConstratintForToplevelAdmin = false;
 
-    private static String constraintResultingBehavior =
-        SessionConstraint.DESTROY_OLDEST_SESSION;
+    private static String constraintHandler =
+            SessionConstraint.DESTROY_OLDEST_SESSION_CLASS;
 
     private String thisSessionServer;
 
@@ -2042,14 +2042,13 @@ public class SessionService {
         return bypassConstratintForToplevelAdmin;
     }
 
-    public static void setConstraintResultingBehavior(String value) {
-        constraintResultingBehavior = value;
+    public static String getConstraintHandler() {
+        return constraintHandler;
     }
 
-    public static String getConstraintResultingBehavior() {
-        return constraintResultingBehavior;
+    public static void setConstraintHandler(String val) {
+        constraintHandler = val;
     }
-
     /**
      * Utility method to obtain session repository reference
      * 
@@ -2141,13 +2140,13 @@ public class SessionService {
                         + bypassConstratintForToplevelAdmin);
             }
 
-            String resultingBehaviorStr = CollectionHelper.getMapAttr(attrs,
-                    CONSTRAINT_RESULTING_BEHAVIOR,
-                    SessionConstraint.DESTROY_OLDEST_SESSION);
+            constraintHandler = CollectionHelper.getMapAttr(attrs,
+                    CONSTRAINT_HANDLER,
+                    SessionConstraint.DESTROY_OLDEST_SESSION_CLASS);
 
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("Resulting behavior if session "
-                        + "quota exhausted:" + resultingBehaviorStr);
+                        + "quota exhausted:" + constraintHandler);
             }
 
             maxWaitTimeForConstraint = Integer.parseInt(

@@ -68,7 +68,7 @@ import org.forgerock.openam.session.service.DestroyOldestAction;
  
 public class SessionConstraint {
 
-    public static final String DESTROY_OLDEST_SESSION =
+    public static final String DESTROY_OLDEST_SESSION_CLASS =
             "org.forgerock.openam.session.service.DestroyOldestAction";
 
     private static final int DEFAULT_QUOTA = Integer.MAX_VALUE;
@@ -95,7 +95,7 @@ public class SessionConstraint {
     }
 
     private static QuotaExhaustionAction getQuotaExhaustionAction() {
-        String clazzName = SessionService.getConstraintResultingBehavior();
+        String clazzName = SessionService.getConstraintHandler();
         if (quotaExhaustionAction != null
                 && quotaExhaustionAction.getClass().getName().equals(clazzName)) {
             return quotaExhaustionAction;

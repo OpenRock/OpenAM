@@ -66,8 +66,8 @@ public class SessionConfigListener implements ServiceListener {
     private static final String BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS = 
         "iplanet-am-session-enable-session-constraint-bypass-topleveladmin";
     
-    private static final String CONSTARINT_RESULTING_BEHAVIOR = 
-        "iplanet-am-session-constraint-resulting-behavior";
+    private static final String CONSTRAINT_HANDLER =
+        "iplanet-am-session-constraint-handler";
 
     private static final String MAX_WAIT_TIME_FOR_CONSTRAINT = 
         "iplanet-am-session-constraint-max-wait-time";    
@@ -172,9 +172,9 @@ public class SessionConfigListener implements ServiceListener {
             	SessionService.setBypassConstraintForToplevelAdmin(false);
             }
 
-            SessionService.setConstraintResultingBehavior(CollectionHelper.getMapAttr(
-                    attrs, CONSTARINT_RESULTING_BEHAVIOR,
-                    SessionConstraint.DESTROY_OLDEST_SESSION));
+            SessionService.setConstraintHandler(CollectionHelper.getMapAttr(
+                    attrs, CONSTRAINT_HANDLER,
+                    SessionConstraint.DESTROY_OLDEST_SESSION_CLASS));
 
             defmaxWaitTimeForConstraintStr = CollectionHelper.getMapAttr(attrs,
                 MAX_WAIT_TIME_FOR_CONSTRAINT, defmaxWaitTimeForConstraintStr);            

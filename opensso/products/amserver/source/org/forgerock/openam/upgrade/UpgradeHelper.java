@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 package org.forgerock.openam.upgrade;
 
 import com.sun.identity.sm.AttributeSchemaImpl;
@@ -33,6 +32,20 @@ import java.util.Set;
  * @author steve
  */
 public interface UpgradeHelper {
+
+    /**
+     * Given the existing attributes in the schema and the new attribute the upgrade helper
+     * can decide how to change the new attr based on the state of the existing attributes.
+     * For example this could be useful, when you add a new attribute, and it's default
+     * value depends on other existing attribute.
+     *
+     * @param existingAttrs The old attributes
+     * @param newAttr The new attribute schema
+     * @return The possibly updated attribute schema, this will be used in the upgrade
+     * @throws UpgradeException If something bad happens, this will be used to log not stop the upgrade
+     */
+    public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
+            throws UpgradeException;
     /**
      * Given the existing attribute schema and the new attribute schema the upgrade helper
      * can decide how to change the new attr based on the state of the existing attribute.
@@ -43,8 +56,8 @@ public interface UpgradeHelper {
      * @throws UpgradeException If something bad happens, this will be used to log not stop the upgrade
      */
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
-    throws UpgradeException;
-    
+            throws UpgradeException;
+
     /**
      * Return the Set of attributes that are to be upgrade by this service helper
      * 

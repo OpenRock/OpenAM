@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 package org.forgerock.openam.upgrade.helpers;
 
 import com.iplanet.am.util.SystemProperties;
@@ -38,71 +37,67 @@ import org.forgerock.openam.upgrade.UpgradeException;
  * session service to maintain the correct custom value. The behaviour is as 
  * follows:
  * 
- * <UL>
- * <LI>Destroy All Sessions property is set to true and service settings is
- * DESTROY_OLD_SESSION; post upgrade setting should be DestroyAllAction
- * <LI>Destroy All Sessions property is set to false and service settings is 
- * DESTROY_OLD_SESSION; This is the default, no action need be taken. 
- * <LI>Deny Access; If this is the current value then post upgrade value should 
- * be DenyAccessAction.
- * </UL>
+ * <ul>
+ * <li>Destroy All Sessions property is set to true and service settings is
+ * DESTROY_OLD_SESSION; post upgrade setting should be DestroyAllAction.</li>
+ * <li>Destroy All Sessions property is set to false and service settings is
+ * DESTROY_OLD_SESSION; This is the default, no action need be taken.</li>
+ * <li>Deny Access; If this is the current value then post upgrade value should
+ * be DenyAccessAction.</li>
+ * </ul>
  * 
  * @author steve
  */
 public class SessionServiceHelper extends AbstractUpgradeHelper {
+
     private final static String DENY_ACCESS = "DENY_ACCESS";
     private final static String DESTROY_OLD_SESSION = "DESTROY_OLD_SESSION";
-    private final static String NEW_DENY_ACCESS = 
+    private final static String NEW_DENY_ACCESS =
             "org.forgerock.openam.session.service.DenyAccessAction";
-    private final static String DESTROY_ALL_SESSIONS_CLASS = 
+    private final static String DESTROY_ALL_SESSIONS_CLASS =
             "org.forgerock.openam.session.service.DestroyAllAction";
-    private final static String DESTROY_OLDEST_SESSIONS_CLASS = 
-            "org.forgerock.openam.session.service.DestroyOldestAction";
     private static final String DESTROY_ALL_SESSIONS =
             "openam.session.destroy_all_sessions";
-    
+    private static final String SESSION_CONSTRAINT_HANDLER_ATTR =
+            "iplanet-am-session-constraint-handler";
+
     static {
         initialize();
     }
-    
+
     private static void initialize() {
-        attributes.add("iplanet-am-session-constraint-resulting-behavior");
     }
-            
-    public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr) 
-    throws UpgradeException {
-        if (!(newAttr.getName().equals("iplanet-am-session-constraint-resulting-behavior"))) {
-            return newAttr;
+
+    @Override
+    public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
+            throws UpgradeException {
+        if (newAttr.getName().equals(SESSION_CONSTRAINT_HANDLER_ATTR)) {
+            for (AttributeSchemaImpl attr : existingAttrs) {
+                if (attr.getName().equals("iplanet-am-session-constraint-resulting-behavior")) {
+                    Set<String> defaultValues = attr.getDefaultValues();
+                    Set<String> newDefaultValues = new HashSet<String>();
+                    if (destroyAllSessionsSet() && defaultValues.contains(DESTROY_OLD_SESSION)) {
+                        newDefaultValues.add(DESTROY_ALL_SESSIONS_CLASS);
+                        newAttr = updateDefaultValues(newAttr, newDefaultValues);
+                    }
+                    if (defaultValues.contains(DENY_ACCESS)) {
+                        newDefaultValues.add(NEW_DENY_ACCESS);
+                        newAttr = updateDefaultValues(newAttr, newDefaultValues);
+                    }
+                    break;
+                }
+            }
         }
-        
-        Set<String> defaultValues = existingAttr.getDefaultValues();
-        
-        if (defaultValues.contains(DESTROY_ALL_SESSIONS_CLASS) || 
-            defaultValues.contains(NEW_DENY_ACCESS) ||
-            defaultValues.contains(DESTROY_OLDEST_SESSIONS_CLASS)) {
-            // nothing to do
-            return null;
-        }
-        
-        if (destroyAllSessionsSet() && defaultValues.contains(DESTROY_OLD_SESSION)) {
-            Set<String> newDefaultValues = new HashSet<String>();
-            newDefaultValues.add(DESTROY_ALL_SESSIONS_CLASS);
-            newAttr = updateDefaultValues(newAttr, newDefaultValues);
-            
-            return newAttr;
-        }
-        
-        if (defaultValues.contains(DENY_ACCESS)) {
-            Set<String> newDefaultValues = new HashSet<String>();
-            newDefaultValues.add(NEW_DENY_ACCESS);
-            newAttr = updateDefaultValues(newAttr, newDefaultValues);
-        } 
-        
+
         return newAttr;
     }
-    
+
+    public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
+            throws UpgradeException {
+        return newAttr;
+    }
+
     private boolean destroyAllSessionsSet() {
         return SystemProperties.getAsBoolean(DESTROY_ALL_SESSIONS);
     }
 }
-

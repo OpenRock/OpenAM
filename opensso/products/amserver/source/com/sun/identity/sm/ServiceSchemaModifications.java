@@ -261,7 +261,7 @@ public class ServiceSchemaModifications {
     protected ServiceSchemaModificationWrapper getServiceAdditionsRecursive(String schemaName, 
                                                                            ServiceSchemaImpl newSchema,
                                                                            ServiceSchemaImpl existingSchema) 
-    throws SMSException {
+    throws SMSException, UpgradeException {
         Set<AttributeSchemaImpl> attrsAdded = new HashSet<AttributeSchemaImpl>();
         ServiceSchemaModificationWrapper attrAddedResult = new ServiceSchemaModificationWrapper(serviceName, schemaName);
         
@@ -363,7 +363,8 @@ public class ServiceSchemaModifications {
         return attrDeletedResult;
     }
     
-    protected Set<AttributeSchemaImpl> getAttributesAdded(Set<AttributeSchemaImpl> newAttrs, Set<AttributeSchemaImpl> existingAttrs) {
+    protected Set<AttributeSchemaImpl> getAttributesAdded(Set<AttributeSchemaImpl> newAttrs,
+            Set<AttributeSchemaImpl> existingAttrs) throws UpgradeException {
         Set<AttributeSchemaImpl> attrAdded = new HashSet<AttributeSchemaImpl>();
         
         for (AttributeSchemaImpl newAttr : newAttrs) {
@@ -375,6 +376,11 @@ public class ServiceSchemaModifications {
             }
             
             if (!found) {
+                UpgradeHelper serviceHelper = ServerUpgrade.getServiceHelper(serviceName);
+                if (serviceHelper != null) {
+                    newAttr = serviceHelper.addNewAttribute(existingAttrs, newAttr);
+                }
+
                 attrAdded.add(newAttr);
             }
         }

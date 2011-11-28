@@ -403,7 +403,20 @@ public class PropertyXMLBuilder extends PropertyXMLBuilderBase {
      * @param map Map of schema type (com.sun.identity.sm.SchemaType) to a set
      *        of attribute schema (com.sun.identity.sm.AttributeSchema)
      */
-    protected void onBeforeBuildingXML(Map map) {
+    protected void onBeforeBuildingXML(Map<SchemaType, Set<AttributeSchema>> map) {
+        if (serviceName.equals("iPlanetAMSessionService")) {
+            //remove deprecated property from the console
+            Set<AttributeSchema> attrs = map.get(SchemaType.GLOBAL);
+            if (attrs != null) {
+                Iterator<AttributeSchema> it = attrs.iterator();
+                while (it.hasNext()) {
+                    if (it.next().getName().equals("iplanet-am-session-constraint-resulting-behavior")) {
+                        it.remove();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
