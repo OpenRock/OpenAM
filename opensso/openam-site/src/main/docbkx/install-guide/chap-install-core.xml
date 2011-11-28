@@ -197,8 +197,9 @@ esac
   releases, and also OpenAM policy agent releases.</para>
   
   <para>For each release of the OpenAM core services, you can download the
-  entire package as a .zip archive, only the OpenAM .war file, or only the
-  administrative tools as a .zip archive.</para> 
+  entire package as a .zip archive, only the OpenAM .war file, only the
+  administrative tools as a .zip archive, or only the OpenAM source code
+  used to build the release.</para>
   
   <variablelist>
    <para>After you unzip the archive of the entire package, you get an
@@ -219,9 +220,9 @@ esac
    </varlistentry>
    <varlistentry>
     <term><filename>fedlet</filename></term>
-    <listitem><para>The lightweight service provider implementation that you
-    embed in your Java EE application to enable it to use federated access
-    management</para></listitem>
+    <listitem><para>The lightweight service provider implementations that you
+    can embed in your Java EE or ASP.NET application to enable it to use
+    federated access management</para></listitem>
    </varlistentry>
    <varlistentry>
     <term><filename>integrations</filename></term>
@@ -232,10 +233,6 @@ esac
     <term><filename>ldif</filename></term>
     <listitem><para>Schema and index definitions for use with external
     LDAP identity repositories</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>legal</filename></term>
-    <listitem><para>Additional license and entitlement files</para></listitem>
    </varlistentry>
    <varlistentry>
     <term><filename>libraries</filename></term>
@@ -255,11 +252,6 @@ esac
     <listitem><para>OpenAM tools for managing SSO, configuring deployed
     .war files, patching deployed .war files, managing sessions, and diagnosing
     deployment issues</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>upgrade</filename></term>
-    <listitem><para>Content for upgrading from legacy versions of Sun
-    Access Manager and Federation Manager</para></listitem>
    </varlistentry>
    <varlistentry>
     <term><filename>xml</filename></term>
@@ -283,7 +275,7 @@ esac
    </step>
    <step>
     <para>Check that you see the initial configuration screen in your browser at
-    example.com:8080/openam</para>
+    openam.example.com:8080/openam</para>
     <note>
      <para>You should NOT use localhost domain for accessing OpenAM, not even
      for testing purposes, because OpenAM strongly relies on browser cookies.
@@ -304,7 +296,11 @@ esac
   
   <procedure xml:id="configure-openam-defaults">
    <title>To Configure OpenAM With Defaults (For Testing)</title>
-   
+   <para>The default configuration option will basically configure the
+   embedded OpenDJ instance on default ports (if the ports are already in use,
+   OpenAM will look for a free port) as both configuration store and identity
+   store. The install will create a standalone OpenAM instance using the
+   subset of the fully qualified hostname as the cookie domain.</para>
    <step>
     <para>In the initial configuration screen, click
     Create Default Configuration under Default Configuration.</para>
@@ -365,7 +361,9 @@ Using CLASSPATH:
      <para>When using the internal OpenAM configuration store, this step
      deletes the embedded directory server and all of its contents. You should
      always stop the application server before removing the configuration
-     files.</para>
+     files. In case you're using external configuration store make sure you
+     delete the entries under the configured OpenAM suffix (by default
+     dc=opensso,dc=java,dc=net).</para>
     </note>
    </step>
    <step>
@@ -457,17 +455,10 @@ Using CLASSPATH:
     The embedded directory can be configured separately to replicate data
     for high availability if necessary.</para>
     <para>You can also add this OpenAM installation to an existing deployment,
-    proving the URL to reach an existing OpenAM instance.</para>
+    providing the URL to reach an existing OpenAM instance.</para>
     <para>Alternatively, if you already manage an OpenDJ or DSEE deployment,
     you can choose to store OpenAM configuration data in your existing
-    directory service. If you decide to use an existing installation of
-    OpenDJ for configuration data, then you must first relax the restriction
-    on objects with multiple structural object classes, by using the OpenDJ
-    <command>dsconfig</command> command before completing OpenAM
-    configuration.</para>
-    <screen>$ dsconfig -h <replaceable>hostname</replaceable> -p 4444 -D "cn=Directory Manager" -w <replaceable>password</replaceable>
- set-global-configuration-prop
- --set single-structural-objectclass-behavior:warn -X -n</screen>
+    directory service.</para>
    </step>
    <step>
     <para>In the User Store screen, you configure where OpenAM looks for
@@ -488,7 +479,7 @@ Using CLASSPATH:
       <listitem>
        <para>If you have a directory service already provisioned with users in
        a supported user data store, then select that type of directory from the
-       options available. For OpenDJ, select OpenDS.</para>
+       options available.</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -496,7 +487,9 @@ Using CLASSPATH:
       <listitem>
        <para>To use a secure connection, check this box, then make sure
        the Port you define corresponds to the port on which the directory
-       listens for StartTLS or SSL connections.</para>
+       listens for StartTLS or SSL connections. When using this option you also
+       need to make sure the truststore used by the JVM running OpenAM has the
+       necessary certificates installed.</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -572,9 +565,9 @@ Using CLASSPATH:
     </mediaobject>
    </step>
    <step>
-    <para>Restrict permissions to the
-    <filename>$HOME/openam</filename> configuration directory, where
-    $HOME corresponds to the user who runs the web container.</para>
+    <para>Restrict permissions to the configuration directory (by default
+    <filename>$HOME/openam</filename>, where
+    $HOME corresponds to the user who runs the web container).</para>
    </step>
   </procedure>
  </section>
