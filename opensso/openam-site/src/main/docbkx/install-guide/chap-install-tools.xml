@@ -56,7 +56,7 @@
    <term><filename>tools/ssoConfiguratorTools.zip</filename></term>
    <listitem>
     <para>Tools for command line installation, upgrade, and
-    configuration</para>
+    initial configuration</para>
    </listitem>
   </varlistentry>
   <varlistentry>
@@ -128,6 +128,8 @@ http://openam.example.com:8080/openam</screen>
     xlink:href="admin-guide#openam-ssoadm-jsp-overview"
     xlink:role="http://docbook.org/xlink/role/olink">OpenAM ssoadm.jsp</link>
     in the <citetitle>Administration Guide</citetitle>.</para>
+  <para>Not all the commands are available on ssoadm.jsp, however this
+  limitation is not present for the command line tool.</para>
   </step>
   <step performance="optional">
    <para>If you have deployed OpenAM in a site configuration, edit the
