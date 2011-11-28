@@ -26,7 +26,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
  <xsl:import href="urn:docbkx:stylesheet"/>
  <xsl:import href="titlepages.xsl"/>
- 
+ <xsl:import href="urn:docbkx:stylesheet/highlight.xsl" />
+
  <xsl:param name="page.height.portrait">9in</xsl:param>
  <xsl:param name="page.width.portrait">7.5in</xsl:param>
  <xsl:param name="double.sided" select="1"></xsl:param>
