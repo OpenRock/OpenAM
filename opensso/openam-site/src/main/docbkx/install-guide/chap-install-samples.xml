@@ -39,7 +39,7 @@
  located in <filename>samples/opensso-client.zip</filename> where you
  unpacked the
  <filename>openam_<replaceable>version</replaceable>.zip</filename> file.
- The <link xlink:href="dev-guide"
+ The <link xlink:href="dev-guide#chap-jdk"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Developer's
  Guide</citetitle></link> describes how to use the Java SDK, and the <link
  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"

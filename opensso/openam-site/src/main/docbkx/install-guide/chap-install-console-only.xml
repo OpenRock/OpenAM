@@ -39,7 +39,10 @@
  <para>You can deploy OpenAM administration console alone, configuring the
  console-only application to point to an instance of OpenAM core services
  elsewhere.</para>
- 
+
+ <para>You must deploy the console-only application in the same cookie domain,
+ such as <literal>.example.com</literal>, as OpenAM core services.</para>
+
  <procedure xml:id="create-console-only-file">
   <title>To Create the Console <filename>.war</filename> File</title>
   

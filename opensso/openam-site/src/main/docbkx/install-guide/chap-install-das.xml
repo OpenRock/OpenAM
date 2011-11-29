@@ -44,6 +44,15 @@
  service.</para>
  <orderedlist>
   <listitem>
+   <para>Make sure the cookie domain for the DAS is configured in OpenAM under
+   Configuration &gt; System &gt; Platform.</para>
+  </listitem>
+  <listitem>
+   <para>Make sure the realms used have a Realm/DNS alias for the DAS
+   configured in OpenAM under Access Control &gt; <replaceable>Realm
+   Name</replaceable> &gt; General.</para>
+  </listitem>
+  <listitem>
    <para>Create the .war file for the DAS using OpenAM software.</para>
   </listitem>
   <listitem>
@@ -51,9 +60,6 @@
    <para>How you deploy the DAS .war file depends on your web application
    container. The procedure in this section shows how to deploy on
    Apache Tomcat.</para>
-  </listitem>
-  <listitem>
-   <para>Create an agent profile for the DAS.</para>
   </listitem>
   <listitem>
    <para>Configure the DAS UI to access OpenAM core services.</para>
@@ -91,36 +97,6 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
   <step>
    <para>Check that you see the initial DAS configuration screen
    in your browser.</para>
-   <mediaobject>
-    <alt>Initial DAS configuration screen</alt>
-    <imageobject>
-     <imagedata fileref="images/das-initial-screen.png" format="PNG" />
-    </imageobject>
-    <textobject><para>The first time you access the DAS, you must configure
-    access to OpenAM.</para></textobject>
-   </mediaobject>
-  </step>
- </procedure>
- 
- <procedure xml:id="create-distributed-auth-user">
-  <title>To Create an Agent Profile for the DAS</title>
- 
-  <step>
-   <para>Login to OpenAM as the administrator,
-   <literal>amadmin</literal>.</para>
-  </step>
-  <step>
-   <para>Under the Access Control &gt; click <literal>/ (Top Level
-   Realm)</literal>.</para>
-  </step>
-  <step>
-   <para>Under the Agents &gt; 2.2 Agents tab, click New... to open the
-   New Agent page.</para>
-  </step>
-  <step>
-   <para>Create a new agent user profile.</para>
-   <para>The subsequent procedures in this section have an agent with name
-   <literal>dasUser</literal> and password <literal>password</literal>.</para>
   </step>
  </procedure>
  
@@ -156,95 +132,39 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
     <varlistentry>
      <term>Application User Name</term>
      <listitem>
-      <para>The DAS uses this identity to authenticate internally to OpenAM.
-      If you configured a 2.2 agent identity for the DAS in OpenAM, then this
-      is the user name of the agent you created.</para>
+      <para>The DAS uses this identity, such as
+      <literal>UrlAccessAgent</literal>, to authenticate to OpenAM.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Application User Password</term>
      <listitem>
-      <para>The DAS uses this password to authenticate internally to OpenAM.
-      If you configured a 2.2 agent identity for the DAS in OpenAM, then this
-      is the password of the agent you created.</para>
+      <para>The DAS uses this password to authenticate to OpenAM.</para>
      </listitem>
     </varlistentry>
    </variablelist>
   </step>
   <step>
    <para>Login through the DAS to access OpenAM services.</para>
-   <para>From the first time you test with either separate physical or virtual
-   host systems housing OpenAM and the DAS, you must at least redirect the
-   browser after successful login to a page that exists. One way to do this
-   is to use the <literal>goto</literal> parameter in the URL.</para>
-   <literallayout class="monospaced">https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
-   <para>As an alternative add sample authentication data, and a sample
-   realm that gives you a landing page after successful login. Otherwise the
-   default result of successful login is a redirect to the default success
-   login URL, which is <literal>/openam/console</literal>, resulting in
-   a successful login, but an error in the browser, since the DAS does not
-   include the console. Indeed, <literal>/openam/console</literal> is a URL
-   you probably do not want to expose outside the firewall. Instead,
-   follow these steps to see the DAS at work.</para>
-   <substeps>
-    <step>
-     <para>When setting up OpenAM, use OpenDJ with the sample data mentioned
-     above.</para>
-    </step>
-    <step>
-     <para>Login to the OpenAM console as the OpenAM Administrator,
-     <literal>amadmin</literal>.</para>
-    </step>
-    <step>
-     <para>Under the Access Control tab, in the Realms section, click New...
-     to create a new Realm called Example.</para>
-     <para>On the General tab for the Example realm, add
-     <literal>.example.com</literal>.</para>
-     <para>On the Authentication tab for the Example realm, make sure the
-     Default Success Login URL list contains only the value
-     <literal>/das/click/index.html</literal>.</para>
-    </step>
-    <step>
-     <para>Edit the file
-     <filename>/path/to/tomcat/webapps/das/click/index.html</filename> so it
-     looks like this:</para>
-     <programlisting language="html">&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Successful login&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;p&gt;Congratulations, you have logged in successfully.&lt;/p&gt;
-&lt;p&gt;Click &lt;a href="../UI/Logout.jsp"&gt;here&lt;/a&gt; to logout.&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</programlisting>
-    </step>
-    <step>
-     <para>In your browser, visit the login page.</para>
-     <para>For example, if Apache Tomcat is listening on
-     <literal>localhost:8080</literal>, then browse to
-     <literal>http://localhost:8081/das/UI/Login?org=/Example</literal>.</para>
-    </step>
-    <step>
-     <para>Login as a sample user from the <filename>Example.ldif</filename>
-     file, such as user <literal>bjensen</literal> who has password
-     <literal>hifalutin</literal>.</para>
-    <mediaobject>
-     <alt>Logging into OpenAM through the DAS</alt>
-     <imageobject>
-      <imagedata fileref="images/das-login-page.png" format="PNG" />
-     </imageobject>
-     <textobject><para>The DAS UI handles access to OpenAM.</para></textobject>
-    </mediaobject>
-    </step>
-   </substeps>
+   <para>For testing, you can login as user <literal>demo</literal>,
+   password <literal>changeit</literal>.</para>
    <mediaobject>
     <alt>Successfully logged in through the DAS</alt>
     <imageobject>
      <imagedata fileref="images/das-login-success.png" format="PNG" />
     </imageobject>
-    <textobject><para>The DAS UI redirects the user to the URL you
+    <textobject><para>The DAS UI redirects the user to the URL
     configured for the realm.</para></textobject>
    </mediaobject>
+   <para>When the <literal>/openam/idm/EndUser</literal> page is inside the
+   firewall, and therefore not visible to users outside, redirect the
+   browser after successful login to a page that exists. One way to do this
+   is to use the <literal>goto</literal> parameter in the URL.</para>
+   <literallayout class="monospaced">https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
+   <!-- Tips from Peter follow. See
+   http://blogs.forgerock.org/petermajor/2011/09/how-to-set-up-multiple-daui-instances/ -->
+   <para>On successful login, your browser stores an
+   <literal>AMDistAuthConfig</literal> cookie that identifies the DAS.</para>
   </step>
   <step>
    <para>Restrict permissions to the configuration for the DAS under the
@@ -252,6 +172,15 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
    web container where you deployed the service.</para>
    <para>The configuration file name ends in
    <filename>AMDistAuthConfig.properties</filename>.</para>
+   <para>If you deploy multiple DAS servers, you can configure them to forward
+   requests to each other based on the <literal>AMDistAuthConfig</literal>
+   cookie by setting the <literal>com.sun.identity.distauth.cluster</literal>
+   property in this file. The following example lines are wrapped to fit on the
+   page, but you put the entire property on a single line in the configuration
+   file.</para>
+   <programlisting language="ini">com.sun.identity.distauth.cluster=
+ http://das.example.com:8080/das/UI/Login,
+ http://das2.example.com:8080/das/UI/Login</programlisting>
   </step>
  </procedure>
 </chapter>
