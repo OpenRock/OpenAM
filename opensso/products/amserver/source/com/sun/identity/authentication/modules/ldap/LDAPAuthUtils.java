@@ -671,10 +671,15 @@ public class LDAPAuthUtils {
             }
         } catch(ErrorResultException ere) {
             if (ere.getResult().getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
-                // set log message to be logged in LDAP modules
-                setLogMessage(ere.getLocalizedMessage() + " : " +
-                    ere.getResult().getDiagnosticMessage());
-                setState(ModuleState.PASSWORD_MIN_CHARACTERS);
+                PasswordPolicyResult result = checkControls(processControls(ere.getResult()));
+                if (result != null) {
+                    processPasswordPolicyControls(result);
+                } else {
+                    // set log message to be logged in LDAP modules
+                    setLogMessage(ere.getLocalizedMessage() + " : "
+                            + ere.getResult().getDiagnosticMessage());
+                    setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
+                }
             } else if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
                 ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
@@ -686,15 +691,16 @@ public class LDAPAuthUtils {
                 setState(ModuleState.SERVER_DOWN);
                 return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
-                Result r = ere.getResult();
-                
-                if (r != null) {
-                    // Were there any password policy controls returned?
-                    PasswordPolicyResult result = checkControls(processControls(r));
+                // Were there any password policy controls returned?
+                PasswordPolicyResult result = checkControls(processControls(ere.getResult()));
 
-                    if (result != null) {
-                        processPasswordPolicyControls(result);
-                    }
+                if (result != null) {
+                    processPasswordPolicyControls(result);
+                } else {
+                    // set log message to be logged in LDAP modules
+                    setLogMessage(ere.getLocalizedMessage() + " : "
+                            + ere.getResult().getDiagnosticMessage());
+                    setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
                 }
             } else if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 Result r = ere.getResult();
