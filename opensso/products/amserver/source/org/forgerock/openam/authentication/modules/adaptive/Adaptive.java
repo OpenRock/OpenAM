@@ -454,6 +454,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     if (countryCode.equalsIgnoreCase(st.nextToken())) {
                         debug.message("Found Country Code : " + countryCode);
                         retVal = geoLocationScore;
+                        break;
                     }
                 }
             }
