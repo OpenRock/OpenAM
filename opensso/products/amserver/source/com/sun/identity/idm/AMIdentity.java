@@ -128,7 +128,7 @@ public final class AMIdentity {
      *            Single sign on token of the user
      * @throws SSOException
      *             if user's single sign on token is invalid.
-     *     * @throws IdRepoException
+     * @throws IdRepoException
      *            if the single sign on token does not have a
      *            a valid universal identifier
      */
