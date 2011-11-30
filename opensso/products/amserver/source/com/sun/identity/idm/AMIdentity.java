@@ -64,36 +64,36 @@ import com.sun.identity.shared.ldap.util.RDN;
  * from this class, it executes all plugins that are configured for performing
  * that operation. For eg: getAttributes. The application gets access to
  * constructing <code> AMIdentity </code> objects by using
- * <code> AMIdentityRepository 
+ * <code> AMIdentityRepository
  * </code> interfaces. For example:
  * <p>
- * 
+ *
  * <PRE>
- * 
+ *
  * AMIdentityRepository idrepo = new AMIdentityRepository(token, org);
  * AMIdentity id = idrepo.getRealmIdentity();
- * 
+ *
  * </PRE>
- * 
+ *
  * The <code>id</code> returned above is the AMIdentity object of the user's
  * single sign-on token passed above. The results obtained from search performed
  * using AMIdentityRepository also return AMIdentity objects. The type of an
  * object can be determined by doing the following:
  * <p>
- * 
+ *
  * <PRE>
- * 
+ *
  * IdType type = identity.getType();
- * 
+ *
  * </PRE>
- * 
+ *
  * The name of an object can be determined by:
  * <p>
- * 
+ *
  * <PRE>
- * 
+ *
  * String name = identity.getName();
- * 
+ *
  * </PRE>
  *
  * @supported.api
@@ -103,27 +103,27 @@ public final class AMIdentity {
 
     private String univIdWithoutDN;
 
-    private SSOToken token;
+    private final SSOToken token;
 
-    private String name;
+    private final String name;
 
-    private IdType type;
+    private final IdType type;
 
-    private String orgName;
+    private final String orgName;
 
     private Set fullyQualifiedNames;
 
-    private AMHashMap modMap = new AMHashMap(false);
+    private final AMHashMap modMap = new AMHashMap(false);
 
-    private AMHashMap binaryModMap = new AMHashMap(true);
+    private final AMHashMap binaryModMap = new AMHashMap(true);
 
     protected String univDN = null;
 
     /**
      * @supported.api
-     * 
+     *
      * Constructor for the <code>AMIdentity</code> object.
-     * 
+     *
      * @param ssotoken
      *            Single sign on token of the user
      * @throws SSOException
@@ -138,9 +138,9 @@ public final class AMIdentity {
 
     /**
      * @supported.api
-     * 
+     *
      * Constructor for the <code>AMIdentity</code> object.
-     * 
+     *
      * @param ssotoken
      *            Single sign on token to construct the identity
      *            object. Access permission to Identity object
@@ -150,7 +150,7 @@ public final class AMIdentity {
      *
      * @throws IdRepoException
      *            if the universal identifier is invalid
-     * 
+     *
      */
     public AMIdentity(SSOToken ssotoken, String universalId)
         throws IdRepoException {
@@ -164,15 +164,15 @@ public final class AMIdentity {
             array = dnObject.explodeDN(true);
         }
         if ((array == null) || (array.length <3)) {
-            // Not a valid UUID since it should have the 
+            // Not a valid UUID since it should have the
             // name, type and realm components
             Object args[] = { universalId };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "215", args);
         }
-        
+
         // Valid UUID, construct rest of the parameters
         univIdWithoutDN = dnObject.toRFCString();
- 
+
         // Check for AMSDK DN
         int index;
         if ((index = univIdWithoutDN.toLowerCase().indexOf(
@@ -201,7 +201,7 @@ public final class AMIdentity {
             array = dnObject.explodeDN(true);
         }
         if ((array == null) || (array.length <3)) {
-            // Not a valid UUID since it should have the 
+            // Not a valid UUID since it should have the
             // name, type and realm components
             Object args[] = { dnObject };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "215", args);
@@ -225,7 +225,7 @@ public final class AMIdentity {
 
     /**
      * Constructor for the <code>AMIdentity</code> object.
-     * 
+     *
      * @param token
      *            Single sign on token to construct the identity
      *            object. Access permission to Identity object
@@ -257,7 +257,7 @@ public final class AMIdentity {
         }
         sb.append("id=").append(name).append(",ou=").append(type.getName())
             .append(",").append(this.orgName);
-        
+
         univIdWithoutDN = sb.toString();
     }
 
@@ -286,13 +286,13 @@ public final class AMIdentity {
 
     // General APIs
     /**
-     * 
+     *
      * Returns the name of the identity.
-     * 
-     * @return Name of the identity 
+     *
+     * @return Name of the identity
      * @supported.api
      */
-    public String getName() {        
+    public String getName() {
         String sname = name;
         if (type.equals(IdType.REALM)) {
             // Since '0'th location currently has ContainerDefaultTemplate
@@ -300,12 +300,12 @@ public final class AMIdentity {
             String[] array = (new DN(univIdWithoutDN)).explodeDN(true);
             sname = array[2];
         }
-        return sname;        
+        return sname;
     }
 
     /**
      * Returns the Type of the Identity.
-     * 
+     *
      * @return <code>IdType</code> representing the type of this object.
      * @supported.api
      */
@@ -315,8 +315,8 @@ public final class AMIdentity {
 
     /**
      * Returns the realm for this identity.
-     * 
-     * @return String representing realm name. 
+     *
+     * @return String representing realm name.
      * @supported.api
      */
     public String getRealm() {
@@ -327,7 +327,7 @@ public final class AMIdentity {
      * If there is a status attribute configured, then verifies if the identity
      * is active and returns true. This method is only valid for AMIdentity
      * objects of type User and Agent.
-     * 
+     *
      * @return true if the identity is active or if it is not configured for a
      *         status attribute, false otherwise.
      * @throws IdRepoException
@@ -364,7 +364,7 @@ public final class AMIdentity {
     /**
      * Returns all attributes and values of this identity. This method is only
      * valid for AMIdentity objects of type User, Agent, Group, and Role.
-     * 
+     *
      * @return Map of attribute-values
      * @throws IdRepoException
      *             If there are repository related error conditions.
@@ -386,10 +386,10 @@ public final class AMIdentity {
 
     /**
      * Returns requested attributes and values of this object.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User, Agent,
      * Group, and Role.
-     * 
+     *
      * @param attrNames
      *            Set of attribute names to be read
      * @return Map of attribute-values.
@@ -424,10 +424,10 @@ public final class AMIdentity {
 
     /**
      * Returns requested attributes and values of this object.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User, Agent,
      * Group, and Role.
-     * 
+     *
      * @param attrNames
      *            Set of attribute names to be read
      * @return Map of attribute-values.
@@ -448,10 +448,10 @@ public final class AMIdentity {
     /**
      * Returns the values of the requested attribute. Returns an empty set, if
      * the attribute is not set in the object.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User, Agent,
      * Group, and Role.
-     * 
+     *
      * @param attrName
      *            Name of attribute
      * @return Set of attribute values.
@@ -477,12 +477,12 @@ public final class AMIdentity {
      * method "store" to commit the changes to the Repository.
      * This method is only valid for <code>AMIdentity</code> objects of
      * type User and Agent.
-     * 
-     * @param attrMap is a map of attribute name 
+     *
+     * @param attrMap is a map of attribute name
      *        <code>(String)</code>
      *        to a <code>Set</code> of attribute values <code>(String)</code>.
-     *        It is arranged as: 
-     *        Map::attrMap --> 
+     *        It is arranged as:
+     *        Map::attrMap -->
      *        Key: String::AttributeName
      *        Value: Set::AttributeValues (Set of String)
      * @throws IdRepoException
@@ -491,14 +491,14 @@ public final class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public void setAttributes(Map attrMap) throws IdRepoException, SSOException 
+    public void setAttributes(Map attrMap) throws IdRepoException, SSOException
     {
         modMap.copy(attrMap);
     }
 
     /**
      * Changes password for the identity.
-     * 
+     *
      * @param oldPassword old password
      * @param newPassword new password
      * @throws IdRepoException If there are repository related error conditions.
@@ -516,9 +516,9 @@ public final class AMIdentity {
     /**
      * Set the values of binary attributes. This method should be followed by
      * the method "store" to commit the changes to the Repository
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User and Agent.
-     * 
+     *
      * @param attrMap
      *            Map of attribute-values to be set in the repository or
      *            repositories (if multiple plugins are configured for "edit").
@@ -536,9 +536,9 @@ public final class AMIdentity {
     /**
      * Removes the attributes from the identity entry. This method should be
      * followed by a "store" to commit the changes to the Repository.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User and Agent.
-     * 
+     *
      * @param attrNames
      *            Set of attribute names to be removed
      * @throws IdRepoException
@@ -556,7 +556,7 @@ public final class AMIdentity {
         boolean agentflg = getType().equals(IdType.AGENTONLY);
         if (agentflg) {
             IdServices idServices = IdServicesFactory.getDataStoreServices();
-            idServices.removeAttributes(token, type, name, attrNames, 
+            idServices.removeAttributes(token, type, name, attrNames,
                 orgName, null);
             Iterator it = attrNames.iterator();
             while (it.hasNext()) {
@@ -574,9 +574,9 @@ public final class AMIdentity {
 
     /**
      * Stores the attributes of the object.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User and Agent.
-     * 
+     *
      * @throws IdRepoException
      *             If there are repository related error conditions.
      * @throws SSOException
@@ -601,9 +601,9 @@ public final class AMIdentity {
 
     /**
      * Returns the set of services already assigned to this identity.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User.
-     * 
+     *
      * @return Set of serviceNames
      * @throws IdRepoException
      *             If there are repository related error conditions.
@@ -639,9 +639,9 @@ public final class AMIdentity {
 
     /**
      * Returns all services which can be assigned to this entity.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User.
-     * 
+     *
      * @return Set of service names
      * @throws IdRepoException
      *             if there are repository related error conditions.
@@ -684,9 +684,9 @@ public final class AMIdentity {
 
     /**
      * Assigns the service and service related attributes to the identity.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User.
-     * 
+     *
      * @param serviceName
      *            Name of service to be assigned.
      * @param attributes
@@ -773,9 +773,9 @@ public final class AMIdentity {
 
     /**
      * Removes a service from the identity.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User.
-     * 
+     *
      * @param serviceName
      *            Name of service to be removed.
      * @throws IdRepoException
@@ -841,9 +841,9 @@ public final class AMIdentity {
     /**
      * Returns attributes related to a service, if the service is assigned to
      * the identity.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User.
-     * 
+     *
      * @param serviceName
      *            Name of the service.
      * @return Map of attribute-values.
@@ -927,9 +927,9 @@ public final class AMIdentity {
      * Set attributes related to a specific service. The assumption is that the
      * service is already assigned to the identity. The attributes for the
      * service are validated against the service schema.
-     * 
+     *
      * This method is only valid for AMIdentity object of type User.
-     * 
+     *
      * @param serviceName
      *            Name of the service.
      * @param attrMap
@@ -964,7 +964,7 @@ public final class AMIdentity {
              values = attrMap.remove(COS_PRIORITY);
         }
 
-        // Validate the attributes 
+        // Validate the attributes
         try {
             ServiceSchemaManager ssm = new ServiceSchemaManager(serviceName,
                     token);
@@ -1032,10 +1032,10 @@ public final class AMIdentity {
     // MEMBERSHIP RELATED APIS
     /**
      * Verifies if this identity is a member of the identity being passed.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type Role, Group and
      * User.
-     * 
+     *
      * @param identity
      *            <code>AMIdentity</code> to check membership with
      * @return true if this Identity is a member of the given Identity
@@ -1151,8 +1151,10 @@ public final class AMIdentity {
     }
 
     /**
+     * @supported.api
+     *
      * If membership is supported then add the new identity as a member.
-     * 
+     *
      * @param identity
      *            AMIdentity to be added
      * @throws IdRepoException
@@ -1170,8 +1172,10 @@ public final class AMIdentity {
     }
 
     /**
+     * @supported.api
+     *
      * Removes the identity from this identity's membership.
-     * 
+     *
      * @param identity
      *            AMIdentity to be removed from membership.
      * @throws IdRepoException
@@ -1189,8 +1193,10 @@ public final class AMIdentity {
     }
 
     /**
+     * @supported.api
+     *
      * Removes the identities from this identity's membership.
-     * 
+     *
      * @param identityObjects
      *            Set of AMIdentity objects
      * @throws IdRepoException
@@ -1216,9 +1222,9 @@ public final class AMIdentity {
     /**
      * Return all members of a given identity type of this identity as a Set of
      * AMIdentity objects.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type Group and User.
-     * 
+     *
      * @param mtype
      *            Type of identity objects
      * @return Set of AMIdentity objects that are members of this object.
@@ -1236,9 +1242,9 @@ public final class AMIdentity {
 
     /**
      * Returns the set of identities that this identity belongs to.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User and Role.
-     * 
+     *
      * @param mtype
      *            Type of member identity.
      * @return Set of AMIdentity objects of the given type that this identity
@@ -1258,9 +1264,9 @@ public final class AMIdentity {
 
     /**
      * This method determines if the identity exists and returns true or false.
-     * 
+     *
      * This method is only valid for AMIdentity objects of type User and Agent.
-     * 
+     *
      * @return true if the identity exists or false otherwise.
      * @throws IdRepoException
      *             If there are repository related error conditions.
@@ -1280,6 +1286,7 @@ public final class AMIdentity {
      * @return <code>true</code> if the given object is equal to this object.
      * @supported.api
      */
+    @Override
     public boolean equals(Object o) {
         boolean isEqual = false;
         if (o instanceof AMIdentity) {
@@ -1319,13 +1326,14 @@ public final class AMIdentity {
     /**
      * Non-javadoc, non-public methods
      */
+    @Override
     public int hashCode() {
         return (univIdWithoutDN.toLowerCase().hashCode());
     }
 
     /**
      * Nonjavadoc, non-public methods
-     * 
+     *
      */
     public void setDN(String dn) {
         univDN = dn;
@@ -1342,20 +1350,21 @@ public final class AMIdentity {
 
     /**
      * Returns the universal identifier of this object.
-     * 
+     *
      * @return String representing the universal identifier of this object.
      * @supported.api
      */
     public String getUniversalId() {
         return univIdWithoutDN;
     }
-    
+
     /**
      * Returns String representation of the <code>AMIdentity</code>
      * object. It returns universal identifier, orgname, type, etc.
      *
      * @return String representation of the <code>ServiceConfig</code> object.
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(100);
         sb.append("AMIdentity object: ").append(univIdWithoutDN);
@@ -1409,7 +1418,7 @@ public final class AMIdentity {
 
     /**
      * Get service default config from SMS
-     * 
+     *
      * @param token
      *            SSOToken a valid SSOToken
      * @param serviceName
@@ -1433,7 +1442,7 @@ public final class AMIdentity {
 
     /**
      * Returns true if the service has the subSchema. False otherwise.
-     * 
+     *
      * @param token
      *            SSOToken a valid SSOToken
      * @param serviceName
@@ -1501,7 +1510,7 @@ public final class AMIdentity {
                     "AMIdentity.getServiceAttributes: Caught SM exception",
                     smse);
             }
-            // just returned whatever we find or empty set 
+            // just returned whatever we find or empty set
             // if services is not found.
         }
 
@@ -1509,6 +1518,6 @@ public final class AMIdentity {
     }
 
     private static Debug debug = Debug.getInstance("amIdm");
-    
+
     public static String COS_PRIORITY = "cospriority";
 }
