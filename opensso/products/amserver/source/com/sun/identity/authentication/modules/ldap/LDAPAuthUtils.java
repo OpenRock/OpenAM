@@ -890,34 +890,39 @@ public class LDAPAuthUtils {
             boolean userNamingValueSet=false;
             
             while (results.hasNext()) {
-                entry = results.readEntry();
-                userDN = entry.getName().toString();
-                userMatches ++;
-                
-                if (attrs != null && attrs.length > 1) {
-                    userNamingValueSet = true;
-                    Attribute attr = entry.getAttribute(userNamingAttr);
-                   
-                    if (attr != null) {
-                        userNamingValue = attr.firstValueAsString();
-                    }
-                    
-                    if (isDynamicUserEnabled && (attrs.length > 2)) {
-                        for (int i = 2; i < userAttrSize + 2; i++) {
-                            attr = entry.getAttribute(attrs[i]);
-                            
-                            if (attr != null) {
-                                Set<String> s = new HashSet<String>();
-                                Iterator<ByteString> values = attr.iterator();
-                                
-                                while (values.hasNext()) {
-                                    s.add(values.next().toString());
+                if (!results.isReference()) {
+                    entry = results.readEntry();
+                    userDN = entry.getName().toString();
+                    userMatches++;
+
+                    if (attrs != null && attrs.length > 1) {
+                        userNamingValueSet = true;
+                        Attribute attr = entry.getAttribute(userNamingAttr);
+
+                        if (attr != null) {
+                            userNamingValue = attr.firstValueAsString();
+                        }
+
+                        if (isDynamicUserEnabled && (attrs.length > 2)) {
+                            for (int i = 2; i < userAttrSize + 2; i++) {
+                                attr = entry.getAttribute(attrs[i]);
+
+                                if (attr != null) {
+                                    Set<String> s = new HashSet<String>();
+                                    Iterator<ByteString> values = attr.iterator();
+
+                                    while (values.hasNext()) {
+                                        s.add(values.next().toString());
+                                    }
+
+                                    userAttributeValues.put(attrs[i], s);
                                 }
-                                
-                                userAttributeValues.put(attrs[i], s);
                             }
                         }
                     }
+                } else {
+                    //read and ignore references
+                    results.readReference();
                 }
             }
             
