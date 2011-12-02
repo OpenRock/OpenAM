@@ -56,7 +56,7 @@
    customizations.</para>
   </step>
   <step>
-   <para>Stop the container where OpenAM is running.</para>
+   <para>Stop OpenAM, or the web container where OpenAM is running.</para>
    <screen>$ /etc/init.d/tomcat stop
 Password: 
 Using CATALINA_BASE:   /path/to/tomcat
