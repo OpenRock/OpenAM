@@ -27,20 +27,19 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.policy.plugins;
 
-import java.util.*;
-
-import com.iplanet.sso.*;
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.sdk.*;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.*;
 import com.sun.identity.policy.interfaces.Subject;
-
-import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPException;
+import com.sun.identity.shared.ldap.util.DN;
+import java.util.*;
 
 /**
  * DSAME Role plugin lets policy admins specify the DSAME roles as a subject.
@@ -82,6 +81,20 @@ public class DSAMERole implements Subject {
      * initialization of <code>Subject</code> instance
      */
     public void initialize(Map configParams) throws PolicyException {
+        
+        String configuredLdapServer = 
+            (String)configParams.get(PolicyConfig.LDAP_SERVER);
+        if (configuredLdapServer == null) {
+            debug.error("DSAMERole.initialize(): failed to get LDAP "
+              + "server name. If you enter more than one server name "
+              + "in the policy config service's Primary LDAP Server "
+              + "field, please make sure the ldap server name is preceded " 
+              + "with the local server name.");
+            throw (new PolicyException(ResBundleUtils.rbName,
+                "invalid_ldap_server_host", null, null));
+        }
+        ldapServer = configuredLdapServer.toLowerCase();
+        
         organizationDN = (String) configParams.get(
             PolicyConfig.IS_ROLES_BASE_DN);
         String scope = (String) configParams.get(
@@ -93,7 +106,6 @@ public class DSAMERole implements Subject {
         } else {
             roleSearchScope = AMConstants.SCOPE_SUB;
         }
-        ldapServer = PolicyUtils.getISDSHostName().toLowerCase();
         try {
             timeLimit = Integer.parseInt((String) configParams.get(
                                         PolicyConfig.LDAP_SEARCH_TIME_OUT));
