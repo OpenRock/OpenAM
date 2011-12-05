@@ -70,12 +70,13 @@
   then follow all the steps below.</para>
   
   <step>
-   <para>On each OpenAM server console in the site, select Configuration &gt;
-   Servers and Sites &gt; Sites &gt; New..., and then create a new site, using
-   the URL through the load balancer to OpenAM as the site URL.</para>
-   <para>For example, if your load balancer listens on host
+   <para>In the OpenAM console for one of the servers in the site, select
+   Configuration &gt; Servers and Sites &gt; Sites &gt; New..., and then
+   create a new site.</para>
+   <para>The site URL is the URL to the load balancer in front of your OpenAM
+   servers in the site. For example, if your load balancer listens on host
    <literal>lb.example.com</literal> and port <literal>8080</literal>,
-   with OpenAM under <literal>/openam</literal>, your site URL might be
+   with OpenAM under <literal>/openam</literal>, then your site URL is
    <literal>http://lb.example.com:8080/openam</literal>.</para>
   </step>
   <step>
@@ -84,20 +85,22 @@
    and then set Parent Site to the site you created before saving your
    work.</para>
   </step>
-  <step>
-   <para>Set up your load balancer for sticky cookie load balancing, where
-   the load balancer inspects the value of the <literal>amlbcookie</literal>
-   to determine which OpenAM server should be preferred to handle a client
-   request.</para>
+  <step performance="optional">
+   <para>If you want to use sticky load balancing, configure your load balancer
+   to inspect the value of the <literal>amlbcookie</literal> to determine which
+   OpenAM server should receive the client request.</para>
    <para>As your load balancer depends on the <literal>amlbcookie</literal>
    value, on each OpenAM server console in the site, select Configuration &gt;
    Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>
    &gt; Advanced, set <literal>com.iplanet.am.lbcookie.value</literal> to a
    unique value, and save your work.</para>
-   <para>Restart OpenAM or the underlying web container to put your change
-   into effect. At this point, <literal>amlbcookie</literal> values from
-   OpenAM should be as you configured them. (To check, login to the console
-   and check the cookie value in your browser.)</para>
+   <para>After you restart the OpenAM server, <literal>amlbcookie</literal>
+   values from OpenAM should be as you configured them. (To check, login to the
+   console and check the cookie value in your browser.)</para>
+  </step>
+  <step>
+   <para>Restart each OpenAM server or the web containers where the OpenAM
+   servers run so that all configuration changes take effect.</para>
   </step>
  </procedure>
  
@@ -109,8 +112,15 @@
   serve as the highly available session data store.</para>
   
   <step>
-   <para>On each OpenAM server, install the session tools from
-   <filename>ssoSessionTools.zip</filename>, for example in the OpenAM
+   <para>Install the session tools from <filename>ssoSessionTools.zip</filename>
+   on at least two, and generally not more than four, servers where you run
+   OpenAM.<footnote><para>You install more than one instance of the session
+   tools in case an instance crashes and must fail over to another instance. At
+   the same time, session failover requires that messages be sent across the
+   network from one instance to another to stay in sync in case of failover. If
+   you install too many instances, however, then the increase in network
+   traffic for synchronization can impair performance.</para></footnote></para>
+   <para>For example, you can install the session tools in the OpenAM
    configuration directory.</para>
    <screen>$ cd $HOME/openam
 $ unzip /path/to/OpenAM/tools/ssoSessionTools.zip
@@ -123,7 +133,7 @@ JMQ is properly setup under directory /home/user/openam/jmq</screen>
   <step>
    <para>Create a password file for the session failover service.</para>
    <screen>$ cd sfoscripts/bin/
-$ ./amsfopassword --passwordfile /home/user/openam/mqpwd.txt --encrypt password
+$ ./amsfopassword --encrypt secret12 --passwordfile /home/user/openam/mqpwd.txt
 os.name=Linux
 SUCCESSFUL</screen>
   </step>
