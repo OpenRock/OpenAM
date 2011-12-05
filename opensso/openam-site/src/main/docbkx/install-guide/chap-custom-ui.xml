@@ -229,9 +229,10 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
    <varlistentry>
     <term>Client name</term>
     <listitem>
-     <para>Client names identify the type of client. The default is
-     <literal>html</literal>, though it can be different for mobile clients,
-     for example.</para>
+     <para>Client names identify the type of client. The default,
+     <literal>html</literal>, is the only client name used unless client
+     detection mode is enabled. When client detection mode is enabled, the
+     client name can be different for mobile clients, for example.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
