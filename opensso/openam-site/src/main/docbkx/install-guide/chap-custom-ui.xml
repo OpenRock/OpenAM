@@ -177,10 +177,10 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
     <listitem>
      <para>When you set up the OpenAM to store its configuration in a directory
      server, you provide the distinguished name of the configuration suffix,
-     by default <literal>dc=opensso,dc=java,dc=net</literal>. By default,
-     therefore, the relative distinguished name attribute value is
-     <literal>opensso</literal>. If instead you set the configuration suffix
-     to be <literal>o=openam</literal>, the RDN value is
+     by default <literal>dc=opensso,dc=java,dc=net</literal>, therefore, the
+     relative distinguished name attribute value is <literal>opensso</literal>.
+     If instead you set the configuration suffix to be
+     <literal>o=openam</literal>, the RDN value is
      <literal>openam</literal>.</para>
     </listitem>
    </varlistentry>
@@ -227,6 +227,14 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term>Client name</term>
+    <listitem>
+     <para>Client names identify the type of client. The default is
+     <literal>html</literal>, though it can be different for mobile clients,
+     for example.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>File name</term>
     <listitem>
      <para>File names are not themselves localized. Thus
@@ -238,7 +246,13 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
 
   <para>OpenAM tries first to find the most specific file for the realm and
   local requested, gradually falling back on less specific alternatives, then
-  on other locales.</para>
+  on other locales. The first and most specific location as follows.</para>
+
+  <literallayout><replaceable>suffix</replaceable>_<replaceable
+  >client-locale-language</replaceable>_<replaceable
+  >client-locale-territory</replaceable>/services/<replaceable
+  >realm</replaceable>/<replaceable>client-name</replaceable>/<replaceable
+  >file-name</replaceable></literallayout>
 
   <example xml:id="example-ui-file-lookup">
    <title>UI File Lookup</title>
@@ -247,38 +261,39 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
    for a realm named <literal>realm</literal>, with the browser requesting
    <literal>en_GB</literal> locale, the platform locale being
    <literal>hu_HU</literal>, and the configuration suffix named
-   <literal>o=openam</literal>.</para>
+   <literal>o=openam</literal>. The client name used in this example is the
+   generic client name <literal>html</literal>.</para>
 
-   <programlisting language="shell">opensso_en_GB/services/realm/html/Login.jsp
-opensso_en_GB/services/realm/Login.jsp
-opensso_en_GB/services/html/Login.jsp
-opensso_en_GB/services/Login.jsp
-opensso_en_GB/html/Login.jsp
-opensso_en_GB/Login.jsp
-opensso_en/services/realm/html/Login.jsp
-opensso_en/services/realm/Login.jsp
-opensso_en/services/html/Login.jsp
-opensso_en/services/Login.jsp
-opensso_en/html/Login.jsp
-opensso_en/Login.jsp
-opensso_hu_HU/services/realm/html/Login.jsp
-opensso_hu_HU/services/realm/Login.jsp
-opensso_hu_HU/services/html/Login.jsp
-opensso_hu_HU/services/Login.jsp
-opensso_hu_HU/html/Login.jsp
-opensso_hu_HU/Login.jsp
-opensso_hu/services/realm/html/Login.jsp
-opensso_hu/services/realm/Login.jsp
-opensso_hu/services/html/Login.jsp
-opensso_hu/services/Login.jsp
-opensso_hu/html/Login.jsp
-opensso_hu/Login.jsp
-opensso/services/realm/html/Login.jsp
-opensso/services/realm/Login.jsp
-opensso/services/html/Login.jsp
-opensso/services/Login.jsp
-opensso/html/Login.jsp
-opensso/Login.jsp
+   <programlisting language="shell">openam_en_GB/services/realm/html/Login.jsp
+openam_en_GB/services/realm/Login.jsp
+openam_en_GB/services/html/Login.jsp
+openam_en_GB/services/Login.jsp
+openam_en_GB/html/Login.jsp
+openam_en_GB/Login.jsp
+openam_en/services/realm/html/Login.jsp
+openam_en/services/realm/Login.jsp
+openam_en/services/html/Login.jsp
+openam_en/services/Login.jsp
+openam_en/html/Login.jsp
+openam_en/Login.jsp
+openam_hu_HU/services/realm/html/Login.jsp
+openam_hu_HU/services/realm/Login.jsp
+openam_hu_HU/services/html/Login.jsp
+openam_hu_HU/services/Login.jsp
+openam_hu_HU/html/Login.jsp
+openam_hu_HU/Login.jsp
+openam_hu/services/realm/html/Login.jsp
+openam_hu/services/realm/Login.jsp
+openam_hu/services/html/Login.jsp
+openam_hu/services/Login.jsp
+openam_hu/html/Login.jsp
+openam_hu/Login.jsp
+openam/services/realm/html/Login.jsp
+openam/services/realm/Login.jsp
+openam/services/html/Login.jsp
+openam/services/Login.jsp
+openam/html/Login.jsp
+openam/Login.jsp
 default_en_GB/services/realm/html/Login.jsp
 default_en_GB/services/realm/Login.jsp
 default_en_GB/services/html/Login.jsp
