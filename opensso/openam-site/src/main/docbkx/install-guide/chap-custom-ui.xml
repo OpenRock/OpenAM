@@ -59,23 +59,23 @@
  <tip>
   <para>The procedures below describe how to update a deployed version of
   OpenAM, so that you can see your changes without redeploying the application.
-  This approach works for development. For production deployment, however,
-  you must package your changes in a custom OpenAM deployable .war file.</para>
-  <para>When developing with a web container that deploys OpenAM in a temporary
-  location, such as JBoss or Jetty, restarting the container can also overwrite
-  your changes with the deployable .war content. For those web containers, you
-  should also prepare a deployable .war containing your changes, and redeploy
-  that file to check your work.</para>
-  <para>To create a deployable .war, unpack the OpenAM .war file from
-  <filename>/path/to/OpenAM/deployable-war</filename> into a staging directory,
-  do your work in that staging directory, and then use the
-  <command>createwar.sh</command> or <command>createwar.bat</command>
+  This approach works for development as long as your web container does
+  not overwrite changes. When developing with a web container that deploys
+  OpenAM in a temporary location, such as JBoss or Jetty, restarting the
+  container can overwrite your changes with the deployable .war content. For
+  those web containers, you should also prepare a deployable .war containing
+  your changes, and redeploy that file to check your work.</para>
+  <para>For production deployment you must package your changes in a custom
+  OpenAM deployable .war file. To create a deployable .war, unpack the
+  OpenAM .war file from <filename>/path/to/OpenAM/deployable-war</filename>
+  into a staging directory, apply your changes in the staging directory, and
+  use the <command>createwar.sh</command> or <command>createwar.bat</command>
   script to prepare the deployable .war.</para>
  </tip>
  
  <procedure xml:id="copy-ui-to-customize-top-level-realm">
   <title>To Copy the Pages to Customize For the Top-Level Realm</title>
-  <para>Rather than change the default pages, customize your own copy.</para>
+  <para>Rather than changing the default pages, customize your own copy.</para>
   <step>
    <para>Change to the <filename>config/auth</filename> directory where
    you deployed OpenAM.</para>
@@ -83,8 +83,12 @@
   </step>
   <step>
    <para>Copy the default files and optionally the localized files to
-   <filename>openam[_<replaceable>locale</replaceable>]/html</filename>,
-   where the optional <replaceable>locale</replaceable> is, for example,
+   <filename><replaceable>suffix</replaceable>[_<replaceable>locale</replaceable
+   >]/html</filename>,
+   where <replaceable>suffix</replaceable> is the value of the RDN of the
+   configuration suffix, such as <literal>opensso</literal> if you use the
+   default configuration suffix <literal>dc=opensso,dc=java,dc=net</literal>,
+   and the optional <replaceable>locale</replaceable> is, for example,
    <literal>jp</literal> for Japanese, or <literal>zh_CN</literal> for
    Simplified Chinese.</para>
    <para>The following example copies the files for the Top-Level Realm
@@ -93,6 +97,8 @@
 $ cp -r default/* openam/html
 $ mkdir -p openam_fr/html
 $ cp -r default_fr/* openam_fr/html</screen>
+   <para>See <link linkend="lookup-for-ui-files"><citetitle>How OpenAM Looks Up
+   UI files</citetitle></link> for details.</para>
   </step>
  </procedure>
  
@@ -107,8 +113,9 @@ $ cp -r default_fr/* openam_fr/html</screen>
   </step>
   <step>
    <para>Depending on which locale you want to customize, copy the default
-   files and optionally the localized files to <filename>openam[_<replaceable>locale</replaceable
-     >]/services/<replaceable>realm</replaceable>/html</filename>.</para>
+   files and optionally the localized files to
+   <filename><replaceable>suffix</replaceable>[_<replaceable>locale</replaceable
+   >]/services/<replaceable>realm</replaceable>/html</filename>.</para>
    <para>The following example copies the files for a custom French locale and
    a realm named <literal>ventes</literal>.</para>
    <screen>$ mkdir -p openam/html
@@ -156,4 +163,152 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
    </mediaobject>
   </step>
  </procedure>
+
+ <section xml:id="lookup-for-ui-files">
+  <title>How OpenAM Looks Up UI Files</title>
+
+  <para>This section provides a more complete description of how OpenAM looks
+  up UI files.</para>
+
+  <variablelist>
+   <para>OpenAM uses the following information to look up the UI files.</para>
+   <varlistentry>
+    <term>Configuration suffix RDN</term>
+    <listitem>
+     <para>When you set up the OpenAM to store its configuration in a directory
+     server, you provide the distinguished name of the configuration suffix,
+     by default <literal>dc=opensso,dc=java,dc=net</literal>. By default,
+     therefore, the relative distinguished name attribute value is
+     <literal>opensso</literal>. If instead you set the configuration suffix
+     to be <literal>o=openam</literal>, the RDN value is
+     <literal>openam</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Client (browser) locale language</term>
+    <listitem>
+     <para>The client can specify a locale, which can consist of both a
+     language and a territory, such as <literal>en_GB</literal> for British
+     English. The language in this case is <literal>en</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Client (browser) locale territory</term>
+    <listitem>
+     <para>If the client local is <literal>en_GB</literal>, then the territory
+     in this case is <literal>GB</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Platform locale language</term>
+    <listitem>
+     <para>The platform locale, defined for the platform where OpenAM runs,
+     can also consist of both a language and a territory, such as
+     <literal>hu_HU</literal>. In this example the platform locale language is
+     <literal>hu</literal> for Hungarian.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Platform locale territory</term>
+    <listitem>
+     <para>If the platform locale is <literal>hu_HU</literal>, the platform
+     locale territory is <literal>HU</literal> for Hungary.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Realm</term>
+    <listitem>
+     <para>Realms can be nested. OpenAM uses the nesting as necessary to look
+     for files specific to a sub-realm before looking in the parent
+     realm.</para>
+     <para>For all realms below the top level realm, OpenAM adds a 
+     <filename>services</filename> directory before the realm to the search
+     path.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>File name</term>
+    <listitem>
+     <para>File names are not themselves localized. Thus
+     <filename>Login.jsp</filename> has the same name for all locales, for
+     example.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>OpenAM tries first to find the most specific file for the realm and
+  local requested, gradually falling back on less specific alternatives, then
+  on other locales.</para>
+
+  <example xml:id="example-ui-file-lookup">
+   <title>UI File Lookup</title>
+
+   <para>OpenAM looks up <filename>Login.jsp</filename> in the following order
+   for a realm named <literal>realm</literal>, with the browser requesting
+   <literal>en_GB</literal> locale, the platform locale being
+   <literal>hu_HU</literal>, and the configuration suffix named
+   <literal>o=openam</literal>.</para>
+
+   <programlisting language="shell">opensso_en_GB/services/realm/html/Login.jsp
+opensso_en_GB/services/realm/Login.jsp
+opensso_en_GB/services/html/Login.jsp
+opensso_en_GB/services/Login.jsp
+opensso_en_GB/html/Login.jsp
+opensso_en_GB/Login.jsp
+opensso_en/services/realm/html/Login.jsp
+opensso_en/services/realm/Login.jsp
+opensso_en/services/html/Login.jsp
+opensso_en/services/Login.jsp
+opensso_en/html/Login.jsp
+opensso_en/Login.jsp
+opensso_hu_HU/services/realm/html/Login.jsp
+opensso_hu_HU/services/realm/Login.jsp
+opensso_hu_HU/services/html/Login.jsp
+opensso_hu_HU/services/Login.jsp
+opensso_hu_HU/html/Login.jsp
+opensso_hu_HU/Login.jsp
+opensso_hu/services/realm/html/Login.jsp
+opensso_hu/services/realm/Login.jsp
+opensso_hu/services/html/Login.jsp
+opensso_hu/services/Login.jsp
+opensso_hu/html/Login.jsp
+opensso_hu/Login.jsp
+opensso/services/realm/html/Login.jsp
+opensso/services/realm/Login.jsp
+opensso/services/html/Login.jsp
+opensso/services/Login.jsp
+opensso/html/Login.jsp
+opensso/Login.jsp
+default_en_GB/services/realm/html/Login.jsp
+default_en_GB/services/realm/Login.jsp
+default_en_GB/services/html/Login.jsp
+default_en_GB/services/Login.jsp
+default_en_GB/html/Login.jsp
+default_en_GB/Login.jsp
+default_en/services/realm/html/Login.jsp
+default_en/services/realm/Login.jsp
+default_en/services/html/Login.jsp
+default_en/services/Login.jsp
+default_en/html/Login.jsp
+default_en/Login.jsp
+default_hu_HU/services/realm/html/Login.jsp
+default_hu_HU/services/realm/Login.jsp
+default_hu_HU/services/html/Login.jsp
+default_hu_HU/services/Login.jsp
+default_hu_HU/html/Login.jsp
+default_hu_HU/Login.jsp
+default_hu/services/realm/html/Login.jsp
+default_hu/services/realm/Login.jsp
+default_hu/services/html/Login.jsp
+default_hu/services/Login.jsp
+default_hu/html/Login.jsp
+default_hu/Login.jsp
+default/services/realm/html/Login.jsp
+default/services/realm/Login.jsp
+default/services/html/Login.jsp
+default/services/Login.jsp
+default/html/Login.jsp
+default/Login.jsp</programlisting>
+  </example>
+ </section>
 </chapter>
