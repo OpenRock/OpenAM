@@ -1035,11 +1035,15 @@ public abstract class PropertyXMLBuilderBase
         List<String> sectionList
     ) {
         Object[] params = { schemaTypeName, schemaTypeName, "true" };
-        xml.append(MessageFormat.format(SUBSECTION_START_TAG, params));
         Set<AttributeSchema> as = getAttributeSchemaForSection(attributeSchemas, sectionList);
         
-        buildSchemaTypeXML(schemaTypeName, as, xml, model, serviceBundle, readonly, false, false);
+        // skip empty sections
+        if (as.isEmpty()) {
+            return;
+        }
         
+        xml.append(MessageFormat.format(SUBSECTION_START_TAG, params));
+        buildSchemaTypeXML(schemaTypeName, as, xml, model, serviceBundle, readonly, false, false);
         xml.append(SUBSECTION_END_TAG);
     } 
     
