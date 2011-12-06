@@ -167,7 +167,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <title>Logging in OpenAM Policy Agents</title>
    
    <para>By default, OpenAM Policy Agents log to local files in their
-   configuration directories for debugging. The exactly location depends on
+   configuration directories for debugging. The exact location depends on
    where you installed the agent.</para>
    
    <para>By default OpenAM policy agents send log messages remotely to OpenAM
