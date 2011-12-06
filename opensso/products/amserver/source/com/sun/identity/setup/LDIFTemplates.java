@@ -44,18 +44,18 @@ import javax.servlet.ServletContext;
  */
 public class LDIFTemplates {
     private static List templates;
-    
+
     static {
         templates = new ArrayList();
 	templates.add("ad/ad_user_schema.ldif");
         templates.add("adam/adam_user_schema.ldif");
-	templates.add("opends/opends_config_schema.ldif");
-	templates.add("opends/opends_user_schema.ldif");
-	templates.add("opends/opends_embinit.ldif");
-	templates.add("opends/opends_userinit.ldif");
-	templates.add("opends/opends_user_index.ldif");
-	templates.add("opends/opends_plugin.ldif");
-	templates.add("opends/opends_remove_user_schema.ldif");
+	templates.add("opendj/opendj_config_schema.ldif");
+	templates.add("opendj/opendj_user_schema.ldif");
+	templates.add("opendj/opendj_embinit.ldif");
+	templates.add("opendj/opendj_userinit.ldif");
+	templates.add("opendj/opendj_user_index.ldif");
+	templates.add("opendj/opendj_plugin.ldif");
+	templates.add("opendj/opendj_remove_user_schema.ldif");
 	templates.add("sunds/sunds_config_schema.ldif");
 	templates.add("sunds/sunds_config_index.ldif");
 	templates.add("sunds/sunds_user_index.ldif");
@@ -66,10 +66,10 @@ public class LDIFTemplates {
 	templates.add("sunds/amsdk_plugin/amsdk_sunone_schema2.ldif");
 	templates.add("tivoli/tivoli_user_schema.ldif");
     }
-    
+
     private LDIFTemplates() {
     }
-    
+
     public static void copy(String dir, ServletContext servletCtx) {
         for (Iterator i = templates.iterator(); i.hasNext(); ) {
             String templ = (String) i.next();
@@ -85,9 +85,9 @@ public class LDIFTemplates {
             }
         }
     }
-    
+
     private static String getContent(
-        String templateName, 
+        String templateName,
         ServletContext servletCtx
     ) {
         InputStreamReader fin = null;
@@ -95,7 +95,7 @@ public class LDIFTemplates {
 
         try {
             fin = new InputStreamReader(
-                AMSetupServlet.getResourceAsStream(servletCtx, 
+                AMSetupServlet.getResourceAsStream(servletCtx,
                 "/WEB-INF/template/ldif/" + templateName));
             char[] cbuf = new char[1024];
             int len;
@@ -116,5 +116,5 @@ public class LDIFTemplates {
         }
         return sbuf.toString();
     }
-    
+
 }

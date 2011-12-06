@@ -87,7 +87,7 @@ IF "%5" == "--debug" SET path_debug=%~6
 IF "%5" == "-p" SET path_AMConfig=%~6
 IF "%5" == "--path" SET path_AMConfig=%~6
 
-"%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/OpenDS.jar;resources" com.sun.identity.tools.bundles.Main
+"%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/OpenDJ.jar;resources" com.sun.identity.tools.bundles.Main
 ENDLOCAL
 
 :exit

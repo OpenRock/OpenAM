@@ -234,17 +234,17 @@
             <zipfileset dir="${amserver.warbase.dir}/ldif/tivoli" prefix="WEB-INF/template/ldif/tivoli">
                 <include name="tivoli_user_schema.ldif" />
             </zipfileset>
-            <zipfileset dir="${amserver.warbase.dir}/ldif/opends" prefix="WEB-INF/template/ldif/opends">
-                <include name="opends_config_schema.ldif" />
-                <include name="opends_user_schema.ldif" />
-                <include name="opends_user_index.ldif" />
-                <include name="opends_userinit.ldif" />
-                <include name="opends_embinit.ldif" />
-                <include name="opends_plugin.ldif" />
-                <include name="opends_remove_user_schema.ldif" />
+            <zipfileset dir="${amserver.warbase.dir}/ldif/opendj" prefix="WEB-INF/template/ldif/opendj">
+                <include name="opendj_config_schema.ldif" />
+                <include name="opendj_user_schema.ldif" />
+                <include name="opendj_user_index.ldif" />
+                <include name="opendj_userinit.ldif" />
+                <include name="opendj_embinit.ldif" />
+                <include name="opendj_plugin.ldif" />
+                <include name="opendj_remove_user_schema.ldif" />
             </zipfileset>
-            <zipfileset dir="${extlib.dir}/" prefix="WEB-INF/template/opends/">
-                <include name="opends.zip" />
+            <zipfileset dir="${extlib.dir}/" prefix="WEB-INF/template/opendj/">
+                <include name="opendj.zip" />
             </zipfileset>
             <zipfileset dir="${lockhart.dir}/xml" prefix="WEB-INF">
                 <include name="cc.tld" />

@@ -85,4 +85,4 @@ fi
 
 
 
-${JAVA_HOME}/bin/java -D"load.config=yes" -D"help.print=${help_print}" -D"path.AMConfig=${path_AMConfig}" -D"path.debug=${path_debug}" -D"path.log=${path_log}" -cp "lib/amserver.jar:lib/amadm_setup.jar:lib/opensso-sharedlib.jar:lib/OpenDS.jar:resources" com.sun.identity.tools.bundles.Main
+${JAVA_HOME}/bin/java -D"load.config=yes" -D"help.print=${help_print}" -D"path.AMConfig=${path_AMConfig}" -D"path.debug=${path_debug}" -D"path.log=${path_log}" -cp "lib/amserver.jar:lib/amadm_setup.jar:lib/opensso-sharedlib.jar:lib/OpenDJ.jar:resources" com.sun.identity.tools.bundles.Main

@@ -2,7 +2,7 @@
 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+# Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -22,28 +22,27 @@
 # your own identifying information:
 # "Portions Copyrighted [year] [name of copyright owner]"
 
-# This script creates the cut down OpenDS.zip for inclusion in the build
-# OpenDS libraries must be copied into extlib manually
+# This script creates the cut down OpenDJ.zip for inclusion in the build
+# OpenDJ libraries must be copied into extlib manually
 
 SED=`which sed`
 UNZIP=`which unzip`
 ZIP=`which zip`
-ZIP_FILE=opends.zip
-LIST=opends_inclusion_list
+ZIP_FILE=opendj.zip
+LIST=opendj_inclusion_list
 LDIF=ldif
 LDIF_FILE=openam_suffix.ldif.template
 CONFIG=config/config.ldif
 
 if [ -z ${@} ] ; then
        echo "Error! No command line argument supplied"
-       echo "Usage: ./create_opends_zip.sh OPENDS_FOLDER"
+       echo "Usage: ./create_opendj_zip.sh OPENDJ_FOLDER"
        exit -1;
 fi
 
 PWD=`pwd`
 cd "${@}"
 cp ../${LDIF_FILE} ${LDIF}
-${SED} -i -e 's/ds-cfg-single-structural-objectclass-behavior: reject/ds-cfg-single-structural-objectclass-behavior: accept/' ${CONFIG}
 ${SED} -i -e '/dn: cn=SNMP/,/^$/d' ${CONFIG}
 ${ZIP} -r -i@../${LIST} ../${ZIP_FILE} .
 cd ${PWD}

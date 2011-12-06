@@ -54,7 +54,7 @@ of Authnicrp that was committed about year ago for proof-of-concept purposes.
 In particular, the need of a companion JavaDB database has been removed.
 Information Card support is now part of the user profile that is stored
 in the Identity Repository (IdRepo) that can be either Active Directory,
-OpenDS, Sun Directory Server Enterprise Edition or MySQL through the JDBC
+OpenDJ, Sun Directory Server Enterprise Edition or MySQL through the JDBC
 IdRepo plug-in.
 
 A RP can now specify its Security Token requirements and security

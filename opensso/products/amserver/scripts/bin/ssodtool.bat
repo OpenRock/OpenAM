@@ -76,7 +76,7 @@ goto exit
 
 SET DEBUG_FLAGS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8888,server=y,suspend=n"
 
-"%_TRIMMED_JAVA_HOME%\bin\java" -cp .;config;lib\locale.jar;lib\opensso-sharedlib.jar;lib\amserver.jar;lib\OpenDS.jar;lib\jaxb-impl.jar;lib\jaxb-api.jar;lib\xsdlib.jar;lib\toolbase.jar;lib\webservices-rt.jar com.sun.identity.diagnostic.base.core.DiagnosticToolMain %*
+"%_TRIMMED_JAVA_HOME%\bin\java" -cp .;config;lib\locale.jar;lib\opensso-sharedlib.jar;lib\amserver.jar;lib\OpenDJ.jar;lib\jaxb-impl.jar;lib\jaxb-api.jar;lib\xsdlib.jar;lib\toolbase.jar;lib\webservices-rt.jar com.sun.identity.diagnostic.base.core.DiagnosticToolMain %*
 ENDLOCAL
 
 :exit

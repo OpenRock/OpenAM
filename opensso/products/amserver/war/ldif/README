@@ -34,19 +34,19 @@ ad (Active Directory)
 	store.
     ad_user_schema.ldif -- schema to be loaded to user store.
 
-opends (OpenDS)
+opendj (OpenDJ)
 ===============
-    opends_config_schema.ldif -- schema to be loaded to configuration
+    opendj_config_schema.ldif -- schema to be loaded to configuration
  	store.
-    opends_embinit.ldif -- file used for initialization in the
+    opendj_embinit.ldif -- file used for initialization in the
 	configuration store.
-    opends_plugin.ldif -- referential integrity plugin.
-    opends_user_schema.ldif -- schema to be loaded to user store.
-    opends_user_index.ldif -- attribute index to be loaded 
-	to user store.
-    opends_userinit.ldif -- file used for initialization in the
+    opendj_plugin.ldif -- referential integrity plugin.
+    opendj_user_schema.ldif -- schema to be loaded to user store.
+    opendj_user_index.ldif -- attribute index to be loaded 
+	tj user store.
+    opendj_userinit.ldif -- file used for initialization in the
 	configuration store.
-    opends_remove_user_schema.ldif -- file used to remove user schema.
+    opendj_remove_user_schema.ldif -- file used to remove user schema.
 
 sunds (Sun Directory Server)
 ============================

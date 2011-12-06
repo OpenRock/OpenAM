@@ -95,8 +95,8 @@ If you don't have installed OpenSSO see:
 
 http://developers.sun.com/identity/reference/techart/opensso-glassfish.html
 
-You will need a directory service, I advise to use OpenDS (https://opends.dev.java.net/),
-and, specifically, I advise from version 1.1. And, after installing OpenDS and
+You will need a directory service, I advise to use OpenDJ (https://opendj.forgerock.org/),
+and, specifically, I advise from version 2.4.4. And, after installing OpenDJ and
 OpenSSO, you will ought to access to opensso web, select Access Control -> Realm 
 -> Data Stores -> generic ldapv3. Then, remove "memberOf" in member group attribute 
 and select "SCOPE_SUB" in "LDAPv3 Plug-in Search Scope" field of LDAP user configuration.

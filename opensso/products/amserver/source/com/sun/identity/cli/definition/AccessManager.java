@@ -1838,7 +1838,7 @@ public class AccessManager {
         macro="authentication",
         optionalOptions={},
         resourceStrings={
-            "import-service-configuration-unknown-ds=Unable to import service configuration because we are unable to recognize the data store type. We support Sun Directory Server and Embedded OpenDS as service configuration data store.",
+            "import-service-configuration-unknown-ds=Unable to import service configuration because we are unable to recognize the data store type. We support Sun Directory Server and Embedded OpenDJ as service configuration data store.",
             "import-service-configuration-processing=Please wait while we import the service configuration...",
             "import-service-configuration-succeeded=Service Configuration was imported.",
             "import-service-configuration-invalid-ds-type=Invalid datastore type.",

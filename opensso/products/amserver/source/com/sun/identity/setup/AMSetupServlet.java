@@ -703,7 +703,7 @@ public class AMSetupServlet extends HttpServlet {
         }
         if (!dsConfig.isDServerUp()) {
             throw new ConfigurationException(
-                "OpenDS cannot be started.");
+                "OpenDJ cannot be started.");
         }
 
         // Determine if DITLoaded flag needs to be set: multi instance
@@ -1850,8 +1850,8 @@ public class AMSetupServlet extends HttpServlet {
                 SetupProgress.reportEnd("emb.rebuildindex.failedmsg", error);
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                     "AMSetupServlet.writeSchemaFiles: " +
-                    "Unable to rebuild indexes in OpenDS: " + ret);
-                throw new Exception("Unable to rebuild indexes in OpenDS: " + ret);
+                    "Unable to rebuild indexes in OpenDJ: " + ret);
+                throw new Exception("Unable to rebuild indexes in OpenDJ: " + ret);
             }
         }
 

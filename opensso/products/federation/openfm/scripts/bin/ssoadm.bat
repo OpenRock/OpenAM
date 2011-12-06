@@ -36,7 +36,7 @@ IF NOT DEFINED JAVA_HOME (
 set TOOLS_HOME=@TOOLS_HOME@
 
 set ORIG_CLASSPATH=%CLASSPATH%
-set CLASSPATH="@CONFIG_DIR@";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/resources";"%TOOLS_HOME%/lib/amadm_setup.jar";"%TOOLS_HOME%/lib/OpenDS.jar";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/lib/mail.jar";"%TOOLS_HOME%/lib/j2ee.jar";"%TOOLS_HOME%/lib/webservices-api.jar";"%TOOLS_HOME%/lib/webservices-rt.jar";"%TOOLS_HOME%/lib/webservices-tools.jar";"%TOOLS_HOME%/lib/xsdlib.jar";"%TOOLS_HOME%/lib/amserver.jar";"%TOOLS_HOME%/lib/opensso-sharedlib.jar";"%TOOLS_HOME%/lib/opensso.jar";"%TOOLS_HOME%/lib/openfedlib.jar";"%TOOLS_HOME%/lib/json.jar"
+set CLASSPATH="@CONFIG_DIR@";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/resources";"%TOOLS_HOME%/lib/amadm_setup.jar";"%TOOLS_HOME%/lib/OpenDJ.jar";"%TOOLS_HOME%/classes";"%TOOLS_HOME%/lib/mail.jar";"%TOOLS_HOME%/lib/j2ee.jar";"%TOOLS_HOME%/lib/webservices-api.jar";"%TOOLS_HOME%/lib/webservices-rt.jar";"%TOOLS_HOME%/lib/webservices-tools.jar";"%TOOLS_HOME%/lib/xsdlib.jar";"%TOOLS_HOME%/lib/amserver.jar";"%TOOLS_HOME%/lib/opensso-sharedlib.jar";"%TOOLS_HOME%/lib/opensso.jar";"%TOOLS_HOME%/lib/openfedlib.jar";"%TOOLS_HOME%/lib/json.jar"
 
 IF DEFINED ORIG_CLASSPATH (
 	set CLASSPATH=%ORIG_CLASSPATH%;%CLASSPATH%

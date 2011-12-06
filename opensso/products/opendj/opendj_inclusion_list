@@ -1,4 +1,5 @@
 instance.loc
+opends_logo.png
 bat/
 bat/backup.bat
 bat/base64.bat
@@ -103,14 +104,14 @@ config/schema/06-compat.ldif
 config/servicetag/
 config/servicetag/opends.uuids.properties
 config/upgrade/
-config/upgrade/config.ldif.6500
-config/upgrade/schema.ldif.6500
+config/upgrade/config.ldif.7356
+config/upgrade/schema.ldif.7356
 db/
 import-tmp/
 ldif/
 ldif/openam_suffix.ldif.template
 legal-notices/
-legal-notices/BinariesLicense.txt
+legal-notices/CDDLv1_0.txt
 legal-notices/OpenDS.LICENSE
 legal-notices/THIRDPARTYREADME.txt
 lib/

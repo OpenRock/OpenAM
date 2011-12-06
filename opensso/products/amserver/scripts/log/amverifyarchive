@@ -31,7 +31,7 @@
 TOOLS_HOME="@TOOLS_HOME@"
 JAVA_HOME="@JAVA_HOME@"
 
-TOOLS_CLASSPATH="@CONFIG_DIR@":${TOOLS_HOME}/lib/amadm_setup.jar:${TOOLS_HOME}/lib/OpenDS.jar:${TOOLS_HOME}/lib/j2ee.jar:${TOOLS_HOME}/lib/amserver.jar:${TOOLS_HOME}/lib/opensso-sharedlib.jar:${TOOLS_HOME}/lib/opensso.jar:${TOOLS_HOME}/lib/openfedlib.jar:${TOOLS_HOME}/resources:${TOOLS_HOME}/config
+TOOLS_CLASSPATH="@CONFIG_DIR@":${TOOLS_HOME}/lib/amadm_setup.jar:${TOOLS_HOME}/lib/OpenDJ.jar:${TOOLS_HOME}/lib/j2ee.jar:${TOOLS_HOME}/lib/amserver.jar:${TOOLS_HOME}/lib/opensso-sharedlib.jar:${TOOLS_HOME}/lib/opensso.jar:${TOOLS_HOME}/lib/openfedlib.jar:${TOOLS_HOME}/resources:${TOOLS_HOME}/config
 
 # Setup proper LD_LIBRARY_PATH if not already set
 

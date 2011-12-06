@@ -111,7 +111,7 @@ class UserIdRepo {
         String strFiles = rb.getString(SetupConstants.SUNDS_LDIF);
         if (type.equals(SetupConstants.UM_LDAPv3ForOpenDS)) {
             strFiles = rb.getString(SetupConstants.OpenDS_LDIF);
-            configName = "OpenDS";
+            configName = "OpenDJ";
         } else if (type.equals(SetupConstants.UM_LDAPv3ForAD)) {
             strFiles = rb.getString(SetupConstants.AD_LDIF);
             configName = "Active Directory";

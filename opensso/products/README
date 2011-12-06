@@ -42,7 +42,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
                relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar, 
                FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
                webservices-rt.jar, webservices-tools.jar, 
-               webservices-extra.jar, webservices-extra-api.jar, OpenDS.jar, 
+               webservices-extra.jar, webservices-extra-api.jar, OpenDJ.jar, 
                je.jar, xercesImpl.jar, jss4.jar,
                esapiport.jar, json.jar, asm-3.1.jar,
                commons-logging-api-1.1.jar, rome-1.0.jar,jdom.jar,
@@ -63,7 +63,7 @@ Portions Copyrighted 2010-2011 ForgeRock AS
         %% 2.9 Obtaining jsr311-api-1.1.jar
         %% 2.10 Obtaining jstl.jar
         %% 2.11 Obtaining jsf.jar, jsf-impl.jar
-        %% 2.12 Obtaining opends.zip
+        %% 2.12 Obtaining opendj.zip
         %% 2.13 Obtaining log4j-1.2.8.jar
         %% 2.14 Obtaining velocity-1.7.jar
         %% 2.15 Obtaining commons-io 2.0.1
@@ -112,7 +112,7 @@ The libraries needed for compiling OpenSSO sources are:
      relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar, 
      FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
      webservices-rt.jar, webservices-tools.jar, webservices-extra.jar,
-     webservices-extra-api.jar, OpenDS.jar, je.jar,
+     webservices-extra-api.jar, OpenDJ.jar, je.jar,
      xercesImpl.jar, jss4.jar
    - TestNG version 5.9 : testng-5.9-jdk15.jar
    - Secure Attribute Exchange API: fmsae.dll and fmsae64.dll
@@ -243,16 +243,16 @@ libraries/native to opensso/products/extlib.
        https://javaserverfaces.dev.java.net/files/documents/1866/138058/mojarra-1.2_13-binary.zip
 2.11.2 Unzip it and the jars are in lib directory.
 
-%% 2.12 Obtaining opends.zip
-2.12.1 Download the latest OpenDS 2.3.x from
-	http://www.opends.org/
+%% 2.12 Obtaining opendj.zip
+2.12.1 Download the latest OpenDJ 2.4.x from
+	http://opendj.forgerock.org/
 2.12.2 Change to the opensso/products/opends directory
-2.12.3 Unzip the OpenDS zip file
-2.12.4 Copy the OpenDS.zip and je.jar files from the OpenDS-2.3.0/lib directory into
+2.12.3 Unzip the OpenDJ zip file
+2.12.4 Copy the OpenDJ.zip and je.jar files from the OpenDJ-2.4.x/lib directory into
         products/extlib
-2.12.5 Run the create_opends_zip.sh script (ensure the script has the execute permission set)
-    	./create_opends_zip.sh OpenDS-2.3.0
-2.12.6 Copy the opends.zip into the products/extlib directory
+2.12.5 Run the create_opendj_zip.sh script (ensure the script has the execute permission set)
+    	./create_opendj_zip.sh OpenDJ-2.4.x
+2.12.6 Copy the opendj.zip into the products/extlib directory
 
 %% 2.13 Obtaining log4j-1.2.8.jar
 2.13.1 Download from

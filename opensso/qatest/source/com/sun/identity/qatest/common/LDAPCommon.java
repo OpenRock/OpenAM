@@ -469,7 +469,7 @@ public class LDAPCommon extends TestCommon {
             .append("sn: dsameuser\n")
             .append("userPassword: amsecret12\n\n");
 
-            if (strVendor.contains("OpenDS")) {
+            if (strVendor.contains("OpenDS") || strVendor.contains("OpenDJ")) {
                 buff.append("dn: cn=dsameuser,ou=DSAME Users,@ROOT_SUFFIX@\n")
                 .append("changetype: modify\n")
                 .append("add: ds-privilege-name\n")
@@ -503,7 +503,7 @@ public class LDAPCommon extends TestCommon {
                     " \"ldap:///cn=amldapuser,ou=DSAME Users," +
                     " @ROOT_SUFFIX@\"; )\n\n");        
 
-            if (strVendor.contains("OpenDS")) {
+            if (strVendor.contains("OpenDS") || strVendor.contains("OpenDJ")) {
                 buff.append("dn:@ROOT_SUFFIX@\n")
                 .append("changetype:modify\n")
                 .append("delete:aci\n")

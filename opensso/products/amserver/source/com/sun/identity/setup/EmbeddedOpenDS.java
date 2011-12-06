@@ -108,7 +108,7 @@ public class EmbeddedOpenDS {
      * Returns <code>true</code> if the server has already been started.
      *
      * @return <code>true</code> if the server has already been started.
-     */ 
+     */
     public static boolean isStarted() {
         return serverStarted;
     }
@@ -147,11 +147,11 @@ public class EmbeddedOpenDS {
         new File(odsRoot).mkdir();
 
         SetupProgress.reportStart("emb.opends.start", null);
-        String zipFileName = "/WEB-INF/template/opends/opends.zip";
+        String zipFileName = "/WEB-INF/template/opendj/opendj.zip";
         BufferedInputStream bin = new BufferedInputStream(
                 AMSetupServlet.getResourceAsStream(servletCtx, zipFileName), 10000);
         BufferedOutputStream bout = new BufferedOutputStream(
-                new FileOutputStream(odsRoot + "/opends.zip"), 10000);
+                new FileOutputStream(odsRoot + "/opendj.zip"), 10000);
 
         try {
             while (bin.available() > 0) {
@@ -179,7 +179,7 @@ public class EmbeddedOpenDS {
             }
         }
 
-        ZipFile opendsZip = new ZipFile(odsRoot + "/opends.zip");
+        ZipFile opendsZip = new ZipFile(odsRoot + "/opendj.zip");
         Enumeration files = opendsZip.entries();
 
         while (files.hasMoreElements()) {
@@ -227,9 +227,9 @@ public class EmbeddedOpenDS {
             }
         }
 
-        // copy OpenDS jar file
+        // copy OpenDJ jar file
         String[] opendsJarFiles = {
-            "OpenDS.jar",
+            "OpenDJ.jar",
             "je.jar",
             "mail.jar"
         };
@@ -345,7 +345,7 @@ public class EmbeddedOpenDS {
         }
 
         // remove zip
-        File toDelete = new File(odsRoot + "/opends.zip");
+        File toDelete = new File(odsRoot + "/opendj.zip");
         if (!toDelete.delete()) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                     "EmbeddedOpenDS.setup(): Unable to delete zip file");
@@ -370,7 +370,7 @@ public class EmbeddedOpenDS {
             SetupProgress.reportStart("emb.creatingfamsuffix", null);
             //EmbeddedOpenDS.shutdownServer("to load ldif");
             int ret = EmbeddedOpenDS.loadLDIF(map, odsRoot, odsRoot + "/ldif/openam_suffix.ldif");
-            
+
             if (ret == 0) {
                 SetupProgress.reportEnd("emb.creatingfamsuffix.success", null);
             } else {
@@ -424,10 +424,10 @@ public class EmbeddedOpenDS {
             try {
                 Cipher.getInstance(preferredTransforms[i]);
                 return preferredTransforms[i];
-             } 
-             catch  ( NoSuchAlgorithmException ex) {  
              }
-             catch  ( NoSuchPaddingException ex) {  
+             catch  ( NoSuchAlgorithmException ex) {
+             }
+             catch  ( NoSuchPaddingException ex) {
              }
         }
         return null;
@@ -522,7 +522,7 @@ public class EmbeddedOpenDS {
     /**
      *  Starts the embedded <code>OpenDS</code> instance.
      *
-     *  @param odsRoot File system directory where <code>OpenDS</code> 
+     *  @param odsRoot File system directory where <code>OpenDS</code>
      *                 is installed.
      *
      *  @throws Exception upon encountering errors.
@@ -549,7 +549,7 @@ public class EmbeddedOpenDS {
             SetupProgress.reportStart("emb.waitingforstarted", null);
             Thread.sleep(1000);
         }
-        
+
         if (EmbeddedUtils.isRunning()) {
             SetupProgress.reportEnd("emb.success", null);
         } else {
@@ -557,7 +557,7 @@ public class EmbeddedOpenDS {
         }
 
         serverStarted = true;
-      
+
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
         if (shutdownMan.acquireValidLock()) {
             try {
@@ -578,7 +578,7 @@ public class EmbeddedOpenDS {
             }
         }
     }
-    
+
 
     /**
      *  Gracefully shuts down the embedded opends instance.
@@ -598,7 +598,7 @@ public class EmbeddedOpenDS {
             while (DirectoryServer.isRunning() && (sleepcount < 60)) {
                 sleepcount++;
                 Thread.sleep(1000);
-            } 
+            }
             serverStarted = false;
             debug.message("EmbeddedOpenDS.shutdown server success.");
         }
@@ -623,7 +623,7 @@ public class EmbeddedOpenDS {
                     "configurator.embreplfailed");
         }
     }
-    
+
     /**
       * Setups replication between two opends sms and user stores.
       * $ dsreplication enable
@@ -631,8 +631,8 @@ public class EmbeddedOpenDS {
       *    --host1 host1 --port1 1389 --bindDN1 "cn=Directory Manager"
       *    --bindPassword1 password --replicationPort1 8989
       *    --host2 host2 --port2 2389 --bindDN2 "cn=Directory Manager"
-      *    --bindPassword2 password --replicationPort2 8990 
-      *    --adminUID admin --adminPassword password 
+      *    --bindPassword2 password --replicationPort2 8990
+      *    --adminUID admin --adminPassword password
       *    --baseDN "dc=example,dc=com"
       *
       *
@@ -667,7 +667,7 @@ public class EmbeddedOpenDS {
             "--adminUID",            // 22
             "admin",                 // 23
             "--adminPassword",       // 24
-            "xxxxxxxx",              // 25 
+            "xxxxxxxx",              // 25
             "--baseDN",              // 26
             "dc=example,dc=com",     // 27
             "--trustAll"             // 28
@@ -699,10 +699,10 @@ public class EmbeddedOpenDS {
                 "Port 2 "+enableCmd[15]);
         }
         int ret = ReplicationCliMain.mainCLI(
-            enableCmd, false, 
-            SetupProgress.getOutputStream(), 
-            SetupProgress.getOutputStream(), 
-            null);         
+            enableCmd, false,
+            SetupProgress.getOutputStream(),
+            SetupProgress.getOutputStream(),
+            null);
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -713,7 +713,7 @@ public class EmbeddedOpenDS {
     }
     /**
       * Syncs replication data between two opends sms and user stores.
-      * $ dsreplication initialize 
+      * $ dsreplication initialize
       *     --baseDN "dc=example,dc=com" --adminUID admin --adminPassword pass
       *     --hostSource host1 --portSource 1389
       *     --hostDestination host2 --portDestination 2389
@@ -757,7 +757,7 @@ public class EmbeddedOpenDS {
         initializeCmd[7] =(String)map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
         int ret = ReplicationCliMain.mainCLI(initializeCmd, false,
             SetupProgress.getOutputStream(), SetupProgress.getOutputStream(),
-            null); 
+            null);
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -793,33 +793,33 @@ public class EmbeddedOpenDS {
             debug.message("EmbeddedOpenDS:getReplicationStatus:exec dsreplication :"
                              +dbgcmd);
         }
-        int ret = ReplicationCliMain.mainCLI(statusCmd, false, oo, err, null); 
+        int ret = ReplicationCliMain.mainCLI(statusCmd, false, oo, err, null);
         if (debug.messageEnabled()) {
             debug.message("EmbeddedOpenDS:getReplicationStatus:dsreplication ret:"
                            +ret);
         }
         return ret;
     }
- 
+
     /**
       * @return true if multi server option is selected in the configurator.
       */
-    public static boolean isMultiServer(Map map) 
+    public static boolean isMultiServer(Map map)
     {
-        String replFlag = (String) map.get(SetupConstants.DS_EMB_REPL_FLAG); 
+        String replFlag = (String) map.get(SetupConstants.DS_EMB_REPL_FLAG);
         if (replFlag != null && replFlag.startsWith(
               SetupConstants.DS_EMP_REPL_FLAG_VAL)) {
             return true;
         }
         return false;
     }
-    
-    private static String concat(String[] args) 
+
+    private static String concat(String[] args)
     {
         String ret = "";
         for (int i = 0; i < args.length; i++)
-           ret += args[i]+" ";        
-        
+           ret += args[i]+" ";
+
         return ret;
     }
 
@@ -841,8 +841,8 @@ public class EmbeddedOpenDS {
                 debug.message("EmbeddedOpenDS:loadLDIF(" + ldif + ")");
             }
 
-            String[] args1 = 
-            { 
+            String[] args1 =
+            {
                 "-C",                                               // 0
                 "org.opends.server.extensions.ConfigFileHandler",   // 1
                 "-f",                                               // 2
@@ -871,7 +871,7 @@ public class EmbeddedOpenDS {
         }
 
         return ret;
-    } 
+    }
 
     /**
       * Returns a one-way hash for passwd using SSHA512 scheme.
@@ -893,7 +893,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     *  Get replication port 
+     *  Get replication port
      *  @param username
      *  @param password
      *  @param hostname
@@ -901,12 +901,12 @@ public class EmbeddedOpenDS {
      *  @return port number if replication is setup, null if not or on error.
      */
     public static String getReplicationPort(
-        String username, 
-        String password, 
-        String hostname, 
+        String username,
+        String password,
+        String hostname,
         String port
     ) {
-        final String replDN = 
+        final String replDN =
            "cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config";
         final String[] attrs = { "ds-cfg-replication-port" };
         String replPort = null;
@@ -935,12 +935,12 @@ public class EmbeddedOpenDS {
         } catch (Exception ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
             "EmbeddedOpenDS.getReplicationPort(). Error getting replication port:", ex);
-             
+
         } finally {
             disconnectDServer(ld);
         }
         return replPort;
-       
+
     }
 
     /**
@@ -995,9 +995,9 @@ public class EmbeddedOpenDS {
 
         return adminPort;
     }
-   
+
     /**
-     * Synchronizes replication server info with current list of opensso servers. 
+     * Synchronizes replication server info with current list of opensso servers.
      */
     public static boolean syncReplicatedServers(
                           Set currServerSet, String port, String passwd)
@@ -1006,7 +1006,7 @@ public class EmbeddedOpenDS {
         debug.message("EmbeddedOPenDS:syncReplication:start processing.");
         String[] args = {
             "-p", port,      // 1 : ds port num
-            "-h", "localhost", 
+            "-h", "localhost",
             "-D",  "cn=directory manager",
             "-w", passwd,    // 7 : password
             "list-replication-server",
@@ -1044,7 +1044,7 @@ public class EmbeddedOpenDS {
             line = brd.readLine(); // 3rd line
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
-        } 
+        }
         if (line == null)  {
             debug.error("EmbeddedOpenDS:syncReplication:cmd failed"+str);
             return false;
@@ -1057,31 +1057,31 @@ public class EmbeddedOpenDS {
             StringTokenizer stok = new StringTokenizer(replservers, ",");
             // Check if this server is part of server list
             List cmdlist = new ArrayList();
-            cmdlist.add("-p"); 
+            cmdlist.add("-p");
             cmdlist.add(port);
-            cmdlist.add("-h"); 
-            cmdlist.add("localhost"); 
-            cmdlist.add("-D");  
+            cmdlist.add("-h");
+            cmdlist.add("localhost");
+            cmdlist.add("-D");
             cmdlist.add("cn=directory manager");
-            cmdlist.add("-w"); 
+            cmdlist.add("-w");
             cmdlist.add(passwd);
             cmdlist.add("--no-prompt");
             cmdlist.add("--trustAll");
             cmdlist.add("set-replication-server-prop");
-            cmdlist.add("--provider-name"); 
+            cmdlist.add("--provider-name");
             cmdlist.add("Multimaster Synchronization");
 
             int numremoved = 0;
             while (stok.hasMoreTokens()) {
                 String tok = stok.nextToken().trim();
                 if (!currServerSet.contains(tok)) {
-                    cmdlist.add("--remove"); 
+                    cmdlist.add("--remove");
                     cmdlist.add("replication-server:"+tok);
                     numremoved++;
                 }
             }
             if (numremoved > 0) {
-                String[] args1 = 
+                String[] args1 =
                     (String[]) cmdlist.toArray(new String[cmdlist.size()]);
                 if (debug.messageEnabled()) {
                     String dbgcmd1 = concat(args1).replaceAll(passwd, "****");
@@ -1105,11 +1105,11 @@ public class EmbeddedOpenDS {
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
             return false;
-        } 
+        }
         return true;
     }
     /**
-     * Synchronizes replication domain info with current list of opensso servers. 
+     * Synchronizes replication domain info with current list of opensso servers.
      */
     public static boolean syncReplicatedDomains(
                           Set currServerSet, String port, String passwd)
@@ -1118,7 +1118,7 @@ public class EmbeddedOpenDS {
         debug.message("EmbeddedOpenDS:syncReplication:Domains:started");
         String[] args = {
             "-p", port,      // 1 : ds port num
-            "-h", "localhost", 
+            "-h", "localhost",
             "-D",  "cn=directory manager",
             "-w", passwd,    // 7 : password
             "list-replication-domains",
@@ -1155,40 +1155,40 @@ public class EmbeddedOpenDS {
                         debug.message("EmbeddedOpenDS:syncRepl:domain="+
                                       domainname+" replservers="+replservers);
                     }
-    
+
                     StringTokenizer stok = new StringTokenizer(replservers, ",");
                     // Check if this server is part of server list
                     List cmdlist = new ArrayList();
-                    cmdlist.add("-p"); 
+                    cmdlist.add("-p");
                     cmdlist.add(port);
-                    cmdlist.add("-h"); 
-                    cmdlist.add("localhost"); 
-                    cmdlist.add("-D");  
+                    cmdlist.add("-h");
+                    cmdlist.add("localhost");
+                    cmdlist.add("-D");
                     cmdlist.add("cn=directory manager");
-                    cmdlist.add("-w"); 
+                    cmdlist.add("-w");
                     cmdlist.add(passwd);
                     cmdlist.add("--no-prompt");
                     cmdlist.add("--trustAll");
                     cmdlist.add("set-replication-domain-prop");
-                    cmdlist.add("--provider-name"); 
+                    cmdlist.add("--provider-name");
                     cmdlist.add("Multimaster Synchronization");
-                    cmdlist.add("--domain-name"); 
+                    cmdlist.add("--domain-name");
                     cmdlist.add(domainname);
-    
+
                     int numremoved = 0;
                     while (stok.hasMoreTokens()) {
                         String tok = stok.nextToken().trim();
                         if (!currServerSet.contains(tok)) {
-                            cmdlist.add("--remove"); 
+                            cmdlist.add("--remove");
                             cmdlist.add("replication-server:"+tok);
                             numremoved++;
                         }
                     }
                     if (numremoved > 0) {
-                        String[] args1 = 
+                        String[] args1 =
                             (String[]) cmdlist.toArray(new String[cmdlist.size()]);
                         if (debug.messageEnabled()) {
-                            String dbgcmd1 = 
+                            String dbgcmd1 =
                                 concat(args1).replaceAll(passwd, "****");
                             debug.message("EmbeddedOpenDS:syncReplication:Execute:"+
                                      dbgcmd1);
@@ -1205,20 +1205,20 @@ public class EmbeddedOpenDS {
                           debug.message("EmbeddedOpenDS:syncReplication:Result:"+
                                  str);
                         }
-                    } 
+                    }
                 } catch (Exception ex) {
                     debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
                     return false;
-                } 
+                }
             }
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
             return false;
-        } 
+        }
         return true;
     }
     /**
-     * Synchronizes replication domain info with current list of opensso servers. 
+     * Synchronizes replication domain info with current list of opensso servers.
      */
     public static boolean syncReplicatedServerList(
                           Set currServerSet, String port, String passwd)
@@ -1251,7 +1251,7 @@ public class EmbeddedOpenDS {
     /**
      * Helper method to return Ldap connection to a embedded opends
      * server.
-     * @return Ldap connection 
+     * @return Ldap connection
      */
     private static LDAPConnection getLDAPConnection(
         String dsHostName,
@@ -1273,7 +1273,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Helper method to disconnect from Directory Server. 
+     * Helper method to disconnect from Directory Server.
      */
     private static void disconnectDServer(LDAPConnection ld) {
         if ((ld != null) && ld.isConnected()) {
@@ -1282,8 +1282,8 @@ public class EmbeddedOpenDS {
             } catch (LDAPException e) {
             }
         }
-    } 
-    static final String replDN = 
+    }
+    static final String replDN =
             "cn=all-servers,cn=Server Groups,cn=admin data";
     /**
      *  Removes host:port from opends replication
@@ -1292,7 +1292,7 @@ public class EmbeddedOpenDS {
         LDAPConnection lc,
         String delServer
     ) {
-        String replServerDN = 
+        String replServerDN =
            "cn="+delServer+",cn=Servers,cn=admin data";
         final String[] attrs = { "ds-cfg-key-id" };
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
@@ -1322,17 +1322,17 @@ public class EmbeddedOpenDS {
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
                         " Error getting replication key:", ex);
-             
+
         }
         try {
             lc.delete(replServerDN);
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
                         " Error getting deleting server entrt:"+replServerDN, ex);
-             
+
         }
         try {
-            LDAPAttribute attr = new LDAPAttribute( 
+            LDAPAttribute attr = new LDAPAttribute(
                                     "uniqueMember", "cn="+ delServer);
             LDAPModification mod = new LDAPModification(
                                    LDAPModification.DELETE, attr);
@@ -1340,7 +1340,7 @@ public class EmbeddedOpenDS {
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
                         " Error getting removing :"+replDN, ex);
-             
+
         }
     }
     /**
@@ -1377,7 +1377,7 @@ public class EmbeddedOpenDS {
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
                         " Error getting replication key:", ex);
-             
+
         }
         return null;
     }
@@ -1389,7 +1389,7 @@ public class EmbeddedOpenDS {
     public static int rebuildIndex(Map map) throws Exception {
         int ret = 0;
         shutdownServer("Rebuild index");
-        String basedir = 
+        String basedir =
             (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
         String odsRoot = basedir + "/" +
             SetupConstants.SMS_OPENDS_DATASTORE;
@@ -1417,7 +1417,7 @@ public class EmbeddedOpenDS {
         String outStr = bos.toString();
         String errStr = boe.toString();
         if (errStr.length() != 0) {
-            debug.error("EmbeddedOpenDS:rebuildIndex:stderr=" + 
+            debug.error("EmbeddedOpenDS:rebuildIndex:stderr=" +
                 errStr);
         }
         if (debug.messageEnabled()) {
@@ -1427,7 +1427,7 @@ public class EmbeddedOpenDS {
                 debug.message("EmbeddedOpenDS:rebuildIndex: "+
                     "Rebuild Status: "+ outStr.substring(idx));
             }
-            debug.message("EmbeddedOpenDS:rebuildIndex:Result:" + 
+            debug.message("EmbeddedOpenDS:rebuildIndex:Result:" +
                 outStr);
         }
         startServer(odsRoot);
@@ -1446,7 +1446,7 @@ public class EmbeddedOpenDS {
 
         return openDSVer1x;
     }
-    
+
     /**
       * @return true if installed OpenDS is version 2.3.0BACKPORT2
       */
@@ -1459,14 +1459,14 @@ public class EmbeddedOpenDS {
 
         return openDSVer230b2;
     }
-    
+
     public static String getOpenDSVersion() {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         String odsRoot = AMSetupServlet.getBaseDir() + "/" + SetupConstants.SMS_OPENDS_DATASTORE;
         String version = "unknown";
-        
+
         File configLdif = new File(odsRoot + OPENDS_UPGRADE_DIR);
-        
+
         if (configLdif.exists() && configLdif.isDirectory()) {
             String[] configFile = configLdif.list(new FilenameFilter() {
                 @Override
@@ -1474,7 +1474,7 @@ public class EmbeddedOpenDS {
                     return name.startsWith(OPENDS_CONFIG_LDIF);
                 }
             });
-            
+
             if (configFile.length != 0) {
                 version = configFile[0].substring(configFile[0].lastIndexOf('.') + 1);
             } else {
@@ -1485,11 +1485,11 @@ public class EmbeddedOpenDS {
                 debug.warning("Unable to determine OpenDS version; could be pre-config");
             }
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("Found OpenDS version: " + version);
         }
-  
+
         return version;
     }
 
