@@ -1006,6 +1006,7 @@ public abstract class AMLoginModule implements LoginModule {
                 throw new AuthLoginException(e);
             }
         } catch (RuntimeException re) {
+            currentState = ISAuthConstants.LOGIN_IGNORE;
             setFailureModuleName(moduleName);
             //rethrow the exception
             throw re;
