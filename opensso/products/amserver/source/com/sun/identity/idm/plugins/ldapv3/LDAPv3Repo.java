@@ -2960,6 +2960,42 @@ public class LDAPv3Repo extends IdRepo {
         }
         return  groupDNs;
     }
+    
+    private String replaceEscapeChars(String dn) {
+        StringBuilder result = new StringBuilder(dn.length());
+        for (int cursor=0; cursor < dn.length(); cursor++) {
+            char nextChar = dn.charAt(cursor);
+            switch (nextChar) {
+                case '*' :
+                    result.append("\\2a");
+                    break;
+                case '(' :
+                    result.append("\\28");
+                    break;
+                case ')' :
+                    result.append("\\29");
+                    break;
+                case '/' :
+                    result.append("\\2f");
+                    break;
+                case '\\' :
+                    //assuming backslash wasn't escaped before this method
+                    result.append("\\5c");
+                    break;
+                case 'N' :
+                	String NULSTR = dn.substring(cursor, cursor+3);
+                    if (NULSTR.equals("NUL")) {
+                        result.append("\\00");
+                        cursor = cursor+2;
+                        break;
+                    }
+                default  :
+                    result.append(nextChar);
+                    break;
+            }
+        }
+    	return result.toString();
+    }
 
     private Set getGroupMemberSearch(
         SSOToken token,
@@ -2974,6 +3010,10 @@ public class LDAPv3Repo extends IdRepo {
         int ldapResultCode = 0;
         groupDNs = new HashSet();
         String dn = getDN(type, name);
+        
+        //replace any special search filter char defined in rfc2254
+        dn = replaceEscapeChars(dn);
+
         String baseDN = getBaseDN(IdType.GROUP);
         String attrs[] = { "dn" };
         int searchGroupScope = searchScope;
