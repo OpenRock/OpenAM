@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011 ForgeRock AS
+ */
 package com.sun.identity.saml2.xmlsig;
 
 import java.io.IOException;
@@ -281,6 +284,22 @@ public final class FMSigProvider implements SigProvider {
 	} catch (TransformerException te) {
 	    throw new SAML2Exception(te);
 	}
+        Element refElement;
+	try {
+	    refElement = (Element) XPathAPI.selectSingleNode(
+	    doc,
+	    "//ds:Reference[1]", nscontext);
+	} catch (TransformerException te) {
+	    throw new SAML2Exception(te);
+	}
+        String refUri = refElement.getAttribute("URI");
+        String signedId = ((Element) sigElement.getParentNode()).getAttribute("ID");
+        if (refUri == null || signedId== null || !refUri.substring(1).equals(signedId)) {
+            SAML2SDKUtils.debug.error(classMethod + "Signature reference ID does "
+                    + "not match with element ID");
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("uriNoMatchWithId"));
+        }
+
 	IdResolver.registerElementById(
 	    doc.getDocumentElement(), idValue);
 	XMLSignature signature = null;
