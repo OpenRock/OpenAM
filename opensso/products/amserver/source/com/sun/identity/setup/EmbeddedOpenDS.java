@@ -32,6 +32,7 @@
 
 package com.sun.identity.setup;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.ShutdownPriority;
@@ -141,8 +142,7 @@ public class EmbeddedOpenDS {
         }
 
         String basedir = (String) map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
-        String odsRoot = basedir + "/" +
-            SetupConstants.SMS_OPENDS_DATASTORE;
+        String odsRoot = getOpenDJBaseDir(map);
         new File(basedir).mkdir();
         new File(odsRoot).mkdir();
 
@@ -357,7 +357,7 @@ public class EmbeddedOpenDS {
         System.setProperty("org.opends.quicksetup.Root", odsRoot);
         System.setProperty(ServerConstants.PROPERTY_SERVER_ROOT, odsRoot);
         System.setProperty(ServerConstants.PROPERTY_INSTANCE_ROOT, odsRoot);
-        EmbeddedOpenDS.setupOpenDS(odsRoot + "/config/config.ldif", map);
+        EmbeddedOpenDS.setupOpenDS(map);
 
         Object[] params = {odsRoot};
         SetupProgress.reportStart("emb.installingemb", params);
@@ -440,11 +440,11 @@ public class EmbeddedOpenDS {
      * @param map The map of configuration options
      * @throws Exception upon encountering errors.
      */
-    public static void setupOpenDS(String configFile, Map map)
+    public static void setupOpenDS(Map map)
     throws Exception {
         SetupProgress.reportStart("emb.setupopends", null);
 
-        int ret = runOpenDSSetup(map, configFile);
+        int ret = runOpenDSSetup(map);
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.setupopends.success", null);
@@ -470,7 +470,7 @@ public class EmbeddedOpenDS {
       *  @param map Map of properties collected by the configurator.
       *  @return status : 0 == success, !0 == failure
       */
-    public static int runOpenDSSetup(Map map, String configFile) {
+    public static int runOpenDSSetup(Map map) {
         String[] setupCmd= {
             "--cli",                        // 0
             "--adminConnectorPort",         // 1
@@ -497,7 +497,7 @@ public class EmbeddedOpenDS {
         setupCmd[6] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
         setupCmd[8] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT);
         setupCmd[13] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT);
-        setupCmd[16] = configFile;
+        setupCmd[16] = getOpenDJConfigFile(map);
 
         Object[] params = {concat(setupCmd)};
         SetupProgress.reportStart("emb.setupcommand", params);
@@ -670,7 +670,9 @@ public class EmbeddedOpenDS {
             "xxxxxxxx",              // 25
             "--baseDN",              // 26
             "dc=example,dc=com",     // 27
-            "--trustAll"             // 28
+            "--trustAll",            // 28
+            "--configFile",          // 29
+            "path/to/config.ldif"    // 30
         };
         enableCmd[3] = (String) map.get(SetupConstants.DS_EMB_REPL_HOST2);
         enableCmd[5] = (String) map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
@@ -679,6 +681,7 @@ public class EmbeddedOpenDS {
         enableCmd[15] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
         enableCmd[21] = (String) map.get(SetupConstants.DS_EMB_REPL_REPLPORT1);
         enableCmd[27] = (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
+        enableCmd[30] = getOpenDJConfigFile(map);
 
         Object[] params = {concat(enableCmd)};
         SetupProgress.reportStart("emb.replcommand", params);
@@ -741,7 +744,9 @@ public class EmbeddedOpenDS {
             "localhost",                  // 13
             "--portDestination",          // 14
             "51389",                      // 15
-            "--trustAll"                  // 16
+            "--trustAll",                 // 16
+            "--configFile",               // 17
+            "path/to/config.ldif"         // 18
         };
         initializeCmd[3] = (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
         initializeCmd[9] = (String)map.get(SetupConstants.DS_EMB_REPL_HOST2);
@@ -750,6 +755,7 @@ public class EmbeddedOpenDS {
             SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST);
         initializeCmd[15] = (String)map.get(
             SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
+        initializeCmd[18] = getOpenDJConfigFile(map);
 
         Object[] params = {concat(initializeCmd)};
         SetupProgress.reportStart("emb.replcommand", params);
@@ -780,13 +786,17 @@ public class EmbeddedOpenDS {
                 OutputStream oo, OutputStream err)
     {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
+        String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
+
         String[] statusCmd= {
                               "status","--no-prompt",
                               "-h",  "localhost",
                               "-p",  port,
                               "--adminUID", "admin",
                               "--adminPassword",  passwd,
-                              "-s"
+                              "-s",
+                              "--configFile",
+                              baseDir + "/opends/config/config.ldif"
                             };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(statusCmd).replaceAll(passwd, "****");
@@ -1389,16 +1399,12 @@ public class EmbeddedOpenDS {
     public static int rebuildIndex(Map map) throws Exception {
         int ret = 0;
         shutdownServer("Rebuild index");
-        String basedir =
-            (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
-        String odsRoot = basedir + "/" +
-            SetupConstants.SMS_OPENDS_DATASTORE;
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         String[] args = {
             "--configClass",
             "org.opends.server.extensions.ConfigFileHandler",
             "--configFile",
-            odsRoot + "/config/config.ldif",
+            getOpenDJConfigFile(map),
             "--baseDN",
             (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
             "--index",
@@ -1430,7 +1436,7 @@ public class EmbeddedOpenDS {
             debug.message("EmbeddedOpenDS:rebuildIndex:Result:" +
                 outStr);
         }
-        startServer(odsRoot);
+        startServer(getOpenDJBaseDir(map));
         return ret;
     }
 
@@ -1498,5 +1504,17 @@ public class EmbeddedOpenDS {
      */
     public static void initializeForClientUse() {
         EmbeddedUtils.initializeForClientUse();
+    }
+
+    // Returns the installation directory for the embedded OpenDJ.
+    private static String getOpenDJBaseDir(Map configProperties) {
+        String basedir = (String) configProperties
+          .get(SetupConstants.CONFIG_VAR_BASE_DIR);
+        return basedir + "/" + SetupConstants.SMS_OPENDS_DATASTORE;
+    }
+
+    // Returns the configuration file name for the embedded OpenDJ.
+    private static String getOpenDJConfigFile(Map configProperties) {
+        return getOpenDJBaseDir(configProperties) + "/config/config.ldif";
     }
 }
