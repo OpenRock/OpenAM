@@ -452,7 +452,9 @@ public class EmbeddedOpenDJ {
             "--no-prompt",                  // 14
             "--configFile",                 // 15
             "/path/to/config.ldif",         // 16
-            "--doNotStart"                  // 17
+            "--doNotStart",                 // 17
+            "--hostname",                   // 18
+            "hostname"                      // 19
         };
 
         setupCmd[2] = map.get(Constants.OPENDJ_ADMIN_PORT);
@@ -461,6 +463,7 @@ public class EmbeddedOpenDJ {
         setupCmd[8] = map.get(Constants.OPENDJ_LDAP_PORT);
         setupCmd[13] = map.get(Constants.OPENDJ_JMX_PORT);
         setupCmd[16] = configFile;
+        setupCmd[19] = map.get(Constants.HOST_FQDN);
 
         final LocalizableMessage message = DB_DJ_SETUP_RUN.get(concat(setupCmd));
         Log.logger.log(Level.FINE, message.toString());

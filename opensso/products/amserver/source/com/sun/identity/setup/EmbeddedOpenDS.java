@@ -489,7 +489,9 @@ public class EmbeddedOpenDS {
             "--no-prompt",                  // 14
             "--configFile",                 // 15
             "/path/to/config.ldif",         // 16
-            "--doNotStart"                  // 17
+            "--doNotStart",                 // 17
+            "--hostname",                   // 18
+            "hostname"                      // 19
         };
 
         setupCmd[2] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
@@ -498,6 +500,7 @@ public class EmbeddedOpenDS {
         setupCmd[8] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT);
         setupCmd[13] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT);
         setupCmd[16] = getOpenDJConfigFile(map);
+        setupCmd[19] = getOpenDJHostName(map);
 
         Object[] params = {concat(setupCmd)};
         SetupProgress.reportStart("emb.setupcommand", params);
@@ -677,7 +680,7 @@ public class EmbeddedOpenDS {
         enableCmd[3] = (String) map.get(SetupConstants.DS_EMB_REPL_HOST2);
         enableCmd[5] = (String) map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
         enableCmd[11] = (String) map.get(SetupConstants.DS_EMB_REPL_REPLPORT2);
-        enableCmd[13] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST);
+        enableCmd[13] = getOpenDJHostName(map);
         enableCmd[15] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
         enableCmd[21] = (String) map.get(SetupConstants.DS_EMB_REPL_REPLPORT1);
         enableCmd[27] = (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
@@ -751,8 +754,7 @@ public class EmbeddedOpenDS {
         initializeCmd[3] = (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
         initializeCmd[9] = (String)map.get(SetupConstants.DS_EMB_REPL_HOST2);
         initializeCmd[11] = (String)map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
-        initializeCmd[13] = (String)map.get(
-            SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST);
+        initializeCmd[13] = getOpenDJHostName(map);
         initializeCmd[15] = (String)map.get(
             SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
         initializeCmd[18] = getOpenDJConfigFile(map);
@@ -1516,5 +1518,17 @@ public class EmbeddedOpenDS {
     // Returns the configuration file name for the embedded OpenDJ.
     private static String getOpenDJConfigFile(Map configProperties) {
         return getOpenDJBaseDir(configProperties) + "/config/config.ldif";
+    }
+
+
+    // Returns the host name for the embedded OpenDJ.
+    private static String getOpenDJHostName(Map configProperties) {
+      String dirHost = (String) configProperties
+          .get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST);
+      if (dirHost.equals("localhost")) {
+        dirHost = (String) configProperties
+            .get(SetupConstants.CONFIG_VAR_SERVER_HOST);
+}
+      return dirHost;
     }
 }
