@@ -26,8 +26,9 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
  */
+
 package com.sun.identity.entitlement.util;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
@@ -94,38 +95,17 @@ public class ResourceNameSplitter implements ISearchIndex {
     public static Set<String> splitHost(RelaxedURL url) {
         Set<String> results = new HashSet<String>();
         String host = url.getHostname().toLowerCase();
-
+        
         results.add("://");
         results.add("://" + host);
-
-        List<String> dns = getDNS(host);
-        String buff = "";
-        for (String s : dns) {
-            if (buff.length() > 0) {
-                results.add("://." + s + buff);
-            } else {
-                results.add("://." + s);
-            }
-
-            buff += "." + s;
-        }
+        int idx = host.indexOf('.');
         
-        return results;
-    }
-
-    private static List<String> getDNS(String host) {
-        List<String> result = new ArrayList<String>();
-        StringTokenizer st = new StringTokenizer(host, ".");
-        boolean first = true;
-        while (st.hasMoreTokens()) {
-            String s = st.nextToken();
-            if (first) {
-                first = false;
-            } else {
-                result.add(0, s);
-            }
+        while (idx != -1) {
+            results.add("://" + host.substring(idx));
+            idx = host.indexOf('.', idx + 1);
         }
-        return result;
+
+        return results;
     }
     
     /**
