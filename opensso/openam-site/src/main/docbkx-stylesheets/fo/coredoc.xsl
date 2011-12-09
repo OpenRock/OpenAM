@@ -80,6 +80,8 @@
  <xsl:param name="toc.max.depth">0</xsl:param>
  
  <xsl:param name="default.table.frame">topbot</xsl:param>
+ <xsl:param name="default.table.rules">none</xsl:param>
+ <xsl:param name="table.cell.border.thickness">0pt</xsl:param>
  
  <xsl:param name="variablelist.as.blocks" select="1"></xsl:param>
  <xsl:param name="variablelist.term.separator"></xsl:param>

@@ -85,9 +85,12 @@
    <replaceable>Realm Name</replaceable> &gt; Data Stores &gt;
    <replaceable>Data Store Name</replaceable> in the OpenAM console.</para>
    
-   <table xml:id="tuning-ldap-data-store-settings">
+   <table xml:id="tuning-ldap-data-store-settings" pgwide="1">
     <title>LDAP Data Store Settings</title>
     <tgroup cols="3">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="3*"/>
      <thead>
       <row>
        <entry>Property</entry>
@@ -117,9 +120,12 @@
    browse to Configuration &gt; Authentication &gt; Core in the OpenAM
    console.</para>
    
-   <table xml:id="tuning-ldap-connection-pool-settings">
+   <table xml:id="tuning-ldap-connection-pool-settings" pgwide="1">
     <title>LDAP Data Store Settings</title>
     <tgroup cols="3">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="3*"/>
      <thead>
       <row>
        <entry>Property</entry>
@@ -166,9 +172,12 @@
    Configuration &gt; Servers and Sites &gt; Default Server Settings &gt;
    SDK.</para>
    
-   <table xml:id="tuning-sms-notifications">
+   <table xml:id="tuning-sms-notifications" pgwide="1">
     <title>SMS Notification Settings</title>
     <tgroup cols="3">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="3*"/>
      <thead>
       <row>
        <entry>Property</entry>
@@ -193,9 +202,12 @@
    Server Settings &gt; Session.</para>
    
    
-   <table xml:id="tuning-session-service-notifications">
+   <table xml:id="tuning-session-service-notifications" pgwide="1">
     <title>Session Service Notification Settings</title>
     <tgroup cols="3">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="3*"/>
      <thead>
       <row>
        <entry>Property</entry>
@@ -229,9 +241,12 @@
    configured under Configuration &gt; Servers and Sites &gt; Default
    Server Settings &gt; Session.</para>
    
-   <table xml:id="tuning-session-service-settings">
+   <table xml:id="tuning-session-service-settings" pgwide="1">
     <title>Session Settings</title>
     <tgroup cols="3">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="3*"/>
      <thead>
       <row>
        <entry>Property</entry>
@@ -268,9 +283,12 @@
   a more detailed garbage collection tuning exercise, or as best practice
   configuration for production.</para>
   
-  <table xml:id="tuning-heap-size">
+  <table xml:id="tuning-heap-size" pgwide="1">
    <title>Heap Size Settings</title>
    <tgroup cols="3">
+    <colspec colnum="1" colwidth="3*"/>
+    <colspec colnum="2" colwidth="2*"/>
+    <colspec colnum="3" colwidth="2*"/>
     <thead>
      <row>
       <entry>JVM Parameters</entry>
@@ -285,11 +303,11 @@
       <entry><para>At least 1024m, production environments 2048m to 3072m.
       This setting depends on the available physical memory, and on whether a
       32 or 64-bit JVM is used.</para></entry>
-      <entry><para></para></entry>
+      <entry><para>-</para></entry>
      </row>
      <row>
       <entry><para><literal>-server</literal></para></entry>
-      <entry><para> </para></entry>
+      <entry><para>-</para></entry>
       <entry><para>Ensures the server JVM is used</para></entry>
      </row>
      <row>
@@ -314,15 +332,18 @@
       <entry><para><literal>-Dsun.net.client.defaultConnectTimeout</literal></para></entry>
       <entry><para>30000</para></entry>
       <entry><para>Controls the connect timeout in the Java HTTP client
-      implementation </para></entry>
+      implementation</para></entry>
      </row>
     </tbody>
    </tgroup>
   </table>
   
-  <table xml:id="tuning-garbage-collection">
+  <table xml:id="tuning-garbage-collection" pgwide="1">
    <title>Garbage Collection Settings</title>
    <tgroup cols="3">
+    <colspec colnum="1" colwidth="3*"/>
+    <colspec colnum="2" colwidth="2*"/>
+    <colspec colnum="3" colwidth="2*"/>
     <thead>
      <row>
       <entry>JVM Parameters</entry>
@@ -333,7 +354,7 @@
     <tbody>
      <row>
       <entry><para><literal>-verbose:gc</literal></para></entry>
-      <entry><para> </para></entry>
+      <entry><para>-</para></entry>
       <entry><para>Verbose garbage collection reporting</para></entry>
      </row>
      <row>
@@ -344,18 +365,18 @@
      </row>
      <row>
       <entry><para><literal>-XX:+PrintClassHistogram</literal></para></entry>
-      <entry><para> </para></entry>
-      <entry><para>Prints a heap histrogram when a SIGTERM signal is received
+      <entry><para>-</para></entry>
+      <entry><para>Prints a heap histogram when a SIGTERM signal is received
       by the JVM</para></entry>
      </row>
      <row>
       <entry><para><literal>-XX:+PrintGCTimeStamps</literal></para></entry>
-      <entry><para> </para></entry>
+      <entry><para>-</para></entry>
       <entry><para>Prints out detailed garbage collection timings</para></entry>
      </row>
      <row>
       <entry><para><literal>-XX:+HeapDumpOnOutOfMemoryError</literal></para></entry>
-      <entry><para> </para></entry>
+      <entry><para>-</para></entry>
       <entry><para>Out of Memory errors generate a heap dump
       automatically</para></entry>
      </row>
@@ -366,17 +387,17 @@
      </row>
      <row>
       <entry><para><literal>-XX:+UseConcMarkSweepGC</literal></para></entry>
-      <entry><para> </para></entry>
+      <entry><para>-</para></entry>
       <entry><para>Use the concurrent mark sweep garbage collector</para></entry>
      </row>
      <row>
       <entry><para><literal>-XX:+UseCMSCompactAtFullCollection</literal></para></entry>
-      <entry><para> </para></entry>
-      <entry><para>Agressive compaction at full collection</para></entry>
+      <entry><para>-</para></entry>
+      <entry><para>Aggressive compaction at full collection</para></entry>
      </row>
      <row>
       <entry><para><literal>-XX:+CMSClassUnloadingEnabled</literal></para></entry>
-      <entry><para> </para></entry>
+      <entry><para>-</para></entry>
       <entry><para>Allow class unloading during CMS sweeps</para></entry>
      </row>
     </tbody>
