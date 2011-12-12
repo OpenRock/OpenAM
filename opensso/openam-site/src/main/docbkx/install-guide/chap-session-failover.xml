@@ -131,6 +131,36 @@ The scripts are properly setup under directory: /home/user/openam/sfoscripts
 JMQ is properly setup under directory /home/user/openam/jmq</screen>
   </step>
   <step>
+   <para>Start the Message Queue broker in order to configure user
+   accounts.</para>
+   <screen>./jmq/imq/bin/imqbrokerd -name openambroker -port 7777 &amp;</screen>
+  </step>
+  <step>
+   <para>Change the default admin password from <literal>admin</literal> to
+   something else.</para>
+   <screen>$ ./jmq/imq/bin/imqusermgr update -u admin -p password -i openambroker
+...
+User repository for broker instance: openambroker
+Are you sure you want to update user admin? (y/n)[n] y
+User admin successfully updated.</screen>
+  </step>
+  <step>
+   <para>Disable the default <literal>guest</literal> account.</para>
+   <screen>$ ./jmq/imq/bin/imqusermgr update -u guest -a false -i openambroker
+...
+User repository for broker instance: openambroker
+Are you sure you want to update user guest? (y/n)[n] y
+User guest successfully updated.</screen>
+  </step>
+  <step>
+   <para>Add a user for the session failover service.</para>
+   <screen>$ ./jmq/imq/bin/imqusermgr add -u openamuser -g admin -p secret12
+ -i openambroker
+...
+User repository for broker instance: openambroker
+User openamuser successfully added.</screen>
+  </step>
+  <step>
    <para>Create a password file for the session failover service.</para>
    <screen>$ cd sfoscripts/bin/
 $ ./amsfopassword --encrypt secret12 --passwordfile /home/user/openam/mqpwd.txt
@@ -138,11 +168,18 @@ os.name=Linux
 SUCCESSFUL</screen>
   </step>
   <step>
+   <para>Stop the broker you started on port 7777.</para>
+  </step>
+  <step>
    <para>Configure the session failover service for the site.</para>
    <para>For each session tools installation, edit the
    <filename>/home/user/openam/sfoscripts/config/lib/amsfo.conf</filename>
-   configuration file to change at least the <literal>CLUSTER_LIST</literal>,
-   and <literal>PASSWORDFILE</literal> parameters.</para>
+   configuration file to change at least the <literal>USER_NAME</literal>,
+   <literal>CLUSTER_LIST</literal>, and <literal>PASSWORDFILE</literal>
+   parameters.</para>
+   <para><literal>USER_NAME</literal> should match the user you created for the
+   session failover service.</para>
+   <screen>USER_NAME=openamuser</screen>
    <para><literal>CLUSTER_LIST</literal> specifies the host:port combinations
    for all the session failover services you configure for the site.</para>
    <screen>CLUSTER_LIST=openam.example.com:7777,openam-bis.example.com:7777</screen>
@@ -165,8 +202,9 @@ SUCCESSFUL</screen>
    <para>On each OpenAM server console in the site, select Configuration &gt;
    Global &gt; Session &gt; Instances &gt; New... to set up session data store
    access.</para>
-   <para>The Session Store User is <literal>guest</literal>, the password
-   the one you entered into the password file, and the Database Url is the
+   <para>Provide a user name for the Session Store User, such as
+   <literal>openamuser</literal>, with the same password you entered into the
+   password file, and the Database Url is the
    host:port you entered for the <literal>CLUSTER_LIST</literal>
    parameter.</para>
    <para>Be sure to Add the new instance, and then also Save your configuration
@@ -182,6 +220,10 @@ SUCCESSFUL</screen>
    <screen>$ ./amsfo start</screen>
    <para>By default, the log and session data store are located under
    <filename>/tmp/amsession/</filename>.</para>
+   <screen>$ tail -f /tmp/amsession/logs/amsessiondb.log
+...
+Initializing and connecting to the Message Queue server ...
+Successfully started.</screen>
   </step>
   <step>
    <para>Start each OpenAM server in the site.</para>
