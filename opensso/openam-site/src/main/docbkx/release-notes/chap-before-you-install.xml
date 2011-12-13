@@ -58,7 +58,7 @@
     <para>Apache Tomcat 6.0.x, 7.0.x</para>
    </listitem>
    <listitem>
-    <para>GlassFish v2, v3</para>
+    <para>GlassFish v2</para>
    </listitem>
    <listitem>
     <para>IBM WebSphere 7.x</para>
@@ -88,7 +88,7 @@
     <para>External ForgeRock OpenDJ data store</para>
    </listitem>
    <listitem>
-    <para>External Sun OpenDJ data store</para>
+    <para>External Sun OpenDS data store</para>
    </listitem>
    <listitem>
     <para>External Sun Directory Server data store</para>
@@ -115,8 +115,8 @@
    </listitem>
   </itemizedlist>
 
-  <para>OpenAM also works with OpenLDAP and other LDAPv3 directory servers.
-  Contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
+  <para>OpenAM also works with OpenLDAP and other LDAPv3 compliant directory
+  servers. Contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
   >info@forgerock.com</link> for details.</para>
  </section>
 
