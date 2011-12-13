@@ -147,9 +147,11 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
             getDebug().message("IdCachedServicesImpl.getInstance(): "
                     + "Creating new Instance of IdCachedServicesImpl()");
             ShutdownManager shutdownMan = ShutdownManager.getInstance();
+            //the instance should be created before acquiring the lock to
+            //prevent possible deadlocks by using Stats
+            instance = new IdCachedServicesImpl();
             if (shutdownMan.acquireValidLock()) {
                 try {
-                    instance = new IdCachedServicesImpl();
                     shutdownMan.addShutdownListener(
                         new ShutdownListener() {
                             public void shutdown() {
