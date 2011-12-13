@@ -693,6 +693,13 @@
 ./WEB-INF/classes/encode_zh.properties
 ./WEB-INF/classes/encode_zh_TW.properties
 ./WEB-INF/classes/entitlement.xml
+./WEB-INF/classes/EntitlementException_de.properties
+./WEB-INF/classes/EntitlementException_en.properties
+./WEB-INF/classes/EntitlementException_es.properties
+./WEB-INF/classes/EntitlementException_fr.properties
+./WEB-INF/classes/EntitlementException_ja.properties
+./WEB-INF/classes/EntitlementException.properties
+./WEB-INF/classes/EntitlementException_zh.properties
 ./WEB-INF/classes/famFederationCommon.properties
 ./WEB-INF/classes/famFederationCommon_de.properties
 ./WEB-INF/classes/famFederationCommon_en.properties
