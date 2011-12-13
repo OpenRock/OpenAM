@@ -58,6 +58,9 @@
   
   <para>Do not run different versions of OpenAM together in the same OpenAM
   site.</para>
+  
+  <para>The Database Repository type of data store is experimental and not
+  supported for production use.</para>
  </section>
  
  <section>
