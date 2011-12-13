@@ -1416,10 +1416,6 @@ void AgentConfiguration::cleanup_properties()
             free((void*) this->agent_server_url.host);
             this->agent_server_url.host = NULL;
         }
-        if (this->agent_server_url.protocol != NULL) {
-            free((void*) this->agent_server_url.protocol);
-            this->agent_server_url.protocol = NULL;
-        }
     }
 
     if (this->notification_url) {
