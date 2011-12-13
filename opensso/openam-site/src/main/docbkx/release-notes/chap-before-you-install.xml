@@ -32,11 +32,120 @@
  <title>Before You Install OpenAM Software</title>
 
  <para>This chapter covers software and hardware prerequisites for installing
- and running OpenAM software.</para>
+ and running OpenAM software. If you have a special request to support a
+ component or combination not listed here, contact ForgeRock at <link
+ xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
  
- <para>TODO: Import the relevant information from
- https://wikis.forgerock.org/confluence/display/openam/OpenAM+Hardware+and+Software+requirements
- modulo changes in particular for test plans.</para>
-  
-</chapter>
+ <section xml:id="java-requirements">
+  <title>Java Requirements</title>
 
+  <para>This release of OpenAM requires Java Development Kit 1.6, at least
+  1.6.0_10. For better performance and security, use at least 1.6.0_22.</para>
+  
+  <para>ForgeRock has tested this release of OpenAM primarily with Oracle
+  Java SE JDK.</para>
+
+  <para>OpenAM Java SDK requires Java Development Kit 1.5 or 1.6.</para>
+ </section>
+
+ <section xml:id="web-container-requirements">
+  <title>Web Application Container Requirements</title>
+
+  <itemizedlist>
+   <para>This release of OpenAM runs in the following web application
+   containers.</para>
+   <listitem>
+    <para>Apache Tomcat 6.0.x, 7.0.x</para>
+   </listitem>
+   <listitem>
+    <para>GlassFish v2, v3</para>
+   </listitem>
+   <listitem>
+    <para>IBM WebSphere 7.x</para>
+   </listitem>
+   <listitem>
+    <para>JBoss Application Server 4.x, 5.x, 7.x</para>
+   </listitem>
+   <listitem>
+    <para>Jetty 7</para>
+   </listitem>
+   <listitem>
+    <para>Oracle WebLogic 10.3.5</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="data-store-requirements">
+  <title>Data Store Requirements</title>
+
+  <itemizedlist>
+   <para>This release of OpenAM works with the following configuration data
+   stores.</para>
+   <listitem>
+    <para>Embedded (using ForgeRock OpenDJ 2.4.4 for the data store)</para>
+   </listitem>
+   <listitem>
+    <para>External ForgeRock OpenDJ data store</para>
+   </listitem>
+   <listitem>
+    <para>External Sun OpenDJ data store</para>
+   </listitem>
+   <listitem>
+    <para>External Sun Directory Server data store</para>
+   </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
+   <para>This release of OpenAM works with the following user profile data
+   stores.</para>
+   <listitem>
+    <para>ForgeRock OpenDJ</para>
+   </listitem>
+   <listitem>
+    <para>Microsoft Active Directory</para>
+   </listitem>
+   <listitem>
+    <para>IBM Tivoli Directory Server</para>
+   </listitem>
+   <listitem>
+    <para>OpenDS</para>
+   </listitem>
+   <listitem>
+    <para>Sun Directory Server</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>OpenAM also works with OpenLDAP and other LDAPv3 directory servers.
+  Contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
+  >info@forgerock.com</link> for details.</para>
+ </section>
+
+ <section xml:id="platform-requirements">
+  <title>Platform Requirements</title>
+
+  <itemizedlist>
+   <para>ForgeRock has tested this release of OpenAM on the following
+   platforms.</para>
+   <listitem>
+    <para>Linux 2.6, 3.0</para>
+   </listitem>
+   <listitem>
+    <para>Microsoft Windows Server 2003, 2008</para>
+   </listitem>
+   <listitem>
+    <para>Oracle Solaris 10</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="hardware-requirements">
+  <title>Hardware Requirements</title>
+
+  <para>You can deploy OpenAM on any hardware supported for the combination of
+  software required. Deploying OpenAM requires a minimum of 1 GB free RAM over
+  and above the RAM used by all other software on the system.</para>
+  
+  <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
+  based systems.</para>
+ </section>
+</chapter>

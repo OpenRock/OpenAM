@@ -61,6 +61,14 @@
    repository.</para>
   </listitem>
   <listitem>
+   <para>OpenAM now uses OpenDJ 2.4.4 as the embedded data store
+   (OPENAM-960).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides JSON output through the identity services REST
+   interface (OPENAM-940).</para>
+  </listitem>
+  <listitem>
    <para>The <command>ssoadm</command> command now provides subcommands to
    manage entitlement application types: <command>create-appl-type</command>,
    <command>delete-appl-types</command>, <command>list-appl-types</command>

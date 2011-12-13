@@ -37,12 +37,48 @@
  <section>
   <title>Major Changes to Existing Functionality</title>
   
-  <para>TODO</para>
+  <para>TODO: Complete this section</para>
   
   <itemizedlist>
    <listitem>
-    <para>The following Policy Agents are compatible with OpenAM
-    <?eval ${serverDocTargetVersion}?>: TODO</para>
+    <itemizedlist>
+     <para>The following web policy agents are compatible with OpenAM
+     <?eval ${serverDocTargetVersion}?>.</para>
+     <listitem>
+      <para>Apache 2.0</para>
+     </listitem>
+     <listitem>
+      <para>Apache 2.2</para>
+     </listitem>
+     <listitem>
+      <para>Microsoft IIS 6</para>
+     </listitem>
+     <listitem>
+      <para>Microsoft IIS 7</para>
+     </listitem>
+    </itemizedlist>
+    <itemizedlist>
+     <para>The following J2EE policy agents are compatible with OpenAM
+     <?eval ${serverDocTargetVersion}?>.</para>
+     <listitem>
+      <para>GlassFish v2 &amp; v3</para>
+     </listitem>
+     <listitem>
+      <para>JBoss v4.2 &amp; v5.x</para>
+     </listitem>
+     <listitem>
+      <para>Jetty v6.1 &amp; v7</para>
+     </listitem>
+     <listitem>
+      <para>Tomcat v6</para>
+     </listitem>
+     <listitem>
+      <para>WebSphere v6.1</para>
+     </listitem>
+     <listitem>
+      <para>WebLogic v10</para>
+     </listitem>
+    </itemizedlist>
    </listitem>
    <listitem>
     <!-- Fix for OpenAM-413 -->
@@ -70,7 +106,8 @@
  &lt;/listener-class&gt;
 &lt;/listener&gt;</programlisting>
     <para>For standalone applications, set the following JVM property.</para>
-    <literallayout class="monospaced">-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
+    <literallayout class="monospaced"
+    >-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
    </listitem>
    <listitem>
     <!-- Fix for OpenAM-699 -->
@@ -80,8 +117,7 @@
     and 7.1.</para>
    </listitem>
   </itemizedlist>
-  
-   </section>
+ </section>
 
  <section>
   <title>Deprecated Functionality</title>
@@ -107,15 +143,11 @@
    </listitem>
   </itemizedlist>
  </section>
- 
+
  <section>
   <title>Removed Functionality</title>
   
-  <para>No functionality has been removed in OpenAM
-  <?eval ${serverDocTargetVersion}?>.</para>
-  
-  <para>No functionality is planned to be removed at this time.</para>
+  <para>OpenAM <?eval ${serverDocTargetVersion}?> does not include the
+  <command>amtune</command> command.</para>
  </section>
-
 </chapter>
-

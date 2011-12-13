@@ -45,7 +45,7 @@
   <para>TODO: build the list of fixes based on
   https://bugster.forgerock.org/jira/browse/OPENAM</para>
  </section>
- 
+
  <section>
   <title>Limitations</title>
   
@@ -72,6 +72,4 @@
   <para>TODO: build the known issues list based on
   https://bugster.forgerock.org/jira/browse/OPENAM</para>
  </section>
-
 </chapter>
-
