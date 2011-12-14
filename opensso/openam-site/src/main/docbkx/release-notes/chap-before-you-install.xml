@@ -64,7 +64,8 @@
     <para>IBM WebSphere 7.x</para>
    </listitem>
    <listitem>
-    <para>JBoss Application Server 4.x, 5.x, 7.x</para>
+    <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
+    <para>JBoss Application Server 7.x</para>
    </listitem>
    <listitem>
     <para>Jetty 7</para>
