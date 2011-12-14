@@ -149,5 +149,10 @@
   
   <para>OpenAM <?eval ${serverDocTargetVersion}?> does not include the
   <command>amtune</command> command.</para>
+
+  <!-- Fix for OpenAM-1020 -->
+  <para>OpenAM console only mode is no longer supported. Console only mode
+  is likely to be replaced with a different solution in a future
+  release.</para>
  </section>
 </chapter>

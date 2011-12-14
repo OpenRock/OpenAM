@@ -52,7 +52,9 @@
  
  <xinclude:include href='chap-install-core.xml' />
  <xinclude:include href='chap-install-tools.xml' />
+ <!-- Fix for OpenAM-1020
  <xinclude:include href='chap-install-console-only.xml' />
+ -->
  <xinclude:include href='chap-install-core-only.xml' />
  <xinclude:include href='chap-install-das.xml' />
  <xinclude:include href='chap-install-samples.xml' />
