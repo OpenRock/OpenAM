@@ -587,14 +587,12 @@ public class LDAP extends AMLoginModule {
                             }
                             newState = ModuleState.PASSWORD_MIN_CHARACTERS;
                             // add log
-                            getLoginState("LDAP").logFailed(
-                                bundle.getString("PasswdMinChars"),
+                            getLoginState("LDAP").logFailed(newState.name(),
                                 "CHANGE_USER_PASSWORD_FAILED", false, null);
                         } else {
                             ldapUtil.changePassword(oldPassword, newPassword,
                                 confirmPassword);
                             newState = ldapUtil.getState();
-                            String logMsg = ldapUtil.getLogMessage();
                             
                             if (newState == 
                                 ModuleState.PASSWORD_UPDATED_SUCCESSFULLY){
@@ -602,10 +600,9 @@ public class LDAP extends AMLoginModule {
                                 getLoginState("LDAP").logSuccess(
                                     "changePasswdSucceeded",
                                     "CHANGE_USER_PASSWORD_SUCCEEDED");
-                            } else if ((logMsg != null) && (newState ==
-                                ModuleState.PASSWORD_MIN_CHARACTERS)) {
+                            } else {
                                 // add log
-                                getLoginState("LDAP").logFailed(logMsg,
+                                getLoginState("LDAP").logFailed(newState.name(),
                                     "CHANGE_USER_PASSWORD_FAILED", false, null);
                             }
                         }

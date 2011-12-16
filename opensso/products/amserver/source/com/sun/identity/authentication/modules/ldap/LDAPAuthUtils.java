@@ -675,10 +675,11 @@ public class LDAPAuthUtils {
                 if (result != null) {
                     processPasswordPolicyControls(result);
                 } else {
-                    // set log message to be logged in LDAP modules
-                    setLogMessage(ere.getLocalizedMessage() + " : "
-                            + ere.getResult().getDiagnosticMessage());
-                    setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
+                    if (isAd) {
+                        setState(ModuleState.PASSWORD_NOT_UPDATE);
+                    } else {
+                        setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
+                    }
                 }
             } else if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
@@ -697,9 +698,6 @@ public class LDAPAuthUtils {
                 if (result != null) {
                     processPasswordPolicyControls(result);
                 } else {
-                    // set log message to be logged in LDAP modules
-                    setLogMessage(ere.getLocalizedMessage() + " : "
-                            + ere.getResult().getDiagnosticMessage());
                     setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
                 }
             } else if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
@@ -713,6 +711,7 @@ public class LDAPAuthUtils {
                         processPasswordPolicyControls(result);
                     }    
                 }
+                setState(ModuleState.PASSWORD_NOT_UPDATE);
             } else {
                 setState(ModuleState.PASSWORD_NOT_UPDATE);
             }
@@ -730,14 +729,6 @@ public class LDAPAuthUtils {
         }
     }
 
-    public void setLogMessage(String logMsg) {
-        this.logMessage = logMsg;
-    }
-
-    public String getLogMessage() {
-        return this.logMessage;
-    }
-    
     private String buildUserFilter() {
         StringBuilder buf = new StringBuilder(100);
         buf.append("(");
