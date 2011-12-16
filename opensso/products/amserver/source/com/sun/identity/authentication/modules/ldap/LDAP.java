@@ -914,10 +914,6 @@ public class LDAP extends AMLoginModule {
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("PasswdMismatch"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                 break;
-            case PASSWORD_USERNAME_SAME:
-                replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("UPSame"));
-                currentState = LoginScreen.PASSWORD_CHANGE.intValue();
-                break;
             case WRONG_PASSWORD_ENTERED:
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("PasswdSame"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();

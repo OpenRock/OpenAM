@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
+
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
@@ -63,5 +67,6 @@
     </Callbacks>
     <Callbacks length="0" order="3" timeout="120" header="您的密码已过期。请联系服务台重置您的密码" error="true"  />
     <Callbacks length="0" order="4" timeout="120" template="user_inactive.jsp" error="true"/>
+    <Callbacks length="0" order="5" timeout="120" header=" Your account is locked. Please contact service desk to unlock your account" error="true" />
 
 </ModuleProperties>

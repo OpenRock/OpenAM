@@ -45,8 +45,6 @@ public enum ModuleState {
 
     PASSWORD_MISMATCH(23, "passwordMismatch"),
 
-    PASSWORD_USERNAME_SAME(24, "usernameSame"),
-
     PASSWORD_NOT_UPDATE(25, "notUpdate"),
 
     SUCCESS(26, "success"),
