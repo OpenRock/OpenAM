@@ -179,6 +179,48 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    Name</replaceable> &gt; Global, and then scroll down to the Audit
    section.</para>
   </section>
+
+  <section xml:id="log-rotate-debug">
+   <title>Rotating Debug Logs</title>
+
+   <para>By default OpenAM does not rotate debug logs. To rotate debug logs,
+   edit <filename>WEB-INF/classes/debugconfig.properties</filename> where
+   OpenAM is deployed.</para>
+
+   <variablelist>
+    <para>The <filename>debugconfig.properties</filename> file includes
+    the following properties.</para>
+    <varlistentry>
+     <term><literal>org.forgerock.openam.debug.prefix</literal></term>
+     <listitem>
+      <para>This property specifies the debug log file prefix applied when
+      OpenAM rotates a debug log file. The property has no default. It takes
+      a string as the property value.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>org.forgerock.openam.debug.suffix</literal></term>
+     <listitem>
+      <para>This property specifies the debug log file suffix applied when
+      OpenAM rotates a debug log file. The property takes a
+      <literal>SimpleDateFormat</literal> string. The default is
+      <literal>-MM.dd.yyyy-kk.mm</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>org.forgerock.openam.debug.rotation</literal></term>
+     <listitem>
+      <para>This property specifies an interval in minutes between debug
+      log rotations. Set this to a value greater than zero to enable debug
+      log rotation.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>After you edit the <filename>debugconfig.properties</filename> file,
+   you must restart OpenAM or the web container where it runs for the changes
+   to take effect.</para>
+  </section>
  </section>
  
  <section xml:id="session-mgmt">
