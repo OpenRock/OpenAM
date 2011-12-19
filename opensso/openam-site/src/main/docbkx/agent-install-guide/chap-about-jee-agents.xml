@@ -72,6 +72,49 @@
   the J2EE security policies defined alongside the policies for OpenAM. In this
   case the filter ensures the J2EE security policy grants access to the
   resource before the agent gets a decision from OpenAM.</para>
+
+  <para>The following diagram shows how the pieces fit together when a Java
+  EE client accesses a resource protected by a policy agent. This diagram is
+  simplified to show only the essential principals rather than to describe
+  every possible case.</para>
+
+  <mediaobject>
+   <alt>Diagram of Java EE policy agent use</alt>
+   <imageobject>
+    <imagedata fileref="images/jee-pa-overview.png" format="PNG" />
+   </imageobject>
+   <textobject>
+    <para>The interaction happens as described in the following list.</para>
+   </textobject>
+  </mediaobject>
+
+  <orderedlist>
+   <para>A Java EE policy agent is a web application installed in the web
+   application container. Other applications have filters configured to
+   call the policy agent when a client requests access to a protected resource
+   in the application.</para>
+   <listitem>
+    <para>The web client requests access to a protected resource.</para>
+   </listitem>
+   <listitem>
+    <para>The web application filter settings put the request through the
+    policy agent that protects the resource according to OpenAM policy. The
+    policy agent acts to enforce policy, whereas the policy configuration and
+    decisions are handled by OpenAM.</para>
+   </listitem>
+   <listitem>
+    <para>The policy agent communicates with OpenAM to get the policy
+    decision to enforce.</para>
+   </listitem>
+   <listitem>
+    <para>For a resource to which OpenAM approves access, the policy agent
+    allows access.</para>
+   </listitem>
+   <listitem>
+    <para>The web application returns the requested access to the web
+    client.</para>
+   </listitem>
+  </orderedlist>
  </section>
  
  <section xml:id="j2ee-agent-configuration">
