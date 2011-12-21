@@ -42,6 +42,12 @@
 
  <procedure xml:id="install-dotnet-fedlet">
   <title>To Install the .NET Fedlet as a Demo Application</title>
+
+  <para>Before you start, create the hosted identity provider, and the Circle
+  of Trust to which you plan to add the Fedlet. You can perform these steps
+  using the Create Hosted Identity Provider wizard on the Common Tasks page of
+  the OpenAM console.</para>
+
   <para>Follow these steps to configure and install the .NET Fedlet demo
   application.</para>
 
@@ -134,19 +140,11 @@ Import file, sp-extended.xml.</screen>
   </step>
   <step>
    <para>Deploy the demo application in Internet Information Server.</para>
-   <para>TODO: Need to find someone who can explain how this works, as I've
-   failed to understand how to Add Application in IIS 7 without getting
-   permission errors.</para>
-  </step>
- </procedure>
-
- <procedure xml:id="hello-world-with-dotnet-fedlet">
-  <title>To Add Your Application</title>
-  <para>Follow these steps for a very simple example of how to customize the
-  .NET Fedlet.</para>
-
-  <step>
-   <para>TODO</para>
+   <!-- TODO: still getting a a 500.19 (0x80070021) error on IIS7.5/Window7.
+        When I resolve that, I get 404.3 "The page you are requesting cannot
+        be served because of the extension configuration. If the page is a
+        script, add a handler. If the file should be downloaded, add a MIME
+        map." -->
   </step>
  </procedure>
 </chapter>
