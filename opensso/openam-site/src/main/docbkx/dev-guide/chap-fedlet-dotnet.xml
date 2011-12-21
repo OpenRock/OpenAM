@@ -140,11 +140,15 @@ Import file, sp-extended.xml.</screen>
   </step>
   <step>
    <para>Deploy the demo application in Internet Information Server.</para>
-   <!-- TODO: still getting a a 500.19 (0x80070021) error on IIS7.5/Window7.
-        When I resolve that, I get 404.3 "The page you are requesting cannot
-        be served because of the extension configuration. If the page is a
-        script, add a handler. If the file should be downloaded, add a MIME
-        map." -->
+   <note>
+    <para>IIS must be installed with ASP.NET and additional application
+    support necessary for web applications beyond static web sites. The
+    additional support is not necessarily installed by default when you
+    activate IIS as a Windows feature.</para>
+   </note>
+   <!-- TODO: The 500 was apparently due to IIS not including all the
+        ASP.NET and related software in the default installation.
+        Still cannot get the SampleApp to work, yet. -->
   </step>
  </procedure>
 </chapter>
