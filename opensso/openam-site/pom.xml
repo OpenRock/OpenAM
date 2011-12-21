@@ -531,7 +531,7 @@ $(".flat").live("dblclick", function() {
 });
 &lt;/script&gt;
 &lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;
-&lt;/head&gt;</replacevalue>
+&lt;/head &gt;</replacevalue>
         </replace>
         <replace dir="${basedir}/target/docbkx/html/"
                  token="&lt;/body&gt;">
@@ -545,7 +545,7 @@ $(".flat").live("dblclick", function() {
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-&lt;/script&gt;&lt;/body&gt;</replaceValue>
+&lt;/script&gt;&lt;/body &gt;</replaceValue>
         </replace>
        </postProcess>
       </configuration>
