@@ -44,17 +44,37 @@
   (SNMP). The services are based on JMX.</para>
   
   <para>To configure monitoring services, login to OpenAM console as OpenAM
-  administrator, and browse to Configuration &gt; System &gt; Monitoring.</para>
-  
+  administrator, and browse to Configuration &gt; System &gt; Monitoring.
+  Alternatively you can use the <command>ssoadm set-attr-defs</command>
+  command.</para>
+
+  <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-enabled=true</screen>
+
   <section xml:id="monitoring-web-pages">
    <title>Web Based Monitoring</title>
    
    <para>You can configure OpenAM to allow you to access a web based view of
    OpenAM MBeans on port 8082 where the core server runs, such as
-   <literal>http://openam-ter.example.com:8082/</literal>. The default
-   authentication file allows you to authenticate over HTTP as user
-   <literal>demo</literal>, password <literal>changeit</literal>. The user name
-   and password are kept in the file specified, with the password
+   <literal>http://openam-ter.example.com:8082/</literal>. Either use the
+   console, or use the <command>ssoadm</command> command.</para>
+
+   <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-http-enabled=true</screen>
+
+   <para>The default authentication file allows you to authenticate over HTTP
+   as user <literal>demo</literal>, password <literal>changeit</literal>. The
+   user name and password are kept in the file specified, with the password
    encrypted.</para>
    
    <screen>$ cat openam/openam/opensso_mon_auth 
@@ -80,8 +100,17 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
     <secondary>JMX</secondary>
    </indexterm>
    <para>You can configure OpenAM to allow you to listen on port 9999 for JMX
-   monitoring.</para>
-   
+   monitoring. Either use the console, or use the <command>ssoadm</command>
+   command.</para>
+
+   <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-rmi-enabled=true</screen>
+
    <para>You can then use <command>jconsole</command> or other JMX-enabled
    tools to browse the MBeans. You can also browse the MBeans by connecting
    to your web application container, and browsing to the OpenAM MBeans.</para>
@@ -103,7 +132,16 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    </indexterm>
    
    <para>You can configure OpenAM to allow you to listen on port 8085 for SNMP
-   monitoring.</para>
+   monitoring. Either use the console, or use the <command>ssoadm</command>
+   command.</para>
+
+   <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-snmp-enabled=true</screen>
   </section>
  </section>
  
