@@ -112,22 +112,20 @@
   <varlistentry>
    <term>Monitoring, HTTP port: 8082</term>
    <listitem>
-    <para>The HTTP port for OpenAM monitoring is enabled by default.</para>
+    <para>The HTTP port for OpenAM monitoring is not enabled by default.</para>
    </listitem>
   </varlistentry>
   <varlistentry>
    <term>Monitoring, RMI port: 9999</term>
    <listitem>
-    <para>The RMI port for OpenAM monitoring is enabled by default.</para>
+    <para>The RMI port for OpenAM monitoring is not enabled by default.</para>
    </listitem>
   </varlistentry>
   <varlistentry>
    <term>Monitoring, SNMP port: 8085</term>
    <listitem>
-    <para>The SNMP port for OpenAM monitoring is enabled by default.</para>
+    <para>The SNMP port for OpenAM monitoring is not enabled by default.</para>
    </listitem>
   </varlistentry>
  </variablelist>
-
 </chapter>
-
