@@ -45,7 +45,7 @@
  
  <para>To manage access to web resources on other servers, you can install
  policy agents that provide tight integration with OpenAM. See the
- <link xlink:href="agent-install-guide"
+ <link xlink:href="agent-install-guide#agent-install-guide"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Policy Agent
  Installation Guide</citetitle></link> for instructions on installing OpenAM
  agents in supported web servers and Java EE application containers.</para>
