@@ -55,8 +55,8 @@
   section   nop
   set       toc,title
  </xsl:param>
- <xsl:param name="toc.section.depth" select="1" />
- <xsl:param name="toc.max.depth" select="1" />
+<!--  <xsl:param name="toc.section.depth" select="1" /> -->
+ <xsl:param name="toc.max.depth" select="2" />
  <xsl:param name="generate.meta.abstract" select="1" />
 
  <xsl:param name="default.table.frame">none</xsl:param>
