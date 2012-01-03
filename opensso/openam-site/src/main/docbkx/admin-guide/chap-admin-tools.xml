@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-admin-tools'
@@ -146,11 +146,12 @@
     <listitem>
      <para>This tool provides a rich command-line interface for configuration
      of OpenAM core services.</para>
-     <para>In a test environment you can active <filename>ssoadm.jsp</filename>
-     to access the same functionality in your browser. To access the
-     functionality of the <command>ssoadm</command> command through the OpenAM
-     console, visit the <filename>ssoadm.jsp</filename> page in your browser
-     after activating it when you installed OpenAM, for example
+     <para>In a test environment you can activate
+     <filename>ssoadm.jsp</filename> to access the same functionality in your
+     browser. To access the functionality of the <command>ssoadm</command>
+     command through the OpenAM console, visit the
+     <filename>ssoadm.jsp</filename> page in your browser after activating it
+     when you installed OpenAM, for example
      <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
      <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
     </listitem>
