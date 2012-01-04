@@ -158,7 +158,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
   <literal>http://openam.example.com:8080/openam/isAlive.jsp</literal>.</para>
   
   <para>If you get a success code (with <literal>Server is ALIVE:</literal> in
-  the body of the page returned, then OpenAM is up.</para>
+  the body of the page returned), then OpenAM is up.</para>
  </section>
  
  <section xml:id="log-mgmt">
