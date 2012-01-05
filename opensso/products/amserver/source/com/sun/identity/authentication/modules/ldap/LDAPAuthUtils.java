@@ -1061,13 +1061,19 @@ public class LDAPAuthUtils {
                     PasswordPolicyResult result = checkControls(controls);
 
                     if (result != null && result.getPasswordPolicyErrorType() != null &&
-                        result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.PASSWORD_EXPIRED)) {                
-                        if(debug.messageEnabled()){
-                            debug.message("Password expired and must be reset");
+                        result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.PASSWORD_EXPIRED)) {
+                        if (result.getPasswordPolicyWarningType() != null) {
+                            //there is a warning about the grace logins, so in
+                            //this case the credential was actually wrong
+                            throw new LDAPUtilException("CredInvalid",
+                                    ResultCode.INVALID_CREDENTIALS, null);
+                        } else {
+                            if(debug.messageEnabled()) {
+                                debug.message("Password expired and must be reset");
+                            }
+                            setState(ModuleState.PASSWORD_EXPIRED_STATE);
                         }
-
-                        setState(ModuleState.PASSWORD_EXPIRED_STATE);
-                        return;  
+                        return;
                     } else if (result != null && result.getPasswordPolicyErrorType() != null &&
                         result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.ACCOUNT_LOCKED)) {
 
@@ -1087,7 +1093,7 @@ public class LDAPAuthUtils {
                     }
                 } else {
                     PasswordPolicyResult result = checkADResult(ere.getResult().getDiagnosticMessage());
-                    
+
                     if (result != null) {
                         processPasswordPolicyControls(result);
                         return;
@@ -1286,7 +1292,12 @@ public class LDAPAuthUtils {
                         debug.message("Number of grace logins remaining " + result.getValue());
                     }
 
-                    setState(ModuleState.GRACE_LOGINS);
+                    if (graceLogins != 0) {
+                        setState(ModuleState.GRACE_LOGINS);
+                    } else {
+                        //the password reset would need one more bind, so fail the auth
+                        setState(ModuleState.PASSWORD_EXPIRED_STATE);
+                    }
                     break;
                 case TIME_BEFORE_EXPIRATION:
                     setExpTime(result.getValue());

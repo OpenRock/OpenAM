@@ -787,6 +787,22 @@ public class LDAP extends AMLoginModule {
 
                     setForceCallbacksRead(true);
                     forceCallbacksInit();
+                    if (ldapUtil.getGraceLogins() == 1) {
+                        Callback[] callback = getCallback(LoginScreen.PASSWORD_CHANGE.intValue());
+                        for (int i = 0; i < callback.length; i++) {
+                            Callback cbk = callback[i];
+                            if (cbk instanceof ConfirmationCallback) {
+                                ConfirmationCallback confirm = (ConfirmationCallback) cbk;
+                                String[] options = confirm.getOptions();
+                                String[] newOptions = new String[1];
+                                System.arraycopy(options, 0, newOptions, 0, 1);
+                                ConfirmationCallback newConfirm =
+                                        new ConfirmationCallback(confirm.getMessageType(), newOptions, confirm.getDefaultOption());
+                                replaceCallback(LoginScreen.PASSWORD_CHANGE.intValue(), i, newConfirm);
+                            }
+                        }
+                    }
+
                     replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), msg);
                 }
                     currentState = LoginScreen.PASSWORD_CHANGE.intValue();
