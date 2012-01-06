@@ -115,6 +115,7 @@ legal-notices/CDDLv1_0.txt
 legal-notices/OpenDS.LICENSE
 legal-notices/THIRDPARTYREADME.txt
 lib/
+lib/extensions/
 lib/_client-script.bat
 lib/_client-script.sh
 lib/_mixed-script.bat

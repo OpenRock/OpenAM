@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -119,9 +119,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.AccessController;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.ServiceLoader;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -136,6 +140,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
@@ -188,6 +193,7 @@ public class AMSetupServlet extends HttpServlet {
         if (servletCtx == null ) {
             servletCtx = config.getServletContext();
         }
+        checkOpenDJUpgrade();
         checkConfigProperties();
         LoginLogoutMapping.setProductInitialized(isConfiguredFlag);
         registerListeners();
@@ -201,8 +207,7 @@ public class AMSetupServlet extends HttpServlet {
             // server instances.
             if (syncServerInfoWithRelication() == false) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "AMSetupServlet.init: embedded replication sync" 
-                     + "failed.");
+                    "AMSetupServlet.init: embedded replication sync failed.");
             }
         }
         
@@ -278,6 +283,110 @@ public class AMSetupServlet extends HttpServlet {
                 d.setDebug(Debug.ERROR);
             }
         }
+    }
+    
+    /**
+     * Checks if the embedded directory (if present) needs to be upgraded
+     */
+    public static void checkOpenDJUpgrade() {
+        // check for embedded directory
+        if (!isEmbeddedDS()) {
+            return;
+        }
+        
+        // check if upgrade is required
+        OpenDJUpgrader upgrader = new OpenDJUpgrader(getBaseDir() + OPENDS_DIR, servletCtx);
+        if (!upgrader.isUpgradeRequired()) {
+            return;
+        }
+        
+        // backup embedded directory
+        createOpenDJBackup();
+                
+        // initiate upgrade
+        try {
+            upgrader.upgrade();
+        } catch (Exception ex) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("OpenDJ upgrade exception: ", ex);
+        }
+    }
+    
+    protected static void createOpenDJBackup() {
+        ZipOutputStream zOut = null;
+        String baseDir = getBaseDir();
+        String backupDir = baseDir + "/backups/";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateStamp = dateFormat.format(new Date());
+        File backupFile = new File(backupDir + "opendj.backup." + dateStamp + ".zip");
+  
+        if (backupFile.exists()) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot continue as backup file exists! " + backupFile.getName());
+            return;
+        }
+       
+        File opendjDirectory = new File(baseDir + OPENDS_DIR);
+        if (opendjDirectory.exists() && opendjDirectory.isDirectory()) {
+            final String[] filenames = opendjDirectory.list();
+            
+            try {
+                zOut = new ZipOutputStream(new FileOutputStream(backupFile));
+                
+                // Compress the files
+                for (int i = 0; i < filenames.length; i++) {
+                    zipDir(new File(baseDir + OPENDS_DIR + File.separator + filenames[i]), 
+                                    baseDir + OPENDS_DIR + File.separator, zOut, (baseDir + File.separator).length());
+                }
+
+                zOut.close();
+            } catch (IOException ioe) {
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error("IOException", ioe);
+            } finally {
+                if (zOut != null) {
+                    try {
+                        zOut.close();
+                    } catch (IOException ioe) {
+                        // do nothing
+                    }
+                }
+            }
+        }
+    }
+    
+    protected static void zipDir(File filename, String dirName, ZipOutputStream zOut, int stripLen) {
+        try {
+            if (!filename.exists()) {
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error("file not found");
+            }
+            
+            if (!filename.isDirectory()) {
+                zOut.putNextEntry(new ZipEntry((dirName + filename.getName()).replace('\\','/').substring(stripLen)));
+                FileInputStream fileIn = new FileInputStream(filename);
+                byte[] buffer =new byte[(int)filename.length()];
+                int inLen = fileIn.read(buffer);
+ 
+                if (inLen != filename.length()) {
+                    Debug.getInstance(SetupConstants.DEBUG_NAME).error("Short read: " + (filename.length() - inLen));
+                }
+            
+                zOut.write(buffer, 0, buffer.length);
+                zOut.closeEntry();
+                fileIn.close();
+                filename = null;
+            } else {
+                String subdirname = dirName + filename.getName() + File.separator;
+                filename = null;
+                zOut.putNextEntry(new ZipEntry(subdirname.replace('\\','/').substring(stripLen)));
+                zOut.closeEntry();
+                
+                String[] dirlist=(new File(subdirname)).list();
+                
+                for(int i = 0 ; i < dirlist.length ; i++){
+                    zipDir(new File(subdirname + dirlist[i]), subdirname, zOut, stripLen);
+                }
+            }
+        } catch(Exception ex) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to create zip file", ex);
+        }        
     }
 
     /**
@@ -1247,8 +1356,6 @@ public class AMSetupServlet extends HttpServlet {
         } else {
             throw new ConfiguratorException("Servlet Context is null");
         }
-        
- 
     }
     
     public static String getNormalizedRealPath(ServletContext servletCtx) {
@@ -2451,6 +2558,10 @@ public class AMSetupServlet extends HttpServlet {
         String version = SystemProperties.get(Constants.AM_VERSION);
         writeToFile(basedir + "/.version", version);
     }
+    
+    private static boolean isEmbeddedDS() {
+        return (new File(getBaseDir() + OPENDS_DIR)).exists();     
+    }
 
     /**
      * Synchronizes embedded replication state with current server list.
@@ -2458,11 +2569,7 @@ public class AMSetupServlet extends HttpServlet {
      */
     private static boolean syncServerInfoWithRelication() {
         // We need to execute syn only if we are in Embedded mode
- 
-        String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
-        boolean isEmbeddedDS = (new File(baseDir + "/opends")).exists();
-
-        if (!isEmbeddedDS) {
+        if (!isEmbeddedDS()) {
             return true;
         }
 
@@ -2601,7 +2708,7 @@ public class AMSetupServlet extends HttpServlet {
         }
     }
 
-    static InputStream getResourceAsStream(ServletContext 
+    public static InputStream getResourceAsStream(ServletContext 
         servletContext, String file) {
 
         if (servletContext == null) {

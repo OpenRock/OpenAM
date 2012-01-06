@@ -27,9 +27,8 @@
 
 -->
 <!--
-    "Portions Copyrighted [2010-2011] [ForgeRock AS]"                                
---> 
-
+    "Portions Copyrighted [2010-2012] [ForgeRock AS]"                                
+-->
 <project xmlns="http://www.netbeans.org/ns/project/1">
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
@@ -45,16 +44,6 @@
                     <label>OpenAM</label>
                     <location>.</location>
                     <encoding>UTF-8</encoding>
-                </source-folder>
-                <source-folder>
-                    <label>products</label>
-                    <type>doc_root</type>
-                    <location>.</location>
-                </source-folder>
-                <source-folder>
-                    <label>products</label>
-                    <type>web_inf</type>
-                    <location>.</location>
                 </source-folder>
                 <source-folder>
                     <label>amserver/source</label>
@@ -85,6 +74,16 @@
                     <type>java</type>
                     <location>federation/openfm/unittest/source</location>
                     <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>products</label>
+                    <type>doc_root</type>
+                    <location>.</location>
+                </source-folder>
+                <source-folder>
+                    <label>products</label>
+                    <type>web_inf</type>
+                    <location>.</location>
                 </source-folder>
             </folders>
             <ide-actions>
@@ -145,34 +144,34 @@
             </view>
             <subprojects/>
         </general-data>
-        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
             <compilation-unit>
                 <package-root>amserver/source</package-root>
-                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDJ.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/publicsuffix-1.0.1.jar:extlib/opendj-ldap-sdk-3.0.0-SNAPSHOT.jar:extlib/geoip-1.2.5.jar</classpath>
+                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDJ.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/publicsuffix-1.0.1.jar:extlib/geoip-1.2.5.jar:extlib/opendj-ldap-sdk-3.0.0-M1.jar</classpath>
                 <built-to>amserver/built/classes</built-to>
                 <built-to>amserver/built/dist/amserver.jar</built-to>
-                <source-level>1.5</source-level>
+                <source-level>1.6</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/library/source</package-root>
                 <classpath mode="compile">extlib/esapiport.jar:extlib/j2ee.jar:extlib/jaxrpc-api.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/jaxrpc-impl.jar:extlib/jersey-client-1.1.1-ea-SNAPSHOT.jar:extlib/jsr311-api-1.1.jar:extlib/webservices-rt.jar</classpath>
                 <built-to>federation/library/built/classes</built-to>
                 <built-to>federation/library/built/dist/openfedlib.jar</built-to>
-                <source-level>1.5</source-level>
+                <source-level>1.6</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/openfm/source</package-root>
                 <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/commons-collections-3.2.1.jar:extlib/esapiport.jar:extlib/icefaces-comps.jar:extlib/icefaces.jar:extlib/j2ee.jar:extlib/jdom.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/rome-1.0.jar:extlib/saaj-api.jar:extlib/scn_stprs_util.jar:extlib/webservices-rt.jar</classpath>
                 <built-to>federation/openfm/built/classes</built-to>
                 <built-to>federation/openfm/built/dist/opensso.jar</built-to>
-                <source-level>1.5</source-level>
+                <source-level>1.6</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>shared/source</package-root>
                 <classpath mode="compile">extlib/j2ee.jar:extlib/json.jar:extlib/jss4.jar</classpath>
                 <built-to>shared/built/dist/opensso-sharedlib.jar</built-to>
                 <built-to>shared/built/classes</built-to>
-                <source-level>1.5</source-level>
+                <source-level>1.6</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>federation/openfm/unittest/source</package-root>
@@ -180,7 +179,7 @@
                 <classpath mode="compile">amserver/built/classes:extlib/jersey-client-1.1.1-ea-SNAPSHOT.jar:extlib/jersey-core-1.1.1-ea.jar:extlib/jsr311-api-1.1.jar:extlib/esapiport.jar:extlib/j2ee.jar:extlib/json.jar:extlib/testng-5.9-jdk15.jar</classpath>
                 <built-to>federation/openfm/unittest/built/classes</built-to>
                 <built-to>federation/openfm/unittest/built/dist/unittest.jar</built-to>
-                <source-level>1.5</source-level>
+                <source-level>1.6</source-level>
             </compilation-unit>
         </java-data>
         <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
@@ -190,17 +189,34 @@
                         <node name="CodeStyle">
                             <node name="project"/>
                         </node>
+                        <node name="project"/>
+                    </node>
+                    <node name="xml">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
+                    </node>
+                    <node name="project"/>
+                    <node name="CodeStyle"/>
+                    <node name="x-ant+xml">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
                     </node>
                 </node>
                 <node name="CodeStyle">
                     <node name="project"/>
-                    <property name="usedProfile" value="default"/>
                 </node>
+                <node name="project"/>
+                <node name="x-java"/>
             </module>
+            <module name="org-netbeans-modules-html-editor-lib"/>
+            <module name="org-netbeans-modules-projectimport-eclipse-core"/>
         </preferences>
         <web-data xmlns="http://www.netbeans.org/ns/freeform-project-web/2">
             <web-module>
                 <doc-root>.</doc-root>
+                <classpath/>
                 <context-path/>
                 <j2ee-spec-level>1.5</j2ee-spec-level>
                 <web-inf>.</web-inf>

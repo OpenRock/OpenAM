@@ -869,7 +869,7 @@ public class LDAPAuthUtils {
             
             try {
                 conn = getAdminConnection();
-                results = conn.search(searchForUser, new LinkedBlockingQueue<Response>());
+                results = conn.search(searchForUser);
             } finally {
                 if (conn != null) {
                     conn.close();
