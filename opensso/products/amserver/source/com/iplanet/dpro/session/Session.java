@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.iplanet.dpro.session;
@@ -818,7 +818,7 @@ public class Session extends GeneralTaskRunnable {
      * Given a restricted token, returns the SSOTokenID of the master token
      * can only be used if the requester is an app token
      *
-     * @param requester Must be an app token
+     * @param s Must be an app token
      * @param restrictedId The SSOTokenID of the restricted token
      * @return The SSOTokenID string of the master token
      * @throws SSOException If the master token cannot be dereferenced

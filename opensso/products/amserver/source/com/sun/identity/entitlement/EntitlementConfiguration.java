@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -314,8 +314,6 @@ public abstract class EntitlementConfiguration {
      * For the passed in Entitlement environment, replace the existing Policy Configuration with the Map of values
      * passed in savedPolicyConfig.
      * @param environment The Entitlement environment to update with the saved Policy Configuration values.
-     * @return A Map containing the existing Policy Configuration to enable it to be restored, may be
-     * null if the Policy Configuration for the Sub Realm could not be loaded.
      */
     public abstract void restoreSavedPolicyConfig(Map<String, Set<String>> environment, Map savedPolicyConfig);
 }

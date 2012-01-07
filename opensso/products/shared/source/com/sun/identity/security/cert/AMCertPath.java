@@ -28,10 +28,8 @@
 
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
-
-
 package com.sun.identity.security.cert;
 
 import java.lang.reflect.Method;
@@ -109,7 +107,7 @@ public class AMCertPath {
     /**
      * It does cert path validation together with CRL check and ocsp checking 
      * if they are properly configured.
-     * @param X509Certificate[] certs
+     * @param certs
      **/
     public boolean verify(X509Certificate[] certs, boolean crlEnabled,
                           boolean ocspEnabled) {

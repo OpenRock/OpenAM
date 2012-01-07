@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.iplanet.dpro.session.service;
 
@@ -248,7 +248,7 @@ public class SessionCount {
 
     /**
      * Increments the session count
-     * @param internalsession for the user
+     * @param is for the user
      *
      */
     public static void incrementSessionCount(InternalSession is) {

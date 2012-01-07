@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.common.configuration;
@@ -582,7 +582,7 @@ public class ServerConfiguration extends ConfigurationBase {
      * 
      * @param newValues
      * @param existingValues
-     * @return 
+     * @return modified key value pairs
      */
     protected static Map<String, String> calculateModifiedServerDefaults(
             Map<String, String> newValues, Map<String, String> existingValues, Set<String> attrToModify) {

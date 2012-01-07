@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.federation.message;
 
 import java.util.List;
@@ -62,7 +65,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * This class represents a Liberty <code>Request</code>.
  * It extends from the abstract base class <code>AbstractRequest</code>.
  *
- * @supported.api.all
+ * @supported.all.api
  */
 public class FSRequest extends Request {
     /*

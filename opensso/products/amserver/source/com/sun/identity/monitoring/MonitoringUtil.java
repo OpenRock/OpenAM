@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -227,7 +227,7 @@ public class MonitoringUtil {
      *    byte    7: deci-seconds (will be 0)
      * 
      * @param date
-     * @return
+     * @return the converted date
      */
     public static Byte[] convertDate(String date) {
         StringTokenizer st = new StringTokenizer(date);

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -436,7 +436,6 @@ public class EmbeddedOpenDS {
     /**
      * Runs the OpenDS setup command to create our instance
      *
-     * @param configFile path to config.ldif
      * @param map The map of configuration options
      * @throws Exception upon encountering errors.
      */

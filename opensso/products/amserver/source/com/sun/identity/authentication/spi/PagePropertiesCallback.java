@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.authentication.spi;
@@ -175,7 +175,7 @@ public class PagePropertiesCallback implements Callback {
     /**
      * Returns the list of infoText elements to display alongside the authentication
      * module display attributes. 
-     * @return 
+     * @return the list of infoText elements
      */
     public List<String> getInfoText() {
         return infoText;

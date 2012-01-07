@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.idm.plugins.ldapv3;
@@ -366,7 +366,6 @@ public class LDAPAuthUtils {
      * @param host Host name
      * @param port port number
      * @param ssl <code>true</code> if it is SSL.
-     * @param bundle ResourceBundle to be used for getting localized messages.
      * @param searchBaseDN directory base.
      * @param debug Debug object.
      * @throws LDAPUtilException

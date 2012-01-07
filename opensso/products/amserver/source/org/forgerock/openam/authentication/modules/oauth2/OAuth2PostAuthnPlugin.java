@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2012 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -74,8 +74,8 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
      * @exception AuthenticationException when there is an error
      */
     public void onLoginFailure(Map requestParamsMap,
-            HttpServletRequest req,
-            HttpServletResponse res)
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws AuthenticationException {
         
         OAuthUtil.debugMessage("OAuth2PostAuthnPlugin:onLoginFailure called");
@@ -83,7 +83,6 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
     }
 
     /** Post processing on Logout.
-     * @param requestParamsMap - map contains HttpServletRequest parameters
      * @param request HttpServletRequest object
      * @param response HttpServletResponse object
      * @param ssoToken - user's session

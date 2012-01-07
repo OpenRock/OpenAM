@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -68,7 +68,7 @@ public class AdaptivePrincipal implements Principal, Serializable {
      * <code>AdaptivePrincipal</code> and the two <code>AdaptivePrincipal</code>s
      * have the same user name.
      *
-     * @param o Object to be compared for equality with this
+     * @param obj Object to be compared for equality with this
      *        <code>AdaptivePrincipal</code>.
      *
      * @return <code>true</code> if the specified Object is equal equal to this

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.iplanet.dpro.session.service;
 
 import java.util.Map;
@@ -39,7 +42,6 @@ import com.iplanet.dpro.session.SessionID;
   * such as <code>JDBCSessionRepository</code>,
   I <code> JMQSessionRepository</code> implements this interface.
   *
-  * @see com.iplanet.dpro.session.jdbc.JDBCSessionRepository
   * @see com.iplanet.dpro.session.JMQSessionRepository
   */ 
 public interface AMSessionRepository {
