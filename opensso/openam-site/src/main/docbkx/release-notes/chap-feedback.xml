@@ -37,7 +37,7 @@
  xlink:show="new">https://lists.forgerock.org/mailman/listinfo/openam</link>
  where you are likely to find an answer.</para>
 
- <para>If you have found issues or reproducible bugs within OpenDJ
+ <para>If you have found issues or reproducible bugs within OpenAM
  <?eval ${serverDocTargetVersion}?>, report them in <link
  xlink:href="https://bugster.forgerock.org" xlink:show="new"
  >https://bugster.forgerock.org</link>.</para>
