@@ -495,9 +495,13 @@ am_status_t AgentConfiguration::populateAgentProperties()
         am_web_log_max_debug("Property [com.forgerock.agents.config.notenforced.ip.handler] value set to [%s]", this->notenforcedIPmode);
     }
     
-    /*  */
+    /* Get post-data preservation URL prefix value */
     if (AM_SUCCESS == status) {
         status = am_properties_get_with_default(this->properties, "com.forgerock.agents.config.pdpuri.prefix", NULL, &(this->dummyPostPrefixUri));
+        /*dummyPostPrefixUri should be either set with non-empty value or NULL (not-enforced dummy_post_url_match processing requirement)*/
+        if (this->dummyPostPrefixUri != NULL && strlen(this->dummyPostPrefixUri) == 0) {
+            this->dummyPostPrefixUri = NULL;
+        }
         am_web_log_max_debug("Property [com.forgerock.agents.config.pdpuri.prefix] value set to [%s]", this->dummyPostPrefixUri);
     }
 
@@ -1434,7 +1438,7 @@ void AgentConfiguration::cleanup_properties()
             delete this->postcache_handle;
         }
     }
-    
+
     this->notenforcedIPmode = NULL;
     this->dummyPostPrefixUri = NULL;
     

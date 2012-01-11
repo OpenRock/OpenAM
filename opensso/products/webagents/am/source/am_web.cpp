@@ -7067,86 +7067,87 @@ am_web_set_host_ip_in_env_map(const char *client_ip,
     }
     return status;
 }
-
 /*
  * Method to get the value of the set-cookie header for the lb cookie
  * when using a LB in front of the agent with post preservation
  * enabled
  */
 extern "C" AM_WEB_EXPORT am_status_t
-am_web_get_postdata_preserve_lbcookie(char **headerValue, 
-                                      boolean_t isValueNull,
-                                      void* agent_config)
-{
+am_web_get_postdata_preserve_lbcookie(char **headerValue,
+        boolean_t isValueNull,
+        void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
     const char *thisfunc = "am_web_get_postdata_preserve_lbcookie()";
     am_status_t status = AM_SUCCESS;
     std::string header;
     std::string stickySessionValueStr;
     std::string cookieName, cookieValue;
     size_t equalPos = 0;
-    const char *stickySessionMode = 
+    const char *stickySessionMode =
             (*agentConfigPtr)->postdatapreserve_sticky_session_mode;
-    const char *stickySessionValue = 
-           (*agentConfigPtr)->postdatapreserve_sticky_session_value;
+    const char *stickySessionValue =
+            (*agentConfigPtr)->postdatapreserve_sticky_session_value;
+    const char *stickySessionCookieDomain = (*agentConfigPtr)->dummyPostPrefixUri;
 
     // If stickySessionMode or stickySessionValue is empty, 
     // then there is no LB in front of the agent.
     if ((stickySessionMode == NULL) || (strlen(stickySessionMode) == 0) ||
-        (stickySessionValue == NULL) || (strlen(stickySessionValue) == 0))
-    {
+            (stickySessionValue == NULL) || (strlen(stickySessionValue) == 0)) {
         status = AM_INVALID_ARGUMENT;
     } else if (strcmp(stickySessionMode, "COOKIE") != 0) {
         // Deals only with the case where the sticky session mode is COOKIE.
         status = AM_INVALID_ARGUMENT;
         if (strcmp(stickySessionMode, "URL") != 0) {
             am_web_log_warning("%s: %s is not a correct value for the property "
-                             "config.postdata.preserve.stickysession.value.",
-                             thisfunc, stickySessionMode);
+                    "config.postdata.preserve.stickysession.value.",
+                    thisfunc, stickySessionMode);
         }
     }
     // Check if the sticky session value has a correct format ("param=value")
-    if (status  == AM_SUCCESS) {
+    if (status == AM_SUCCESS) {
         stickySessionValueStr.assign(stickySessionValue);
         equalPos = stickySessionValueStr.find('=');
         if (equalPos != std::string::npos) {
             cookieName = stickySessionValueStr.substr(0, equalPos);
-            cookieValue = stickySessionValueStr.substr(equalPos+1);
+            cookieValue = stickySessionValueStr.substr(equalPos + 1);
             if (cookieName.empty() || cookieValue.empty()) {
                 am_web_log_warning("%s: The property "
-                     "config.postdata.preserve.stickysession.value "
-                     "(%s) does not a have correct format.",
-                     thisfunc, stickySessionValueStr.c_str());
+                        "config.postdata.preserve.stickysession.value "
+                        "(%s) does not a have correct format.",
+                        thisfunc, stickySessionValueStr.c_str());
                 status = AM_INVALID_ARGUMENT;
             }
         } else {
             am_web_log_warning("%s: The property "
-                     "config.postdata.preserve.stickysession.value "
-                     "(%s) does not have a correct format.",
-                     thisfunc, stickySessionValueStr.c_str());
+                    "config.postdata.preserve.stickysession.value "
+                    "(%s) does not have a correct format.",
+                    thisfunc, stickySessionValueStr.c_str());
             status = AM_INVALID_ARGUMENT;
         }
     }
-    if (status  == AM_SUCCESS) {
+    if (status == AM_SUCCESS) {
         if (isValueNull == B_TRUE) {
             cookieValue = "";
         }
         header = " ";
         header.append(cookieName).append("=").
-               append(cookieValue).append(";Path=/");
+                append(cookieValue).append(";Path=/");
+        if (stickySessionCookieDomain != NULL && strlen(stickySessionCookieDomain) > 0) {
+            header.append(stickySessionCookieDomain);
+        }
         *headerValue = strdup(header.c_str());
         if (*headerValue == NULL) {
             am_web_log_error("%s: Not enough memory to allocate "
-                             "the headerValue variable.", thisfunc);
-             status = AM_NO_MEMORY;
+                    "the headerValue variable.", thisfunc);
+            status = AM_NO_MEMORY;
         }
     }
     if (status == AM_SUCCESS) {
-            am_web_log_debug("%s: Sticky session mode: %s", thisfunc, 
-                       stickySessionMode);
-            am_web_log_debug("%s: Sticky session value: %s", 
-                             thisfunc, *headerValue);
+        am_web_log_debug("%s: Sticky session mode: %s", thisfunc,
+                stickySessionMode);
+        am_web_log_debug("%s: Sticky session value: %s",
+                thisfunc, *headerValue);
     }
     return status;
 }
