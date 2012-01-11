@@ -19,7 +19,7 @@
  *
  * CCPL HEADER END
  *
- *     Copyright 2011 ForgeRock AS
+ *     Copyright 2011-2012 ForgeRock AS
  *    
 */
 
@@ -177,7 +177,7 @@ div.abstract,div.important,div.caution,div.note,div.tip,div.warning,div.example,
     padding: 6px;
 }
 
-div.chapter,div.preface
+div.appendix,div.chapter,div.preface
 {
  border-bottom: thin solid #ccc; 
 }
