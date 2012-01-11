@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2010-2012 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -69,7 +69,7 @@
 
 #end
     <properties>
-        <openam.version>snapshot951RC2</openam.version>
+        <openam.version>954</openam.version>
     </properties>
 
     <repositories>

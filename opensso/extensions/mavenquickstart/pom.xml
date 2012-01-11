@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2010-2012 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.forgerock.openam</groupId>
     <artifactId>mavenquickstart</artifactId>
-    <version>snapshot951RC2</version>
+    <version>954</version>
     <packaging>jar</packaging>
     <name>OpenAM - Auth-module quickstart</name>
     
