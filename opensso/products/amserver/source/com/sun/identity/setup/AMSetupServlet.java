@@ -141,6 +141,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.forgerock.openam.upgrade.OpenDJUpgrader;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
@@ -312,6 +314,13 @@ public class AMSetupServlet extends HttpServlet {
     }
     
     protected static void createOpenDJBackup() {
+        try {
+            UpgradeServices.createUpgradeDirectories();
+        } catch (UpgradeException ue) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot create backup directory", ue);
+            return;
+        }
+        
         ZipOutputStream zOut = null;
         String baseDir = getBaseDir();
         String backupDir = baseDir + "/backups/";

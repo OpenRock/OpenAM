@@ -99,11 +99,10 @@ public class UpgradeServices {
     
     public ServiceUpgradeWrapper preUpgrade(SSOToken adminToken) 
     throws UpgradeException {
-        createUpgradeDirectories();
         return preUpgradeProcessing(adminToken);
     }
     
-    protected void createUpgradeDirectories() 
+    public static void createUpgradeDirectories() 
     throws UpgradeException {
             String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
             String upgradeDir = baseDir + "/upgrade/";
@@ -113,7 +112,7 @@ public class UpgradeServices {
             createDirectory(upgradeDir);
     }
     
-    protected void createDirectory(String dirName) 
+    protected static void createDirectory(String dirName) 
     throws UpgradeException {
         File d = new File(dirName);
             
