@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.idsvcs.rest;
@@ -55,6 +55,7 @@ import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.IdentityServicesImpl;
 import com.sun.identity.idsvcs.IdentityServicesFactory;
 import com.sun.identity.idsvcs.AccountExpired;
+import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.idsvcs.MaximumSessionReached;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.OrgInactive;
@@ -416,7 +417,7 @@ public class IdentityServicesHandler extends HttpServlet {
                     String[] rolesArray = new String[rolesList.size()];
 
                     rolesList.toArray(rolesArray);
-                    rv.setRoles(rolesArray);
+                    rv.setRoleList(new ListWrapper(rolesArray));
                 }
 
                 String[] groups = request.getParameterValues(n + "_groups");
@@ -434,7 +435,7 @@ public class IdentityServicesHandler extends HttpServlet {
                     String[] groupsArray = new String[groupsList.size()];
 
                     groupsList.toArray(groupsArray);
-                    rv.setGroups(groupsArray);
+                    rv.setGroupList(new ListWrapper(groupsArray));
                 }
 
                 String[] members = request.getParameterValues(n + "_members");
@@ -452,7 +453,7 @@ public class IdentityServicesHandler extends HttpServlet {
                     String[] membersArray = new String[membersList.size()];
 
                     membersList.toArray(membersArray);
-                    rv.setMembers(membersArray);
+                    rv.setMemberList(new ListWrapper(membersArray));
                 }
 
                 List attrList = new ArrayList();

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.sun.identity.idsvcs.rest;
 
@@ -47,6 +47,7 @@ import org.json.JSONObject;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.idsvcs.UserDetails;
@@ -384,27 +385,36 @@ public class MarshallerFactory {
                 wrt.writeEndElement();
 
                 // write the roles.
-                String[] roles = value.getRoles();
-                for (int i = 0; (roles != null && i < roles.length); i++) {
-                    wrt.writeStartElement("role");
-                    wrt.writeAttribute("id", roles[i]);
-                    wrt.writeEndElement();
+                ListWrapper roleList = value.getRoleList();
+                if (roleList != null) {
+                    String[] roles = roleList.getElements();
+                    for (int i = 0; (roles != null && i < roles.length); i++) {
+                        wrt.writeStartElement("role");
+                        wrt.writeAttribute("id", roles[i]);
+                        wrt.writeEndElement();
+                    }
                 }
 
                 // write the groups.
-                String[] groups = value.getGroups();
-                for (int i = 0; (groups != null && i < groups.length); i++) {
-                    wrt.writeStartElement("group");
-                    wrt.writeAttribute("id", groups[i]);
-                    wrt.writeEndElement();
+                ListWrapper groupList = value.getGroupList();
+                if (groupList != null) {
+                    String[] groups = groupList.getElements();
+                    for (int i = 0; (groups != null && i < groups.length); i++) {
+                        wrt.writeStartElement("group");
+                        wrt.writeAttribute("id", groups[i]);
+                        wrt.writeEndElement();
+                    }
                 }
 
                 // write the memberships.
-                String[] members = value.getMembers();
-                for (int i = 0; (members != null && i < members.length); i++) {
-                    wrt.writeStartElement("member");
-                    wrt.writeAttribute("id", members[i]);
-                    wrt.writeEndElement();
+                ListWrapper memberList = value.getMemberList();
+                if (memberList != null) {
+                    String[] members = memberList.getElements();
+                    for (int i = 0; (members != null && i < members.length); i++) {
+                        wrt.writeStartElement("member");
+                        wrt.writeAttribute("id", members[i]);
+                        wrt.writeEndElement();
+                    }
                 }
 
                 // write each of the attributes
@@ -691,26 +701,35 @@ public class MarshallerFactory {
             obj.put("type", id.getType());
             obj.put("realm", id.getRealm());
             JSONArray roles = new JSONArray();
-            String[] values = id.getRoles();
-            if (values != null) {
-                for (String val : values) {
-                    roles.put(val);
+            ListWrapper roleList = id.getRoleList();
+            if (roleList != null) {
+                String[] values = roleList.getElements();
+                if (values != null) {
+                    for (String val : values) {
+                        roles.put(val);
+                    }
                 }
             }
             obj.put("roles", roles);
             JSONArray groups = new JSONArray();
-            values = id.getGroups();
-            if (values != null) {
-                for (String val : values) {
-                    groups.put(val);
+            ListWrapper groupList = id.getGroupList();
+            if (groupList != null) {
+                String[] values = groupList.getElements();
+                if (values != null) {
+                    for (String val : values) {
+                        groups.put(val);
+                    }
                 }
             }
             obj.put("groups", groups);
             JSONArray members = new JSONArray();
-            values = id.getMembers();
-            if (values != null) {
-                for (String val : values) {
-                    members.put(val);
+            ListWrapper memberList = id.getMemberList();
+            if (memberList != null) {
+                String[] values = memberList.getElements();
+                if (values != null) {
+                    for (String val : values) {
+                        members.put(val);
+                    }
                 }
             }
             obj.put("members", members);
@@ -877,30 +896,39 @@ public class MarshallerFactory {
                 wrt.println(details.getRealm());
 
                 // write the roles.
-                String[] roles = details.getRoles();
-                for (int i = 0; (roles != null && i < roles.length); i++) {
-                    // add prefix to denote a parent object..
-                    wrt.print(prfx);
-                    wrt.print("role=");
-                    wrt.println(roles[i]);
+                ListWrapper roleList = details.getRoleList();
+                if (roleList != null) {
+                    String[] roles = roleList.getElements();
+                    for (int i = 0; (roles != null && i < roles.length); i++) {
+                        // add prefix to denote a parent object..
+                        wrt.print(prfx);
+                        wrt.print("role=");
+                        wrt.println(roles[i]);
+                    }
                 }
 
                 // write the groups.
-                String[] groups = details.getGroups();
-                for (int i = 0; (groups != null && i < groups.length); i++) {
-                    // add prefix to denote a parent object..
-                    wrt.print(prfx);
-                    wrt.print("group=");
-                    wrt.println(groups[i]);
+                ListWrapper groupList = details.getGroupList();
+                if (groupList != null) {
+                    String[] groups = groupList.getElements();
+                    for (int i = 0; (groups != null && i < groups.length); i++) {
+                        // add prefix to denote a parent object..
+                        wrt.print(prfx);
+                        wrt.print("group=");
+                        wrt.println(groups[i]);
+                    }
                 }
 
                 // write the members.
-                String[] members = details.getMembers();
-                for (int i = 0; (members != null && i < members.length); i++) {
-                    // add prefix to denote a parent object..
-                    wrt.print(prfx);
-                    wrt.print("member=");
-                    wrt.println(members[i]);
+                ListWrapper memberList = details.getMemberList();
+                if (memberList != null) {
+                    String[] members = memberList.getElements();
+                    for (int i = 0; (members != null && i < members.length); i++) {
+                        // add prefix to denote a parent object..
+                        wrt.print(prfx);
+                        wrt.print("member=");
+                        wrt.println(members[i]);
+                    }
                 }
 
                 // write the attributes..

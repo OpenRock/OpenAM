@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
 
@@ -92,6 +92,7 @@ import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -833,9 +834,9 @@ public class IdentityServicesImpl
                 
                 // Process roles, groups & memberships
                 if (objectIdType.equals(IdType.USER)) {
-                    String[] roleNames = identity.getRoles();
+                    ListWrapper roles = identity.getRoleList();
 
-                    if ((roleNames != null) && (roleNames.length > 0)) {
+                    if (roles != null && roles.getElements() != null && roles.getElements().length > 0) {
                         if (!isOperationSupported(repo, IdType.ROLE,
                             IdOperation.EDIT)) {
                             // TODO: localize message
@@ -844,6 +845,7 @@ public class IdentityServicesImpl
                                 " Operation: EDIT");
                         }
 
+                        String[] roleNames = roles.getElements();
                         for (int i = 0; i < roleNames.length; i++) {
                             AMIdentity role = fetchAMIdentity(repo, IdType.ROLE,
                                 roleNames[i], false);
@@ -855,9 +857,9 @@ public class IdentityServicesImpl
                         }
                     }
 
-                    String[] groupNames = identity.getGroups();
+                    ListWrapper groups = identity.getGroupList();
 
-                    if ((groupNames != null) && (groupNames.length > 0)) {
+                    if (groups != null && groups.getElements() != null && groups.getElements().length > 0) {
                         if (!isOperationSupported(repo, IdType.GROUP,
                             IdOperation.EDIT)) {
                             // TODO: localize message
@@ -866,6 +868,7 @@ public class IdentityServicesImpl
                                 " Operation: EDIT");
                         }
 
+                        String[] groupNames = groups.getElements();
                         for (int i = 0; i < groupNames.length; i++) {
                             AMIdentity group = fetchAMIdentity(repo,
                                 IdType.GROUP, groupNames[i], false);
@@ -879,9 +882,9 @@ public class IdentityServicesImpl
 
                 if (objectIdType.equals(IdType.GROUP) ||
                     objectIdType.equals(IdType.ROLE)) {
-                    String[] memberNames = identity.getMembers();
+                    ListWrapper members = identity.getMemberList();
 
-                    if (memberNames != null) {
+                    if (members != null) {
                         if (objectIdType.equals(IdType.GROUP) &&
                             !isOperationSupported(repo, IdType.GROUP,
                             IdOperation.EDIT)) {
@@ -896,6 +899,7 @@ public class IdentityServicesImpl
                             throw new NeedMoreCredentials("");
                         }
 
+                        String[] memberNames = members.getElements();
                         for (int i = 0; i < memberNames.length; i++) {
                             AMIdentity user = fetchAMIdentity(repo, IdType.USER,
                                 memberNames[i], false);
@@ -1142,18 +1146,20 @@ public class IdentityServicesImpl
             }
 
             if (objectIdType.equals(IdType.USER)) {
-                String[] roleNames = identity.getRoles();
+                ListWrapper roles = identity.getRoleList();
 
-                if (roleNames != null) {
+                if (roles != null) {
+                    String[] roleNames = roles.getElements();
                     Set roleMemberships = new HashSet(roleNames.length);
                     roleMemberships.addAll(Arrays.asList(roleNames));
 
                     setMemberships(repo, amIdentity, roleMemberships, IdType.ROLE);
                 }
 
-                String[] groupNames = identity.getGroups();
+                ListWrapper groups = identity.getGroupList();
 
-                if (groupNames != null) {
+                if (groups != null) {
+                    String[] groupNames = groups.getElements();
                     Set groupMemberships = new HashSet(groupNames.length);
                     groupMemberships.addAll(Arrays.asList(groupNames));
 
@@ -1164,13 +1170,14 @@ public class IdentityServicesImpl
             if (objectIdType.equals(IdType.GROUP) ||
                 objectIdType.equals(IdType.ROLE))
             {
-                String[] memberNames = identity.getMembers();
+                ListWrapper members = identity.getMemberList();
 
-                if (memberNames != null) {
-                    Set members = new HashSet(memberNames.length);
-                    members.addAll(Arrays.asList(memberNames));
+                if (members != null) {
+                    String[] memberNames = members.getElements();
+                    Set memberships = new HashSet(memberNames.length);
+                    memberships.addAll(Arrays.asList(memberNames));
 
-                    setMembers(repo, amIdentity, members, IdType.USER);
+                    setMembers(repo, amIdentity, memberships, IdType.USER);
                 }
             }
         } catch (IdRepoException ex) {
@@ -1703,7 +1710,7 @@ public class IdentityServicesImpl
                         roleNames[i] = rolesFound[i].getName();
                     }
 
-                    rv.setRoles(roleNames);
+                    rv.setRoleList(new ListWrapper(roleNames));
                 }
 
                 Set groups = amIdentity.getMemberships(IdType.GROUP);
@@ -1718,7 +1725,7 @@ public class IdentityServicesImpl
                         groupNames[i] = groupsFound[i].getName();
                     }
 
-                    rv.setGroups(groupNames);
+                    rv.setGroupList(new ListWrapper(groupNames));
                 }
             }
 
@@ -1735,7 +1742,7 @@ public class IdentityServicesImpl
                         memberNames[i] = membersFound[i].getName();
                     }
 
-                    rv.setMembers(memberNames);
+                    rv.setMemberList(new ListWrapper(memberNames));
                 }
             }
 
