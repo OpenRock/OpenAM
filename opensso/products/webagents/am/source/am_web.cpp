@@ -1211,16 +1211,20 @@ am_bool_t in_not_enforced_list(URL &urlObj,
     }
 
     // Check for dummy post url
+    am_resource_match_t dummy_post_url_match;
     urlObj.getRootURL(dummyNotEnforcedUrl_str);
     if ((*agentConfigPtr)->dummyPostPrefixUri != NULL) {
-        dummyNotEnforcedUrl_str.append("/").append((*agentConfigPtr)->dummyPostPrefixUri).append("*");
+        dummyNotEnforcedUrl_str.append("/").append((*agentConfigPtr)->dummyPostPrefixUri).append(DUMMY_NOTENFORCED);
+        dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
+            dummyNotEnforcedUrl_str.c_str(),
+            url, B_TRUE);
     } else {
         dummyNotEnforcedUrl_str.append(DUMMY_NOTENFORCED);
-    }
-    am_resource_match_t dummy_post_url_match;
-    dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
+        dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
             dummyNotEnforcedUrl_str.c_str(),
             baseURL, B_TRUE);
+    }
+        
     if ((AM_EXACT_MATCH == dummy_post_url_match) ||
             (AM_EXACT_PATTERN_MATCH == dummy_post_url_match)) {
         dummy_post_url_match_flag = AM_TRUE;
@@ -7088,7 +7092,7 @@ am_web_get_postdata_preserve_lbcookie(char **headerValue,
             (*agentConfigPtr)->postdatapreserve_sticky_session_mode;
     const char *stickySessionValue =
             (*agentConfigPtr)->postdatapreserve_sticky_session_value;
-    const char *stickySessionCookieDomain = (*agentConfigPtr)->dummyPostPrefixUri;
+    const char *stickySessionCookiePath = (*agentConfigPtr)->dummyPostPrefixUri;
 
     // If stickySessionMode or stickySessionValue is empty, 
     // then there is no LB in front of the agent.
@@ -7128,13 +7132,13 @@ am_web_get_postdata_preserve_lbcookie(char **headerValue,
     }
     if (status == AM_SUCCESS) {
         if (isValueNull == B_TRUE) {
-            cookieValue = "";
+            cookieValue = ";Max-Age=0;Expires=Thu, 01-Jan-1970 00:00:01 GMT";
         }
         header = " ";
         header.append(cookieName).append("=").
                 append(cookieValue).append(";Path=/");
-        if (stickySessionCookieDomain != NULL && strlen(stickySessionCookieDomain) > 0) {
-            header.append(stickySessionCookieDomain);
+        if (stickySessionCookiePath != NULL && strlen(stickySessionCookiePath) > 0) {
+            header.append(stickySessionCookiePath);
         }
         *headerValue = strdup(header.c_str());
         if (*headerValue == NULL) {
