@@ -538,7 +538,7 @@ $(".flat").live("dblclick", function() {
          <include name="**/**/*.html" />
          <replaceValue>&lt;script type="text/javascript"&gt;
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-23412190-4']);
+  _gaq.push(['_setAccount', 'UA-23412190-7']);
   _gaq.push(['_trackPageview']);
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
