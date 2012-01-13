@@ -315,7 +315,7 @@ public class AMSetupServlet extends HttpServlet {
     
     protected static void createOpenDJBackup() {
         try {
-            UpgradeServices.createUpgradeDirectories();
+            UpgradeServices.createUpgradeDirectories(getBaseDir());
         } catch (UpgradeException ue) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot create backup directory", ue);
             return;
