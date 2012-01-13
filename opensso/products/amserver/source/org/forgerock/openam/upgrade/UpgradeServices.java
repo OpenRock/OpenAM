@@ -99,6 +99,7 @@ public class UpgradeServices {
     
     public ServiceUpgradeWrapper preUpgrade(SSOToken adminToken) 
     throws UpgradeException {
+        createUpgradeDirectories();
         return preUpgradeProcessing(adminToken);
     }
     
@@ -116,7 +117,7 @@ public class UpgradeServices {
     throws UpgradeException {
         File d = new File(dirName);
             
-        if (!d.exists() && d.isFile()) {
+        if (d.exists() && d.isFile()) {
             throw new UpgradeException("Directory: " + dirName + 
                     " cannot be created as file of the same name already exists");
         }
