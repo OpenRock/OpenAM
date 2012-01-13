@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
