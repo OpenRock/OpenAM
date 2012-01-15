@@ -172,22 +172,22 @@ public class SessionCount {
     /*
      * Get user sessions from local server
      */
-    static Map getSessionsFromLocalServer(String uuid) {
-
-        Set sessions = (Set) uuidSessionMap.get(uuid);
-        Map retSessions = new HashMap();
+    static Map<String, Long> getSessionsFromLocalServer(String uuid) {
+        Set<SessionID> sessions = (Set<SessionID>) uuidSessionMap.get(uuid);
+        Map<String, Long> retSessions = new HashMap<String, Long>();
 
         if (sessions != null) {
             synchronized (sessions) {
-                Iterator i = sessions.iterator();
-                while (i.hasNext()) {
-                    SessionID sid = (SessionID) i.next();
+                for (SessionID sid : sessions) {
                     InternalSession is = getSS().getInternalSession(sid);
-                    retSessions.put(sid.toString(), new Long(is
-                            .getExpirationTime()));
+                    
+                    if (is != null) {
+                        retSessions.put(sid.toString(), new Long(is.getExpirationTime()));
+                    }
                 }
             }
         }
+        
         return retSessions;
     }
 
