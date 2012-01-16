@@ -193,13 +193,21 @@
   <para>The Database Repository type of data store is experimental and not
   supported for production use.</para>
 
-  <!-- Fix for 737: Add details to the release notes of OpenAM (for 735) -->
+  <!-- Fix for OPENAM-737: Add details to the release notes of OpenAM (for 735) -->
   <para>By default, the REST and SOAP APIs return different responses depending
   on whether the user name provided is valid or invalid. This behavior could
   allow an attacker to build list of valid user names, after which only
   passwords would be required to gain access to user account details. To
   prevent this risk, set the server configuration property
   <literal>openam.auth.soap.rest.generic.authentication.exception=true</literal>.
+  You can set this property in OpenAM console under Configuration &gt; Servers
+  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+
+  <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
+  <para>By default OpenAM does not enforce session quotas when running in Site
+  mode without session failover. To work around this behavior, set the server
+  configuration property
+  <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
   You can set this property in OpenAM console under Configuration &gt; Servers
   and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
  </section>
