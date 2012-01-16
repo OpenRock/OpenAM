@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-compatibility'
@@ -34,11 +34,9 @@
  <para>This chapter covers both major changes to existing functionality, and
  also deprecated and removed functionality.</para>
 
- <section>
+ <section xml:id="changes">
   <title>Major Changes to Existing Functionality</title>
-  
-  <para>TODO: Complete this section</para>
-  
+
   <itemizedlist>
    <listitem>
     <itemizedlist>
@@ -119,7 +117,7 @@
   </itemizedlist>
  </section>
 
- <section>
+ <section xml:id="deprecated">
   <title>Deprecated Functionality</title>
   
   <para>The following functionality is deprecated in OpenAM
@@ -144,7 +142,7 @@
   </itemizedlist>
  </section>
 
- <section>
+ <section xml:id="removed">
   <title>Removed Functionality</title>
   
   <para>OpenAM <?eval ${serverDocTargetVersion}?> does not include the

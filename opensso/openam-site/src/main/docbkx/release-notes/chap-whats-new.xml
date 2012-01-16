@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-whats-new'
@@ -69,6 +69,14 @@
    interface (OPENAM-940).</para>
   </listitem>
   <listitem>
+   <para>OpenAM now allows authentication modules to be installed as a single
+   .jar file (OPENAM-916).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM has improved console configuration for handling services such
+   as Authentication Core Settings and Identity Repositories (OPENAM-887).</para>
+  </listitem>
+  <listitem>
    <para>The <command>ssoadm</command> command now provides subcommands to
    manage entitlement application types: <command>create-appl-type</command>,
    <command>delete-appl-types</command>, <command>list-appl-types</command>
@@ -89,6 +97,10 @@
    you require more from users when they login from an unfamiliar location,
    from a new device, after a long period during which the account remained
    idle, and so forth.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM console now includes many more helpful hints and built-in
+   documentation (OPENAM-805).</para>
   </listitem>
   <listitem>
    <para>OpenAM now lets you fetch maximum session time, time remaining, and
@@ -221,8 +233,13 @@
    created, and the number of connections destroyed.</para>
   </listitem>
   <listitem>
+   <para>OpenAM Windows Desktop SSO now provides a mechanism to fail attempted
+   authentication when Kerberos-authenticated user has no profile in the OpenAM
+   data store (OPENAM-403).</para>
+  </listitem>
+  <listitem>
    <para>OpenAM now handles Active Directory password expiration responses
-   properly. (OPENAM-258)</para>
+   properly (OPENAM-258).</para>
   </listitem>
   <listitem>
    <para>OpenAM password reset now uses realm aliases to find realms for
