@@ -24,6 +24,9 @@
  *
  * $Id: Functions.java,v 1.2 2009/12/16 17:29:48 farble1670 Exp $
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.admin;
 
 import java.io.IOException;
@@ -66,17 +69,6 @@ public class Functions {
             return 0;
         }
         return c.size();
-    }
-
-    public static String scrape(String url) {
-        try {
-            Scraper s = new Scraper(url);
-            String result = s.scrape();
-            return result;
-        } catch (IOException ioe) {
-            Resources r = new Resources();
-            return r.getString(Functions.class, "scrapeError", url, ioe);
-        }
     }
 
     public static String concat(String s1, String s2) {

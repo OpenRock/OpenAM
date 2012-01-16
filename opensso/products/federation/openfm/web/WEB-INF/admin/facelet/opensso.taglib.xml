@@ -26,6 +26,9 @@
   $Id: opensso.taglib.xml,v 1.7 2009/12/16 17:29:48 farble1670 Exp $
 
 -->
+<!--
+  Portions Copyrighted 2012 ForgeRock AS
+-->
 <!DOCTYPE facelet-taglib PUBLIC "-//Sun Microsystems, Inc.//DTD Facelet Taglib 1.0//EN" "http://java.sun.com/dtd/facelet-taglib_1_0.dtd"> 
 <facelet-taglib>
     <namespace>http://opensso.dev.java.net</namespace>
@@ -76,10 +79,6 @@
     <tag>
         <tag-name>tooltip</tag-name>
         <source>tag/tooltip.xhtml</source>
-    </tag>
-    <tag>
-        <tag-name>iframe</tag-name>
-        <source>tag/iframe.xhtml</source>
     </tag>
     <tag>
         <tag-name>messages</tag-name>
@@ -157,11 +156,6 @@
         <function-name>size</function-name>
         <function-class>com.sun.identity.admin.Functions</function-class>
         <function-signature>int size(java.util.Collection)</function-signature>
-    </function>
-    <function>
-        <function-name>scrape</function-name>
-        <function-class>com.sun.identity.admin.Functions</function-class>
-        <function-signature>java.lang.String scrape(java.lang.String)</function-signature>
     </function>
     <function>
         <function-name>concat</function-name>
