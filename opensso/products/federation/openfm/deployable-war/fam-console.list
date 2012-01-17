@@ -1858,7 +1858,6 @@
 ./WEB-INF/admin/facelet/tag/clink.xhtml
 ./WEB-INF/admin/facelet/tag/conditionpanel.xhtml
 ./WEB-INF/admin/facelet/tag/feed.xhtml
-./WEB-INF/admin/facelet/tag/iframe.xhtml
 ./WEB-INF/admin/facelet/tag/landing.xhtml
 ./WEB-INF/admin/facelet/tag/litem.xhtml
 ./WEB-INF/admin/facelet/tag/messages.xhtml
@@ -1875,7 +1874,6 @@
 ./WEB-INF/admin/facelet/tag/wizard.xhtml
 ./WEB-INF/admin/facelet/tag/wstep.xhtml
 ./admin/index.html
-./admin/proxy.jsp
 ./admin/css/admin.css
 ./admin/css/admin_ie7.css
 ./admin/css/override.css
