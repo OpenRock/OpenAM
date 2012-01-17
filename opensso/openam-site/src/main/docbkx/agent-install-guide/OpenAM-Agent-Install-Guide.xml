@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <book xml:id='agent-install-guide'
@@ -32,7 +32,7 @@
  <info>
   <title>OpenAM Policy Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</title>
   <copyright>
-   <year>2011</year>
+   <year>2011-2012</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
