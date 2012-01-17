@@ -156,9 +156,11 @@ public class UpgradeServices {
         UpgradeProgress.reportStart("upgrade.writingbackup", null);
         writeBackup(adminToken);
         UpgradeProgress.reportEnd("upgrade.success", null);
-        
+
+        UpgradeReport report = null;
         if (serviceChanges != null) {
             try {
+                report = new UpgradeReport(adminToken, serviceChanges, false);
                 processUpgrade(adminToken, serviceChanges);
             } catch (UpgradeException ue) {
                 UpgradeProgress.reportEnd("upgrade.failed", null);
@@ -167,7 +169,7 @@ public class UpgradeServices {
         }
         
         UpgradeProgress.reportStart("upgrade.writinglog", null);
-        generateDetailedUpgradeReport(adminToken, serviceChanges, false);
+        report.writeReport();
         UpgradeProgress.reportEnd("upgrade.success", null);
         
         if (debug.messageEnabled()) {
