@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <preface xml:id='preface'
@@ -103,11 +103,9 @@ Terminal sessions are formatted like this.</screen>
   <para>Fully baked core documentation is available at <link
   xlink:href='http://...'>...</link>.</para>
   
-  <para>You need not wait until the core documentation is finished, though,
-  to read more about OpenAM, and also to read about related topics that
-  involve OpenAM without being strictly about OpenAM. The <link
-  xlink:href='http://wikis.forgerock.org/openam/'>OpenAM Wiki</link> regularly
-  brings you more, fresh content. In addition, you are welcome to <link
+  <para>The <link xlink:href='http://wikis.forgerock.org/openam/'
+  xlink:show="new">OpenAM Wiki</link> regularly brings you more, fresh content.
+  In addition, you are welcome to <link xlink:show="new"
   xlink:href='https://idp.forgerock.org/openam/UI/Login?service=register'
   >sign up</link> and then edit the Wiki if you notice an error, or if you
   have something to share.</para>
