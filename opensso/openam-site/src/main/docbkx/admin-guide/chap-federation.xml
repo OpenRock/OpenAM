@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -30,21 +30,29 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Managing Federation</title>
+ <title>Managing SAML 2.0 SSO</title>
 
- <para>This chapter addresses how to set up and manage federation for
+ <para>This chapter addresses how to set up and manage SAML 2.0 SSO for
  single sign on and single log out across resources belonging to
  organizations participating in a circle of trust.</para>
  
  <section xml:id="about-federation">
-  <title>About Federation</title>
+  <title>About SAML 2.0 SSO &amp; Federation</title>
   <indexterm><primary>Federation</primary></indexterm>
-  <para>Federation lets single sign on cross organizational boundaries.
-  Federation helps organization share identities and services without giving
-  away their identity information, or the services they provide.</para>
+  <para>SAML 2.0 SSO is part of federated access management. Federation lets
+  access management cross organizational boundaries. Federation helps
+  organizations share identities and services without giving away their
+  identity information, or the services they provide.</para>
+  
+  <para>To bridge heterogenous systems, federation requires interoperability,
+  and thus depends on standards for orchestrating interaction and exchanging
+  information between providers. OpenAM federation relies on standards such as
+  <link xlink:href="http://saml.xml.org/saml-specifications">Security Assertion
+  Markup Language (SAML) 2.0</link>. SAML 2.0 describes the messages, how they
+  are relayed, how they are exchanged, and common use cases.</para>
   
   <itemizedlist>
-   <para>To achieve federation, OpenAM separates <firstterm>identity
+   <para>To achieve SAML 2.0 SSO, OpenAM separates <firstterm>identity
    providers</firstterm> from <firstterm>service providers</firstterm>,
    lets you include them them in a <firstterm>circle of trust</firstterm>, and
    has you configure how the providers in the circle of trust interact.</para>
@@ -66,7 +74,7 @@
     others' services.</para>
    </listitem>
    <listitem>
-    <para>Federation maps attributes from accounts at the identity provider to
+    <para>SAML 2.0 SSO maps attributes from accounts at the identity provider to
     attributes on accounts at the service provider. The identity provider makes
     assertions to the service provider, for example to attest that a user has
     authenticated with the identity provider. The service provider then
@@ -76,13 +84,6 @@
    </listitem>
   </itemizedlist>
   
-  <para>To bridge heterogenous systems, federation requires interoperability,
-  and thus depends on standards for orchestrating interaction and exchanging
-  information between providers. OpenAM federation relies on standards such as
-  <link xlink:href="http://saml.xml.org/saml-specifications">Security Assertion
-  Markup Language (SAML) 2.0</link>. SAML 2.0 describes the messages, how they
-  are relayed, how they are exchanged, and common use cases.</para>
-  
   <para>In federation deployments where not all providers support SAML 2.0,
   OpenAM can act as a multi-protocol hub, translating for providers who rely
   on other and older standards such as SAML 1.x, Liberty Alliance Project
@@ -91,10 +92,10 @@
  </section>
  
  <section xml:id="set-up-federation">
-  <title>Setting Up Federation</title>
+  <title>Setting Up SAML 2.0 SSO</title>
   
   <itemizedlist>
-   <para>Before you set up federation in OpenAM, you must:</para>
+   <para>Before you set up SAML 2.0 SSO in OpenAM, you must:</para>
    <listitem>
     <para>Know which providers participate in the circle of trust.</para>
    </listitem>
@@ -524,7 +525,6 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
     </step>
     <step>
      <para>Adjust the identity provider metadata.</para>
-     <para>TODO</para>
     </step>
     <step>
      <para>On the service provider console, create a remote identity provider
