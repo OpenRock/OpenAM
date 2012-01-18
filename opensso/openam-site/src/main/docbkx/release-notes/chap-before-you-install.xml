@@ -67,9 +67,11 @@
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
     <para>JBoss Application Server 7.x</para>
    </listitem>
+<!-- For EA: JSF Library conflict (Mojarra on JSF not JSF-RI)
    <listitem>
     <para>Jetty 7</para>
    </listitem>
+ -->
    <listitem>
     <para>Oracle WebLogic 10.3.5</para>
    </listitem>
@@ -92,7 +94,7 @@
     <para>External Sun OpenDS data store</para>
    </listitem>
    <listitem>
-    <para>External Sun Directory Server data store</para>
+    <para>External Oracle Directory Server Enterprise Edition data store</para>
    </listitem>
   </itemizedlist>
 
@@ -112,7 +114,7 @@
     <para>OpenDS</para>
    </listitem>
    <listitem>
-    <para>Sun Directory Server</para>
+    <para>Oracle Directory Server Enterprise Edition</para>
    </listitem>
   </itemizedlist>
 
