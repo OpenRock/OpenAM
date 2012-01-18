@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-auth-services'
@@ -137,7 +137,7 @@
   </indexterm>
   <para>With OpenAM, you can further set <firstterm>authentication
   levels</firstterm> per module, with higher levels being used typically
-  to allow access to more restricted resources. The OpenAM APIs also let you
+  to allow access to more restricted resources. The OpenAM SPIs also let you
   develop your own authentication modules, and post-authentication plugins.
   Client applications can specify the authentication level, module, user, and
   authentication service to use among those you have configured. As described
@@ -182,7 +182,7 @@
   password during authentication.</para>
   
   <tip>
-   <para>One parameter shared by all modules is Authentication Level.
+   <para>One parameter that all modules have is Authentication Level.
    You change Authentication Level from 0 to a positive integer in order to
    indicate those modules are seen as more secure. Then you configure
    authorization to require a minimum authentication level required to access
@@ -210,6 +210,8 @@
      <listitem>
       <para>The default port for LDAP is 389. If you are connecting to
       Active Directory over SSL, the default port for LDAP/SSL is 636.</para>
+      <para>To allow users to change passwords through OpenAM, Active Directory
+      requires that you connect over SSL.</para>
       <para>If you want to use SSL or TLS for security, then scroll down to
       enable SSL/TLS Access to Active Directory Server. Make sure that OpenAM
       can trust the Active Directory certificate when using this option.</para>
@@ -243,12 +245,14 @@
       manage account lockout, or if Active Directory requires that OpenAM
       authenticate in order to read users' attributes, then OpenAM needs the
       DN and password to authenticate to Active Directory.</para>
-      <para>The default is <literal>amldapuser</literal>. Make sure that
-      password is correct before you logout. If it is incorrect, you will be
-      locked out. If this should occur, you can login with the super user DN,
-      which by default is
+      <para>The default is <literal>amldapuser</literal>. If the administrator
+      authentication chain (default: <literal>ldapService</literal>) has been
+      configured to include only the Active Directory module, then make sure
+      that the password is correct before you logout. If it is incorrect, you
+      will be locked out. If you do get locked out, you can login with the
+      super user DN, which by default is
       <literal>uid=amAdmin,ou=People,<replaceable>OpenAM-deploy-base</replaceable></literal>,
-      where <replaceable>OpenAM-deploy-base</replaceable> you set during
+      where <replaceable>OpenAM-deploy-base</replaceable> was set during
       OpenAM configuration.</para>
       <para><command>ssoadm</command> attributes:
       <literal>iplanet-am-auth-ldap-bind-dn</literal> and
@@ -304,8 +308,8 @@
      <term>Return User DN to Authenticate</term>
      <listitem>
       <para>When enabled, and OpenAM uses Active Directory as the user store,
-      the module returns the DN rather than the rather than the User ID, so the
-      bind for authentication can be completed without a search to retrieve
+      the module returns the DN rather than the User ID, so the bind for
+      authentication can be completed without a search to retrieve
       the DN.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-ldap-return-user-dn</literal></para>
@@ -314,8 +318,9 @@
     <varlistentry>
      <term>Active Directory Server Check Interval</term>
      <listitem>
-      <para>Specifies the number of minutes between checks that Active
-      Directory continues to respond.</para>
+      <para>Used by the failover mechanism. Specifies the number of minutes
+      between checks whether a previously unavailable Active Directory has
+      become available again.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-ldap-server-check</literal></para>
      </listitem>
@@ -360,7 +365,7 @@
    If the Adaptive Risk module calculates a total score below the threshold you
    set, the module returns success, and OpenAM finishes authentication
    processing without requiring further credentials. Otherwise the Adaptive
-   Risk module evaluates the score to be abover the risk threshold, and returns
+   Risk module evaluates the score to be above the risk threshold, and returns
    failure. OpenAM then calls the HOTP module, requiring the user to
    authenticate with a one-time password delivered to her by email or by SMS
    to her mobile phone.</para>
@@ -401,8 +406,8 @@
      <term>Failed Authentication Check</term>
      <listitem>
       <para>When enabled, check the user profile for authentication failures
-      since the last successful login. This check therefore requires that
-      OpenAM have access to the user profile, and that Account Lockout be
+      since the last successful login. This check therefore requires
+      OpenAM to have access to the user profile, and Account Lockout to be
       enabled (otherwise OpenAM does not record authentication
       failures).</para>
       <para><command>ssoadm</command> attribute:
@@ -447,7 +452,7 @@
       or as a range from one address to another
       (<literal><replaceable>x.x.x.x</replaceable>:<replaceable>y.y.y.y</replaceable></literal>,
       meaning from <replaceable>x.x.x.x</replaceable> to
-      <replaceable>y.y.y.y</replaceable>).</para>
+      <replaceable>y.y.y.y</replaceable>). Currently supports only IPv4.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-range-range</literal></para>
      </listitem>
@@ -762,7 +767,8 @@
      <term>Geolocation Database location</term>
      <listitem>
       <para>Path to GeoIP data file used to convert IP addresses to
-      country locations.</para>
+      country locations. Use the binary .dat file format, rather than
+      .csv.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-geo-location-database</literal></para>
      </listitem>
@@ -1237,11 +1243,11 @@
      <term>Persistent Cookie Mode</term>
      <listitem>
       <para>Determines whether users can return to their authenticated session
-      after restarting the browser. When enabled, a user session does not
-      expire until its persistent cookie expires (as specified by the value of
-      the Persistent Cookie Maximum Time attribute), or the user explicitly
-      logs out. By default, the Authentication Service uses only memory cookies
-      (expires when the browser is closed).</para>
+      after restarting the browser. When enabled, the persistent cookie can be
+      used to reauthenticate until the persistent cookie expires (as specified
+      by the value of the Persistent Cookie Maximum Time attribute), or until
+      the user explicitly logs out. By default, the Authentication Service uses
+      only memory cookies (expires when the browser is closed).</para>
       <para>The client must explicitly request a persistent cookie by adding
       <literal>iPSPCookie=yes</literal> as a parameter to the login URL. OpenAM
       sets a <literal>DProPCookie</literal> as described in
@@ -1434,8 +1440,7 @@
       after authentication has failed. The format of this attribute is
       <literal><replaceable>client-type</replaceable>|<replaceable>URL</replaceable></literal>
       although the only value you can specify at this time is a URL
-      which assumes the type HTML. The default value is
-      <literal>/openam/console</literal>. Values that do not specify HTTP have
+      which assumes the type HTML. Values that do not specify HTTP have
       that appended to the deployment URI.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-login-failure-url</literal></para>
@@ -1449,10 +1454,11 @@
       The Java class must implement the
       <literal>com.sun.identity.authentication.spi.AMPostAuthProcessInterface</literal>
       OpenAM interface.</para>
-      <para>The class or .jar containing the post processing class belongs in
+      <para>A .jar containing the post processing class belongs in
       the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
-      instance, and so you should add it to a custom OpenAM .war file that you
-      deploy.</para>
+      instance. If you do not build a .jar, add the class files under
+      <filename>WEB-INF/classes</filename>. For deployment, add the .jar or
+      classes into a custom OpenAM .war file.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-post-login-process-class</literal></para>
      </listitem>
@@ -1497,10 +1503,11 @@
       OpenAM interface. OpenAM supports account lockout and password changes.
       OpenAM supports password changes through the LDAP authentication module,
       and so the feature is only available for the LDAP module.</para>
-      <para>The class or .jar containing the status event class belongs in
+      <para>A .jar containing the user status event class belongs in
       the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
-      instance, and so you should add it to a custom OpenAM .war file that you
-      deploy.</para>
+      instance. If you do not build a .jar, add the class files under
+      <filename>WEB-INF/classes</filename>. For deployment, add the .jar or
+      classes into a custom OpenAM .war file.</para>
       <para><command>ssoadm</command> attribute:
       <literal>sunAMUserStatusCallbackPlugins</literal></para>
      </listitem>
@@ -1535,7 +1542,7 @@
      <listitem>
       <para>Enables the authenticating user's identity attributes (stored in
       the identity repository) to be set as session properties in the user's
-      AMToken. The value takes the format
+      SSOToken. The value takes the format
       <literal><replaceable>User-Profile-Attribute</replaceable>|<replaceable>Session-Attribute-Name</replaceable></literal>.
       If <replaceable>Session-Attribute-Name</replaceable> is not specified,
       the value of <replaceable>User-Profile-Attribute</replaceable> is used.
@@ -1545,15 +1552,15 @@
       the user's email address (available in the user session) as
       <literal>user.mail</literal>, the entry for this attribute would be
       <literal>mail|user.mail</literal>. After a successful authentication,
-      the <literal>AMToken.getProperty(String)</literal> method is used to
+      the <literal>SSOToken.getProperty(String)</literal> method is used to
       retrieve the user profile attribute set in the session. The user's email
       address is retrieved from the user's session using the
-      <literal>AMToken.getProperty("am.protected.user.mail")</literal> method
+      <literal>SSOToken.getProperty("am.protected.user.mail")</literal> method
       call.</para>
       <para>Properties that are set in the user session using User Attribute
       Mapping to Session Attributes can not be modified (for example,
-      <literal>AMToken.setProperty(String, String)</literal>). This results in
-      an <literal>AMException</literal>. Multi-value attributes, such as
+      <literal>SSOToken.setProperty(String, String)</literal>). This results in
+      an <literal>SSOException</literal>. Multi-value attributes, such as
       <literal>memberOf</literal>, are listed as a single session variable
       with a <literal>|</literal> separator.</para>
       <para><command>ssoadm</command> attribute:
@@ -1590,6 +1597,10 @@
    against the same data store repository. Additionally, you do not need to
    write a custom authentication module where flat-file authentication is
    needed for the corresponding repository in that realm.</para>
+   <para>Yet, the Data Store module is generic. It does not implement data
+   store-specific capabilities such as the password policy and password reset
+   features provided by LDAP modules. Therefore the Data Store module returns
+   failure when such capabilities are invoked.</para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>Data Store</secondary>
@@ -1903,11 +1914,17 @@
       replicas to which OpenAM can connect to retrieve and update directory
       data. You set up primary and secondary servers in case a replica is down
       due to maintenance or to a problem with a particular server.</para>
-      <para>OpenAM first attempts to contact primary servers. If no primary
-      server is available, then OpenAM attempts to contact secondaries. If
-      all directory replica share the same data, you could choose for example
-      to configure directory replica in the same data center as primaries, and
-      to configure directory replica in another data center as secondaries.</para>
+      <para>Set one primary and optionally one secondary directory server for
+      each OpenAM server. For the current OpenAM server, specify each directory
+      server as a
+      <literal><replaceable>host</replaceable>:<replaceable>port</replaceable></literal>
+      combination. For other OpenAM servers in the deployment, you can specify
+      each directory server as
+      <literal><replaceable>server-name</replaceable>|<replaceable>host</replaceable>:<replaceable>port</replaceable></literal>,
+      where <replaceable>server-name</replaceable> is the Server Name of the
+      OpenAM server from the list under Configuration &gt; Servers and
+      Sites, and <replaceable>host</replaceable>:<replaceable>port</replaceable>
+      identifies the directory server.</para>
       <para>When authenticating users from a directory service that is remote
       from OpenAM, set both the primary and secondary server values.</para>
       <para>The default port for LDAP is 389. If you are connecting to
@@ -2046,16 +2063,6 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Trust All Server Certificates</term>
-     <listitem>
-      <para>When enabled, do not check that the certificate presented by the
-      LDAP server has be signed by a known Certificate Authority. Useful when
-      testing with self-signed certificates.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-ldap-auth-level</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
      <term>Authentication Level</term>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-ldap-auth-level</literal></para></listitem>
@@ -2138,11 +2145,10 @@
      <term>Trusted Gateway IP Address</term>
      <listitem>
       <para>Specifies a list of IP addresses of trusted clients that can access
-      MSIDSN modules. You can set the IP addresses of all clients allows to
-      access the MSISDN module by adding each address such as 10.0.0.2.
-      If you leave the list empty, then all clients are allowed.
-      If you specify the value <literal>none</literal>, no clients are
-      allowed.</para>
+      MSIDSN modules. Either restrict the clients allowed to access the MSISDN
+      module by add each IPv4 address here, or leave the list empty to allow
+      all clients to access the module. If you specify the value
+      <literal>none</literal>, no clients are allowed access.</para>
       <para><command>ssoadm</command> attribute:
       <literal>sunAMAuthMSISDNTrustedGatewayList</literal></para>
      </listitem>
@@ -2591,9 +2597,9 @@
     <varlistentry>
      <term>Health check interval</term>
      <listitem>
-      <para>Specify often OpenAM checks offline RADIUS servers by sending an
-      invalid authentication request. OpenAM only starts using RADIUS servers
-      once the health check has been successful. Default: 5 minutes</para>
+      <para>Used for failover. Specify how often OpenAM performs a health check
+      on a previously unavailable RADIUS server by sending an invalid
+      authentication request. Default: 5 minutes</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-radius-healthcheck-interval</literal></para>
      </listitem>
