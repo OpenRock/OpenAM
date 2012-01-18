@@ -120,6 +120,8 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
     <textobject><para>The upgrade report screen lets you keep an upgrade
     report listing configuration changes in case of error.</para></textobject>
    </mediaobject>
+   <para>Log messages pertaining to upgrade of the embedded directory are
+   written to the web container log.</para>
   </step>
   <step>
    <para>When upgrade completes, click Proceed to Login to login to the
