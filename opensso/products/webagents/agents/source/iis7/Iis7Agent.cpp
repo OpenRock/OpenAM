@@ -410,7 +410,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 	IHttpRequest* req = pHttpContext->GetRequest();
 	IHttpResponse* res = pHttpContext->GetResponse();
 
-	am_web_log_error("ProcessRequest -- Starting");
+	am_web_log_debug("ProcessRequest -- Starting");
 
 	if (readAgentConfigFile == FALSE) {
 		EnterCriticalSection(&initLock);
