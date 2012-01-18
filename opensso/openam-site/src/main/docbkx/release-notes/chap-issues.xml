@@ -220,6 +220,10 @@
 
   <itemizedlist>
    <listitem>
+    <para>Clicking the Version button in the console for OpenAM installed in
+    JBoss 7.0.2 results in an uncaught exception page (OPENAM-1062).</para>
+   </listitem>
+   <listitem>
     <para>The check whether session quota is reached does not work correctly
     for users with multiple sessions (OPENAM-1047).</para>
    </listitem>
