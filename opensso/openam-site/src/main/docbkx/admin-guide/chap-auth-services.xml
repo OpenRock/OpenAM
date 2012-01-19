@@ -2922,7 +2922,7 @@
        <para>Set <literal>iplanet-am-auth-shared-state-enabled=true</literal>
        to allow subsequent modules in the authentication chain to use
        the credentials, such as user name and password, captured by this
-       module.</para>
+       module. (Default: <literal>true</literal>)</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -2930,7 +2930,8 @@
       <listitem>
        <para>Set <literal>iplanet-am-auth-store-shared-state-enabled=true</literal>
        to store the captured credentials. Shared state is cleared when the
-       user successfully authenticates, quits the chain, or logs out.</para>
+       user successfully authenticates, quits the chain, or logs out.
+       (Default: <literal>false</literal>)</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -2946,11 +2947,11 @@
       </listitem>
      </varlistentry>
     </variablelist>
-    <para>For example, consider a chain with two modules sharing credentials.
-    The first module in the chain has the option
-    <literal>iplanet-am-auth-shared-state-enabled=true</literal>, and criteria
-    <literal>REQUIRED</literal>. The second module in the chain has options
-    <literal>iplanet-am-auth-shared-state-enabled=true</literal>,
+    <para>For example, consider a chain with two modules sharing credentials
+    according to the default settings. The first module in the chain has the
+    option <literal>iplanet-am-auth-shared-state-enabled=true</literal>, and
+    criteria <literal>REQUIRED</literal>. The second module in the chain has
+    options <literal>iplanet-am-auth-shared-state-enabled=true</literal>,
     <literal>iplanet-am-auth-shared-state-behavior-pattern=tryFirstPass</literal>,
     and criteria <literal>REQUIRED</literal>. A successful authentication
     sequence happens as follows. The user enters her credentials for the first
