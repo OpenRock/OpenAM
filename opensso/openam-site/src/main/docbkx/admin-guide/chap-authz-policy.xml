@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-authz-policy'
@@ -82,15 +82,13 @@
   
   <para>OpenAM receives the redirected user, serving a login page that
   collects her email and password. With the email and password credentials,
-  OpenAM authenticates the user, and gives her a session. OpenAM checks the
-  policy that matches the page she wants to access, and grants access to the
-  page, giving the user's browser a cookie to show the policy agent.
-  OpenAM redirects the user's browser back to the page to update her profile.
-  The policy agent notices that the user has been granted access, and so
-  lets the user access the page. As she now has a session on OpenAM, the
-  user can go away to another page in her browser, come back to the update
-  profile page while the session is still valid, and gain access without having
-  to enter her email and password again.</para>
+  OpenAM authenticates the user, and gives her a session. OpenAM then redirects
+  the user to the policy agent, which gets the policy decision from OpenAM for
+  the page she wants to access, and grants access to the page. OpenAM and the
+  policy agent use cookies set in the user's browser to reference her session.
+  While the user has a valid session with OpenAM, she can go away to another
+  page in her browser, come back to the update profile page, and gain access
+  without having to enter her email and password again.</para>
   
   <para>Notice how OpenAM and the policy agent handle the access in the
   example. The web site developer can offer a profile page, but the web site
@@ -122,8 +120,7 @@
   <para>Policies can include <firstterm>response providers</firstterm>.
   Response providers extend HTTP headers with additional information beyond
   an "allow" or "deny" decision. For example, a response provider can return
-  a user's full name upon login so that a web application can show the user's
-  name on the pages it displays.</para>
+  a message about why access was denied.</para>
  </section>
  
  <section xml:id="configure-authz-policy">

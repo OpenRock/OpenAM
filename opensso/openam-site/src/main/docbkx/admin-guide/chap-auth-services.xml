@@ -2883,10 +2883,9 @@
     <secondary>Chains</secondary>
    </indexterm>
   <para>Once you have configured authentication modules, and added the modules
-  needed for you realm to the list of module instances, you can configure
-  authentication chains. Authentication chains let you handle situations where
-  alternative modules are needed, or where a single set of credentials is not
-  sufficient.</para>
+  to the list of module instances, you can configure authentication chains.
+  Authentication chains let you handle situations where alternative modules
+  are needed, or where a single set of credentials is not sufficient.</para>
   
   <procedure xml:id="create-authn-chain">
    <title>To Create an Authentication Chain</title>
@@ -2978,10 +2977,21 @@
     <para>On the Access Control tab page of the OpenAM console, click the
     realm for which to set the default authentication chain.</para>
    </step>
-   <step>
-    <para>On the Authentication tab page for the realm, adjust the drop-down
-    lists for Organization Authentication Configuration and Administrator
-    Authentication Configuration to the appropriate authentication chains.</para>
+   <step performance="optional">
+    <para>If necessary, on the Authentication tab page for the realm, adjust
+    the drop-down lists for Organization Authentication Configuration and
+    Administrator Authentication Configuration to the appropriate
+    authentication chains.</para>
+    <para>The Organization Authentication Configuration serves when users
+    access <literal>/openam/UI/Login</literal>.</para>
+    <para>The Administrator Authentication Configuration serves when users
+    access <literal>/openam/console</literal>.</para>
+    <para>You can set these independently to separate administrative login
+    from user login. For example, you can change the default user chain, but
+    leave the default administrator chain as is to avoid locking yourself
+    out as administrator. By default, <literal>amadmin</literal> can login at
+    <literal>/openam/UI/Login</literal>. You can change that for your
+    deployment.</para>
    </step>
    <step>
     <para>Save your work.</para>
@@ -3029,19 +3039,20 @@
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term>forceAuth</term>
+    <term>ForceAuth</term>
     <listitem>
-     <para>If <literal>forceAuth=true</literal>, request that OpenAM force the
+     <para>If <literal>ForceAuth=true</literal>, request that OpenAM force the
      user to authenticate even if she already has a valid session. On
      successful authentication, OpenAM updates the session token.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?forceAuth=true</literal></para>
+     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?ForceAuth=true</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
     <term>goto</term>
     <listitem>
      <para>On successful authentication, or successful logout, request that
-     OpenAM redirect the user to the specified location.</para>
+     OpenAM redirect the user to the specified location. Values must be
+     URL encoded.</para>
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?goto=http%3A%2F%2Fwww.example.com%2Fsuccess.html</literal></para>
     </listitem>
    </varlistentry>
@@ -3049,7 +3060,7 @@
     <term>gotoOnFail</term>
     <listitem>
      <para>On authentication failure, request that OpenAM redirect the user to
-     the specified location.</para>
+     the specified location. Values must be URL encoded.</para>
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?goto=http%3A%2F%2Fwww.example.com%2Ffailure.html</literal></para>
     </listitem>
    </varlistentry>
@@ -3060,7 +3071,10 @@
      parameters in the URL. The <literal>IDToken</literal> credentials map
      to the fields in the login page for the authentication module, such as
      <literal>IDToken1</literal> as user ID and <literal>IDToken2</literal>
-     as password for basic user name, password authentication.</para>
+     as password for basic user name, password authentication. The order
+     depends on the callbacks in login page for the module;
+     <literal>IDTokenN</literal> represents the N<superscript>th</superscript>
+     callback of the login page.</para>
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?IDToken1=bjensen&amp;IDToken2=hifalutin</literal></para>
     </listitem>
    </varlistentry>
@@ -3121,14 +3135,15 @@
    <varlistentry>
     <term>module</term>
     <listitem>
-     <para>Request that OpenAM use the specified authentication module that you
-     have configured for the realm where the user is authenticating.</para>
+     <para>Request that OpenAM use the authentication module instance as
+     configured for the realm where the user is authenticating.</para>
      <para>As this parameter determines authentication module selection, do
      not use it with <literal>authlevel</literal>, <literal>service</literal>,
      or <literal>user</literal>.</para>
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?module=DataStore</literal></para>
     </listitem>
    </varlistentry>
+<!-- 
    <varlistentry>
     <term>PersistAMCookie=yes</term>
     <listitem>
@@ -3138,6 +3153,7 @@
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?PersistAMCookie=yes</literal></para>
     </listitem>
    </varlistentry>
+ -->
    <varlistentry>
     <term>realm</term>
     <listitem>
