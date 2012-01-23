@@ -329,6 +329,9 @@
         in the directory configured for the policy service, which by default
         is the identity repository. See Configuration &gt; Global &gt; Policy
         Configuration &gt; Realm Attributes &gt; Primary LDAP Server.</para>
+        <para>Alternatively you can set this for the realm under Access Control
+        &gt; <replaceable>Realm Name</replaceable> &gt; Services &gt; Policy
+        Configuration.</para>
        </listitem>
        <listitem>
         <para>Resource/Environment/IP Address lets you make the policy apply
@@ -475,7 +478,8 @@ PUBLIC "-//OpenSSO Policy Administration DTD//EN"
    
    <step>
     <para>Create your XML policy file.</para>
-    <screen>$ cat policy.xml &lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+    <screen>$ cat policy.xml
+&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
 &lt;!DOCTYPE Policies 
 PUBLIC "-//OpenSSO Policy Administration DTD//EN"
 "jar://com/sun/identity/policy/policyAdmin.dtd"&gt;

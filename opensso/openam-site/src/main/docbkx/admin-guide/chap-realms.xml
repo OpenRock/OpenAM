@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-realms'
@@ -110,8 +110,8 @@
    configuration.</para>
   </step>
   <step>
-   <para>On the Privileges tab, click the name of the group or the user to
-   whom you intend to grant access.</para>
+   <para>On the Privileges tab, click the name of the group to whom you intend
+   to grant access.</para>
   </step>
   <step>
    <para>Select the administrative privileges to delegate for the realm,
@@ -205,6 +205,9 @@
   <step>
    <para>Click the Subjects tab, and make sure the connection to your
    new data store is working, by searching for a known identity.</para>
+   <para>By default the Subjects list only retrieves 100 entries from the
+   data store. Narrow your search if you do not see the identity you are
+   looking for in the list.</para>
   </step>
   <step>
    <para>If you no longer need the connection to the inherited data store

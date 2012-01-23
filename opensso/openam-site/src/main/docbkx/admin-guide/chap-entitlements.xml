@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-entitlements'
@@ -72,9 +72,9 @@
   </itemizedlist>
   
   <para>Entitlement policies define who has who has access to what, under what
-  conditions, much in the same way that other OpenAM policies do. Entitlement
-  policies do let you define virtual subjects and subjects based on attribute
-  lookup to determine who has access to the resources.</para>
+  conditions, in the same way that other OpenAM policies define policy.
+  Entitlement policies do let you define virtual subjects and subjects based on
+  attribute lookup to determine who has access to the resources.</para>
   
   <para>Entitlements apply for <firstterm>applications</firstterm>, which in
   this context mean protected resources that share a common set of actions
@@ -105,10 +105,10 @@
   <para>Use the nascent console to manage entitlements. After you login as
   OpenAM Administrator to OpenAM Console, click Test Beta Console, then
   Entitlements. You can return to the Standard Console by using the link at
-  the upper right of the new console window.</para>
+  the upper right corner of the new console window.</para>
   
   <procedure xml:id="create-entitlements-policy-gui">
-   <title>To Create a Policy</title>
+   <title>To Create an Entitlements Policy</title>
    
    <step>
     <para>Select Entitlements &gt; Policies &gt; Create Policies to start the
@@ -139,7 +139,7 @@
   </procedure>
   
   <procedure xml:id="export-entitlements-policy-gui">
-   <title>To Export a Policy</title>
+   <title>To Export an Entitlements Policy</title>
    
    <step>
     <para>Select Entitlements &gt; Policies &gt; Manage Policies to
@@ -163,7 +163,7 @@
   </procedure>
 
   <procedure xml:id="create-entitlements-application-gui">
-   <title>To Create an Application</title>
+   <title>To Create an Entitlements Application</title>
    
    <step>
     <para>Select Entitlements &gt; Applications &gt; Create Applications to
@@ -200,7 +200,7 @@
   </procedure>
   
   <procedure xml:id="create-entitlements-delegation-gui">
-   <title>To Create a Delegation</title>
+   <title>To Create an Entitlements Delegation</title>
    <indexterm>
     <primary>Authorization</primary>
     <secondary>Delegating</secondary>
@@ -284,7 +284,7 @@
   </procedure>
   
   <procedure xml:id="import-entitlements-policy-cli">
-   <title>To Import a Policy</title>
+   <title>To Import an Entitlements Policy</title>
    
    <step>
     <para>Use the <command>ssoadm create-xacml</command> command to import
