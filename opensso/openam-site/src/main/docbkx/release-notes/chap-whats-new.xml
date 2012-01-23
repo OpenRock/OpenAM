@@ -33,7 +33,13 @@
 
  <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
  provides the following additional features.</para>
- 
+
+ <note>
+  <para>OpenAM 10.0.0 Early Access is a preview of the OpenAM 10.0.0 release.
+  <emphasis role="strong">The Early Access release is not supported for
+  production use.</emphasis></para>
+ </note>
+
  <itemizedlist>
   <listitem>
    <para>OpenIG, the ForgeRock <link
