@@ -220,6 +220,26 @@
 
   <itemizedlist>
    <listitem>
+    <para>When AM SDK cache is disabled, <literal>amadmin</literal> cannot
+    login (OPENAM-1071).</para>
+    <para>Avoid disabling AM SDK caching for this early access release.</para>
+    <para>If you do lock yourself out, edit the entry with DN
+    <literal>ou=server-default,ou=com-sun-identity-servers,ou=default,
+    ou=GlobalConfig,ou=1.0,ou=iPlanetAMPlatformService,ou=services,
+    %ROOT_SUFFIX%</literal> in an LDAP browser, manually changing the
+    AM SDK cache configuration value. Then restart OpenAM, or the web
+    application container.</para>
+   </listitem>
+   <listitem>
+    <para>The <filename>fam-noconsole.list</filename> file for building
+    a custom, no-console .war includes the wrong versions of OpenDJ LDAP SDK
+    and Grizzly Framework .jar files (OPENAM-1070).</para>
+    <para>To work around this issue, edit the file to include these versions
+    instead:</para>
+    <literallayout class="monospaced">./WEB-INF/lib/opendj-ldap-sdk-3.0.0-M1.jar
+./WEB-INF/lib/grizzly-framework-2.1.7.jar</literallayout>
+   </listitem>
+   <listitem>
     <para>Clicking the Version button in the console for OpenAM installed in
     JBoss 7.0.2 results in an uncaught exception page (OPENAM-1062).</para>
    </listitem>
