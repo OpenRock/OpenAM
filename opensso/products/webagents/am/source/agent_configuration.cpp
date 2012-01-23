@@ -453,9 +453,9 @@ am_status_t AgentConfiguration::populateAgentProperties()
     /* Get conditional login URL*/
     if (AM_SUCCESS == status) {
         const char *property_str;
-        am_properties_set_list(this->properties, "com.forgerock.agents.conditional.login.url", " ");
-        am_properties_get(this->properties, "com.forgerock.agents.conditional.login.url", &property_str);
-        if (property_str != NULL) {
+        am_status_t cond_login_status = am_properties_set_list(this->properties, "com.forgerock.agents.conditional.login.url", " ");
+        cond_login_status = am_properties_get(this->properties, "com.forgerock.agents.conditional.login.url", &property_str);
+        if (AM_SUCCESS == cond_login_status && property_str != NULL) {
             this->cond_login_url = conditional_login_url(property_str);
         }
     }
