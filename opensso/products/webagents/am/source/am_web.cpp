@@ -1214,15 +1214,20 @@ am_bool_t in_not_enforced_list(URL &urlObj,
     am_resource_match_t dummy_post_url_match;
     urlObj.getRootURL(dummyNotEnforcedUrl_str);
     if ((*agentConfigPtr)->dummyPostPrefixUri != NULL) {
+        std::string url_nef = url_str;
+        size_t q_found = url_nef.find("?");
+        /* remove query parameter(s) before running am_policy_compare_urls()
+         * on a prefixed-dummyNotEnforcedUrl and request url */
+        if (q_found != std::string::npos) url_nef.erase(q_found);
         dummyNotEnforcedUrl_str.append("/").append((*agentConfigPtr)->dummyPostPrefixUri).append(DUMMY_NOTENFORCED);
         dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
-            dummyNotEnforcedUrl_str.c_str(),
-            url, B_TRUE);
+                dummyNotEnforcedUrl_str.c_str(),
+                url_nef.c_str(), B_TRUE);
     } else {
         dummyNotEnforcedUrl_str.append(DUMMY_NOTENFORCED);
         dummy_post_url_match = am_policy_compare_urls(&rsrcTraits,
-            dummyNotEnforcedUrl_str.c_str(),
-            baseURL, B_TRUE);
+                dummyNotEnforcedUrl_str.c_str(),
+                baseURL, B_TRUE);
     }
         
     if ((AM_EXACT_MATCH == dummy_post_url_match) ||
