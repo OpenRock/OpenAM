@@ -13,16 +13,6 @@
         storeLoginIdValidated( '$type', response );
     }
 
-    function validateconfigStoreServer() {
-        validateStoreServer('$type');
-    }
-    function validateconfigStoreBaseDN() {
-        validateStoreBaseDN('$type');
-    }
-    function validateconfigStoreLoginId() {
-        validateStoreLoginId('$type');
-    }
-
     function validateUserFields(response) {
         if (response.responseText == "ok") { 
 	    eval(field + "Valid = true;" );

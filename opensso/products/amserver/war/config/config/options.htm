@@ -23,15 +23,6 @@
         alert( "Not implemented!" );
     }
 
-    function onUpgradeOlderResponse( response ) {
-        //for now, these methods are the same:
-        onCoexistResponse( response );
-    }
-    function upgradeOlder() {
-        YAHOO.sun.identity.config.options.upgrading.show();
-        AjaxUtils.call( "$context$path?actionLink=olderUpgradeLink", onUpgradeOlderResponse );
-    }
-
     function onUpgradeResponse( response ) {
         if ( response.responseText == "true" ) {
             //operation was successful, hide the writing dialog, show the confComplete:
@@ -50,11 +41,7 @@
         }
 
     }
-    function upgrade() {
-        YAHOO.sun.identity.config.options.upgrading.show();
-        AjaxUtils.call( "$context$path?actionLink=upgradeLink", onUpgradeResponse );
-    }
-    
+
     function renderUpgradePanel() {
         YAHOO.sun.identity.config.options.upgrade = new YAHOO.widget.Panel("upgrade", { fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
         YAHOO.sun.identity.config.options.upgrade.render();
@@ -66,7 +53,6 @@
     }
 
     #else
-    var passwordUpdateRequired = $passwordUpdateRequired;
     var configOption = 0;
 
     
@@ -124,22 +110,6 @@
         YAHOO.sun.identity.config.options.defaultSummary = new YAHOO.widget.Panel("defaultSummary", { width:"450px", fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:false });
         YAHOO.sun.identity.config.options.defaultSummary.render();
         YAHOO.sun.identity.config.options.defaultSummary.center();
-    }
-    
-    
-    function onNewPasswordSubmitSuccess( response ) {
-        var formError = (response != null && (response.getResponseHeader["formError"] != null));
-        if ( !formError ) {
-            YAHOO.sun.identity.config.options.passwordDialog.hide();
-            passwordUpdateRequired = false;
-            if ( configOption == 1 ) {
-                document.location = '$context/config/defaultSummary.htm?' + getLocale();
-            } else if ( configOption == 2 ) {
-                YAHOO.sun.identity.config.options.wizard.show();
-            } else if ( configOption == 3 ) {
-                document.location = '$context/config/existConf.htm';
-            }
-        }
     }
     
     function showWizard() {
@@ -297,7 +267,6 @@
     </div>
 </div>
 #else
-    <div id="passwordDialogContainer"></div>
     <div id="defaultSummaryContainer"></div>
     <div id="wizardContainer"></div>
 #end

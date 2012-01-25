@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.config;
@@ -36,6 +36,7 @@ import com.sun.identity.config.util.TemplatedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
 import org.apache.click.control.ActionLink;
+import org.forgerock.openam.upgrade.UpgradeUtils;
 
 public class Options extends TemplatedPage {
 
@@ -43,7 +44,6 @@ public class Options extends TemplatedPage {
     public ActionLink testUrlLink = new ActionLink("coexistLink", this, "coexist" );
     public ActionLink pushConfigLink = new ActionLink("olderUpgradeLink", this, "olderUpgrade" );
 
-    protected boolean passwordUpdateRequired = true;
     protected boolean upgrade = false;
     protected boolean upgradeCompleted = false;
     protected boolean isOpenDS1x = false;
@@ -56,10 +56,7 @@ public class Options extends TemplatedPage {
     }
 
     public void doInit() {
-        passwordUpdateRequired = getConfigurator().isPasswordUpdateRequired();
-        addModel("passwordUpdateRequired",
-            Boolean.valueOf( passwordUpdateRequired ) );
-        upgrade = !getConfigurator().isNewInstall();
+        upgrade = !isNewInstall();
         upgradeCompleted = AMSetupServlet.isUpgradeCompleted();
         addModel("upgradeCompleted", Boolean.valueOf(upgradeCompleted));
         addModel( "upgrade", Boolean.valueOf( upgrade ) );
@@ -78,36 +75,15 @@ public class Options extends TemplatedPage {
         }
     }
 
-    public boolean upgrade() {
-        try {
-            getConfigurator().upgrade();
-            writeToResponse("true");
-        } catch ( Exception e ) {
-            writeToResponse( e.getMessage());
+    /**
+     * @return If <tt>true</tt>, the options.htm page will be cusotmized for a new installation, otherwise it will be
+     * customized for an upgrade.
+     */
+    public boolean isNewInstall() {
+        if (AMSetupServlet.isConfigured() && UpgradeUtils.isVersionNewer()) {
+            return !UpgradeUtils.canUpgrade();
+        } else {
+            return true;
         }
-        setPath(null);
-        return false;
-    }
-
-    public boolean coexist() {
-        try {
-            getConfigurator().coexist();
-            writeToResponse("true");
-        } catch ( Exception e ) {
-            writeToResponse(e.getMessage());
-        }
-        setPath(null);
-        return false;
-    }
-
-    public boolean olderUpgrade() {
-        try {
-            getConfigurator().olderUpgrade();
-            writeToResponse("true");
-        } catch ( Exception e ) {
-            writeToResponse(e.getMessage());
-        }
-        setPath(null);
-        return false;
     }
 }

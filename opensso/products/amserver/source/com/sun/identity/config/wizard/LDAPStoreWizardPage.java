@@ -45,15 +45,6 @@ public class LDAPStoreWizardPage extends AjaxPage {
 
     public ActionLink clearLink = 
         new ActionLink("clearStore", this, "clearStore");
-    public ActionLink checkNameLink = 
-        new ActionLink("checkName", this, "checkName");
-    public ActionLink checkHostLink = 
-        new ActionLink("checkServer", this, "checkServer");
-    public ActionLink checkBaseDNLink = 
-        new ActionLink("checkBaseDN", this, "checkBaseDN");
-    public ActionLink checkLoginIdLink = 
-        new ActionLink("checkLoginId", this, "checkLoginId");
-
     private String type = "config";
     private String typeTitle = "Configuration";
     private String storeSessionName = "customConfigStore";
@@ -126,93 +117,5 @@ public class LDAPStoreWizardPage extends AjaxPage {
 
     protected void save(LDAPStore config) {
         getContext().setSessionAttribute(getStoreSessionName(), config);
-    }
-
-    public boolean checkName() {
-        String storeName = toString("name");
-        if (storeName != null) {
-            LDAPStore config = ensureConfig();
-            config.setName(storeName );
-            save(config);
-            writeToResponse("true");
-        } else {
-            writeToResponse(getLocalizedString("missing.host.name"));
-        }
-        //ajax response - rendered directly - prevent click from 
-        //rendering a velocity template:
-        setPath( null );
-        return false;
-    }
-
-    public boolean checkServer() {
-        String host = toString("host");
-        int port = toInt("port");
-        boolean portSecure = toBoolean("securePort");
-
-        if ( host == null ) {
-            writeToResponse(getLocalizedString("missing.host.name"));
-        } else if ( port > 65535 ) {
-            writeToResponse(getLocalizedString("invalid.port.number"));
-        } else {
-            try {
-                LDAPStore store = ensureConfig();
-                store.setHostName(host);
-                store.setHostPort(port);
-                store.setHostPortSecure(portSecure);
-
-                getConfigurator().testHost(store);
-                save(store);
-                writeToResponse("true");
-            } catch (Exception e) {
-                writeToResponse(e.getMessage());
-            }
-        }
-
-        setPath(null);
-        return false;
-    }
-
-    public boolean checkBaseDN() {
-        String baseDN = toString("baseDN");
-        if (baseDN == null) {
-            writeToResponse(getLocalizedString("missing.base.dn"));
-        } else {
-            LDAPStore store = ensureConfig();
-            store.setBaseDN(baseDN);
-            try {
-                getConfigurator().testBaseDN(store);
-                save(store);
-                writeToResponse("true");
-            } catch (Exception e) {
-                writeToResponse(e.getMessage());
-            }
-        }
-
-        setPath(null);
-        return false;
-    }
-
-    public boolean checkLoginId() {
-        String loginId = toString("loginId");
-        String password = toString("password");
-        if (loginId == null) {
-            writeToResponse(getLocalizedString("missing.login.id"));
-        } else if ( password == null ) {
-            writeToResponse(getLocalizedString("missing.password"));
-        } else {
-            LDAPStore store = ensureConfig();
-            store.setUsername(loginId);
-            store.setPassword(password);
-
-            try {
-                getConfigurator().testLoginId( store);
-                save( store );
-                writeToResponse("true");
-            } catch (Exception e) {
-                writeToResponse(e.getMessage());
-            }
-        }
-        setPath( null );
-        return false;
     }
 }

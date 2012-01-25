@@ -27,20 +27,18 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.config.util;
 
-import com.sun.identity.config.Configurator;
-import com.sun.identity.config.DummyConfigurator;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,8 +46,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.click.control.ActionLink;
 import org.apache.click.Page;
+import org.apache.click.control.ActionLink;
 import org.publicsuffix.PSS;
 
 
@@ -68,7 +66,6 @@ public abstract class AjaxPage extends Page {
     public static final String RESPONSE_TEMPLATE = "{\"valid\":\"${valid}\", \"body\":\"${body}\"}";
     public static final String OLD_RESPONSE_TEMPLATE = "{\"isValid\":${isValid}, \"errorMessage\":\"${errorMessage}\"}";
    
-    private Configurator configurator = null;
     private static int MIN_PASSWORD_SIZE = 8;
     private boolean rendering = false;
     private String hostName;
@@ -93,15 +90,6 @@ public abstract class AjaxPage extends Page {
 
     public boolean isRendering() {
         return rendering;
-    }
-
-    protected Configurator getConfigurator() {
-        if ( this.configurator == null ) {
-            //TODO - retrieve Configuration instance from runtime environment
-            //servlet context lookup?  JNDI?  Still awaiting word.  Use dummy for now:
-            this.configurator = new DummyConfigurator( this );
-        }
-        return this.configurator;
     }
 
     protected String toString( String paramName ) {

@@ -194,12 +194,6 @@
                        userStoreLoginIdValid;
             }
 
-            function validateStore( type ) {
-                validateStoreServer(type);
-                validateStoreBaseDN(type);
-                validateStoreLoginId(type);
-            }
-
             function disableCustomConfig( storeType ) {
                 $(storeType + 'StoreModule').style.display = "none";
                 $(storeType + 'StoreCustom').checked = false;
@@ -284,43 +278,6 @@
                 return "/config/wizard/step" + (type == 'config' ? 3 : 4 ) + ".htm";
             }
        
-            function validateStoreServer( type ) {
-
-                var host = $(type + 'StoreHost').value;
-                var port = $(type + 'StorePort').value;
-
-                var callUrl = "$context" + toPath(type) + "?actionLink=checkServer&";
-                callUrl += "host=" + host;
-                callUrl += "&port=" + port;
-                var callbackFunction = null;
-                eval( "callbackFunction = " + type + "StoreServerValidated;" );
-                ie7fix++;
-                callUrl = callUrl + "&ie7fix=" + ie7fix;
-                AjaxUtils.call( callUrl, callbackFunction );
-            }
-
-            function validateStoreBaseDN( type ) {
-                var callUrl = "$context" + toPath(type) + "?actionLink=checkBaseDN&baseDN=" + $(type + 'StoreBaseDN').value
-                var callbackFunction = null;
-                eval( "callbackFunction = " + type + "StoreBaseDNValidated;" );
-                ie7fix++;
-                callUrl = callUrl + "&ie7fix=" + ie7fix;
-                AjaxUtils.call( callUrl, callbackFunction );
-            }
-
-            function validateStoreLoginId( type ) {
-                var loginId = $(type + 'StoreLoginId').value;
-                var password = $(type + 'StorePassword').value;
-
-                var callUrl = "$context" + toPath(type) + "?actionLink=checkLoginId&";
-                callUrl += "loginId=" + loginId;
-                callUrl += "&password=" + password;
-                var callbackFunction = null;
-                eval( "callbackFunction = " + type + "StoreLoginIdValidated;" );
-                ie7fix++;
-                callUrl = callUrl + "&ie7fix=" + ie7fix;
-                AjaxUtils.call( callUrl, callbackFunction );
-            }
 
             function clearStore( type ) {
                 $(type + 'StoreHost').value = null;
