@@ -220,6 +220,12 @@
 
   <itemizedlist>
    <listitem>
+    <para>Web service library conflicts when deploying Oracle 11g Application
+    Server (OPENAM-1073).</para>
+    <para>OpenAM console and most features continue to function correctly,
+    but the conflicts can pose problems for STS.</para>
+   </listitem>
+   <listitem>
     <para>When AM SDK cache is disabled, <literal>amadmin</literal> cannot
     login (OPENAM-1071).</para>
     <para>Avoid disabling AM SDK caching for this early access release.</para>
