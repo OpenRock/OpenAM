@@ -28,7 +28,7 @@
 #
 # $Id: defines_SunOS.mk,v 1.4 2008/06/25 05:54:25 qcheng Exp $
 #
-#
+# Portions Copyrighted 2012 ForgeRock AS
 
 #
 # This makefile defines a number of standard OS-dependent symbols
@@ -120,6 +120,8 @@ TAR := /bin/tar
 
 ifeq ($(MC_ARCH), i86pc)
 include $(USERX_ROOT)/arch/defines_SunOS_$(MC_ARCH).mk
+else
+include $(USERX_ROOT)/arch/defines_SunOS_sparc.mk
 endif
 
 PRODUCT_DIR := SUNWam/agents
