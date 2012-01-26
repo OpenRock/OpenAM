@@ -171,6 +171,18 @@ pre.programlisting,pre.screen,pre.flat
     padding: 6px;
 }
 
+pre.screen,pre.flat
+{
+    text-indent: -18px;
+}
+
+.toggle
+{
+ position: relative;
+ left: -40px;
+ float:left;
+}
+
 div.abstract,div.important,div.caution,div.note,div.tip,div.warning,div.example,div.toc
 {
     border: thin dotted #ccc;
