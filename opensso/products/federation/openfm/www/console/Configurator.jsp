@@ -25,7 +25,9 @@
    $Id: Configurator.jsp,v 1.10 2008/11/11 07:05:08 veiming Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
 
 <html>
 <head>
@@ -42,7 +44,8 @@ com.sun.identity.security.EncodeAction,
 com.sun.identity.setup.SetupClientWARSamples,
 java.io.*,
 java.security.AccessController,
-java.util.Properties"
+java.util.Properties,
+org.owasp.esapi.ESAPI"
 %>
 
 <%
@@ -234,19 +237,19 @@ java.util.Properties"
 
     <tr>
     <td>Server Protocol:</td>
-    <td><input name="famProt" type="text" size="6" value="<%= famProt == null ? "" : famProt %>" /></td>
+    <td><input name="famProt" type="text" size="6" value="<%= famProt == null ? "" : ESAPI.encoder().encodeForHTML(famProt) %>" /></td>
     </tr>
     <tr>
     <td>Server Host:</td>
-    <td><input name="famHost" type="text" size="30" value="<%= famHost == null ? "" : famHost %>" /></td>
+    <td><input name="famHost" type="text" size="30" value="<%= famHost == null ? "" : ESAPI.encoder().encodeForHTML(famHost) %>" /></td>
     </tr>
     <tr>
     <td>Server Port:</td>
-    <td><input name="famPort" type="text" size="6" value="<%= famPort == null ? "" : famPort %>" /></td>
+    <td><input name="famPort" type="text" size="6" value="<%= famPort == null ? "" : ESAPI.encoder().encodeForHTML(famPort) %>" /></td>
     </tr>
     <tr>
     <td>Server Deployment URI:</td>
-    <td><input name="famDeploymenturi" type="text" size="15" value="<%= famDeploymenturi == null ? "" : famDeploymenturi %>" /></td>
+    <td><input name="famDeploymenturi" type="text" size="15" value="<%= famDeploymenturi == null ? "" : ESAPI.encoder().encodeForHTML(famDeploymenturi) %>" /></td>
     </tr>
     <tr>
     <td>Password Encryption Key:</td>
@@ -254,35 +257,34 @@ java.util.Properties"
     </tr>
     <tr>
     <td>Application user name</td>
-    <td><input name="appUser" type="text" size="15" value="<%= appUser == null ? "" : appUser %>" /></td>
+    <td><input name="appUser" type="text" size="15" value="<%= appUser == null ? "" : ESAPI.encoder().encodeForHTML(appUser) %>" /></td>
     </tr>
     <tr>
     <td>Application user password</td>
-    <td><input name="appPassword" type="password" size="15" value="<%= appPassword == null ? "" : appPassword %>" /></td>
+    <td><input name="appPassword" type="password" size="15" value="" /></td>
     </tr>
     <tr>
         <td>  </td>
     </tr>
     <tr>
     <td>Administration Console Protocol:</td>
-    <td><input name="consoleProt" type="text" size="6" value="<%= consoleProt == null ? "" : consoleProt %>" /></td>
+    <td><input name="consoleProt" type="text" size="6" value="<%= consoleProt == null ? "" : ESAPI.encoder().encodeForHTML(consoleProt) %>" /></td>
     </tr>
     <tr>
     <td>Administration Console Host:</td>
-    <td><input name="consoleHost" type="text" size="30" value="<%= consoleHost == null ? "" : consoleHost %>" /></td>
+    <td><input name="consoleHost" type="text" size="30" value="<%= consoleHost == null ? "" : ESAPI.encoder().encodeForHTML(consoleHost) %>" /></td>
     </tr>
     <tr>
     <td>Administration Console Port:</td>
-    <td><input name="consolePort" type="text" size="6" value="<%= consolePort == null ?
-"" : consolePort %>" /></td>
+    <td><input name="consolePort" type="text" size="6" value="<%= consolePort == null ? "" : ESAPI.encoder().encodeForHTML(consolePort) %>" /></td>
     </tr>
     <tr>
     <td>Administration Console Deployment URI:</td>
-    <td><input name="consoleDeploymenturi" type="text" size="15" value="<%= consoleDeploymenturi == null ? "" : consoleDeploymenturi %>" /></td>
+    <td><input name="consoleDeploymenturi" type="text" size="15" value="<%= consoleDeploymenturi == null ? "" : ESAPI.encoder().encodeForHTML(consoleDeploymenturi) %>" /></td>
     </tr>
     <tr>
     <td>Administration Console Debug directory</td>
-    <td><input name="debugDir" type="text" size="15" value="<%= debugDir == null ? "" : debugDir %>" /></td>
+    <td><input name="debugDir" type="text" size="15" value="<%= debugDir == null ? "" : ESAPI.encoder().encodeForHTML(debugDir) %>" /></td>
     </tr>
     <tr>
         <td>  </td>

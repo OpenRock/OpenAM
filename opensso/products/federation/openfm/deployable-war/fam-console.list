@@ -1797,7 +1797,6 @@
 ./console/webservices/WSPPServiceSupportedContainerAdd.jsp
 ./console/webservices/WSPPServiceSupportedContainerEdit.jsp
 ./console/webservices/WSPersonalProfileService.jsp
-./console/Configurator.jsp
 ./console/index.html
 ./css/css_ie5win.css
 ./css/css_ie6up.css

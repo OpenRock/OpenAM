@@ -266,7 +266,7 @@
         </copy>
 
         <copy todir="${war.package.dir}/console">
-            <fileset dir="${openfm.dir}/www/console"/>
+            <fileset dir="${openfm.dir}/www/console" excludes="Configurator.jsp" />
         </copy>
 
         <copy overwrite="true" todir="${war.package.dir}">
