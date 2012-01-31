@@ -25,10 +25,14 @@
    $Id: validateWait.jsp,v 1.5 2009/01/05 23:23:24 veiming Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
 
 <%@ page import="com.sun.identity.common.SystemConfigurationUtil" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
 <%@ page import="com.sun.identity.workflow.ValidateSAML2" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
 
 <%
@@ -53,7 +57,7 @@
 <div><img src="<%= deployuri %>/com_sun_web_ui/images/other/dot.gif" alt="" border="0" height="120" width="1" /></div>
 <center><img src="<%= deployuri %>/console/images/processing.gif" alt="" border="0" height="66" width="66" />
 <p>&nbsp;</p>
-<span class="ProgressText" id="message"><%= message %></span>
+<span class="ProgressText" id="message"><%= ESAPI.encoder().encodeForHTML(message) %></span>
 </center>
 
 
