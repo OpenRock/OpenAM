@@ -25,7 +25,9 @@
    $Id: build.xml,v 1.11 2009/07/09 17:04:15 veiming Exp $
 
 -->
-
+<!--
+   Portions Copyrighted 2012 ForgeRock AS
+-->
 <project name="opensso-sample-server" default="all">
     <description>Open Web Single Sign-On: Server Samples</description>
 
@@ -54,13 +56,13 @@
         location="${server.sample.dir}/source" />
 
     <target name="all" depends="preparebuild">
-        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+        <!--javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
             destdir="${samples.server.classes.dir}"
             source="${target.jdk.set}" target="${target.jdk.set}"
             debug="${build.debug}" debuglevel="${build.debuglevel}">
             <src path="${samples.server.source.dir}"/>
             <classpath refid="build.class.path"/>
-        </javac>
+        </javac-->
         <unjar src="${amserver.dist.dir}/opensso-amserver.war"
             dest="${samples.server.package.dir}" />
 
@@ -70,7 +72,7 @@
             <fileset dir="${samples.server.classes.dir}"/>
         </copy>
         <delete file="${samples.server.package.dir}/index.html" />
-        <copy file="${server.sample.dir}/www/index.html"
+        <!--copy file="${server.sample.dir}/www/index.html"
             tofile="${samples.server.package.dir}/index.html" />
         <mkdir dir="${samples.server.package.dir}/samples" />
         <copy todir="${samples.server.package.dir}/samples">
@@ -84,7 +86,7 @@
         </copy>
 
         <copy file="${samples.server.package.dir}/xml/LoginModuleSample.xml" 
-            tofile="${samples.server.package.dir}/config/auth/default/LoginModuleSample.xml" />
+            tofile="${samples.server.package.dir}/config/auth/default/LoginModuleSample.xml" /-->
 
         <mkdir dir="${samples.server.packageweb.dir}" />
         <move file="${samples.server.package.dir}/WEB-INF/web.xml"

@@ -26,7 +26,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2012 ForgeRock AS
 -->
 
 <project name="openfed-war" default="all">
@@ -461,11 +461,11 @@
         <move file="${war.package.dir}/WEB-INF/web.xml" tofile="${war.packageweb.dir}/web.xml" />
 
         <!-- add federation server samples to the WAR -->
-        <mkdir dir="${war.package.dir}/samples" />
+        <!--mkdir dir="${war.package.dir}/samples" />
         <copy todir="${war.package.dir}/samples">
             <fileset dir="${openfm.samples.dir}/war"
                  excludes="**/CVS" />
-        </copy>
+        </copy-->
 
         <copy todir="${war.package.dir}">
             <fileset dir="${openfm.web.dir}" excludes="**/CVS" />
