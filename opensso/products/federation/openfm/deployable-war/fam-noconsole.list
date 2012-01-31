@@ -2191,7 +2191,6 @@
 ./saml2/jsp/spSingleLogoutInit.jsp
 ./saml2/jsp/spSingleLogoutPOST.jsp
 ./saml2/jsp/spSingleLogoutRedirect.jsp
-./saml2/jsp/validate.jsp
 ./samples/authentication/AuthSampleLoginModule.html
 ./samples/authentication/Authentication.html
 ./samples/idff/idp/configure.jsp
