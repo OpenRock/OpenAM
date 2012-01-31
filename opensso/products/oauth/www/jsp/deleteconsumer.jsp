@@ -25,9 +25,12 @@
    $Id: deleteconsumer.jsp,v 1.1 2009/11/20 19:25:15 huacui Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.sun.identity.shared.debug.Debug" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -55,8 +58,9 @@
                     out.println("Service could not be deleted - Unauthorized.");
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace(new java.io.PrintWriter(out));
-                    }
+                    Debug.getInstance("CoreToken").warning("Error while deleting consumer", ex);
+                    out.println("An error occured while deleting the consumer");
+                }
         %>
         <hr><br>
         <form name="return_ind" action="index.jsp" method="GET">
