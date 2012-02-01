@@ -882,6 +882,9 @@ am_web_get_parameter_value(const char *inpQuery, const char *param_name, char **
 AM_WEB_EXPORT boolean_t
 am_web_is_cdsso_enabled(void* agent_config);
 
+AM_WEB_EXPORT boolean_t
+am_web_is_cache_control_enabled(void* agent_config);
+
 AM_WEB_EXPORT am_status_t am_web_check_cookie_in_post(
 		void ** args, char ** dpro_cookie,
 		char ** request_url,

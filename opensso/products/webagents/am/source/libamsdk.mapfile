@@ -178,6 +178,8 @@ SUNW_1.0 {
 		am_string_set_allocate;
 		am_string_set_destroy;
 
+                am_web_is_cache_control_enabled;
+
 	local:
 		*;
 };

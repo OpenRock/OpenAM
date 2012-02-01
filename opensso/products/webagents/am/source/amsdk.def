@@ -215,3 +215,5 @@ EXPORTS
         am_web_get_authType;
         am_web_get_postdata_preserve_lbcookie;
         am_web_get_postdata_preserve_URL_parameter;
+
+        am_web_is_cache_control_enabled;

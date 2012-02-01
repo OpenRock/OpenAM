@@ -6201,6 +6201,13 @@ process_request(am_web_request_params_t *req_params,
                       agent_config);
         am_web_log_info("%s: Access check for URL %s returned %s.",
                         thisfunc, req_params->url, am_status_to_string(sts));
+        /* avoid caching of any unauthenticated response */
+        if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && sts != AM_SUCCESS && req_func->add_header_in_response.func != NULL) {
+            req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Cache-Control", "no-store"); //HTTP 1.1
+            req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Cache-Control", "no-cache"); //HTTP 1.1
+            req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Pragma", "no-cache"); //HTTP 1.0
+            req_func->add_header_in_response.func(req_func->add_header_in_response.args, "Expires", "0"); //prevents caching at the proxy server
+        }
         // map access check result to web result - OK, FORBIDDEN, etc.
         switch(sts) {
             case AM_SUCCESS:
@@ -6858,6 +6865,17 @@ am_web_is_cdsso_enabled(void* agent_config) {
         status = B_TRUE;
     }
 
+    return status;
+}
+
+extern "C" AM_WEB_EXPORT boolean_t
+am_web_is_cache_control_enabled(void* agent_config) {
+    boolean_t status = B_FALSE;
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    if ((*agentConfigPtr)->cache_control_header_enable == AM_TRUE) {
+        status = B_TRUE;
+    }
     return status;
 }
 

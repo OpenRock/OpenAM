@@ -442,9 +442,8 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 	if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE)){
 		isCdssoEnabled = TRUE;
 	}
-	req->SetHeader("Cache-Control","no-cache",(USHORT)strlen("no-cache"),TRUE);
-	res->SetHeader("Cache-Control","no-store",(USHORT)strlen("no-store"),TRUE);
-	res->DisableKernelCache(9);
+
+        res->DisableKernelCache(9);
 
 	// Get the request url
 	status = get_request_url(pHttpContext, requestURL, origRequestURL,
@@ -671,7 +670,13 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 			am_status_to_string(status), status);
 		am_map_destroy(env_parameter_map);
 	}
-
+        /* avoid caching of any unauthenticated response */
+        if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && status != AM_SUCCESS) {
+            res->SetHeader("Cache-Control", "no-store", (USHORT)strlen("no-store"), TRUE);
+            res->SetHeader("Cache-Control", "no-cache", (USHORT)strlen("no-cache"), TRUE);
+            res->SetHeader("Pragma", "no-cache", (USHORT)strlen("no-cache"), TRUE);
+            res->SetHeader("Expires", "0", (USHORT)strlen("0"), TRUE);
+        }
 	//  Check for status and proceed accordingly
 	switch(status) {
 		case AM_SUCCESS:

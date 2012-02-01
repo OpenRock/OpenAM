@@ -199,6 +199,7 @@ public:
     PRBool use_redirect_for_advice;	// use redirect instead of POST for advice
     PRBool cdsso_cookie_urlencode;	// encode cookie value extracted from LARES response
     PRBool cdsso_disable_redirect_on_post;	// disable extra-302-redirect on (after) LARES post
+    PRBool cache_control_header_enable;	// enable cache-control/pragma/expires = no-cache headers for unauthenticated sessions
     am_status_t error;
     
     smap_t cond_login_url;

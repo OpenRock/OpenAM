@@ -532,6 +532,14 @@ am_status_t AgentConfiguration::populateAgentProperties()
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cdsso_disable_redirect_on_post ? "TRUE" : "FALSE"));
     }
 
+    if (AM_SUCCESS == status) {
+        parameter = "com.forgerock.agents.cache_control_header.enable";
+        status = am_properties_get_boolean_with_default(this->properties,
+                parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->cache_control_header_enable));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cache_control_header_enable ? "TRUE" : "FALSE"));
+    }
+
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
         status = am_properties_get_boolean_with_default(this->properties,
