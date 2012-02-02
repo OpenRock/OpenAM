@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-session-failover'
@@ -133,31 +133,28 @@ JMQ is properly setup under directory /home/user/openam/jmq</screen>
   <step>
    <para>Start the Message Queue broker in order to configure user
    accounts.</para>
-   <screen>./jmq/imq/bin/imqbrokerd -name openambroker -port 7777 &amp;</screen>
+   <screen>$ cd jmq/imq/bin
+$ ./imqbrokerd -name aminstance -port 7777 &amp;</screen>
   </step>
   <step>
    <para>Change the default admin password from <literal>admin</literal> to
    something else.</para>
-   <screen>$ ./jmq/imq/bin/imqusermgr update -u admin -p password -i openambroker
-...
-User repository for broker instance: openambroker
+   <screen>$ ./imqusermgr update -u admin -p password -i aminstance
+User repository for broker instance: aminstance
 Are you sure you want to update user admin? (y/n)[n] y
 User admin successfully updated.</screen>
   </step>
   <step>
    <para>Disable the default <literal>guest</literal> account.</para>
-   <screen>$ ./jmq/imq/bin/imqusermgr update -u guest -a false -i openambroker
-...
-User repository for broker instance: openambroker
+   <screen>$ ./imqusermgr update -u guest -a false -i aminstance
+User repository for broker instance: aminstance
 Are you sure you want to update user guest? (y/n)[n] y
 User guest successfully updated.</screen>
   </step>
   <step>
    <para>Add a user for the session failover service.</para>
-   <screen>$ ./jmq/imq/bin/imqusermgr add -u openamuser -g admin -p secret12
- -i openambroker
-...
-User repository for broker instance: openambroker
+   <screen>$ ./imqusermgr add -u openamuser -g admin -p secret12 -i aminstance
+User repository for broker instance: aminstance
 User openamuser successfully added.</screen>
   </step>
   <step>
@@ -180,9 +177,10 @@ SUCCESSFUL</screen>
    <para><literal>USER_NAME</literal> should match the user you created for the
    session failover service.</para>
    <screen>USER_NAME=openamuser</screen>
-   <para><literal>CLUSTER_LIST</literal> specifies the host:port combinations
+   <para><literal>CLUSTER_LIST</literal> specifies the <literal><replaceable
+   >host</replaceable>:<replaceable>port</replaceable></literal> combinations
    for all the session failover services you configure for the site.</para>
-   <screen>CLUSTER_LIST=openam.example.com:7777,openam-bis.example.com:7777</screen>
+   <screen>CLUSTER_LIST=openam.example.com:7777,openam2.example.com:7777</screen>
    <para><literal>PASSWORDFILE</literal> specifies the path to the password
    file you created.</para>
    <screen>PASSWORDFILE=/home/user/openam/mqpwd.txt</screen>
@@ -202,11 +200,13 @@ SUCCESSFUL</screen>
    <para>On each OpenAM server console in the site, select Configuration &gt;
    Global &gt; Session &gt; Instances &gt; New... to set up session data store
    access.</para>
+
    <para>Provide a user name for the Session Store User, such as
    <literal>openamuser</literal>, with the same password you entered into the
-   password file, and the Database Url is the
-   host:port you entered for the <literal>CLUSTER_LIST</literal>
-   parameter.</para>
+   password file, and the Database Url is the <literal><replaceable
+   >host</replaceable>:<replaceable>port</replaceable></literal> combination
+   that you entered for the <literal>CLUSTER_LIST</literal> parameter.</para>
+
    <para>Be sure to Add the new instance, and then also Save your configuration
    changes. The configuration changes take effect after you restart
    OpenAM.</para>
@@ -217,7 +217,8 @@ SUCCESSFUL</screen>
   </step>
   <step>
    <para>Start each session data service in the cluster.</para>
-   <screen>$ ./amsfo start</screen>
+   <screen>$ cd /home/user/openam/sfoscripts/bin
+$ ./amsfo start</screen>
    <para>By default, the log and session data store are located under
    <filename>/tmp/amsession/</filename>.</para>
    <screen>$ tail -f /tmp/amsession/logs/amsessiondb.log
@@ -228,8 +229,11 @@ Successfully started.</screen>
   <step>
    <para>Start each OpenAM server in the site.</para>
    <screen>$ /etc/init.d/tomcat start</screen>
-   <para>After OpenAM has started, you should be able to test session
-   failover.</para>
+   <para>Wait for each OpenAM server to start before starting another.</para>
+   <screen>$ tail -f /path/to/tomcat/logs/catalina.out
+...
+INFO: Server startup in 26047 ms</screen>
+   <para>After OpenAM has started, you can test session failover.</para>
    <!-- TODO: Cover how to troubleshoot when things go wrong, either here
    or in the Admin Guide troubleshooting chapter. -->
   </step>
