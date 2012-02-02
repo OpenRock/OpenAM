@@ -31,6 +31,11 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM <?eval ${serverDocTargetVersion}?> Administration Guide</title>
+  <abstract>
+   <para>Guide to configuring and using OpenAM features. OpenAM provides open
+   source Authentication, Authorization, Entitlement and Federation
+   software.</para>
+  </abstract>
   <copyright>
    <year>2011-2012</year>
    <holder>ForgeRock AS</holder>

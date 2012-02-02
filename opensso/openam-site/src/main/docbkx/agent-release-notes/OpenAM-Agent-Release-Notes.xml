@@ -31,6 +31,11 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM Policy Agent <?eval ${agentsDocTargetVersion}?> Release Notes</title>
+  <abstract>
+   <para>Notes covering prerequisites, fixes, known issues for OpenAM policy
+   agents. OpenAM provides open source Authentication, Authorization,
+   Entitlement and Federation software.</para>
+  </abstract>
   <copyright>
    <year>2011</year>
    <holder>ForgeRock AS</holder>
