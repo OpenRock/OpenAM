@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.sun.identity.console.base;
 
@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import org.owasp.esapi.ESAPI;
 
 
 /**
@@ -394,8 +395,8 @@ public abstract class ConsoleServletBase
                 }
                 queryString = x;
             }
-
-            return "&" + queryString;
+            boolean isValid = ESAPI.validator().isValidInput("AMLogin_params", queryString, "HTTPURI", 1024, true);
+            return isValid ? "&" + queryString : "";
         }
 
         return (queryString != null) ? queryString : "";
