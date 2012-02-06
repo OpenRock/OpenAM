@@ -224,7 +224,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
   &gt; Conditions &gt; New... Notice in the list of conditions that you can
   now apply your Sample Condition.</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-sample-condition">
    <alt>Sample Condition in list of conditions</alt>
    <imageobject>
     <imagedata fileref="images/sample-condition.png" format="PNG"/>

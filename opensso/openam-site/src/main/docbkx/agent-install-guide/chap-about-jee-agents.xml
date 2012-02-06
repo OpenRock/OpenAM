@@ -78,7 +78,7 @@
   simplified to show only the essential principals rather than to describe
   every possible case.</para>
 
-  <mediaobject>
+  <mediaobject xml:id="figure-jee-pa-overview">
    <alt>Diagram of Java EE policy agent use</alt>
    <imageobject>
     <imagedata fileref="images/jee-pa-overview.png" format="PNG" />

@@ -105,7 +105,7 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
  
   <step>
    <para>Configure the DAS using the agent profile to connect to OpenAM.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-das-complete-config">
     <alt>Completed DAS configuration screen</alt>
     <imageobject>
      <imagedata fileref="images/das-complete-config.png" format="PNG" />
@@ -148,7 +148,7 @@ $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
    <para>Login through the DAS to access OpenAM services.</para>
    <para>For testing, you can login as user <literal>demo</literal>,
    password <literal>changeit</literal>.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-das-login-success">
     <alt>Successfully logged in through the DAS</alt>
     <imageobject>
      <imagedata fileref="images/das-login-success.png" format="PNG" />

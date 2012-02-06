@@ -397,7 +397,7 @@ WAR file was created.</screen>
     
     <step>
      <para>Configure the identity provider discovery service.</para>
-     <mediaobject>
+     <mediaobject xml:id="figure-ipds-complete-config">
       <alt>Completed discovery service configuration screen</alt>
       <imageobject>
        <imagedata fileref="images/ipds-complete-config.png" format="PNG" />

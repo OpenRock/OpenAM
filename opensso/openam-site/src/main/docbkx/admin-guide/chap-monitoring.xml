@@ -84,7 +84,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    command. After changing the authentication file, you must restart OpenAM
    for the changes to take effect.</para>
    
-   <mediaobject>
+   <mediaobject xml:id="figure-web-based-monitoring">
     <alt>OpenAM MBeans in a browser</alt>
     <imageobject>
      <imagedata fileref="images/web-based-monitoring.png" format="PNG" />
@@ -115,7 +115,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    tools to browse the MBeans. You can also browse the MBeans by connecting
    to your web application container, and browsing to the OpenAM MBeans.</para>
    
-   <mediaobject>
+   <mediaobject xml:id="figure-jconsole-to-openam">
     <alt>Jconsole browsing OpenAM MBeans</alt>
     <imageobject>
      <imagedata fileref="images/jconsole-to-openam.png" format="PNG" />
@@ -271,7 +271,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
   <para>OpenAM console lets the administrator view and manage current
   user sessions under the Sessions tab page.</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-session-management">
    <alt>Session management tab page</alt>
    <imageobject>
     <imagedata fileref="images/session-management.png" format="PNG" />

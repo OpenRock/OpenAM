@@ -138,7 +138,7 @@ Logged Out!!</screen>
   <step>
    <para>Browse to the application you deployed to configure access to
    OpenAM.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-web-samples">
     <alt>Configuring web-based samples to access OpenAM</alt>
     <imageobject>
      <imagedata fileref="images/web-samples.png" format="PNG" />

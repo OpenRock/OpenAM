@@ -283,7 +283,7 @@ esac
      characters, like <literal>openam.example.com</literal>.
      </para>
     </note>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-start">
      <alt>Initial OpenAM configuration screen</alt>
      <imageobject>
       <imagedata fileref="images/openam-start.png" format="PNG" />
@@ -308,7 +308,7 @@ esac
    <step>
     <para>Provide different passwords for the default OpenAM administrator,
     <literal>amadmin</literal>, and default Policy Agent users.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-default-conf">
      <alt>OpenAM default configuration</alt>
      <imageobject>
       <imagedata fileref="images/openam-default-conf.png" format="PNG" />
@@ -321,7 +321,7 @@ esac
     <para>When the configuration completes, click Proceed to Login, and then
     login as OpenAM administrator with the first of the two passwords you
     provided.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-first-login">
      <alt>OpenAM first login</alt>
      <imageobject>
       <imagedata fileref="images/openam-first-login.png" format="PNG" />
@@ -393,7 +393,7 @@ Using CLASSPATH:
    <step>
     <para>Provide a password having at least 8 characters for the OpenAM
     Administrator, <literal>amadmin</literal>.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-conf-amadmin">
      <alt>OpenAM amadmin password</alt>
      <imageobject>
       <imagedata fileref="images/openam-conf-amadmin.png" format="PNG" />
@@ -404,7 +404,7 @@ Using CLASSPATH:
    </step>
    <step>
     <para>Make sure the server settings are valid for your configuration.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-conf-server-settings">
      <alt>OpenAM server settings</alt>
      <imageobject>
       <imagedata fileref="images/openam-conf-server-settings.png" format="PNG" />
@@ -466,7 +466,7 @@ Using CLASSPATH:
     <para>OpenAM must have write access to the directory service you choose,
     as it adds to the directory schema needed to allow OpenAM to manage access
     for users in the user store.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-conf-user-store">
      <alt>OpenAM user store settings</alt>
      <imageobject>
       <imagedata fileref="images/openam-conf-user-store.png" format="PNG" />
@@ -531,7 +531,7 @@ Using CLASSPATH:
     <para>In the Site Configuration screen, you can set up OpenAM as part of
     a site where the load is balanced across multiple OpenAM servers.</para>
     <para>For your first OpenAM installation, accept the defaults.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-conf-site">
      <alt>OpenAM site configuration</alt>
      <imageobject>
       <imagedata fileref="images/openam-conf-site.png" format="PNG" />
@@ -543,7 +543,7 @@ Using CLASSPATH:
    <step>
     <para>In the Agent Information screen, provide a password having at least
     8 characters to be used by policy agents to connect to OpenAM.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-conf-pa">
      <alt>OpenAM policy agent password</alt>
      <imageobject>
       <imagedata fileref="images/openam-conf-pa.png" format="PNG" />
@@ -555,7 +555,7 @@ Using CLASSPATH:
    <step>
     <para>When the configuration completes, click Proceed to Login, and then
     login as OpenAM administrator.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-openam-first-login-admin">
      <alt>OpenAM first login</alt>
      <imageobject>
       <imagedata fileref="images/openam-first-login.png" format="PNG" />

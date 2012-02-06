@@ -65,7 +65,7 @@
    the application to access OpenAM using the application user name,
    <literal>UrlAccessAgent</literal>, and password configured when you set up
    OpenAM.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-config-client-sdk-war">
     <alt>Sample web app configuration screen</alt>
     <imageobject>
      <imagedata fileref="images/config-client-sdk-war.png" format="PNG" />

@@ -68,7 +68,7 @@
   simplified to show only the essential principals rather than to describe
   every possible case.</para>
 
-  <mediaobject>
+  <mediaobject xml:id="figure-web-pa-overview">
    <alt>Diagram of web policy agent use</alt>
    <imageobject>
     <imagedata fileref="images/web-pa-overview.png" format="PNG" />

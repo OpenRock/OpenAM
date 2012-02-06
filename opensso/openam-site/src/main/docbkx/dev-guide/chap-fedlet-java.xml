@@ -118,7 +118,7 @@ $ mv fedlet.war /path/to/tomcat/webapps</screen>
   <step>
    <para>Try one or more examples from the Fedlet home page to validate Fedlet
    setup.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-fedlet-demo">
     <alt>Home page for demo Fedlet</alt>
     <imageobject>
      <imagedata fileref="images/fedlet-demo.png" format="PNG" />

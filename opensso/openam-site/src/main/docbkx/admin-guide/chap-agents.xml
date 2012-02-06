@@ -165,7 +165,7 @@
    <step>
     <para>Provide a name for the agent, and also the URLs to OpenAM and to
     the application to protect, then click Create.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-create-agent">
      <alt>Creating a new web agent profile</alt>
      <imageobject>
       <imagedata fileref="images/create-agent.png" format="PNG" />

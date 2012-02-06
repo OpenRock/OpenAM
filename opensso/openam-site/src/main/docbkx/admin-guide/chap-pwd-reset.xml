@@ -44,7 +44,7 @@
   clicking Edit next to the Password field to display the change password
   page.</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-console-change-pwd">
    <alt>The OpenAM Change Password page</alt>
    <imageobject>
     <imagedata fileref="images/console-change-pwd.png" format="PNG" />
@@ -286,7 +286,7 @@
     <literal>http://openam.example.com:8080/openam/idm/EndUser</literal>,
     where she can provide a valid email address to recover the reset password
     and can edit Password Reset Options.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-console-end-user">
      <alt>The OpenAM end user page</alt>
      <imageobject>
       <imagedata fileref="images/console-end-user.png" format="PNG" />
@@ -300,7 +300,7 @@
    <step>
     <para>After the user updates her secret questions, she can use the
     password reset service when necessary.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-console-secret-questions">
      <alt>The OpenAM secret question page</alt>
      <imageobject>
       <imagedata fileref="images/console-secret-questions.png" format="PNG" />
@@ -331,7 +331,7 @@
     name</replaceable>, as in</literal>
     <literal>http://openam.example.com:8080/openam/ui/PWResetUserValidation?realm=<replaceable>realm
     name</replaceable></literal>.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-console-user-validation">
      <alt>The OpenAM user validation page</alt>
      <imageobject>
       <imagedata fileref="images/console-user-validation.png" format="PNG" />
@@ -344,14 +344,14 @@
     <para>The user answers the specified questions, and clicks OK.</para>
     <para>OpenAM resets the password, sending mail to the SMTP service
     you configured.</para>
-    <mediaobject>
+    <mediaobject xml:id="figure-console-answer-questions">
      <alt>The OpenAM user validation page</alt>
      <imageobject>
       <imagedata fileref="images/console-answer-questions.png" format="PNG" />
      </imageobject>
      <textobject><para>OpenAM prompts with secret questions.</para></textobject>
     </mediaobject>
-    <mediaobject>
+    <mediaobject xml:id="figure-console-reset-confirmation">
      <alt>The page confirming password reset</alt>
      <imageobject>
       <imagedata fileref="images/console-reset-confirmation.png" format="PNG" />

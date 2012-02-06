@@ -349,7 +349,7 @@
    user to complete further authentication steps. After configuring the
    Adaptive Risk module, insert it in your authentication chain with criteria
    set to sufficient as shown in the following example.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-adaptive-auth-module">
     <alt>Including the Adaptive Risk module in an authentication chain</alt>
     <imageobject>
      <imagedata fileref="images/adaptive-auth-module.png" format="PNG" />
@@ -3089,7 +3089,7 @@
      <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?iPSPCookie=yes</literal></para>
      <para>OpenAM sets an <literal>DProPCookie</literal> that persists until
      expiry. The following screen shot shows an example.</para>
-     <mediaobject>
+     <mediaobject xml:id="figure-persistent-dpropcookie">
       <alt>DProPCookie shown in the browser</alt>
       <imageobject>
        <imagedata fileref="images/persistent-dpropcookie.png" format="PNG" />

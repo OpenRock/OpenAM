@@ -46,7 +46,7 @@
   containers listens (in this case 8080), and deployment URI (in this case
   <literal>/openam</literal>).</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-console-as-amadmin">
    <alt>How the console looks to amadmin</alt>
    <imageobject>
     <imagedata fileref="images/console-as-amadmin.png" format="PNG" />
@@ -68,7 +68,7 @@
   any access to perform administrative operations, then instead of the OpenAM
   console, you see a page to view and update your account information.</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-console-as-bjensen">
    <alt>How the console looks to an end user</alt>
    <imageobject>
     <imagedata fileref="images/console-as-bjensen.png" format="PNG" />
@@ -87,7 +87,7 @@
   console capabilities.<footnote><para>For more on delegated administration,
   see the chapter covering realms.</para></footnote></para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-console-as-kvaughan">
    <alt>How the console looks to an administrator</alt>
    <imageobject>
     <imagedata fileref="images/console-as-kvaughan.png" format="PNG" />

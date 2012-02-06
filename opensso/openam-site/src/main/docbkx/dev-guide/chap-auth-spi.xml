@@ -806,7 +806,7 @@ INFO: Server startup in 32746 ms</screen>
   <para>After creating the module, click the name in the Module Instances
   list, and configure as appropriate.</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-sampleauth-conf">
    <alt>SampleAuth module configuration</alt>
    <imageobject>
     <imagedata fileref="images/sampleauth-conf.png" format="PNG"/>
@@ -823,7 +823,7 @@ INFO: Server startup in 32746 ms</screen>
   <para>Now that your module is configured, logout of OpenAM console, to
   return to the login page.</para>
   
-  <mediaobject>
+  <mediaobject xml:id="figure-sampleauth-test">
    <alt>SampleAuth module testing</alt>
    <imageobject>
     <imagedata fileref="images/sampleauth-test.png" format="PNG"/>

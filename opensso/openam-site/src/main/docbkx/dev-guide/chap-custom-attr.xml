@@ -187,7 +187,7 @@ $ /etc/init.d/tomcat start</screen>
   <step>
    <para>Login to OpenAM console as a user to check that a user can save a
    value for your new, custom attribute.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-bjensen-with-custom-attribute">
     <alt>Saving Babs Jensen's profile with a custom attribute</alt>
     <imageobject>
      <imagedata fileref="images/bjensen-with-custom-attribute.png" format="PNG"/>

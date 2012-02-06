@@ -153,7 +153,7 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
    <literal>Mot de passe</literal> has been replaced with the string
    <literal>Votre mot de passe</literal> in
    <filename>openam_fr/html/DataStore.xml</filename>.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-modified-fr-login">
     <alt>Example customized OpenAM login page</alt>
     <imageobject>
      <imagedata fileref="images/modified-fr-login.png" format="PNG" />

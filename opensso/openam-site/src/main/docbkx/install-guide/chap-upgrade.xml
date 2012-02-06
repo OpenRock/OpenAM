@@ -99,7 +99,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
    <para>In your browser, visit the location where OpenAM is deployed, such
    as <literal>http://openam.example.com:8080/openam</literal>, and then
    click Upgrade to OpenAM <?eval ${serverDocTargetVersion}?>.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-upgrade-initial-screen">
     <alt>Initial OpenAM upgrade screen</alt>
     <imageobject>
      <imagedata fileref="images/upgrade-initial-screen.png" format="PNG" />
@@ -112,7 +112,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
    <para>In the Upgrading OpenAM screen, click Save Report to download an
    OpenAM Upgrade Report listing necessary configuration changes, and
    then click Upgrade.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-upgrade-report">
     <alt>OpenAM upgrade report screen</alt>
     <imageobject>
      <imagedata fileref="images/upgrade-report.png" format="PNG" />
@@ -126,7 +126,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
   <step>
    <para>When upgrade completes, click Proceed to Login to login to the
    OpenAM console and continue your work.</para>
-   <mediaobject>
+   <mediaobject xml:id="figure-upgrade-complete">
     <alt>OpenAM upgrade complete screen</alt>
     <imageobject>
      <imagedata fileref="images/upgrade-complete.png" format="PNG" />
