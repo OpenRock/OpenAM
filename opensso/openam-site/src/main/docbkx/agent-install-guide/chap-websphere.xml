@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-websphere'
@@ -337,5 +337,16 @@ Install log file location:
   
   <para>Uninstall does not remove the agent instance directory, but you can
   do so manually after removing the agent configuration from WebSphere.</para>
+ </section>
+
+ <section xml:id="websphere-network-deployment">
+  <title>Notes About WebSphere Network Deployment</title>
+
+  <para>When using WebSphere Application Server Network Deployment, you must
+  install policy agents on the Deployment Manager, on each Node Agent, and
+  on each Application Server. Each server configuration stored in
+  <filename>server.xml</filename> must be in sync with the Deployment Manager
+  copy. Furthermore, during installation, you must stop the Deployment Manager,
+  each Node Agent, and each Application Server in the Network Deployment.</para>
  </section>
 </chapter>
