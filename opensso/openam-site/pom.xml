@@ -120,7 +120,6 @@
   <dbstyle-dir>${basedir}/src/main/docbkx-stylesheets</dbstyle-dir>
   <docbkx-out>${basedir}/target/docbkx</docbkx-out>
   <site-out>${basedir}/target/site</site-out>
-  <legalnotice>${basedir}/legalnotice.html</legalnotice>
   <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
   <fonts-src>${basedir}/src/fonts</fonts-src>
   <fonts-gen>${basedir}/target/fonts</fonts-gen>
@@ -138,7 +137,7 @@
    <plugin>
     <groupId>com.agilejava.docbkx</groupId>
     <artifactId>docbkx-fop-support</artifactId>
-    <version>2.0.13</version>
+    <version>2.0.14</version>
     <inherited>false</inherited>
     <executions>
      <execution>
@@ -155,7 +154,7 @@
    <plugin>
     <groupId>com.agilejava.docbkx</groupId>
     <artifactId>docbkx-maven-plugin</artifactId>
-    <version>2.0.13</version>
+    <version>2.0.14</version>
     <inherited>false</inherited>
     <configuration>
      <sourceDirectory>${basedir}/src/main/docbkx</sourceDirectory>
@@ -495,18 +494,6 @@
         </copy>
        </preProcess>
        <postProcess>
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/admin-guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-install-guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-release-notes' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/dev-guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/install-guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/reference' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/release-notes' />
-        <replace dir="${basedir}/target/docbkx/html/"
-                 token="target/docbkx/html/legalnotice.html"
-                 value="legalnotice.html">
-         <include name="**/**/*.html" />
-        </replace>
         <replace dir="${basedir}/target/docbkx/html/"
                  token="&lt;/head&gt;">
          <include name="**/**/*.html" />
@@ -605,18 +592,6 @@ $(".flat").live("dblclick", function() {
         </copy>
        </preProcess>
        <postProcess>
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/admin-guide/OpenAM-Admin-Guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-install-guide/OpenAM-Agent-Install-Guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/dev-guide/OpenAM-Dev-Guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/install-guide/OpenAM-Install-Guide' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/reference/OpenAM-Reference' />
-        <copy file='${legalnotice}' todir='${docbkx-out}/html/release-notes/OpenAM-Release-Notes' />
-        <replace dir="${basedir}/target/docbkx/html/"
-                 token="target/docbkx/html/legalnotice.html"
-                 value="legalnotice.html">
-         <include name="**/**/**/*.html" />
-        </replace>
         <replace dir="${basedir}/target/docbkx/html/"
                  token="&lt;/head&gt;">
          <include name="**/**/**/*.html" />
