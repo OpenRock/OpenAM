@@ -29,10 +29,18 @@
  <xsl:import href="urn:docbkx:stylesheet" />
  <xsl:import href="urn:docbkx:stylesheet/highlight.xsl" />
 
- <xsl:param name="html.stylesheet">css/coredoc.css</xsl:param>
+ <xsl:param name="make.clean.html" select="1" />
+ <xsl:param name="docbook.css.link" select="0" />
+ <xsl:param name="html.stylesheet">css/docbook.css</xsl:param>
+ <xsl:param name="admon.style">
+  <xsl:value-of select="string('font-style: italic;')"></xsl:value-of>
+ </xsl:param>
+ <xsl:param name="default.table.frame">none</xsl:param>
+ <xsl:param name="default.table.rules">none</xsl:param>
+ <xsl:param name="table.cell.border.thickness">0pt</xsl:param>
+
  <xsl:param name="chunk.section.depth" select="0" />
  <xsl:param name="chunker.output.encoding">UTF-8</xsl:param>
- <xsl:param name="chunker.output.indent">yes</xsl:param>
  <xsl:param name="generate.legalnotice.link" select="1" />
  <xsl:param name="root.filename">index</xsl:param> <!-- docbkx-tools ignores this. -->
  <xsl:param name="use.id.as.filename" select="1" />
@@ -58,10 +66,6 @@
 <!--  <xsl:param name="toc.section.depth" select="1" /> -->
  <xsl:param name="toc.max.depth" select="2" />
  <xsl:param name="generate.meta.abstract" select="1" />
-
- <xsl:param name="default.table.frame">none</xsl:param>
- <xsl:param name="default.table.rules">none</xsl:param>
- <xsl:param name="table.cell.border.thickness">0pt</xsl:param>
 
  <xsl:template match="xslthl:keyword" mode="xslthl">
    <strong class="hl-keyword">
