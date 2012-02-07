@@ -344,9 +344,15 @@ Install log file location:
 
   <para>When using WebSphere Application Server Network Deployment, you must
   install policy agents on the Deployment Manager, on each Node Agent, and
-  on each Application Server. Each server configuration stored in
-  <filename>server.xml</filename> must be in sync with the Deployment Manager
-  copy. Furthermore, during installation, you must stop the Deployment Manager,
-  each Node Agent, and each Application Server in the Network Deployment.</para>
+  on each Application Server. Installation requires that you stop and then
+  restart the Deployment Manager, each Node Agent, and each Application Server
+  in the Network Deployment.</para>
+
+  <para>Before installation, synchronize each server configuration with the
+  profile saved by the Deployment Manager using the <command>syncNode</command>
+  command. After agent installation, copy the server configuration for each
+  node, stored in <filename>server.xml</filename>, to the corresponding
+  Deployment Manager profile. After you have synchronized the configurations,
+  you must restart the Deployment Manager for the Network Deployment.</para>
  </section>
 </chapter>
