@@ -30,6 +30,7 @@
  */
 package com.iplanet.dpro.session.service;
 
+import com.iplanet.am.util.SystemProperties;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.session.util.RestrictedTokenContext;
+import com.sun.identity.shared.Constants;
 
  
  /**
@@ -62,7 +64,7 @@ import com.sun.identity.session.util.RestrictedTokenContext;
   * <li> MULTI_SERVER_MODE :  
   * Query other AM servers for the sessions for the  given user Add the numbers 
   * up (including the local one) and return the value. If any of the AM servers 
-  * is down, simply ignors it since all the sessions maintained by that instance
+  * is down, simply ignores it since all the sessions maintained by that instance
   * are not available.                        
   * <li> SFO_MODE : Fetch the sessions for the given user directly from the 
   * session repository.
@@ -88,6 +90,9 @@ public class SessionCount {
     private static Debug debug = SessionService.sessionDebug;
 
     private static SSOToken adminToken = null;
+
+    private static boolean caseSensitiveUUID =
+        SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
 
     static {
         try {
@@ -142,9 +147,10 @@ public class SessionCount {
      *             repository.
      */
     public static Map getAllSessionsByUUID(String uuid) throws Exception {
-
-       
         Map sessions = null;
+        if (!caseSensitiveUUID) {
+            uuid = uuid.toLowerCase();
+        }
 
         switch (deploymentMode) {
         case SINGLE_SERVER_MODE:
@@ -254,13 +260,13 @@ public class SessionCount {
     public static void incrementSessionCount(InternalSession is) {
 
         if (deploymentMode == SINGLE_SERVER_MODE) {
-            Set sessions = (Set) uuidSessionMap.get(is.getUUID());
+            Set sessions = (Set) uuidSessionMap.get((caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase());
             if (sessions != null) {
                 sessions.add(is.getID());
             } else {
                 sessions = Collections.synchronizedSet(new HashSet());
                 sessions.add(is.getID());
-                uuidSessionMap.put(is.getUUID(), sessions);
+                uuidSessionMap.put((caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase(), sessions);
             }
         }
     }
@@ -272,7 +278,7 @@ public class SessionCount {
      */
     static void decrementSessionCount(InternalSession is) {
 
-        String uuid = is.getUUID();
+        String uuid = (caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase();
         SessionID sid = is.getID();
 
         if (deploymentMode == SINGLE_SERVER_MODE) {

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.shared;
@@ -1095,6 +1095,9 @@ public interface Constants {
     
     public static final String AUTH_RATE_MONITORING_INTERVAL =
         "openam.auth.rate_monitoring_interval";
+
+    public static final String CASE_SENSITIVE_UUID =
+        "openam.session.case.sensitive.uuid";
 
     public static final String RETAINED_HTTP_HEADERS_LIST =
             "openam.retained.http.headers";

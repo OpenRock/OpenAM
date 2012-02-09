@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.authentication.spi;
@@ -2621,9 +2621,7 @@ public abstract class AMLoginModule implements LoginModule {
 
             if (univId != null) {
                 sessionQuota = getSessionQuota(amIdUser);
-                sessionCount =
-                        SessionCount.getAllSessionsByUUID(univId.toLowerCase()).size()
-                        + SessionCount.getAllSessionsByUUID(univId).size();
+                sessionCount = SessionCount.getAllSessionsByUUID(univId).size();
 
                 if (debug.messageEnabled()) {
                     debug.message("AMLoginModule.isSessionQuotaReached :: univId= "

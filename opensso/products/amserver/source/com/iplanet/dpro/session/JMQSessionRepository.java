@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.iplanet.dpro.session;
 
@@ -46,6 +46,7 @@ import javax.jms.IllegalStateException;
 import com.sun.identity.ha.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.ha.FAMPersisterManager;
+import com.sun.identity.shared.Constants;
 
 /**
  * This class implements JMQ-based session repository which
@@ -124,6 +125,8 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
      */
     private static long runPeriod = 1 * 60 * 1000; // 1 min in milliseconds
 
+    private static boolean caseSensitiveUUID =
+        SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
 
     static Debug debug = SessionService.sessionDebug;
 
@@ -314,7 +317,7 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
             String key = SessionUtils.getEncryptedStorageKey(sid);
             byte[] blob = SessionUtils.encode(is);
             long expirationTime = is.getExpirationTime() + gracePeriod;
-            String uuid = is.getUUID();
+            String uuid = caseSensitiveUUID ? is.getUUID() : is.getUUID().toLowerCase();
             if (debug.messageEnabled()) {
                 debug.message("JMQSessionRepository.save(): " + 
                     "session size=" + blob.length + " bytes");
