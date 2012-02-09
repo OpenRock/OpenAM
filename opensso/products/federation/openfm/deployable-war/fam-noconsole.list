@@ -1260,7 +1260,7 @@
 ./WEB-INF/lib/esapiport.jar
 ./WEB-INF/lib/geoip-1.2.5.jar
 ./WEB-INF/lib/gmbal-api-only-3.0.0-b023.jar
-./WEB-INF/lib/grizzly-framework-2.1.1.jar
+./WEB-INF/lib/grizzly-framework-2.1.7.jar
 ./WEB-INF/lib/i18n-core-1.2.0.jar
 ./WEB-INF/lib/idpdiscovery.jar
 ./WEB-INF/lib/imq.jar
@@ -1285,7 +1285,7 @@
 ./WEB-INF/lib/oauth-signature-1.1.5-ea-SNAPSHOT.jar
 ./WEB-INF/lib/oauthservice.jar
 ./WEB-INF/lib/ognl-2.6.9.jar
-./WEB-INF/lib/opendj-ldap-sdk-3.0.0-SNAPSHOT.jar
+./WEB-INF/lib/opendj-ldap-sdk-3.0.0-M1.jar
 ./WEB-INF/lib/openfedlib.jar
 ./WEB-INF/lib/opensso-sharedlib.jar
 ./WEB-INF/lib/opensso.jar
