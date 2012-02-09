@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.authentication.client;
@@ -3203,6 +3203,8 @@ public class AuthClientUtils {
         String ipAddrHeader = getClientIPAddressHeader();
         if ((ipAddrHeader != null) && (ipAddrHeader.length() != 0)) {
             result = request.getHeader(ipAddrHeader);
+            String[] ips = result.split(",");
+            result = ips[0].trim();
         }
         if ((result == null) || (result.length() == 0)) {
             result = request.getRemoteAddr();
