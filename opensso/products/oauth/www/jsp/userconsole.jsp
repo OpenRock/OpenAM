@@ -25,7 +25,9 @@
    $Id: userconsole.jsp,v 1.3 2010/01/20 17:51:38 huacui Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
 
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
@@ -52,21 +54,13 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
                                 PathDefs.OPENSSO_COOKIE_NAME);
         String getUid(String cookieValue) 
             throws OAuthServiceException {
-            String uid = null;
-            String username = null;
+            String uuid = null;
             try {
-                username = OAuthServiceUtils.getUsernameByTokenId(cookieValue);
+                uuid = OAuthServiceUtils.getUUIDByTokenId(cookieValue);
             } catch (OAuthServiceException oe) {
                 throw oe;
             }
-            if (username != null) {
-                try {
-                    uid = OAuthServiceUtils.getUidByTokenId(cookieValue, username);
-                } catch (OAuthServiceException oe) {
-                    throw oe;
-                }
-            }
-            return uid;
+            return uuid;
         }
     %>
 

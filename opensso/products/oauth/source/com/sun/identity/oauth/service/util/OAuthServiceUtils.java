@@ -25,7 +25,9 @@
  * $Id: OAuthServiceUtils.java,v 1.1 2009/11/20 19:31:58 huacui Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.oauth.service.util;
 
 import com.sun.identity.oauth.service.OAuthServiceConstants;
@@ -45,19 +47,12 @@ import javax.ws.rs.core.MultivaluedMap;
 public class OAuthServiceUtils implements OAuthServiceConstants {
     private static final String AUTHN_USERNAME = "username";
     private static final String AUTHN_PASSWORD = "password";
-    private static final String USER_NAME = "name";
-    private static final String ADMIN_TOKEN = "admin";
     private static final String SUBJECT_ID = "subjectid";
     private static final String TOKEN_ID = "tokenid";
-    private static final String ATTRIBUTE_KEY = "identitydetails.attribute";
-    private static final String ATTRIBUTE_NAME_KEY = "identitydetails.attribute.name";
-    private static final String ATTRIBUTE_VALUE_KEY = "identitydetails.attribute.value";
-    private static final String UUID_ATTRIBUTE_NAME = "universalid";
+    private static final String UUID_SESSION_PROPERTY_NAME = "sun.am.UniversalIdentifier";
     private static final String ATTRIBUTE_TOKEN_ID_KEY = "token.id";
     private static final String USERDETAILS_NAME_KEY = "userdetails.attribute.name";
     private static final String USERDETAILS_VALUE_KEY = "userdetails.attribute.value";
-    private static final String UID_ATTRIBUTE_NAME = "uid";
-
 
     private static Client client = Client.create();
 
@@ -70,11 +65,6 @@ public class OAuthServiceUtils implements OAuthServiceConstants {
     private static WebResource attributesResource =
      client.resource(OAuthProperties.get(PathDefs.OPENSSO_SERVER_URL) +
                      PathDefs.OPENSSO_SERVER_ATTRIBUTES_ENDPOINT);
-
-    // OpenSSO RESTful attribute reading service endpoint
-    private static WebResource readAttributesResource =
-     client.resource(OAuthProperties.get(PathDefs.OPENSSO_SERVER_URL) +
-                     PathDefs.OPENSSO_SERVER_READ_ATTRIBUTES_ENDPOINT);
 
     // OpenSSO RESTful token validation service endpoint
     private static WebResource tokenValidationResource =
@@ -123,26 +113,26 @@ public class OAuthServiceUtils implements OAuthServiceConstants {
         return adminTokenIdString;
     }
 
-    public static String getUsernameByTokenId(String tokenId)
-        throws OAuthServiceException {
-        String username = null;
+    public static String getUUIDByTokenId(String tokenId) throws OAuthServiceException {
+        String uuid;
 
         MultivaluedMapImpl params = new MultivaluedMapImpl();
         params.add(SUBJECT_ID, tokenId);
+        params.add("attributenames", UUID_SESSION_PROPERTY_NAME);
 
         String response;
         try {
             response = attributesResource.queryParams(params).get(String.class);
         }
         catch (UniformInterfaceException uie) {
-            throw new OAuthServiceException("Get uid failed", uie);
+            throw new OAuthServiceException("Get uuid failed", uie);
         }
 
         if (response == null) {
             return null;
         }
 
-        int index = response.indexOf(USERDETAILS_NAME_KEY + "=" + UID_ATTRIBUTE_NAME);
+        int index = response.indexOf(USERDETAILS_NAME_KEY + "=" + UUID_SESSION_PROPERTY_NAME);
         index = response.indexOf(USERDETAILS_VALUE_KEY + "=", index);
         int startIdx = index + USERDETAILS_VALUE_KEY.length() + 1;
         int idx = response.indexOf(USERDETAILS_NAME_KEY + "=", startIdx);
@@ -152,41 +142,8 @@ public class OAuthServiceUtils implements OAuthServiceConstants {
         } else {
             endIdx = response.length() - 1;
         }
-        username = response.substring(startIdx, endIdx).trim();
-        return username;
-    }
-
-    public static String getUidByTokenId(String tokenId, String username)
-        throws OAuthServiceException {
-        String uid = null;
-        MultivaluedMapImpl params = new MultivaluedMapImpl();
-        params.add(USER_NAME, username);
-        params.add(ADMIN_TOKEN, tokenId);
-
-        String response;
-        try {
-            response = readAttributesResource.queryParams(params).get(String.class);
-        }
-        catch (UniformInterfaceException uie) {
-            throw new OAuthServiceException("Get attributes failed", uie);
-        }
-
-        if (response == null) {
-            return null;
-        }
-
-        int index = response.indexOf(ATTRIBUTE_NAME_KEY + "=" + UUID_ATTRIBUTE_NAME);
-        index = response.indexOf(ATTRIBUTE_VALUE_KEY + "=", index);
-        int startIdx = index + ATTRIBUTE_VALUE_KEY.length() + 1;
-        int idx = response.indexOf(ATTRIBUTE_KEY + "=", startIdx);
-        int endIdx;
-        if (idx > 0) {
-            endIdx = idx;
-        } else {
-            endIdx = response.length() - 1;
-        }
-        uid = response.substring(startIdx, endIdx).trim();
-        return uid;
+        uuid = response.substring(startIdx, endIdx).trim();
+        return uuid;
     }
 
     public static boolean isTokenValid(String tokenId)

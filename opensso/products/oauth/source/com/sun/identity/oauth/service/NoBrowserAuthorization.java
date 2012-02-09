@@ -25,7 +25,9 @@
  * $Id: NoBrowserAuthorization.java,v 1.1 2009/11/20 19:31:57 huacui Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.oauth.service;
 
 import com.sun.identity.oauth.service.models.RequestToken;
@@ -92,7 +94,7 @@ public class NoBrowserAuthorization implements OAuthServiceConstants {
         // Based on the session token, get the UUID of the user
         String subject = null;
         try {
-            subject = OAuthServiceUtils.getUidByTokenId(tokenId, username);
+            subject = OAuthServiceUtils.getUUIDByTokenId(tokenId);
         } catch (OAuthServiceException oe) {
             Logger.getLogger(NoBrowserAuthorization.class.getName()).log(Level.SEVERE, null, oe);
             return Response.status(FORBIDDEN).build();
