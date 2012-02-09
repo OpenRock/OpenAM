@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
-
 package com.sun.identity.sm;
 
 import com.iplanet.am.util.Cache;
@@ -535,8 +534,10 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
             deregisterListener();
         }
         ssm = null;
-        orgConfigs.clear();
-        globalConfigs.clear();
+        if (SMSEntry.cacheSMSEntries) {
+            orgConfigs.clear();
+            globalConfigs.clear();
+        }
     }
     
     // @Override
