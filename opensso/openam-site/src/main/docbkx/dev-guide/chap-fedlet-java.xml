@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-fedlet-java'
@@ -75,7 +75,7 @@
   </step>
   <step>
    <para>Click create to generate the Fedlet.zip file, such as
-   <filename>$HOME/openam/myfedlets/httpwwwexamplecom8080myapp/Fedlet.zip</filename>.</para>
+   <filename>$HOME/openam/myfedlets/httpwwwexamplecom8080fedlet/Fedlet.zip</filename>.</para>
   </step>
   <step>
    <para>Provide the Fedlet to the service provider.</para>
@@ -114,6 +114,12 @@ $ mv fedlet.war /path/to/tomcat/webapps</screen>
    <para>For demo purposes, you can copy the test
    <filename>keystore.jks</filename>, <filename>.keypass</filename>, and
    <filename>.storepass</filename> from the OpenAM identity provider.</para>
+   <screen>$ cd /home/user/openam/openam
+$ scp keystore.jks .keypass .storepass www.example.com:/home/user/fedlet/
+user@www.example.com's password:
+keystore.jks                                   100% 1348     1.3KB/s   00:00
+.keypass                                       100%   36     0.0KB/s   00:00
+.storepass                                     100%   36     0.0KB/s   00:00</screen>
   </step>
   <step>
    <para>Try one or more examples from the Fedlet home page to validate Fedlet
