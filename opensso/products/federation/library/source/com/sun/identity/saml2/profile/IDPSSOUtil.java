@@ -27,7 +27,7 @@
  */
 
  /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -300,6 +300,25 @@ public class IDPSSOUtil {
             return;
         }
 
+        // Invoke the IDP Adapter
+        try {
+            SAML2Utils.debug.message(classMethod + " Invoking the "
+                    + "IDP Adapter");
+            SAML2IdentityProviderAdapter idpAdapter =
+                    IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+            if (idpAdapter != null) {
+                // If the preSendResponse returns true we end here
+                if (idpAdapter.preSendResponse(authnReq, idpEntityID,
+                        realm, request, response, session, null, relayState)) {
+                    return;
+                }  // else we continue with the logic. Beware of loops
+            }
+        } catch (SAML2Exception se2) {
+            SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
+                    + "the preSendResponse of the IDP Adapter: ", se2);
+        }
+        // End of invocation
+        
         sendResponseToACS(request, response, session, authnReq, spEntityID,
             idpEntityID, idpMetaAlias, realm, nameIDFormat, relayState, null);
     }
