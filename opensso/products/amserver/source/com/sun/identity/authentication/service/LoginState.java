@@ -28,7 +28,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.authentication.service;
@@ -2487,7 +2487,8 @@ public class LoginState {
                     debug.message("retrieving session service from role");
                     if (amIdentityRole != null) {
                         //Fix for OPENAM-612 - this request is cached most of the time
-                        if (amIdentityRole.getAttribute("objectclass").contains("iplanet-am-session-service")) {
+                        Set oc = amIdentityRole.getAttribute("objectclass");
+                        if (oc != null && oc.contains("iplanet-am-session-service")) {
                             serviceAttrs = amIdentityRole.getServiceAttributes(
                                     ISAuthConstants.SESSION_SERVICE_NAME);
                         }
@@ -2495,7 +2496,8 @@ public class LoginState {
                 } else if (idt.equals(IdType.USER)) {
                     debug.message("retrieving session service from user");
                     //Fix for OPENAM-612 - this request is cached most of the time
-                    if (amIdentityUser.getAttribute("objectclass").contains("iplanet-am-session-service")) {
+                    Set oc = amIdentityUser.getAttribute("objectclass");
+                    if (oc != null && oc.contains("iplanet-am-session-service")) {
                         serviceAttrs = amIdentityUser.getServiceAttributes(
                                 ISAuthConstants.SESSION_SERVICE_NAME);
                     }
