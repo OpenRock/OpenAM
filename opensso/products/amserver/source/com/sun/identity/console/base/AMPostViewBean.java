@@ -28,11 +28,16 @@
 
 package com.sun.identity.console.base;
 
+import com.iplanet.jato.NavigationException;
+import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.ViewBeanBase;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.web.ui.view.alert.CCAlert;
+import org.owasp.esapi.ESAPI;
 
 /**
  * This view bean bridges view beans from two deployment domains.
@@ -42,12 +47,14 @@ import com.iplanet.jato.view.html.StaticTextField;
 public class AMPostViewBean
     extends ViewBeanBase
 {
+    private static final Debug debug = Debug.getInstance("amConsole");
     private static final String PAGE_NAME = "AMPost";
     private static final String DEFAULT_DISPLAY_URL =
         "/console/base/AMPost.jsp";
     private static final String FORM_ACTION = "formAction";
 
     private String urlViewBean;
+    private boolean isValid = false;
 
     /**
      * Constructs a post view bean.
@@ -88,6 +95,21 @@ public class AMPostViewBean
      * @param url URL of target view bean.
      */
     public void setTargetViewBeanURL(String url) {
+        isValid = ESAPI.validator().isValidInput("AMPost_viewbeanUrl", url, "HTTPURI", 1024, false);
+        if (!isValid && debug.warningEnabled()) {
+            debug.warning("Possibly malicious content detected in AMPostViewBean: " + url);
+        }
         urlViewBean = url;
+    }
+
+    @Override
+    public void forwardTo(RequestContext requestContext) throws NavigationException {
+        if (isValid) {
+            super.forwardTo(requestContext);
+        } else {
+            MessageViewBean msgVB = (MessageViewBean) getViewBean(MessageViewBean.class);
+            msgVB.setMessage(CCAlert.TYPE_ERROR, "message.error", "message.input.error");
+            msgVB.forwardTo(requestContext);
+        }
     }
 }
