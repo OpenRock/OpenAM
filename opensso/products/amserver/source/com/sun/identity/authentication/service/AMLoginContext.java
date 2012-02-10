@@ -1784,13 +1784,18 @@ public class AMLoginContext {
                         debug.message("orgDN from existing auth context: " +
                         orgDN + ", orgDN from query string: " + newOrgDN);
                     }
-                    if (normOrgDN != null && !normOrgDN.equals(newOrgDN)) {
-                        st.setStatus(LoginStatus.AUTH_RESET);
-                        loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
-                        setErrorMsgAndTemplate();
-                        internalAuthError=true;
-                        throw new AuthLoginException(bundleName,
-                        AMAuthErrorCode.AUTH_ERROR, null);
+                    if (normOrgDN != null ) {
+                        // persistentCookieMode in loginState is more reliable
+                        // since pCookieMode is set according to login param
+                        pCookieMode = loginState.persistentCookieMode;
+                        if (!normOrgDN.equals(newOrgDN) && !pCookieMode) {
+	                        st.setStatus(LoginStatus.AUTH_RESET);
+	                        loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
+	                        setErrorMsgAndTemplate();
+	                        internalAuthError=true;
+	                        throw new AuthLoginException(bundleName,
+	                        AMAuthErrorCode.AUTH_ERROR, null);
+                        }
                     }
                 }
                 
@@ -1944,6 +1949,7 @@ public class AMLoginContext {
         if (loginState.ignoreProfile()) {
             try {
                 loginState.populateDefaultUserAttributes();
+                loginState.setUserName(indexName);
             } catch (Exception e) {
                 debug.message("Error get default attributes " , e);
                 setAuthError(AMAuthErrorCode.AUTH_ERROR,"loginFailed");

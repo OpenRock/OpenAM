@@ -93,6 +93,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -104,6 +105,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
@@ -1462,6 +1464,14 @@ public class LoginState {
                 session.putProperty(ISAuthConstants.AUTH_TYPE, authMethName);
             }
             session.putProperty(ISAuthConstants.PRINCIPAL, userDN);
+
+            if (userId == null && userDN != null) {
+                DN dnObj  = new DN(userDN);
+                List rdn = dnObj.getRDNs();
+                if (rdn!=null && rdn.size()>0) {
+                    userId = ((RDN)rdn.get(0)).getValues()[0];
+                }
+            }
             session.putProperty(ISAuthConstants.USER_ID, userId);
             session.putProperty(ISAuthConstants.USER_TOKEN, token);
             session.putProperty(ISAuthConstants.ORGANIZATION, getOrgDN());
@@ -1487,6 +1497,8 @@ public class LoginState {
             
             if (univId != null) {
                 session.putProperty(Constants.UNIVERSAL_IDENTIFIER, univId);
+            } else if (univId == null && userDN != null) {
+                session.putProperty(Constants.UNIVERSAL_IDENTIFIER, userDN);
             }
             if ((indexType == AuthContext.IndexType.ROLE) &&
                 (indexName != null)
@@ -1760,6 +1772,24 @@ public class LoginState {
             debug.message("ERROR in getUserDomain - " + e.toString());
         }
         
+        //org profile is not loaded yet so we can't check with getPersistentCookieMode()
+        //but we will check if persistentCookie is there and use it because we will
+        //verify if the pcookie is valid later anyways.
+        String username =null;
+        String cookieValue = CookieUtils.getCookieValueFromReq(request, pCookieName);
+        if (cookieValue != null) {
+            username = parsePersistentCookie(cookieValue);
+            if (username != null) {
+                //call to searchPersistentCookie should set userOrg
+                //getDN or AuthD.getOrgDN doesn't return correct dn so using DNMapper
+                orgDN = DNMapper.orgNameToDN(this.userOrg);
+                if (!username.endsWith(orgDN)) {
+                    orgDN = ServiceManager.getBaseDN();
+                }
+                userOrg = orgDN;
+            }
+        }
+
         if (userOrg == null) {
             if (AuthUtils.newSessionArgExists(requestHash, sid) &&
             sid.toString().length() > 0) {
@@ -6560,4 +6590,11 @@ public class LoginState {
         }
         return authValid;
     }  
+
+    /**
+     * Sets userDN based on pcookie - called by <code>AMLoginContext</code>.
+     */
+    public void setUserName(String username) {
+        userDN = username;
+    }
 }
