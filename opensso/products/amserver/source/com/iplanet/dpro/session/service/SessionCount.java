@@ -91,6 +91,8 @@ public class SessionCount {
 
     private static SSOToken adminToken = null;
 
+    private static boolean useLocalSessionsInMultiServerMode = false;
+    
     private static boolean caseSensitiveUUID =
         SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
 
@@ -118,6 +120,14 @@ public class SessionCount {
                 //If an error occurs fallback to multi server mode
                 deploymentMode = MULTI_SERVER_MODE;
             }
+        }
+        
+        // Without this property defined the default will be false which is 
+        // backwards compatable.
+        useLocalSessionsInMultiServerMode = 
+                SystemProperties.getAsBoolean(Constants.USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE);
+        if (debug.messageEnabled()) {
+            debug.message("SessionCount: useLocalSessionsInMultiServerMode set to " + useLocalSessionsInMultiServerMode);                        
         }
     }
 
@@ -157,7 +167,11 @@ public class SessionCount {
             sessions = getSessionsFromLocalServer(uuid);
             break;
         case MULTI_SERVER_MODE:
-            sessions = getSessionsFromPeerServers(uuid);
+            if (useLocalSessionsInMultiServerMode()) {
+                sessions = getSessionsFromLocalServer(uuid);
+            } else {
+                sessions = getSessionsFromPeerServers(uuid);
+            }
             break;
         case SFO_MODE:
             sessions = getSessionsFromRepository(uuid);
@@ -173,6 +187,14 @@ public class SessionCount {
         }
         
         return sessions;
+    }
+        
+    /*
+     * Return true if the Constants.USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE property 
+     * has been defined and set to true.
+     */
+    static boolean useLocalSessionsInMultiServerMode() {
+        return useLocalSessionsInMultiServerMode;
     }
 
     /*
@@ -259,7 +281,8 @@ public class SessionCount {
      */
     public static void incrementSessionCount(InternalSession is) {
 
-        if (deploymentMode == SINGLE_SERVER_MODE) {
+        if ((deploymentMode == SINGLE_SERVER_MODE) || 
+                (deploymentMode == MULTI_SERVER_MODE && useLocalSessionsInMultiServerMode())) {
             Set sessions = (Set) uuidSessionMap.get((caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase());
             if (sessions != null) {
                 sessions.add(is.getID());
@@ -281,7 +304,8 @@ public class SessionCount {
         String uuid = (caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase();
         SessionID sid = is.getID();
 
-        if (deploymentMode == SINGLE_SERVER_MODE) {
+        if ((deploymentMode == SINGLE_SERVER_MODE) || 
+                (deploymentMode == MULTI_SERVER_MODE && useLocalSessionsInMultiServerMode())) {
             Set sessions = (Set) uuidSessionMap.get(uuid);
             if (sessions != null) {
                 sessions.remove(sid);

@@ -1146,4 +1146,11 @@ public interface Constants {
      */
     public static final String GENERIC_SOAP_REST_AUTHENTICATION_EXCEPTION =
             "openam.auth.soap.rest.generic.authentication.exception";
+    
+    /**
+     * Switch to allow using local sessions to track session counts when running
+     * in SessionCount.MULTI_SERVER_MODE.
+     */
+    public static final String USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE =
+        "openam.session.useLocalSessionsInMultiServerMode";
 }

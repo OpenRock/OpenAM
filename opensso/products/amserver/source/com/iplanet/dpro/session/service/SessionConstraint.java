@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.iplanet.dpro.session.service;
 
@@ -127,9 +127,11 @@ public class SessionConstraint {
 
         // Disable the session quota constraint checking if in
         // MULTI_SERVER_MODE mode.
-        if (SessionCount.getDeploymentMode() == SessionCount.MULTI_SERVER_MODE)
-        {
-            return false;
+        if (SessionCount.getDeploymentMode() == SessionCount.MULTI_SERVER_MODE) {
+            // Override default behaviour if using local sessions in MULTI_SERVER_MODE
+            if (!SessionCount.useLocalSessionsInMultiServerMode()) {
+                return false;
+            }
         }
 
         // Check if it is upgrade scenario
