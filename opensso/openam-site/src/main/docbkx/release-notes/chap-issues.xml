@@ -51,6 +51,7 @@
 <listitem><para>Wildcards in referrals can be ignored due to invalid search filter (OPENAM-1006).</para></listitem>
 <listitem><para>OpenAM should not be shipped with JDMK monitoring enabled by default (OPENAM-1004).</para></listitem>
 <listitem><para>Deadlock during server startup (OPENAM-1003).</para></listitem>
+<listitem><para>Special character used in membership search filter should be escaped (rfc2254) (OPENAM-987).</para></listitem>
 <listitem><para>RuntimeException in Sufficient module breaks the chain (OPENAM-975).</para></listitem>
 <listitem><para>OpenAM 10 does not get deployed in JBoss 7.02 (OPENAM-949).</para></listitem>
 <listitem><para>Fedlet encounters error processing LogoutRequest as /saml2loginwithrelay.template is missing from the classpath (OPENAM-933).</para></listitem>
