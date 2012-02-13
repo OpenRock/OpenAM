@@ -220,6 +220,19 @@ public abstract class ConsoleServletBase
         throw new CompleteRequestException();
     }
 
+    @Override
+    protected void onPageSessionDeserializationException(
+            RequestContext requestContext,
+            ViewBean viewBean,
+            Exception e)
+            throws ServletException, IOException {
+        ViewBeanManager viewBeanManager = requestContext.getViewBeanManager();
+        ViewBean targetView = viewBeanManager.getViewBean(
+                AMInvalidURLViewBean.class);
+        targetView.forwardTo(requestContext);
+        throw new CompleteRequestException();
+    }
+
     /**
      * Forwards to uncaught exception view bean, to respond to uncaught 
      * application error messages.

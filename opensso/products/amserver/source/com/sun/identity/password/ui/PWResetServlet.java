@@ -25,7 +25,9 @@
  * $Id: PWResetServlet.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.password.ui;
 
 import com.iplanet.jato.ApplicationServletBase;
@@ -232,5 +234,17 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
         throw new CompleteRequestException();
     }
 
+    @Override
+    protected void onPageSessionDeserializationException(
+            RequestContext requestContext,
+            ViewBean viewBean,
+            Exception e)
+            throws ServletException, IOException {
+        ViewBeanManager viewBeanManager = requestContext.getViewBeanManager();
+        ViewBean targetView = viewBeanManager.getViewBean(
+                PWResetInvalidURLViewBean.class);
+        targetView.forwardTo(requestContext);
+        throw new CompleteRequestException();
+    }
 }
 

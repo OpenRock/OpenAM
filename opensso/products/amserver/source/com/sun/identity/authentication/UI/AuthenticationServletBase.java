@@ -26,8 +26,9 @@
  *
  */
 
-
- 
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.authentication.UI;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ import com.iplanet.jato.ApplicationServletBase;
 import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.ViewBeanManager;
+import com.iplanet.jato.view.ViewBean;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -114,6 +116,22 @@ static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
         if (exDebug.messageEnabled()) {
             exDebug.message("AuthenticationServletBase.onUncaughtException:"
                 , e);
+        }
+        vb.forwardTo(requestContext);
+        throw new CompleteRequestException();
+    }
+
+    @Override
+    protected void onPageSessionDeserializationException(
+            RequestContext requestContext,
+            ViewBean viewBean,
+            Exception e)
+            throws ServletException, IOException {
+        ViewBeanManager viewBeanManager = requestContext.getViewBeanManager();
+        AuthExceptionViewBean vb = (AuthExceptionViewBean) viewBeanManager.getViewBean(
+                com.sun.identity.authentication.UI.AuthExceptionViewBean.class);
+        if (exDebug.messageEnabled()) {
+            exDebug.message("AuthenticationServletBase.onPageSessionDeserializationException:", e);
         }
         vb.forwardTo(requestContext);
         throw new CompleteRequestException();

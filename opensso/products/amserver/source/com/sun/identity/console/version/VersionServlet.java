@@ -24,12 +24,15 @@
  *
  * $Id: VersionServlet.java,v 1.1 2009/08/05 20:15:51 veiming Exp $
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.console.version;
 
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestContextImpl;
 import com.iplanet.jato.ViewBeanManager;
+import com.iplanet.jato.view.ViewBean;
 import com.sun.identity.console.base.AMViewBeanBase;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -73,5 +76,22 @@ public class VersionServlet extends
         String redirectUrl = VersionViewBean.getCurrentURL(httpRequest) +
             "/base/AMUncaughtException";
         requestContext.getResponse().sendRedirect(redirectUrl);
+    }
+
+    @Override
+    protected void onPageSessionDeserializationException(
+            RequestContext requestContext,
+            ViewBean viewBean,
+            Exception e)
+            throws ServletException, IOException {
+        HttpServletRequest httpRequest = (HttpServletRequest) requestContext.getRequest();
+        AMViewBeanBase.debug.error("VersionServlet.onUncaughtException", e);
+        String redirectUrl = VersionViewBean.getCurrentURL(httpRequest)
+                + "/base/AMInvalidURL";
+        requestContext.getResponse().sendRedirect(redirectUrl);
+    }
+
+    @Override
+    protected void onSessionTimeout(RequestContext requestContext) throws ServletException {
     }
 }
