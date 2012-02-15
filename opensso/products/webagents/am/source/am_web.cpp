@@ -5857,7 +5857,7 @@ set_user_attributes(am_policy_result_t *result,
                    cookie_info.path = const_cast<char*>("/");
                    // set cookie in request and response.
                    set_sts = set_cookie_in_request_and_response(
-                             &cookie_info, req_params, req_func, false);
+                             &cookie_info, req_params, req_func, true);
                    am_web_log_debug("%s: set cookie %s, value %s in header, "
                                     "returned %s", thisfunc, key,
                                     values.c_str(), am_status_to_name(sts));
