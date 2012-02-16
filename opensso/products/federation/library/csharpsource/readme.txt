@@ -2,9 +2,9 @@
 README file for the .NET Fedlet
 ------------------------------------------------------------------------------
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
 Copyright (c) 2009-2010 Sun Microsystems Inc. All Rights Reserved
-  
+
 The contents of this file are subject to the terms
 of the Common Development and Distribution License
 (the License). You may not use this file except in
@@ -39,28 +39,28 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
     %% 10. Subtle differences between Java and .NET Fedlet
 
 
-%% 1. Contents of this directory 
-   This README file provides information on the Fedlet for .NET without a 
+%% 1. Contents of this directory
+   This README file provides information on the Fedlet for .NET without a
    pre-configured Identity Provider (IDP) and Fedlet (SP) metadata.  Manual
    steps are needed to set up the Fedlet for .NET to work with a remote IDP.
- 
+
    Fedlet-unconfigured.zip
      |- asp.net
-         |                           
-         |- bin                    
+         |
+         |- bin
          |   |- Fedlet.dll        The DLL to deploy in the bin/ folder of
          |                        your application.
-         |                        
-         |- conf                  Folder containing template metadata files 
+         |
+         |- conf                  Folder containing template metadata files
          |                        for use by the Fedlet for .NET applications.
-         |                             
+         |
          |- SampleApp             The sample application to demonstrate
          |                        connectivity between the remote IDP and
          |                        the Fedlet (SP).
-         |                             
+         |
          |- readme.txt            This README file. The file shows how to
                                   install, configure, and use the Fedlet.
-                                  
+
 
 %% 2. What is currently supported
    The Fedlet.dll currently supports IDP and SP initiated Single Sign On (SSO)
@@ -72,14 +72,14 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
    Section 5 below.
 
 %% 3. How to configure and deploy the Fedlet for .NET
-   The Fedlet.dll contains all the necessary bits for the Fedlet provide 
+   The Fedlet.dll contains all the necessary bits for the Fedlet provide
    ASP.NET developers an interface to a light-weight SAMLv2 Service Provider
-   API. These developers can use the API to initiate single sign on to an 
-   Identity Service Provider and receive an HTTP-POST in their application to 
+   API. These developers can use the API to initiate single sign on to an
+   Identity Service Provider and receive an HTTP-POST in their application to
    retrieve useful information provided in the AuthnResponse.
 
    Steps to configure and deploy the Fedlet for .NET:
-      a) Extract the asp.net/ folder within the Fedlet-unconfigured.zip to a 
+      a) Extract the asp.net/ folder within the Fedlet-unconfigured.zip to a
          temporary directory.
       b) Within the conf/ folder, edit the template files by changing
          the following tags:
@@ -101,7 +101,7 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
          metadata must be imported to the IDP machine and must be associated
          with the same Circle of Trust as the IDP. If your IDP is an OpenSSO
          deployment, use the Register Remote Service Provider workflow
-         available from the Common Tasks page to import your Fedlet's 
+         available from the Common Tasks page to import your Fedlet's
          metadata.
       f) Configuration is now complete.
       g) Copy the Fedlet.dll from the bin/ folder to your application's bin/
@@ -131,59 +131,59 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
 
    If the identity provider is using a product other than OpenSSO Enterprise,
    they would make the changes according to their product's documentation.
-      
+
 %% 4. How to use the Sample Application to test your deployment
    The Sample Application could be used to test your deployment of the Fedlet
    for your .NET applications.
 
-   Steps to deploy the Sample Application:   
+   Steps to deploy the Sample Application:
       a) Install the Sample Application on your Service Provider
-          i) Navigate to the asp.net/ folder extracted from the 
+          i) Navigate to the asp.net/ folder extracted from the
              Fedlet-unconfigured.zip as described in Section 3 above.
          ii) Copy over the metadata files edited in Section 3 above and place
-             into the SampleApp/App_Data folder. 
+             into the SampleApp/App_Data folder.
              - The following files should have been copied over:
                idp.xml, idp-extended.xml, sp.xml, sp-extended.xml, fedlet.cot
-             - The files in the existing sample application were configured 
-               for idp.example.com and sp.example.com and are expected to be 
+             - The files in the existing sample application were configured
+               for idp.example.com and sp.example.com and are expected to be
                replaced for your installation.
-        iii) Within Internet Information Server, create a virtual directory 
+        iii) Within Internet Information Server, create a virtual directory
              with the SampleApp/ folder found within the unzipped folder.
-             - IIS 6 has Add Virtual Directory.  Be sure to have Read and 
+             - IIS 6 has Add Virtual Directory.  Be sure to have Read and
                Script permissions set for the application.
-             - IIS 7 has Add Application with no additional options required 
+             - IIS 7 has Add Application with no additional options required
                to be altered.
-      b) Try out the Sample Application. 
+      b) Try out the Sample Application.
            i) Open the SampleApp in your browser. For example:
               http://sp.example.com/SampleApp
           ii) Click the link to perform the IDP initiated SSO.
          iii) Enter in your credentials (such as demo / changeit ).
-          iv) After the form submission, you should be at the 
-              fedletapplication.aspx page with access to the AuthnResponse 
+          iv) After the form submission, you should be at the
+              fedletapplication.aspx page with access to the AuthnResponse
               information.
 
 %% 5. How to integrate with existing application after Single Sign-on
-   The Sample Application described above demonstrates possible usage by 
-   ASP.NET developers. Once the application has the necessary artifacts 
-   installed, a specific URI is required to receive the HTTP-POST containing 
-   the SAMLv2 response after successful authentication by the IDP.  The 
+   The Sample Application described above demonstrates possible usage by
+   ASP.NET developers. Once the application has the necessary artifacts
+   installed, a specific URI is required to receive the HTTP-POST containing
+   the SAMLv2 response after successful authentication by the IDP.  The
    following example shows how the developer would retrieve this information:
-   
-       AuthnResponse authnResponse = null; 
-       try 
-       { 
-           ServiceProviderUtility spu = new ServiceProviderUtility(Context); 
+
+       AuthnResponse authnResponse = null;
+       try
+       {
+           ServiceProviderUtility spu = new ServiceProviderUtility(Context);
            authnResponse = spu.GetAuthnResponse(Context);
-       } 
-       catch (Saml2Exception se) 
-       { 
-           // invalid AuthnResponse received 
-       } 
-       catch (ServiceProviderUtilityException spue) 
-       { 
-           // issues with deployment (reading metadata) 
-       } 
-   
+       }
+       catch (Saml2Exception se)
+       {
+           // invalid AuthnResponse received
+       }
+       catch (ServiceProviderUtilityException spue)
+       {
+           // issues with deployment (reading metadata)
+       }
+
    If a SAML response was received the authnResponse object will be populated
    with the assertion information.  The sample application demonstrates how to
    retreive attributes and sujbect information from this object.
@@ -285,7 +285,7 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
 
           i) If no IDP has been established as the preferred IDP,
              clicking on this link will arbitrarily redirect you to one of the
-             configured IDPs for authentication.  Once authenticated, this IDP 
+             configured IDPs for authentication.  Once authenticated, this IDP
              will be designated as the preferred IDP by the discovery service.
          ii) If an IDP has already been established as the preferred IDP,
              clicking on this link will again redirect you to this IDP for
@@ -350,7 +350,7 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
 
       c) Set the appropriate permissions to allow read access to the certificate
          for the user account used by Internet Information Server (IIS) as
-         described at the aformentioned article. For example, using the menu in 
+         described at the aformentioned article. For example, using the menu in
          the aforementioned snap-in above, navigate to:
 
             Action > All Tasks > Manage Private Keys
@@ -411,15 +411,15 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
 
    The .NET Fedlet is now able to sign requests and responses to the identity
    provider with the appropriate changes to the configured metadata.
-   
+
       AuthnRequest
       Set AuthnRequestsSigned attribute within the sp.xml metadata file or the
       WantAuthnRequestsSigned within the idp.xml metadata file to true.
-      
+
       ArtifactResolve
-      Set wantArtifactResolveSigned attribute within the idp-extended.xml 
+      Set wantArtifactResolveSigned attribute within the idp-extended.xml
       metadata file to true.
-      
+
       LogoutRequests
       Set wantLogoutRequestSigned attribute within the idp-extended.xml
       metadata file to true.
@@ -439,5 +439,3 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
       to be written as regular expressions. More information about .NET
       Framework Regular Expressions is available at:
       http://msdn.microsoft.com/en-us/library/hs600312.aspx
-
-

@@ -26,7 +26,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2010-2011 ForgeRock AS
+   Portions Copyrighted 2010-2012 ForgeRock AS
 -->
 
 <project name="Open Federation" default="usage">
@@ -148,51 +148,10 @@
             <arg value="${library.dir}/fedlet/README.unconfigured"/>
             <arg value="${openfm.dir}/built/dist/.fedletjava"/>
         </java>
-        <mkdir dir="${openfm.dir}/built/dist/.fedletdotnet"/>
-        <fail message="Compiled DLL is not present in ${extlib.dir}">
-            <condition>
-                <not>
-                    <available file="${extlib.dir}/Fedlet.dll" />
-                </not>
-            </condition>
-        </fail>
-        <copy file="${library.dir}/fedlet/README.net"
-              tofile="${openfm.dir}/built/dist/.fedletdotnet/readme.txt"/>
-        <copy todir="${openfm.dir}/built/dist/.fedletdotnet/bin">
-            <fileset dir="${extlib.dir}">
-              <include name="Fedlet.dll"/>
-            </fileset>
-        </copy>
-        <copy todir="${openfm.dir}/built/dist/.fedletdotnet/conf">
-            <fileset dir="${library.dir}/csharpsource/Fedlet/Fedlet/conf">
-              <include name="*.cot-template"/>
-              <include name="*.xml-template"/>
-            </fileset>
-        </copy>
-        <copy todir="${openfm.dir}/built/dist/.fedletdotnet/SampleApp">
-            <fileset dir="${library.dir}/csharpsource/Fedlet/SampleApp">
-              <include name="Web.config"/>
-              <include name="site.master"/>
-              <include name="App_Data/*" />
-              <include name="**/*.aspx"/>
-              <include name="**/*.png"/>
-              <include name="**/*.jpg"/>
-              <include name="**/*.gif"/>
-              <include name="**/*.css"/>
-              <include name="**/*.js"/>
-            </fileset>
-        </copy>
-        <copy todir="${openfm.dir}/built/dist/.fedletdotnet/SampleApp/bin">
-            <fileset dir="${openfm.dir}/built/dist/.fedletdotnet/bin">
-              <include name="*.dll"/>
-            </fileset>
-        </copy>
         <zip destfile="${openfm.dir}/built/dist/Fedlet-unconfigured.zip">
-             <zipfileset dir="${openfm.dir}/built/dist/.fedletjava"   prefix="java"/>
-             <zipfileset dir="${openfm.dir}/built/dist/.fedletdotnet" prefix="asp.net"/>
+             <zipfileset dir="${openfm.dir}/built/dist/.fedletjava"   prefix=""/>
         </zip>
         <delete dir="${openfm.dir}/built/dist/.fedletjava" />
-        <delete dir="${openfm.dir}/built/dist/.fedletdotnet" />
     </target>
 
     <target name="externaltools" depends="jar">
