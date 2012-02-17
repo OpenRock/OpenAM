@@ -1856,7 +1856,6 @@
 ./config/auth/default/JDBC.xml
 ./config/auth/default/LDAP.xml
 ./config/auth/default/Login.jsp
-./config/auth/default/LoginModuleSample.xml
 ./config/auth/default/Logout.jsp
 ./config/auth/default/MSISDN.xml
 ./config/auth/default/Membership.xml
