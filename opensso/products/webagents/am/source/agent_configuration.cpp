@@ -30,7 +30,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 #include <prlock.h>
@@ -1048,25 +1048,48 @@ am_status_t AgentConfiguration::populateAgentProperties()
                      NULL, &this->clientHostnameHeader);
     }
 
-    std::string notURL_str;
-    const char* normURL = NULL;
-    
-    if (this->notification_url != NULL &&
-            strlen(this->notification_url) > 0) {
-        smi::URL url(this->notification_url);
-        url.getURLString(notURL_str);
-        normURL = notURL_str.c_str();
-        
-        if (normURL == NULL || *normURL == '\0') {
-            status = AM_FAILURE;
-        } else {
-            this->notification_url = strdup(normURL);
-            
-            if (!this->notification_url) {
-                status = AM_NO_MEMORY;
+    if (AM_SUCCESS == status && this->notification_enable
+            && this->notification_url != NULL
+            && strlen(this->notification_url) > 0) {
+        am_web_log_debug("%s: normalizing notification URL: %s", thisfunc, this->notification_url);
+        int local_alloc = 0;
+        try {
+            std::string notURL_str;
+            const char* normURL = NULL;
+            smi::URL url(this->notification_url);
+            url.getURLString(notURL_str);
+            normURL = notURL_str.c_str();
+            if (normURL == NULL || *normURL == '\0') {
+                status = AM_FAILURE;
+            } else {
+                this->notification_url = strdup(normURL);
+                if (!this->notification_url) {
+                    status = AM_NO_MEMORY;
+                } else local_alloc = 1;
             }
+        } catch (InternalException& exc) {
+            am_web_log_error("%s: InternalException encountered while normalizing notification URL, status %s", thisfunc,
+                    exc.getMessage(), am_status_to_name(exc.getStatusCode()));
+            status = AM_FAILURE;
+        } catch (...) {
+            am_web_log_error("%s: Unknown exception encountered while normalizing notification URL", thisfunc);
+            status = AM_FAILURE;
         }
+        if (status != AM_SUCCESS) {
+            /*on error allow agent to continue with notifications disabled*/
+            status = AM_SUCCESS;
+            this->notification_enable = AM_FALSE;
+            if (local_alloc == 1 && this->notification_url) {
+                free((void *) this->notification_url);
+                this->notification_url = NULL;
+            }
+            am_web_log_error("%s: error normalizing notification URL, notifications are disabled", thisfunc);
+        }
+        am_web_log_debug("%s: notification URL normalization result: %s, enabled: %s", thisfunc,
+                (this->notification_url != NULL ? this->notification_url : "empty"),
+                (this->notification_enable ? "yes" : "no"));
     }
+
 
     /* Get attribute multi value separator property */
     if (AM_SUCCESS == status) {
@@ -1403,7 +1426,6 @@ void AgentConfiguration::cleanup_properties()
         this->not_enforce_IPAddr = NULL;
     }
     Utils::cleanup_url_info_list(&this->login_url_list);
-    this->notification_url = NULL;
     this->unauthenticated_user = NULL;
 
     this->user_id_param = NULL;
