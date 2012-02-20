@@ -442,7 +442,14 @@ public class ServiceSchemaModifications {
         return attrDeleted;
     }
             
-    public Map<String, ServiceSchemaImpl> fetchNewServiceAttributes(Document doc) {
+    public Map<String, ServiceSchemaImpl> fetchNewServiceAttributes(Document doc) 
+    throws UpgradeException {
+        try {
+            ServiceManager.checkAndEncryptPasswordSyntax(doc, true);
+        } catch (SMSException smse) {
+            UpgradeUtils.debug.error("Unable to encrypt default values for passwords");
+            throw new UpgradeException(smse);
+        }
         Map<String, ServiceSchemaImpl> schemas = getAttributes(doc);
         
         return schemas;

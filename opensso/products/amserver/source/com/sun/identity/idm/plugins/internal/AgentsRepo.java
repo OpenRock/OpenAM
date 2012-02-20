@@ -1210,6 +1210,11 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         }
         String name =
             serviceComponent.substring(serviceComponent.indexOf('/') + 1);
+        
+        if (name.isEmpty()) {
+            return;
+        }
+        
         // If notification URLs are present, send notifications
         sendNotificationSet(type, idType, name);
 
@@ -1242,6 +1247,10 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             // Get the Agent name
             String name = serviceComponent.substring(
                 serviceComponent.indexOf('/') + 1);
+            
+            if (name.isEmpty()) {
+                return;
+            }
             
             // Send local notification first
             if (repoListener != null) { 
