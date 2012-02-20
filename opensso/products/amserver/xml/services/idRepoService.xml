@@ -27,7 +27,9 @@
    $Id: idRepoService.xml,v 1.37 2009/11/10 01:50:57 hengming Exp $
   
 -->
-
+<!--
+   Portions Copyrighted 2012 ForgeRock AS
+-->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -1078,6 +1080,24 @@
                         </DefaultValues>
                     </AttributeSchema>
 
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-active"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20173">
+                       <DefaultValues>
+                           <Value>Active</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20174">
+                       <DefaultValues>
+                           <Value>Inactive</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
@@ -1747,6 +1767,24 @@
                         </DefaultValues>
                     </AttributeSchema>
 
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-active"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20173">
+                       <DefaultValues>
+                           <Value>Active</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20174">
+                       <DefaultValues>
+                           <Value>Inactive</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
@@ -2279,6 +2317,24 @@
                             <Value>inetuserstatus</Value>
                         </DefaultValues>
                     </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-active"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20173">
+                       <DefaultValues>
+                           <Value>Active</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20174">
+                       <DefaultValues>
+                           <Value>Inactive</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
 
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
