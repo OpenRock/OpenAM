@@ -19,6 +19,9 @@
  *
  * Contributor(s): 
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.shared.ldap;
 
 
@@ -158,34 +161,41 @@ public class LDAPResponseListener extends LDAPMessageQueue {
         }
     }
     
-    private void waitForMessage () throws LDAPException {
+     private void waitForMessage () throws LDAPException {
         try {
             if (request.timeToComplete > 0) {
                 long timeToWait = request.timeToComplete -
                     System.currentTimeMillis();
                 if (timeToWait > 0) {
                     wait(timeToWait);
-                    if (!notified) { 
+                    if (notified) {
+                        notified = false;
+                    } else if (request.timeToComplete < System.currentTimeMillis()) {
+                        // Spurious wakeup before timeout.
+                        return;
+                    } else {
                         request = null;
-                        throw new LDAPException(
+                        m_exception = new LDAPException(
                             "Time to complete operation exceeded",
                             LDAPException.LDAP_TIMEOUT);
-                    } else {
-                        notified = false;
                     }
                 } else {
                     request = null;
-                    throw new LDAPException(
+                    m_exception = new LDAPException(
                         "Time to complete operation exceeded",
                         LDAPException.LDAP_TIMEOUT);
                 }
             } else {
                 wait();
+                notified = false;
             }
         } catch (InterruptedException e) {
-            throw new LDAPInterruptedException("Interrupted LDAP operation");
+            m_exception = new LDAPInterruptedException("Interrupted LDAP operation");
+        } catch (Exception e) {
+          m_exception = new LDAPException("Unexpected exception while waiting for response",
+              LDAPException.OTHER, e.getMessage());
         }
-    }    
+    }
     
     public int getType() {
         return LDAPMessageQueue.LDAP_RESPONSE_LISTENER;

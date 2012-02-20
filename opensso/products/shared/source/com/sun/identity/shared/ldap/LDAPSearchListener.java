@@ -19,6 +19,9 @@
  *
  * Contributor(s): 
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 package com.sun.identity.shared.ldap;
 
 import java.util.*;
@@ -276,7 +279,7 @@ public class LDAPSearchListener extends LDAPMessageQueue {
             }
         }                                
     }               
-    
+
     private void waitForMessage(ExtendedRequestEntry entry) throws
         LDAPException {
         try {
@@ -285,17 +288,20 @@ public class LDAPSearchListener extends LDAPMessageQueue {
                     System.currentTimeMillis();
                 if (timeToWait > 0) {
                     wait(timeToWait);
-                    if (!notified) { 
+                    if (notified) {
+                        notified = false;
+                    } else if (entry.timeToComplete < System.currentTimeMillis()) {
+                        // Spurious wakeup before timeout
+                        return;
+                    } else {
                         removeRequest(entry.id);                        
-                        throw new LDAPException(
+                        m_exception = new LDAPException(
                             "Time to complete operation exceeded",
                             LDAPException.LDAP_TIMEOUT);
-                    } else {
-                        notified = false;
                     }
                 } else {
                     removeRequest(entry.id);                                            
-                    throw new LDAPException(
+                    m_exception = new LDAPException(
                         "Time to complete operation exceeded",
                         LDAPException.LDAP_TIMEOUT);
                 }
@@ -304,7 +310,10 @@ public class LDAPSearchListener extends LDAPMessageQueue {
                 notified = false;
             }
         } catch (InterruptedException e) {
-            throw new LDAPInterruptedException("Interrupted LDAP operation");
+            m_exception = new LDAPInterruptedException("Interrupted LDAP operation");
+        } catch (Exception e) {
+            m_exception = new LDAPException("Unexpected exception while waiting for response",
+                    LDAPException.OTHER, e.getMessage());
         }
     }
     
