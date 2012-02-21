@@ -157,14 +157,4 @@
   <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
   based systems.</para>
  </section>
-
- <section xml:id="password-encryption-key-requirements">
-  <title>Password Encryption Key Requirements</title>
-
-  <para>If you deploy OpenAM in a multiple server environment, you must use the
-  same password encryption key value for each OpenAM installation.</para>
-
-  <para>Copy the password encryption key value from the first installation, and
-  then use the key when configuring additional OpenAM installations.</para>
- </section>
 </chapter>
