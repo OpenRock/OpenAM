@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-backup-restore'
@@ -33,8 +33,9 @@
  <title>Backing Up and Restoring OpenAM Configurations</title>
  
  <para>This chapter shows how to backup and restore OpenAM configuration
- data. This chapter does not cover backup and restore of user data, which
- in a critical production system should be stored separately.</para>
+ data. This chapter <emphasis>does not cover backup and restore of user
+ data</emphasis>, which in a critical production system should be stored
+ separately.</para>
  
  <procedure xml:id="backup-config-to-xml">
   <title>To Back Up OpenAM Configuration</title>
@@ -115,6 +116,7 @@ Service Configuration was exported.</screen>
 Directory Service contains existing data. Do you want to delete it? [y|N] y
 Please wait while we import the service configuration...
 Service Configuration was imported.</screen>
+   <para>In a site configuration, you perform this step only once.</para>
   </step>
   <step>
    <para>Restart OpenAM.</para>
