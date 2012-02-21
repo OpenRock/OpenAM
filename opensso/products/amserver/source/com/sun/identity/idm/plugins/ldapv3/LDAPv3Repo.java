@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2012 ForgeRock AS
  */
 
 package com.sun.identity.idm.plugins.ldapv3;
@@ -1420,14 +1420,16 @@ public class LDAPv3Repo extends IdRepo {
         }
         LDAPv3EventService eventService;
         
-        synchronized (listOfPS) {
         // keep a count with eventsMgr.ldapServerName of number of listener.
         // when the count reaches 0. remove the ldapServerName entry.
         // see if we already have an event service for this server.
         eventService = (LDAPv3EventService) _eventsMgr
                 .get(ldapServerName);
         if (eventService != null) {
-            if (hasListener) {
+        	//OPENAM-1007 synchronizing with listOfPS caused deadlock
+        	//synchronizing with eventservice instead
+        	synchronized (eventService) {
+        	if (hasListener) {
                 // find the listener idrepo.
                 // if this is the last, then remove the listener.
                 // if not, just remove teh idrepo from list.
@@ -1467,7 +1469,7 @@ public class LDAPv3Repo extends IdRepo {
                     _eventsMgr.remove(ldapServerName);
                 }
             }
-        }
+        	} // end of synchronized(eventService)
         }
         Iterator iter = tobeRemoveListener.iterator();
         while (iter.hasNext()) {
@@ -1503,7 +1505,7 @@ public class LDAPv3Repo extends IdRepo {
                 configMap.get(LDAPv3Config_LDAP_SERVER)); 
             return 0;
         }
-        synchronized (listOfPS) {
+
             checkConnPool();
             // TODO Auto-generated method stub
             // listener.setConfigMap(configMap);
@@ -1565,6 +1567,9 @@ public class LDAPv3Repo extends IdRepo {
                 }
             }
         
+        //OPENAM-1007 synchronizing with listOfPS caused deadlock
+        //synchronizing with eventservice instead
+        synchronized (eventService) {
             String psIdKey = getPSKey(myConfigMap);
             Map listOfRepo = (Map) listOfPS.get(psIdKey);
             if (listOfRepo == null) { // no ps found for this host.
