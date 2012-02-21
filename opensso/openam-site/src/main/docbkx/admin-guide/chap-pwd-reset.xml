@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-pwd-reset'
@@ -79,7 +79,17 @@
 
    <para>You can configure the password reset service for OpenAM, letting
    each realm inherit the global settings.</para>
-   
+
+   <step performance="optional">
+    <para>If you use LDAP as the user repository, set the default
+    authentication type for the realm to LDAP rather than the default (Data
+    Store) to prevent authentication from failing after user passwords are
+    reset.</para>
+    <para>You can change the settings through the OpenAM console. Browse to
+    Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
+    Authentication &gt; Authentication Chaining &gt; ldapService, and then set
+    Instance to LDAP and Criteria to REQUIRED.</para>
+   </step>
    <step>
     <para>In the OpenAM console, browse to Configuration &gt; Global &gt;
     Password Reset in the Global Properties list.</para>
