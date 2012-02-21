@@ -160,7 +160,7 @@
 <listitem><para>Distributed authentication UI not able to do resource based authentication (OPENAM-298).</para></listitem>
 <listitem><para>Blank in form can break fedlet creation (OPENAM-269).</para></listitem>
 <listitem><para>SAML2.0 isPassive attribute in the AuthnRequest is ignored by the IdP (OPENAM-261).</para></listitem>
-<listitem><para>Distributed Authenticaion UI Login URL not accepted (OPENAM-247).</para></listitem>
+<listitem><para>Distributed Authentication UI Login URL not accepted (OPENAM-247).</para></listitem>
 <listitem><para>Remote SessionRequest.setProperty causes HTTP 500 for null property/value (OPENAM-191).</para></listitem>
 <listitem><para>SetupDistAuthWAR does not support the ability to set the lb value (OPENAM-188).</para></listitem>
 <listitem><para>"Authentication by Module Chain" fails when used in a sub-realm (OPENAM-171).</para></listitem>
