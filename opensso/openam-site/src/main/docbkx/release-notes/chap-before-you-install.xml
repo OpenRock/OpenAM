@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-before-you-install'
@@ -76,6 +76,10 @@
     <para>Oracle WebLogic 10.3.5</para>
    </listitem>
   </itemizedlist>
+
+  <para>If running as a non-root user, the web application container must be
+  able to write to its own home directory, where OpenAM stores configuration
+  files.</para>
  </section>
 
  <section xml:id="data-store-requirements">
@@ -86,6 +90,8 @@
    stores.</para>
    <listitem>
     <para>Embedded (using ForgeRock OpenDJ 2.4.4 for the data store)</para>
+    <para>When using the embedded configuration store, you must deploy OpenAM
+    on a local file system and not on an NFS-mounted file system.</para>
    </listitem>
    <listitem>
     <para>External ForgeRock OpenDJ data store</para>
@@ -150,5 +156,15 @@
   
   <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
   based systems.</para>
+ </section>
+
+ <section xml:id="password-encryption-key-requirements">
+  <title>Password Encryption Key Requirements</title>
+
+  <para>If you deploy OpenAM in a multiple server environment, you must use the
+  same password encryption key value for each OpenAM installation.</para>
+
+  <para>Copy the password encryption key value from the first installation, and
+  then use the key when configuring additional OpenAM installations.</para>
  </section>
 </chapter>
