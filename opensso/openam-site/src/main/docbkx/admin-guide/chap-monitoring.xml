@@ -186,8 +186,8 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <filename>amAuthentication.error</filename>.</para>
    
    <para>See the <link xlink:href="reference#chap-log-messages"
-  xlink:role="http://docbook.org/xlink/role/olink">Log Messages</link>
-  reference for details.</para>
+   xlink:role="http://docbook.org/xlink/role/olink">Log Messages</link>
+   reference for details.</para>
    
    <para>OpenAM lets you change the log level on the fly. OpenAM also supports
    log rotation, secure logging, and log message buffering.</para>
@@ -195,13 +195,30 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <para>To configure OpenAM logging properties overall, login to the OpenAM
    console as OpenAM administrator, and browse to Configuration &gt; System &gt;
    Logging.</para>
-   
+
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Level</secondary>
+   </indexterm>
    <para>To adjust the debug level while OpenAM is running, login to the OpenAM
    console as OpenAM administrator, and browse to Configuration &gt; Servers
    and Sites &gt; <replaceable>Server Name</replaceable> &gt; General, and then
    scroll down to Debugging. The default level for debug logging is Error.
    This level is appropriate for normal production operations, in which case
    no debug log messages are expected.</para>
+
+   <para>Setting debug log level to Warning increases the volume of messages.
+   Setting debug log level to Message dumps detailed trace messages. Unless
+   told to do so by qualified support personnel, do not use Warning and Message
+   levels in production.</para>
+
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Single file</secondary>
+   </indexterm>
+   <para>During development, you might find it useful to log all debug messages
+   to a single file. In order to do so, set Merge Debug Files to
+   <literal>on</literal>.</para>
   </section>
   
   <section xml:id="log-mgmt-agents">
@@ -221,8 +238,52 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    section.</para>
   </section>
 
+  <section xml:id="log-debug-selective-capture">
+   <title>Debug Logging by Service</title>
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Service selection</secondary>
+   </indexterm>
+
+   <para>OpenAM lets you capture debug log messages selectively for a specific
+   service. This can be useful when you must turn on debugging in a production
+   system where you want to avoid excessive logging, but must gather messages
+   when you reproduce a problem.</para>
+
+   <orderedlist>
+    <para>Perform these steps to capture debug messages for a specific
+    service.</para>
+    <listitem>
+     <para>Login to OpenAM console as administrator,
+     <literal>amadmin</literal>.</para>
+    </listitem>
+    <listitem>
+     <para>Browse to <filename>Debug.jsp</filename>, for example
+     <literal>http://openam.example.com:8080/openam/Debug.jsp</literal>.</para>
+     <para>No links to this page are provided in the console.</para>
+    </listitem>
+    <listitem>
+     <para>Select the service to debug and also the level required given the
+     hints provided in the <filename>Debug.jsp</filename> page.</para>
+     <para>The change takes effect immediately.</para>
+    </listitem>
+    <listitem>
+     <para>Promptly reproduce the problem you are investigating.</para>
+    </listitem>
+    <listitem>
+     <para>After reproducing the problem, immediately return to the
+     <filename>Debug.jsp</filename> page, and revert to normal log levels
+     to avoid filling up the disk where debug logs are stored.</para>
+    </listitem>
+   </orderedlist>
+  </section>
+
   <section xml:id="log-rotate-debug">
    <title>Rotating Debug Logs</title>
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Rotation</secondary>
+   </indexterm>
 
    <para>By default OpenAM does not rotate debug logs. To rotate debug logs,
    edit <filename>WEB-INF/classes/debugconfig.properties</filename> where
