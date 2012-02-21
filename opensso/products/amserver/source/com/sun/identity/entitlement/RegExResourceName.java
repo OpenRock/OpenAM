@@ -27,8 +27,9 @@
 
 package com.sun.identity.entitlement;
 
+import com.iplanet.am.util.Cache;
 import com.sun.identity.entitlement.interfaces.ResourceName;
-import java.util.HashMap;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -44,8 +45,9 @@ public class RegExResourceName implements ResourceName {
     private String delimiter = "/";
     private static final ReadWriteLock patternCacheLock =
         new ReentrantReadWriteLock();
-    private static Map<String, Pattern> patternCache =
-        new HashMap<String, Pattern>();
+
+    private static final int MAX_CACHE_SIZE = 1000;
+    private static Cache patternCache = new Cache(MAX_CACHE_SIZE);
 
     public Set getServiceTypeNames() {
         return null;
@@ -166,19 +168,9 @@ public class RegExResourceName implements ResourceName {
     }
 
     private static Pattern getPatternFromCache(String strPattern) {
-        patternCacheLock.readLock().lock();
-        try {
-            Pattern pattern = patternCache.get(strPattern);
-            if (pattern != null) {
-                return pattern;
-            }
-        } finally {
-            patternCacheLock.readLock().unlock();
-        }
-
         patternCacheLock.writeLock().lock();
         try {
-            Pattern pattern = patternCache.get(strPattern);
+            Pattern pattern = (Pattern)patternCache.get(strPattern);
             if (pattern != null) {
                 return pattern;
             }

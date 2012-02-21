@@ -64,7 +64,7 @@ import com.sun.identity.shared.ldap.util.DN;
 /**
  * This subject applies to all users/agents with valid <code>SSOToken</code>.
  */
-public class AuthenticatedSharedAgents implements Subject, ServiceListener {
+public class AuthenticatedSharedAgents implements Subject {
 
     private static final String version = "1.0";
 
@@ -82,23 +82,16 @@ public class AuthenticatedSharedAgents implements Subject, ServiceListener {
 
     static Debug debug = Debug.getInstance("AuthAgents");
 
-    /**
-     * Default Constructor
-     */
-    public AuthenticatedSharedAgents() {
+    static {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
         if (debug.messageEnabled()) {
             debug.message(": AuthenticatedSharedAgents adding Listener");
         }
         try {
-            if (scm == null) {
-                scm = new ServiceConfigManager(adminToken, agentserviceName,
+            scm = new ServiceConfigManager(adminToken, agentserviceName,
                     version);
-            }
-            if (scm != null) {
-                scm.addListener(this);
-            }
+            scm.addListener(new ServiceListenerImpl());
         } catch (SMSException smse) {
             if (debug.warningEnabled()) {
                 debug.warning("AuthenticatedSharedAgents: "
@@ -110,6 +103,12 @@ public class AuthenticatedSharedAgents implements Subject, ServiceListener {
                         + "Unable to init scm due to " + ssoe);
             }
         }
+    }
+
+    /**
+     * Default Constructor
+     */
+    public AuthenticatedSharedAgents() {
     }
 
     /**
@@ -393,51 +392,53 @@ public class AuthenticatedSharedAgents implements Subject, ServiceListener {
         realmCache = rmap;
     }
 
-    // The following three methods implement ServiceListener interface
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.sun.identity.sm.ServiceListener#globalConfigChanged(
-     *      java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String, int)
-     */
-    public void globalConfigChanged(String serviceName, String version,
-        String groupName, String serviceComponent, int type) {
-        if (debug.messageEnabled()) {
-            debug.message("AuthenticatedSharedAgents.globalConfigChanged..");
+    private static class ServiceListenerImpl implements ServiceListener {
+        // The following three methods implement ServiceListener interface
+        /*
+         * (non-Javadoc)
+         *
+         * @see com.sun.identity.sm.ServiceListener#globalConfigChanged(
+         *      java.lang.String,
+         *      java.lang.String, java.lang.String, java.lang.String, int)
+         */
+        public void globalConfigChanged(String serviceName, String version,
+            String groupName, String serviceComponent, int type) {
+            if (debug.messageEnabled()) {
+                debug.message("AuthenticatedSharedAgents.globalConfigChanged..");
+            }
+            clearCache();
         }
-        clearCache();
-    }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.sun.identity.sm.ServiceListener#organizationConfigChanged(
-     *      java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String, int)
-     */
-    public void organizationConfigChanged(String serviceName, String version,
-        String orgName, String groupName, String serviceComponent, int type)
+        /*
+         * (non-Javadoc)
+         *
+         * @see com.sun.identity.sm.ServiceListener#organizationConfigChanged(
+         *      java.lang.String,
+         *      java.lang.String, java.lang.String, java.lang.String,
+         *      java.lang.String, int)
+         */
+        public void organizationConfigChanged(String serviceName, String version,
+            String orgName, String groupName, String serviceComponent, int type)
 
-    {
-        if (debug.messageEnabled()) {
-            debug.message("AuthenticatedSharedAgents."+
-                "organizationConfigChanged..");
+        {
+            if (debug.messageEnabled()) {
+                debug.message("AuthenticatedSharedAgents."+
+                    "organizationConfigChanged..");
+            }
+            clearCache();
         }
-        clearCache();
-    }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.sun.identity.sm.ServiceListener#schemaChanged(java.lang.String,
-     *      java.lang.String)
-     */
-    public void schemaChanged(String serviceName, String version) {
-        if (debug.messageEnabled()) {
-            debug.message("AuthenticatedSharedAgents.schemaChanged..");
+        /*
+         * (non-Javadoc)
+         *
+         * @see com.sun.identity.sm.ServiceListener#schemaChanged(java.lang.String,
+         *      java.lang.String)
+         */
+        public void schemaChanged(String serviceName, String version) {
+            if (debug.messageEnabled()) {
+                debug.message("AuthenticatedSharedAgents.schemaChanged..");
+            }
+            clearCache();
         }
-        clearCache();
     }
 }

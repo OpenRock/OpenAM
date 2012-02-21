@@ -447,15 +447,6 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
             }
         }
 
-        if (count >= threshold && count != maxSize) {
-            // Rehash the table if the threshold is exceeded
-            modCount++;
-            rehash();
-
-            tab = table;
-            index = (hash & 0x7FFFFFFF) % tab.length;
-        }
-
         Entry e = null;
         if (count == maxSize) { // Table is full need to replace an entry with
                                 // new one
