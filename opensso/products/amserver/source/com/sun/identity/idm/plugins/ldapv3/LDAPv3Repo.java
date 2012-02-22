@@ -273,6 +273,9 @@ public class LDAPv3Repo extends IdRepo {
                 | LDAPPersistSearchControl.DELETE
                 | LDAPPersistSearchControl.MODDN;
 
+    private ShutdownListener shutdownListener = null;
+    private LDAPRebind reBind = null;
+
     // access to the _eventsMgr and _eventsMgr needs to be sync.
     protected static Hashtable _eventsMgr = new Hashtable();
 
@@ -787,16 +790,17 @@ public class LDAPv3Repo extends IdRepo {
                             ldc.getAuthenticationDN(),
                                 ldc.getAuthenticationPassword(),
                                 ldc, connOptions);
-                        shutdownMan.addShutdownListener(
-                            new ShutdownListener() {
-                                public void shutdown() {
-                                    hasShutdown = true;
-                                    if (connPool != null) {
-                                        connPool.destroy();
-                                    }
+
+                        // create the shutdown hook
+                        shutdownListener = new ShutdownListener() {
+                            public void shutdown() {
+                                if (connPool != null) {
+                                    connPool.destroy();
                                 }
                             }
-                        );
+                        };
+                        // Register the shutdown hook
+                        shutdownMan.addShutdownListener(shutdownListener);
                     } finally {
                         shutdownMan.releaseLockAndNotify();
                     }
@@ -833,7 +837,8 @@ public class LDAPv3Repo extends IdRepo {
 
     protected void setDefaultReferralCredentials(LDAPConnection conn) {
         final LDAPConnection mConn = conn;
-        LDAPRebind reBind = new LDAPRebind() {
+        
+        reBind = new LDAPRebind() {
             public LDAPRebindAuth getRebindAuthentication(String host, int port)
             {
                 return new LDAPRebindAuth(mConn.getAuthenticationDN(), mConn
@@ -1079,14 +1084,37 @@ public class LDAPv3Repo extends IdRepo {
 
     }
 
+    @Override
     public void shutdown() {
-        debug.message("LDAPv3Repo: shutdown");
+        if (debug.messageEnabled()) {
+            debug.message("LDAPv3Repo: shutdown");
+        }
         hasShutdown = true;
         super.shutdown();
         if (connPool != null) {
             connPool.destroy();
+            connPool = null;
         }
+        
         removeListener();
+        
+        if (shutdownListener != null) {
+            ShutdownManager shutdownMan = ShutdownManager.getInstance();
+            if (shutdownMan.acquireValidLock()) {
+                try {
+                    shutdownMan.removeShutdownListener(shutdownListener);
+                    shutdownListener = null;                   
+                    if (debug.messageEnabled()) {
+                        debug.message("LDAPv3Repo: removed shutdown listener");
+                    }
+                } finally {
+                    shutdownMan.releaseLockAndNotify();
+                }
+            }
+        }        
+        
+        reBind = null;
+        myListener = null;
     }
 
     /*

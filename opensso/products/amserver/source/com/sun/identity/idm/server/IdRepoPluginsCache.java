@@ -698,6 +698,7 @@ public class IdRepoPluginsCache implements ServiceListener {
             if (plugin != null) {
                 plugin.removeListener();
                 plugin.shutdown();
+                plugin = null;
             }
             if (idrepos != null && !idrepos.isEmpty()) {
                 // Iterate through the plugins
@@ -709,6 +710,7 @@ public class IdRepoPluginsCache implements ServiceListener {
                     repo.removeListener();
                     repo.shutdown();
                 }
+                idrepos = null;
             }
         }
      }
