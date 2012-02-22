@@ -117,6 +117,9 @@ Directory Service contains existing data. Do you want to delete it? [y|N] y
 Please wait while we import the service configuration...
 Service Configuration was imported.</screen>
    <para>In a site configuration, you perform this step only once.</para>
+   <para>If the password for <literal>amadmin</literal> has been changed
+   through the OpenAM console, then use the bind password for the root DN of
+   the configuration store.</para>
   </step>
   <step>
    <para>Restart OpenAM.</para>
