@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2012 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS. 
  * 
  * The contents of this file are subject to the terms
@@ -26,26 +26,7 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.iplanet.sso.SSOException;
-
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -54,17 +35,32 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.encode.Base64;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.owasp.esapi.ESAPI;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.owasp.esapi.ESAPI;
 
 public class OAuth extends AMLoginModule {
 
@@ -517,7 +513,7 @@ public class OAuth extends AMLoginModule {
             } else if (connection.getResponseCode() == HttpURLConnection.HTTP_BAD_METHOD) {
                 // GET method not accepted by the Identity Provider
                 OAuthUtil.debugMessage("OAuth.getContentStreamByGET: IT was NOT-OK: " + 
-                        connection.getResponseCode());
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
                 is = getContentStreamByPOST(serviceUrl);
             } else {
                 // Server returned HTTP error code.
@@ -561,7 +557,7 @@ public class OAuth extends AMLoginModule {
                 is = connection.getInputStream();
             } else { // Error Code
                 OAuthUtil.debugError("OAuth.getContentStreamByPOST: IT was NOT-OK: " + 
-                        connection.getResponseCode());
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
                 String data[] = {String.valueOf(connection.getResponseCode())};
                 throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data);
             }

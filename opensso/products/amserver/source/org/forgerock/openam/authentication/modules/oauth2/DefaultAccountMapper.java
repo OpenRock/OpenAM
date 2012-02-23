@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2012 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -35,17 +35,16 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.json.JSONException;
-import org.json.JSONObject;
-import com.sun.identity.shared.debug.Debug;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.StringTokenizer;
 import java.util.UUID;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.BUNDLE_NAME;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class DefaultAccountMapper implements AccountMapper {
@@ -78,7 +77,7 @@ public class DefaultAccountMapper implements AccountMapper {
                 String responseName = st.nextToken();
                 String localName = st.nextToken();
 
-                String data = "";
+                String data;
                 if (responseName != null && responseName.indexOf(".") != -1) {
                     StringTokenizer parts = new StringTokenizer(responseName, ".");
                     data = json.getJSONObject(parts.nextToken()).getString(parts.nextToken());
@@ -99,13 +98,19 @@ public class DefaultAccountMapper implements AccountMapper {
         return attr;
     }
 
+    @Override
     public AMIdentity searchUser(AMIdentityRepository idrepo, Map<String, Set<String>> attr) {
         AMIdentity identity = null;
         IdSearchControl ctrl = getSearchControl(IdSearchOpModifier.OR, attr);
 
-        IdSearchResults results = null;
+        IdSearchResults results;
         try {
             results = idrepo.searchIdentities(IdType.USER, "*", ctrl);
+            Iterator<AMIdentity> iter = results.getSearchResults().iterator();
+            if (iter.hasNext()) {
+                identity = iter.next();
+                OAuthUtil.debugMessage("getUser: user found : " + identity.getName());
+            }
         } catch (IdRepoException ex) {
             OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Problem while  "
                     + "searching  for the user. IdRepo", ex);
@@ -114,16 +119,10 @@ public class DefaultAccountMapper implements AccountMapper {
                     + "searching  for the user. SSOExc", ex);
         }
 
-        Iterator iter = results.getSearchResults().iterator();
-        if (iter.hasNext()) {
-            identity = (AMIdentity) iter.next();
-            OAuthUtil.debugMessage("getUser: user found : " + identity.getName());
-
-        }
-
         return identity;
     }
 
+    @Override
     public AMIdentity provisionUser(AMIdentityRepository idrepo, Map<String, Set<String>> attributes) 
       throws AuthLoginException {
 

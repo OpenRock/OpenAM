@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2012 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -26,17 +26,13 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Map;
-
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
@@ -233,7 +229,7 @@ public class OAuthConf {
                     + param(PARAM_REDIRECT_URI,
                     OAuthUtil.encodeUriToRedirect(originalUrl));
         } catch (UnsupportedEncodingException ex) {
-            OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding"
+            OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
                     + "the scope", ex);
             throw new AuthLoginException("Problem to build the Auth Service URL", ex);
         }
@@ -256,13 +252,18 @@ public class OAuthConf {
                     + PARAM_CLIENT_ID + "=" + clientId;
         }
 
-        return tokenServiceUrl
-                + param(PARAM_REDIRECT_URI,
-                OAuthUtil.encodeUriToRedirect(authServiceURL))
-                + param(PARAM_SCOPE, scope)
-                + param(PARAM_CLIENT_SECRET, clientSecret)
-                + param(PARAM_CODE, code);
-
+        try {
+            return tokenServiceUrl
+                    + param(PARAM_REDIRECT_URI,
+                    OAuthUtil.encodeUriToRedirect(authServiceURL))
+                    + param(PARAM_SCOPE, URLEncoder.encode(scope,"UTF-8"))
+                    + param(PARAM_CLIENT_SECRET, clientSecret)
+                    + param(PARAM_CODE, code);
+        } catch (UnsupportedEncodingException ex) {
+            OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
+                    + "the scope", ex);
+            throw new AuthLoginException("Problem to build the Token Service URL", ex);
+        }
     }
 
     String getProfileServiceUrl(String token) {
