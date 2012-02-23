@@ -110,6 +110,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -121,6 +123,8 @@ import org.w3c.dom.NodeList;
  */
 public class UpgradeUtils {
 
+    private static final Pattern VERSION_FORMAT_PATTERN =
+            Pattern.compile("^(?:.*?(\\d+\\.\\d+\\.?\\d*).*)?\\((.*)\\)");
     static Properties configTags;
     public final static String SCHEMA_TYPE_GLOBAL = "global";
     public final static String SCHEMA_TYPE_ORGANIZATION = "organization";
@@ -265,34 +269,51 @@ public class UpgradeUtils {
      * @return true if the war file version is newer than the deployed version
      */
     public static boolean isVersionNewer() {
-        String currentVersion = stripVersionText(getCurrentVersion());
-        String warVersion = stripVersionText(getWarFileVersion());
-        
+        return isVersionNewer(getCurrentVersion(), getWarFileVersion());
+    }
+
+    protected static boolean isVersionNewer(String currentVersion, String warVersion) {
+        String[] current = parseVersion(currentVersion);
+        String[] war = parseVersion(warVersion);
+        if (current == null || war == null) {
+            return false;
+        }
         SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT, Locale.UK);
         Date currentVersionDate = null;
         Date warVersionDate = null;
-        
+
         try {
-            currentVersionDate = versionDateFormat.parse(currentVersion);
-            warVersionDate = versionDateFormat.parse(warVersion);
+            currentVersionDate = versionDateFormat.parse(current[1]);
+            warVersionDate = versionDateFormat.parse(war[1]);
         } catch (ParseException pe) {
             debug.error("Unable to parse date strings; current:" + currentVersion +
                     " war version: " + warVersion, pe);
         }
-        
+
         if (currentVersionDate == null || warVersionDate == null) {
             // stop upgrade if we cannot check
             return false;
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("Current version: " + currentVersionDate);
             debug.message("War version: " + warVersionDate);
         }
-        
-        return currentVersionDate.before(warVersionDate);
+        boolean isBefore = currentVersionDate.before(warVersionDate);
+        if (isBefore) {
+            if (Integer.valueOf(current[0]) <= Integer.valueOf(war[0])) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (Integer.valueOf(current[0]) < Integer.valueOf(war[0])) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
-    
     public static String getCurrentVersion() {
         return SystemProperties.get(Constants.AM_VERSION);
     }
@@ -301,12 +322,18 @@ public class UpgradeUtils {
         return ServerConfiguration.getWarFileVersion();
     }
     
-    protected static String stripVersionText(String fullVersion) {
-        if (fullVersion.indexOf('(') == -1 || fullVersion.indexOf(')') == -1) {
-            return fullVersion;
+    private static String[] parseVersion(String version) {
+        Matcher matcher = VERSION_FORMAT_PATTERN.matcher(version);
+        if (matcher.matches()) {
+            String ver = matcher.group(1);
+            if (ver == null) {
+                ver = "-1";
+            } else {
+                ver = ver.replace(".", "");
+            }
+            return new String[]{ver, matcher.group(2)};
         }
-        
-        return fullVersion.substring(fullVersion.indexOf('(') + 1, fullVersion.indexOf(')'));
+        return null;
     }
    
 
