@@ -26,7 +26,7 @@
  *
  */
 
-/*
+/**
  * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
@@ -290,10 +290,10 @@ public class IdentityServicesImpl
                 AuthUtils.logout(ssoToken.getTokenID().toString(), null, null);
             }
         } catch (TokenExpired te) {
-            debug.error("IdentityServicesImpl:logout", te);
+            debug.error("IdentityServicesImpl:logout : " + te.getMessage());
             throw new GeneralFailure(te.getMessage());
         } catch (SSOException ex) {
-            debug.error("IdentityServicesImpl:logout", ex);
+            debug.error("IdentityServicesImpl:logout : " + ex.getMessage());
             throw new GeneralFailure(ex.getMessage());
         }
 
@@ -386,7 +386,7 @@ public class IdentityServicesImpl
             logger.log(logRecord, appToken);
             logger.flush();
         } catch (AMLogException e) {
-            debug.error("IdentityServicesImpl:authorize", e);
+            debug.error("IdentityServicesImpl:log", e);
             throw new GeneralFailure(e.getMessage());
         }
         return new LogResponse();
@@ -650,10 +650,10 @@ public class IdentityServicesImpl
                     objectType);
             }
         } catch (IdRepoException e) {
-            debug.error("IdentityServicesImpl:list", e);
+            debug.error("IdentityServicesImpl:search", e);
             throw new GeneralFailure(e.getMessage());
         } catch (SSOException e) {
-            debug.error("IdentityServicesImpl:list", e);
+            debug.error("IdentityServicesImpl:search", e);
             throw new GeneralFailure(e.getMessage());
         }
 
@@ -1030,10 +1030,10 @@ public class IdentityServicesImpl
                 rv.setRealm(realm);
             }
         } catch (IdRepoException e) {
-            debug.error("IdentityServicesImpl:list", e);
+            debug.error("IdentityServicesImpl:read", e);
             throw new GeneralFailure(e.getMessage());
         } catch (SSOException e) {
-            debug.error("IdentityServicesImpl:list", e);
+            debug.error("IdentityServicesImpl:read", e);
             throw new GeneralFailure(e.getMessage());
         }
 
