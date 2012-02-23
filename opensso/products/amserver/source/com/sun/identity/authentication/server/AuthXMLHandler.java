@@ -26,10 +26,9 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
-
 package com.sun.identity.authentication.server;
 
 import com.iplanet.am.util.SystemProperties;
@@ -419,8 +418,12 @@ public class AuthXMLHandler implements RequestHandler {
                         clientHost = servletRequest.getRemoteAddr();
                     }
                     loginState.setClient(clientHost);
-                    loginState.setHttpServletRequest(authXMLRequest.getClientRequest());
+                    HttpServletRequest clientRequest = authXMLRequest.getClientRequest();
+                    loginState.setHttpServletRequest(clientRequest);
                     loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
+                    if (clientRequest != null) {
+                        loginState.setParamHash(AuthUtils.parseRequestParameters(clientRequest));
+                    }
                     authContext.login();
                     //setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
