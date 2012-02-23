@@ -29,7 +29,7 @@
 -->
 
 <!--
-  Portions Copyrighted 2011 ForgeRock AS 
+  Portions Copyrighted 2011-2012 ForgeRock AS
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -153,11 +153,12 @@
                     i18nKey="a119b">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceDenyAccess">org.forgerock.openam.session.service.DenyAccessAction</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyNextExpiring">org.forgerock.openam.session.service.DestroyNextExpiringAction</ChoiceValue>
                         <ChoiceValue i18nKey="choiceDestroyOldSession">org.forgerock.openam.session.service.DestroyOldestAction</ChoiceValue>
                         <ChoiceValue i18nKey="choiceDestroyAll">org.forgerock.openam.session.service.DestroyAllAction</ChoiceValue>
                    </ChoiceValues>
                     <DefaultValues>
-                        <Value>org.forgerock.openam.session.service.DestroyOldestAction</Value>
+                        <Value>org.forgerock.openam.session.service.DestroyNextExpiringAction</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-constraint-max-wait-time"

@@ -186,7 +186,8 @@ public class SessionConstraint {
                         "checkQuotaAndPerformAction: " +
                         "Session quota exhausted.");
             }
-	} else {
+	}
+        if (!reject) {
 	    SessionCount.incrementSessionCount(is);
 	}
 	return reject;

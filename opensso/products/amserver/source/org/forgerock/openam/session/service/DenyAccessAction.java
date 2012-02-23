@@ -33,6 +33,7 @@ import java.util.Map;
  */
 public class DenyAccessAction implements QuotaExhaustionAction {
 
+    @Override
     public boolean action(InternalSession is, Map<String, Long> sessions) {
         // no-op, simply deny the session activation request
         return true;

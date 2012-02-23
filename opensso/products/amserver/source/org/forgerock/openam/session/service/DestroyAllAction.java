@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,20 +29,23 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.QuotaExhaustionAction;
-import com.iplanet.dpro.session.service.SessionCount;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ * This action will invalidate all currently existing sessions, but it will
+ * let the current session to get created, so this way the user will always have
+ * only one session.
+ *
  * @author Steve Ferris
  */
 public class DestroyAllAction implements QuotaExhaustionAction {
 
     private static Debug debug = SessionService.sessionDebug;
 
+    @Override
     public boolean action(InternalSession is, Map sessions) {
         Set<String> sids = sessions.keySet();
         debug.message("there are " + sids.size() + " sessions");
@@ -66,7 +69,6 @@ public class DestroyAllAction implements QuotaExhaustionAction {
                 }
             }
         }
-        SessionCount.incrementSessionCount(is);
         return false;
     }
 }

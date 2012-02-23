@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -32,20 +32,17 @@ import java.util.Set;
 import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
- * This class is used by the upgrade mechanism (pre-upgrade) to set the value
- * of the iplanet-am-session-constraint-resulting-behavior attribute in the 
- * session service to maintain the correct custom value. The behaviour is as 
- * follows:
- * 
- * <ul>
- * <li>Destroy All Sessions property is set to true and service settings is
+ * This class is used by the upgrade mechanism (pre-upgrade) to set the value of
+ * the iplanet-am-session-constraint-resulting-behavior attribute in the session
+ * service to maintain the correct custom value. The behaviour is as follows:
+ *
+ * <ul> <li>Destroy All Sessions property is set to true and service settings is
  * DESTROY_OLD_SESSION; post upgrade setting should be DestroyAllAction.</li>
  * <li>Destroy All Sessions property is set to false and service settings is
  * DESTROY_OLD_SESSION; This is the default, no action need be taken.</li>
  * <li>Deny Access; If this is the current value then post upgrade value should
- * be DenyAccessAction.</li>
- * </ul>
- * 
+ * be DenyAccessAction.</li> </ul>
+ *
  * @author steve
  */
 public class SessionServiceHelper extends AbstractUpgradeHelper {
@@ -56,32 +53,33 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
             "org.forgerock.openam.session.service.DenyAccessAction";
     private final static String DESTROY_ALL_SESSIONS_CLASS =
             "org.forgerock.openam.session.service.DestroyAllAction";
+    private final static String DESTROY_OLDEST_SESSION_CLASS =
+            "org.forgerock.openam.session.service.DestroyOldestAction";
     private static final String DESTROY_ALL_SESSIONS =
             "openam.session.destroy_all_sessions";
+    private static final String DESTROY_OLDEST_SESSION =
+            "openam.session.destroy_oldest_session";
     private static final String SESSION_CONSTRAINT_HANDLER_ATTR =
             "iplanet-am-session-constraint-handler";
-
-    static {
-        initialize();
-    }
-
-    private static void initialize() {
-    }
+    private static final String SESSION_CONSTRAINT_HANDLER_OLD_ATTR =
+            "iplanet-am-session-constraint-resulting-behavior";
 
     @Override
     public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
             throws UpgradeException {
         if (newAttr.getName().equals(SESSION_CONSTRAINT_HANDLER_ATTR)) {
             for (AttributeSchemaImpl attr : existingAttrs) {
-                if (attr.getName().equals("iplanet-am-session-constraint-resulting-behavior")) {
+                if (attr.getName().equals(SESSION_CONSTRAINT_HANDLER_OLD_ATTR)) {
                     Set<String> defaultValues = attr.getDefaultValues();
                     Set<String> newDefaultValues = new HashSet<String>();
                     if (destroyAllSessionsSet() && defaultValues.contains(DESTROY_OLD_SESSION)) {
                         newDefaultValues.add(DESTROY_ALL_SESSIONS_CLASS);
                         newAttr = updateDefaultValues(newAttr, newDefaultValues);
-                    }
-                    if (defaultValues.contains(DENY_ACCESS)) {
+                    } else if (defaultValues.contains(DENY_ACCESS)) {
                         newDefaultValues.add(NEW_DENY_ACCESS);
+                        newAttr = updateDefaultValues(newAttr, newDefaultValues);
+                    } else if (destroyOldestSessionSet()) {
+                        newDefaultValues.add(DESTROY_OLDEST_SESSION_CLASS);
                         newAttr = updateDefaultValues(newAttr, newDefaultValues);
                     }
                     break;
@@ -92,6 +90,7 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
         return newAttr;
     }
 
+    @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
         return newAttr;
@@ -99,5 +98,9 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
 
     private boolean destroyAllSessionsSet() {
         return SystemProperties.getAsBoolean(DESTROY_ALL_SESSIONS);
+    }
+
+    private boolean destroyOldestSessionSet() {
+        return SystemProperties.getAsBoolean(DESTROY_OLDEST_SESSION);
     }
 }
