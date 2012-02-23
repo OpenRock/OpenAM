@@ -26,12 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -54,7 +56,6 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.EncryptedID;
@@ -82,8 +83,6 @@ import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.SessionIndex;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusDetail;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
 
 /**
@@ -888,10 +887,10 @@ public class LogoutUtil {
         boolean needSignResponse = false;
         
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-            needSignResponse = SAML2Utils.getWantLogoutRequestSigned(realm, 
+            needSignResponse = SAML2Utils.getWantLogoutResponseSigned(realm, 
                                   remoteEntity, SAML2Constants.SP_ROLE);
         } else {
-            needSignResponse = SAML2Utils.getWantLogoutRequestSigned(realm, 
+            needSignResponse = SAML2Utils.getWantLogoutResponseSigned(realm, 
                                   remoteEntity, SAML2Constants.IDP_ROLE);
         }
         
