@@ -72,6 +72,9 @@
   <step>
    <para>If you must map attributes to match profiles on the service provider,
    set up the attribute mapping.</para>
+   <para>To prepare to perform the Fedlet Attribute Query example, set
+   <literal>CommonName=cn</literal>, <literal>GivenName=sn</literal>, and
+   <literal>UserStatus=inetUserStatus</literal>.</para>
   </step>
   <step>
    <para>Click create to generate the Fedlet.zip file, such as
@@ -156,7 +159,8 @@ keystore.jks                                   100% 1348     1.3KB/s   00:00
      machine for the web application container at startup. For example, if
      you store the configuration under <filename>/export/fedlet/</filename>,
      then you could pass the following property to the JVM.</para>
-     <literallayout class="monospaced">-Dcom.sun.identity.fedlet.home=/export/fedlet/conf</literallayout>
+     <literallayout class="monospaced"
+     >-Dcom.sun.identity.fedlet.home=/export/fedlet/conf</literallayout>
      <para>You do not need to include these files in your application.</para>
     </listitem>
    </varlistentry>
@@ -241,7 +245,8 @@ keystore.jks                                   100% 1348     1.3KB/s   00:00
 
   <!-- Here, it would be nice to demo a page that returns to the identity
   provider to login, then shows a Hello, user page with the common name from
-  the provider. -->
+  the provider. But if I could get the attribute query to work, I might have
+  to retire in order to celebrate. -->
   <para>Follow these steps for a very simple demonstration of how to customize
   the Fedlet.</para>
   <step>
@@ -323,4 +328,399 @@ $ cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</screen>
    <para>After login you are redirected to <filename>myapp.jsp</filename>.</para>
   </step>
  </procedure>
+
+ <section xml:id="fedlet-signing-encryption">
+  <title>Signing &amp; Encryption</title>
+
+  <para>By default when you create the Java Fedlet, signing and encryption are
+  not configured. You can however set up OpenAM and the fedlet to sign and
+  to verify XML signatures and to encrypt and to decrypt data such as SAML
+  assertions.</para>
+
+  <itemizedlist>
+   <para>Enable signing and encryption for the Java Fedlet involves the
+   following high level stages.</para>
+   <listitem>
+    <para>Before you create the Fedlet, configure the IDP to sign and encrypt
+    data. See Federation &gt; Entity Providers &gt; <replaceable>IDP
+    Name</replaceable> &gt; Signing and Encryption in the OpenAM console.</para>
+    <para>For evaluation, you can use the <literal>test</literal> certificate
+    delivered with OpenAM.</para>
+   </listitem>
+   <listitem>
+    <para>Initially deploy and configure the Fedlet, but do not use the Fedlet
+    until you finish.</para>
+   </listitem>
+   <listitem>
+    <para>On the Fedlet side set up a JKS keystore used for signing and
+    encryption. For evaluation, you can use copy the
+    <filename>keystore.jks</filename> file delivered with OpenAM. You can find
+    the file under the configuration directory for OpenAM, such as
+    <filename>$HOME/openam/openam/</filename> for a server instance with
+    base URI <literal>openam</literal>. The built-in keystore includes the
+    <literal>test</literal> certificate.</para>
+    <para>You must also set up <filename>.storepass</filename> and
+    <filename>.keypass</filename> files using the
+    <filename>fedletEncode.jsp</filename> page, such as
+    <literal>http://www.example.com:8080/fedlet/fedletEncode.jsp</literal>, to
+    encode passwords on the Fedlet side. The passwords for the test key store
+    and private key are both <literal>changeit</literal>.</para>
+   </listitem>
+   <listitem>
+    <para>Configure the Fedlet to perform signing and encryption by ensuring
+    the Fedlet has access to the key store, and by updating the SP metadata
+    for the Fedlet.</para>
+   </listitem>
+   <listitem>
+    <para>Import the updated SP metadata into the IDP to replace the default
+    Fedlet configuration.</para>
+   </listitem>
+   <listitem>
+    <para>Restart the Fedlet or container in which the Fedlet runs for the
+    changes you made on the Fedlet side to take effect.</para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="fedlet-conf-signing-encryption">
+   <title>To Configure the Fedlet For Signing &amp; Encryption</title>
+
+   <para>The <filename>FederationConfig.properties</filename> file specifies
+   the paths to the JKS keystore holding the signing or encryption keys for
+   the Fedlet, the keystore password file, and the private key password
+   file.</para>
+
+   <step>
+    <para>After setting up your keystore and password files as described above,
+    edit the properties file in the configuration directory, such as
+    <filename>$HOME/fedlet/FederationConfig.properties</filename>, to point
+    to the keystore and password files.</para>
+   </step>
+   <step>
+    <para>Export the certificate to use for signing and encryption
+    purposes.</para>
+
+    <screen>$ keytool -export -rfc -keystore keystore.jks -alias test
+Enter keystore password:
+-----BEGIN CERTIFICATE-----
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==</screen>
+   </step>
+
+   <step>
+    <para>Edit the standard metadata file for the Fedlet, such as
+    <filename>$HOME/fedlet/sp.xml</filename>, to include the certificate
+    in KeyDescriptor elements, that are children of the SPSSODescriptor
+    element.</para>
+
+    <programlisting language="xml">&lt;EntityDescriptor
+ xmlns=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
+ entityID=&quot;http://www.example.com:8080/fedlet&quot;&gt;
+ &lt;SPSSODescriptor
+  AuthnRequestsSigned=&quot;true&quot;
+  WantAssertionsSigned=&quot;true&quot;
+  protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
+  &lt;KeyDescriptor use=&quot;signing&quot;&gt;
+   &lt;ds:KeyInfo xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+    &lt;ds:X509Data&gt;
+     &lt;ds:X509Certificate&gt;
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==
+     &lt;/ds:X509Certificate&gt;
+    &lt;/ds:X509Data&gt;
+   &lt;/ds:KeyInfo&gt;
+  &lt;/KeyDescriptor&gt;
+  &lt;KeyDescriptor use=&quot;encryption&quot;&gt;
+   &lt;ds:KeyInfo xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+    &lt;ds:X509Data&gt;
+     &lt;ds:X509Certificate&gt;
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==
+     &lt;/ds:X509Certificate&gt;
+    &lt;/ds:X509Data&gt;
+   &lt;/ds:KeyInfo&gt;
+   &lt;EncryptionMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#aes128-cbc&quot;&gt;
+    &lt;xenc:KeySize xmlns:xenc=&quot;http://www.w3.org/2001/04/xmlenc#&quot;&gt;
+     128
+    &lt;/xenc:KeySize&gt;
+   &lt;/EncryptionMethod&gt;
+  &lt;/KeyDescriptor&gt;
+  &lt;SingleLogoutService
+   Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&quot;
+   Location=&quot;http://www.example.com:8080/fedlet/fedletSloRedirect&quot;
+   ResponseLocation=&quot;http://www.example.com:8080/fedlet/fedletSloRedirect&quot; /&gt;
+  &lt;SingleLogoutService
+   Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+   Location=&quot;http://www.example.com:8080/fedlet/fedletSloPOST&quot;
+   ResponseLocation=&quot;http://www.example.com:8080/fedlet/fedletSloPOST&quot; /&gt;
+  &lt;SingleLogoutService
+   Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:SOAP&quot;
+   Location=&quot;http://www.example.com:8080/fedlet/fedletSloSoap&quot; /&gt;
+  &lt;NameIDFormat&gt;
+   urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+  &lt;/NameIDFormat&gt;
+  &lt;AssertionConsumerService
+   index=&quot;0&quot;
+   isDefault=&quot;true&quot;
+   Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+   Location=&quot;http://www.example.com:8080/fedlet/fedletapplication&quot; /&gt;
+  &lt;AssertionConsumerService
+   index=&quot;1&quot;
+   Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact&quot;
+   Location=&quot;http://www.example.com:8080/fedlet/fedletapplication&quot; /&gt;
+ &lt;/SPSSODescriptor&gt;
+ &lt;RoleDescriptor
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:query=&quot;urn:oasis:names:tc:SAML:metadata:ext:query&quot;
+  xsi:type=&quot;query:AttributeQueryDescriptorType&quot;
+  protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
+ &lt;/RoleDescriptor&gt;
+ &lt;XACMLAuthzDecisionQueryDescriptor
+  WantAssertionsSigned=&quot;false&quot;
+  protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot; /&gt;
+&lt;/EntityDescriptor&gt;</programlisting>
+   </step>
+   <step>
+    <para>Edit the extended metadata file for the Fedlet, such as
+    <filename>$HOME/fedlet/sp-extended.xml</filename>, to set the certificate
+    alias names to the alias for the Fedlet certificate, and the
+    <literal>want*Signed</literal> and <literal>want*Encrypted</literal> values
+    to <literal>true</literal>.</para>
+
+    <para>If you reformat the file, take care not to add white space around
+    string values in elements.</para>
+
+    <programlisting language="xml" width="88"><?dbfo pgwide="1"?>
+&lt;EntityConfig xmlns=&quot;urn:sun:fm:SAML:2.0:entityconfig&quot;
+ xmlns:fm=&quot;urn:sun:fm:SAML:2.0:entityconfig&quot; hosted=&quot;1&quot;
+ entityID=&quot;http://www.example.com:8080/fedlet&quot;&gt;
+ &lt;SPSSOConfig metaAlias=&quot;/sp&quot;&gt;
+  &lt;Attribute name=&quot;description&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;signingCertAlias&quot;&gt;
+   &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;encryptionCertAlias&quot;&gt;
+   &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;basicAuthOn&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;basicAuthUser&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;basicAuthPassword&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;autofedEnabled&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;autofedAttribute&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;transientUser&quot;&gt;
+   &lt;Value&gt;anonymous&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAdapter&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAdapterEnv&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;fedletAdapter&quot;&gt;
+   &lt;Value&gt;com.sun.identity.saml2.plugins.DefaultFedletAdapter&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;fedletAdapterEnv&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAccountMapper&quot;&gt;
+   &lt;Value&gt;com.sun.identity.saml2.plugins.DefaultLibrarySPAccountMapper&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;useNameIDAsSPUserID&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAttributeMapper&quot;&gt;
+   &lt;Value&gt;com.sun.identity.saml2.plugins.DefaultSPAttributeMapper&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAuthncontextMapper&quot;&gt;
+   &lt;Value&gt;com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAuthncontextClassrefMapping&quot;&gt;
+   &lt;Value
+   &gt;urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport|0|default&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spAuthncontextComparisonType&quot;&gt;
+   &lt;Value&gt;exact&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;attributeMap&quot;&gt;
+   &lt;Value&gt;*=*&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;saml2AuthModuleName&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;localAuthURL&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;intermediateUrl&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;defaultRelayState&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;appLogoutUrl&quot;&gt;
+   &lt;Value&gt;http://www.example.com:8080/fedlet/logout&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;assertionTimeSkew&quot;&gt;
+   &lt;Value&gt;300&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantAttributeEncrypted&quot;&gt;
+   &lt;Value&gt;true&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantAssertionEncrypted&quot;&gt;
+   &lt;Value&gt;true&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantNameIDEncrypted&quot;&gt;
+   &lt;Value&gt;true&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantPOSTResponseSigned&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantArtifactResponseSigned&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantLogoutRequestSigned&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantLogoutResponseSigned&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantMNIRequestSigned&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantMNIResponseSigned&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;responseArtifactMessageEncoding&quot;&gt;
+   &lt;Value&gt;URI&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;cotlist&quot;&gt;
+   &lt;Value&gt;fedlet-cot&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;saeAppSecretList&quot;&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;saeSPUrl&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;saeSPLogoutUrl&quot;&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;ECPRequestIDPListFinderImpl&quot;&gt;
+   &lt;Value&gt;com.sun.identity.saml2.plugins.ECPIDPFinder&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;ECPRequestIDPList&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;ECPRequestIDPListGetComplete&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;enableIDPProxy&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;idpProxyList&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;idpProxyCount&quot;&gt;
+   &lt;Value&gt;0&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;useIntroductionForIDPProxy&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;spSessionSyncEnabled&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;relayStateUrlList&quot;&gt;
+  &lt;/Attribute&gt;
+ &lt;/SPSSOConfig&gt;
+ &lt;AttributeQueryConfig metaAlias=&quot;/attrQuery&quot;&gt;
+  &lt;Attribute name=&quot;signingCertAlias&quot;&gt;
+   &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;encryptionCertAlias&quot;&gt;
+   &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantNameIDEncrypted&quot;&gt;
+   &lt;Value&gt;true&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;cotlist&quot;&gt;
+   &lt;Value&gt;fedlet-cot&lt;/Value&gt;
+  &lt;/Attribute&gt;
+ &lt;/AttributeQueryConfig&gt;
+ &lt;XACMLAuthzDecisionQueryConfig metaAlias=&quot;/pep&quot;&gt;
+  &lt;Attribute name=&quot;signingCertAlias&quot;&gt;
+   &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;encryptionCertAlias&quot;&gt;
+   &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;basicAuthOn&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;basicAuthUser&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;basicAuthPassword&quot;&gt;
+   &lt;Value&gt;&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantXACMLAuthzDecisionResponseSigned&quot;&gt;
+   &lt;Value&gt;false&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantAssertionEncrypted&quot;&gt;
+   &lt;Value&gt;true&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;cotlist&quot;&gt;
+   &lt;Value&gt;fedlet-cot&lt;/Value&gt;
+  &lt;/Attribute&gt;
+ &lt;/XACMLAuthzDecisionQueryConfig&gt;
+&lt;/EntityConfig&gt;</programlisting>
+   </step>
+
+   <step>
+    <para>In OpenAM console delete the original SP entity configuration for the
+    Fedlet, and then import the updated metadata for the new configuration into
+    OpenAM on the IDP side.</para>
+   </step>
+
+   <step>
+    <para>Restart the Fedlet or the container in which it runs in order for
+    the Fedlet to pick up the changes to the configuration properties and the
+    metadata.</para>
+   </step>
+  </procedure>
+ </section>
 </chapter>
