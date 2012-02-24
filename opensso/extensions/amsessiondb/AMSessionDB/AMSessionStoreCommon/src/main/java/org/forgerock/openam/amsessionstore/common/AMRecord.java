@@ -65,6 +65,7 @@ public class AMRecord implements Serializable {
     private String secondaryKey = null;
     private int state = 0;
     private String auxdata = null;
+    @SuppressWarnings("UseOfObsoleteCollectionType")
     private Vector<String> records = null;
     
     // byte[] encoded as Base64

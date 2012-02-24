@@ -78,6 +78,7 @@ public abstract class AbstractTask implements Callable<AMRecord> {
         }
                 
         ClientResource authRes = new ClientResource(resourceURL + ConfigResource.URI);
+        authRes.setNext(client);
         authRes.setChallengeResponse(ChallengeScheme.HTTP_DIGEST, "login", "test");
         
         try {
