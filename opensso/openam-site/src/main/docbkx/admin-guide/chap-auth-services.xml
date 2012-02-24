@@ -3185,4 +3185,70 @@
    </varlistentry>
   </variablelist>
  </section>
+
+ <section xml:id="configure-account-lockout">
+  <title>Configuring Account Lockout</title>
+  <indexterm>
+   <primary>Account lockout</primary>
+  </indexterm>
+
+  <itemizedlist>
+   <para>OpenAM supports two different approaches to <firstterm>account
+   lockout</firstterm>, where OpenAM locks an account after repeated
+   authentication failures. Lockout works with modules for which users
+   can enter a password incorrectly.</para>
+
+   <listitem>
+    <para>Memory lockout locks the user account, keeping track of the locked
+    state only in memory, and then unlocking the account after a specified
+    delay. Memory lockout is also released when OpenAM restarts.</para>
+   </listitem>
+
+   <listitem>
+    <para>Persistent (physical) lockout sets the user account status to
+    <literal>inactive</literal> in the user profile. For persistent lockout,
+    OpenAM tracks failed authentication attempts by writing to the user
+    repository.</para>
+    <para>Persistent account lockout works independently of account lockout
+    mechanisms in the underlying directory server that serves as the user
+    data store.</para>
+   </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
+   <para>You configure account lockout by editing settings for the <link
+   xlink:href="admin-guide#core-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink">core authentication
+   module</link>. Access the settings in OpenAM console under Access Control
+   &gt; <replaceable>Realm Name</replaceable> &gt; Authentication &gt; All
+   Core Settings..., and then scroll down to the Account Lockout section.
+   The inline help explains the settings in detail.</para>
+
+   <listitem>
+    <para>Enable lockout by checking Login Failure Lockout Mode, setting
+    the number of attenpts, and setting the lockout interval and
+    duration.</para>
+    <para>You can also opt to warn users after several consecutive failures,
+    or to multiply the lockout duration on each successive lockout.</para>
+   </listitem>
+   <listitem>
+    <para>You can set up email notification upon lockout to an administrator
+    if OpenAM is configured to send mail. (Servers and Sites &gt; <replaceable
+    >Server Name</replaceable> &gt; General &gt; Mail Server.)</para>
+   </listitem>
+   <listitem>
+    <para>For persistent lockout, OpenAM sets the value of the user's
+    <literal>inetuserstatus</literal> profile attribute to
+    <literal>inactive</literal>. You can also specify another attribute to
+    update on lockout. You can further set a non-default attribute on which
+    to store the number of failed authentication attempts. When you do store
+    the number of failed attempts in the data store, other OpenAM servers
+    accessing the user data store can also see the number.</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>If you need to unlock a user's account, find the user under Access
+  Control &gt; <replaceable>Realm Name</replaceable> &gt; Subjects &gt; User,
+  set the user's User Status to Active, and click Save.</para>
+ </section>
 </chapter>
