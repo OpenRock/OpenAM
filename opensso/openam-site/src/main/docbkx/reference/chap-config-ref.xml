@@ -577,7 +577,7 @@
      and password used to protect access to monitoring information. The
      default user name password combination is <literal>demo</literal> and
      <literal>changeit</literal>. You can encode a new password using the
-     <link xlink:href="reference#man-ampassword-1"
+     <link xlink:href="reference#ampassword-1"
      xlink:role="http://docbook.org/xlink/role/olink"><command
      >ampassword</command></link>command.</para>
 
