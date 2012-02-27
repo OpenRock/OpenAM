@@ -27,7 +27,7 @@
 
 package com.sun.identity.entitlement.util;
 
-import com.sun.identity.shared.debug.IDebug;
+import com.sun.identity.shared.debug.Debug;
 import org.testng.annotations.Test;
 
 /**
@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
 public class DebugLogTest {
     @Test
     public void testDebug() {
-        IDebug debug = DebugFactory.getDebug("debugtest");
+        Debug debug = Debug.getInstance("debugtest");
         try {
             String s = null;
             s.equals("test");
