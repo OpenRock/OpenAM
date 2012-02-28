@@ -846,7 +846,11 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
                     u.path().c_str(),
                     u.query().c_str(),
                     u.URL().c_str());
-            if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1)) != 1) {
+            if (u.host().empty()) {
+                status = AM_FAILURE;
+                am_web_log_error("URL [%s] validation failed. Host name is not resolvable", str.c_str());
+                break;
+            } else if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1)) != 1) {
                 status = AM_FAILURE;
                 am_web_log_error("URL [%s] validation failed with error [%d]", str.c_str(), vrv);
                 break;
@@ -1427,10 +1431,15 @@ am_web_get_token_from_assertion(char * enc_assertion,
     if ((tmp1 != NULL)  &&
       !(strncmp(dec_assertion, LARES_PARAM, strlen(LARES_PARAM)))) {
         tmp2 = tmp1 + 1;
+        if (*tmp2 == NULL) {
+	    am_web_log_error("Empty LARES parameter received");
+	    status = AM_FAILURE;
+	    return status;
+	}
         decode_base64(tmp2, tmp1);
 	am_web_log_debug("Received Authn Response = %s", tmp1);
 	if (*tmp1 == NULL) {
-	    am_web_log_error("Improper LARES param received");
+	    am_web_log_error("Improper LARES parameter received");
 	    status = AM_FAILURE;
 	    return status;
 	}
