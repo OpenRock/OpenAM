@@ -436,13 +436,19 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 	am_web_log_debug("ProcessRequest -- Starting");
 
 	if (readAgentConfigFile == FALSE) {
-		EnterCriticalSection(&initLock);
-		if (readAgentConfigFile == FALSE) {
-			loadAgentPropertyFile(pHttpContext);
-			readAgentConfigFile = TRUE;
-		}
-		LeaveCriticalSection(&initLock);
-	}
+            EnterCriticalSection(&initLock);
+            if (readAgentConfigFile == FALSE) {
+                if (loadAgentPropertyFile(pHttpContext) == FALSE) {
+                    am_web_log_error("%s: Agent bootstrap failed.", thisfunc);
+                    do_deny(pHttpContext);
+                    retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                    LeaveCriticalSection(&initLock);
+                    return retStatus;
+                }
+                readAgentConfigFile = TRUE;
+            }
+            LeaveCriticalSection(&initLock);
+        }
 	// Initialize agent
 	if(agentInitialized != B_TRUE){
 		EnterCriticalSection(&initLock);
