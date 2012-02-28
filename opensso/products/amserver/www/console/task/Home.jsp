@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted [2010] [ForgeRock AS]
+   Portions Copyrighted [2010-2012] [ForgeRock AS]
 --%>
 
 <%@ page info="Home" language="java" %>
@@ -276,7 +276,7 @@
                                     <table width="100%"  border="0" cellspacing="0" cellpadding="0">
                                         <tr>
                                             <td width="2%" valign="bottom" class="TskPgeTskLftTd"><img alt="spacer" id="gif11" src="../console/images/tasks/spacer.gif" width="12" height="8" /></td>
-                                            <td width="100%" class="TskPgeTskCntrTd"><a href="https://wikis.forgerock.org/openam" class="TskPgeTxtBg" onmouseover="this.className='TskPgeTxtBgOvr'" onfocus="this.className='TskPgeTxtBgOvr'" onmouseout="this.className='TskPgeTxtBg'" onblur="this.className='TskPgeTxtBg'"><span class="TskPgeTskLftBtm"></span><span class="TskPgeTskLftTp"></span><span class="TskPgeTskRghtBtm"></span><span class="TskPgeTskRghtTp"></span><span class="TskPgeTskRghtBrdr"></span><span class="TskPgeTskPdng"><cc:text name="txtLblDoc" defaultValue="commontask.label.doc" bundleID="amConsole"/></span></a></td>
+                                            <td width="100%" class="TskPgeTskCntrTd"><a href="http://docs.forgerock.org/en/index.html?product=openam" target="_blank" class="TskPgeTxtBg" onmouseover="this.className='TskPgeTxtBgOvr'" onfocus="this.className='TskPgeTxtBgOvr'" onmouseout="this.className='TskPgeTxtBg'" onblur="this.className='TskPgeTxtBg'"><span class="TskPgeTskLftBtm"></span><span class="TskPgeTskLftTp"></span><span class="TskPgeTskRghtBtm"></span><span class="TskPgeTskRghtTp"></span><span class="TskPgeTskRghtBrdr"></span><span class="TskPgeTskPdng"><cc:text name="txtLblDoc" defaultValue="commontask.label.doc" bundleID="amConsole"/></span></a></td>
 
                                             <td width="3%" align="right" valign="top" class="TskPgeTskRghtTd" ><a href="#" onclick="test(11); event.cancelBubble = true; return false;" onmouseover="hoverImg(11); event.cancelBubble = true;" onmouseout="outImg(11); event.cancelBubble = true;" onfocus="hoverImg(11); event.cancelBubble = true;" onblur="outImg(11); event.cancelBubble = true;" id="i11"><img alt="get documentation" id="togImg11" src="../console/images/tasks/rightToggle.gif" width="29" height="21"  border="0" /></a></td>
                                         </tr>
