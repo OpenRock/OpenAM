@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -86,8 +86,6 @@ public class Step2 extends AjaxPage {
         String baseDir = null;
         String presetDir = AMSetupServlet.getPresetConfigDir();
         if ((presetDir == null) || (presetDir.trim().length() == 0)) {
-            add("fixDir",            
-                "onkeyup=\"APP.callDelayed(this, validateConfigDir)\"");
             val = (String)getContext().getSessionAttribute(
                 SessionAttributeNames.CONFIG_DIR);
             if (val == null) {

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -377,7 +377,7 @@ public class Step4 extends AjaxPage {
             ld = (ssl) ? new LDAPConnection(
                 SSLSocketFactoryManager.getSSLSocketFactory()) :
                 new LDAPConnection();
-            ld.setConnectTimeout(300);
+            ld.setConnectTimeout(5);
             ld.connect(3, host, port, bindDN, bindPwd);
             
             String filter = "cn=" + "\"" + rootSuffix + "\"";
@@ -435,6 +435,7 @@ public class Step4 extends AjaxPage {
     }
 
     public boolean validateUMDomainName() {
+        setPath(null);
         Context ctx = getContext();
         String strSSL = (String)ctx.getSessionAttribute(
             SessionAttributeNames.USER_STORE_SSL);
@@ -452,9 +453,11 @@ public class Step4 extends AjaxPage {
         } catch (NamingException nex) {
             writeToResponse(
                 getLocalizedString("cannot.connect.to.UM.datastore"));
+            return false;
         } catch (IOException ioex) {
             writeToResponse(
                 getLocalizedString("cannot.connect.to.UM.datastore"));
+            return false;
         } 
         String host = hostAndPort[0];
         int port = Integer.parseInt(hostAndPort[1]);
@@ -471,7 +474,7 @@ public class Step4 extends AjaxPage {
             ld = (ssl) ? new LDAPConnection(
                 SSLSocketFactoryManager.getSSLSocketFactory()) :
                 new LDAPConnection();
-            ld.setConnectTimeout(300);
+            ld.setConnectTimeout(5);
             ld.connect(3, host, port, bindDN, bindPwd);
             
             String filter = "cn=" + "\"" + rootSuffix + "\"";
@@ -529,7 +532,6 @@ public class Step4 extends AjaxPage {
                 }
             }
         }
-        setPath(null);
         return false;
     }
 

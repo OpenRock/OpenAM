@@ -1,56 +1,123 @@
+<script  type="text/javascript">
+    jQuery(function() {
+        $("#content").show();
+        $('#donemy').show();
+        $('#done').hide();
+        $('#cancel').hide();
+        $("#progress").hide();
 
+        $("#createCustomConfig").click(function(){
+            createConfig();
+        });
 
-<div style="margin-left:10px;">
-    <h1>$page.getLocalizedString("summary.title")</h1>
-    <p>$page.getLocalizedString("summary.description")</p>
-    
-    <div class="summaryPanel" style="width:570px">
-        <b class="xtop">
-            <b class="xt1"></b>
-            <b class="xt2"></b>
-            <b class="xt3"></b>
-            <b class="xt4"></b>
-        </b>
-        <div class="headerBox">$page.getLocalizedString("summary.title")</div>
-        <div class="bodyBox" style="height:300px">
-            <span>
-                <b>$page.getLocalizedString("step3.sub.title")</b>
-                <a href="#" onclick="showTab(3); return false;">$page.getLocalizedString("edit.label")</a>
-                <div style="margin-left:10px">
-                <table class="temp">
-                    <tr>
-                        <td>
-                            $page.getLocalizedString("ssl.label") <br>
-                            $page.getLocalizedString("host.name.label") <br>
-                            $page.getLocalizedString("local.port.label") <br>
-                            #if ($embedded)
-                            $page.getLocalizedString("local.admin.port.label") <br>
-                            $page.getLocalizedString("local.jmx.port.label") <br>
-                            #end
-                            $page.getLocalizedString("root.suffix.label") <br>
-                            $page.getLocalizedString("user.name.label") <br>
-                            $page.getLocalizedString("directory.name.label")
-                        </td>
-                        <td>
-                            $displayConfigStoreSSL <br>
-                            $configStoreHost <br>
-                            $configStorePort <br>
-                            #if ($embedded)
-                            $configStoreAdminPort <br>
-                            $configStoreJmxPort <br>
-                            #end
-                            $rootSuffix <br>
-                            $configStoreLoginId <br>
-                            $configDirectory
-                        </td>                   
-                    </tr>
-                </table>
+        function createConfig() {
+            $("#setupMessage").text("");
+            $("#content").hide();
+            $("#progress").show();
+            disableClose();
+            var fr1 = window.frames['progressIframe'];
+            if ( fr1 ) {
+                fr1.location = "$context/setup/setSetupProgress";
+            }
+            $.get("$context/config/wizard/wizard.htm?actionLink=createConfig",
+            function( data ) {
+                if (data == 'true') {
+                    $('#donemy').hide();
+                    $('#done').show();
+                    $('#prgrbr').replaceWith('<h3 class="message no-icon">$page.getLocalizedString("configuration.option1.complete.message")</h3>');
+                } else {
+                    $('#donemy').hide();
+                    $('#done').hide();
+                    $('#prgrbr').replaceWith('<h3 class="message no-icon">Configuration error</h3>');
+                    $("#setupMessage").text(data);
+                    $('#cancel').show();
+                }
+            });
+        }
+
+        $("#backp").click(function(){
+            if ($("#progress").is(":visible")) {
+                $("#content").show();
+                $("#progress").hide();
+            } else {
+                if ($.amconfig.add_to_existing) {
+                    openWizardConfig("step5");
+                } else {
+                    openWizardConfig("step6");
+                }
+            }
+            return false;
+        });
+        $("#done").click(function(){
+            gotoLoginPage();
+        });
+
+        function disableClose() {
+            $('#closeimg').removeAttr('href');
+            $('#closeimg').removeAttr('onclick').click(function(e) { e.preventDefault(); });
+        }
+
+        $(document).keydown(function(e) {
+            if (e.keyCode == 27) return false;
+        });
+    });
+</script>
+<div id="modal" class="box clear-float">
+    <a id="closeimg" class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="done">$page.getLocalizedString("general.tab")</li>
+            <li class="done">$page.getLocalizedString("server.tab")</li>
+            <li class="done">$page.getLocalizedString("configuration.tab")</li>
+            <li class="done">$page.getLocalizedString("user.tab")</li>
+            <li class="done">$page.getLocalizedString("site.tab")</li>
+            <li class="done">$page.getLocalizedString("agent.tab")</li>
+            <li class="on">$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <div id="content">
+            <h1>Configuration Options</h1>
+            <h3 class="message no-icon">$page.getLocalizedString("summary.title")</h3>
+            <p>$page.getLocalizedString("summary.description")</p>
+            <fieldset>
+                <legend>Configurator Summary Details</legend>
+
+                <h4>$page.getLocalizedString("step3.sub.title") &nbsp;<a href="#" onclick="openWizardConfig('step3');">edit</a></h4>
+                <div id="stcd" style="padding-left: 30px; padding-top: 5px;">
+                    <table class="temp">
+                        <tr>
+                            <td>
+                                $page.getLocalizedString("ssl.label") <br>
+                                $page.getLocalizedString("host.name.label") <br>
+                                $page.getLocalizedString("local.port.label") <br>
+                                #if ($embedded)
+                                $page.getLocalizedString("local.admin.port.label") <br>
+                                $page.getLocalizedString("local.jmx.port.label") <br>
+                                #end
+                                $page.getLocalizedString("root.suffix.label") <br>
+                                $page.getLocalizedString("user.name.label") <br>
+                                $page.getLocalizedString("directory.name.label")
+                            </td>
+                            <td>
+                                $displayConfigStoreSSL <br>
+                                $configStoreHost <br>
+                                $configStorePort <br>
+                                #if ($embedded)
+                                $configStoreAdminPort <br>
+                                $configStoreJmxPort <br>
+                                #end
+                                $rootSuffix <br>
+                                $configStoreLoginId <br>
+                                $configDirectory
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 #if ($firstInstance)
-                <b>$page.getLocalizedString("step4.sub.title")</b>
-                <a href="#" onclick="showTab(4); return false;">$page.getLocalizedString("edit.label")</a>
-                <div style="margin-left:10px">
+                <h4 style="padding-top: 20px;">$page.getLocalizedString("step4.sub.title") &nbsp;<a href="#" onclick="openWizardConfig('step4');">edit</a></h4>
+                <div id="uscd" style="padding-left: 30px; padding-top: 5px;">
                     <table class="temp">
                         <tr>
                             #if ($displayUserHostName)
@@ -69,27 +136,26 @@
                                 $userRootSuffix<br>
                                 $userLoginID<br>
                                 $userStoreType
-                            </td>            
-                            #else 
+                            </td>
+                            #else
                             <td colspan="2">
                                 $page.getLocalizedString("default.user.store")
-                            </td>  
+                            </td>
                             #end
                         </tr>
                     </table>
                 </div>
                 #end
 
-                <b>$page.getLocalizedString("step5.sub.title")</b>
-                <a href="#" onclick="showTab(5); return false;">$page.getLocalizedString("edit.label")</a>
-                <div style="margin-left:10px">
+                <h4 style="padding-top: 20px;">$page.getLocalizedString("step5.sub.title") &nbsp;<a href="#" onclick="openWizardConfig('step5');">edit</a></h4>
+                <div id="sicd" style="padding-left: 30px; padding-top: 5px;">
                     <table class="temp">
-                        <tr>                        
+                        <tr>
                             #if ($loadBalancerHost)
                             <td>
                                 $page.getLocalizedString("site.name.label")<br>
                                 $page.getLocalizedString("primary.url.label")
-                            </td>                    
+                            </td>
                             <td>
                                 $loadBalancerHost<br>
                                 $loadBalancerPort
@@ -99,17 +165,29 @@
                                 $page.getLocalizedString("site.configure.label")
                             </td>
                             #end
-                        </tr>  
+                        </tr>
                     </table>
                 </div>
-            </span>
+            </fieldset>
+            <div class="row">
+                <input type="button" id="backp" class="button" value='$page.getLocalizedString("previous.button")'/>
+                <button id="createCustomConfig" type="button" class="button primary">$page.getLocalizedString("create.button")</button>
+                <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+            </div>
         </div>
-        <b class="xbottom">
-            <b class="xbGray1"></b>
-            <b class="xbGray2"></b>
-            <b class="xbGray3"></b>
-            <b class="xbGray4"></b>
-        </b>
+        <div id="progress">
+            <h1>Configuration Progress</h1>
+            <h3 id="prgrbr" class="message no-icon"><img width="640" height="11" src="$context/images/loading.gif" /></h3>
+            <fieldset>
+                <legend>Details</legend>
+                <iframe id="progressIframe" name="progressIframe" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
+                <h4 id="setupMessage"></h4>
+            </fieldset>
+            <div class="row">
+                <input type="submit" id="donemy" class="button disabled" value="Processing..."/>
+                <input type="submit" id="done" class="button primary" value='$page.getLocalizedString("go.to.login.screen")'/>
+                <input type="button" id="cancel" class="button right" value="Close" onclick="closeWizardConfig();"/>
+            </div>
+        </div>
     </div>
 </div>
-

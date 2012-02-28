@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -99,12 +99,12 @@ public class Step5 extends AjaxPage {
         boolean returnVal = true;
         String siteName = toString("host");
         if (siteName == null) {
-            writeInvalid(getLocalizedString("missing.site.name"));
+            writeToResponse(getLocalizedString("missing.site.name"));
             returnVal = false;
         } else {
             getContext().setSessionAttribute( 
                 SessionAttributeNames.LB_SITE_NAME, siteName);
-            writeValid(getLocalizedString("ok.label"));
+            writeToResponse("ok");
         }
 
         setPath(null);
