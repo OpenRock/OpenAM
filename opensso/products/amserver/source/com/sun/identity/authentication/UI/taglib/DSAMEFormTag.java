@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 package com.sun.identity.authentication.UI.taglib;
 
@@ -87,7 +87,7 @@ public class DSAMEFormTag  extends FormTag
         buffer.append(AuthViewBeanBase.PAGE_ENCODING)
             .append("\" value=\"")
             .append(vb.getDisplayFieldValue("gx_charset"))
-            .append("\">")
+            .append("\"/>")
             .append("</form>");
         writeOutput(buffer);
         return EVAL_PAGE;

@@ -25,383 +25,217 @@
    $Id: register.jsp,v 1.6 2008/08/15 01:05:29 veiming Exp $
                                                                                 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <%@page info="Self Registration Module" language="java"%>
+    <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
+    <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
+    <jato:useViewBean className="com.sun.identity.authentication.UI.LoginViewBean">
+        <%@ page contentType="text/html" %>
+        <head>
+            <title><jato:text name="htmlTitle_SelfRegModule" /></title>
+            <%
+            String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
+            %>
+            <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
+            <!--[if IE 9]> <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+            <!--[if lte IE 7]> <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+            <script language="JavaScript" src="<%= ServiceURI%>/js/auth.js" type="text/javascript"></script>
+            <jato:content name="validContent">
+                <script language="JavaScript" type="text/javascript">
+                    var defaultBtn = 'Submit';
+                    var elmCount = 0;
 
+                    function defaultSubmit() {
+                        LoginSubmit(defaultBtn);
+                    }
 
+                    function LoginSubmit(value) {
+                        aggSubmit();
+                        var hiddenFrm = document.forms['Login'];
 
-<html>
+                        if (hiddenFrm != null) {
+                            hiddenFrm.elements['IDButton'].value = value;
+                            hiddenFrm.submit();
+                        }
+                    }
 
-<%@page info="Self Registration Module" language="java"%>
-<%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
-<%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
-<jato:useViewBean className="com.sun.identity.authentication.UI.LoginViewBean">
+                    function resetForms() {
+                        var frms = document.forms;
+                        for (var i = 0; i < elmCount; i++) {
+                            var frm = frms['frm' + i];
 
-
-<%@ page contentType="text/html" %>
-
-<head>
-<title><jato:text name="htmlTitle_SelfRegModule" /></title>
-
-<% 
-String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
-%>
-
-<link rel="stylesheet" href="<%= ServiceURI %>/css/styles.css" type="text/css" />
-<script language="JavaScript" src="<%= ServiceURI %>/js/browserVersion.js"></script>
-<script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-
-<script language="javascript">
-
-    writeCSS('<%= ServiceURI %>');
-
-<jato:content name="validContent">
-    var defaultBtn = 'Submit';
-    var elmCount = 0;
-
-    function defaultSubmit() {
-        LoginSubmit(defaultBtn);
-    }
-
-    function LoginSubmit(value) {
-        aggSubmit();
-        var hiddenFrm = document.forms['Login'];
-
-        if (hiddenFrm != null) {
-            hiddenFrm.elements['IDButton'].value = value;
-            hiddenFrm.submit();
-        }
-    }
-
-    function resetForms() {
-        var frms = document.forms;
-        for (var i = 0; i < elmCount; i++) {
-            var frm = frms['frm' + i];
-
-            if (frm != null) {
-                clearFormElms(frm);
-            }
-        }
-        placeCursorOnFirstElm();
-    }
-</jato:content>
-</script>
-<script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
-//-->
-</script>
-</head>
-
-<body class="LogBdy" onload="placeCursorOnFirstElm();">
-
-  <table border="0" cellpadding="0" cellspacing="0" align="center" title="">
-    <tr>
-      <td width="50%"><img src="<%= ServiceURI %>/images/dot.gif" width="1" height="1" alt="" /></td>
-      <td><img src="<%= ServiceURI %>/images/dot.gif" width="728" height="1" alt="" /></td>
-      <td width="50%"><img src="<%= ServiceURI %>/images/dot.gif" width="1" height="1" alt="" /></td>
-    </tr>
-    <tr class="LogTopBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogtop.jpg); 
-    background-repeat: repeat-x; background-position: left top;">
-      <td>&nbsp;</td>
-      <td><img src="<%= ServiceURI %>/images/dot.gif" width="1" height="30" alt="" /></td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td class="LogMidBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogsides.jpg);
-        background-repeat:repeat-x;background-position:left top;">&nbsp;</td>
-      <td class="LogCntTd" style="background-image: url(<%= ServiceURI %>/images/login-backimage.jpg);
-        background-repeat:no-repeat;background-position:left top;" height="435" align="center" valign="middle">
-        <table border="0" background="<%= ServiceURI %>/images/dot.gif" cellpadding="0" cellspacing="0" 
-        width="100%" title="">
-          <tr>
-            <td width="260"><img src="<%= ServiceURI %>/images/dot.gif" width="260" height="245" alt="" /></td>
-            <td width="415" bgcolor="#ffffff" valign="top"><img name="Login.productLogo" 
-            src="<%= ServiceURI %>/images/PrimaryProductName.png" alt="<auth:resBundle bundleName="amAuthUI" resourceKey="basic_realm" />" 
-            border="0" />
-              <table border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td colspan="2">
-                      <img src="<%= ServiceURI %>/images/dot.gif" width="1" height="25" alt="" />                                
-                  </td>
-                </tr>
-
-        <!-- display authentication scheme -->
-
-        <!-- Header display -->
-        <tr>
-        <td nowrap="nowrap"></td>
-        <td><div class="logTxtSvrNam">                    
-        <jato:content name="ContentStaticTextHeader">
-            <jato:getDisplayFieldValue name='StaticTextHeader'
-                defaultValue='Authentication' fireDisplayEvents='true'
-                escape='false'/>
-        </jato:content>        
-        </div></td>
-        </tr>
-        <!-- End of Header display -->      
-  
-        <jato:content name="validContent">
-
-        <jato:tiledView name="tiledCallbacks"
-            type="com.sun.identity.authentication.UI.CallBackTiledView">
-
-        <script language="javascript">
-            elmCount++;
-        </script>
-
-        <jato:content name="textBox">
-        <!-- text box display -->
-        <tr>
-        <form name="frm<jato:text name="txtIndex" />" action="blank"
-            onSubmit="defaultSubmit(); return false;" method="post">
-
-        <td nowrap="nowrap"><div class="logLbl">
-            <jato:content name="isRequired">
-            <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field" 
-            title="Required Field" width="7" height="14" />
+                            if (frm != null) {
+                                clearFormElms(frm);
+                            }
+                        }
+                        placeCursorOnFirstElm();
+                    }
+                </script>
             </jato:content>
-            <span class="LblLev2Txt">
-            <label for="IDToken<jato:text name="txtIndex" />">                
-                <jato:text name="txtPrompt" defaultValue="User name:" 
-                                                        escape="false" />                            
-            </label></span></div>
-        </td>
-        
-        <td><div class="logInp">
-            <input type="text" name="IDToken<jato:text name="txtIndex" />"
-                id="IDToken<jato:text name="txtIndex" />"
-                value="<jato:text name="txtValue" />" class="TxtFld"></div>
-        </td>
-        </form>
-        </tr>
-        <jato:content name="hasInfoText">
-            <tr><td nowrap="nowrap"></td><td><div class="logInp"><jato:text name="txtInfo" />
-                    </div></td></tr>
-        </jato:content>
+        </head>
+        <body onload="placeCursorOnFirstElm();">
+            <div class="container_12">
+                <div class="grid_4 suffix_8">
+                    <a class="logo" href="<%= ServiceURI%>"></a>
+                </div>
+                <div class="box clear-float">
+                    <div class="grid_3">
+                        <div class="product-logo"></div>
+                    </div>
+                    <div class="grid_9 left-seperator">
+                        <div class="box-content clear-float">
+                            <jato:content name="ContentStaticTextHeader">
+                                <h1><jato:getDisplayFieldValue name='StaticTextHeader'
+                                                           defaultValue='Authentication' fireDisplayEvents='true'
+                                                           escape='false'/></h1>
+                                </jato:content>
+                            <p class="message"><span class="icon info"></span>
+                                <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field"
+                                     title="Required Field" width="7" height="14" />&nbsp;
+                                <auth:resBundle bundleName="amAuthUI" resourceKey="reqfield.desc" /></p>
+                                <jato:content name="validContent">
+                                    <jato:tiledView name="tiledCallbacks"
+                                                    type="com.sun.identity.authentication.UI.CallBackTiledView">
+                                    <script language="javascript">
+                                        elmCount++;
+                                    </script>
+                                    <jato:content name="textBox">
+                                        <form name="frm<jato:text name="txtIndex" />" action="blank"
+                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                            <div class="row">
+                                                <label for="IDToken<jato:text name="txtIndex" />">
+                                                    <jato:text name="txtPrompt" defaultValue="User name:" escape="false" />
+                                                    <jato:content name="isRequired">
+                                                        <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field"
+                                                             title="Required Field" width="7" height="14" />
+                                                    </jato:content>
+                                                </label>
+                                                <input class="textbox" type="text" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtValue" />" />
+                                            </div>
+                                        </form>
+                                    </jato:content>
+                                    <jato:content name="password">
+                                        <form name="frm<jato:text name="txtIndex" />" action="blank"
+                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                            <div class="row">
+                                                <label for="IDToken<jato:text name="txtIndex" />">
+                                                    <jato:text name="txtPrompt" defaultValue="Password:" escape="false" />
+                                                    <jato:content name="isRequired">
+                                                        <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field"
+                                                             title="Required Field" width="7" height="14" />
+                                                    </jato:content>
+                                                </label>
+                                                <input class="textbox" type="password" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="" />
 
-        <!-- end of textBox -->
-        </jato:content>
+                                            </div>
+                                        </form>
+                                    </jato:content>
+                                    <jato:content name="choice">
+                                        <form name="frm<jato:text name="txtIndex" />" action="blank"
+                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                            <div class="row">
+                                                <label for="IDToken<jato:text name="txtIndex" />">
+                                                    <jato:text name="txtPrompt" defaultValue="RadioButton:" escape="false" />
+                                                    <jato:content name="isRequired">
+                                                        <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field"
+                                                             title="Required Field" width="7" height="14" />
+                                                    </jato:content>
+                                                </label>
+                                                <div class="radios">
+                                                    <jato:tiledView name="tiledChoices" type="com.sun.identity.authentication.UI.CallBackChoiceTiledView">
+                                                        <jato:content name="selectedChoice">
+                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtParentIndex" />" value="<jato:text name="txtIndex" />" checked="checked" />
+                                                            <label for="IDToken<jato:text name="txtParentIndex" />">
+                                                                <jato:text name="txtChoice" />
+                                                            </label>
+                                                        </jato:content>
+                                                        <jato:content name="unselectedChoice">
+                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtParentIndex" />" value="<jato:text name="txtIndex" />" />
+                                                            <label for="IDToken<jato:text name="txtParentIndex" />">
+                                                                <jato:text name="txtChoice" />
+                                                            </label>
+                                                        </jato:content>
+                                                    </jato:tiledView>
+                                                </div>
 
-        <jato:content name="password">
-        <!-- password display -->
-        <tr>
-        <form name="frm<jato:text name="txtIndex" />" action="blank"
-            onSubmit="defaultSubmit(); return false;" method="post">
-
-        <td nowrap="nowrap"><div class="logLbl">
-            <jato:content name="isRequired">
-            <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field" 
-            title="Required Field" width="7" height="14" />
-            </jato:content>
-            <span class="LblLev2Txt">
-            <label for="IDToken<jato:text name="txtIndex" />">  
-                <jato:text name="txtPrompt" defaultValue="Password:" 
-                                                        escape="false" />                
-            </label></span></div>
-        </td>
-
-        <td><div class="logInp">
-            <input type="password" name="IDToken<jato:text name="txtIndex" />"
-                id="IDToken<jato:text name="txtIndex" />"
-                value="" class="TxtFld"></div>
-        </td>
-        </form>
-        </tr>      
-        <jato:content name="hasInfoText">
-            <tr><td nowrap="nowrap"></td><td><div class="logInp"><jato:text name="txtInfo" />
-                    </div></td></tr>
-        </jato:content>
-        <!-- end of password -->
-        </jato:content>
-
-        <jato:content name="choice">
-        <!-- choice value display -->
-        <tr>
-        <form name="frm<jato:text name="txtIndex" />" action="blank"
-            onSubmit="defaultSubmit(); return false;" method="post">
-
-        <td nowrap="nowrap"><div class="logLbl">
-            <jato:content name="isRequired">
-            <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field" 
-            title="Required Field" width="7" height="14" />
-            </jato:content>
-            <span class="LblLev2Txt">
-            <label for="IDToken<jato:text name="txtIndex" />">  
-                <jato:text name="txtPrompt" defaultValue="RadioButton:" 
-                                                            escape="false" />                
-            </label></span></div>
-        </td>
-
-        <td><div class="logInp">
-            <jato:tiledView name="tiledChoices"
-                type="com.sun.identity.authentication.UI.CallBackChoiceTiledView">
-
-            <jato:content name="selectedChoice">
-                <input type="radio"
-                    name="IDToken<jato:text name="txtParentIndex" />"
-                    id="IDToken<jato:text name="txtParentIndex" />"
-                    value="<jato:text name="txtIndex" />" class="Rb"
-                    checked><jato:text name="txtChoice" /><br>
-            </jato:content>
-
-            <jato:content name="unselectedChoice">
-                <input type="radio"
-                    name="IDToken<jato:text name="txtParentIndex" />"
-                    id="IDToken<jato:text name="txtParentIndex" />"
-                    value="<jato:text name="txtIndex" />" class="Rb"
-                    ><jato:text name="txtChoice" /><br>
-            </jato:content>
-
-            </jato:tiledView></div>
-        </td>
-        </form>
-        </tr>
-        <jato:content name="hasInfoText">
-            <tr><td nowrap="nowrap"></td><td><div class="logInp"><jato:text name="txtInfo" />
-                    </div></td></tr>
-        </jato:content>
-        <tr></tr>
-        <!-- end of choice -->
-        </jato:content>
-
-        <!-- end of tiledCallbacks -->
-        </jato:tiledView>
-
-        <!-- end of validContent -->
-        </jato:content>
-
-
-        <jato:content name="ContentStaticTextResult">
-        <!-- after login output message -->
-        <p><b><jato:getDisplayFieldValue name='StaticTextResult'
-            defaultValue='' fireDisplayEvents='true' escape='false'/></b></p>
-        </jato:content>
-
-        <jato:content name="ContentHref">
-        <!-- URL back to Login page -->
-            <p><auth:href name="LoginURL"
-                    fireDisplayEvents='true'>
-                <jato:text
-                name="txtGotoLoginAfterFail" /></auth:href></p>
-        </jato:content>
-
-        <jato:content name="ContentImage">
-        <!-- customized image defined in properties file -->
-            <p><img name="IDImage"
-                src="<jato:getDisplayFieldValue name='Image'/>" alt=""></p>
-        </jato:content>
-
-        <center>
-        <img src="<%= ServiceURI %>/images/required.gif" alt="Required Field" 
-                    title="Required Field" width="7" height="14" />&nbsp;
-        <auth:resBundle bundleName="amAuthUI" resourceKey="reqfield.desc" />
-        </center>
-
-        <jato:content name="ContentButtonLogin">
-        <!-- Submit button -->
-
-        <jato:content name="hasButton">
-        <script language="javascript">
-            defaultBtn = '<jato:text name="defaultBtn" />';
-        </script>
-        <tr>
-        <td><img src="<%= ServiceURI %>/images/dot.gif" 
-        width="1" height="15" alt="" /></td>
-        <td>
-            <table border=0 cellpadding=0 cellspacing=0>
-            <tr>
-            <jato:tiledView name="tiledButtons"
-                type="com.sun.identity.authentication.UI.ButtonTiledView">            
-                <script language="javascript">
-                    markupButton(
-                        '<jato:text name="txtButton" />',
-                        "javascript:LoginSubmit('<jato:text name="txtButton" />')");
-                </script>            
-            </jato:tiledView>
-            <script language="javascript">
-                    markupButton(
-                        "<jato:text name="lblReset" />",
-                        'javascript:resetForms()');
-            </script>
-            </tr>
-            </table>
-        </td>
-        </tr>
-        <!-- end of hasButton -->
-        </jato:content>
-
-        <jato:content name="hasNoButton">
-        <tr>
-        <td><img src="<%= ServiceURI %>/images/dot.gif" 
-        width="1" height="15" alt="" /></td>
-        <td>
-            <table border=0 cellpadding=0 cellspacing=0>
-            <tr>
-            <script language="javascript">
-                    markupButton(
-                        "<jato:text name="lblSubmit" />",
-                        "javascript:LoginSubmit('<jato:text name="cmdSubmit" />')");
-            </script>            
-            <script language="javascript">
-                    markupButton(
-                        "<jato:text name="lblReset" />",
-                        'javascript:resetForms()');
-            </script>
-            </tr>
-            </table>
-        </td>
-        </tr>
-        <!-- end of hasNoButton -->
-        </jato:content>
-
-        <!-- end of ContentButtonLogin -->
-        </jato:content>
-        <tr>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td><img src="<%= ServiceURI %>/images/dot.gif" 
-            width="1" height="33" alt="" /></td>
-            <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td width="45"><img src="<%= ServiceURI %>/images/dot.gif" 
-      width="45" height="245" alt="" /></td>
-    </tr>
-    </table>
-    </td>
-    <td class="LogMidBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogsides.jpg);
-    background-repeat:repeat-x;background-position:left top;">&nbsp;</td>
-    </tr>
-    <tr class="LogBotBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogbot.jpg);
-    background-repeat:repeat-x;background-position:left top;">
-      <td>&nbsp;</td>
-      <td><div class="logCpy"><span class="logTxtCpy">
-        <auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></span></div>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-  </table>
-
-<jato:content name="validContent">
-<auth:form name="Login" method="post"
-    defaultCommandChild="DefaultLoginURL">
-
-
-<script language="javascript">
-    if (elmCount != null) {
-        for (var i = 0; i < elmCount; i++) {
-            document.write(
-                "<input name=\"IDToken" + i + "\" type=\"hidden\">");
-        }
-    document.write("<input name=\"IDButton"  + "\" type=\"hidden\">");        
-    }
-</script>
-<input type="hidden" name="page_state" value="<auth:value key='PageState' />">
-</auth:form>
-</jato:content>
-
-</body>
-
-</jato:useViewBean>
-
+                                            </div>
+                                        </form>
+                                    </jato:content>
+                                </jato:tiledView>
+                            </jato:content>
+                            <jato:content name="ContentStaticTextResult">
+                                <!-- after login output message -->
+                                <p><b><jato:getDisplayFieldValue name='StaticTextResult'
+                                                           defaultValue='' fireDisplayEvents='true' escape='false'/></b></p>
+                                    </jato:content>
+                                    <jato:content name="ContentHref">
+                                <!-- URL back to Login page -->
+                                <p><auth:href name="LoginURL"
+                                           fireDisplayEvents='true'>
+                                        <jato:text name="txtGotoLoginAfterFail" /></auth:href></p>
+                                </jato:content>
+                                <jato:content name="ContentImage">
+                                <!-- customized image defined in properties file -->
+                                <p><img name="IDImage" src="<jato:getDisplayFieldValue name='Image'/>" alt=""/></p>
+                            </jato:content>
+                            <jato:content name="ContentButtonLogin">
+                                <fieldset>
+                                    <jato:content name="hasButton">
+                                        <div class="row">
+                                            <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
+                                                <input name="Login.Submit" type="button" onClick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
+                                            </jato:tiledView>
+                                            <input name="Login.Submit" type="button" onClick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
+                                        </div>
+                                        <script language="javascript" type="text/javascript">
+                                            defaultBtn = '<jato:text name="defaultBtn" />';
+                                            var inputs = document.getElementsByTagName('input');
+                                            for (var i = 0; i < inputs.length; i ++) {
+                                                if (inputs[i].type == 'button' && inputs[i].value == defaultBtn) {
+                                                    inputs[i].setAttribute("class", "button primary");;
+                                                    break;
+                                                }
+                                            }
+                                        </script>
+                                    </jato:content>
+                                    <jato:content name="hasNoButton">
+                                        <div class="row">
+                                            <input name="Login.Submit" type="button" onClick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                            <input name="Login.Submit" type="button" onClick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
+                                        </div>
+                                    </jato:content>
+                                </fieldset>
+                            </jato:content>
+                            <jato:content name="validContent">
+                                <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL">
+                                    <script language="javascript">
+                                        if (elmCount != null) {
+                                            for (var i = 0; i < elmCount; i++) {
+                                                document.write(
+                                                "<input name=\"IDToken" + i + "\" type=\"hidden\">");
+                                            }
+                                            document.write("<input name=\"IDButton"  + "\" type=\"hidden\">");
+                                        }
+                                    </script>
+                                    <input type="hidden" name="page_state" value="<auth:value key='PageState' />"/>
+                                </auth:form>
+                            </jato:content>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer alt-color">
+                    <div class="grid_6 suffix_3">
+                        <p><auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></p>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </jato:useViewBean>
 </html>
+
+

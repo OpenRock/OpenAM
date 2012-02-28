@@ -25,116 +25,53 @@
    $Id: createSessionError.jsp,v 1.6 2008/08/19 19:10:45 veiming Exp $
                                                                                 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
-
-
-<html>
-
-<%@page info="Session Creation Error" language="java"%>
-<%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
-<%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
-<jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
-
-<%@ page contentType="text/html" %>
-
-<head>
-<TITLE><jato:text name="htmlTitle_CreateSessionError" /></TITLE>
-
-<% 
-String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
-%>
-
-<link rel="stylesheet" href="<%= ServiceURI %>/css/styles.css" type="text/css" />
-<script language="JavaScript" src="<%= ServiceURI %>/js/browserVersion.js"></script>
-<script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-
-<script language="javascript">
-    writeCSS('<%= ServiceURI %>');
-</script>
-<script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
-//-->
-</script>
-</head>
-
-<body bgcolor="#FFFFFF" text="#000000" leftmargin="9" marginwidth="9"
-    topmargin="9" marginheight="9">
-<br>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-
-    <!-- branding -->
-    <tr>
-    <td width="110"><img src="<%= ServiceURI %>/login_images/logo_sun.gif" width="110"
-        height="82" alt="Sun Microsystems Logo"></td>
-    <td><img src="<%= ServiceURI %>/login_images/spacer.gif" width="9" height="1" 
-        alt=""></td>
-    <td valign="bottom" bgcolor="#ACACAC" width="100%"><img
-        src="<%= ServiceURI %>/login_images/Identity_LogIn.gif" alt="OpenSSO"></td>
-    </tr>
-    <tr>
-    <td colspan="3"><img src="<%= ServiceURI %>/login_images/spacer.gif" width="1"
-        height="39" alt=""></td>
-    </tr>
-
-    <tr>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>
-    <table border="0" cellspacing="0" cellpadding="10">
-        <tr>
-            <td>
-            <table border="0" cellspacing="0" cellpadding="2" class="alert-error-frame">
-            <tr>
-                <td>
-                <table cellspacing="0" cellpadding="5" border="0" class="alert-error-content">
-                <tr>
-                    <td valign="top">
-                    <img src="<%= ServiceURI %>/login_images/error_32_sunplex.gif" 
-                    width="32" height="32" border="0">
-                    </td>
-                    <td>
-                    <div class="alert-header-text">
-                    <auth:resBundle bundleName="amAuthUI" resourceKey="create.session.error" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <%@page info="Session Creation Error" language="java"%>
+    <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
+    <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
+    <jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
+        <%@ page contentType="text/html" %>
+        <head>
+            <title><jato:text name="htmlTitle_CreateSessionError" /></title>
+            <%
+            String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
+            %>
+            <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
+            <!--[if IE 9]> <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+            <!--[if lte IE 7]> <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+        </head>
+        <body>
+            <div class="container_12">
+                <div class="grid_4 suffix_8">
+                    <a class="logo" href="<%= ServiceURI%>"></a>
+                </div>
+                <div class="box box-spaced clear-float">
+                    <div class="grid_3">
+                        <div class="product-logo"></div>
                     </div>
-                    <div class="alert-normal-text">
-                    <!---- hyperlink ---->
-                    <jato:content name="ContentHref">
-                    <p><auth:href name="LoginURL"
-                        fireDisplayEvents='true'><jato:text
-                        name="txtGotoLoginAfterFail" /></auth:href></p>
-                    </jato:content>
+                    <div class="grid_9">
+                        <div class="box-content clear-float">
+                            <div class="message">
+                                <span class="icon error"></span>
+                                <h3><auth:resBundle bundleName="amAuthUI" resourceKey="create.session.error" /></h3>
+                                <jato:content name="ContentHref">
+                                    <p><auth:href name="DefaultLoginURL" fireDisplayEvents='true'><jato:text name="txtGotoLoginAfterFail" /></auth:href></p>
+                                </jato:content>
+                            </div>
+                        </div>
                     </div>
-                    </td>
-                </tr>
-                </table>
-                </td>
-            </tr>
-            </table>
-            </td>
-        </tr>
-    </table>
-    </td>
-    </tr>
-
-    <tr>
-    <td colspan="3"><img src="<%= ServiceURI %>/login_images/spacer.gif" width="1"
-        height="57" alt=""></td>
-    </tr>
-
-    <!-- copyrights -->
-    <tr>
-    <td width="110" align="right" valign="top"><img
-        src="<%= ServiceURI %>/login_images/Java.gif" width="52" height="83" 
-        alt="Sun Java System Software"></td>
-    <td><img src="<%= ServiceURI %>/login_images/spacer.gif" width="9" height="1" 
-        alt=""></td>
-    <td valign="top" class="footerText">
-        <auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" />
-    </td>
-    </tr>
-      
-</table>
-</body>
-
-</jato:useViewBean>
+                </div>
+                <div class="footer alt-color">
+                    <div class="grid_6 suffix_3">
+                        <p><auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></p>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </jato:useViewBean>
 </html>

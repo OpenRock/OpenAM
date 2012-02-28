@@ -25,7 +25,9 @@
  * $Id: auth.js,v 1.6 2008/06/25 05:44:32 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 /** makes current page occupies entire browser window */
 function occupyFullBrowser() {
@@ -36,21 +38,9 @@ function occupyFullBrowser() {
 
 /** places cursor on the first form element */
 function placeCursorOnFirstElm() {
-    var frms = document.forms;
-    var frmCount = frms.length;
-
-    for (var i = 0; i < frmCount; i++) {
-        var frm = frms[i];
-        var sz = frm.elements.length;
-
-        for (var j = 0; j < sz; j++) {
-            var elm = frm.elements[j];
-
-            if (elm.type != "hidden") {
-                elm.focus();
-                return;
-            }
-        }
+    var field = document.getElementById("IDToken1");
+    if (field) {
+       field.focus();
     }
 }
 

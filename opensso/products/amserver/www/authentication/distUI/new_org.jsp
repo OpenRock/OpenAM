@@ -25,188 +25,118 @@
    $Id: new_org.jsp,v 1.6 2008/08/15 01:05:31 veiming Exp $
                                                                                 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
-
-
-<html>
-
-<%@page info="New Org Confirmation Page" language="java"%>
-<%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
-<%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
-<jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
-
-
-<%@ page contentType="text/html" %>
-
-<head>
-<title><jato:text name="htmlTitle_NewOrg" /></title>
-
-<% 
-String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
-String encoded = "false";
-String orgValue = request.getParameter("realm");
-if ((orgValue == null) || (orgValue.length() == 0)) {
-    orgValue = request.getParameter("org");
-}
-if ((orgValue == null) || (orgValue.length() == 0)) {
-    orgValue = request.getParameter("domain");
-}
-orgValue = (String) viewBean.getEncodedInputValue(orgValue);
-String moduleValue = (String) viewBean.getEncodedInputValue(request.getParameter("module"));
-String gotoURL = (String) viewBean.getValidatedInputURL(
-    request.getParameter("goto"), request.getParameter("encoded"), request);
-if (((orgValue != null) && (orgValue.length() != 0)) ||
-    ((moduleValue != null) && (moduleValue.length() != 0)) ||
-    ((gotoURL != null) && (gotoURL.length() != 0))) {
-    encoded = "true";
-}
-%>
-
-<link rel="stylesheet" href="<%= ServiceURI %>/css/styles.css" type="text/css" />
-<script language="JavaScript" src="<%= ServiceURI %>/js/browserVersion.js"></script>
-<script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-
-<script language="javascript">
-    writeCSS('<%= ServiceURI %>');
-    function LoginSubmit(value) {
-        var frm = document.forms[0];
-        frm.elements['Login.ButtonLogin'].value = value;        
-        frm.submit();
-    }
-</script>
-<script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
-//-->
-</script>
-</head>
-
-<body class="LogBdy">
-  <auth:form name="Login" method="post"
-  defaultCommandChild='DefaultLoginURL' >
-  
-  <input name="Login.ButtonLogin"  type="hidden">
-  <table border="0" cellpadding="0" cellspacing="0" align="center" title="">
-    <tr>
-      <td width="50%"><img src="<%= ServiceURI %>/images/dot.gif" width="1" height="1" alt="" /></td>
-      <td><img src="<%= ServiceURI %>/images/dot.gif" width="728" height="1" alt="" /></td>
-      <td width="50%"><img src="<%= ServiceURI %>/images/dot.gif" width="1" height="1" alt="" /></td>
-    </tr>
-    <tr class="LogTopBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogtop.jpg); 
-    background-repeat: repeat-x; background-position: left top;">
-      <td>&nbsp;</td>
-      <td><img src="<%= ServiceURI %>/images/dot.gif" width="1" height="30" alt="" /></td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td class="LogMidBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogsides.jpg);
-        background-repeat:repeat-x;background-position:left top;">&nbsp;</td>
-      <td class="LogCntTd" style="background-image: url(<%= ServiceURI %>/images/login-backimage.jpg);
-        background-repeat:no-repeat;background-position:left top;" height="435" align="center" valign="middle">
-        <table border="0" background="<%= ServiceURI %>/images/dot.gif" cellpadding="0" cellspacing="0" 
-        width="100%" title="">
-          <tr>
-            <td width="260"><img src="<%= ServiceURI %>/images/dot.gif" width="260" height="245" alt="" /></td>
-            <td width="415" bgcolor="#ffffff" valign="top"><img name="Login.productLogo" 
-            src="<%= ServiceURI %>/images/PrimaryProductName.png" alt="<auth:resBundle bundleName="amAuthUI" resourceKey="basic_realm" />" 
-            border="0" />
-            <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-            <td colspan="2">
-            <img src="<%= ServiceURI %>/images/dot.gif" width="1" height="25" alt="" />                                
-            </td>
-            </tr>            
-            <tr>
-            <td>&nbsp;</td>
-            <td><div class="logErr"><table align="center" border="0" cellpadding="0" cellspacing="0" 
-            class="AlrtTbl" title="">
-            <tr>
-            <td valign="middle">
-            <div class="AlrtWrnTxt"> 
-            <img name="Login.AlertImage" src="<%= ServiceURI %>/images/warning_large.gif" alt="Warning" 
-            height="21" width="21" />
-            <auth:resBundle bundleName="amAuthUI" resourceKey="newOrg.agree" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <%@page info="New Org Confirmation Page" language="java"%>
+    <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
+    <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
+    <jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
+        <%@ page contentType="text/html" %>
+        <head>
+            <title><jato:text name="htmlTitle_NewOrg" /></title>
+            <%
+            String ServiceURI = (String) viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);
+            String encoded = "false";
+            String orgValue = request.getParameter("realm");
+            if ((orgValue == null) || (orgValue.length() == 0)) {
+                orgValue = request.getParameter("org");
+            }
+            if ((orgValue == null) || (orgValue.length() == 0)) {
+                orgValue = request.getParameter("domain");
+            }
+            orgValue = (String) viewBean.getEncodedInputValue(orgValue);
+            String moduleValue = (String) viewBean.getEncodedInputValue(request.getParameter("module"));
+            String gotoURL = (String) viewBean.getValidatedInputURL(
+                request.getParameter("goto"), request.getParameter("encoded"), request);
+            if (((orgValue != null) && (orgValue.length() != 0)) ||
+                ((moduleValue != null) && (moduleValue.length() != 0)) ||
+                ((gotoURL != null) && (gotoURL.length() != 0))) {
+                encoded = "true";
+            }
+            %>
+            <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
+            <!--[if IE 9]> <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+            <!--[if lte IE 7]> <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+            <script language="JavaScript" type="text/javascript">
+                <!--
+                function LoginSubmit(value) {
+                    var frm = document.forms[0];
+                    frm.elements['Login.ButtonLogin'].value = value;
+                    frm.elements['Disagree'].disabled = true;
+                    frm.elements['Agree'].disabled = true;
+                    frm.submit();
+                }
+                function LoginSubmitTitled(value) {
+                    var frm = document.forms[0];
+                    frm.elements['Login.ButtonLogin'].value = value;
+                    frm.submit();
+                }
+                -->
+            </script>
+        </head>
+        <body>
+            <div class="container_12">
+                <div class="grid_4 suffix_8">
+                    <a class="logo" href="<%= ServiceURI%>"></a>
+                </div>
+                <div class="box box-spaced clear-float">
+                    <div class="grid_3">
+                        <div class="product-logo"></div>
+                    </div>
+                    <div class="grid_9">
+                        <div class="box-content clear-float">
+                            <div class="message">
+                                <span class="icon info"></span>
+                                <h3><auth:resBundle bundleName="amAuthUI" resourceKey="newOrg.agree" /></h3>
+                            </div>
+                            <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL" >
+                                <fieldset>
+                                    <jato:content name="hasButton">
+                                        <div class="row">
+                                            <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
+                                                <input name="Login.ButtonLogin" type="button" class="button" onClick="LoginSubmitTitled('<jato:text name="txtButton" />')" value="<jato:text name="txtButton" />" />
+                                            </jato:tiledView>
+                                        </div>
+                                        <script language="javascript" type="text/javascript">
+                                        <!--
+                                        defaultBtn = '<jato:text name="defaultBtn" />';
+                                        var inputs = document.getElementsByTagName('input');
+                                        for (var i = 0; i < inputs.length; i ++) {
+                                            if (inputs[i].type == 'button' && inputs[i].value == defaultBtn) {
+                                                inputs[i].setAttribute("class", "button primary");;
+                                                break;
+                                            }
+                                        }
+                                        -->
+                                        </script>
+                                    </jato:content>
+                                    <jato:content name="hasNoButton">
+                                        <div class="row">
+                                            <input name="Login.ButtonLogin" type="hidden"/>
+                                            <input name="Agree" type="submit" class="button primary" onClick="LoginSubmit('<jato:text name="cmdYes" />')" value="<jato:text name="lblYes" />" />
+                                            <input name="Disagree" type="submit" class="button" onClick="LoginSubmit('<jato:text name="cmdNo" />')" value="<jato:text name="lblNo" />" />
+                                        </div>
+                                    </jato:content>
+                                    <input type="hidden" name="org" value="<%= orgValue %>"/>
+                                    <input type="hidden" name="module" value="<%= moduleValue %>"/>
+                                    <input type="hidden" name="goto" value="<%= gotoURL %>"/>
+                                    <input type="hidden" name="encoded" value="<%= encoded %>"/>
+                                    <input type="hidden" name="new_org" value="true"/>
+                                </fieldset>
+                            </auth:form>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer alt-color">
+                    <div class="grid_6 suffix_3">
+                        <p><auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></p>
+                    </div>
+                </div>
             </div>
-            </td></tr></table></div></td>
-            </tr>
-
-        <jato:content name="hasButton">
-        <tr>
-        <td><img src="<%= ServiceURI %>/images/dot.gif" 
-        width="1" height="15" alt="" /></td>
-        <td>
-            <table border=0 cellpadding=0 cellspacing=0>
-            <tr>
-            <jato:tiledView name="tiledButtons"
-                type="com.sun.identity.authentication.UI.ButtonTiledView">            
-                <script language="javascript">
-                    markupButton(
-                        '<jato:text name="txtButton" />',
-                        "javascript:LoginSubmit('<jato:text name="txtButton" />')");
-                </script>            
-            </jato:tiledView>        
-            </tr>
-            </table>
-        </td>
-        </tr>
-        </jato:content>
-
-    <jato:content name="hasNoButton">
-    <tr>
-        <td><img src="<%= ServiceURI %>/images/dot.gif" 
-        width="1" height="15" alt="" /></td>
-        <td>
-            <table border=0 cellpadding=0 cellspacing=0>
-            <tr>
-            <script language="javascript">
-                markupButton(
-                    "<jato:text name="lblYes" />",
-                    "javascript:LoginSubmit('<jato:text name="cmdYes" />')");
-            </script>        
-            <script language="javascript">
-                markupButton(
-                    "<jato:text name="lblNo" />",
-                    "javascript:LoginSubmit('<jato:text name="cmdNo" />')");
-             </script>
-            </tr>
-            </table>
-        </td>
-    </tr>
-    </jato:content>
-
-    <tr>
-    <td>&nbsp;</td>
-    </tr>
-    <tr>
-    <td><img src="<%= ServiceURI %>/images/dot.gif" 
-    width="1" height="33" alt="" /></td>
-    <td>&nbsp;</td>
-    </tr>
-    </table>
-    </td>
-    <td width="45"><img src="<%= ServiceURI %>/images/dot.gif" 
-    width="45" height="245" alt="" /></td>
-    </tr>
-    </table>
-    </td>
-    <td class="LogMidBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogsides.jpg);
-    background-repeat:repeat-x;background-position:left top;">&nbsp;</td>
-    </tr>
-    <tr class="LogBotBnd" style="background-image: url(<%= ServiceURI %>/images/gradlogbot.jpg);
-    background-repeat:repeat-x;background-position:left top;">
-      <td>&nbsp;</td>
-      <td><div class="logCpy"><span class="logTxtCpy">
-        <auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></span></div>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-  </table>
-<input type="hidden" name="org" value="<%= orgValue %>">
-<input type="hidden" name="module" value="<%= moduleValue %>">
-<input type="hidden" name="goto" value="<%= gotoURL %>">
-<input type="hidden" name="encoded" value="<%= encoded %>">
-<input type="hidden" name="new_org" value="true">
-</auth:form>
-</body>
-
-</jato:useViewBean>
+        </body>
+    </jato:useViewBean>
 </html>

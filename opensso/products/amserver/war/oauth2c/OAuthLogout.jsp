@@ -22,7 +22,9 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                               
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -36,8 +38,6 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
-
-
 <%
    // Internationalization stuff. You can use any internationalization framework
    String lang = request.getParameter("lang");
@@ -108,104 +108,86 @@
   System.out.println("loggedout=" + loggedout);
   
 %>
-
-<html>
-
-
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-        <link rel="stylesheet" href="<%= ServiceURI %>/css/styles.css" type="text/css" />
-        <script language="JavaScript" src="<%= ServiceURI %>/js/browserVersion.js"></script>
-        <script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-        <script language="JavaScript">
-            writeCSS('<%= ServiceURI %>');
-        </script>
-        <script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
-            //-->
-        </script>
-        <script>
-                function adios() { 
-                    window.location = "<%= gotoURL %>";
-                }
+        <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
+        <!--[if IE 9]> <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <!--[if lte IE 7]> <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <script language="JavaScript" type="text/javascript">
+            function adios() {
+                window.location = "<%= gotoURL %>";
+            }
                 
-                function logoutAll() {
-                    // Creates an iFrame to log out from the OAuth 2.0 IdP
-                    var frame = document.getElementById('frame');
-                    if (!frame){return};
-                    var logMsg = document.getElementById('logoutMsg');
-                    var main = document.getElementById('main');
-                    logMsg.style.display = '';
-                    main.style.display = 'none';
-                    var iframe = document.createElement('iframe');
-                    iframe.setAttribute('src', '<%= logoutURL %>');
-                    iframe.setAttribute('width', 0);
-                    iframe.setAttribute('height', 0);                  
-                    iframe.setAttribute('frameborder', 0);
-                    frame.innerHTML = '';
-                    iframe.onload = adios();
-                    frame.appendChild(iframe);
-                }
-      </script>
-      <script>
-                <% if (loggedout != null && loggedout.equalsIgnoreCase("logmeout")){
+            function logoutAll() {
+                // Creates an iFrame to log out from the OAuth 2.0 IdP
+                var frame = document.getElementById('frame');
+                if (!frame){return};
+                var logMsg = document.getElementById('logoutMsg');
+                var logMsgVs = document.getElementById('logoutMsgVisible');
+                var main = document.getElementById('main');
+                logMsg.style.display = '';
+                main.style.display = 'none';
+                logMsgVs.style.display = 'none';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('src', '<%= logoutURL %>');
+                iframe.setAttribute('width', 0);
+                iframe.setAttribute('height', 0);
+                iframe.setAttribute('frameborder', 0);
+                frame.innerHTML = '';
+                iframe.onload = adios();
+                frame.appendChild(iframe);
+            }
+
+            <% if (loggedout != null && loggedout.equalsIgnoreCase("logmeout")){
                    out.println("window.onload = function() {");
                    out.println("logoutAll(); }");
                 }
-                %>
-                    
-     </script>
-       <title>Logout</title>
+            %>
+        </script>
+        <title>Logout</title>
     </head>
-
     <body>
-
-
-        <div style="height: 50px; width: 100%;">
-
-        </div>
-        <center>
-            <div style="background-image:url('<%= ServiceURI%>/images/login-backimage.jpg'); background-repeat:no-repeat; 
-                 height: 435px; width: 728px; vertical-align: middle; text-align: center;">
-
-                <table>
-                    <tr height="100px"><td width="295px"></td>
-                        <td></td></tr>
-                    <tr><td width="295px"></td>
-                        <td align="left"><img src="<%= ServiceURI %>/images/PrimaryProductName.png" /></td></tr>    
-                    <tr><td width="295px"></td>
-                        <td>
-                            <div id="logoutMsg" style="display:none">
-                                <center>
-                                <p><%= loggingYouOut %></p>
-                                </center>
-                            </div>
-                            <div id="frame">
-                                <noscript>
-                                   Your browser does not support scripts.
-                                   This page needs javascript to be enabled in your browser.                  
-                                </noscript>
-                            </div>
-                            <div id="main">
-                            <form name="<%= logoutForm %>" method="POST" action="">
-                                <p><%= doYouWantToLogout %></p>       
-                                <button type="button" name="<%= loggedoutParam %>"
-                                      value="<%= logmeoutValue %>" onClick="logoutAll()"
-                                      onmousedown="logoutAll()">
-                                      <%= logmeoutValue%>
-                                </button>
-                                <button type="button" name="<%= loggedoutParam %>"
-                                      value="<%= donotValue %>" onClick="adios()" 
-                                      onmousedown="adios()" >
-                                      <%= donotValue %>
-                                </button> 
-                            </form>  
-                            </div>
-                        </td>
-                    </tr>
-
-                </table>
+        <div class="container_12">
+            <div class="grid_4 suffix_8">
+                <a class="logo" href="<%= ServiceURI%>"></a>
             </div>
-        </center>
-
+            <div class="box box-spaced clear-float">
+                <div class="grid_3">
+                    <div class="product-logo"></div>
+                </div>
+                <div class="grid_9">
+                    <div class="box-content clear-float">
+                        <div class="message">
+                            <span class="icon info"></span>
+                            <div id="logoutMsg" style="display:none">
+                                <h3><%= loggingYouOut %></h3>
+                            </div>
+                            <div id="logoutMsgVisible">
+                                <h3><%= doYouWantToLogout %></h3>
+                            </div>
+                        </div>
+                        <div id="frame">
+                            <noscript>
+                                Your browser does not support scripts.
+                                This page needs javascript to be enabled in your browser.
+                            </noscript>
+                        </div>
+                        <div id="main">
+                            <form name="<%= logoutForm %>" method="POST" action="">
+                                <input name="<%= loggedoutParam %>" type="button" class="button" onClick="adios()" onmousedown="adios()" value="<%= donotValue %>" />
+                                <input name="<%= loggedoutParam %>" type="button" class="button right" onClick="logoutAll()" onmousedown="adios()" value="<%= logmeoutValue %>" />
+                            </form>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer alt-color">
+                <div class="grid_6 suffix_3">
+                    <p><auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></p>
+                </div>
+            </div>
+        </div>
     </body>
-</html>      
+</jato:useViewBean>
+</html>
