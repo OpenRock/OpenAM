@@ -49,7 +49,7 @@ static agent_props_t agent_props = {
 boolean_t agentInitialized = B_FALSE;
 
 #define EMPTY_STRING        ""
-#define AGENT_DESCRIPTION   "Sun OpenSSO Policy Agent 3.0 for Microsoft IIS 7.0"
+#define AGENT_DESCRIPTION   "ForgeRock OpenAM Policy Agent 3.0 for Microsoft IIS 7.0"
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
 
@@ -364,6 +364,29 @@ static void send_ok(IHttpContext* pHttpContext)
 	}
 }
 
+static void send_error(IHttpContext* pHttpContext) {
+    am_web_log_debug("send_error(): sending http response error");
+    HRESULT hr;
+    IHttpResponse* pHttpResponse = pHttpContext->GetResponse();
+    pHttpResponse->Clear();
+    PCSTR pszBuffer;
+    pszBuffer = "Internal Server Error";
+    hr = pHttpResponse->SetStatus(500, "Status Internal Server Error", 0, S_OK);
+    hr = pHttpResponse->SetHeader("Content-Type", "text/plain", (USHORT) strlen("text/plain"), TRUE);
+    hr = pHttpResponse->SetHeader("Content-Length", "21", (USHORT) strlen("21"), TRUE);
+    if (FAILED(hr)) {
+        am_web_log_error("send_error(): SetHeader failed.");
+    }
+    HTTP_DATA_CHUNK dataChunk;
+    dataChunk.DataChunkType = HttpDataChunkFromMemory;
+    DWORD cbSent;
+    dataChunk.FromMemory.pBuffer = (PVOID) pszBuffer;
+    dataChunk.FromMemory.BufferLength = (USHORT) strlen(pszBuffer);
+    hr = pHttpResponse->WriteEntityChunks(&dataChunk, 1, FALSE, TRUE, &cbSent);
+    if (FAILED(hr)) {
+        am_web_log_error("send_error(): WriteEntityChunks failed.");
+    }
+}
 /*
 *This function gets invoked at every request by OnBeginRequest.
 *
@@ -637,16 +660,16 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 							(char*)response.c_str(), B_FALSE, set_cookie, 
 							set_method, agent_config);
 						if (status == AM_SUCCESS) {
-							requestURL = req_url;
-							isLocalAlloc = FALSE;
-							am_web_log_debug("%s: SSO token found in "
-								"assertion.",thisfunc);
-							redirectRequest = TRUE;
+                                                    requestURL = req_url;
+                                                    isLocalAlloc = FALSE;
+                                                    am_web_log_debug("%s: SSO token found in assertion.", thisfunc);
+                                                    redirectRequest = TRUE;
+                                                } else if (status == AM_NO_MEMORY || status == AM_FAILURE) {
+                                                    am_web_log_debug("%s: Error locating SSO token in assertion. Responding with an error page.", thisfunc);
+                                                    status = AM_FAILURE;
 						} else {
-							am_web_log_debug("%s: SSO token not found in "
-								"assertion. Redirecting to login page.",
-								thisfunc);
-							status = AM_INVALID_SESSION;
+                                                    am_web_log_debug("%s: SSO token not found in assertion. Redirecting to login page.", thisfunc);
+                                                    status = AM_INVALID_SESSION;
 						}
 						if(req_url != NULL) {
 							delete [] req_url;
@@ -871,13 +894,10 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
 		case AM_NO_MEMORY:
 		case AM_FAILURE:
 		default:
-			am_web_log_error("%s: status: %s (%d)",thisfunc,
-				am_status_to_string(status), status);
-			HRESULT hr = res->SetStatus(500,"Internal Server Error", 0, S_OK);
-			if (FAILED(hr)) {
-				am_web_log_error("%s: Cannot set status to 500 .",thisfunc);
-			}
-			break;
+		    am_web_log_error("%s: status: %s (%d)", thisfunc, am_status_to_string(status), status);
+                    send_error(pHttpContext);
+                    retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                    break;
 	}
 
 	if (requestMethod != NULL) {
