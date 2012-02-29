@@ -54,6 +54,9 @@
         $(document).keydown(function(e) {
             if (e.keyCode == 27) return false;
         });
+        window.onbeforeunload = function(){
+            return alert("Please restart server to complete the upgrade process");
+        };
 
     });
 </script>
@@ -105,7 +108,7 @@
             </fieldset>
             <div class="row">
                 <input type="submit" id="donemy" class="button disabled" value="Processing..."/>
-                <input type="submit" id="done" class="button primary" value='$page.getLocalizedString("launch.console.link")'/>
+                <input type="submit" id="done" class="button primary" value="Restart OpenAM for changes to take effect"/>
                 <input type="button" id="cancel" class="button right" value="Close" onclick="closeUpgradeConfig();"/>
             </div>
         </div>
