@@ -113,13 +113,13 @@
         }
 
         function validateUMDomainName() {
-            return validateFieldValue("$context$path?", "userStoreDomainName", "userStoreDomainNameError", {
+            return validateFieldValueAsync("$context$path?", "userStoreDomainName", "userStoreDomainNameError", {
                 actionLink: 'validateUMDomainName'
             });
         }
 
         function validateUMHost() {
-            return validateFieldValue("$context$path?", "userStoreHost", "userStoreHostError", {
+            return validateFieldValueAsync("$context$path?", "userStoreHost", "userStoreHostError", {
                 actionLink: 'validateUMHost'
             });
         }

@@ -194,8 +194,15 @@
             }
 
             function validateFieldValue(url, field, errorfield, postdata) {
+                return validateField(url, field, errorfield, postdata, false);
+            }
+
+            function validateFieldValueAsync(url, field, errorfield, postdata) {
+                return validateField(url, field, errorfield, postdata, true);
+            }
+
+            function validateField(url, field, errorfield, postdata, async) {
                 var result = false;
-                var hide = false;
                 $.ajax({
                     type: 'POST',
                     url: url,
@@ -224,10 +231,10 @@
                             result = false;
                         }
                     },
-                    async:false
+                    async: async
                 });
-                if (hide) $('#'+errorfield).hide();
                 return result;
+
             }
 
             $(function() {

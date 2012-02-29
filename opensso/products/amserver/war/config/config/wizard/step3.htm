@@ -409,7 +409,7 @@
         }
 
         function validateSMHost() {
-            return validateFieldValue("$context$path?", "configStoreHost", "configStoreHostError", {
+            return validateFieldValueAsync("$context$path?", "configStoreHost", "configStoreHostError", {
                 actionLink: 'validateSMHost'
             });
         }

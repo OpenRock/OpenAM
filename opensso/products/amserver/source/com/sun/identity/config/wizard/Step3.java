@@ -637,7 +637,7 @@ public class Step3 extends LDAPStoreWizardPage {
             ld = (ssl) ? new LDAPConnection(
                 SSLSocketFactoryManager.getSSLSocketFactory()) :
                 new LDAPConnection();
-            ld.setConnectTimeout(300);
+            ld.setConnectTimeout(5);
             ld.connect(3, host, port, bindDN, bindPwd);
 
             String filter = "cn=" + "\"" + rootSuffix + "\"";
