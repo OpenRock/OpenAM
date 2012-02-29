@@ -75,7 +75,7 @@ public abstract class TemplatedPage extends AjaxPage {
 
     public void onInit() {
 	super.onInit();
-        addModel("title", getTitle());
+        addModel("title", getLocalizedString(getTitle()));
         List sessionStatusMessages = getStatusMessageCodes();
         if (sessionStatusMessages != null && !sessionStatusMessages.isEmpty()) {
             Iterator i = sessionStatusMessages.iterator();

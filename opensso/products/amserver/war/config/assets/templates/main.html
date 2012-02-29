@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Configuration Options - OpenAM - ForgeRock</title>
+        <title>$title</title>
         <link href="$context/css/new_style.css" rel="stylesheet" type="text/css" />
         <!--[if IE 9]> <link href="$context/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
         <!--[if lte IE 7]> <link href="$context/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
@@ -173,17 +173,6 @@
                 });
             }
 
-            function upgradeCompleteDone() {
-                closeUpgradeConfig();
-                closeWizardConfig();
-                closeDefaultConfig();
-                $("#maincntr").hide();
-                $("#defaultSummaryContainer").hide();
-                $("#wizardContainer").hide();
-                $("#upgradeContainer").hide();
-                $("#upgradeComplete").show();
-            }
-
             function closeUpgradeConfig() {
                 clearVars();
                 $("#upgradeContainer").dialog("close");
@@ -243,32 +232,15 @@
 
             $(function() {
                 clearVars();
-                $("#upgradeComplete").hide();
             });
         </script>
     </head>
     <body>
-        #parse($path)
-        <div id="defaultSummaryContainer"></div>
-        <div id="wizardContainer"></div>
-        <div id="upgradeContainer"></div>
-        <div id="upgradeComplete" class="container_12">
-            <div class="grid_4 suffix_8">
-                <a class="logo" href="javascript:;"></a>
-            </div>
-            <div class="box box-spaced clear-float">
-                <div class="grid_3">
-                    <div class="product-logo"></div>
-                </div>
-                <div class="grid_9">
-                    <div class="box-content clear-float">
-                        <div class="message">
-                            <span class="icon info"></span>
-                            <h3>$page.getLocalizedString("upgrade.restart.container")</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="maincntr" class="container_12">
+            #parse($path)
+            <div id="defaultSummaryContainer"></div>
+            <div id="wizardContainer"></div>
+            <div id="upgradeContainer"></div>
             <div class="footer alt-color">
                 <div class="grid_6 suffix_3">
                     <p>$page.getLocalizedString("product.copyrights")</p>

@@ -3,9 +3,9 @@
 
         $("#ucontent").show();
         $("#done").hide();
-        $('#donemy').show();
         $('#cancel').hide();
         $("#uprogress").hide();
+        $("#prgcomplete").hide();
 
         $("#upgradeButton").click(function(){
             doUpgrade();
@@ -23,24 +23,18 @@
             $.get("$context$path?actionLink=doUpgrade",
             function( data ) {
                 if (data == 'true') {
-                    $('#donemy').hide();
                     $('#done').show();
                     $('#prgrbrtle').replaceWith('<h3 class="message no-icon">$page.getLocalizedString("upgrade.option.complete.title")</h3>');
-                    $('#prgrbr').replaceWith('<h3 class="message no-icon">$page.getLocalizedString("upgrade.option.complete.body")</h3>');
+                    $('#prgrbr').hide();
+                    $('#prgcomplete').show();
                 } else {
-                    $('#donemy').hide();
                     $('#done').hide();
-                    $('#prgrbr').replaceWith('<h3 class="message no-icon">Configuration error</h3>');
+                    $('#prgrbr').replaceWith('<h3 class="message no-icon">Unexpected error occured during upgrade</h3>');
                     $("#setupMessage").text(data);
                     $('#cancel').show();
                 }
             });
         }
-
-        $("#done").click(function(){
-            upgradeCompleteDone();
-
-        });
 
         $("#saveReportButton").click(function(){
             window.open("$context$path?actionLink=saveReport", "Download");
@@ -54,13 +48,9 @@
         $(document).keydown(function(e) {
             if (e.keyCode == 27) return false;
         });
-        window.onbeforeunload = function(){
-            return alert('$page.getLocalizedString("upgrade.restart.container")');
-        };
-
     });
 </script>
-<div id="modal" class="box clear-float">
+<div id="modal" class="box box-spaced clear-float">
     <a id="closeimg" class="close" href="javascript:;" onclick="closeUpgradeConfig();">Close</a>
     <div class="col" id="left-col">
         <ol id="steps">
@@ -71,7 +61,6 @@
         <div id="ucontent">
             <h1>$page.getLocalizedString("upgrade.main.title")</h1>
             <h3 class="message no-icon">$page.getLocalizedString("upgrade.title")</h3>
-            <p>$page.getLocalizedString("upgrade.description")</p>
             #if ($error)
             <fieldset>
                 <legend>Details</legend>
@@ -83,7 +72,7 @@
             #else
             <fieldset>
                 <legend>Details</legend>
-                <div style="margin: 10px 23px">
+                <div style="margin: 10px auto; width: 90%">
                     $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
                     $page.getLocalizedString("upgrade.new.version") $newVersion
                 </div>
@@ -106,11 +95,9 @@
                 <iframe id="progressIframe" name="progressIframe" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
                 <h4 id="setupMessage"></h4>
             </fieldset>
-            <div class="row">
-                <input type="submit" id="donemy" class="button disabled" value="Processing..."/>
-                <input type="submit" id="done" class="button primary" value='$page.getLocalizedString("upgrade.restart.container")'/>
-                <input type="button" id="cancel" class="button right" value="Close" onclick="closeUpgradeConfig();"/>
-            </div>
+            <!--p id="prgcomplete" class="message no-icon">$page.getLocalizedString("upgrade.option.complete.body")</p-->
+            <h3 id="done" class="message"><span class="icon info"></span>$page.getLocalizedString("upgrade.restart.container")</h3>
+            <input type="button" id="cancel" class="button right" value="Close" onclick="closeUpgradeConfig();"/>
         </div>
     </div>
 </div>
