@@ -52,7 +52,7 @@ public class Options extends TemplatedPage {
     private java.util.Locale configLocale = null;
     
     protected String getTitle() {
-        return isNewInstall() ? "configOptions.title" : "upgrade.title";
+        return isNewInstall() ? "configuration.options.title" : "upgrade.title";
     }
 
     public void doInit() {
