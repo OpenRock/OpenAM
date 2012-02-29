@@ -129,6 +129,27 @@
   >info@forgerock.com</link> for details.</para>
  </section>
 
+ <section xml:id="browsers-tested">
+  <title>Browsers Tested</title>
+
+  <itemizedlist>
+   <para>ForgeRock has tested many browsers with OpenAM console and end user
+   pages, including the following browsers.</para>
+   <listitem>
+    <para>Chrome and Chromium 16 and later</para>
+   </listitem>
+   <listitem>
+    <para>Firefox 3.6 and later</para>
+   </listitem>
+   <listitem>
+    <para>Internet Explorer 7 and later</para>
+   </listitem>
+   <listitem>
+    <para>Safari 5 and later</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
  <section xml:id="platform-requirements">
   <title>Platform Requirements</title>
 
