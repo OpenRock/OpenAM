@@ -25,6 +25,9 @@
 * $Id: admin.css,v 1.7 2010/01/08 22:12:05 farble1670 Exp $
 *
 */
+/**
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 * {
     margin: 0;
@@ -300,20 +303,19 @@ span.button img.left {
 }
 
 #header {
-    height: 139px;
-    background: transparent url(../image/curve.png) no-repeat;
+    height: 92px;
+    background: transparent url(../../com_sun_web_ui/images/masthead/masthead-background.jpg);
     z-index: 999;
-    position: relative;
 }
 
 #logo {
     height: 60px;
     width: 640px;
     position: absolute;
-    left: 100px;
-    top: 60px;
+    left: 40px;
+    top: 25px;
     z-index: 10;
-    background: transparent url(../image/logo.png) no-repeat;
+    background: transparent url(../../images/open-am.png) no-repeat;
 }
 
 #java-logo {
