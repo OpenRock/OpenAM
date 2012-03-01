@@ -94,91 +94,82 @@
    String passwordRules = resources.getString("passwordRules");
 %>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-        <link rel="stylesheet" href="<%= ServiceURI %>/css/styles.css" type="text/css" />
-        <script language="JavaScript" src="<%= ServiceURI %>/js/browserVersion.js"></script>
+        <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
+        <!--[if IE 9]> <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <!--[if lte IE 7]> <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
         <script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-
-        <script language="JavaScript">
-            writeCSS('<%= ServiceURI %>');
-        </script>
-        <script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
-            //-->
-        </script>
-
         <title>Password change</title>
-
-    </head>
-
-    <body>
-
         <script type="text/javascript" language="JavaScript">
             
             function validatePassword(form, token1, token2)
             {
                 // The following are just example rules for a password
                 // For the implementation you can modify them to suit your needs
-                form.output.value = "";
+                var out = document.getElementById("msgcnt");
+                
+                out.innerHTML = "";
                 if(form.elements[token1].value != '') {
                     if (form.elements[token1].value == form.elements[token2].value) {
                         if(form.elements[token1].value.length < 8) {
-                            form.output.value = "<%= errLength %>";
+                            out.innerHTML = "<%= errLength %>";
                             form.elements[token1].focus();
                             return false;
                         }
                                                         
                         var re = /[0-9]/;    // Include numbers
                         if(!re.test(form.elements[token1].value)) {
-                            form.output.value = "<%= errNumbers %>";
+                            out.innerHTML = "<%= errNumbers %>";
                             form.elements[token1].focus();
                             return false;
                         }
                         re = /[a-z]/;       // Include lowercase
                         if(!re.test(form.elements[token1].value)) {
-                            form.output.value = 
+                            out.innerHTML = 
                                 "<%= errLowercase %>";
                             form.elements[token1].focus();
                             return false;
                         }
                         re = /[A-Z]/;     // Include Uppercase
                         if(!re.test(form.elements[token1].value)) {
-                            form.output.value =  "<%= errUppercase %>";
+                            out.innerHTML =  "<%= errUppercase %>";
                             form.elements[token1].focus();
                             return false;
                         }
                         re = /^[a-zA-Z0-9.\\-\\/+=_ ]*$/   // Any of these
                         if(!re.test(form.elements[token1].value)) {
-                            form.output.value = "<%= errInvalidPass %>";
+                            out.innerHTML = "<%= errInvalidPass %>";
                             form.elements[token1].focus();
                             return false;
                         }
                     } else {
-                        form.output.value = "<%= errNoMatch %>";
+                        out.innerHTML = "<%= errNoMatch %>";
                         form.elements[token1].focus();
                         return false;
                     }
                                                     
-                    form.output.value = "<%= emptyField %>";
+                    out.innerHTML = "<%= emptyField %>";
                     return true;
                 } else {
                     form.elements[token1].focus();
-                    form.output.value = "<%= errEmptyPass %>";
+                    out.innerHTML = "<%= errEmptyPass %>";
                     return false;
                 }
                                                 
-           }               
+            }               
              
             function validateTerms(form, terms)
             {
-                form.output.value = '';
+                var out = document.getElementById("msgcnt");
+                out.innerHTML = '';
                 if(form.elements[terms].checked == true) {
                     return true;
                 } 
 
                 form.elements[terms].focus();
-                form.output.value = "<%= errTandC %>";
+                out.innerHTML = "<%= errTandC %>";
                 return false;
 
             }
@@ -194,22 +185,19 @@
             }
             
             function adios() { 
-                    window.location = "<%= logoutURL %>";
+                window.location = "<%= logoutURL %>";
             }
             
             function validateNow(form, token1, token2, terms, login) {
                 if (validatePassword(form, token1, token2)) {
-                   if (validateTerms(form, terms)) {
-                       if (validateButton(form, login)){
-                         return true;
-                       }
-                   }
+                    if (validateTerms(form, terms)) {
+                        if (validateButton(form, login)){
+                            return true;
+                        }
+                    }
                 }
                 return false;
             }
-            
-        </script>
-        <script type="text/javascript">
             
             function newPopup(url) {
                 popupWindow = window.open(
@@ -217,95 +205,64 @@
 resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
             }
             
-        </script> 
-        <script type="text/javascript" language="JavaScript">
-
-              function toggleWdw(att)
-              {   var wdw=document.getElementById(att);
-                  if (wdw.style.display == "none") {
-                      wdw.style.display="block";
-                  } else {
-                      wdw.style.display="none";
-                  }
-              }
+            function toggleWdw(att)
+            {   var wdw=document.getElementById(att);
+                if (wdw.style.display == "none") {
+                    wdw.style.display="block";
+                } else {
+                    wdw.style.display="none";
+                }
+            }
 
             function closeWindow(att){
                 var wdw=document.getElementById(att);
                 wdw.style.display="none";
             }
-    </script>
-
-        <div style="height: 50px; width: 100%;">
-
-        </div>
-        <center>
-            <div style="background-image:url('<%= ServiceURI%>/images/login-backimage.jpg'); 
-                 background-repeat:no-repeat;  height: 435px; width: 728px; 
-                 vertical-align: middle; text-align: center;">
-                <table>
-
-                    <form name="<%= settingForm %>" method="POST" action="<%= emptyField %>" 
-                          onSubmit="return validateNow(this, '<%= token1 %>', 
-                              '<%= token2 %>','<%= terms %>','<%= button1 %>')">
-                        <tr height="100px"><td width="295px"></td><td></td></tr>
-                        <tr><td width="295px"></td>
-                            <td align="left"><img src="<%= ServiceURI %>/images/PrimaryProductName.png" /></td>
-                        </tr>    
-                        <tr><td width="295px"></td>
-                            <td>
-                                <p><%= passwordSetMsg %>
-                                    <a href="javascript:toggleWdw('rules');">
-                                       <img src="<%= ServiceURI%>/images/info_large.gif" 
-                                         alt="information" height="12" width="12" border="none">
-                                    </a></p>
-                                    <div id="rules" style="display:none; width: 80%;">
-                                                <div style="background-color: #EAEAEA; text-align: left">
-                                                    <%= passwordRules %>
-                                                </div>
-                                   </div>
-                                <table align="center" border="0" cellpadding="2" cellspacing="2" >
-
-                                    <tr><td>
-                                            <label for="<%= token1 %>" ><%= newPassLabel %></label>
-                                        </td>
-                                        <td>
-                                            <input type="password" size="15" name="<%= token1 %>">
-                                        </td>
-                                    </tr>
-                                    <tr><td>
-                                            <label for="<%= token2 %>"><%= confirmPassLabel %></label>
-                                        </td>
-                                        <td>
-                                            <input type="password" size="15" name="<%= token2 %>">
-                                        </td>
-                                    </tr>
-                                    <tr><td colspan="2">
-                                            <p>
-                                                <input type="checkbox" name="<%= terms %>" 
-                                                       value="<%= accept%>">
-                                                I accept <a href="JavaScript:newPopup('<%= termsAndConditionsPage %>');">
-                                                    <%= termsAndCondsLabel %></a> <br>
-                                            </p>
-                                            <br />
-                                            <input type="submit" name="<%= button1 %>" 
-                                                   value="<%= submitValue %>" >
-                                            <input type="submit" name="<%= button1 %>"
-                                                   value="<%= cancelValue %>" onClick="adios()">
-                                        </td>
-                                    </tr>
-                                </table>
-
-                            </td>
-                        </tr>
-                        <tr><td width="295px"></td><td align="center">
-                                <input type="text" name="<%= outputField %>" 
-                                       style="border: 0; font-family: verdana; color: blue; text-align: center;" 
-                                       value="<%= emptyField %>" size="60" readonly>
-                            </td>
-                        </tr>
-                    </form>  
-                </table>
+        </script>
+    </head>
+    <body>
+        <div class="container_12">
+            <div class="grid_4 suffix_8">
+                <a class="logo" href="<%= ServiceURI%>"></a>
             </div>
-        </center>
+            <div class="box clear-float">
+                <div class="grid_3">
+                    <div class="product-logo"></div>
+                </div>
+                <div class="grid_9 left-seperator">
+                    <div class="box-content clear-float">
+                        <h1>Password change</h1>
+                        <p class="message"><a href="javascript:toggleWdw('rules');"><span class="icon info"></a></span><span id="msgcnt"><%= passwordSetMsg %></span>
+                            <span id="rules" style="display:none; text-align: left; font-weight:400;"><%= passwordRules %></span></p>
+                        <form name="<%= settingForm %>" method="POST" action="<%= emptyField %>" 
+                              onSubmit="return validateNow(this, '<%= token1 %>', 
+                                  '<%= token2 %>','<%= terms %>','<%= button1 %>')">
+                            <fieldset>
+                                <div class="row"><label for="<%= token1 %>"><%= newPassLabel %></label><input class="textbox" type="password" id="<%= token1 %>" name="<%= token1 %>"/></div>
+                                <div class="row"><label for="<%= token2 %>"><%= confirmPassLabel %></label><input class="textbox" type="password" id="<%= token2 %>" name="<%= token2 %>"/></div>
+                                <div class="row">
+                                    <label>Terms</label>
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="<%= terms %>" value="<%= accept%>" name="<%= terms %>"/><label for="<%= terms %>">I accept <a href="JavaScript:newPopup('<%= termsAndConditionsPage %>');"><%= termsAndCondsLabel %></a></label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= button1 %>"/>
+                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= button1 %>" onClick="adios()"/>
+                                </div>
+                            </fieldset>
+                        </form> 
+                    </div>
+                </div>
+            </div>
+            <div class="footer alt-color">
+                <div class="grid_3">
+                    <p>Copyright &copy; 2010 ForgeRock AS,<br />Philip Pedersens vei 1,<br />1366 Lysaker,<br />Norway.<br />All rights reserved.</p>
+                </div>
+                <div class="grid_6 suffix_3">
+                    <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

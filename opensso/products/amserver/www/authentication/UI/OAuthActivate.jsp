@@ -83,109 +83,78 @@
    String emptyField = ESAPI.encoder().encodeForHTML(""); 
 %>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-        <link rel="stylesheet" href="<%= ServiceURI %>/css/styles.css" type="text/css" />
-        <script language="JavaScript" src="<%= ServiceURI %>/js/browserVersion.js"></script>
+        <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
+        <!--[if IE 9]> <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <!--[if lte IE 7]> <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
         <script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-
-        <script language="JavaScript">
-            writeCSS('<%= ServiceURI %>');
-        </script>
-        
-        <script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
-            //-->
-        </script>
-        
         <script language="JavaScript">
             
-        function validateEntry(form, activation, submit) {
-            form.output.value = "";
-            if(form.elements[submit].value == '<%= cancelValue %>') {
+            function validateEntry(form, activation, submit) {
+                var out = document.getElementById("msgcnt");
+                out.innerHTML = "";
+                if(form.elements[submit].value == '<%= cancelValue %>') {
                     return false;
+                }
+                if(form.elements[activation].value == '') {
+                    out.innerHTML = "<%= emptyCode %>";
+                    form.elements[activation].focus();
+                    return false;
+                }
+                var re = /^[a-zA-Z0-9.\\-\\/+=_ ]*$/
+                if(!re.test(form.elements[activation].value)) {
+                    out.innerHTML = "<%= errInvalidCode %>";
+                    form.elements[activation].focus();
+                    return false;
+                }
+                out.innerHTML = "<%= ESAPI.encoder().encodeForHTML("") %>";
+                return true;
             }
-            if(form.elements[activation].value == '') {
-                form.output.value = "<%= emptyCode %>";
-                form.elements[activation].focus();
-                return false;
-            }
-            var re = /^[a-zA-Z0-9.\\-\\/+=_ ]*$/
-            if(!re.test(form.elements[activation].value)) {
-                form.output.value = "<%= errInvalidCode %>";
-                form.elements[token1].focus();
-                return false;
-           }
-           form.output.value = "<%= ESAPI.encoder().encodeForHTML("") %>";
-           return true;
-        }
         
-        function adios() { 
-             window.location = "<%= logoutURL %>";
-        }
+            function adios() { 
+                window.location = "<%= logoutURL %>";
+            }
         
         </script>
-        
         <title><%= activationTitle %></title>
-
     </head>
-
     <body>
-            <div style="height: 50px; width: 100%;">
-                
-        </div>
-        <center>
-            <div style="background-image:url('<%= ServiceURI%>/images/login-backimage.jpg'); 
-                 background-repeat:no-repeat; height: 435px; width: 728px; 
-                 vertical-align: middle; text-align: center;" >
-                <table>
-                    <form name="Login" method="POST" action="<%= emptyField %>" 
-                          onSubmit="return validateEntry(this,'<%= activation %>' , 
-                              '<%= submitButton %>');" >
-
-                        <tr height="100px"><td width="295px"></td><td></td></tr>
-                        <tr><td width="295px"></td>                          
-                            <td align="left">
-                                <img src="<%= ServiceURI %>/images/PrimaryProductName.png" />
-                            </td>
-                        </tr>    
-                        <tr><td width="295px"></td>
-                            <td>
-                                <p><%= activationCodeMsg %>
-                                </p>
-                                <table align="center" border="0" cellpadding="2" cellspacing="2" >
-                                    
-                                    <tr><td>
-                                            <label for="<%= activation %>" >
-                                                <%=activationLabel%>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <input type="text" size="30" 
-                                                   name="<%= activation %>">
-                                        </td>
-                                    </tr>
-                                    <tr><td colspan="2">
-                                            <input type="submit" name="<%= submitButton %>" 
-                                                   value="<%= submitValue %>" >
-                                            <input type="submit" name="<%= submitButton %>"
-                                                   value="<%= cancelValue %>" onClick="adios()">
-                                        </td>                                
-                                    </tr>                                 
-
-                                </table>
-                            </td>
-                        </tr>
-                        <tr><td width="295px"></td>
-                            <td align="center">
-                                <input type="text" name="<%= outputField %>" 
-                                       style="border: 0; font-family: verdana; color: blue; text-align: center;" 
-                                       value="<%= emptyField %>" size="60" readonly>
-                            </td>
-                        </tr>
-                    </form>   
-                </table>
+        <div class="container_12">
+            <div class="grid_4 suffix_8">
+                <a class="logo" href="<%= ServiceURI%>"></a>
             </div>
-        </center>
+            <div class="box clear-float">
+                <div class="grid_3">
+                    <div class="product-logo"></div>
+                </div>
+                <div class="grid_9 left-seperator">
+                    <div class="box-content clear-float">
+                        <h1>Activation Code</h1>
+                        <p class="message"><span class="icon info"></span><span id="msgcnt"><%= activationCodeMsg %></span></p>
+                        <form name="Login" method="POST" action="<%= emptyField %>" 
+                              onSubmit="return validateEntry(this,'<%= activation %>' , 
+                                  '<%= submitButton %>');" >
+                            <fieldset>
+                                <div class="row"><label for="<%= activation %>"><%=activationLabel%></label><input class="textbox" type="text" id="<%= activation %>" name="<%= activation %>"/></div>
+                                <div class="row">
+                                    <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= submitButton %>"/>
+                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>" onClick="adios()"/>
+                                </div>
+                            </fieldset>
+                        </form> 
+                    </div>
+                </div>
+            </div>
+            <div class="footer alt-color">
+                <div class="grid_3">
+                    <p>Copyright &copy; 2010 ForgeRock AS,<br />Philip Pedersens vei 1,<br />1366 Lysaker,<br />Norway.<br />All rights reserved.</p>
+                </div>
+                <div class="grid_6 suffix_3">
+                    <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
