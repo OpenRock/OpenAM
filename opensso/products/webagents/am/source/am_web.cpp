@@ -1433,7 +1433,7 @@ am_web_get_token_from_assertion(char * enc_assertion,
         tmp2 = tmp1 + 1;
         if (*tmp2 == NULL) {
 	    am_web_log_error("Empty LARES parameter received");
-	    status = AM_FAILURE;
+	    status = AM_NO_MEMORY;
 	    return status;
 	}
         decode_base64(tmp2, tmp1);

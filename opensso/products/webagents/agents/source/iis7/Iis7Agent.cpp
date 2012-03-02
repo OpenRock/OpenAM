@@ -670,7 +670,7 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                                                     isLocalAlloc = FALSE;
                                                     am_web_log_debug("%s: SSO token found in assertion.", thisfunc);
                                                     redirectRequest = TRUE;
-                                                } else if (status == AM_NO_MEMORY || status == AM_FAILURE) {
+                                                } else if (status == AM_NO_MEMORY) {
                                                     am_web_log_debug("%s: Error locating SSO token in assertion. Responding with an error page.", thisfunc);
                                                     status = AM_FAILURE;
 						} else {
