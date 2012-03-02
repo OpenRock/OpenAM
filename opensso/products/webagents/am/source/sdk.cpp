@@ -303,7 +303,7 @@ int sdk::utils::validate_agent_credentials(url *u, const char *aname, const char
         goto exit;
     }
 
-    if ((prStatus = PR_Connect(sslSocket, &addr, PR_INTERVAL_NO_TIMEOUT)) != PR_SUCCESS) {
+    if ((prStatus = PR_Connect(sslSocket, &addr, PR_SecondsToInterval(2))) != PR_SUCCESS) {
         ret = PR_GetError();
         goto exit;
     }
