@@ -37,6 +37,7 @@
 const char REDIRECT_TEMPLATE[] = {
     "Location: %s\r\n"
     "Content-Length: 0\r\n"
+    "Content-Type: text/html\r\n"        
     "\r\n"
 };
 
@@ -44,6 +45,7 @@ const char REDIRECT_COOKIE_TEMPLATE[] = {
     "Location: %s\r\n"
     "%s"
     "Content-Length: 0\r\n"
+    "Content-Type: text/html\r\n"
     "\r\n"
 };
 
