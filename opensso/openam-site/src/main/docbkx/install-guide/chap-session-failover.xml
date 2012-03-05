@@ -159,13 +159,20 @@ User openamuser successfully added.</screen>
   </step>
   <step>
    <para>Create a password file for the session failover service.</para>
-   <screen>$ cd sfoscripts/bin/
+   <screen>$ cd ../../../sfoscripts/bin/
 $ ./amsfopassword --encrypt secret12 --passwordfile /home/user/openam/mqpwd.txt
 os.name=Linux
 SUCCESSFUL</screen>
   </step>
   <step>
    <para>Stop the broker you started on port 7777.</para>
+   <screen>$ fg
+./imqbrokerd -name aminstance -port 7777 (wd: ~/openam/jmq/imq/bin)
+^C
+[05/Mar/2012:08:35:22 CET] [B1047]: Shutting down broker...
+[05/Mar/2012:08:35:22 CET] [B1077]: Broadcast good-bye to all connections ...
+[05/Mar/2012:08:35:22 CET] [B1078]: Flushing good-bye messages ...
+[05/Mar/2012:08:35:23 CET] [B1048]: Shutdown of broker complete.</screen>
   </step>
   <step>
    <para>Configure the session failover service for the site.</para>
