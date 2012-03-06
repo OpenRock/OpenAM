@@ -38,6 +38,7 @@ import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.federation.common.FSException;
@@ -69,7 +70,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.sm.SMSEntry;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -339,10 +343,40 @@ public class CDCServlet extends HttpServlet {
          */
         SSOToken token = getSSOToken(request, response);
 
-        String policyAdviceList = checkForPolicyAdvice(request, response);
+        String policyAdviceList = checkForPolicyAdvice(token, request, response);
         if ((token == null) || (policyAdviceList != null)) {
             redirectForAuthentication(request, response, policyAdviceList);
         } else {
+        	//ok, the token is valid check if cookie is already set for this platform server
+        	//if the CDCServlet was accessed with valid token, but the cookie is not set
+            //then set it to browser before redirecting
+            String cookieName = AuthClientUtils.getCookieName();
+            Cookie ssoCookie = CookieUtils.getCookieFromReq(request, cookieName);
+            if (ssoCookie == null) {
+                try {
+                    String cookieValue = token.getTokenID().toString();
+                    if (cookieName != null && cookieName.length() != 0) {
+                        Set domains = AuthClientUtils.getCookieDomainsForReq(request);
+                        if (!domains.isEmpty()) {
+                            for (Iterator it = domains.iterator(); it.hasNext(); ) {
+                                String domain = (String)it.next();
+                                Cookie cookie = CookieUtils.newCookie(cookieName, 
+                                        cookieValue,"/", domain);
+                                CookieUtils.addCookieToResponse(response, cookie);
+                            }
+                        } else {
+                            Cookie cookie = CookieUtils.newCookie(cookieName, 
+                                    cookieValue,"/", null);
+                            CookieUtils.addCookieToResponse(response, cookie);
+                        }
+                    }
+                } catch (Exception e) {
+                    if (debug.messageEnabled()) {
+                        debug.message("Error creating cookie. : " + e.getMessage());
+                    }
+                }
+            }
+
             redirectWithAuthNResponse(request, response, token);
         }
     }
@@ -488,6 +522,7 @@ public class CDCServlet extends HttpServlet {
      * Returns policy advices
      */
     private String checkForPolicyAdvice(
+        SSOToken token,
         HttpServletRequest request,
         HttpServletResponse response
     ) {
@@ -495,7 +530,36 @@ public class CDCServlet extends HttpServlet {
         
         for (Enumeration e = request.getParameterNames(); e.hasMoreElements();){
             String paramName = (String)e.nextElement();
+            
+            // this is to workaround cross domain SSO scenario where user 
+            // has logged in against openAM server, but not with PA in different domain
+            // we will assume we don't need to re-authenticate user if it's not session
+            // upgrade
             if (adviceParams.contains(paramName)) {
+                if (token != null) {
+            	    if (paramName.equals("realm") && request.getParameter("sunamcompositeadvice") == null) {
+                        try {
+                            String orgDN = token.getProperty("Organization");
+                        if (orgDN !=null ) {
+                                String tokenRealm = LDAPDN.explodeDN(orgDN, false)[0];
+                                if (tokenRealm.equalsIgnoreCase(SMSEntry.getRootSuffix())) {
+                                    tokenRealm = "/";
+                                } else {
+                                    int orgIndex = tokenRealm.indexOf(SMSEntry.ORGANIZATION_RDN + SMSEntry.EQUALS);
+                                    tokenRealm = tokenRealm.substring(orgIndex+2, tokenRealm.length());
+                                }
+                                String requestRealm = request.getParameter(paramName);
+                                if (tokenRealm.equalsIgnoreCase(requestRealm)) {
+                                    //if realm for user session is the same as the one from request,
+                                    //then it's not session upgrade and therefore no re-auth necessary
+                                    return null;
+                                }
+                            }
+                        } catch (SSOException ssoe) {
+                            debug.error("CDCServlet.checkForPolicyAdvice: Failed to get realm info. ", ssoe);
+                        }
+                    }
+                }
                 if (adviceList == null) {
                     adviceList = new StringBuilder();
                 } else {
