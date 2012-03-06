@@ -82,8 +82,12 @@ void sdk::utils::url::parse(const std::string& url_s) {
     const std::string prot_end("://");
     std::string::const_iterator prot_i = std::search(url_s.begin(), url_s.end(),
             prot_end.begin(), prot_end.end());
-    if (prot_i == url_s.end())
+    if (prot_i == url_s.end()) {
+#ifdef _MSC_VER
+        WSACleanup();
+#endif
         return;
+    }
     protocol_.reserve(std::distance(url_s.begin(), prot_i));
     std::transform(url_s.begin(), prot_i,
             std::back_inserter(protocol_),
@@ -111,6 +115,9 @@ void sdk::utils::url::parse(const std::string& url_s) {
     //validate host value
     if (inet_addr(host_.c_str()) == INADDR_NONE && gethostbyname(host_.c_str()) == NULL) {
         host_.clear();
+#ifdef _MSC_VER
+        WSACleanup();
+#endif
         return;
     }
 
@@ -132,6 +139,9 @@ void sdk::utils::url::parse(const std::string& url_s) {
             domain_.assign(host_.substr(lstp));
         }
     }
+#ifdef _MSC_VER
+    WSACleanup();
+#endif
 }
 
 std::string sdk::utils::format(const char *fmt, ...) {

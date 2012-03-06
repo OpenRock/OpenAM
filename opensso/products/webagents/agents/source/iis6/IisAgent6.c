@@ -88,6 +88,7 @@ CHAR httpServerError[]          = "500 Internal Server Error";
 DWORD http200                   = 200;
 DWORD http302                   = 302;
 DWORD http500                   = 500;
+DWORD http403                   = 403;
 DWORD http404                   = 404;
 
 const CHAR httpProtocol[]       = "http";
@@ -133,24 +134,12 @@ typedef struct OphResources {
 #define RESOURCE_INITIALIZER \
     { NULL, 0, AM_POLICY_RESULT_INITIALIZER }
 
-
-BOOL WINAPI GetExtensionVersion(HSE_VERSION_INFO * pVer)
-{
-   HMODULE      nsprHandle = NULL;
-
-   // Initialize NSPR library
-   PR_Init(PR_SYSTEM_THREAD, PR_PRIORITY_NORMAL, 0);
-   nsprHandle = LoadLibrary("libnspr4.dll");
-
-
-   pVer->dwExtensionVersion = MAKELONG(0, 1);   // Version 1.0
-
-   // A brief one line description of the ISAPI extension
-   strncpy(pVer->lpszExtensionDesc, agentDescription, HSE_MAX_EXT_DLL_NAME_LEN);
-
-   InitializeCriticalSection(&initLock);
-
-   return TRUE;
+BOOL WINAPI GetExtensionVersion(HSE_VERSION_INFO * pVer) {
+    pVer->dwExtensionVersion = MAKELONG(0, 1); // Version 1.0
+    // A brief one line description of the ISAPI extension
+    strncpy(pVer->lpszExtensionDesc, agentDescription, HSE_MAX_EXT_DLL_NAME_LEN);
+    InitializeCriticalSection(&initLock);
+    return TRUE;
 }
 
 BOOL loadAgentPropertyFile(EXTENSION_CONTROL_BLOCK *pECB)
@@ -388,7 +377,22 @@ DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB)
     const char *thisfunc = "send_error()";
     const char *data = INTERNAL_SERVER_ERROR_MSG;
     size_t data_len = sizeof(INTERNAL_SERVER_ERROR_MSG) - 1;
-    pECB->dwHttpStatusCode = http200;
+    pECB->dwHttpStatusCode = http500;
+    if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
+                     (LPDWORD)&data_len, (DWORD) 0))==FALSE)
+    {
+        am_web_log_error("%s: WriteClient did not succeed: "
+                     "Attempted message = %s ", thisfunc, data);
+    }
+    return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
+}
+
+DWORD do_deny(EXTENSION_CONTROL_BLOCK *pECB) 
+{
+    const char *thisfunc = "do_deny()";
+    const char *data = FORBIDDEN_MSG;
+    size_t data_len = sizeof(FORBIDDEN_MSG) - 1;
+    pECB->dwHttpStatusCode = http403;
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
                      (LPDWORD)&data_len, (DWORD) 0))==FALSE)
     {
@@ -1773,7 +1777,11 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     if (readAgentConfigFile == FALSE) {
         EnterCriticalSection(&initLock);
         if (readAgentConfigFile == FALSE) {
-            loadAgentPropertyFile(pECB);
+            if (loadAgentPropertyFile(pECB) == FALSE) {
+                LeaveCriticalSection(&initLock);
+                am_web_log_error("%s: Agent init failed.", thisfunc);
+                return do_deny(pECB);
+            }
             readAgentConfigFile = TRUE;
         }
         LeaveCriticalSection(&initLock);
