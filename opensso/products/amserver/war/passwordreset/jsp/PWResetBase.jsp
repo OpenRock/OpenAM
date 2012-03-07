@@ -25,9 +25,10 @@
    $Id: PWResetBase.jsp,v 1.6 2008/08/19 19:09:38 veiming Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock AS
+--%>
 <% 
-    String passwordUrl = "../password";
-    String passwordImages = passwordUrl + "/images"; 
-    String productName = "OpenSSO";
+    String ServiceURI = "../";
+    String productName = "OpenAM";
 %>
