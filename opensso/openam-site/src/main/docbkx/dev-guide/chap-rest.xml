@@ -379,7 +379,7 @@ $ curl "https://openam.example.com:8080/openam/identity/create?
   </section>
   
   <section xml:id="rest-api-read">
-   <title>Reading &amp; Searching for Identies</title>
+   <title>Reading &amp; Searching for Identities</title>
    
    <para>Reading is similar to attribute retrieval, as described in
    <xref linkend="rest-api-tokens" />, but obtained using the token of
@@ -475,7 +475,7 @@ string=bjensen</screen>
   </section>
   
   <section xml:id="rest-api-update">
-   <title>Updating Identies</title>
+   <title>Updating Identities</title>
    
    <para>You can update an identity with the same parameters used to create
    identities, provided the token corresponds to a user with access to
@@ -491,7 +491,7 @@ string=bjensen</screen>
   </section>
   
   <section xml:id="rest-api-delete">
-   <title>Deleting Identies</title>
+   <title>Deleting Identities</title>
    
    <para>You can also delete an identity.</para>
    
