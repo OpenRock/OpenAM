@@ -15,10 +15,10 @@
         function isValid() {
             if ($.amconfig.user_store_local == false) {
                 if ($.amconfig.ustore_type == 'LDAPv3ForADDC') {
-                    if (!validateUserStoreDomainName() || !validateADUserStoreLoginId() || !validateADUserStorePassword() || !validateUMDomainName()) return false;
+                    if (!validateUserStoreDomainName() || !validateADUserStoreLoginId() || !validateADUserStorePassword() || !validateUMDomainName(false)) return false;
                 } else {
                     if (!validateUserStoreSSL() || !validateUserStoreHost() || !validateUserStorePort()
-                        || !validateUserStoreRootSuffix() || !validateUserStoreLoginId() || !validateUserStorePassword() || !validateUMHost()) return false;
+                        || !validateUserStoreRootSuffix() || !validateUserStoreLoginId() || !validateUserStorePassword() || !validateUMHost(false)) return false;
                 }
             }
             return true;
@@ -29,11 +29,11 @@
                 if ($.amconfig.user_store_local === false) {
                     if ($.amconfig.ustore_type === 'LDAPv3ForADDC') {
                         if ($('#userStoreDomainName').val() && $('#ADuserStoreLoginId').val() && $('#ADuserStorePassword').val()) {
-                            validateUMDomainName();
+                            validateUMDomainName(true);
                         }
                     } else {
                         if ($('#userStoreHost').val() && $('#userStorePort').val() && $('#userStoreRootSuffix').val() && $('#userStoreLoginId').val() && $('#userStorePassword').val()) {
-                            validateUMHost();
+                            validateUMHost(true);
                         }
                     }
                 }
@@ -112,16 +112,16 @@
             });
         }
 
-        function validateUMDomainName() {
-            return validateFieldValueAsync("$context$path?", "userStoreDomainName", "userStoreDomainNameError", {
+        function validateUMDomainName(async) {
+            return validateField("$context$path?", "userStoreDomainName", "userStoreDomainNameError", {
                 actionLink: 'validateUMDomainName'
-            });
+            }, async);
         }
 
-        function validateUMHost() {
-            return validateFieldValueAsync("$context$path?", "userStoreHost", "userStoreHostError", {
+        function validateUMHost(async) {
+            return validateField("$context$path?", "userStoreHost", "userStoreHostError", {
                 actionLink: 'validateUMHost'
-            });
+            }, async);
         }
 
         if ($.amconfig.user_store_local) {

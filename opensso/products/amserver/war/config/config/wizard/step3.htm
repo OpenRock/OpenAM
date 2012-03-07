@@ -58,7 +58,7 @@
             if (validator()) {
                 if (!$.amconfig.add_to_existing && !$.amconfig.config_store_local) {
                     if ($('#configStoreHost').val() && $('#configStorePort').val() && $('#configStoreLoginId').val() && $('#configStorePassword').val() && $('#rootSuffix').val()) {
-                        validateSMHost();
+                        validateSMHost(true);
                     }
                 }
             }
@@ -183,7 +183,7 @@
                         return false;
                     }
                 } else {
-                    if (!validateConfigStoreHost() || !validatePort() || !validateEncKey() || !validateConfigStoreLoginId() || !validateConfigStorePassword() || !validateConfigStoreSSL() || !validateRootSuffix() || !validateSMHost()) {
+                    if (!validateConfigStoreHost() || !validatePort() || !validateEncKey() || !validateConfigStoreLoginId() || !validateConfigStorePassword() || !validateConfigStoreSSL() || !validateRootSuffix() || !validateSMHost(false)) {
                         return false;
                     }
                 }
@@ -408,10 +408,10 @@
             });
         }
 
-        function validateSMHost() {
-            return validateFieldValueAsync("$context$path?", "configStoreHost", "configStoreHostError", {
-                actionLink: 'validateSMHost'
-            });
+        function validateSMHost(async) {
+             return validateField("$context$path?", "configStoreHost", "configStoreHostError", {
+                 actionLink: 'validateSMHost'
+             }, async);
         }
 
         isValid();
