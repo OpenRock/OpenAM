@@ -1,0 +1,374 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock AS. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ * $Id$
+ */
+package org.forgerock.restlet.ext.oauth2.flow;
+
+import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.restlet.ext.oauth2.model.Client;
+import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
+import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
+import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
+import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Reference;
+import org.restlet.data.Status;
+import org.restlet.ext.freemarker.TemplateRepresentation;
+import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
+import org.restlet.routing.Redirector;
+import org.restlet.security.User;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author $author$
+ * @version $Revision$ $Date$
+ */
+public abstract class AbstractFlow extends ServerResource {
+
+    protected OAuth2.EndpointType endpointType;
+    protected OAuth2Client client = null;
+    protected User resourceOwner = null;
+    protected SessionClient sessionClient = null;
+
+    private ClientVerifier clientVerifier = null;
+
+
+    public ClientVerifier getClientVerifier() throws OAuthProblemException {
+        if (null == clientVerifier) {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "ClientVerifier is not initialised");
+        }
+        return clientVerifier;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void init(Context context, Request request, Response response) {
+        super.doInit();
+        Object o = context.getAttributes().get(ClientVerifier.class.getName());
+        if (o instanceof ClientVerifier) {
+            clientVerifier = (ClientVerifier) o;
+        }
+    }
+
+
+    /**
+     * Handles a call by first verifying the optional request conditions and
+     * continue the processing if possible. Note that in order to evaluate those
+     * conditions, {@link #getInfo()} or {@link #getInfo(org.restlet.representation.Variant)} methods might
+     * be invoked.
+     *
+     * @return The response entity.
+     * @throws ResourceException
+     */
+    protected Representation doConditionalHandle() throws ResourceException {
+        validateMethod();
+        validateContentType();
+        validateRequiredParameters();
+        validateOptionalParameters();
+        validateNotAllowedParameters();
+        return super.doConditionalHandle();
+    }
+
+
+    /**
+     * Effectively handles a call without content negotiation of the response
+     * entity. The default behavior is to dispatch the call to one of the
+     * {@link #get()}, {@link #post(org.restlet.representation.Representation)},
+     * {@link #put(org.restlet.representation.Representation)}, {@link #delete()}, {@link #head()} or
+     * {@link #options()} methods.
+     *
+     * @return The response entity.
+     * @throws org.restlet.resource.ResourceException
+     *
+     */
+    protected Representation doHandle() throws ResourceException {
+        validateMethod();
+        validateContentType();
+        validateRequiredParameters();
+        validateOptionalParameters();
+        validateNotAllowedParameters();
+        return super.doHandle();
+    }
+
+    public void setEndpointType(OAuth2.EndpointType endpointType) {
+        this.endpointType = endpointType;
+    }
+
+    /**
+     * Invoked when an error or an exception is caught during initialization,
+     * handling or releasing. By default, updates the responses's status with
+     * the result of
+     * {@link org.restlet.service.StatusService#getStatus(Throwable, org.restlet.resource.Resource)}
+     * .
+     *
+     * @param throwable The caught error or exception.
+     */
+    @Override
+    protected void doCatch(Throwable throwable) {
+        if (throwable instanceof OAuthProblemException) {
+            OAuthProblemException exception = (OAuthProblemException) throwable;
+            getResponse().setStatus(exception.getStatus());
+
+            switch (endpointType) {
+                case TOKEN_ENDPOINT: {
+                    getResponse().setEntity(new JacksonRepresentation<Map>(exception.getErrorMessage()));
+                    break;
+                }
+                case AUTHORIZATION_ENDPOINT: {
+                    if (this instanceof AuthorizationCodeServerResource) {
+                        Redirector dispatcher = OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(), exception);
+                        if (null != dispatcher) {
+                            dispatcher.handle(getRequest(), getResponse());
+                        } else {
+                            //TODO Introduce new method
+                            Representation result = getPage("error.html", exception.getErrorMessage());
+                            if (null != result) {
+                                getResponse().setEntity(result);
+                            }
+                        }
+                        break;
+                    } else if (this instanceof ImplicitGrantServerResource) {
+                        Redirector dispatcher = OAuth2Utils.ParameterLocation.HTTP_FRAGMENT.getRedirector(getContext(), exception);
+                        if (null != dispatcher) {
+                            dispatcher.handle(getRequest(), getResponse());
+                        } else {
+                            //TODO Introduce new method
+                            Representation result = getPage("error.html", exception.getErrorMessage());
+                            if (null != result) {
+                                getResponse().setEntity(result);
+                            }
+                        }
+                        break;
+                    }
+                }
+                default: {
+                    //TODO Customize this to call an abstract method
+                    doError(exception);
+                }
+            }
+        } else {
+            //TODO Use custom StatusServer to set the proper status
+            super.doCatch(throwable);
+        }
+    }
+
+    /**
+     * @See <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-5.2">5.2.  Error Response</a>
+     */
+    public Representation doError(OAuthProblemException exception) {
+        doError(Status.CLIENT_ERROR_BAD_REQUEST);
+        return new JacksonRepresentation<Map>(exception.getErrorMessage());
+    }
+
+
+    /**
+     * Error Response
+     * <p/>
+     * If the request fails due to a missing, invalid, or mismatching redirection URI, or if the client identifier is
+     * missing or invalid, the authorization server SHOULD inform the resource owner of the error, and MUST NOT
+     * automatically redirect the user-agent to the invalid redirection URI.
+     *
+     * @See <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.2.1">4.1.2.1.  Error Response</a>
+     * @See <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.2.1">4.2.2.1.  Error Response</a>
+     */
+    public Representation doError(OAuthProblemException exception, Reference redirect) {
+        if (null != redirect) {
+            return null;
+        } else {
+            //TODO make null safe and configure the error page
+            return getPage("error.html", exception.getErrorMessage());
+        }
+    }
+
+    protected Representation getPage(String templateName, Object dataModel) {
+        OAuth2.DisplayType displayType = Enum.valueOf(OAuth2.DisplayType.class,
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DISPLAY, String.class));
+        return getPage(displayType != null ? displayType.getFolder() : OAuth2.DisplayType.PAGE.getFolder(), templateName, dataModel);
+    }
+
+    protected Representation getPage(String display, String templateName, Object dataModel) {
+        TemplateRepresentation result = null;
+        Object factory = getContext().getAttributes().get(TemplateFactory.class.getName());
+        if (factory instanceof TemplateFactory) {
+            result = ((TemplateFactory) factory).getTemplateRepresentation(null != display ? display + "templates/" +
+                    templateName : "templates/page/" + templateName);
+        } else {
+            factory = TemplateFactory.newInstance(getContext());
+            getContext().getAttributes().put(TemplateFactory.class.getName(), factory);
+            result = ((TemplateFactory) factory).getTemplateRepresentation(templateName);
+        }
+        if (null != result) {
+            result.setDataModel(dataModel);
+        }
+        return result;
+    }
+
+    /**
+     * Validate the {@code redirectionURI} and return an object used in the session.
+     * <p/>
+     * Throws {@link OAuthProblemException.OAuthError#REDIRECT_URI_MISMATCH}
+     *
+     * @return
+     * @throws OAuthProblemException
+     */
+    protected OAuth2Client validateRemoteClient() {
+        switch (endpointType) {
+            case AUTHORIZATION_ENDPOINT: {
+                String client_id = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CLIENT_ID, String.class);
+                Client client = getClientVerifier().findClient(client_id);
+                if (null != client) {
+                    return new OAuth2Client(client);
+                } else {
+                    /*
+                    unauthorized_client
+                        The client is not authorized to request an authorization
+                        code using this method.
+                     */
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest());
+                }
+            }
+            case TOKEN_ENDPOINT: {
+                return getAuthenticatedClient();
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+
+    protected User getAuthenticatedResourceOwner() throws OAuthProblemException {
+        if (getRequest().getClientInfo().getUser() != null && getRequest().getClientInfo().isAuthenticated()) {
+            return getRequest().getClientInfo().getUser();
+        }
+        throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), "The authorization server can not authenticate the resource owner.");
+    }
+
+    protected OAuth2Client getAuthenticatedClient() throws OAuthProblemException {
+        if (getRequest().getClientInfo().getUser() != null && getRequest().getClientInfo().isAuthenticated()) {
+            if (getRequest().getClientInfo().getUser() instanceof OAuth2Client) {
+                return (OAuth2Client) getRequest().getClientInfo().getUser();
+            }
+        }
+        throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), "The authorization server can not authenticate the client.");
+    }
+
+
+    protected Map<String, Object> getDataModel() {
+        Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
+        data.put("target", getRequest().getResourceRef().toString());
+        return data;
+    }
+
+    protected void validateMethod() throws OAuthProblemException {
+        switch (endpointType) {
+            case AUTHORIZATION_ENDPOINT: {
+                if (!Method.POST.equals(getRequest().getMethod())) {
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                            "Required Method: POST found: " + getRequest().getMethod().getName());
+                }
+            }
+            case TOKEN_ENDPOINT: {
+                if (!(Method.GET.equals(getRequest().getMethod()) || Method.POST.equals(getRequest().getMethod()))) {
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                            "Required Method: GET or POST found: " + getRequest().getMethod().getName());
+                }
+            }
+            default: {
+
+            }
+        }
+    }
+
+    protected void validateContentType() throws OAuthProblemException {
+        switch (endpointType) {
+            case AUTHORIZATION_ENDPOINT: {
+                if (!MediaType.APPLICATION_JSON.equals(getRequest().getEntity().getMediaType())) {
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invalid Content Type");
+                }
+            }
+            case TOKEN_ENDPOINT: {
+
+            }
+            default: {
+
+            }
+        }
+    }
+
+    protected void validateRequiredParameters() throws OAuthProblemException {
+        String[] required = getRequiredParameters();
+        if (required != null && required.length > 0) {
+            StringBuilder sb = null;
+            for (String s : required) {
+                if (!getRequest().getAttributes().containsKey(s)) {
+                    if (null == sb) {
+                        sb = new StringBuilder("Missing parameters: ");
+                    }
+                    sb.append(s).append(" ");
+                }
+            }
+            if (null != sb) {
+                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), sb.toString());
+            }
+        }
+    }
+
+    public Set<String> getCheckedScope(String requestedScope, Set<String> maximumScope, Set<String> defaultScope) {
+        if (null == requestedScope) {
+            return defaultScope;
+        } else {
+            Set<String> intersect = OAuth2Utils.split(requestedScope, OAuth2Utils.getScopeDelimiter(getContext()));
+            if (intersect.retainAll(maximumScope)) {
+                return intersect;
+            } else {
+                return defaultScope;
+            }
+        }
+    }
+
+    protected String[] getRequiredParameters() {
+        return null;
+    }
+
+    protected void validateOptionalParameters() throws OAuthProblemException {
+    }
+
+    protected void validateNotAllowedParameters() throws OAuthProblemException {
+    }
+
+
+}

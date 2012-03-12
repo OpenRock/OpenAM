@@ -1,0 +1,99 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock AS. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ * $Id$
+ */
+package org.forgerock.restlet.ext.oauth2.provider;
+
+import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.restlet.ext.oauth2.model.Client;
+import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.restlet.security.User;
+
+import java.net.URI;
+
+/**
+ * @author $author$
+ * @version $Revision$ $Date$
+ */
+public class OAuth2Client extends User {
+
+    private final Client client;
+
+    public OAuth2Client(Client client) {
+        super(client.getClientId());
+        this.client = client;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+
+    /**
+     * Validate the {@code redirectionURI} and return an object used in the session.
+     * <p/>
+     * Throws {@link org.forgerock.restlet.ext.oauth2.OAuthProblemException.OAuthError#REDIRECT_URI_MISMATCH}
+     * <p/>
+     * The authorization server SHOULD require all clients to register their
+     * redirection endpoint prior to utilizing the authorization endpoint
+     * <p/>
+     * The authorization server SHOULD require the client to provide the
+     * complete redirection URI (the client MAY use the "state" request
+     * parameter to achieve per-request customization).  If requiring the
+     * registration of the complete redirection URI is not possible, the
+     * authorization server SHOULD require the registration of the URI
+     * scheme, authority, and path (allowing the client to dynamically vary
+     * only the query component of the redirection URI when requesting
+     * authorization).
+     * <p/>
+     * The authorization server MAY allow the client to register multiple
+     * redirection endpoints.
+     *
+     * @param redirectionURI
+     * @return
+     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     *
+     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-3.1.2.3">3.1.2.3.  Dynamic Configuration</a>
+     */
+    public SessionClient getClientInstance(String redirectionURI) throws OAuthProblemException {
+        if (OAuth2Utils.isBlank(redirectionURI)) {
+            if (getClient().getRedirectionURIs().isEmpty()) {
+                //Redirect URI is not registered and not in the request
+            } else if (getClient().getRedirectionURIs().size() == 1) {
+                //Use the Default
+            } else {
+                // missing require redirect_uri
+            }
+        } else {
+            URI request = URI.create(redirectionURI);
+            for (URI uri : getClient().getRedirectionURIs()) {
+                if (uri.equals(request)) {
+
+                }
+            }
+        }
+        return null;
+    }
+
+}
