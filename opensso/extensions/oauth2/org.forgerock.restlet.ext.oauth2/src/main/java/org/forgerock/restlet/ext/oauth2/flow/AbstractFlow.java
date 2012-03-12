@@ -31,6 +31,7 @@ import org.forgerock.restlet.ext.oauth2.model.Client;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
+import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -64,12 +65,20 @@ public abstract class AbstractFlow extends ServerResource {
 
     private ClientVerifier clientVerifier = null;
 
+    private OAuth2TokenStore tokenStore = null;
 
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "ClientVerifier is not initialised");
         }
         return clientVerifier;
+    }
+
+    public OAuth2TokenStore getTokenStore() throws OAuthProblemException {
+        if (null == tokenStore) {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "ClientVerifier is not initialised");
+        }
+        return tokenStore;
     }
 
     /**
@@ -80,6 +89,10 @@ public abstract class AbstractFlow extends ServerResource {
         Object o = context.getAttributes().get(ClientVerifier.class.getName());
         if (o instanceof ClientVerifier) {
             clientVerifier = (ClientVerifier) o;
+        }
+        o = context.getAttributes().get(OAuth2TokenStore.class.getName());
+        if (o instanceof OAuth2TokenStore) {
+            tokenStore = (OAuth2TokenStore) o;
         }
     }
 
@@ -213,6 +226,7 @@ public abstract class AbstractFlow extends ServerResource {
         }
     }
 
+    //TODO Use flexible util to detect the client-agent and select the proper display
     protected Representation getPage(String templateName, Object dataModel) {
         OAuth2.DisplayType displayType = Enum.valueOf(OAuth2.DisplayType.class,
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DISPLAY, String.class));

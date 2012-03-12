@@ -75,4 +75,17 @@ public interface Client {
      */
     public Set<String> defaultGrantScopes();
 
+    /**
+     * Get the auto_grant property of the client
+     * <p/>
+     * If "auto_grant" is true then the server does not require the Resource Owner's approval unless the
+     * request has the {@link org.forgerock.restlet.ext.oauth2.OAuth2.Custom#APPROVAL_PROMPT} property and the
+     * value is null.
+     * <p/>
+     * This function is not part of the OAuth2 specification
+     *
+     * @return
+     */
+    public boolean isAutoGrant();
+
 }

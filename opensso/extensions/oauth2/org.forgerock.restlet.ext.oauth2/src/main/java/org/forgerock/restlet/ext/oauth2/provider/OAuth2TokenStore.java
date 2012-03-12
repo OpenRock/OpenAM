@@ -108,21 +108,23 @@ public interface OAuth2TokenStore {
      * @param scopes          the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
      * @param realm           the name of the realm where this token should be created
      * @param uuid            the user identifier (resource owner)
+     * @param client          the client making the request
      * @return a newly created and stored access token
      */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid);
+    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, SessionClient client);
 
     /**
-     * Creates and stores an access token using the resource owner password flow, where the client passes the
+     * Creates and stores an access token using the resource owner password and implicit flow, where the client passes the
      * credentials to the OAuth endpoint. The resulting token has no parent.
      *
      * @param accessTokenType MAC, Bearer or an extended access token type
      * @param scopes          the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
      * @param realm           the name of the realm where this token should be created
      * @param uuid            the user identifier (resource owner)
+     * @param clientId        the client making the request
      * @return a newly created and stored access token
      */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, SessionClient client);
+    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, String clientId);
 
     /**
      * Creates and stores an access token using the client credential flow, where the client only is authenticated and
@@ -131,10 +133,10 @@ public interface OAuth2TokenStore {
      * @param accessTokenType MAC, Bearer or an extended access token type
      * @param scopes          the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
      * @param realm           the name of the realm where this token should be created
-     * @param client          the client making the request
+     * @param clientId        the client making the request
      * @return a newly created and stored access token
      */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, SessionClient client) throws OAuthProblemException;
+    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String clientId) throws OAuthProblemException;
 
     /**
      * Retrieves an access token from store.
@@ -161,15 +163,15 @@ public interface OAuth2TokenStore {
      * Creates and stores a refresh token in the resource owner password flow. There is no parent token to the refresh
      * token in this case.
      *
-     * @param scopes the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
-     * @param realm  the name of the realm where this token should be created
-     * @param uuid   the user identifier (resource owner)
-     * @param client the client making the request
+     * @param scopes   the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
+     * @param realm    the name of the realm where this token should be created
+     * @param uuid     the user identifier (resource owner)
+     * @param clientId the client making the request
      * @return a newly created refresh token
      * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
      *
      */
-    RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, SessionClient client) throws OAuthProblemException;
+    RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId) throws OAuthProblemException;
 
     /**
      * Retrieves a refresh token from store.

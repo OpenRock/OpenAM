@@ -117,6 +117,10 @@ public class AbstractFlowTest {
                 return Collections.emptySet();
             }
 
+            @Override
+            public boolean isAutoGrant() {
+                return false;
+            }
         };
 
         return new ClientVerifier() {

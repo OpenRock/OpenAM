@@ -60,7 +60,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
         client = getAuthenticatedClient();
         String refresh_token = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.REFRESH_TOKEN, String.class);
         //Find Token
-        RefreshToken refreshToken = null;
+        RefreshToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
 
 
         if (null == refreshToken) {
@@ -70,7 +70,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Token was issued to a different client");
         } else {
             //TODO validate the refresh token.
-            if (refreshToken.getExpireTime() - System.currentTimeMillis() < 0) {
+            if (refreshToken.getExpireTime() - System.currentTimeMillis() < 0 || refreshToken.isExpired()) {
                 //Throw expired refreshToken
             }
 
@@ -83,8 +83,8 @@ public class RefreshTokenServerResource extends AbstractFlow {
             Set<String> checkedScope = null;//getCheckedScope(scope_after, toke.getScope(), client.getClient().defaultGrantScopes());
 
             //Generate Token
-            AccessToken token = null;
-            Map<String, Object> response = token.convertToMap();
+            AccessToken token = createAccessToken(refreshToken, checkedScope);
+            Map<String, String> response = token.convertToForm().getValuesMap();
 
         }
 
@@ -101,5 +101,16 @@ public class RefreshTokenServerResource extends AbstractFlow {
         return new String[]{OAuth2.Params.GRANT_TYPE, OAuth2.Params.REFRESH_TOKEN};
     }
 
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param checkedScope
+     * @return
+     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     *
+     */
+    protected AccessToken createAccessToken(RefreshToken refreshToken, Set<String> checkedScope) {
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope, refreshToken);
+    }
 
 }

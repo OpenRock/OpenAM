@@ -51,13 +51,26 @@ public class ClientCredentialsServerResource extends AbstractFlow {
                 client.getClient().defaultGrantScopes());
 
 
-        AccessToken token = null;
+        AccessToken token = createAccessToken(checkedScope);
 
-        return new JacksonRepresentation<Map>(token.convertToMap());
+        return new JacksonRepresentation<Map>(token.convertToForm().getValuesMap());
     }
 
     @Override
     protected String[] getRequiredParameters() {
         return new String[]{OAuth2.Params.GRANT_TYPE};
+    }
+
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param checkedScope
+     * @return
+     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     *
+     */
+    private AccessToken createAccessToken(Set<String> checkedScope) {
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
+                OAuth2Utils.getRealm(getRequest()), client.getClient().getClientId());
     }
 }

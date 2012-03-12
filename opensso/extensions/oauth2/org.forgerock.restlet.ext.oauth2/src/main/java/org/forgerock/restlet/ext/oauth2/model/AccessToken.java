@@ -25,6 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.model;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.restlet.data.Form;
 
 import java.util.Map;
 
@@ -43,5 +44,5 @@ public interface AccessToken extends Token {
     @JsonSerialize
     public RefreshToken getRefreshToken();
 
-    public Map<String, Object> convertToMap();
+    public Form convertToForm();
 }

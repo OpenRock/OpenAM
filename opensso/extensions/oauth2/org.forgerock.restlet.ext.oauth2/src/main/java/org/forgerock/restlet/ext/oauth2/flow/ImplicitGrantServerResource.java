@@ -63,6 +63,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
 
         resourceOwner = getAuthenticatedResourceOwner();
 
+        String approval_prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT, String.class);
 
         if (true) {
             /*
@@ -86,7 +87,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
                     OAuth2.Params.REDIRECT_URI, String.class));
 
 
-            AccessToken token = null;
+            AccessToken token = createAccessToken(checkedScope);
 
 
         } else {
@@ -134,4 +135,26 @@ public class ImplicitGrantServerResource extends AbstractFlow {
     protected String[] getRequiredParameters() {
         return new String[]{OAuth2.Params.RESPONSE_TYPE, OAuth2.Params.CLIENT_ID};
     }
+
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param checkedScope
+     * @return
+     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     *
+     */
+    protected AccessToken createAccessToken(Set<String> checkedScope) {
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
+                OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(), sessionClient);
+    }
+
+    protected Form mapToForm(Map<String, String> token) {
+        Form result = new Form();
+        for (Map.Entry<String, String> entry : token.entrySet()) {
+            result.add(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
 }

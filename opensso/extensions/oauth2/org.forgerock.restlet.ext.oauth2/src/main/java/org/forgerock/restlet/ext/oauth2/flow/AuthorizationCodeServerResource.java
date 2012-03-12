@@ -69,6 +69,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         sessionClient = client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
                 OAuth2.Params.REDIRECT_URI, String.class));
 
+        String approval_prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT, String.class);
 
         if (true) {
             /*
@@ -130,7 +131,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                     client.getClient().defaultGrantScopes());
 
             //Generate Token  resourceOwner, sessionClient, checkedScope, customParameters
-            AuthorizationCode token = null;
+            AuthorizationCode token = createAuthorizationCode(checkedScope);
 
 
             Reference location = new Reference(sessionClient.getRedirectUri());
@@ -166,7 +167,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
         // Find code
         String code_p = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CODE, String.class);
-        AuthorizationCode code = null;
+        AuthorizationCode code = getTokenStore().readAuthorizationCode(code_p);
 
         if (null == code) {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "authorization code has been user!");
@@ -175,7 +176,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "authorization code has been user!");
         } else {
             //TODO Token expire check
-            if (code.getExpireTime() - System.currentTimeMillis() < 0) {
+            if (code.getExpireTime() - System.currentTimeMillis() < 0 || code.isExpired()) {
                 //Throw expired code
             }
             //TODO validate redirect URI and ClientID
@@ -184,8 +185,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             }
 
             //Generate Token
-            AccessToken token = null;
-            Map<String, Object> response = token.convertToMap();
+            AccessToken token = createAccessToken(code);
+            Map<String, String> response = token.convertToForm().getValuesMap();
 
         }
 
@@ -225,5 +226,28 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                 return null;
             }
         }
+    }
+
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param checkedScope
+     * @return
+     * @throws OAuthProblemException
+     */
+    protected AuthorizationCode createAuthorizationCode(Set<String> checkedScope) {
+        return getTokenStore().createAuthorizationCode(checkedScope, OAuth2Utils.getRealm(getRequest()),
+                resourceOwner.getIdentifier(), sessionClient);
+    }
+
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param code
+     * @return
+     * @throws OAuthProblemException
+     */
+    protected AccessToken createAccessToken(AuthorizationCode code) {
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), code.getScope(), code);
     }
 }

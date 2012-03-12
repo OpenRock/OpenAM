@@ -58,10 +58,10 @@ public class PasswordServerResource extends AbstractFlow {
         Set<String> checkedScope = getCheckedScope(scope_before, client.getClient().allowedGrantScopes(),
                 client.getClient().defaultGrantScopes());
 
-        AccessToken token = null;
+        AccessToken token = createAccessToken(checkedScope);
         RefreshToken refreshToken = null;
 
-        Map<String, Object> result = token.convertToMap();
+        Map<String, String> result = token.convertToForm().getValuesMap();
         result.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
 
         return new JacksonRepresentation<Map>(result);
@@ -72,4 +72,16 @@ public class PasswordServerResource extends AbstractFlow {
         return new String[]{OAuth2.Params.GRANT_TYPE, OAuth2.Params.USERNAME, OAuth2.Params.PASSWORD};
     }
 
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param checkedScope
+     * @return
+     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     *
+     */
+    protected AccessToken createAccessToken(Set<String> checkedScope) {
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
+                OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(), client.getClient().getClientId());
+    }
 }
