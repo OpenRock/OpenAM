@@ -57,18 +57,18 @@
   
   <menu name="OpenAM Documentation">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./doc/release-notes/OpenAM-Release-Notes.html" />
-   <item name="Installation Guide" href="./doc/install-guide/OpenAM-Install-Guide.html" />
-   <item name="Admin Guide" href="./doc/admin-guide/OpenAM-Admin-Guide.html" />
-   <item name="Developer Guide" href="./doc/dev-guide/OpenAM-Dev-Guide.html" />
-   <item name="Reference" href="./doc/reference/OpenAM-Reference.html" />
+   <item name="Release Notes" href="./doc/release-notes/index.html" />
+   <item name="Installation Guide" href="./doc/install-guide/index.html" />
+   <item name="Admin Guide" href="./doc/admin-guide/index.html" />
+   <item name="Developer Guide" href="./doc/dev-guide/index.html" />
+   <item name="Reference" href="./doc/reference/index.html" />
    <item name="Javadoc" href="./doc/public-api/index.html" />
   </menu>
 
   <menu name="Policy Agent Documentation">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./doc/agent-release-notes/OpenAM-Agent-Release-Notes.html" />
-   <item name="Install Guide" href="./doc/agent-install-guide/OpenAM-Agent-Install-Guide.html" />
+   <item name="Release Notes" href="./doc/agent-release-notes/index.html" />
+   <item name="Install Guide" href="./doc/agent-install-guide/index.html" />
   </menu>
 
   <menu name="Project Information">
