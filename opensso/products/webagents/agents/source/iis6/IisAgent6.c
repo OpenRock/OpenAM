@@ -64,6 +64,14 @@ const char FORBIDDEN_MSG[] = {
     "403 Forbidden"
 };
 
+const char NOTFOUND_MSG[] = {
+    "HTTP/1.1 404 Not Found\r\n"
+    "Content-Length: 13\r\n"
+    "Content-Type: text/html\r\n"
+    "\r\n"
+    "404 Not Found"
+};
+
 const char INTERNAL_SERVER_ERROR_MSG[] = {
     "HTTP/1.1 500 Internal Server Error\r\n"
     "Content-Length: 25\r\n"
@@ -83,6 +91,7 @@ CHAR httpOk[]                   = "200 OK";
 CHAR httpRedirect[]             = "302 Found";
 CHAR httpBadRequest[]           = "400 Bad Request";
 CHAR httpForbidden[]            = "403 Forbidden";
+CHAR httpNotFound[]             = "404 Not Found";
 CHAR httpServerError[]          = "500 Internal Server Error";
 
 DWORD http200                   = 200;
@@ -380,6 +389,24 @@ DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB) {
     pECB->ServerSupportFunction(pECB->ConnID,
             HSE_REQ_SEND_RESPONSE_HEADER,
             "500 Internal Server Error",
+            (LPDWORD) NULL,
+            (LPDWORD) NULL);
+    if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
+            (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
+        am_web_log_error("%s: WriteClient did not succeed: "
+                "Attempted message = %s ", thisfunc, data);
+    }
+    return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
+}
+
+DWORD send_notfound(EXTENSION_CONTROL_BLOCK *pECB) {
+    const char *thisfunc = "send_notfound()";
+    const char *data = NOTFOUND_MSG;
+    size_t data_len = sizeof (NOTFOUND_MSG) - 1;
+    pECB->dwHttpStatusCode = http404;
+    pECB->ServerSupportFunction(pECB->ConnID,
+            HSE_REQ_SEND_RESPONSE_HEADER,
+            "404 Not Found",
             (LPDWORD) NULL,
             (LPDWORD) NULL);
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
@@ -1731,8 +1758,8 @@ DWORD getHttpStatusCode(EXTENSION_CONTROL_BLOCK *pECB) {
     int err_id = stat(pECB->lpszPathTranslated, &stat_buf);
     if (err_id) {
         am_web_log_debug("getHttpStatusCode(): File %s doesn't exist, "
-                         "setting HTTP status code to 404.",
-                         pECB->lpszPathTranslated);
+                "setting HTTP status code to 404.",
+                pECB->lpszPathTranslated);
         status = http404;
     }
     return status;
@@ -2102,11 +2129,16 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                                           NULL,
                                           NULL);
                     }
-                    returnValue = process_original_url(pECB, requestURL,
-                                                       orig_req_method,
-                                                       request_hdrs,
-                                                       pOphResources,
-                                                       agent_config);
+                    if (pECB->dwHttpStatusCode == http404) {
+                        returnValue = send_notfound(pECB);
+                        am_web_log_warning("%s: requested resource not found, returning HTTP-404 error.", thisfunc);
+                    } else {
+                        returnValue = process_original_url(pECB, requestURL,
+                                orig_req_method,
+                                request_hdrs,
+                                pOphResources,
+                                agent_config);
+                    }
                 }
             }
             if (set_cookies_list != NULL) {
