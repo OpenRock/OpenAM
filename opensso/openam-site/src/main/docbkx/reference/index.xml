@@ -79,5 +79,4 @@
  <xinclude:include href='chap-standards.xml' />
 
  <index />
- <?dbhtml-include href="../ga.html"?>
 </book>

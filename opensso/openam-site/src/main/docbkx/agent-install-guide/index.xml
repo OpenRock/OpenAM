@@ -77,5 +77,4 @@
       mentioned in the What's new section of the release notes -->
 
  <index />
- <?dbhtml-include href="../ga.html"?>
 </book>
