@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-issues'
@@ -52,7 +52,7 @@
   <section xml:id="web-agent-limitations">
    <title>Limitations</title>
 
-   <para>TODO</para>
+   <para>OpenAM web policy agents do not currently support IPv6.</para>
   </section>
 
   <section xml:id="web-agent-known-issues">
