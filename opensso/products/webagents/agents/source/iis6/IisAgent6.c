@@ -59,7 +59,7 @@ const char REDIRECT_COOKIE_TEMPLATE[] = {
 const char FORBIDDEN_MSG[] = {
     "HTTP/1.1 403 Forbidden\r\n"
     "Content-Length: 13\r\n"
-    "Content-Type: text/plain\r\n"
+    "Content-Type: text/html\r\n"
     "\r\n"
     "403 Forbidden"
 };
@@ -372,32 +372,38 @@ am_status_t get_post_data(EXTENSION_CONTROL_BLOCK *pECB, char **body)
     return status;
 }
 
-DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB) 
-{
+DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB) {
     const char *thisfunc = "send_error()";
     const char *data = INTERNAL_SERVER_ERROR_MSG;
-    size_t data_len = sizeof(INTERNAL_SERVER_ERROR_MSG) - 1;
+    size_t data_len = sizeof (INTERNAL_SERVER_ERROR_MSG) - 1;
     pECB->dwHttpStatusCode = http500;
-    if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
-                     (LPDWORD)&data_len, (DWORD) 0))==FALSE)
-    {
+    pECB->ServerSupportFunction(pECB->ConnID,
+            HSE_REQ_SEND_RESPONSE_HEADER,
+            "500 Internal Server Error",
+            (LPDWORD) NULL,
+            (LPDWORD) NULL);
+    if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
+            (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
-                     "Attempted message = %s ", thisfunc, data);
+                "Attempted message = %s ", thisfunc, data);
     }
     return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
 }
 
-DWORD do_deny(EXTENSION_CONTROL_BLOCK *pECB) 
-{
+DWORD do_deny(EXTENSION_CONTROL_BLOCK *pECB) {
     const char *thisfunc = "do_deny()";
     const char *data = FORBIDDEN_MSG;
-    size_t data_len = sizeof(FORBIDDEN_MSG) - 1;
+    size_t data_len = sizeof (FORBIDDEN_MSG) - 1;
     pECB->dwHttpStatusCode = http403;
-    if ((pECB->WriteClient(pECB->ConnID, (LPVOID)data,
-                     (LPDWORD)&data_len, (DWORD) 0))==FALSE)
-    {
+    pECB->ServerSupportFunction(pECB->ConnID,
+            HSE_REQ_SEND_RESPONSE_HEADER,
+            "403 Forbidden",
+            (LPDWORD) NULL,
+            (LPDWORD) NULL);
+    if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
+            (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
-                     "Attempted message = %s ", thisfunc, data);
+                "Attempted message = %s ", thisfunc, data);
     }
     return HSE_STATUS_SUCCESS_AND_KEEP_CONN;
 }
