@@ -30,6 +30,7 @@ import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
 import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Provider;
+import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.ClassDirectoryServerResource;
 import org.restlet.Context;
 import org.restlet.Restlet;
@@ -58,6 +59,8 @@ public class OAuth2Component {
     private ClientVerifier clientVerifier;
 
     private Verifier userVerifier;
+
+    protected OAuth2TokenStore tokenStore = null;
 
     private String realm = null;
 
@@ -99,10 +102,20 @@ public class OAuth2Component {
         this.userVerifier = userVerifier;
     }
 
+    public OAuth2TokenStore getTokenStore() {
+        return tokenStore;
+    }
+
+    public void setTokenStore(OAuth2TokenStore tokenStore) {
+        this.tokenStore = tokenStore;
+    }
+
     public Restlet activate() {
         logger = provider.getContext().getLogger();
         Context childContext = getProvider().getContext().createChildContext();
         Router root = new Router(childContext);
+
+        // Define Resources directory
         Directory directory = new Directory(root.getContext(), "clap:///resources");
         directory.setTargetClass(ClassDirectoryServerResource.class);
         root.attach("/resources", directory);
@@ -114,7 +127,7 @@ public class OAuth2Component {
         au.setNext(finder);
 
         // This endpoint protected by OpenAM Filter
-        root.attach(OAuth2Utils.getAuthorizePath(childContext), finder);
+        root.attach(OAuth2Utils.getAuthorizePath(childContext), au);
 
 
         // Define Token Endpoint
@@ -126,9 +139,15 @@ public class OAuth2Component {
         root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
 
         if (getConfiguration().get(OAuth2.Custom.REALM) instanceof String) {
-            realm = (String) configuration.get(OAuth2.Custom.REALM);
+            realm = (String) getConfiguration().get(OAuth2.Custom.REALM);
             realm = OAuth2Utils.isNotBlank(realm) ? realm : null;
         }
+
+        //Configure context
+        childContext.setDefaultVerifier(userVerifier);
+        OAuth2Utils.setClientVerifier(clientVerifier, childContext);
+        OAuth2Utils.setTokenStore(tokenStore, childContext);
+        OAuth2Utils.setContextRealm(realm, childContext);
 
         if (null != realm ? provider.attachRealm(realm, root) : provider.attachDefaultRealm(root)) {
             logger.fine("Realm attached");

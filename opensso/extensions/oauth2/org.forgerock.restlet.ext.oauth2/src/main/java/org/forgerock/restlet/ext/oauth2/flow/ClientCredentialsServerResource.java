@@ -53,7 +53,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
 
         AccessToken token = createAccessToken(checkedScope);
 
-        return new JacksonRepresentation<Map>(token.convertToForm().getValuesMap());
+        return new JacksonRepresentation<Map>(token.convertToMap());
     }
 
     @Override
@@ -71,6 +71,6 @@ public class ClientCredentialsServerResource extends AbstractFlow {
      */
     private AccessToken createAccessToken(Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
-                OAuth2Utils.getRealm(getRequest()), client.getClient().getClientId());
+                OAuth2Utils.getContextRealm(getContext()), client.getClient().getClientId());
     }
 }

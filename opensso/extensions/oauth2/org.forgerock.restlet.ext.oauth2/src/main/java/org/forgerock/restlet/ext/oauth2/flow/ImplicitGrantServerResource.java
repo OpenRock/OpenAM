@@ -37,7 +37,6 @@ import org.restlet.routing.Redirector;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author $author$
@@ -60,7 +59,6 @@ public class ImplicitGrantServerResource extends AbstractFlow {
      */
     @Get("html")
     public Representation represent() {
-
         resourceOwner = getAuthenticatedResourceOwner();
 
         String approval_prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT, String.class);
@@ -69,6 +67,12 @@ public class ImplicitGrantServerResource extends AbstractFlow {
             /*
             APPROVAL_PROMPT = false AND CLIENT.AUTO_GRANT
              */
+
+            //Validate the client
+            client = validateRemoteClient();
+            //Validate Redirect URI throw exception
+            sessionClient = client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
+                    OAuth2.Params.REDIRECT_URI, String.class));
 
             //The target contains the state
             String state = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
@@ -79,49 +83,37 @@ public class ImplicitGrantServerResource extends AbstractFlow {
             Set<String> checkedScope = getCheckedScope(scope_before, client.getClient().allowedGrantScopes(),
                     client.getClient().defaultGrantScopes());
 
-
-            //Validate the client
-            client = validateRemoteClient();
-            //Validate Redirect URI throw exception
-            sessionClient = client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                    OAuth2.Params.REDIRECT_URI, String.class));
-
-
             AccessToken token = createAccessToken(checkedScope);
 
+            Form tokenForm = new Form();
+            for (Map.Entry<String, Object> entry : token.convertToMap().entrySet()) {
+                tokenForm.add(entry.getKey(), entry.getValue().toString());
+            }
+
+            /*
+              scope
+                OPTIONAL, if identical to the scope requested by the client,
+                otherwise REQUIRED.  The scope of the access token as described
+                by Section 3.3.
+             */
+            if (isScopeChanged()) {
+                tokenForm.add(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, null));
+            }
+            if (null != state) {
+                tokenForm.add(OAuth2.Params.STATE, state);
+            }
+
+            Reference redirectReference = new Reference(sessionClient.getRedirectUri());
+            redirectReference.setFragment(tokenForm.getQueryString());
+
+            Redirector dispatcher = new Redirector(getContext(), redirectReference.toString(), Redirector.MODE_CLIENT_FOUND);
+            dispatcher.handle(getRequest(), getResponse());
+            return getResponseEntity();
 
         } else {
             //Build approval page data
             return getPage("authorize.html", getDataModel());
         }
-
-
-        //SAMPLE PART to DELETE
-        Form params = getQuery();
-        Map<String, String> dm = params.getValuesMap();
-        dm.put("target", getOriginalRef().toString(true, false));
-
-
-        Form token = new Form();
-        token.add(OAuth2.Params.ACCESS_TOKEN, UUID.randomUUID().toString());
-        token.add(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
-        token.add(OAuth2.Params.EXPIRES_IN, "3600");
-
-        String scope = params.getFirstValue(OAuth2.Params.SCOPE);
-        if (null != scope) {
-            token.add(OAuth2.Params.SCOPE, scope);
-        }
-        String state = params.getFirstValue(OAuth2.Params.STATE);
-        if (null != state) {
-            token.add(OAuth2.Params.STATE, state);
-        }
-
-        Reference redirectReference = new Reference("http://localhost:8080/oauth2/cb");
-        redirectReference.setFragment(token.getQueryString());
-
-        Redirector dispatcher = new Redirector(getContext(), redirectReference.toString(), Redirector.MODE_CLIENT_FOUND);
-        dispatcher.handle(getRequest(), getResponse());
-        return getResponseEntity();
     }
 
     @Override
@@ -146,13 +138,13 @@ public class ImplicitGrantServerResource extends AbstractFlow {
      */
     protected AccessToken createAccessToken(Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
-                OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(), sessionClient);
+                OAuth2Utils.getContextRealm(getContext()), resourceOwner.getIdentifier(), sessionClient);
     }
 
-    protected Form mapToForm(Map<String, String> token) {
+    protected Form mapToForm(Map<String, Object> token) {
         Form result = new Form();
-        for (Map.Entry<String, String> entry : token.entrySet()) {
-            result.add(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, Object> entry : token.entrySet()) {
+            result.add(entry.getKey(), entry.getValue().toString());
         }
         return result;
     }

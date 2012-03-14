@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.provider;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.Client;
+import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -78,7 +78,7 @@ public class ClientAuthenticationFilter extends Authenticator {
 
         if (getVerifier() != null) {
             String client_id = OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID, String.class);
-            Client client = getVerifier().findClient(client_id);
+            ClientApplication client = getVerifier().findClient(client_id);
             try {
                 if (request.getChallengeResponse() != null) {
                     client = getVerifier().verify(request.getChallengeResponse());

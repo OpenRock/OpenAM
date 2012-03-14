@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.Client;
+import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
@@ -51,6 +51,7 @@ import org.restlet.security.User;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author $author$
@@ -62,6 +63,11 @@ public abstract class AbstractFlow extends ServerResource {
     protected OAuth2Client client = null;
     protected User resourceOwner = null;
     protected SessionClient sessionClient = null;
+
+    /**
+     * If the {@link AbstractFlow#getCheckedScope} change the requested scope then this value is true.
+     */
+    private boolean scopeChanged = false;
 
     private ClientVerifier clientVerifier = null;
 
@@ -82,18 +88,23 @@ public abstract class AbstractFlow extends ServerResource {
     }
 
     /**
-     * {@inheritDoc}
+     * After the call of {@link AbstractFlow#getCheckedScope} it return true if the requested scope was changed.
+     *
+     * @return
      */
-    public void init(Context context, Request request, Response response) {
-        super.doInit();
-        Object o = context.getAttributes().get(ClientVerifier.class.getName());
-        if (o instanceof ClientVerifier) {
-            clientVerifier = (ClientVerifier) o;
-        }
-        o = context.getAttributes().get(OAuth2TokenStore.class.getName());
-        if (o instanceof OAuth2TokenStore) {
-            tokenStore = (OAuth2TokenStore) o;
-        }
+    public boolean isScopeChanged() {
+        return scopeChanged;
+    }
+
+    /**
+     * Set-up method that can be overridden in order to initialize the state of
+     * the resource. By default it does nothing.
+     *
+     * @see #init(Context, Request, Response)
+     */
+    protected void doInit() throws ResourceException {
+        clientVerifier = OAuth2Utils.getClientVerifier(getContext());
+        tokenStore = OAuth2Utils.getTokenStore(getContext());
     }
 
 
@@ -228,21 +239,21 @@ public abstract class AbstractFlow extends ServerResource {
 
     //TODO Use flexible util to detect the client-agent and select the proper display
     protected Representation getPage(String templateName, Object dataModel) {
-        OAuth2.DisplayType displayType = Enum.valueOf(OAuth2.DisplayType.class,
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DISPLAY, String.class));
-        return getPage(displayType != null ? displayType.getFolder() : OAuth2.DisplayType.PAGE.getFolder(), templateName, dataModel);
+        String display = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DISPLAY, String.class);
+        OAuth2.DisplayType displayType = null != display ? Enum.valueOf(OAuth2.DisplayType.class, display) : OAuth2.DisplayType.PAGE;
+        return getPage(displayType.getFolder(), templateName, dataModel);
     }
 
     protected Representation getPage(String display, String templateName, Object dataModel) {
         TemplateRepresentation result = null;
         Object factory = getContext().getAttributes().get(TemplateFactory.class.getName());
+        String reference = "templates/" + (null != display ? display : OAuth2.DisplayType.PAGE.getFolder()) + "/" + templateName;
         if (factory instanceof TemplateFactory) {
-            result = ((TemplateFactory) factory).getTemplateRepresentation(null != display ? display + "templates/" +
-                    templateName : "templates/page/" + templateName);
+            result = ((TemplateFactory) factory).getTemplateRepresentation(reference);
         } else {
             factory = TemplateFactory.newInstance(getContext());
             getContext().getAttributes().put(TemplateFactory.class.getName(), factory);
-            result = ((TemplateFactory) factory).getTemplateRepresentation(templateName);
+            result = ((TemplateFactory) factory).getTemplateRepresentation(reference);
         }
         if (null != result) {
             result.setDataModel(dataModel);
@@ -262,7 +273,7 @@ public abstract class AbstractFlow extends ServerResource {
         switch (endpointType) {
             case AUTHORIZATION_ENDPOINT: {
                 String client_id = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CLIENT_ID, String.class);
-                Client client = getClientVerifier().findClient(client_id);
+                ClientApplication client = getClientVerifier().findClient(client_id);
                 if (null != client) {
                     return new OAuth2Client(client);
                 } else {
@@ -310,16 +321,19 @@ public abstract class AbstractFlow extends ServerResource {
     protected void validateMethod() throws OAuthProblemException {
         switch (endpointType) {
             case AUTHORIZATION_ENDPOINT: {
-                if (!Method.POST.equals(getRequest().getMethod())) {
-                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                            "Required Method: POST found: " + getRequest().getMethod().getName());
-                }
-            }
-            case TOKEN_ENDPOINT: {
-                if (!(Method.GET.equals(getRequest().getMethod()) || Method.POST.equals(getRequest().getMethod()))) {
+                if (!(Method.POST.equals(getRequest().getMethod()) || Method.GET.equals(getRequest().getMethod()))) {
                     throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                             "Required Method: GET or POST found: " + getRequest().getMethod().getName());
                 }
+                break;
+            }
+
+            case TOKEN_ENDPOINT: {
+                if (!(Method.POST.equals(getRequest().getMethod()) || Method.GET.equals(getRequest().getMethod()))) {
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                            "Required Method: GET or POST found: " + getRequest().getMethod().getName());
+                }
+                break;
             }
             default: {
 
@@ -330,7 +344,8 @@ public abstract class AbstractFlow extends ServerResource {
     protected void validateContentType() throws OAuthProblemException {
         switch (endpointType) {
             case AUTHORIZATION_ENDPOINT: {
-                if (!MediaType.APPLICATION_JSON.equals(getRequest().getEntity().getMediaType())) {
+                if (null != getRequest().getEntity() &&
+                        !MediaType.APPLICATION_WWW_FORM.equals(getRequest().getEntity().getMediaType())) {
                     throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invalid Content Type");
                 }
             }
@@ -365,11 +380,13 @@ public abstract class AbstractFlow extends ServerResource {
         if (null == requestedScope) {
             return defaultScope;
         } else {
-            Set<String> intersect = OAuth2Utils.split(requestedScope, OAuth2Utils.getScopeDelimiter(getContext()));
+            Set<String> intersect = new TreeSet<String>(OAuth2Utils.split(requestedScope, OAuth2Utils.getScopeDelimiter(getContext())));
             if (intersect.retainAll(maximumScope)) {
+                // TODO Log not allowed scope was requested and was modified
+                scopeChanged = true;
                 return intersect;
             } else {
-                return defaultScope;
+                return intersect;
             }
         }
     }

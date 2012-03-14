@@ -25,7 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.provider;
 
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.Client;
+import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 
@@ -62,7 +62,7 @@ public interface ClientVerifier {
      * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
      *          when authentication failed
      */
-    public Client verify(ChallengeResponse challengeResponse) throws OAuthProblemException;
+    public ClientApplication verify(ChallengeResponse challengeResponse) throws OAuthProblemException;
 
     /**
      * Authenticates the client and use the {@link org.forgerock.restlet.ext.oauth2.OAuth2.Params#CLIENT_ID} and {@link org.forgerock.restlet.ext.oauth2.OAuth2.Params#CLIENT_SECRET} from
@@ -73,7 +73,7 @@ public interface ClientVerifier {
      * @return Client if the credentials are correct
      * @throws OAuthProblemException when authentication failed
      */
-    public Client verify(String client_id, String client_secret) throws OAuthProblemException;
+    public ClientApplication verify(String client_id, String client_secret) throws OAuthProblemException;
 
     /**
      * Get the configured HTTP Authentication scheme for the given {@code client_id}
@@ -94,5 +94,5 @@ public interface ClientVerifier {
      * @param client_id client_id from the request
      * @return null if there is no client with the given identifier.
      */
-    public Client findClient(String client_id);
+    public ClientApplication findClient(String client_id);
 }

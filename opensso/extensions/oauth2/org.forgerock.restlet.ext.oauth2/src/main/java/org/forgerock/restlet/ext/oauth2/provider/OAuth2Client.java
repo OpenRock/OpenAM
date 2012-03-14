@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.oauth2.provider;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.Client;
+import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.restlet.security.User;
 
@@ -38,14 +38,14 @@ import java.net.URI;
  */
 public class OAuth2Client extends User {
 
-    private final Client client;
+    private final ClientApplication client;
 
-    public OAuth2Client(Client client) {
+    public OAuth2Client(ClientApplication client) {
         super(client.getClientId());
         this.client = client;
     }
 
-    public Client getClient() {
+    public ClientApplication getClient() {
         return client;
     }
 
@@ -74,6 +74,7 @@ public class OAuth2Client extends User {
      * @return
      * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
      *
+     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-3.1.2.2">3.1.2.2.  Registration Requirements</a>
      * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-3.1.2.3">3.1.2.3.  Dynamic Configuration</a>
      */
     public SessionClient getClientInstance(String redirectionURI) throws OAuthProblemException {
@@ -81,7 +82,7 @@ public class OAuth2Client extends User {
             if (getClient().getRedirectionURIs().isEmpty()) {
                 //Redirect URI is not registered and not in the request
             } else if (getClient().getRedirectionURIs().size() == 1) {
-                //Use the Default
+                return new SessionClientImpl(getClient().getClientId(), getClient().getRedirectionURIs().iterator().next().toString());
             } else {
                 // missing require redirect_uri
             }
@@ -89,11 +90,34 @@ public class OAuth2Client extends User {
             URI request = URI.create(redirectionURI);
             for (URI uri : getClient().getRedirectionURIs()) {
                 if (uri.equals(request)) {
-
+                    return new SessionClientImpl(getClient().getClientId(), uri.toString());
                 }
             }
         }
         return null;
+    }
+
+    public class SessionClientImpl implements SessionClient {
+
+        private static final long serialVersionUID = 1934721539808864899L;
+
+        private String clientId;
+        private String redirectUri;
+
+        private SessionClientImpl(String clientId, String redirectUri) {
+            this.clientId = clientId;
+            this.redirectUri = redirectUri;
+        }
+
+        @Override
+        public String getClientId() {
+            return clientId;
+        }
+
+        @Override
+        public String getRedirectUri() {
+            return redirectUri;
+        }
     }
 
 }

@@ -25,6 +25,8 @@
 package org.forgerock.restlet.ext.oauth2;
 
 
+import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
+import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -53,6 +55,7 @@ public class OAuth2Utils {
         HTTP_HEADER,
         HTTP_FRAGMENT,
         HTTP_BODY;
+
         @SuppressWarnings(value = "unchecked")
         public Map<String, String> getParameters(Request request) {
             Map<String, String> result = null;
@@ -165,7 +168,49 @@ public class OAuth2Utils {
      * @return The value of the "scope_delimiter" parameter.
      */
     public static String getScopeDelimiter(Context context) {
-        return context.getParameters().getFirstValue(SCOPE_DELIMITER_CONFIG, false, SCOPE_DELIMITER);
+        if (null != context) {
+            return context.getParameters().getFirstValue(SCOPE_DELIMITER_CONFIG, false, SCOPE_DELIMITER);
+        } else {
+            return SCOPE_DELIMITER;
+        }
+    }
+
+    /**
+     * Returns the value of the "realm" parameter.
+     *
+     * @param context The context where to find the parameter.
+     * @return The value of the "realm" parameter.
+     */
+    public static String getContextRealm(Context context) {
+        return context.getParameters().getFirstValue("realm", false);
+    }
+
+    /**
+     * Returns the value of the "ClientVerifier" parameter.
+     *
+     * @param context The context where to find the parameter.
+     * @return The value of the "ClientVerifier" parameter.
+     */
+    public static ClientVerifier getClientVerifier(Context context) {
+        Object o = context.getAttributes().get(ClientVerifier.class.getName());
+        if (o instanceof ClientVerifier) {
+            return (ClientVerifier) o;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the value of the "OAuth2TokenStore" parameter.
+     *
+     * @param context The context where to find the parameter.
+     * @return The value of the "OAuth2TokenStore" parameter.
+     */
+    public static OAuth2TokenStore getTokenStore(Context context) {
+        Object o = context.getAttributes().get(OAuth2TokenStore.class.getName());
+        if (o instanceof OAuth2TokenStore) {
+            return (OAuth2TokenStore) o;
+        }
+        return null;
     }
 
     /**
@@ -196,6 +241,36 @@ public class OAuth2Utils {
      */
     public static void setScopeDelimiter(String value, Context context) {
         context.getParameters().set(SCOPE_DELIMITER_CONFIG, value);
+    }
+
+    /**
+     * Sets the value of the "realm" parameter.
+     *
+     * @param value   The value of the "realm" parameter
+     * @param context The context where to set the parameter.
+     */
+    public static void setContextRealm(String value, Context context) {
+        context.getParameters().set("realm", value);
+    }
+
+    /**
+     * Sets the value of the "scope_delimiter" parameter.
+     *
+     * @param value   The value of the "scope_delimiter" parameter
+     * @param context The context where to set the parameter.
+     */
+    public static void setTokenStore(OAuth2TokenStore value, Context context) {
+        context.getAttributes().put(OAuth2TokenStore.class.getName(), value);
+    }
+
+    /**
+     * Sets the value of the "scope_delimiter" parameter.
+     *
+     * @param value   The value of the "scope_delimiter" parameter
+     * @param context The context where to set the parameter.
+     */
+    public static void setClientVerifier(ClientVerifier value, Context context) {
+        context.getAttributes().put(ClientVerifier.class.getName(), value);
     }
 
     /**

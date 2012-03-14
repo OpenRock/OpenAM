@@ -186,7 +186,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
             //Generate Token
             AccessToken token = createAccessToken(code);
-            Map<String, String> response = token.convertToForm().getValuesMap();
+            Map<String, Object> response = token.convertToMap();
 
         }
 
@@ -236,7 +236,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
      * @throws OAuthProblemException
      */
     protected AuthorizationCode createAuthorizationCode(Set<String> checkedScope) {
-        return getTokenStore().createAuthorizationCode(checkedScope, OAuth2Utils.getRealm(getRequest()),
+        return getTokenStore().createAuthorizationCode(checkedScope, OAuth2Utils.getContextRealm(getContext()),
                 resourceOwner.getIdentifier(), sessionClient);
     }
 

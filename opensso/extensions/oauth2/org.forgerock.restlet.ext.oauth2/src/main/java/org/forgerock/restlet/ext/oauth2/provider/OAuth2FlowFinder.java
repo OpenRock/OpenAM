@@ -140,30 +140,30 @@ public class OAuth2FlowFinder extends Finder {
 
 
     public OAuth2FlowFinder supportAuthorizationCode() {
-        flowServerResources.put(OAuth2.AuthorizationEndpoint.code, AuthorizationCodeServerResource.class);
-        flowServerResources.put(OAuth2.TokeEndpoint.authorization_code, AuthorizationCodeServerResource.class);
-        flowServerResources.put(OAuth2.TokeEndpoint.refresh_token, RefreshTokenServerResource.class);
+        flowServerResources.put(OAuth2.AuthorizationEndpoint.CODE, AuthorizationCodeServerResource.class);
+        flowServerResources.put(OAuth2.TokeEndpoint.AUTHORIZATION_CODE, AuthorizationCodeServerResource.class);
+        flowServerResources.put(OAuth2.TokeEndpoint.REFRESH_TOKEN, RefreshTokenServerResource.class);
         return this;
     }
 
     public OAuth2FlowFinder supportImplicit() {
-        flowServerResources.put(OAuth2.AuthorizationEndpoint.token, ImplicitGrantServerResource.class);
+        flowServerResources.put(OAuth2.AuthorizationEndpoint.TOKEN, ImplicitGrantServerResource.class);
         return this;
     }
 
     public OAuth2FlowFinder supportClientCredentials() {
-        flowServerResources.put(OAuth2.TokeEndpoint.client_credentials, ClientCredentialsServerResource.class);
+        flowServerResources.put(OAuth2.TokeEndpoint.CLIENT_CREDENTIALS, ClientCredentialsServerResource.class);
         return this;
     }
 
     public OAuth2FlowFinder supportPassword() {
-        flowServerResources.put(OAuth2.TokeEndpoint.password, PasswordServerResource.class);
-        flowServerResources.put(OAuth2.TokeEndpoint.refresh_token, RefreshTokenServerResource.class);
+        flowServerResources.put(OAuth2.TokeEndpoint.PASSWORD, PasswordServerResource.class);
+        flowServerResources.put(OAuth2.TokeEndpoint.REFRESH_TOKEN, RefreshTokenServerResource.class);
         return this;
     }
 
     public OAuth2FlowFinder supportSAML20() {
-        flowServerResources.put(OAuth2.TokeEndpoint.saml2_bearer, SAML20BearerServerResource.class);
+        flowServerResources.put(OAuth2.TokeEndpoint.SAML2_BEARER, SAML20BearerServerResource.class);
         return this;
     }
 

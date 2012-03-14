@@ -27,8 +27,6 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -47,21 +45,16 @@ import static org.testng.Assert.assertTrue;
  * @author $author$
  * @version $Revision$ $Date$
  */
-public class RefreshTokenServerResourceTest extends AbstractFlowTest {
+public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
     @Test
     public void testValidRequest() throws Exception {
-
         Reference reference = new Reference("riap://component/test/oauth2/access_token");
         Request request = new Request(Method.POST, reference);
         Response response = new Response(request);
 
-        RefreshToken refreshToken = realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null), "test", "admin", "cid");
-
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.Params.REFRESH_TOKEN);
-        parameters.add(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
-        parameters.add(OAuth2.Params.SCOPE, OAuth2Utils.join(refreshToken.getScope(), null));
-        parameters.add(OAuth2.Params.STATE, "random");
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.CLIENT_CREDENTIALS);
+        parameters.add(OAuth2.Params.SCOPE, "read write");
         request.setEntity(parameters.getWebRepresentation());
 
 
@@ -76,7 +69,7 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
                 MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN) && value.containsKey(OAuth2.Params.REFRESH_TOKEN);
+                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
             }
         });
     }

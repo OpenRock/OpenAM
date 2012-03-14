@@ -26,11 +26,15 @@ package org.forgerock.restlet.ext.oauth2.flow;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
+import org.restlet.security.SecretVerifier;
+import org.restlet.security.User;
+import org.restlet.security.Verifier;
 
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +54,15 @@ public class PasswordServerResource extends AbstractFlow {
         String password = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.PASSWORD, String.class);
 
         // Authenticate ResourceOwner
-        resourceOwner = null;
+        if (getContext().getDefaultVerifier() instanceof SecretVerifier) {
+            if (Verifier.RESULT_VALID == ((SecretVerifier) getContext().getDefaultVerifier()).verify(username, password.toCharArray())) {
+                resourceOwner = new User(username, password.toCharArray());
+            } else {
+                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest());
+            }
+        } else {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "SecretVerifier is not set in the Context");
+        }
 
         //Get the requested scope
         String scope_before = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
@@ -59,9 +71,10 @@ public class PasswordServerResource extends AbstractFlow {
                 client.getClient().defaultGrantScopes());
 
         AccessToken token = createAccessToken(checkedScope);
-        RefreshToken refreshToken = null;
+        Map<String, Object> result = token.convertToMap();
 
-        Map<String, String> result = token.convertToForm().getValuesMap();
+        //TODO Conditional
+        RefreshToken refreshToken = createRefreshToken(checkedScope);
         result.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
 
         return new JacksonRepresentation<Map>(result);
@@ -82,6 +95,19 @@ public class PasswordServerResource extends AbstractFlow {
      */
     protected AccessToken createAccessToken(Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
-                OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(), client.getClient().getClientId());
+                OAuth2Utils.getContextRealm(getContext()), resourceOwner.getIdentifier(), client.getClient().getClientId());
+    }
+
+    /**
+     * This method is intended to be overridden by subclasses.
+     *
+     * @param checkedScope
+     * @return
+     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     *
+     */
+    protected RefreshToken createRefreshToken(Set<String> checkedScope) {
+        return getTokenStore().createRefreshToken(checkedScope, OAuth2Utils.getContextRealm(getContext()),
+                resourceOwner.getIdentifier(), client.getClient().getClientId());
     }
 }

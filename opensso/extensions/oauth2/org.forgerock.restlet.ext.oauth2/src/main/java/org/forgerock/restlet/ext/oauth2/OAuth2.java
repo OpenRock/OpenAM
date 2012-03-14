@@ -185,11 +185,11 @@ public class OAuth2 {
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.1">4.1.1.  Authorization Request</a>
          */
-        public static final String code = "code";
+        public static final String CODE = "CODE";
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.1">4.2.1.  Authorization Request</a>
          */
-        public static final String token = "token";
+        public static final String TOKEN = "token";
     }
 
     /**
@@ -199,23 +199,23 @@ public class OAuth2 {
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.3">4.1.3.  Access Token Request</a>
          */
-        public static final String authorization_code = "authorization_code";
+        public static final String AUTHORIZATION_CODE = "authorization_code";
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.3.2">4.3.2.  Access Token Request</a>
          */
-        public static final String password = "password";
+        public static final String PASSWORD = "password";
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.4.2">4.4.2.  Access Token Request</a>
          */
-        public static final String client_credentials = "client_credentials";
+        public static final String CLIENT_CREDENTIALS = "client_credentials";
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-6">6.  Refreshing an Access Token</a>
          */
-        public static final String refresh_token = "refresh_token";
+        public static final String REFRESH_TOKEN = "refresh_token";
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer">2.1.  Using SAML20BearerServerResource Assertions as Authorization Grants</a>
          */
-        public static final String saml2_bearer = "urn:ietf:params:oauth:grant-type:saml2-bearer";
+        public static final String SAML2_BEARER = "urn:ietf:params:oauth:grant-type:saml2-bearer";
     }
 
     /**

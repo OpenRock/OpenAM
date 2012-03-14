@@ -31,7 +31,7 @@ import java.util.Set;
  * @author $author$
  * @version $Revision$ $Date$
  */
-public interface Client {
+public interface ClientApplication {
 
     public enum ClientType {
         CONFIDENTIAL, PUBLIC;

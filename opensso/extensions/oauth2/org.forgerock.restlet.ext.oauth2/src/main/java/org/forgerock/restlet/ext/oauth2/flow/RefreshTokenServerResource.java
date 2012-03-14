@@ -33,10 +33,8 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author $author$
@@ -84,16 +82,9 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
             //Generate Token
             AccessToken token = createAccessToken(refreshToken, checkedScope);
-            Map<String, String> response = token.convertToForm().getValuesMap();
-
+            Map<String, Object> response = token.convertToMap();
+            return new JacksonRepresentation<Map>(response);
         }
-
-        Map<String, Object> response = new HashMap<String, Object>();
-        response.put(OAuth2.Params.ACCESS_TOKEN, UUID.randomUUID().toString());
-        response.put(OAuth2.Params.REFRESH_TOKEN, UUID.randomUUID().toString());
-        response.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
-        response.put(OAuth2.Params.EXPIRES_IN, 3600);
-        return new JacksonRepresentation<Map>(response);
     }
 
     @Override
