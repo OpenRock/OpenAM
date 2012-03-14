@@ -52,7 +52,7 @@
   <section xml:id="web-agent-limitations">
    <title>Limitations</title>
 
-   <para>Not all features of OpenAM policy agents work with IPv6.</para>
+   <para>OpenAM web policy agents do not currently support IPv6.</para>
   </section>
 
   <section xml:id="web-agent-known-issues">
@@ -83,7 +83,7 @@
   <section xml:id="javaee-agent-limitations">
    <title>Limitations</title>
 
-   <para>TODO</para>
+   <para>Not all features of OpenAM Java EE policy agents work with IPv6.</para>
   </section>
 
   <section xml:id="javaee-agent-known-issues">
