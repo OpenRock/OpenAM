@@ -44,51 +44,26 @@ NM := nm -p
 # C/C++ Compiler related symbols
 #
 CC := cc
-
-ifeq ($(MC_ARCH), i86pc)
-ifeq ($(BUILD_TYPE), 64)
-CXX := CC  -I$(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx_64/include
-else 
-CXX := CC  -I$(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/include
-endif
-else
-ifeq ($(BUILD_TYPE), 64)
-CXX := CC  -I$(USERX_ROOT)/extlib/SunOS/stdcxx_64/include
-else
-CXX := CC  -I$(USERX_ROOT)/extlib/SunOS/stdcxx/include
-endif
-endif 
+CXX := CC
 
 CFLAGS += -DSOLARIS -mt
-CXXFLAGS += -DSOLARIS -mt
+CXXFLAGS += -DSOLARIS -mt -library=Cstd -library=Crun
 
 ifeq ($(BUILD_TYPE), 64)
-CFLAGS += -KPIC -m64
-CXXFLAGS += -KPIC -m64 -DSOLARIS_64 
+CFLAGS += -m64
+CXXFLAGS += -m64 -DSOLARIS_64 
+LD_ORIGIN_FLAG := '-R$$ORIGIN' '-R$$ORIGIN/../lib' 
+else
+LD_ORIGIN_FLAG := '-R$$ORIGIN' '-R$$ORIGIN/../lib' 
 endif
 
-CXX_STD_LIBS := -library=no%Cstd -library=Crun
-LD_ORIGIN_FLAG := '-R$$ORIGIN' '-R$$ORIGIN/../lib'
+LDFLAGS += -mt -norunpath -library=Cstd -library=Crun
 	
-ifeq ($(MC_ARCH), i86pc)
-ifeq ($(BUILD_TYPE), 64)
-LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx_64/lib -lstdcxx
-else 
-LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS_$(MC_ARCH)/stdcxx/lib -lstdcxx
-endif
-else
-ifeq ($(BUILD_TYPE), 64)
-LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS/stdcxx_64/lib -lstdcxx
-else
-LDFLAGS += -mt $(LD_ORIGIN_FLAG) -norunpath -L $(USERX_ROOT)/extlib/SunOS/stdcxx/lib -lstdcxx
-endif
-endif 
-
 LD_COMMON_ORIGIN_FLAG := 
 LD_FILTER_SYMS_FLAG = -M$(filter %.mapfile, $^)
-LD_MAKE_SHARED_LIB_FLAG := -G -z nodelete -z ignore -z lazyload -z combreloc -norunpath
+LD_MAKE_SHARED_LIB_FLAG := -G -i -z nodefaultlib -z ignore -norunpath -R/lib -R/usr/lib
 ifeq ($(BUILD_TYPE), 64)
-LD_MAKE_SHARED_LIB_FLAG += -m64
+LD_MAKE_SHARED_LIB_FLAG += -m64 -R/lib/64 -R/usr/lib/64
 endif
 LD_SHARED_FLAG := -Bdynamic
 LD_STATIC_FLAG :=

@@ -201,8 +201,6 @@ endif
 
 $(TEST_LIB)_LDLIBS := $($(STD_LIB)_LDLIBS)
 ifeq ($(OS_ARCH), SunOS)
-CXXFLAGS += -library=no%Cstd -library=Crun 
-$(STD_LIB)_LDFLAGS := -KPIC -z defs
 LD_STATIC_FLAGS += -xar
 endif
 
