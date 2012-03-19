@@ -36,10 +36,8 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.routing.Redirector;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author $author$
@@ -87,7 +85,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                     client.getClient().defaultGrantScopes());
 
 
-            return getPage("authorize.html", getDataModel());
+            return getPage("authorize.ftl", getDataModel());
         } else {
             decision_allow = true;
             return authorization();
@@ -187,14 +185,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             //Generate Token
             AccessToken token = createAccessToken(code);
             Map<String, Object> response = token.convertToMap();
-
+            return new JacksonRepresentation<Map>(response);
         }
-
-        Map<String, Object> response = new HashMap<String, Object>();
-        response.put(OAuth2.Params.ACCESS_TOKEN, UUID.randomUUID().toString());
-        response.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
-        response.put(OAuth2.Params.EXPIRES_IN, 3600);
-        return new JacksonRepresentation<Map>(response);
     }
 
 

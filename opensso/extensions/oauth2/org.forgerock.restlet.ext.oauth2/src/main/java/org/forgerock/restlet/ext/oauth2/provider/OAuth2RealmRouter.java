@@ -74,14 +74,14 @@ public class OAuth2RealmRouter extends Router implements OAuth2Provider {
         Restlet next = null;
         if (null == realm) {
             if (null == defaultRealm) {
-                OAuthProblemException.OAuthError.NOT_FOUND.handle(request).description("No Default Realm configured").pushException();
+                OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "No Default Realm configured").pushException();
             } else {
                 next = defaultRealm;
             }
         } else {
             next = routes.get(realm);
             if (null == next) {
-                OAuthProblemException.OAuthError.NOT_FOUND.handle(request).description(1 > routes.size() ?
+                OAuthProblemException.OAuthError.NOT_FOUND.handle(request, 1 > routes.size() ?
                         "There is not Realm configured" : "Realm was not configured").pushException();
             }
         }

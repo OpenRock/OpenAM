@@ -133,7 +133,7 @@ public class AbstractFlowTest {
         when(client.getRedirectionURIs()).thenReturn(redirectionURIs);
 
         when(realm.getClientVerifier().verify(anyString(), anyString())).thenReturn(client);
-        when(realm.getClientVerifier().findClient(anyString())).thenReturn(client);
+        when(realm.getClientVerifier().findClient(matches("cid"))).thenReturn(client);
 
 
         //Mock Token Store

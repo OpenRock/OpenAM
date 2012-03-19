@@ -37,6 +37,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.ext.freemarker.TemplateRepresentation;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -79,7 +80,7 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         Form parameters = new Form();
         parameters.add(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.CODE);
         parameters.add(OAuth2.Params.CLIENT_ID, "cid");
-        parameters.add(OAuth2.Params.REDIRECT_URI, "");
+        parameters.add(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/oauth2/cb");
         parameters.add(OAuth2.Params.SCOPE, "read write");
         parameters.add(OAuth2.Params.STATE, "random");
         parameters.add(OAuth2.Custom.DECISION, OAuth2.Custom.ALLOW);
@@ -98,6 +99,33 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
                 return value.containsKey(OAuth2.Params.CODE);
             }
         });
+
+        reference = new Reference("riap://component/test/oauth2/access_token");
+        request = new Request(Method.POST, reference);
+        response = new Response(request);
+
+        parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.AUTHORIZATION_CODE);
+        parameters.add(OAuth2.Params.CODE, fragment.getFirstValue(OAuth2.Params.CODE));
+        parameters.add(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/oauth2/cb");
+        request.setEntity(parameters.getWebRepresentation());
+
+
+        //handle
+        getClient().handle(request, response);
+        assertTrue(MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType()));
+        JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(response.getEntity(), Map.class);
+
+        //assert
+        assertThat(representation.getObject()).includes(
+                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase()),
+                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+            @Override
+            public boolean matches(Map<?, ?> value) {
+                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+            }
+        });
+
     }
 
     @Test

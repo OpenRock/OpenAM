@@ -123,7 +123,7 @@ public class OAuth2Component {
         // Define Authorization Endpoint
         OAuth2FlowFinder finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT).supportAuthorizationCode().supportClientCredentials().supportImplicit().supportPassword();
         ChallengeAuthenticator au = new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "realm");
-        au.setVerifier(userVerifier);
+        au.setVerifier(getUserVerifier());
         au.setNext(finder);
 
         // This endpoint protected by OpenAM Filter

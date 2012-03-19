@@ -84,11 +84,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
                     client.getClient().defaultGrantScopes());
 
             AccessToken token = createAccessToken(checkedScope);
-
-            Form tokenForm = new Form();
-            for (Map.Entry<String, Object> entry : token.convertToMap().entrySet()) {
-                tokenForm.add(entry.getKey(), entry.getValue().toString());
-            }
+            Form tokenForm = tokenToForm(token.convertToMap());
 
             /*
               scope
@@ -97,7 +93,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
                 by Section 3.3.
              */
             if (isScopeChanged()) {
-                tokenForm.add(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, null));
+                tokenForm.add(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils.getScopeDelimiter(getContext())));
             }
             if (null != state) {
                 tokenForm.add(OAuth2.Params.STATE, state);
@@ -112,7 +108,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
 
         } else {
             //Build approval page data
-            return getPage("authorize.html", getDataModel());
+            return getPage("authorize.ftl", getDataModel());
         }
     }
 
@@ -141,7 +137,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
                 OAuth2Utils.getContextRealm(getContext()), resourceOwner.getIdentifier(), sessionClient);
     }
 
-    protected Form mapToForm(Map<String, Object> token) {
+    protected Form tokenToForm(Map<String, Object> token) {
         Form result = new Form();
         for (Map.Entry<String, Object> entry : token.entrySet()) {
             result.add(entry.getKey(), entry.getValue().toString());

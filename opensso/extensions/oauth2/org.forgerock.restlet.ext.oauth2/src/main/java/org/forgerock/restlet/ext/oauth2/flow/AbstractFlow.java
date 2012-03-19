@@ -164,7 +164,7 @@ public abstract class AbstractFlow extends ServerResource {
     protected void doCatch(Throwable throwable) {
         if (throwable instanceof OAuthProblemException) {
             OAuthProblemException exception = (OAuthProblemException) throwable;
-            getResponse().setStatus(exception.getStatus());
+            doError(exception.getStatus());
 
             switch (endpointType) {
                 case TOKEN_ENDPOINT: {
@@ -178,7 +178,7 @@ public abstract class AbstractFlow extends ServerResource {
                             dispatcher.handle(getRequest(), getResponse());
                         } else {
                             //TODO Introduce new method
-                            Representation result = getPage("error.html", exception.getErrorMessage());
+                            Representation result = getPage("error.ftl", exception.getErrorMessage());
                             if (null != result) {
                                 getResponse().setEntity(result);
                             }
@@ -190,7 +190,19 @@ public abstract class AbstractFlow extends ServerResource {
                             dispatcher.handle(getRequest(), getResponse());
                         } else {
                             //TODO Introduce new method
-                            Representation result = getPage("error.html", exception.getErrorMessage());
+                            Representation result = getPage("error.ftl", exception.getErrorMessage());
+                            if (null != result) {
+                                getResponse().setEntity(result);
+                            }
+                        }
+                        break;
+                    } else if (this instanceof ErrorServerResource) {
+                        Redirector dispatcher = null;//OAuth2Utils.ParameterLocation.HTTP_FRAGMENT.getRedirector(getContext(), exception);
+                        if (null != dispatcher) {
+                            dispatcher.handle(getRequest(), getResponse());
+                        } else {
+                            //TODO Introduce new method
+                            Representation result = getPage("error.ftl", exception.getErrorMessage());
                             if (null != result) {
                                 getResponse().setEntity(result);
                             }
@@ -199,13 +211,20 @@ public abstract class AbstractFlow extends ServerResource {
                     }
                 }
                 default: {
-                    //TODO Customize this to call an abstract method
-                    doError(exception);
+                    errorPage(exception);
                 }
             }
         } else {
             //TODO Use custom StatusServer to set the proper status
             super.doCatch(throwable);
+        }
+    }
+
+
+    public void errorPage(OAuthProblemException exception) {
+        Representation result = getPage("error.ftl", exception.getErrorMessage());
+        if (null != result) {
+            getResponse().setEntity(result);
         }
     }
 
@@ -233,7 +252,7 @@ public abstract class AbstractFlow extends ServerResource {
             return null;
         } else {
             //TODO make null safe and configure the error page
-            return getPage("error.html", exception.getErrorMessage());
+            return getPage("error.ftl", exception.getErrorMessage());
         }
     }
 

@@ -78,13 +78,14 @@ public class ClientAuthenticationFilter extends Authenticator {
 
         if (getVerifier() != null) {
             String client_id = OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID, String.class);
-            ClientApplication client = getVerifier().findClient(client_id);
+            ClientApplication client;
             try {
                 if (request.getChallengeResponse() != null) {
                     client = getVerifier().verify(request.getChallengeResponse());
                     request.getClientInfo().setUser(new OAuth2Client(client));
                 } else {
-                    client = getVerifier().verify(client_id, "client_secret");
+                    String client_secret = OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_SECRET, String.class);
+                    client = getVerifier().verify(client_id, client_secret);
                     request.getClientInfo().setUser(new OAuth2Client(client));
                 }
             } catch (OAuthProblemException e) {

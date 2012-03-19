@@ -35,6 +35,7 @@ import org.restlet.resource.Post;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author $author$
@@ -76,9 +77,11 @@ public class RefreshTokenServerResource extends AbstractFlow {
             String scope_before = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
 
             //Get the granted scope
-            Set<String> granted_after = refreshToken.getScope();
+            Set<String> granted_after = new TreeSet<String>(refreshToken.getScope());
+            granted_after.retainAll(client.getClient().allowedGrantScopes());
+
             //Validate the granted scope
-            Set<String> checkedScope = null;//getCheckedScope(scope_after, toke.getScope(), client.getClient().defaultGrantScopes());
+            Set<String> checkedScope = getCheckedScope(scope_before, granted_after, granted_after);
 
             //Generate Token
             AccessToken token = createAccessToken(refreshToken, checkedScope);

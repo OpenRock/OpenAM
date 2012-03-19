@@ -10,16 +10,17 @@
 </head>
 <body>
 <p><b>Error: </b>
-    <#if error??>
-        <#if error_uri??>
-            <a href="${error_uri}">${error}</a>
-            <#else/>
-            ${error}
-        </#if>
+<#if error??>
+    <#if error_uri??>
+        <a href="${error_uri}">${error}</a>
+    <#else>
+    ${error}
     </#if>
+</#if>
 </p>
+
 <p><b>Description: </b>
-    <#if error_description??>${error_description}</#if>
+<#if error_description??>${error_description}</#if>
 </p>
 </body>
 </html>

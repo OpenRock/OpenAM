@@ -128,7 +128,7 @@ public class OAuthProblemException extends ResourceException {
         this.request = request;
         if (null != this.request) {
             String redirect = OAuth2Utils.getRequestParameter(request, OAuth2.Params.REDIRECT_URI, String.class);
-            this.redirectTargetPattern = URI.create(redirect);
+            this.redirectTargetPattern = null != redirect ? URI.create(redirect) : null;
             this.state = OAuth2Utils.getRequestParameter(request, OAuth2.Params.STATE, String.class);
             this.scope = OAuth2Utils.getRequestParameter(request, OAuth2.Params.SCOPE, String.class);
         } else {
@@ -187,7 +187,7 @@ public class OAuthProblemException extends ResourceException {
     }
 
     public String getDescription() {
-        return description != null ? description : getStatus().getDescription();
+        return description != null ? description : super.getStatus().getDescription();
     }
 
     public String getErrorUri() {
@@ -218,7 +218,11 @@ public class OAuthProblemException extends ResourceException {
      * {@inheritDoc}
      */
     public Status getStatus() {
-        return new Status(super.getStatus(), getCause(), getDescription());
+        if (null == description) {
+            return super.getStatus();
+        } else {
+            return new Status(super.getStatus(), getCause(), description);
+        }
     }
 
     /**

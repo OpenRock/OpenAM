@@ -24,19 +24,29 @@
  */
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.Form;
+import org.restlet.data.Method;
+import org.restlet.data.Reference;
+import org.restlet.data.Status;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
 import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author $author$
  * @version $Revision$ $Date$
  */
-public class ErrorServerResourceTest {
+public class ErrorServerResourceTest extends AbstractFlowTest {
     @Test
     public void testCheckedScope() throws Exception {
         Set<String> allowedGrantScopes = OAuth2Utils.split("read list write", OAuth2Utils.getScopeDelimiter(null));
@@ -55,5 +65,42 @@ public class ErrorServerResourceTest {
 
         checkedScope = testable.getCheckedScope("read delete", allowedGrantScopes, defaultGrantScopes);
         assertThat(checkedScope).containsOnly("read");
+    }
+
+    @Test
+    public void testInvalidRealm() throws Exception {
+        Reference reference = new Reference("riap://component/none/oauth2/access_token");
+        Request request = new Request(Method.POST, reference);
+        Response response = new Response(request);
+
+        //handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_NOT_FOUND);
+    }
+
+    @Test
+    public void testInvalidGrantType() throws Exception {
+        Reference reference = new Reference("riap://component/test/oauth2/access_token");
+        Request request = new Request(Method.POST, reference);
+        Response response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.SAML20.GRANT_TYPE_URI);
+        request.setEntity(parameters.getWebRepresentation());
+
+        //handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN);
+
+
+        reference = new Reference("riap://component/test/oauth2/access_token");
+        request = new Request(Method.POST, reference);
+        response = new Response(request);
+
+
+        //handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_NOT_FOUND);
+        assertTrue(response.getEntity() instanceof JacksonRepresentation);
     }
 }

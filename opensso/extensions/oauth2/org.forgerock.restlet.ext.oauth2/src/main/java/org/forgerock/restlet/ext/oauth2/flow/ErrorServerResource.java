@@ -24,9 +24,10 @@
  */
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 
 /**
@@ -34,6 +35,10 @@ import org.restlet.resource.ResourceException;
  * @version $Revision$ $Date$
  */
 public class ErrorServerResource extends AbstractFlow {
+
+    public ErrorServerResource() {
+        endpointType = OAuth2.EndpointType.OTHER;
+    }
 
     /**
      * Effectively handles a call without content negotiation of the response
@@ -49,9 +54,10 @@ public class ErrorServerResource extends AbstractFlow {
     protected Representation doHandle() throws ResourceException {
         Representation result = null;
         OAuthProblemException e = OAuthProblemException.popException(getRequest());
-        result = getPage("templates/error.html", null != e ? e.getErrorMessage() : getRequest().getAttributes());
-        if (null == result) {
-            result = new StringRepresentation("Error");
+        if (null != e) {
+            doCatch(e);
+        } else {
+            getResponse().setStatus(new Status(Status.SERVER_ERROR_INTERNAL, "Unknown exception"));
         }
         return result;
     }

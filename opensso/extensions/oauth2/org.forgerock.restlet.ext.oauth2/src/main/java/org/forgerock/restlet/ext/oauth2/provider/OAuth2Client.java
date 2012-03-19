@@ -84,7 +84,7 @@ public class OAuth2Client extends User {
             } else if (getClient().getRedirectionURIs().size() == 1) {
                 return new SessionClientImpl(getClient().getClientId(), getClient().getRedirectionURIs().iterator().next().toString());
             } else {
-                // missing require redirect_uri
+                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "Missing parameter: redirect_uri");
             }
         } else {
             URI request = URI.create(redirectionURI);
@@ -93,6 +93,7 @@ public class OAuth2Client extends User {
                     return new SessionClientImpl(getClient().getClientId(), uri.toString());
                 }
             }
+            throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(request);
         }
         return null;
     }

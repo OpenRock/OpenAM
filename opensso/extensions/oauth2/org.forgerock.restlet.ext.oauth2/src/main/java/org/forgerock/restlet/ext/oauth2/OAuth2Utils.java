@@ -33,6 +33,7 @@ import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
+import org.restlet.engine.util.ChildContext;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.routing.Redirector;
@@ -146,7 +147,23 @@ public class OAuth2Utils {
      * @return The value of the "access_token_path" parameter.
      */
     public static String getAccessTokenPath(Context context) {
-        String path = context.getParameters().getFirstValue(ACCESS_TOKEN_PATH, false, ACCESS_TOKEN);
+        String path = null;
+        Context parent = context;
+        do {
+            path = parent.getParameters().getFirstValue(ACCESS_TOKEN_PATH);
+            if (null == path && parent instanceof ChildContext) {
+                try {
+                    java.lang.reflect.Method getParentContext = ChildContext.class.getDeclaredMethod("getParentContext");
+                    getParentContext.setAccessible(true);
+                    parent = (Context) getParentContext.invoke(parent, null);
+                } catch (Exception e) {
+                    parent = null;
+                }
+            } else {
+                parent = null;
+            }
+        } while (null == path && null != parent);
+        path = null != path ? path : ACCESS_TOKEN;
         return path.startsWith("/") ? path : "/" + path;
     }
 
@@ -157,7 +174,23 @@ public class OAuth2Utils {
      * @return The value of the "access_token_path" parameter.
      */
     public static String getAuthorizePath(Context context) {
-        String path = context.getParameters().getFirstValue(AUTHORIZE_PATH, false, AUTHORIZE);
+        String path = null;
+        Context parent = context;
+        do {
+            path = parent.getParameters().getFirstValue(AUTHORIZE_PATH);
+            if (null == path && parent instanceof ChildContext) {
+                try {
+                    java.lang.reflect.Method getParentContext = ChildContext.class.getDeclaredMethod("getParentContext");
+                    getParentContext.setAccessible(true);
+                    parent = (Context) getParentContext.invoke(parent, null);
+                } catch (Exception e) {
+                    parent = null;
+                }
+            } else {
+                parent = null;
+            }
+        } while (null == path && null != parent);
+        path = null != path ? path : AUTHORIZE;
         return path.startsWith("/") ? path : "/" + path;
     }
 
@@ -182,7 +215,7 @@ public class OAuth2Utils {
      * @return The value of the "realm" parameter.
      */
     public static String getContextRealm(Context context) {
-        return context.getParameters().getFirstValue("realm", false);
+        return context.getParameters().getFirstValue(OAuth2.Custom.REALM, false);
     }
 
     /**
@@ -250,7 +283,7 @@ public class OAuth2Utils {
      * @param context The context where to set the parameter.
      */
     public static void setContextRealm(String value, Context context) {
-        context.getParameters().set("realm", value);
+        context.getParameters().set(OAuth2.Custom.REALM, value);
     }
 
     /**
@@ -405,7 +438,7 @@ public class OAuth2Utils {
             buffer.append(iterator.next());
             String d = null != delimiter ? delimiter : SCOPE_DELIMITER;
             while (iterator.hasNext()) {
-                buffer.append(delimiter).append(iterator.next());
+                buffer.append(d).append(iterator.next());
             }
             return buffer.toString();
         }
