@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-before-you-install'
@@ -37,4 +37,8 @@
  <para>TODO: Import the relevant information from
  https://wikis.forgerock.org/confluence/display/openam/OpenAM+Policy+Agents+3.0.4+supported
  modulo changes in particular for test plans.</para>
+ 
+ <para>Before installing web policy agents on Solaris 10, make sure you have
+ applied the latest shared library patch for C++, at least 119963-16, or
+ 119964-12.</para>
 </chapter>
