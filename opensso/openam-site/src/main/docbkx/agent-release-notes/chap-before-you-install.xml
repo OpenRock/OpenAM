@@ -39,6 +39,6 @@
  modulo changes in particular for test plans.</para>
  
  <para>Before installing web policy agents on Solaris 10, make sure you have
- applied the latest shared library patch for C++, at least 119963-16, or
- 119964-12.</para>
+ applied the latest shared library patch for C++, at least 119963-16 on SPARC,
+ or 119964-12 on x86.</para>
 </chapter>
