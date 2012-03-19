@@ -1733,14 +1733,18 @@ DWORD send_ok(EXTENSION_CONTROL_BLOCK *pECB)
 }
 
 DWORD getHttpStatusCode(EXTENSION_CONTROL_BLOCK *pECB) {
+    const char *thisfunc = "getHttpStatusCode()";
     DWORD status = http200;
-    struct stat stat_buf;
-    int err_id = stat(pECB->lpszPathTranslated, &stat_buf);
-    if (err_id) {
-        am_web_log_debug("getHttpStatusCode(): File %s doesn't exist, "
-                "setting HTTP status code to 404.",
-                pECB->lpszPathTranslated);
+    WIN32_FIND_DATA fi;
+    BOOL rootrq = (pECB->lpszPathInfo != NULL && strcmp(pECB->lpszPathInfo, "/") == 0) ? TRUE : FALSE;
+    if (rootrq == FALSE && FindFirstFile(pECB->lpszPathTranslated, &fi) == INVALID_HANDLE_VALUE) {
+        am_web_log_debug("%s: File \"%s\" doesn't exist, setting HTTP status code to 404.", thisfunc, pECB->lpszPathTranslated);
         status = http404;
+    } else {
+        am_web_log_debug((rootrq
+                ? "%s: Requested \"%s\" resource (will use Default Content Page setting, directory \"%s\"), setting HTTP status code to 200."
+                : "%s: Requested \"%s\" resource is mapped to an existing file \"%s\", setting HTTP status code to 200."),
+                thisfunc, pECB->lpszPathInfo, pECB->lpszPathTranslated);
     }
     return status;
 }
