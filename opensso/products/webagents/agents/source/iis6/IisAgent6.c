@@ -1384,6 +1384,36 @@ am_status_t remove_key_in_headers(char* key, char** httpHeaders)
     return status;
 }
 
+int test_attr_exists(char *key, char* set_headers_list) {
+    char *a, *ab, *hlCopy;
+    hlCopy = strdup(set_headers_list);
+    for ((a = strtok_s(hlCopy, ":\r\n", &ab)); a; (a = strtok_s(NULL, ":\r\n", &ab))) {
+        if (strnicmp(key, a, strlen(a)) == 0) {
+            free(hlCopy);
+            return 1;
+        }
+    }
+    free(hlCopy);
+    return 0;
+}
+
+void rem_attr_headers(char** rawHeaders, char* set_headers_list) {
+    char *a, *ab, *rawCopy, *tmpHdr;
+    if (*rawHeaders != NULL && set_headers_list != NULL) {
+        rawCopy = strdup(*rawHeaders);
+        tmpHdr = (char*) calloc(1, strlen(rawCopy));
+        for ((a = strtok_s(rawCopy, "\r\n", &ab)); a; (a = strtok_s(NULL, "\r\n", &ab))) {
+            if (test_attr_exists(a, set_headers_list) == 0) {
+                sprintf(tmpHdr, "%s%s\n", tmpHdr, a);
+            }
+        }
+        memset(*rawHeaders, 0, strlen(*rawHeaders));
+        strcpy(*rawHeaders, tmpHdr);
+        free(rawCopy);
+        free(tmpHdr);
+    }
+}
+
 am_status_t set_request_headers(EXTENSION_CONTROL_BLOCK *pECB,
                                 void** args, BOOL addOriginalHeaders)
 {
@@ -1413,61 +1443,11 @@ am_status_t set_request_headers(EXTENSION_CONTROL_BLOCK *pECB,
 
         if (addOriginalHeaders == TRUE) {
             //Get the original headers from the request
-            status = get_header_value(pECB, "ALL_RAW", &httpHeaders,
-                                      TRUE, FALSE);
+            status = get_header_value(pECB, "ALL_RAW", &httpHeaders, TRUE, FALSE);
         //Remove profile attributes from original request headers, if any,
         //to avoid tampering
             if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
-                pkeyStart = set_headers_list;
-                iKeyStart=0;
-                for (i = 0; i < strlen(set_headers_list); ++i) {
-                    if (set_headers_list[i] == ':') {
-                        keyLength = i + 1 - iKeyStart;
-                        key = malloc(keyLength + 1);
-                        if (key != NULL) {
-                            memset(key,0,keyLength + 1);
-                            strncpy (key,pkeyStart,keyLength);
-                            if (strlen(key) > 0) {
-                                status = remove_key_in_headers(key, &httpHeaders);
-                            }
-                            if((strchr(key, '-'))&&(strlen(key) > 0)) {
-                                while(temp = strchr(key, '-')) {
-                                    if(temp == NULL) {
-                                        break;
-                                    }
-                                    key[temp-key]='_';
-                                }
-                                status1 = remove_key_in_headers(key, &httpHeaders);
-                            }
-                            if((strchr(key, '_'))&&(strlen(key) > 0)) {
-                                while(temp = strchr(key, '_')) {
-                                    if(temp==NULL) {
-                                        break;
-                                    }
-                                    key[temp-key]='-';
-                                }
-                                status2 = remove_key_in_headers(key, &httpHeaders);
-                            }
-                            if(status == AM_NO_MEMORY || status1 == AM_NO_MEMORY ||
-                                status2 == AM_NO_MEMORY) {
-                                status = AM_NO_MEMORY;
-                            }
-                            free(key);
-                            key = NULL;
-                        } else {
-                            am_web_log_error("%s:Not enough memory "
-                                    "to allocate key variable", thisfunc);
-                            status = AM_NO_MEMORY;
-                            break;
-                        }
-                        pkeyStart = set_headers_list;
-                    }
-                    if ((set_headers_list[i] == '\r') &&
-                        (set_headers_list[i+1] == '\n')) {
-                        iKeyStart = i+2;
-                        pkeyStart = pkeyStart + i + 2;
-                    }
-                }
+                rem_attr_headers(&httpHeaders, set_headers_list);
             }
             //Remove empty values from set_headers_list 
             if ((status == AM_SUCCESS) && (set_headers_list != NULL)) {
