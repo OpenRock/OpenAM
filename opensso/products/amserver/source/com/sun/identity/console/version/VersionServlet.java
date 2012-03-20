@@ -29,6 +29,7 @@
  */
 package com.sun.identity.console.version;
 
+import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestContextImpl;
 import com.iplanet.jato.ViewBeanManager;
@@ -89,6 +90,7 @@ public class VersionServlet extends
         String redirectUrl = VersionViewBean.getCurrentURL(httpRequest)
                 + "/base/AMInvalidURL";
         requestContext.getResponse().sendRedirect(redirectUrl);
+        throw new CompleteRequestException();
     }
 
     @Override

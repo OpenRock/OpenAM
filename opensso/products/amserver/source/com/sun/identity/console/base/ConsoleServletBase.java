@@ -226,10 +226,8 @@ public abstract class ConsoleServletBase
             ViewBean viewBean,
             Exception e)
             throws ServletException, IOException {
-        ViewBeanManager viewBeanManager = requestContext.getViewBeanManager();
-        ViewBean targetView = viewBeanManager.getViewBean(
-                AMInvalidURLViewBean.class);
-        targetView.forwardTo(requestContext);
+        //redirect, since forwardTo would carry the invalid pagesession
+        requestContext.getResponse().sendRedirect("../base/AMInvalidURL");
         throw new CompleteRequestException();
     }
 
