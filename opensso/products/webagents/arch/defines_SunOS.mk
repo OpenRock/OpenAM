@@ -68,7 +68,7 @@ endif
 LD_SHARED_FLAG := -Bdynamic
 LD_STATIC_FLAG :=
 LD_VERSION_LIB_FLAG = -h$@
-PIC_FLAG := -KPIC
+PIC_FLAG := -xcode=pic32
 
 #
 # Give DEBUG_FLAGS a default setting based on the build type
