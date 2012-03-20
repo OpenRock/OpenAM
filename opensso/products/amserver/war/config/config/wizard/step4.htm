@@ -150,8 +150,6 @@
             }
         });
 
-        $('input:radio[name=userStoreType][value='+$.amconfig.ustore_type+']').click();
-
         //active directory in domain name mode
         if ($.amconfig.ustore_type == 'LDAPv3ForADDC') {
             $("#addn").show();
@@ -162,6 +160,8 @@
         }
         $("input[name=userStoreType]:radio").click(function() {
             $.amconfig.ustore_type = $(this).val();
+            var callUrl = "$context$path?actionLink=setStoreType";
+            $.get(callUrl + "&type=" + $(this).val());
             if ($(this).val() == 'LDAPv3ForADDC') {
                 $("#addn").show();
                 $("#noaddn").hide();
@@ -171,6 +171,8 @@
             }
             isValid();
         });
+
+        $('input:radio[name=userStoreType][value='+$.amconfig.ustore_type+']').click();
 
         if ($.amconfig.ustore_ssl) {
             $('input[name=userStoreSSL]').attr('checked', true);
@@ -254,11 +256,6 @@
         });
         $("#userStoreDomainName").keyup(function () {
             typewatch(function(){checkConnection(validateUserStoreDomainName)}, 500);
-        });
-
-        $("input[name=userStoreType]:radio").click(function() {
-            var callUrl = "$context$path?actionLink=setStoreType";
-            $.get(callUrl + "&type=" + $(this).val());
         });
 
         isValid();
