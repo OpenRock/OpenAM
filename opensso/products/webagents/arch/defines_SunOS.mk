@@ -68,7 +68,6 @@ endif
 LD_SHARED_FLAG := -Bdynamic
 LD_STATIC_FLAG :=
 LD_VERSION_LIB_FLAG = -h$@
-PIC_FLAG := -xcode=pic32
 
 #
 # Give DEBUG_FLAGS a default setting based on the build type
@@ -94,8 +93,10 @@ LN_s := ln -s
 TAR := /bin/tar
 
 ifeq ($(MC_ARCH), i86pc)
+PIC_FLAG := -KPIC
 include $(USERX_ROOT)/arch/defines_SunOS_$(MC_ARCH).mk
 else
+PIC_FLAG := -xcode=pic32
 include $(USERX_ROOT)/arch/defines_SunOS_sparc.mk
 endif
 
