@@ -995,6 +995,12 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
         "Content-Type: text/html\r\n"
         "\r\n"
     };
+    const char advice_headers_cookie_template[] = {
+        "%s"
+        "Content-Length: %d\r\n"
+        "Content-Type: text/html\r\n"
+        "\r\n"
+    };
 
     am_status_t ret = AM_SUCCESS;
     const am_map_t advice_map = policy_result->advice_map;
@@ -1027,11 +1033,22 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                     size_t data_length = (advice_txt != NULL) ? strlen(advice_txt) : 0;
                     if (data_length > 0) {
                         //Send the headers
-                        advice_headers_len = strlen(advice_headers_template) + 3;
+                        CHAR* set_cookies_list = *((CHAR**) args[2]);
+                        if (set_cookies_list == NULL) {
+                            advice_headers_len = strlen(advice_headers_template) + 3;
+                        } else {
+                            advice_headers_len = strlen(advice_headers_cookie_template) + strlen(set_cookies_list) + 3;
+                        }
                         advice_headers = (char *) malloc(advice_headers_len);
                         if (advice_headers != NULL) {
                             memset(advice_headers, 0, advice_headers_len);
-                            sprintf(advice_headers, advice_headers_template, data_length);
+                            if (set_cookies_list == NULL) {
+                                sprintf(advice_headers, advice_headers_template, data_length);
+                            } else {
+                                sprintf(advice_headers, advice_headers_cookie_template, set_cookies_list, data_length);
+                                free(set_cookies_list);
+                                set_cookies_list = NULL;
+                            }
                             sendHdr.pszStatus = httpOk;
                             sendHdr.pszHeader = advice_headers;
                             sendHdr.cchStatus = (DWORD) strlen(httpOk);
@@ -2133,18 +2150,14 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 
         case AM_INVALID_SESSION:
             am_web_log_info("%s: Invalid session.",thisfunc);
-            // First clear the stale cdsso cookies if any, in the browser
-            if (am_web_is_cdsso_enabled(agent_config) == B_TRUE)
-            {
-                cdStatus = am_web_do_cookie_domain_set(set_cookie, args, 
-                                                       EMPTY_STRING,
-                                                       agent_config);
-                if(cdStatus != AM_SUCCESS) {
-                    am_web_log_error("%s : CDSSO reset cookie failed. ",
-                                     thisfunc);
+            // reset ldap cookies on invalid session.
+            am_web_do_cookies_reset(set_cookie, args, agent_config);
+            // reset the CDSSO cookie 
+            if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                if(am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config) != AM_SUCCESS) {
+                    am_web_log_error("%s : CDSSO reset cookie failed. ", thisfunc);
                 }
             }
-            am_web_do_cookies_reset(set_cookie, args, agent_config);
             // If the post data preservation feature is enabled
             // save the post data in the cache for post requests.
             if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0 
@@ -2166,9 +2179,11 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                             OphResources.result.remote_user ?
                             OphResources.result.remote_user : "unknown user");
             if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
-                am_web_log_debug("%s: Resetting cookie to avoid double "
-                                 "assertion post.", thisfunc);
+                am_web_log_debug("%s: Resetting cookie to avoid double assertion post.", thisfunc);
                 am_web_do_cookies_reset(set_cookie, args, agent_config);
+                if(am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config) != AM_SUCCESS) {
+                    am_web_log_error("%s : CDSSO reset cookie failed. ", thisfunc);
+                }
             }
             // If the post data preservation feature is enabled
             // save the post data in the cache for post requests.
