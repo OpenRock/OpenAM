@@ -67,8 +67,6 @@ fi
 
 CLASSPATH=${IMQ_JAR_PATH}/imq.jar:${JMS_JAR_PATH}/jms.jar:${AM_HOME}/ext/je.jar:${AM_HOME}/locale:${AM_HOME}/lib/am_sessiondb.jar:.
 
-OS_ARCH=`/bin/uname -s`
-
 JAVA_OPTS="-Xms128m -Xmx512m"
 RESTART=true
 
