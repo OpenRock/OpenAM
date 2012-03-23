@@ -42,10 +42,9 @@
 
  <itemizedlist>
   <listitem>
-   <para>OpenIG, the ForgeRock <link
-   xlink:href="http://resources.apexidentity.com/projects/docs/wiki">Identity
-   Gateway</link>, is a high-performance reverse proxy server with specialized
-   session management and credential replay functionality. The Identity Gateway
+   <para>OpenIG, the ForgeRock <link xlink:href="http://openig.forgerock.org/"
+   >Identity Gateway</link>, is a high-performance reverse proxy server with
+   specialized session management and credential replay functionality. OpenIG
    integrates well with OpenAM, and there is no need to modify the target
    application or the container in which it runs.</para>
    <para>OpenIG also includes the Federation Gateway, which enables federation
