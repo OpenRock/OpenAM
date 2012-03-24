@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -72,7 +72,7 @@
                                 <fieldset>
                                     <div class="row">
                                         <input name="Login.ButtonLogin" type="hidden"/>
-                                        <input name="Continue" type="submit" class="button primary" onClick="LoginSubmit('<jato:text name="cmdContinue" />')" value="<jato:text name="lblContinue" />" />
+                                        <input name="Continue" type="submit" class="button primary" onclick="LoginSubmit('<jato:text name="cmdContinue" />')" value="<jato:text name="lblContinue" />" />
                                     </div>
                                 </fieldset>
                             </auth:form>

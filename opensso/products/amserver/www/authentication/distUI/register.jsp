@@ -47,6 +47,7 @@
             <script language="JavaScript" src="<%= ServiceURI%>/js/auth.js" type="text/javascript"></script>
             <jato:content name="validContent">
                 <script language="JavaScript" type="text/javascript">
+                    <!--
                     var defaultBtn = 'Submit';
                     var elmCount = 0;
 
@@ -75,6 +76,7 @@
                         }
                         placeCursorOnFirstElm();
                     }
+                    -->
                 </script>
             </jato:content>
         </head>
@@ -101,12 +103,14 @@
                                 <jato:content name="validContent">
                                     <jato:tiledView name="tiledCallbacks"
                                                     type="com.sun.identity.authentication.UI.CallBackTiledView">
-                                    <script language="javascript">
+                                    <script language="javascript" type="text/javascript">
+                                        <!--
                                         elmCount++;
+                                        -->
                                     </script>
                                     <jato:content name="textBox">
                                         <form name="frm<jato:text name="txtIndex" />" action="blank"
-                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                              onsubmit="defaultSubmit(); return false;" method="post">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
                                                     <jato:text name="txtPrompt" defaultValue="User name:" escape="false" />
@@ -124,7 +128,7 @@
                                     </jato:content>
                                     <jato:content name="password">
                                         <form name="frm<jato:text name="txtIndex" />" action="blank"
-                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                              onsubmit="defaultSubmit(); return false;" method="post">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
                                                     <jato:text name="txtPrompt" defaultValue="Password:" escape="false" />
@@ -142,7 +146,7 @@
                                     </jato:content>
                                     <jato:content name="choice">
                                         <form name="frm<jato:text name="txtIndex" />" action="blank"
-                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                              onsubmit="defaultSubmit(); return false;" method="post">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
                                                     <jato:text name="txtPrompt" defaultValue="RadioButton:" escape="false" />
@@ -192,39 +196,31 @@
                                     <jato:content name="hasButton">
                                         <div class="row">
                                             <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                <input name="Login.Submit" type="button" onClick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
+                                                <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />')" class="<jato:text name="txtClass" />" value="<jato:text name="txtButton" />" />
                                             </jato:tiledView>
-                                            <input name="Login.Submit" type="button" onClick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
+                                            <input name="Login.Submit" type="button" onclick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
                                         </div>
-                                        <script language="javascript" type="text/javascript">
-                                            defaultBtn = '<jato:text name="defaultBtn" />';
-                                            var inputs = document.getElementsByTagName('input');
-                                            for (var i = 0; i < inputs.length; i ++) {
-                                                if (inputs[i].type == 'button' && inputs[i].value == defaultBtn) {
-                                                    inputs[i].setAttribute("class", "button primary");;
-                                                    break;
-                                                }
-                                            }
-                                        </script>
                                     </jato:content>
                                     <jato:content name="hasNoButton">
                                         <div class="row">
-                                            <input name="Login.Submit" type="button" onClick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
-                                            <input name="Login.Submit" type="button" onClick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
+                                            <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                            <input name="Login.Submit" type="button" onclick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
                                         </div>
                                     </jato:content>
                                 </fieldset>
                             </jato:content>
                             <jato:content name="validContent">
                                 <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL">
-                                    <script language="javascript">
+                                    <script language="javascript" type="text/javascript">
+                                        <!--
                                         if (elmCount != null) {
                                             for (var i = 0; i < elmCount; i++) {
                                                 document.write(
-                                                "<input name=\"IDToken" + i + "\" type=\"hidden\">");
+                                                "<input name=\"IDToken" + i + "\" type=\"hidden\" />");
                                             }
-                                            document.write("<input name=\"IDButton"  + "\" type=\"hidden\">");
+                                            document.write("<input name=\"IDButton"  + "\" type=\"hidden\" />");
                                         }
+                                        -->
                                     </script>
                                     <input type="hidden" name="page_state" value="<%= viewBean.getDisplayFieldValue(viewBean.PAGE_STATE) %>"/>
                                 </auth:form>

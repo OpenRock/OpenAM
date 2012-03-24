@@ -134,13 +134,13 @@
                         <h1>Activation Code</h1>
                         <p class="message"><span class="icon info"></span><span id="msgcnt"><%= activationCodeMsg %></span></p>
                         <form name="Login" method="POST" action="<%= emptyField %>" 
-                              onSubmit="return validateEntry(this,'<%= activation %>' , 
+                              onsubmit="return validateEntry(this,'<%= activation %>' ,
                                   '<%= submitButton %>');" >
                             <fieldset>
                                 <div class="row"><label for="<%= activation %>"><%=activationLabel%></label><input class="textbox" type="text" id="<%= activation %>" name="<%= activation %>"/></div>
                                 <div class="row">
                                     <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= submitButton %>"/>
-                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>" onClick="adios()"/>
+                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>" onclick="adios()"/>
                                 </div>
                             </fieldset>
                         </form> 

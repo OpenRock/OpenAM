@@ -1,7 +1,7 @@
 <%--
    DO  NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-   Copyright © 2011 ForgeRock AS. All rights reserved.
+   Copyright © 2011-2012 ForgeRock Inc. All rights reserved.
   
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -235,7 +235,7 @@ resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,s
                         <p class="message"><a href="javascript:toggleWdw('rules');"><span class="icon info"></a></span><span id="msgcnt"><%= passwordSetMsg %></span>
                             <span id="rules" style="display:none; text-align: left; font-weight:400;"><%= passwordRules %></span></p>
                         <form name="<%= settingForm %>" method="POST" action="<%= emptyField %>" 
-                              onSubmit="return validateNow(this, '<%= token1 %>', 
+                              onsubmit="return validateNow(this, '<%= token1 %>',
                                   '<%= token2 %>','<%= terms %>','<%= button1 %>')">
                             <fieldset>
                                 <div class="row"><label for="<%= token1 %>"><%= newPassLabel %></label><input class="textbox" type="password" id="<%= token1 %>" name="<%= token1 %>"/></div>
@@ -248,7 +248,7 @@ resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,s
                                 </div>
                                 <div class="row">
                                     <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= button1 %>"/>
-                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= button1 %>" onClick="adios()"/>
+                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= button1 %>" onclick="adios()"/>
                                 </div>
                             </fieldset>
                         </form> 

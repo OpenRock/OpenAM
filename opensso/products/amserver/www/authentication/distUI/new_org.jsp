@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -98,7 +98,7 @@
                                     <jato:content name="hasButton">
                                         <div class="row">
                                             <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                <input name="Login.ButtonLogin" type="button" class="button" onClick="LoginSubmitTitled('<jato:text name="txtButton" />')" value="<jato:text name="txtButton" />" />
+                                                <input name="Login.ButtonLogin" type="button" class="button" onclick="LoginSubmitTitled('<jato:text name="txtButton" />')" value="<jato:text name="txtButton" />" />
                                             </jato:tiledView>
                                         </div>
                                         <script language="javascript" type="text/javascript">
@@ -117,8 +117,8 @@
                                     <jato:content name="hasNoButton">
                                         <div class="row">
                                             <input name="Login.ButtonLogin" type="hidden"/>
-                                            <input name="Agree" type="submit" class="button primary" onClick="LoginSubmit('<jato:text name="cmdYes" />')" value="<jato:text name="lblYes" />" />
-                                            <input name="Disagree" type="submit" class="button" onClick="LoginSubmit('<jato:text name="cmdNo" />')" value="<jato:text name="lblNo" />" />
+                                            <input name="Agree" type="submit" class="button primary" onclick="LoginSubmit('<jato:text name="cmdYes" />')" value="<jato:text name="lblYes" />" />
+                                            <input name="Disagree" type="submit" class="button" onclick="LoginSubmit('<jato:text name="cmdNo" />')" value="<jato:text name="lblNo" />" />
                                         </div>
                                     </jato:content>
                                     <input type="hidden" name="org" value="<%= orgValue %>"/>

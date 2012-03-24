@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+  Portions Copyrighted 2012 ForgeRock Inc
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -178,7 +178,7 @@
                                                 <div class="row">
                                                     <jato:tiledView name="tiledButtons"
                                                                     type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                        <input name="Login.Submit" type="button" onClick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
+                                                        <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
 
                                                     </jato:tiledView>
                                                 </div>
@@ -197,7 +197,7 @@
                                             </jato:content>
                                             <jato:content name="hasNoButton">
                                                 <div class="row">
-                                                    <input name="Login.Submit" type="submit" onClick="LoginSubmit('<jato:text name="lblSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                                    <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="lblSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
                                                 </div>
                                             </jato:content>
                                         </fieldset>

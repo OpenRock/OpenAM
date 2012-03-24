@@ -113,7 +113,7 @@
                                     </script>
                                     <jato:content name="textBox">
                                         <form name="frm<jato:text name="txtIndex" />" action="blank"
-                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                              onsubmit="defaultSubmit(); return false;" method="post">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
                                                     <jato:text name="txtPrompt" defaultValue="User name:" escape="false" />
@@ -128,7 +128,7 @@
                                     </jato:content>
                                     <jato:content name="password">
                                         <form name="frm<jato:text name="txtIndex" />" action="blank"
-                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                              onsubmit="defaultSubmit(); return false;" method="post">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
                                                     <jato:text name="txtPrompt" defaultValue="Password:" escape="false" />
@@ -144,7 +144,7 @@
 
                                     <jato:content name="choice">
                                         <form name="frm<jato:text name="txtIndex" />" action="blank"
-                                              onSubmit="defaultSubmit(); return false;" method="post">
+                                              onsubmit="defaultSubmit(); return false;" method="post">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
                                                     <jato:text name="txtPrompt" defaultValue="RadioButton:" escape="false" />
@@ -197,7 +197,7 @@
                                             <div class="row">
                                                 <jato:tiledView name="tiledButtons"
                                                                 type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                    <input name="Login.Submit" type="button" onClick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
+                                                    <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
 
                                                 </jato:tiledView>
                                             </div>
@@ -216,8 +216,8 @@
                                         </jato:content>
                                         <jato:content name="hasNoButton">
                                             <div class="row">
-                                                <input name="Login.Submit" type="submit" onClick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
-                                                <input name="Login.Submit" type="submit" onClick="LoginSubmit('<jato:text name="cmdNewUser" />')" class="button" value="<jato:text name="lblNewUser" />" />
+                                                <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                                <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="cmdNewUser" />')" class="button" value="<jato:text name="lblNewUser" />" />
                                             </div>
                                         </jato:content>
                                     </fieldset>
