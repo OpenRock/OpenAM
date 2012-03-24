@@ -116,6 +116,9 @@
                                                     </jato:content>
                                                 </label>
                                                 <input class="textbox" type="text" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtValue" />" />
+                                                <jato:content name="hasInfoText">
+                                                    <p class="message"><span class="icon error"></span><jato:text name="txtInfo" /></p>
+                                                </jato:content>
                                             </div>
                                         </form>
                                     </jato:content>
@@ -131,7 +134,9 @@
                                                     </jato:content>
                                                 </label>
                                                 <input class="textbox" type="password" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="" />
-
+                                                <jato:content name="hasInfoText">
+                                                    <p class="message"><span class="icon error"></span><jato:text name="txtInfo" /></p>
+                                                </jato:content>
                                             </div>
                                         </form>
                                     </jato:content>
