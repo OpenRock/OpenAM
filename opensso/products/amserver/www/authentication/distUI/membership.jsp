@@ -161,15 +161,15 @@
                                                 <div class="radios">
                                                     <jato:tiledView name="tiledChoices" type="com.sun.identity.authentication.UI.CallBackChoiceTiledView">
                                                         <jato:content name="selectedChoice">
-                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtParentIndex" />" value="<jato:text name="txtIndex" />" checked="checked" />
-                                                            <label for="IDToken<jato:text name="txtParentIndex" />">
+                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtIndex" />" checked="checked" />
+                                                            <label for="IDToken<jato:text name="txtIndex" />">
                                                                 <jato:text name="txtChoice" />
                                                             </label>
                                                         </jato:content>
 
                                                         <jato:content name="unselectedChoice">
-                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtParentIndex" />" value="<jato:text name="txtIndex" />" />
-                                                            <label for="IDToken<jato:text name="txtParentIndex" />">
+                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtIndex" />" />
+                                                            <label for="IDToken<jato:text name="txtIndex" />">
                                                                 <jato:text name="txtChoice" />
                                                             </label>
                                                         </jato:content>

@@ -44,14 +44,6 @@
             <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
             <!--[if IE 9]> <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
             <!--[if lte IE 7]> <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
-            <script language="JavaScript" type="text/javascript">
-                function LoginSubmit(value) {
-                    var frm = document.forms[0];
-                    frm.elements['Login.ButtonLogin'].value = value;
-                    frm.elements['Continue'].disabled = true;
-                    frm.submit();
-                }
-            </script>
         </head>
         <body>
             <div class="container_12">
@@ -67,15 +59,10 @@
                             <div class="message">
                                 <span class="icon error"></span>
                                 <h3><auth:resBundle bundleName="amAuthUI" resourceKey="disclaimer.declined" /></h3>
+                                <jato:content name="ContentHref">
+                                    <p><auth:href name="LoginURL" fireDisplayEvents='true'><jato:text name="txtGotoLoginAfterFail" /></auth:href></p>
+                                </jato:content>
                             </div>
-                            <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL" >
-                                <fieldset>
-                                    <div class="row">
-                                        <input name="Login.ButtonLogin" type="hidden"/>
-                                        <input name="Continue" type="submit" class="button" onClick="LoginSubmit('<jato:text name="cmdContinue" />')" value="<jato:text name="lblContinue" />" />
-                                    </div>
-                                </fieldset>
-                            </auth:form>
                         </div>
                     </div>
                 </div>
