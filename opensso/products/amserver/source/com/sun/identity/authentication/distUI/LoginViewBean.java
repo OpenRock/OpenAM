@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.distUI;
@@ -336,7 +336,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             }
             String authCookieValue = AuthClientUtils.getAuthCookieValue(request);
             loginURL = AuthClientUtils.constructLoginURL(request);
-            session.setAttribute("LoginURL", loginURL);
+            //Commented out due to OPENAM-1215
+            //session.setAttribute("LoginURL", loginURL);
             reqDataHash = AuthClientUtils.parseRequestParameters(request);
 
             if (ssoToken != null) {
