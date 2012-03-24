@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -156,15 +156,15 @@
                                                 <div class="radios">
                                                     <jato:tiledView name="tiledChoices" type="com.sun.identity.authentication.UI.CallBackChoiceTiledView">
                                                         <jato:content name="selectedChoice">
-                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtParentIndex" />" value="<jato:text name="txtIndex" />" checked="checked" />
-                                                            <label for="IDToken<jato:text name="txtParentIndex" />">
+                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtIndex" />" checked="checked" />
+                                                            <label for="IDToken<jato:text name="txtIndex" />">
                                                                 <jato:text name="txtChoice" />
                                                             </label>
                                                         </jato:content>
 
                                                         <jato:content name="unselectedChoice">
-                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtParentIndex" />" value="<jato:text name="txtIndex" />" />
-                                                            <label for="IDToken<jato:text name="txtParentIndex" />">
+                                                            <input type="radio" name="IDToken<jato:text name="txtParentIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtIndex" />" />
+                                                            <label for="IDToken<jato:text name="txtIndex" />">
                                                                 <jato:text name="txtChoice" />
                                                             </label>
                                                         </jato:content>
