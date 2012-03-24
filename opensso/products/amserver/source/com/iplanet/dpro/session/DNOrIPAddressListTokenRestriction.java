@@ -27,12 +27,12 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.Misc;
-import com.iplanet.am.util.Debug;
+import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
@@ -41,8 +41,8 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.net.InetAddress;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +52,7 @@ import java.util.Map;
 
 /**
  * <code>DNOrIPAddressListTokenRestriction</code> implements
- * <code>TokenRestriction</code> interface and handles the restriction of
+ * {@link TokenRestriction} interface and handles the restriction of
  * the <code>DN</code> or <code>IPAddress</code>
  */
 
@@ -62,7 +62,7 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     private String dn;
     private static Debug debug;
 
-    private Set addressList = new HashSet();
+    private Set<InetAddress> addressList = new HashSet<InetAddress>();
 
     private String asString;
      /**
@@ -80,7 +80,6 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         "iplanet-am-session-dnrestrictiononly";
 
     private static final String AM_SESSION_SERVICE = "iPlanetAMSessionService";
-    private static SSOToken adminToken = null;
 
    static {
        debug = Debug.getInstance("amSession");
@@ -101,48 +100,47 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     * @exception Exception if finding IP Address of host to be restricted or
     *            if something goes wrong.
     */
-   public DNOrIPAddressListTokenRestriction(String dn, List hostNames)
-        throws Exception
-    {
-        String val = ""; 
-        boolean hostmatch = false;    
-        for (Iterator i = hostNames.iterator(); i.hasNext();) {
-            try { 
-                val = (String)i.next();  
-                addressList.add(InetAddress.getByName(val)); 
-                hostmatch = true; 
-            } catch (java.net.UnknownHostException e) { 
-                if (SessionService.sessionDebug.warningEnabled()) { 
-                    SessionService.sessionDebug.warning(
-                    "DNOrIPAddressListTokenRestriction.constructor: " +
-                    "failure resolving host " + val); 
-                } 
-                if (!i.hasNext() && !hostmatch) {
-                    throw new java.net.UnknownHostException (val); 
-                }
-            } 
-        }
+    public DNOrIPAddressListTokenRestriction(String dn, List<String> hostNames) throws Exception {
 
-        StringBuffer buf = null;
-        if (dn.indexOf("|") > 0) {
+        StringBuilder buf = null;
+        if (dn.indexOf('|') > 0) {
             StringTokenizer st = new StringTokenizer(dn, "|");
-            while(st.hasMoreTokens()) {
+            while (st.hasMoreTokens()) {
                 if (buf == null) {
-                    buf = new StringBuffer(Misc.canonicalize(st.nextToken()));
+                    buf = new StringBuilder(Misc.canonicalize(st.nextToken()));
                 } else {
-                    buf.append("|").append(Misc.canonicalize(st.nextToken()));
+                    buf.append('|').append(Misc.canonicalize(st.nextToken()));
                 }
             }
         } else {
-            buf = new StringBuffer(Misc.canonicalize(dn));
+            buf = new StringBuilder(Misc.canonicalize(dn));
         }
         this.dn = buf.toString();
-        buf.append("\n");
-        Object[] sortedAddressList = addressList.toArray();
-        Arrays.sort(sortedAddressList, addressComparator);
-        for (int i = 0; i < sortedAddressList.length; i++) {
-            buf.append(((InetAddress) sortedAddressList[i]).getHostAddress());
-            buf.append("\n");
+
+        if (!dnRestrictionOnly) {
+            boolean hostmatch = false;
+            Iterator<String> it = hostNames.iterator();
+            while (it.hasNext()) {
+                String val = it.next();
+                try {
+                    addressList.add(InetAddress.getByName(val));
+                    hostmatch = true;
+                } catch (UnknownHostException e) {
+                    if (SessionService.sessionDebug.warningEnabled()) {
+                        SessionService.sessionDebug.warning(
+                                "DNOrIPAddressListTokenRestriction.constructor: "
+                                + "failure resolving host " + val);
+                    }
+                    if (!it.hasNext() && !hostmatch) {
+                        throw new UnknownHostException(val);
+                    }
+                }
+            }
+        }
+        buf.append('\n');
+        Collections.sort(hostNames);
+        for (String hostName : hostNames) {
+            buf.append(hostName).append('\n');
         }
         asString = buf.toString();
         if (debug.messageEnabled()) {
@@ -150,18 +148,12 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         }
     }
 
-    private static Comparator addressComparator = new Comparator() {
-        public int compare(Object o1, Object o2) {
-            return ((InetAddress) o1).getHostAddress().compareTo(
-                    ((InetAddress) o2).getHostAddress());
-        }
-    };
-
     /**
      * This method returns the restriction as a string.
      * 
      * @return A concatenated string of DN and/or Host Name/IP Address.
      */
+    @Override
     public String toString() {
         return asString;
     }
@@ -171,6 +163,7 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
      * 
      * @return a hash code value for this object.
      */
+    @Override
     public int hashCode() {
         return toString().hashCode();
     }
@@ -211,12 +204,14 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
             return false;
         } else if (context instanceof InetAddress) {
             if (dnRestrictionOnly) {
+                //returning true here lessens the security, but truth to be told
+                //sessionservice endpoint should not be available externally
                 SessionService.sessionDebug.error(
-                     "DNOrIPAddressListTokenRestriction"
-                    +".isSatisfied():dnRestrictionOnly"
-                    +" is true, hence cannot accept passed IP as"
-                    +" restriction");
-                return false;
+                     "DNOrIPAddressListTokenRestriction.isSatisfied():"
+                        + "dnRestrictionOnly is true, but IP has been received "
+                        + "as the restriction context, this could be a "
+                        + "suspicious activity");
+                return true;
             } else {
                 if (SessionService.sessionDebug.messageEnabled()) {
                     SessionService.sessionDebug.message(
@@ -227,7 +222,7 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
                         +".isSatisfied(): IP based"
                         +" restriction received and accepted");
                 }
-                return addressList.contains(context);
+                return addressList.contains((InetAddress) context);
             }
         } else {
             if (SessionService.sessionDebug.warningEnabled()) {
@@ -241,37 +236,36 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     /**
      * Returns true of <code>other</code> meets these criteria.
      * <ol type="1">
-     * <li>it is not null;
-     * <li>it is an instance of <code>DNOrIPAddressListTokenRestriction</code>;
-     * <li>it has the same distinguished name as this object; and
+     * <li>it is not null
+     * <li>it is an instance of {@link DNOrIPAddressListTokenRestriction}
+     * <li>it has the same distinguished name as this object and
      * <li>it has the same set of IP addresses as this object.
      * </ol>
      * 
      * @param other the object to be used for comparison.
      * @return true if <code>other</code> meets the above criteria.
      */
+    @Override
     public boolean equals(Object other) {
         return other != null
                 && (other instanceof DNOrIPAddressListTokenRestriction)
                 && other.toString().equals(this.toString());
     }
 
-   /*
+   /**
     * Gets the admin token for checking the dn restriciton property
-    * @return admin <code>SSOTken</code>
+    * @return admin the admin {@link SSOToken}
     */
     static SSOToken getAdminToken() {
-        if (adminToken == null) {
-            try {
-                adminToken = (SSOToken) AccessController.doPrivileged(
-                     AdminTokenAction.getInstance());
-            } catch (Exception e) {
-                SessionService.sessionDebug.error(
-                   "Failed to get the admin token for "
-                        + "dnRestrictionOnly property checking.", e);
-            }
+        try {
+            return (SSOToken) AccessController.doPrivileged(
+                    AdminTokenAction.getInstance());
+        } catch (Exception e) {
+            SessionService.sessionDebug.error(
+                    "Failed to get the admin token for "
+                    + "dnRestrictionOnly property checking.", e);
         }
-        return adminToken;
+        return null;
     }
 
     static SessionService getSS() {
@@ -284,9 +278,11 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         return ss;
     }
 
-    /*
+    /**
      * Gets the  value of the "iplanet-am-session-dnrestrictiononly"
      * session global attribute.
+     *
+     * @return whether the DN restriction only is enabled
      */
     private static boolean getDNRestrictionOnly() {
         boolean dnRestrictionOnly = false;
@@ -296,9 +292,8 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
             ServiceSchema schema = ssm.getGlobalSchema();
             Map attrs = schema.getAttributeDefaults();
             dnRestrictionOnly = Boolean.valueOf(
-                        CollectionHelper.getMapAttr(
-                        attrs,  SESSION_DNRESTRICTIONONLY_ATTR_NAME, "false")
-                        ).booleanValue();
+                    CollectionHelper.getMapAttr(
+                    attrs, SESSION_DNRESTRICTIONONLY_ATTR_NAME, "false")).booleanValue();
         } catch (Exception e) {
             if (SessionService.sessionDebug.messageEnabled()) {
                 SessionService.sessionDebug.message(
