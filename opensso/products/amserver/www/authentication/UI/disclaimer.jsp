@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -47,14 +47,7 @@
             <script language="JavaScript" type="text/javascript">
                 function LoginSubmit(value) {
                     var frm = document.forms[0];
-                    frm.elements['Login.ButtonLogin'].value = value;
-                    frm.elements['Disagree'].disabled = true;
-                    frm.elements['Agree'].disabled = true;
-                    frm.submit();
-                }
-                function LoginSubmitTitled(value) {
-                    var frm = document.forms[0];
-                    frm.elements['Login.ButtonLogin'].value = value;
+                    frm.elements['IDButton'].value = value;
                     frm.submit();
                 }
             </script>
@@ -79,26 +72,10 @@
                                 <fieldset>
                                     <jato:content name="hasButton">
                                         <div class="row">
+                                            <input name="IDButton" type="hidden"/>
                                             <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                <input name="Login.ButtonLogin" type="button" class="button" onClick="LoginSubmitTitled('<jato:text name="txtButton" />')" value="<jato:text name="txtButton" />" />
+                                                <input name="Login.Submit" type="button" class="<jato:text name="txtClass" />" onclick="LoginSubmit('<jato:text name="txtButton" />')" value="<jato:text name="txtButton" />" />
                                             </jato:tiledView>
-                                        </div>
-                                        <script language="javascript" type="text/javascript">
-                                            defaultBtn = '<jato:text name="defaultBtn" />';
-                                            var inputs = document.getElementsByTagName('input');
-                                            for (var i = 0; i < inputs.length; i ++) {
-                                                if (inputs[i].type == 'button' && inputs[i].value == defaultBtn) {
-                                                    inputs[i].setAttribute("class", "button primary");;
-                                                    break;
-                                                }
-                                            }
-                                        </script>
-                                    </jato:content>
-                                    <jato:content name="hasNoButton">
-                                        <div class="row">
-                                            <input name="Login.ButtonLogin" type="hidden"/>
-                                            <input name="Agree" type="submit" class="button primary" onClick="LoginSubmit('<jato:text name="cmdAgree" />')" value="<jato:text name="lblAgree" />" />
-                                            <input name="Disagree" type="submit" class="button" onClick="LoginSubmit('<jato:text name="cmdDisagree" />')" value="<jato:text name="lblDisagree" />" />
                                         </div>
                                     </jato:content>
                                 </fieldset>
