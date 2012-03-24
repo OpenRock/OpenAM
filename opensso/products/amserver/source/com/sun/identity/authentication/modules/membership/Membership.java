@@ -202,10 +202,10 @@ public class Membership extends AMLoginModule {
                 
                 break;
                 
-            default:
+            case REGISTRATION:
                 // this is REGISTRATION state, registration will attempt to
                 // create a new user profile
-                
+
                 // callbacks[len-1] is a user selected button index
                 // next == 0 is a Submit button
                 // next == 1 is a Cancel button
@@ -223,7 +223,7 @@ public class Membership extends AMLoginModule {
                     
                     switch (result) {
                         case DISCLAIMER:
-                            nextState = processRegistrationResult(result);
+                            nextState = processRegistrationResult();
                             break;
 
                         case REGISTRATION:
@@ -247,7 +247,7 @@ public class Membership extends AMLoginModule {
         return nextState.intValue();
     }
     
-    private ModuleState processRegistrationResult(ModuleState result) 
+    private ModuleState processRegistrationResult()
     throws AuthLoginException {
         ModuleState nextState = null;
         
@@ -256,7 +256,7 @@ public class Membership extends AMLoginModule {
                 debug.message("Move to disclaimer page");
             }
 
-            nextState = result;
+            nextState = ModuleState.DISCLAIMER;
         } else {
             if (debug.messageEnabled()) {
                 debug.message("No disclaimer, register user");
@@ -268,10 +268,10 @@ public class Membership extends AMLoginModule {
                 case USER_EXISTS_ERROR:
                     setErrorMessage(regResult,0);
                     nextState = ModuleState.REGISTRATION;
-
+                    break;
                 case PROFILE_ERROR:
                     nextState = ModuleState.PROFILE_ERROR;
-
+                    break;
                 case NO_ERROR:
                     nextState = ModuleState.COMPLETE;
             }
@@ -512,7 +512,7 @@ public class Membership extends AMLoginModule {
         
         // get the value of the user name from the input form
         userID = getCallbackFieldValue(callbacks[0]);
-        
+
         // check user name
         if ((userID == null) || userID.length() == 0) {
             // no user name was entered, this is required to
@@ -686,7 +686,7 @@ public class Membership extends AMLoginModule {
             values.add(userID);
             userAttrs.put(attrName, values);
             
-            result = processRegistrationResult(result);
+            result = processRegistrationResult();
         }
         
         return result;
