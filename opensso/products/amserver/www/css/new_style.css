@@ -275,3 +275,5 @@ hr { border-top:1px solid #B3B3B3; border-bottom:1px solid #FFF; border-left:0; 
 #steps li a { text-decoration:none; cursor:text; }
 #steps li.done a { cursor:pointer; }
 
+/* customization */
+div .row .button { margin-right:5px }
