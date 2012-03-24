@@ -26,7 +26,7 @@
                                                                                 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -58,10 +58,7 @@
                             <div class="message">
                                 <span class="icon error"></span>
                                 <h3>Authentication Service is not initialized</h3>
-                                <p><auth:resBundle bundleName="amAuthUI" resourceKey="contactadmin" /></p>
-                                <jato:content name="ContentHref">
-                                    <p><auth:href name="DefaultLoginURL" fireDisplayEvents='true'><jato:text name="txtGotoLoginAfterFail" /></auth:href></p>
-                                </jato:content>
+                                <p>Contact your system administrator.</p>
                             </div>
                         </div>
                     </div>

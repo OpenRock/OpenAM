@@ -1,7 +1,7 @@
 <%--
    DO  NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-   Copyright © 2011 ForgeRock AS. All rights reserved.
+   Copyright © 2011-2012 ForgeRock Inc. All rights reserved.
   
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -38,7 +38,7 @@
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
 
 <%
-   // Internationalization stuff. Tis is just an example. You can use any i18n framework
+   // Internationalization stuff. This is just an example. You can use any i18n framework
    // as long as you use amAuthOAuth as the resource bundle.
    String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR); 
    String lang = request.getParameter("lang");
