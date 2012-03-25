@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted [2010-2012] [ForgeRock AS]
+   Portions Copyrighted 2010-2012 ForgeRock Inc
 --%>
 
 <%@ page info="Home" language="java" %>
@@ -84,9 +84,6 @@
         <div id="info12" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
             <div><a href="#" id="close12" onclick="closeAll(12); event.cancelBubble = true;return false;"><img alt="close register product" src="../console/images/tasks/close.gif" border="0" /></a></div><p><span class="TskPgeHdr"><cc:text name="txtRegisterProduct" defaultValue="commontask.register.product" bundleID="amConsole" /></span></p></div>
 
-        <div id="info15" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
-            <div><a href="#" id="close15" onclick="closeAll(15); event.cancelBubble = true;return false;"><img alt="close beta console" src="../console/images/tasks/close.gif" border="0" /></a></div><p><span class="TskPgeHdr"><cc:text name="txtConsoleBeta" defaultValue="commontask.test.console.beta" bundleID="amConsole" /></span></p></div>
-
         <div class="TskPgeFllPge" id="TskPge" onclick="hideAllMenus()">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr valign="top"><td>&nbsp;</td><td colspan="4"></td></tr>
@@ -101,27 +98,6 @@
                     <td>&nbsp;</td>
                     <td valign="top">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="TskPgeBtmSpc">
-                            <tr>
-                                <td valign="top" colspan=3><span class="TskPgeSbHdr"><cc:text name="txtSectionConsoleBeta" defaultValue="page.title.common.tasks.section.console.beta" bundleID="amConsole" /></span></td>
-                            </tr>
-
-                            <tr><td class="TskPgeBckgrTd">
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                        <tr><td colspan=3 style="background-color:#FFFFFF"><span class="TskPgeHdr"><cc:text name="txtSectionDescConsoleBeta" defaultValue="page.title.common.tasks.section.desc.console.beta" bundleID="amConsole" /></span></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-
-                            <tr><td class="TskPgeBckgrTd">
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                        <tr>
-                                            <td width="2%" valign="bottom" class="TskPgeTskLftTd"><img alt="spacer" id="gif15" src="../console/images/tasks/spacer.gif" width="12" height="8" /></td>
-                                            <td width="100%;" class="TskPgeTskCntrTd"><a href="../admin" class="TskPgeTxtBg" onmouseover="this.className='TskPgeTxtBgOvr'" onfocus="this.className='TskPgeTxtBgOvr'" onmouseout="this.className='TskPgeTxtBg'" onblur="this.className='TskPgeTxtBg'"><span class="TskPgeTskLftBtm"></span><span class="TskPgeTskLftTp"></span><span class="TskPgeTskRghtBtm"></span><span class="TskPgeTskRghtTp"></span><span class="TskPgeTskRghtBrdr"></span><span class="TskPgeTskPdng"><cc:text name="txtConsoleBeta" defaultValue="commontask.label.test.console.beta" bundleID="amConsole" /></span></a></td>
-                                            <td width="3%" class="TskPgeTskRghtTd" align="right" valign="top"><a href="#" onclick="test(15); event.cancelBubble = true; return false;"  onmouseover="hoverImg(15); event.cancelBubble = true;" onmouseout="outImg(15); event.cancelBubble = true;" onfocus="hoverImg(15); event.cancelBubble = true;" onblur="outImg(15); event.cancelBubble = true;" id="i15"><img alt="try beta console" src="../console/images/tasks/rightToggle.gif" width="29" height="21" border="0" id="togImg15" /></a></td>
-                                        </tr>
-                                    </table>
-                                </td></tr>
                             <tr>
                                 <td colspan="3"><span class="TskPgeSbHdr"><cc:text name="txtSectionSAMLv2" defaultValue="page.title.common.tasks.section.SAML2" bundleID="amConsole" /></span></td>
                             </tr>

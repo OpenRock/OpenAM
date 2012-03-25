@@ -26,7 +26,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2011-2012 ForgeRock AS
+   Portions Copyrighted 2011-2012 ForgeRock Inc
 -->
 
 <project name="openfed-war" default="all">
@@ -466,10 +466,6 @@
             <fileset dir="${openfm.samples.dir}/war"
                  excludes="**/CVS" />
         </copy-->
-
-        <copy todir="${war.package.dir}">
-            <fileset dir="${openfm.web.dir}" excludes="**/CVS" />
-        </copy>
 
         <!-- Uncomment the following line to include the unittest files in the WAR -->
         <!-- <antcall target="unittest" /> -->

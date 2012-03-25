@@ -67,104 +67,11 @@
         <param-value>true</param-value>
     </context-param>
 
-    <context-param>
-        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
-        <param-value>.xhtml</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.concurrentDOMViews</param-name>
-        <param-value>true</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.debugDOMUpdate</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.sun.faces.validateXml</param-name>
-        <param-value>true</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.sun.faces.verifyObjects</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.uploadMaxFileSize</param-name>
-        <param-value>4048576</param-value>
-    </context-param>
-    <context-param>
-        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
-        <param-value>server</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.synchronousUpdate</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.heartbeatInterval</param-name>
-        <param-value>60000</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.heartbeatTimeout</param-name>
-        <param-value>60000</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.connectionTimeout</param-name>
-        <param-value>60000</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.blockingConnectionTimeout</param-name>
-        <param-value>60000</param-value>
-    </context-param>
-    <context-param>
-        <param-name>com.icesoft.faces.heartbeatRetries</param-name>
-        <param-value>3</param-value>
-    </context-param>
-    <context-param>
-        <param-name>facelets.LIBRARIES</param-name>
-        <param-value>
-            /WEB-INF/admin/facelet/opensso.taglib.xml
-        </param-value>
-    </context-param>
-    <context-param>
-        <param-name>org.jboss.jbossfaces.WAR_BUNDLES_JSF_IMPL</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
-
     <!-- context param -->
 
     <!-- filter definition -->
 
-    <filter>
-        <filter-name>AdminAuthFilter</filter-name>
-        <filter-class>com.sun.identity.admin.AuthFilter</filter-class>
-    </filter>
-    <filter>
-        <filter-name>AdminPermissionFilter</filter-name>
-        <filter-class>com.sun.identity.admin.PermissionFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>AdminAuthFilter</filter-name>
-        <url-pattern>/admin/facelet/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AdminPermissionFilter</filter-name>
-        <url-pattern>/admin/facelet/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AdminAuthFilter</filter-name>
-        <url-pattern>/admin/pxml/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AdminAuthFilter</filter-name>
-        <url-pattern>/admin/test/*</url-pattern>
-    </filter-mapping>
-
     <!-- filter mapping -->
-
-    <listener>
-        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
-    </listener>
 
     <!-- listener declaration -->
 
@@ -221,37 +128,6 @@
     <servlet>
         <servlet-name>click-servlet</servlet-name>
         <servlet-class>org.apache.click.ClickServlet</servlet-class>
-    </servlet>
-
-    <servlet>
-        <servlet-name>PrivilegeXmlServlet</servlet-name>
-        <servlet-class>com.sun.identity.admin.PrivilegeXmlServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>AdminTestServlet</servlet-name>
-        <servlet-class>com.sun.identity.admin.TestServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>Faces Servlet</servlet-name>
-        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>Persistent Faces Servlet</servlet-name>
-        <servlet-class>com.icesoft.faces.webapp.xmlhttp.PersistentFacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>Blocking Servlet</servlet-name>
-        <servlet-class>com.icesoft.faces.webapp.xmlhttp.BlockingServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>uploadServlet</servlet-name>
-        <servlet-class>com.icesoft.faces.component.inputfile.FileUploadServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <!-- servlet declaration -->
@@ -311,31 +187,6 @@
     <servlet-mapping>
         <servlet-name>click-servlet</servlet-name>
         <url-pattern>*.htm</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>PrivilegeXmlServlet</servlet-name>
-        <url-pattern>/admin/pxml/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AdminTestServlet</servlet-name>
-        <url-pattern>/admin/test/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Persistent Faces Servlet</servlet-name>
-        <url-pattern>/xmlhttp/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Persistent Faces Servlet</servlet-name>
-        <url-pattern>*.xhtml</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Blocking Servlet</servlet-name>
-        <url-pattern>/block/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>uploadServlet</servlet-name>
-        <url-pattern>/uploadHtml</url-pattern>
     </servlet-mapping>
 
     <!-- servlet mapping -->
