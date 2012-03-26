@@ -43,11 +43,6 @@
         <maven.compiler.source>1.6</maven.compiler.source>
         <jackson.version>1.9.5</jackson.version>
         <restlet.version>2.1-RC3</restlet.version>
-        <!-- Commons JSON versions -->
-        <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
-        <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <commons.json-crypto.version>1.1.0</commons.json-crypto.version>
-        <commons.json-resource.version>1.2.2</commons.json-resource.version>
     </properties>
 
     <repositories>
@@ -78,23 +73,6 @@
                 mvn versions:display-dependency-updates
                 mvn versions:use-latest-versions
         -->
-
-        <!-- ForgeRock Commons -->
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-fluent</artifactId>
-            <version>${commons.json-fluent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.json.resource</artifactId>
-            <version>${commons.json-resource.version}</version>
-        </dependency>
-        <!--dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.util</artifactId>
-            <version>1.0.0</version>
-        </dependency-->
 
         <!-- Restlet -->
         <dependency>

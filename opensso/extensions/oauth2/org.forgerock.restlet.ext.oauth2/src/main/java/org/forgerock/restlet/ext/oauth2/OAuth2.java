@@ -185,7 +185,7 @@ public class OAuth2 {
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.1">4.1.1.  Authorization Request</a>
          */
-        public static final String CODE = "CODE";
+        public static final String CODE = "code";
         /**
          * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.1">4.2.1.  Authorization Request</a>
          */

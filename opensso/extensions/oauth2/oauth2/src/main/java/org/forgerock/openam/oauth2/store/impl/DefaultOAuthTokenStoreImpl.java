@@ -49,13 +49,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     // Removed: long requestTime
     // Removed: String clientID
     // Removed: String redirectURI
-    
+
     @Override
     public AuthorizationCode createAuthorizationCode(Set<String> scopes, String realm, String uuid, SessionClient client) throws OAuthProblemException {
 
         String id = UUID.randomUUID().toString();
         long expires = System.currentTimeMillis() + AUTHZ_CODE_LIFETIME;
-        
+
         // Create an authorization code JSON object
         JsonValue code = new JsonValue(new HashMap<String, Object>());
         code.add("id", id);
@@ -70,7 +70,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         code.add("expires", expires);
 
         JsonValue response = null;
-        
+
         // Store in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(null, JsonResourceContext.newRootContext());
         // TODO: call above with CTS resource
@@ -110,7 +110,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         // Construct an AuthorizationCode object and return it
-        AuthorizationCode ac = constructAuthorizationCode(!response.get("valid").asBoolean(), response.get("id").asString(), response.get("uuid").asString(), (SessionClient)response.get("client"), response.get("realm").asString(), response.get("expires").asLong());
+        AuthorizationCode ac = constructAuthorizationCode(!response.get("valid").asBoolean(), response.get("id").asString(), response.get("uuid").asString(), (SessionClient) response.get("client"), response.get("realm").asString(), response.get("expires").asLong());
         return ac;
         // Construct a request
         //JsonValue request = new JsonValue(new HashMap<String, Object>());
@@ -129,19 +129,45 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     private AuthorizationCode constructAuthorizationCode(final boolean valid, final String id, final String uuid, final SessionClient client, final String realm, final long expires) {
         return new AuthorizationCode() {
-            public boolean isTokenIssued() { return valid; }
-            public String getToken() { return id; }
-            public String getUserID() { return uuid; }
-            public String getRealm() { return realm; }
-            public SessionClient getClient() { return client; }
-            public Set<String> getScope() { return Collections.emptySet(); }
-            public long getExpireTime() { return 0; }
-            public boolean isExpired() { return false; }
-            public long getExpires() { return expires; }
+            public boolean isTokenIssued() {
+                return valid;
+            }
+
+            public String getToken() {
+                return id;
+            }
+
+            public String getUserID() {
+                return uuid;
+            }
+
+            public String getRealm() {
+                return realm;
+            }
+
+            public SessionClient getClient() {
+                return client;
+            }
+
+            public Set<String> getScope() {
+                return Collections.emptySet();
+            }
+
+            public long getExpireTime() {
+                return 0;
+            }
+
+            public boolean isExpired() {
+                return false;
+            }
+
+            public long getExpires() {
+                return expires;
+            }
         };
     }
 
-    
+
     @Override
     public void deleteAuthorizationCode(String id) throws OAuthProblemException {
         //To change body of implemented methods use File | Settings | File Templates.
@@ -168,7 +194,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, SessionClient client) throws OAuthProblemException {
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, String clientId) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -183,7 +209,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, SessionClient client) throws OAuthProblemException {
+    public RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId) throws OAuthProblemException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

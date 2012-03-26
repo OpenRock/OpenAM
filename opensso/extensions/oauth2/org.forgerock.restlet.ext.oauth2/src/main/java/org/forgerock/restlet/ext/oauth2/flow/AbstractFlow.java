@@ -36,17 +36,22 @@ import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.data.CacheDirective;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
+import org.restlet.engine.header.Header;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Redirector;
 import org.restlet.security.User;
+import org.restlet.util.Series;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -123,6 +128,17 @@ public abstract class AbstractFlow extends ServerResource {
         validateRequiredParameters();
         validateOptionalParameters();
         validateNotAllowedParameters();
+        // -------------------------------------
+        //  Add Cache-Control: no-store
+        //      Pragma: no-cache
+        // -------------------------------------
+        getResponse().getCacheDirectives().add(CacheDirective.noStore());
+        Series<Header> additionalHeaders = (Series<Header>) getResponse().getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        if (additionalHeaders == null) {
+            additionalHeaders = new Series<Header>(Header.class);
+            getResponse().getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, additionalHeaders);
+        }
+        additionalHeaders.add(HeaderConstants.HEADER_PRAGMA, HeaderConstants.CACHE_NO_CACHE);
         return super.doConditionalHandle();
     }
 
@@ -363,7 +379,7 @@ public abstract class AbstractFlow extends ServerResource {
     protected void validateContentType() throws OAuthProblemException {
         switch (endpointType) {
             case AUTHORIZATION_ENDPOINT: {
-                if (null != getRequest().getEntity() &&
+                if (!(null == getRequest().getEntity() || getRequest().getEntity() instanceof EmptyRepresentation) &&
                         !MediaType.APPLICATION_WWW_FORM.equals(getRequest().getEntity().getMediaType())) {
                     throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invalid Content Type");
                 }
