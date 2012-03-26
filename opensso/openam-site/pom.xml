@@ -119,6 +119,7 @@
   <site-out>${basedir}/target/site</site-out>
   <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
   <products-basedir>${basedir}/../products</products-basedir>
+  <gaId>UA-23412190-7</gaId>
  </properties>
  <distributionManagement>
   <site>
@@ -269,7 +270,7 @@
     <inherited>false</inherited>
     <configuration>
      <projectName>OpenAM</projectName>
-     <googleAnalyticsId>UA-23412190-7</googleAnalyticsId>
+     <googleAnalyticsId>${gaId}</googleAnalyticsId>
     </configuration>
     <executions>
      <execution>
