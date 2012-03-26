@@ -1405,7 +1405,7 @@ int test_attr_exists(char *key, char* set_headers_list) {
     char *a, *ab, *hlCopy;
     hlCopy = strdup(set_headers_list);
     for ((a = strtok_s(hlCopy, ":\r\n", &ab)); a; (a = strtok_s(NULL, ":\r\n", &ab))) {
-        if (strnicmp(key, a, strlen(a)) == 0) {
+        if (strcmp(key, a) == 0) {
             free(hlCopy);
             return 1;
         }
