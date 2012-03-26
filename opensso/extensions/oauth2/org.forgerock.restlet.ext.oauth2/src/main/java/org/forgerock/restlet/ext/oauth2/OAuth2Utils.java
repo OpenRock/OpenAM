@@ -81,8 +81,7 @@ public class OAuth2Utils {
                             // restore the entity body
                             request.setEntity(form.getWebRepresentation());
                             result.putAll(form.getValuesMap());
-                        } else if (MediaType.TEXT_PLAIN.equals(request.getEntity().getMediaType()) ||
-                                MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
+                        } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
                             JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(request.getEntity(), Map.class);
                             request.setEntity(representation);
                             result.putAll(representation.getObject());
@@ -376,7 +375,7 @@ public class OAuth2Utils {
         if (Method.GET.equals(request.getMethod()) || request.getEntity() instanceof EmptyRepresentation) {
             return OAuth2Utils.ParameterLocation.HTTP_QUERY.getParameters(request);
         } else {
-            return OAuth2Utils.ParameterLocation.HTTP_BODY.getParameters(request);
+            return OAuth2Utils.ParameterLocation.HTTP_QUERY.getParameters(request);
         }
     }
 

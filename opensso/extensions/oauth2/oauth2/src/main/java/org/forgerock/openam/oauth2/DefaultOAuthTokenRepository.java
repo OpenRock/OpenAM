@@ -20,7 +20,6 @@ import java.util.Date;
 /**
  * @author $author$
  * @version $Revision$ $Date$
- *
  * @see org.forgerock.json.resource.SimpleJsonResource
  */
 public class DefaultOAuthTokenRepository extends GeneralTaskRunnable implements JsonResource {

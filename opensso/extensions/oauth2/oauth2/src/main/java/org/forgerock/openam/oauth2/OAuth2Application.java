@@ -25,12 +25,13 @@
 
 package org.forgerock.openam.oauth2;
 
+import org.forgerock.openam.oauth2.internal.ClientIdentityVerifier;
+import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.store.impl.DefaultOAuthTokenStoreImpl;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
-import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
 import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;
@@ -44,7 +45,7 @@ import org.restlet.Restlet;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.routing.Router;
-import org.restlet.security.MapVerifier;
+import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
 
 import java.net.URI;
@@ -112,13 +113,18 @@ public class OAuth2Application extends Application {
         authorizer.setNext(finder);
 
 
+        ChallengeAuthenticator filter = new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
+        filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters()));
+
+        //ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
+        // Try to authenticate the client The verifier MUST set
+        //filter.setVerifier(getClientVerifier());
+        root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
+
+
         // Define Token Endpoint
         finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT).supportAuthorizationCode().supportClientCredentials().supportImplicit().supportPassword();
-        // Try to authenticate the client The verifier MUST set
-        ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
-        filter.setVerifier(getClientVerifier());
         filter.setNext(finder);
-        root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
 
 
         //Configure context
@@ -135,11 +141,7 @@ public class OAuth2Application extends Application {
     }
 
     public Verifier getUserVerifier() {
-        MapVerifier mapVerifier = new MapVerifier();
-        // Load a single static login/secret pair.
-        mapVerifier.getLocalSecrets().put("admin", "admin".toCharArray());
-        mapVerifier.getLocalSecrets().put("amadmin", "Passw0rd".toCharArray());
-        return mapVerifier;
+        return new UserIdentityVerifier(new OpenAMParameters());
     }
 
     public OAuth2TokenStore getTokenStore() {
