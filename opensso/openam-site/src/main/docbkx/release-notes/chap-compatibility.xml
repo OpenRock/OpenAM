@@ -141,13 +141,6 @@
     JATO is deprecated and is likely to be replaced in a future release.</para>
    </listitem>
   </itemizedlist>
-  <itemizedlist>
-   <listitem>
-    <para>The OpenAM Test Beta Console is deprecated. The Test Beta Console is
-    likely to be removed in a future release, and its functionality made
-    accessible through other means.</para>
-   </listitem>
-  </itemizedlist>
  </section>
 
  <section xml:id="removed">
@@ -160,5 +153,8 @@
   <para>OpenAM console only mode is no longer supported. Console only mode
   is likely to be replaced with a different solution in a future
   release.</para>
+
+  <para>The Test Beta Console has been removed. Its functionality is currently
+  available through the <command>ssoadm</command> command.</para>
  </section>
 </chapter>
