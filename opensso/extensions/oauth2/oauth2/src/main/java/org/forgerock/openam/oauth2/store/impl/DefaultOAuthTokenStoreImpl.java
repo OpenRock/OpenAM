@@ -17,10 +17,17 @@
 
 package org.forgerock.openam.oauth2.store.impl;
 
+import org.forgerock.openam.ext.cts.CoreTokenService;
+import org.forgerock.openam.ext.cts.repo.JMQTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceAccessor;
 import org.forgerock.json.resource.JsonResourceContext;
 import org.forgerock.json.resource.JsonResourceException;
+import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
+import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;
+import org.forgerock.openam.oauth2.model.impl.RefreshTokenImpl;
+import org.forgerock.openam.oauth2.model.impl.SessionClientImpl;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
@@ -29,8 +36,6 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.restlet.data.Status;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -50,32 +55,37 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     // Removed: String clientID
     // Removed: String redirectURI
 
+    private JsonResource repository;
+
+    /**
+     * Constructor, creates the repository instance used.
+     *
+     * @throws OAuthProblemException
+     */
+    public DefaultOAuthTokenStoreImpl() throws OAuthProblemException {
+        try {
+            repository = new CoreTokenService(new JMQTokenRepo());
+        } catch (Exception e) {
+            // TODO: legacy code throws Exception, look to refactor
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(), "Service unavailable", "Could not create underlying storage", null);
+        }
+    }
+
     @Override
-    public AuthorizationCode createAuthorizationCode(Set<String> scopes, String realm, String uuid, SessionClient client) throws OAuthProblemException {
+    public AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid, SessionClient client) throws OAuthProblemException {
 
         String id = UUID.randomUUID().toString();
-        long expires = System.currentTimeMillis() + AUTHZ_CODE_LIFETIME;
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + AUTHZ_CODE_LIFETIME;
 
-        // Create an authorization code JSON object
-        JsonValue code = new JsonValue(new HashMap<String, Object>());
-        code.add("id", id);
-        code.add("type", "authorization_code");
-        code.add("uuid", uuid);
-        if (client != null) {
-            code.add("client", client.getClientId());
-        }
-        code.add("realm", realm);
-        code.add("scope", scopes);
-        code.add("valid", true);
-        code.add("expires", expires);
-
+        AuthorizationCodeImpl code = new AuthorizationCodeImpl(id, uuid, client, realm, scope, false, expireTime);
+        JsonValue jsonCode = code.asJson();
         JsonValue response = null;
 
         // Store in CTS
-        JsonResourceAccessor accessor = new JsonResourceAccessor(null, JsonResourceContext.newRootContext());
-        // TODO: call above with CTS resource
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, code);
+            response = accessor.create(id, jsonCode);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS", null);
@@ -85,19 +95,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS", null);
         }
 
-        // Construct an AuthorizationCode object and return it
-        AuthorizationCode ac = constructAuthorizationCode(true, response.get("id").asString(), uuid, client, realm, expires);
-        return ac;
+        return code;
     }
 
     @Override
     public AuthorizationCode readAuthorizationCode(String id) throws OAuthProblemException {
-
         JsonValue response = null;
 
         // Read from CTS
-        JsonResourceAccessor accessor = new JsonResourceAccessor(null, JsonResourceContext.newRootContext());
-        // TODO: call above with CTS resource
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
@@ -110,116 +116,282 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         // Construct an AuthorizationCode object and return it
-        AuthorizationCode ac = constructAuthorizationCode(!response.get("valid").asBoolean(), response.get("id").asString(), response.get("uuid").asString(), (SessionClient) response.get("client"), response.get("realm").asString(), response.get("expires").asLong());
+        AuthorizationCode ac = new AuthorizationCodeImpl(response.get("value"));
         return ac;
-        // Construct a request
-        //JsonValue request = new JsonValue(new HashMap<String, Object>());
-
-
-        // Call the CTS
-
-        // Wrap the returned object // TODO:
-
-        // Return the AuthorizationCode
-        //return ac;
     }
-
-    /**
-     * Internal helper class to construct an anonymous authorization code object.
-     */
-    private AuthorizationCode constructAuthorizationCode(final boolean valid, final String id, final String uuid, final SessionClient client, final String realm, final long expires) {
-        return new AuthorizationCode() {
-            public boolean isTokenIssued() {
-                return valid;
-            }
-
-            public String getToken() {
-                return id;
-            }
-
-            public String getUserID() {
-                return uuid;
-            }
-
-            public String getRealm() {
-                return realm;
-            }
-
-            public SessionClient getClient() {
-                return client;
-            }
-
-            public Set<String> getScope() {
-                return Collections.emptySet();
-            }
-
-            public long getExpireTime() {
-                return 0;
-            }
-
-            public boolean isExpired() {
-                return false;
-            }
-
-            public long getExpires() {
-                return expires;
-            }
-        };
-    }
-
 
     @Override
     public void deleteAuthorizationCode(String id) throws OAuthProblemException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        JsonValue response = null;
+
+        // Read from CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.read(id);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not find token using CTS", null);
+        }
+
+        // Create a query for other tokens with this as a parent
+        // TODO secondary key search via query
+
+        // Delete the code
+        try {
+            response = accessor.delete(id, null);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
+        }
+
+        // TODO check if delete can return null without exception?
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, AuthorizationCode code) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, AuthorizationCode code) {
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+
+        AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, code);
+        // TODO decide where the scope in the access token is checked against the authorization code
+
+        JsonValue value = accessToken.asJson();
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, value);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not create token in CTS", null);
+        }
+
+        return accessToken;
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, RefreshToken refreshToken) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, RefreshToken refreshToken) {
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+
+        AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, refreshToken);
+        // TODO find out where the scope in the access token is checked against the authorization code
+
+        JsonValue value = accessToken.asJson();
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, value);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not create token in CTS", null);
+        }
+
+        return accessToken;
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm, String uuid) {
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+
+        AccessTokenImpl accessToken = new AccessTokenImpl(id, null, uuid, null, realm, scope, expireTime);
+        JsonValue value = accessToken.asJson();
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, value);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not create token in CTS", null);
+        }
+
+        return accessToken;
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, SessionClient client) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm, String uuid, SessionClient client) {
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+
+        AccessTokenImpl accessToken = new AccessTokenImpl(id, null, uuid, client, realm, scope, expireTime);
+        // TODO should scope be checked against client settings?
+        JsonValue value = accessToken.asJson();
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, value);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not create token in CTS", null);
+        }
+
+        return accessToken;
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, String clientId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm, String uuid, String clientId) {
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+
+        AccessTokenImpl accessToken = new AccessTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm, scope, expireTime);
+        // TODO should scope be checked against client settings?
+        JsonValue value = accessToken.asJson();
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, value);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not create token in CTS", null);
+        }
+
+        return accessToken;
     }
 
     @Override
     public AccessToken readAccessToken(String id) throws OAuthProblemException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        JsonValue response = null;
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.read(id);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not read token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not read token in CTS", null);
+        }
+        
+        AccessToken accessToken = new AccessTokenImpl(response);
+        return accessToken;
     }
 
     @Override
     public void deleteAccessToken(String id) throws OAuthProblemException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        JsonValue response = null;
+
+        // Delete the code
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.delete(id, null);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
+        }
+
+        // TODO check if delete can return null without exception?
     }
 
     @Override
-    public RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId) throws OAuthProblemException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid, String clientId) throws OAuthProblemException {
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        // TODO expiry time cascading config
+        long expireTime = System.currentTimeMillis() + REFRESH_TOKEN_LIFETIME;
+
+        RefreshTokenImpl refreshToken = new RefreshTokenImpl(id, null, uuid, null, realm, scope, expireTime);
+        JsonValue value = refreshToken.asJson();
+
+        // Create in CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, value);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not create token in CTS", null);
+        }
+
+        return refreshToken;
     }
 
     @Override
     public RefreshToken readRefreshToken(String id) throws OAuthProblemException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        JsonValue response = null;
+
+        // Read from CTS
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.read(id);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not find token from CTS", null);
+        }
+
+        // Construct a RefreshToken object and return it
+        RefreshToken rt = new RefreshTokenImpl(response.get("value"));
+        return rt;
     }
 
     @Override
     public void deleteRefreshToken(String id) throws OAuthProblemException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        JsonValue response = null;
+
+        // Delete the code
+        JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.delete(id, null);
+        } catch (JsonResourceException e) {
+            // TODO: logging
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
+        }
+
+        // TODO check if delete can return null without exception?
     }
+
 }
