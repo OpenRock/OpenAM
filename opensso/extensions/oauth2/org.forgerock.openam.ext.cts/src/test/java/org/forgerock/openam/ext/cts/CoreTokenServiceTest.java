@@ -18,9 +18,10 @@ package org.forgerock.openam.ext.cts;
 
 import org.forgerock.openam.ext.cts.repo.MockTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 
 import java.util.HashMap;
 import java.util.HashSet;

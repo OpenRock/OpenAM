@@ -18,13 +18,13 @@
 package org.forgerock.openam.ext.cts.repo;
 
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.common.Constants;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.ha.FAMPersisterManager;
 import com.sun.identity.ha.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.session.util.SessionUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;

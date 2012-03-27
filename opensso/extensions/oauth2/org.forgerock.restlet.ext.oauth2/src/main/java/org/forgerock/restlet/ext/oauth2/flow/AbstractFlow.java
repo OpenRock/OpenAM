@@ -232,7 +232,8 @@ public abstract class AbstractFlow extends ServerResource {
             }
         } else {
             //TODO Use custom StatusServer to set the proper status
-            super.doCatch(throwable);
+            doCatch(OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),throwable.getMessage()));
+            //super.doCatch(throwable);
         }
     }
 
