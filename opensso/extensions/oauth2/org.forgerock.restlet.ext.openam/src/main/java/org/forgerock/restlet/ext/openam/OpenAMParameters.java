@@ -32,11 +32,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * An OpenAMParameters does ...
+ * An OpenAMParameters is a proxy class to AMConfig.properties.
+ * <p/>
+ * If the OpenAM SDK is available in the class path this class proxies the calls to
+ * {@link com.iplanet.am.util.SystemProperties} otherwise it keeps the properties in its own {@link #getAttributes()} Map.
  *
  * @author Laszlo Hordos
  */
 public class OpenAMParameters {
+
+    public enum IndexType {
+        SERVICE,
+        MODULE;
+
+        public String getQueryParameter() {
+            return name().toLowerCase();
+        }
+    }
 
     public static final String AUTHENTICATE = "authenticate";
     public static final String LOGOUT = "logout";
@@ -51,6 +63,7 @@ public class OpenAMParameters {
     public static final String SERVICES_DEBUG_DIRECTORY = "com.iplanet.services.debug.directory";
     public static final String AM_APPLICATION_USERNAME = "com.sun.identity.agents.app.username";
     public static final String AM_APPLICATION_PASSWORD = "com.iplanet.am.service.password";
+    public static final String AM_SERVER_LOGINURL = "com.sun.identity.loginurl";
 
     public static final boolean OPENAM_SDK;
 
@@ -72,24 +85,20 @@ public class OpenAMParameters {
     private String loginIndexName = "DataStore";
     private String orgName = "/";
     private String locale = null;
+    private IndexType loginIndexType = null;
 
 
     public OpenAMParameters() {
         this.attributes = new ConcurrentHashMap<String, Object>();
+    }
+
+    public Reference getOpenAMServerRef() {
         Reference baseRef = new Reference();
-        //this.baseRef = new Reference("http://localhost:8080/openam/identity");
         baseRef.setScheme(getServerProtocol().getSchemeName());
         baseRef.setHostDomain(getServerHost());
         baseRef.setHostPort(getServerPort());
         baseRef.setPath(getServerDeploymentURI());
-        baseRef.toString();
-    }
-
-    public Reference getOpenAMServerRef() {
-        String url = getServerProtocol().getSchemeName() + "://" +
-                getServerHost() + ":" + getServerPort() + "/" +
-                getServerDeploymentURI();
-        return new Reference(url);
+        return baseRef;
     }
 
     /**
@@ -128,10 +137,16 @@ public class OpenAMParameters {
     }
 
     /**
-     * URI entry point to OpenAM such as /openam
+     * URI entry point to OpenAM such as openam
+     * <p/>
+     * The leading "/" is removed
      */
     public String getServerDeploymentURI() {
-        return getProperty(AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+        String uri = getProperty(AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+        if (null != uri) {
+            return uri.startsWith("/") ? uri : "/" + uri;
+        }
+        return "";
     }
 
     public void setServerDeploymentURI(String serverDeploymentURI) {
@@ -193,6 +208,18 @@ public class OpenAMParameters {
 
     public void setLocale(String locale) {
         this.locale = locale;
+    }
+
+    public IndexType getLoginIndexType() {
+        return loginIndexType;
+    }
+
+    public void setLoginIndexType(IndexType loginIndexType) {
+        this.loginIndexType = loginIndexType;
+    }
+
+    public ConcurrentMap<String, Object> getAttributes() {
+        return attributes;
     }
 
     //-------------------------------------------------------------

@@ -28,30 +28,20 @@ import com.iplanet.sso.SSOToken;
 import org.restlet.security.User;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An OpenAMUser wraps the {@link SSOToken} of the authenticated {@link User}
+ *
+ * @author Laszlo Hordos
  */
 public class OpenAMUser extends User {
     private SSOToken token;
-    private String realm;
-    private String universalId;
 
-    public OpenAMUser(String name, String realm, String universalId, SSOToken token) {
+    public OpenAMUser(String name, SSOToken token) {
         super(name);
+        //name = token.getProperty("UserId")
         this.token = token;
-        this.realm = realm;
-        this.universalId = universalId;
     }
 
     public SSOToken getToken() {
         return token;
-    }
-
-    public String getRealm() {
-        return realm;
-    }
-
-    public String getUniversalId() {
-        return universalId;
     }
 }

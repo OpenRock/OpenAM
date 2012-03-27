@@ -23,27 +23,28 @@
  * $Id$
  */
 
-package org.forgerock.openam.oauth2.internal;
+package org.forgerock.restlet.ext.openam;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.AuthContext;
-import org.forgerock.restlet.ext.openam.OpenAMParameters;
-import org.forgerock.restlet.ext.openam.OpenAMUser;
+import org.restlet.data.Reference;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
- * A UserIdentityVerifier does ...
+ * A NAME does ...
  *
  * @author Laszlo Hordos
  */
-public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
-
-    public UserIdentityVerifier(OpenAMParameters parameters) {
-        super(parameters);
-    }
-
-    @Override
-    protected OpenAMUser createUser(AuthContext authContext) throws Exception {
-        SSOToken token = authContext.getSSOToken();
-        return new OpenAMUser(token.getProperty("UserId"), token);
+public class OpenAMParametersTest {
+    @Test
+    public void testGetOpenAMServerRef() throws Exception {
+        OpenAMParameters parameters = new OpenAMParameters();
+        Reference baseRef = new Reference();
+        baseRef.setScheme(parameters.getServerProtocol().getSchemeName());
+        baseRef.setHostDomain(parameters.getServerHost());
+        baseRef.setHostPort(parameters.getServerPort());
+        baseRef.setPath(parameters.getServerDeploymentURI());
+        Assert.assertEquals(baseRef.toString(), "http://localhost:8080/openam");
+        baseRef.setPath(baseRef.getPath() + "/UI/Login");
+        Assert.assertEquals(baseRef.toString(), "http://localhost:8080/openam/UI/Login");
     }
 }

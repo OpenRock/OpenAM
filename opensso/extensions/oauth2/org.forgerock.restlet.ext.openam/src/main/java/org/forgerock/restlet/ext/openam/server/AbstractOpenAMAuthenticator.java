@@ -30,11 +30,11 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
+import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -50,31 +50,65 @@ import org.restlet.security.Enroler;
 public abstract class AbstractOpenAMAuthenticator extends Authenticator {
 
     private final Reference openamServer;
+    private String serviceName = null;
+    private String moduleName = null;
+    private String realm = null;
 
-    public AbstractOpenAMAuthenticator(Context context, Reference openamServer) {
+    /**
+     * {@inheritDoc}
+     */
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters) {
         super(context);
-        this.openamServer = openamServer;
+        this.openamServer = parameters.getOpenAMServerRef();
+        init(parameters);
     }
 
-    public AbstractOpenAMAuthenticator(Context context, Reference openamServer, boolean optional) {
+    /**
+     * {@inheritDoc}
+     */
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean optional) {
         super(context, optional);
-        this.openamServer = openamServer;
+        this.openamServer = parameters.getOpenAMServerRef();
+        init(parameters);
     }
 
-    public AbstractOpenAMAuthenticator(Context context, Reference openamServer, boolean multiAuthenticating, boolean optional, Enroler enroler) {
+    /**
+     * {@inheritDoc}
+     */
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean multiAuthenticating,
+                                       boolean optional, Enroler enroler) {
         super(context, multiAuthenticating, optional, enroler);
-        this.openamServer = openamServer;
+        this.openamServer = parameters.getOpenAMServerRef();
+        init(parameters);
     }
 
-    public AbstractOpenAMAuthenticator(Context context, Reference openamServer, boolean optional, Enroler enroler) {
+    /**
+     * {@inheritDoc}
+     */
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean optional, Enroler enroler) {
         super(context, optional, enroler);
-        this.openamServer = openamServer;
+        this.openamServer = parameters.getOpenAMServerRef();
+        init(parameters);
+    }
+
+    protected void init(OpenAMParameters parameters) {
+        String path = this.openamServer.getPath();
+        path = path.endsWith("/") ? path + "UI/Login" : path + "/UI/Login";
+        this.openamServer.setPath(path);
+        realm = parameters.getOrgName();
+        if (OpenAMParameters.IndexType.MODULE.equals(parameters.getLoginIndexType())) {
+            moduleName = parameters.getLoginIndexName();
+        } else if (OpenAMParameters.IndexType.SERVICE.equals(parameters.getLoginIndexType())) {
+            serviceName = parameters.getLoginIndexName();
+        }
     }
 
 
     protected abstract SSOToken getToken(Request request, Response response) throws SSOException;
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean authenticate(Request request, Response response) {
         try {
@@ -82,7 +116,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
             if (null != token) {
                 AMIdentity identity = IdUtils.getIdentity(token);
 
-                OpenAMUser user = new OpenAMUser(identity.getName(), identity.getRealm(), identity.getUniversalId(),
+                OpenAMUser user = new OpenAMUser(identity.getName(),
                         token);
                 request.getClientInfo().setUser(user);
                 return identity.isActive();
@@ -96,13 +130,16 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     }
 
     protected void redirect(Request request, Response response) {
-        Form parameters = request.getResourceRef().getQueryAsForm();
-        String realm = parameters.getFirstValue("realm");
-
         Reference amserver = new Reference(openamServer);
-        if (null != realm && realm.trim().length() > 0) {
+        if (null != realm) {
             amserver.addQueryParameter("realm", realm);
         }
+        if (null != moduleName) {
+            amserver.addQueryParameter("module", moduleName);
+        } else if (null != serviceName) {
+            amserver.addQueryParameter("service", serviceName);
+        }
+
         amserver.addQueryParameter("goto", request.getResourceRef().toString());
 
         Redirector redirector = new Redirector(getContext(), amserver.toString(), Redirector.MODE_CLIENT_FOUND);

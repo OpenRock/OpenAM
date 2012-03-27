@@ -1,7 +1,7 @@
 package org.forgerock.restlet.ext.openam;
 
+import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
-import org.forgerock.restlet.ext.openam.internal.OpenAMAuthorizer;
 import org.restlet.Application;
 import org.restlet.Restlet;
 
@@ -22,7 +22,7 @@ public class DemoApplication extends Application {
     public Restlet createInboundRoot() {
         OpenAMServletAuthenticator root = new OpenAMServletAuthenticator(getContext(), null);
         root.setEnroler(new OpenAMEnroler());
-        OpenAMAuthorizer authorizer = new OpenAMAuthorizer("OAUTH2");
+        OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer("OAUTH2");
         authorizer.setNext(DemoServerResource.class);
         root.setNext(authorizer);
         return root;

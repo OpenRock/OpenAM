@@ -18,17 +18,20 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An OpenAMServerAuthorizer request for a Policy Decision.
+ * <p/>
+ * It use the remote {@link PolicyEvaluator}
+ *
+ * @author Laszlo Hordos
  */
-public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
+public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
 
     protected PolicyEvaluator pe;
 
     /**
      * Default constructor.
      */
-    public OpenAMAuthorizer() {
+    public OpenAMServerAuthorizer() {
         super();
         init();
     }
@@ -38,7 +41,7 @@ public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
      *
      * @param identifier The identifier unique within an application.
      */
-    public OpenAMAuthorizer(String identifier) {
+    public OpenAMServerAuthorizer(String identifier) {
         super(identifier);
         init();
     }

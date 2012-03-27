@@ -50,7 +50,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.util.Map;
 
 /**
- * A NAME does ...
+ * A OpenAMProxy transparently authenticates the client before the request. This is a sample class and not optimized yet.
  *
  * @author Laszlo Hordos
  */

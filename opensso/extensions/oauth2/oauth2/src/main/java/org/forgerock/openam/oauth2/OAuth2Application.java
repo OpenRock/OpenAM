@@ -37,7 +37,7 @@ import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
-import org.forgerock.restlet.ext.openam.internal.OpenAMAuthorizer;
+import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -100,11 +100,11 @@ public class OAuth2Application extends Application {
         Router root = new Router(childContext);
 
         OpenAMParameters parameters = new OpenAMParameters();
-        OpenAMServletAuthenticator authenticator = new OpenAMServletAuthenticator(childContext, parameters.getOpenAMServerRef());
+        OpenAMServletAuthenticator authenticator = new OpenAMServletAuthenticator(childContext, parameters);
         // This endpoint protected by OpenAM Filter
         root.attach(OAuth2Utils.getAuthorizePath(childContext), authenticator);
 
-        OpenAMAuthorizer authorizer = new OpenAMAuthorizer();
+        OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
         authenticator.setNext(authorizer);
 
 

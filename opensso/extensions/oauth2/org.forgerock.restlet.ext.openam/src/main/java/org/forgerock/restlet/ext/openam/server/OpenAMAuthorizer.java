@@ -43,8 +43,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An OpenAMAuthorizer request for a Policy Decision.
+ * <p/>
+ * It use the remote {@link PolicyEvaluator}
+ *
+ * @author Laszlo Hordos
  */
 public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
 
@@ -82,9 +85,11 @@ public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
     @Override
     protected boolean getPolicyDecision(OpenAMUser user, Request request, Response response) throws SSOException, PolicyException {
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
-        Set<String> paramValue = new HashSet<String>(1);
-        paramValue.add(getIdentifier());
-        env.put("application_identifier", paramValue);
+        if (null != getIdentifier()) {
+            Set<String> paramValue = new HashSet<String>(1);
+            paramValue.add(getIdentifier());
+            env.put("application_identifier", paramValue);
+        }
         //env.put(Condition.REQUEST_AUTHENTICATED_TO_REALMS, "/");
 
         Set<String> actions = new HashSet<String>();
@@ -93,5 +98,11 @@ public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
                 request.getResourceRef().toString(), actions, env);
         return pe.isAllowed(user.getToken(),
                 request.getResourceRef().toString(), request.getMethod().getName(), env);
+    }
+
+    protected void createEnvironment(Request request, Map<String, Set<String>> env) {
+        Set<String> paramValue = new HashSet<String>(1);
+        paramValue.add(request.getClientInfo().getAddress());
+        env.put("ip", paramValue);
     }
 }

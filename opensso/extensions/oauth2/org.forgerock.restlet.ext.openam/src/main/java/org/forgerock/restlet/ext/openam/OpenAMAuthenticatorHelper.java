@@ -45,7 +45,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 
 /**
- * An OpenAMAuthenticatorHelper does ...
+ * An OpenAMAuthenticatorHelper generates the {@code WWW-Authenticate: OpenAM} challenge request and parse the
+ * {@code Authorization: OpenAM } challenge response to get the SSOToken ID.
  *
  * @author Laszlo Hordos
  */

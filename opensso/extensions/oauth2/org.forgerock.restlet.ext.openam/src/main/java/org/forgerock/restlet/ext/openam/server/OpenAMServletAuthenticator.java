@@ -27,11 +27,10 @@ package org.forgerock.restlet.ext.openam.server;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import org.forgerock.restlet.ext.openam.server.AbstractOpenAMAuthenticator;
+import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.security.Enroler;
 
@@ -39,25 +38,29 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An OpenAMServletAuthenticator gets the {@link SSOToken} from the  {@link HttpServletRequest} and authenticates the
+ * {@link org.restlet.security.User}.
+ * <p/>
+ * This class works with the Servlet Extension only!!!
+ *
+ * @author Laszlo Hordos
  */
 public class OpenAMServletAuthenticator extends AbstractOpenAMAuthenticator {
 
-    public OpenAMServletAuthenticator(Context context, Reference openamServer) {
-        super(context, openamServer);
+    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters) {
+        super(context, parameters);
     }
 
-    public OpenAMServletAuthenticator(Context context, Reference openamServer, boolean optional) {
-        super(context, openamServer, optional);
+    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters, boolean optional) {
+        super(context, parameters, optional);
     }
 
-    public OpenAMServletAuthenticator(Context context, Reference openamServer, boolean multiAuthenticating, boolean optional, Enroler enroler) {
-        super(context, openamServer, multiAuthenticating, optional, enroler);
+    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters, boolean multiAuthenticating, boolean optional, Enroler enroler) {
+        super(context, parameters, multiAuthenticating, optional, enroler);
     }
 
-    public OpenAMServletAuthenticator(Context context, Reference openamServer, boolean optional, Enroler enroler) {
-        super(context, openamServer, optional, enroler);
+    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters, boolean optional, Enroler enroler) {
+        super(context, parameters, optional, enroler);
     }
 
 

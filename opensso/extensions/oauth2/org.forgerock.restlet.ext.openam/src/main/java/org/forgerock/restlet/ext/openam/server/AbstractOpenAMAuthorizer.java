@@ -37,8 +37,10 @@ import org.restlet.security.Authorizer;
 import java.util.Locale;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An AbstractOpenAMAuthorizer request for a Policy Decision. There are two implementation because there is an internal
+ * {@link com.sun.identity.policy.PolicyEvaluator} and a remote {@link com.sun.identity.policy.client.PolicyEvaluator}
+ *
+ * @author Laszlo Hordos
  */
 public abstract class AbstractOpenAMAuthorizer extends Authorizer {
 

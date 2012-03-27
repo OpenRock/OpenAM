@@ -29,33 +29,48 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.restlet.ext.openam.OpenAMAuthenticatorHelper;
+import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Reference;
 import org.restlet.security.Enroler;
 
 /**
- * A NAME does ...
+ * An OpenAMAuthenticator gets the {@link SSOToken} from the  {@code Authorization: OpenAM } header value
+ * and authenticate the {@link org.restlet.security.User}.
+ * <p/>
+ * This class depend on OpenAM SDK only and support non-servlet deployment.
  *
  * @author Laszlo Hordos
  */
 public class OpenAMAuthenticator extends AbstractOpenAMAuthenticator {
 
-    public OpenAMAuthenticator(Context context, Reference openamServer) {
-        super(context, openamServer);
+    /**
+     * {@inheritDoc}
+     */
+    public OpenAMAuthenticator(Context context, OpenAMParameters parameters) {
+        super(context, parameters);
     }
 
-    public OpenAMAuthenticator(Context context, Reference openamServer, boolean optional) {
-        super(context, openamServer, optional);
+    /**
+     * {@inheritDoc}
+     */
+    public OpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean optional) {
+        super(context, parameters, optional);
     }
 
-    public OpenAMAuthenticator(Context context, Reference openamServer, boolean multiAuthenticating, boolean optional, Enroler enroler) {
-        super(context, openamServer, multiAuthenticating, optional, enroler);
+    /**
+     * {@inheritDoc}
+     */
+    public OpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean multiAuthenticating, boolean optional, Enroler enroler) {
+        super(context, parameters, multiAuthenticating, optional, enroler);
     }
 
-    public OpenAMAuthenticator(Context context, Reference openamServer, boolean optional, Enroler enroler) {
-        super(context, openamServer, optional, enroler);
+    /**
+     * {@inheritDoc}
+     */
+    public OpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean optional, Enroler enroler) {
+        super(context, parameters, optional, enroler);
     }
 
     @Override

@@ -138,6 +138,22 @@
 
     </dependencies>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <links>
+                            <link>http://docs.oracle.com/javase/6/docs/api</link>
+                            <link>http://www.restlet.org/documentation/2.1/jse/api</link>
+                            <link>http://www.restlet.org/documentation/2.1/jse/ext</link>
+                            <link>http://www.restlet.org/documentation/2.1/jse/engine</link>
+                        </links>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>

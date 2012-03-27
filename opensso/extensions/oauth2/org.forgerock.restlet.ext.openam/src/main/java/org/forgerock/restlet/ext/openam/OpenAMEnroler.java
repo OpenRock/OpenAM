@@ -36,8 +36,10 @@ import org.restlet.security.Role;
 import java.util.Set;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An OpenAMEnroler gets the membership {@link AMIdentity#getMemberships(com.sun.identity.idm.IdType)}} of
+ * {@link IdType#GROUP} and populates the {@link org.restlet.data.ClientInfo#getRoles()} collection.
+ *
+ * @author Laszlo Hordos
  */
 public class OpenAMEnroler implements Enroler {
 

@@ -54,7 +54,7 @@ public class OpenAMAuthenticatorTest extends OpenAMTestBase {
     public void setUp() throws Exception {
         OpenAMParameters parameters = new OpenAMParameters();
         //Protect the ServerResource
-        OpenAMAuthenticator filter = new OpenAMAuthenticator(new Context(), parameters.getOpenAMServerRef());
+        OpenAMAuthenticator filter = new OpenAMAuthenticator(new Context(), parameters);
         //Authorize
         OpenAMAuthorizer authorizer = new OpenAMAuthorizer("OAUTH2");
         filter.setNext(authorizer);
