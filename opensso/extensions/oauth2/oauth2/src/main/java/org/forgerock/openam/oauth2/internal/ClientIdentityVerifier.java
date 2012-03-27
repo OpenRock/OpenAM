@@ -50,7 +50,7 @@ public class ClientIdentityVerifier extends AbstractIdentityVerifier<OAuth2Clien
         SSOToken token = authContext.getSSOToken();
         client.put("id", token.getProperty("UserId"));
         client.put("clientType", ClientApplication.ClientType.CONFIDENTIAL.name());
-        client.put("redirectionURIs", Arrays.asList("http://localhost:8080/oauth2/cb"));
+        client.put("redirectionURIs", Arrays.asList("http://local.identitas.no:9085/openam/oauth2test/code-token.html"));
         client.put("allowedGrantScopes", Arrays.asList("red", "write", "delete"));
         client.put("defaultGrantScopes", Arrays.asList("red"));
         return new OAuth2Client(client);

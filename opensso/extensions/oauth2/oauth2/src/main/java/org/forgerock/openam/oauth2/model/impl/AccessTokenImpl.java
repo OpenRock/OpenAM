@@ -17,8 +17,10 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.model.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,8 +73,13 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
 
     @Override
     public Map<String, Object> convertToMap() {
+        Map<String, Object> tokenMap = new HashMap<String, Object>();
+        tokenMap.put(OAuth2.Params.ACCESS_TOKEN, getToken());
+        //tokenMap.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
+        tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
+        tokenMap.put(OAuth2.Params.EXPIRES_IN, getExpireTime() - System.currentTimeMillis());
         // TODO implement or change interface
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return tokenMap;
     }
 
 }

@@ -193,7 +193,7 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
             FAMRecord famRec = new FAMRecord(cts, FAMRecord.WRITE, primaryKey, expirationTime, secondaryKey, 0, null, blob);
             FAMRecord retRec = pSession.send(famRec);
 
-            JsonValue retValue = new JsonValue(new HashMap<String,Object>());
+            JsonValue retValue = new JsonValue(new HashMap<String, Object>());
             retValue.put("_id", primaryKey);
             retValue.put("_rev", null); // TODO: relevance of revision
             return retValue;
@@ -231,11 +231,14 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
         try {
             FAMRecord famRec = new FAMRecord(cts, FAMRecord.READ, primaryKey, 0, null, 0, null, null);
             FAMRecord retRec = pSession.send(famRec);
+            if (null == retRec) {
+                throw new JsonResourceException(JsonResourceException.NOT_FOUND, "Object not found with id: " + primaryKey);
+            }
             byte[] blob = retRec.getBlob();
             Object retObj = SessionUtils.decode(blob);
             JsonValue tokenObj = (JsonValue) retObj; // TODO: check cast
 
-            JsonValue retValue = new JsonValue(new HashMap<String,Object>());
+            JsonValue retValue = new JsonValue(new HashMap<String, Object>());
             retValue.put("_id", primaryKey);
             retValue.put("_rev", null); // TODO: relevance of revision
             retValue.put("value", tokenObj);
@@ -257,6 +260,7 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
     /**
      * Updates a token in the store. Note that this will overwrite the previous token completely. In the event that the
      * original token has not been stored, the token will be created.
+     *
      * @param request the JSON request object including the entire token object to be stored
      * @return JSON response including the ID of the token
      * @throws JsonResourceException
@@ -269,6 +273,7 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
 
     /**
      * Deletes a token from the store based on the ID in the request.
+     *
      * @param request the JSON request object including the ID of the token to delete
      * @return null
      * @throws JsonResourceException
@@ -303,6 +308,7 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
     /**
      * Applies a patch to a token in the store by retrieving, patching, then updating. This method does not currently
      * support changing the primary or secondary key of the token.
+     *
      * @param request the JSON request including the patch object
      * @return simple JSON response of _id and _rev
      * @throws JsonResourceException
@@ -311,11 +317,11 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
     protected JsonValue patch(JsonValue request) throws JsonResourceException {
         String primaryKey = request.get("id").asString();
         JsonValue patch = request.get("value");
-        
-        JsonValue readRequest = new JsonValue(new HashMap<String,Object>());
+
+        JsonValue readRequest = new JsonValue(new HashMap<String, Object>());
         readRequest.put("id", primaryKey);
         readRequest.put("method", "read");
-        
+
         // Read the token
         JsonValue readResponse = handle(readRequest);
         JsonValue originalToken = readResponse.get("value");
@@ -324,12 +330,12 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
         JsonPatch.patch(originalToken, patch);
 
         // Update the token
-        JsonValue updateRequest = new JsonValue(new HashMap<String,Object>());
+        JsonValue updateRequest = new JsonValue(new HashMap<String, Object>());
         updateRequest.put("id", primaryKey);
         updateRequest.put("value", originalToken);
         // TODO handle case where primary key or secondary key changes
 
-        JsonValue retValue = new JsonValue(new HashMap<String,Object>());
+        JsonValue retValue = new JsonValue(new HashMap<String, Object>());
         retValue.put("_id", primaryKey);
         retValue.put("_rev", null); // TODO: relevance of revision
         return retValue;
