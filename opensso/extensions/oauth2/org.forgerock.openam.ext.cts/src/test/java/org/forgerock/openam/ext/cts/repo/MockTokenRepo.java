@@ -14,7 +14,7 @@
  * Copyright © 2012 ForgeRock. All rights reserved.
  */
 
-package org.forgerock.ext.cts.repo;
+package org.forgerock.openam.ext.cts.repo;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.JsonResourceException;

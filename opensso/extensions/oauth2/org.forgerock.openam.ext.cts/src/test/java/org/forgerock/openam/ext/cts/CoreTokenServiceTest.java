@@ -14,11 +14,10 @@
  * Copyright © 2012 ForgeRock. All rights reserved.
  */
 
-package org.forgerock.ext.cts;
+package org.forgerock.openam.ext.cts;
 
-import org.forgerock.ext.cts.repo.MockTokenRepo;
+import org.forgerock.openam.ext.cts.repo.MockTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
