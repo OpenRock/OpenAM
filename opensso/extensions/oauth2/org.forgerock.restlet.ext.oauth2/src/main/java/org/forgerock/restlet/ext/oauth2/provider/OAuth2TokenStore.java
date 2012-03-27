@@ -114,8 +114,9 @@ public interface OAuth2TokenStore {
     AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid, SessionClient client);
 
     /**
-     * Creates and stores an access token using the resource owner password and implicit flow, where the client passes the
-     * credentials to the OAuth endpoint. The resulting token has no parent.
+     * Creates and stores an access token using the resource owner password, where the client passes the
+     * credentials to the OAuth endpoint. The resulting token has no parent. There is no redirect UR in this case since
+     * the token is sent directly as a response to a POST.
      *
      * @param accessTokenType MAC, Bearer or an extended access token type
      * @param scopes          the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
@@ -128,7 +129,8 @@ public interface OAuth2TokenStore {
 
     /**
      * Creates and stores an access token using the client credential flow, where the client only is authenticated and
-     * identified. The resulting token will not be tied to the resource owner, and will have no parent token.
+     * identified. The resulting token will not be tied to the resource owner, and will have no parent token. There is
+     * no redirect URI in this case since the client is the same as the resource owner and redirection is not needed.
      *
      * @param accessTokenType MAC, Bearer or an extended access token type
      * @param scopes          the scope(s) for which to issue the token, must be identical to or a subset of authz code scopes
