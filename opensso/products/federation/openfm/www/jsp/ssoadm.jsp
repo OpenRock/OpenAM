@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted [2010] [ForgeRock AS]
+   Portions Copyrighted 2010-2012 ForgeRock Inc
 --%>
 
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
@@ -35,12 +35,16 @@
 <%@ page import="com.sun.identity.cli.*" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
 <%@ page import="java.text.MessageFormat" %>
+<%@ page import="com.sun.identity.common.DNUtils" %>
+<%@ page import="com.sun.identity.idm.AMIdentity" %>
+<%@ page import="com.sun.identity.idm.IdType" %>
+<%@ page import="java.util.ResourceBundle" %>
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>OpenSSO</title>
+    <title>OpenAM</title>
     <link rel="stylesheet" type="text/css" href="com_sun_web_ui/css/css_ns6up.css" />
     <link rel="shortcut icon" href="com_sun_web_ui/images/favicon/favicon.ico" type="image/x-icon" />
     <script language="Javascript" src="js/admincli.js"></script>
@@ -74,7 +78,29 @@
         try {
             SSOTokenManager manager = SSOTokenManager.getInstance();
             SSOToken ssoToken = manager.createSSOToken(request);
-            manager.validateToken(ssoToken);
+            String adminUserDN = "";
+            AMIdentity adminUserId = null;
+
+            // This will give you the 'amAdmin' user dn
+            String adminUser = SystemProperties.get(
+            "com.sun.identity.authentication.super.user");
+            if (adminUser != null) {
+                adminUserDN = DNUtils.normalizeDN(adminUser);
+                // This will give you the 'amAdmin' Identity
+                adminUserId = new AMIdentity(ssoToken, adminUser,
+                    IdType.USER, "/", null);
+            }
+
+            // This will be your incoming user/token.
+            AMIdentity user = new AMIdentity(ssoToken);
+
+            if ((!adminUserDN.equals(DNUtils.normalizeDN(
+                ssoToken.getPrincipal().getName()))) &&
+                (!user.equals(adminUserId))) {
+    
+                out.println(ResourceBundle.getBundle("encode", request.getLocale()).getString("no.permission"));
+                return;
+            }
 
             WebCLIHelper helper = new WebCLIHelper(request,
                 "com.sun.identity.cli.AccessManager,com.sun.identity.federation.cli.FederationManager",

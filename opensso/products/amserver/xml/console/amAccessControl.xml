@@ -26,7 +26,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2012 ForgeRock Inc
 -->
 <accesscontrols>
     <!-- REALM -->
@@ -337,7 +337,6 @@
 
     <neednodealwith classname="com.sun.identity.console.federation.CreateCOTViewBean" />
     <neednodealwith classname="com.sun.identity.console.federation.FSAuthDomainsEditViewBean" />
-    <neednodealwith classname="com.sun.identity.console.federation.FileChooserViewBean" />
     <neednodealwith classname="com.sun.identity.console.federation.FederationViewBean" />
     <neednodealwith classname="com.sun.identity.console.federation.ImportEntityViewBean" />
     <neednodealwith classname="com.sun.identity.console.federation.IDFFIDPViewBean" />

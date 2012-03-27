@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.shared;
@@ -246,6 +246,8 @@ public interface Constants {
     String AUTHENTICATION_SUPER_USER = 
         "com.sun.identity.authentication.super.user";
 
+    String CONSOLE_PRIVILEGED_USERS =
+            "console.privileged.users";
     /**
      * Property string for authentication super user.
      */
