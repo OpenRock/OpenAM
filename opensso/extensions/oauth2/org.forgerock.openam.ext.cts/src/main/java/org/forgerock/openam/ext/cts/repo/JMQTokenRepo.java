@@ -166,10 +166,10 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
             throw new JsonResourceException(JsonResourceException.BAD_REQUEST, "No value to store was found in the request");
         }
 
-        String requestId = request.get("id").asString();
+        String requestId = request.get("id").required().asString();
         String primaryKey = null;
         String secondaryKey = request.get("value").get("parent").asString();
-        long expirationTime = request.get("value").get("expire_time").asLong();
+        long expirationTime = request.get("value").get("expire_time").required().asLong();
 
         // Generate the token ID or set to the value provided in the request or payload
         if (requestId != null) {
@@ -189,7 +189,7 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
         }
 
         try {
-            byte[] blob = SessionUtils.encode(request.get("value"));
+            byte[] blob = SessionUtils.encode(request.get("value").getObject());
             FAMRecord famRec = new FAMRecord(cts, FAMRecord.WRITE, primaryKey, expirationTime, secondaryKey, 0, null, blob);
             FAMRecord retRec = pSession.send(famRec);
 
