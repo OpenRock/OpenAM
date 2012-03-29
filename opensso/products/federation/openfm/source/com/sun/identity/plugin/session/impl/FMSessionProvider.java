@@ -162,10 +162,7 @@ public class FMSessionProvider implements SessionProvider {
      *             newly created Session by calling setProperty(), later
      *             the target application may consume the information. 
      * @param request the HttpServletRequest the user made to initiate
-     *                the SSO; Note that it should be the initial request
-     *                coming from the browser as opposed to the possible
-     *                subsequent back-channel HTTP request for delivering
-     *                SOAP message.
+     *                the SSO.
      * @param response the HttpServletResponse that will be sent to the
      *                 user (for example it could be used to set a cookie).
      * @param targetApplication the original resource that was requested
@@ -197,19 +194,22 @@ public class FMSessionProvider implements SessionProvider {
         String authLevel = (String)info.get(AUTH_LEVEL);
 
         Object oldSession = null;
-        try {
-            oldSession = getSession(request);
-            String oldPrincipal = getPrincipalName(oldSession);
-            oldPrincipal = oldPrincipal.toLowerCase();
-            if ((!oldPrincipal.equals(principalName.toLowerCase())) &&
-                (!oldPrincipal.startsWith(
-                "id=" + principalName.toLowerCase() +",")))
-            {
-                invalidateSession(oldSession, request, response);
+        
+        if (request != null) {
+            try {
+                oldSession = getSession(request);
+                String oldPrincipal = getPrincipalName(oldSession);
+                oldPrincipal = oldPrincipal.toLowerCase();
+                if ((!oldPrincipal.equals(principalName.toLowerCase())) &&
+                    (!oldPrincipal.startsWith(
+                    "id=" + principalName.toLowerCase() +",")))
+                {
+                    invalidateSession(oldSession, request, response);
+                    oldSession = null;
+                }
+            } catch (SessionException se) {
                 oldSession = null;
             }
-        } catch (SessionException se) {
-            oldSession = null;
         }
 
         // Call auth module "Federation"
