@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -88,14 +88,14 @@ public class UpgradeHttpServletRequest implements IHttpServletRequest {
                 contextPath = getContextPath(value);
             }
             
-            // need to modify the Default Agent Password to pass validation
-            if (attributeName.equals(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD) || 
-                    attributeName.equals(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM)) {
-                parameters.put(attributeName, value + "!");
-            } else {
-                parameters.put(attributeName, value);
-            }
+            parameters.put(attributeName, value);
         }
+        //If a given instance was added to an existing deployment, then .configParam
+        //will not contain URLAccessAgent's password, so this hack makes sure
+        //that the password and confirmation is always present, this way
+        //ServicesDefaultValues#validatePassword will always succeed
+        parameters.put(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD, "********!");
+        parameters.put(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM, "********!");
     }
     
     public Locale getLocale() {
