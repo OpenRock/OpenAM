@@ -1,160 +1,147 @@
 <script type="text/javascript">
-    jQuery(function(){
 
-        $("#contentd").show();
-        $('#donedmy').show();
-        $('#doned').hide();
-        $('#canceld').hide();
-        $("#progressd").hide();
+    var defaultAgentFieldsValid = false;
+    var defaultAdminFieldsValid = false;
+    function defaultFieldsValid() {
+        return defaultAgentFieldsValid &&
+               defaultAdminFieldsValid; 
+    }
 
-        $('#defaultAdminPassword').val($.amconfig.amadmin_password);
-        if ($.amconfig.amadmin_password != '') {
-            $('#defaultAdminConfirm').val($.amconfig.amadmin_password);
-        }
-        $('#defaultAdminPassword').bind('change', function(){
-            $.amconfig.amadmin_password = $(this).val();
-        });
-        $('#defaultAgentPassword').val($.amconfig.pa_password);
-        if ($.amconfig.pa_password != '') {
-            $('#defaultAgentConfirm').val($.amconfig.pa_password);
-        }
-        $('#defaultAgentPassword').bind('change', function(){
-            $.amconfig.pa_password = $(this).val();
-        });
-
-        function validateDefaultAdminPasswords() {
-            return  validateFieldValue("$context$path?", "defaultAdminPassword", "defaultAdminPasswordError", {
-                actionLink: 'checkPasswords',
-                confirm: $("#defaultAdminConfirm").val(),
-                password: $("#defaultAdminPassword").val(),
-                otherPassword: $("#defaultAgentPassword").val(),
-                type: 'admin'
-            });
-        }
-
-        function validateDefaultAgentPasswords() {
-            return  validateFieldValue("$context$path?", "defaultAgentPassword", "defaultAgentPasswordError", {
-                actionLink: 'checkPasswords',
-                confirm: $("#defaultAgentConfirm").val(),
-                password: $("#defaultAgentPassword").val(),
-                otherPassword: $("#defaultAdminPassword").val(),
-                type: 'agent'
-            });
-        }
-
-        function createConfig() {
-            $("#setupMessage").text("");
-            $("#contentd").hide();
-            $("#progressd").show();
-            disableClose();
-            var fr1 = window.frames['progressIframe'];
-            if ( fr1 ) {
-                fr1.location = "$context/setup/setSetupProgress";
-            }
-            $.get("$context$path?actionLink=createDefaultConfig",
-            function( data ) {
-                if (data == 'true') {
-                    $('#donedmy').hide();
-                    $('#doned').show();
-                    $('#prgrbr').replaceWith('<h3 class="message no-icon">$page.getLocalizedString("configuration.option1.complete.message")</h3>');
-                } else {
-                    $('#donedmy').hide();
-                    $('#doned').hide();
-                    $('#prgrbr').replaceWith('<h3 class="message no-icon">Configuration error</h3>');
-                    $("#setupMessage").text(data);
-                    $('#canceld').show();
-                }
-            });
-        }
-
-        $("#defaultAdminPassword").keyup(function () {
-            typewatch(validateDefaultAdminPasswords, 500);
-        });
-        $("#defaultAdminConfirm").keyup(function () {
-            typewatch(validateDefaultAdminPasswords, 500);
-        });
-        $("#defaultAgentPassword").keyup(function () {
-            typewatch(validateDefaultAgentPasswords, 500);
-        });
-        $("#defaultAgentConfirm").keyup(function () {
-            typewatch(validateDefaultAgentPasswords, 500);
-        });
+    function closeDefault() {
+        YAHOO.sun.identity.config.options.defaultSummary.hide(); 
+    }
     
-        $("#createDefaultConfig").click(function(){
-            if (!validateDefaultAdminPasswords() || !validateDefaultAgentPasswords()) {
-                return false;
-            }
-            createConfig();
-        });
 
-        $("#doned").click(function(){
-            gotoLoginPage();
-        });
+    function createConfig() {
+        document.getElementById("returnToConfig").style.display = "none";
+        document.getElementById("setupMessage").innerHTML = "";
+        YAHOO.sun.identity.config.options.inProgress.show();
 
-        function disableClose() {
-            $('#closeimg').removeAttr('href');
-            $('#closeimg').removeAttr('onclick').click(function(e) { e.preventDefault(); });
+        var fr1 = window.frames['progressIframe'];
+        if ( fr1 ) {
+            fr1.location = "$context/setup/setSetupProgress";
         }
+        
+        AjaxUtils.call("$context$path?actionLink=createDefaultConfig", writeConfigResponse);         
+    }
+    
+    
+    function defaultAdminPasswordResponse(response) {
+	if (response.responseText == "true") {
+	    $('defaultAdminPasswordStatus').innerHTML = okString;
+            defaultAdminFieldsValid = true;
+	} else {
+	    $('defaultAdminPasswordStatus').innerHTML = errorImage +
+		'<small>' + response.responseText + '</small>';
+			
+           defaultAdminFieldsValid = false;
+	}
+        $('createDefaultConfig').disabled = !defaultFieldsValid();
+    }
 
-        $(document).keydown(function(e) {
-            if (e.keyCode == 27) return false;
-        });
-    });
+    function validateDefaultAdminPasswords() {
+        var link = "?actionLink=checkPasswords";
+        var cValue = "confirm=" + $('defaultAdminConfirm').value;
+        var aValue = "&password=" + $('defaultAdminPassword').value;        
+	var oValue = "&otherPassword=" + $('defaultAgentPassword').value;
+        var type = "&type=admin";
+        ie7fix++;
+        AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
+            cValue+aValue+oValue+type, defaultAdminPasswordResponse, null,
+            null);
+    }
+
+    function defaultAgentPasswordResponse(response) {
+	if (response.responseText == "true") {
+	    $('defaultAgentPasswordStatus').innerHTML = okString;
+	   defaultAgentFieldsValid = true;
+	} else {
+	   $('defaultAgentPasswordStatus').innerHTML = errorImage +
+		'<small>' + response.responseText + '</small>';
+	   defaultAgentFieldsValid = false;
+	}
+        $('createDefaultConfig').disabled = !defaultFieldsValid();
+    }
+       
+    function validateDefaultAgentPasswords() {
+        var link = "?actionLink=checkPasswords";
+        var cValue = "confirm=" + $('defaultAgentConfirm').value;
+        var aValue = "&password=" + $('defaultAgentPassword').value;
+	var oValue = "&otherPassword=" + $('defaultAdminPassword').value;
+        var type = "&type=agent";
+        ie7fix++;
+        AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
+            cValue + aValue + oValue + type, defaultAgentPasswordResponse,
+            null, null);
+    }
+    
+    function initialize() {
+        $('createDefaultConfig').disabled = true;
+    }
+    YAHOO.util.Event.onDOMReady(initialize);
 </script>
 
-<div id="modal" class="box clear-float">
-    <a id="closeimg" class="close" href="javascript:;" onclick="closeDefaultConfig();">Close</a>
-    <div class="col" id="left-col">
-        <ol id="steps">
-            <li class="on">$page.getLocalizedString("general.tab")</li>
-        </ol>
+<link href="$context/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
+
+<div id="defaultSummary" style="width:800px;background-color: #FFFFFF">    
+    <div style="background-color: #FFFFFF;padding:0">
+	<div class="header">$page.getLocalizedString("fam.configurator.title")</div>
+        <div id="title">$page.getLocalizedString("default.config.title")</div>
     </div>
-    <div class="col left-seperator" id="main-col">
-        <div id="contentd">
-            <h1>$page.getLocalizedString("fam.configurator.title")</h1>
-            <h3 class="message no-icon">$page.getLocalizedString("default.config.title")</h3>
-            <p>$page.getLocalizedString("default.config.description")</p>
-            <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
-            <fieldset>
-                <legend>$page.getLocalizedString("default.user.name")</legend>
-                <div class="row">
-                    <label for="defaultAdminPassword">$page.getLocalizedString("password.label")*</label>
-                    <input class="textbox" type="password" id="defaultAdminPassword" />
-                </div>
-                <div class="row">
-                    <label for="defaultAdminConfirm">$page.getLocalizedString("confirm.label")*</label>
-                    <input class="textbox" type="password" id="defaultAdminConfirm" />
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>$page.getLocalizedString("agent.user.name")</legend>
-                <div class="row">
-                    <label for="defaultAgentPassword">$page.getLocalizedString("password.label")*</label>
-                    <input class="textbox" type="password" id="defaultAgentPassword" />
-                </div>
-                <div class="row">
-                    <label for="defaultAgentConfirm">$page.getLocalizedString("confirm.label")*</label>
-                    <input class="textbox" type="password" id="defaultAgentConfirm" />
-                </div>
-            </fieldset>
-            <div class="row">
-                <button id="createDefaultConfig" type="button" class="button primary">$page.getLocalizedString("create.button")</button>
-                <input type="button" class="button right" value="Cancel" onclick="closeDefaultConfig();"/>
-            </div>
+    <div style="margin-left: 5%; margin-top: 5%; margin-bottom:5%; margin-right: 5%;">
+        $page.getLocalizedString("default.config.description")
+        <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
+        <table class="temp">
+            <tr>
+                <td colspan="2"><b>$page.getLocalizedString("default.user.name")</b></td>
+            </tr>
+            <tr>
+                <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("password.label")</td>
+                <td><input id="defaultAdminPassword" name="defaultAdminPassword" 
+                        type="password" value="" class="text"
+                        onkeyup="APP.callDelayed(this,validateDefaultAdminPasswords)">
+                    <span id="defaultAdminPasswordStatus"></span>
+                </td>
+            </tr>
+            <tr>
+                <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("confirm.label")</td>
+                <td>
+                    <input id="defaultAdminConfirm" name="defaultAdminConfirm" 
+                        type="password" value="" class="text" 
+                        onkeyup="APP.callDelayed(this,validateDefaultAdminPasswords)">
+                </td>
+            </tr>
+        </table>      
+        <table class="temp">
+            <tr>
+                <td colspan="2"><b>$page.getLocalizedString("agent.user.name")</b></td>
+            </tr>
+            <tr>
+                <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("password.label")</td>
+                <td>
+                    <input id="defaultAgentPassword" name="defaultAgentPassword" 
+                        type="password" class="text"                
+                        onkeyup="APP.callDelayed(this,validateDefaultAgentPasswords)">
+                    <span id="defaultAgentPasswordStatus"></span>
+                </td>
+            </tr>
+            <tr>
+                <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("confirm.label")</td>
+                <td>
+                    <input id="defaultAgentConfirm" name="defaultAgentConfirm" 
+                        type="password" class="text" 
+                        onkeyup="APP.callDelayed(this,validateDefaultAgentPasswords)">
+                </td>
+            </tr>
+        </table>      
+    </div>
+ 
+    <div id="wizardFooter">        
+        <div align="left" style="float:left">
+            <button id="createDefaultConfig" type="button" onclick="createConfig();" class="buttonblue">$page.getLocalizedString("create.button")</button>
         </div>
-        <div id="progressd">
-            <h1>Configuration Progress</h1>
-            <h3 id="prgrbr" class="message no-icon"><img width="640" height="11" src="$context/images/loading.gif" /></h3>
-            <fieldset>
-                <legend>Details</legend>
-                <iframe id="progressIframe" name="progressIframe" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
-                <h4 id="setupMessage"></h4>
-            </fieldset>
-            <div class="row">
-                <input type="submit" id="donedmy" class="button disabled" value="Processing..."/>
-                <input type="submit" id="doned" class="button primary" value='$page.getLocalizedString("go.to.login.screen")'/>
-                <input type="button" id="canceld" class="button right" value="Close" onclick="closeDefaultConfig();"/>
-            </div>
+        <div align="right">
+            <button id="wizardCancelButton" type="button" onclick="closeDefault();">$page.getLocalizedString("cancel.button")</button>
         </div>
     </div>
 </div>

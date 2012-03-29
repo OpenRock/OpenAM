@@ -1,76 +1,80 @@
-<script  type="text/javascript">
-    jQuery(function() {
+<script type="text/javascript">
+    
+    function agentPasswordResponse(response) {
+	if (response.responseText == "true") {
+            $('agentPasswordStatus').innerHTML = okString;
+            $('nextTabButton').disabled = false;
+	} else {
+            $('agentPasswordStatus').innerHTML = errorImage +
+                '<small>' + response.responseText + '</small>';
+            $('nextTabButton').disabled = true;
+	}      
+    }
+        
+    function validateAgentPasswords() {        
+        var link = "?actionLink=checkPasswords";        
+        var cValue = "confirm=" + $('agentConfirm').value;
+        var aValue = "&password=" + $('agentPassword').value;  
+        var oValue = "&otherPassword=" + $('adminConfirm').value;
+        var type = "&type=agent";
+        ie7fix++;
+        AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
+            cValue + aValue + oValue + type, agentPasswordResponse, null, null);
+    } 
 
-        $('#agentPassword').val($.amconfig.pa_password);
-        if ($.amconfig.pa_password != '') {
-            $('#agentConfirm').val($.amconfig.pa_password);
-        }
-        $('#agentPassword').bind('change', function(){
-            $.amconfig.pa_password = $(this).val();
-        });
-
-        function validateAgentPasswords() {
-            return  validateFieldValue("$context$path?", "agentPassword", "agentPasswordError", {
-                actionLink: 'checkPasswords',
-                confirm: $("#agentConfirm").val(),
-                password: $("#agentPassword").val(),
-                otherPassword: $.amconfig.amadmin_password,
-                type: 'agent'
-            });
-        }
-
-        $("#agentPassword").keyup(function () {
-            typewatch(validateAgentPasswords, 500);
-        });
-        $("#agentConfirm").keyup(function () {
-            typewatch(validateAgentPasswords, 500);
-        });
-
-        $("#submit").click(function(){
-            if (validateAgentPasswords()) {
-                openWizardConfig("step7");
-            } else {
-                return false;
-            }
-        });
-        $("#back").click(function(){
-            openWizardConfig("step5");
-        });
-    });
+    function initStep6() {
+        $('nextTabButton').disabled = true;
+    }
+    YAHOO.util.Event.onDOMReady(initStep6);
 </script>
-<div id="modal" class="box clear-float">
-    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
-    <div class="col" id="left-col">
-        <ol id="steps">
-            <li class="done">$page.getLocalizedString("general.tab")</li>
-            <li class="done">$page.getLocalizedString("server.tab")</li>
-            <li class="done">$page.getLocalizedString("configuration.tab")</li>
-            <li class="done">$page.getLocalizedString("user.tab")</li>
-            <li class="done">$page.getLocalizedString("site.tab")</li>
-            <li class="on">$page.getLocalizedString("agent.tab")</li>
-            <li>$page.getLocalizedString("summary.tab")</li>
-        </ol>
-    </div>
-    <div class="col left-seperator" id="main-col">
-        <h1>Configuration Options</h1>
-        <h3 class="message no-icon">$page.getLocalizedString("agent.step.title")</h3>
-        <p>$page.getLocalizedString("agent.step.description")</p>
-        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
-        <fieldset>
-            <legend>$page.getLocalizedString("agent.user.name")</legend>
-            <div class="row">
-                <label for="agentPassword">$page.getLocalizedString("password.label")*</label>
-                <input class="textbox" type="password" id="agentPassword" name="agentPassword"  />
-            </div>
-            <div class="row">
-                <label for="agentConfirm">$page.getLocalizedString("confirm.label")*</label>
-                <input class="textbox" type="password" id="agentConfirm" name="agentConfirm"  />
-            </div>
-        </fieldset>
-        <div class="row">
-            <input type="button" id="back" class="button" value='$page.getLocalizedString("previous.button")' />
-            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")'/>
-            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+
+<div style="margin-left:10px;">
+    <h1>$page.getLocalizedString("agent.step.title")<img class="pointer" src="$context/assets/images/message.gif"/></h1>
+    <p>$page.getLocalizedString("agent.step.description")</p>
+    
+    <div class="summaryPanel" style="width:570px">
+        <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
+        <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
+        <div class="headerBox">$page.getLocalizedString("agent.step.subtitle")</div>
+        <div class="bodyBox"  style="height:180px">
+            <span>
+                <table class="temp">
+                    <tr>
+                        <td colspan="2">
+                            <b>$page.getLocalizedString("agent.user.name")</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <em>&nbsp;*&nbsp;</em>$page.getLocalizedString("password.label")
+                        </td>
+                        <td>
+                            <input id="agentPassword" name="agentPassword" 
+                                   type="password" value="" class="text"
+                                   onkeyup="APP.callDelayed(this,validateAgentPasswords)"
+                                   onchange="APP.callDelayed(this,validateAgentPasswords)">                            
+                            <span id="agentPasswordStatus"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <em>&nbsp;*&nbsp;</em>$page.getLocalizedString("confirm.label")
+                        </td>
+                        <td>
+                            <input id="agentConfirm" name="agentConfirm" 
+                                   type="password" value="" class="text" 
+                                   onkeyup="APP.callDelayed(this,validateAgentPasswords)"
+                                   onchange="APP.callDelayed(this,validateAgentPasswords)"/>                            
+                        </td>
+                    </tr>
+                </table> 
+            </span>
         </div>
+        <b class="xbottom">
+            <b class="xbGray1"></b>
+            <b class="xbGray2"></b>
+            <b class="xbGray3"></b>
+            <b class="xbGray4"></b>
+        </b>
     </div>
 </div>

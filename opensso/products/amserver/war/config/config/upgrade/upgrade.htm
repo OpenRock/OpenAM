@@ -1,103 +1,67 @@
-<script  type="text/javascript">
-    jQuery(function() {
+<script type="text/javascript">
+    YAHOO.namespace("sun.identity.config.options.upgrade");
 
-        $("#ucontent").show();
-        $("#done").hide();
-        $('#cancel').hide();
-        $("#uprogress").hide();
-        $("#prgcomplete").hide();
+    //convenient alias:
+    var $ = YAHOO.util.Dom.get;
+    
+    function cancelUpgrade() {
+        YAHOO.sun.identity.config.options.upgrade.hide();
+    }
 
-        $("#upgradeButton").click(function(){
-            doUpgrade();
-        });
+    function saveReport() {
+        window.open("$context$path?actionLink=saveReport", "Download");
+    }
 
-        function doUpgrade() {
-            $("#setupMessage").text("");
-            $("#ucontent").hide();
-            $("#uprogress").show();
-            disableClose();
-            var fr1 = window.frames['progressIframe'];
-            if ( fr1 ) {
-                fr1.location = "$context/upgrade/setUpgradeProgress";
-            }
-            $.get("$context$path?actionLink=doUpgrade",
-            function( data ) {
-                if (data == 'true') {
-                    $('#done').show();
-                    $('#prgrbrtle').replaceWith('<h3 class="message no-icon">$page.getLocalizedString("upgrade.option.complete.title")</h3>');
-                    $('#prgrbr').hide();
-                    $('#prgcomplete').show();
-                } else {
-                    $('#done').hide();
-                    $('#prgrbr').replaceWith('<h3 class="message no-icon">Unexpected error occured during upgrade</h3>');
-                    $("#setupMessage").text(data);
-                    $('#cancel').show();
-                }
-            });
+    function writeUpgradeAsync() {
+        ie7fix++;
+        AjaxUtils.call("$context$path?actionLink=doUpgrade&ie7fix=" + ie7fix, writeConfigResponse);
+    }
+
+    function doUpgrade() {
+        document.getElementById("returnToConfig").style.display = "none";
+        document.getElementById("setupMessage").innerHTML = "";
+        YAHOO.sun.identity.config.options.inProgress.show();
+
+        var fr1 = window.frames['progressIframe'];
+        if (fr1) {
+            fr1.location = "$context/upgrade/setUpgradeProgress";
         }
-
-        $("#saveReportButton").click(function(){
-            window.open("$context$path?actionLink=saveReport", "Download");
-        });
-
-        function disableClose() {
-            $('#closeimg').removeAttr('href');
-            $('#closeimg').removeAttr('onclick').click(function(e) { e.preventDefault(); });
-        }
-
-        $(document).keydown(function(e) {
-            if (e.keyCode == 27) return false;
-        });
-    });
+        setTimeout('writeUpgradeAsync()', 2000);
+    }
 </script>
-<div id="modal" class="box box-spaced clear-float">
-    <a id="closeimg" class="close" href="javascript:;" onclick="closeUpgradeConfig();">Close</a>
-    <div class="col" id="left-col">
-        <ol id="steps">
-            <li class="on">Upgrade</li>
-        </ol>
-    </div>
-    <div class="col left-seperator" id="main-col">
-        <div id="ucontent">
-            <h1>$page.getLocalizedString("upgrade.main.title")</h1>
-            <h3 class="message no-icon">$page.getLocalizedString("upgrade.title")</h3>
-            #if ($error)
-            <fieldset>
-                <legend>Details</legend>
-                <p>$page.getLocalizedString("upgrade.init.error")</p>
-            </fieldset>
-            <div class="row">
-                <button id="cancelButtonE" type="button" class="button primary" onclick="closeUpgradeConfig();">$page.getLocalizedString("cancel.button")</button>
-            </div>
-            #else
-            <fieldset>
-                <legend>Details</legend>
-                <div style="margin: 10px auto; width: 90%">
-                    $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
-                    $page.getLocalizedString("upgrade.new.version") $newVersion
-                </div>
-                <div style="overflow: auto; border: solid 1px; height: 180px; width: 90%; margin: 0 auto;">
-                    $changelist
-                </div>
-            </fieldset>
-            <div class="row">
-                <button id="upgradeButton" type="button" class="button primary">$page.getLocalizedString("upgrade.button")</button>
-                <input id="cancelButton" type="button" class="button" value='$page.getLocalizedString("cancel.button")' onclick="closeUpgradeConfig();"/>
-                <button id="saveReportButton" type="button" class="button right">$page.getLocalizedString("save.report.button")</button>
-            </div>
-            #end
-        </div>
-        <div id="uprogress">
-            <h1 id="prgrbrtle">Configuration Progress</h1>
-            <h3 id="prgrbr" class="message no-icon"><img width="640" height="11" src="$context/images/loading.gif" /></h3>
-            <fieldset>
-                <legend>Details</legend>
-                <iframe id="progressIframe" name="progressIframe" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
-                <h4 id="setupMessage"></h4>
-            </fieldset>
-            <!--p id="prgcomplete" class="message no-icon">$page.getLocalizedString("upgrade.option.complete.body")</p-->
-            <h3 id="done" class="message"><span class="icon info"></span>$page.getLocalizedString("upgrade.restart.container")</h3>
-            <input type="button" id="cancel" class="button right" value="Close" onclick="closeUpgradeConfig();"/>
+<div id="upgrade" style="width: 500px; background-color: #FFFFFF">
+    <div class="header">$page.getLocalizedString("upgrade.main.title")</div>
+    #if ($error)
+    <div id="content" class="tabContent">
+        <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+            <p class="blueSmall">$page.getLocalizedString("upgrade.init.error")</p>
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
         </div>
     </div>
+    #else
+    <div id="content" class="tabContent">
+        <div style="margin: 10px 23px">
+            $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
+            $page.getLocalizedString("upgrade.new.version") $newVersion
+        </div>
+        <div style="overflow: auto; border: solid 1px; height: 180px; width: 90%; margin: 0 auto;">
+            $changelist
+        </div>
+    </div>
+    <!--    </div>-->
+    <div id="upgradeFooter" style="padding-bottom: 10px">
+        <div class="col1">&nbsp;</div>
+
+        <div style="float: left; margin-left: 23px">
+            <button id="upgradeButton" type="button" onclick="doUpgrade()">$page.getLocalizedString("upgrade.button")</button>
+        </div>
+        <div style="float: right; margin-right: 23px">
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+        </div>
+        <div style="text-align: center">
+            <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue">$page.getLocalizedString("save.report.button")</button>
+        </div>
+    </div>
+    #end
 </div>
+

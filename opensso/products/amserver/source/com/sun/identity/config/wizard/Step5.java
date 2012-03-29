@@ -99,12 +99,12 @@ public class Step5 extends AjaxPage {
         boolean returnVal = true;
         String siteName = toString("host");
         if (siteName == null) {
-            writeToResponse(getLocalizedString("missing.site.name"));
+            writeInvalid(getLocalizedString("missing.site.name"));
             returnVal = false;
         } else {
             getContext().setSessionAttribute( 
                 SessionAttributeNames.LB_SITE_NAME, siteName);
-            writeToResponse("ok");
+            writeValid("ok.label");
         }
 
         setPath(null);
