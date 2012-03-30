@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-upgrade'
@@ -134,6 +134,13 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
     <textobject><para>The upgrade complete screen tells you the new version
     of OpenAM is ready to use.</para></textobject>
    </mediaobject>
+  </step>
+  <step>
+   <para>In site deployments with multiple OpenAM servers using the embedded
+   OpenDJ store, you must keep the first upgraded server running when upgrading
+   the others.</para>
+   <para>This allows secondary servers to correctly replicate their embedded
+   stores with that of the first server you upgraded.</para>
   </step>
  </procedure>
  
