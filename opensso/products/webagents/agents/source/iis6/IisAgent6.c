@@ -1753,14 +1753,11 @@ DWORD getHttpStatusCode(EXTENSION_CONTROL_BLOCK *pECB) {
     const char *thisfunc = "getHttpStatusCode()";
     DWORD status = http200;
     WIN32_FIND_DATA fi;
-    BOOL rootrq = (pECB->lpszPathInfo != NULL && strcmp(pECB->lpszPathInfo, "/") == 0) ? TRUE : FALSE;
-    if (rootrq == FALSE && FindFirstFile(pECB->lpszPathTranslated, &fi) == INVALID_HANDLE_VALUE) {
-        am_web_log_debug("%s: File \"%s\" doesn't exist, setting HTTP status code to 404.", thisfunc, pECB->lpszPathTranslated);
+    if (GetFileAttributes(pECB->lpszPathTranslated) == INVALID_FILE_ATTRIBUTES) {
+        am_web_log_debug("%s: File/directory \"%s\" doesn't exist, setting HTTP status code to 404.", thisfunc, pECB->lpszPathTranslated);
         status = http404;
     } else {
-        am_web_log_debug((rootrq
-                ? "%s: Requested \"%s\" resource (will use Default Content Page setting, directory \"%s\"), setting HTTP status code to 200."
-                : "%s: Requested \"%s\" resource is mapped to an existing file \"%s\", setting HTTP status code to 200."),
+        am_web_log_debug("%s: Requested \"%s\" resource is mapped to an existing file/directory \"%s\", setting HTTP status code to 200.",
                 thisfunc, pECB->lpszPathInfo, pECB->lpszPathTranslated);
     }
     return status;
@@ -2130,16 +2127,11 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                                           NULL,
                                           NULL);
                     }
-                    if (pECB->dwHttpStatusCode == http404) {
-                        returnValue = send_notfound(pECB);
-                        am_web_log_warning("%s: requested resource not found, returning HTTP-404 error.", thisfunc);
-                    } else {
-                        returnValue = process_original_url(pECB, requestURL,
+                    returnValue = process_original_url(pECB, requestURL,
                                 orig_req_method,
                                 request_hdrs,
                                 pOphResources,
                                 agent_config);
-                    }
                 }
             }
             if (set_cookies_list != NULL) {
