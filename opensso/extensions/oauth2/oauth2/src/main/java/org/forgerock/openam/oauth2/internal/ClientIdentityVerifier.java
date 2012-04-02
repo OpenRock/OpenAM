@@ -51,8 +51,8 @@ public class ClientIdentityVerifier extends AbstractIdentityVerifier<OAuth2Clien
         client.put("id", token.getProperty("UserId"));
         client.put("clientType", ClientApplication.ClientType.CONFIDENTIAL.name());
         client.put("redirectionURIs", Arrays.asList("http://local.identitas.no:9085/openam/oauth2test/code-token.html"));
-        client.put("allowedGrantScopes", Arrays.asList("red", "write", "delete"));
-        client.put("defaultGrantScopes", Arrays.asList("red"));
+        client.put("allowedGrantScopes", Arrays.asList("read", "write", "delete"));
+        client.put("defaultGrantScopes", Arrays.asList("read"));
         return new OAuth2Client(client);
     }
 }
