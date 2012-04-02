@@ -80,7 +80,7 @@
    <literal>http://lb.example.com:8080/openam</literal>.</para>
   </step>
   <step>
-   <para>On each OpenAM server console in the site, select Configuration &gt;
+   <para>For each OpenAM server in the site, select Configuration &gt;
    Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>,
    and then set Parent Site to the site you created before saving your
    work.</para>
@@ -92,11 +92,19 @@
    <para>As your load balancer depends on the <literal>amlbcookie</literal>
    value, on each OpenAM server console in the site, select Configuration &gt;
    Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>
-   &gt; Advanced, set <literal>com.iplanet.am.lbcookie.value</literal> to a
-   unique value, and save your work.</para>
-   <para>After you restart the OpenAM server, <literal>amlbcookie</literal>
-   values from OpenAM should be as you configured them. (To check, login to the
-   console and check the cookie value in your browser.)</para>
+   &gt; Advanced, makes sure that
+   <literal>com.iplanet.am.lbcookie.value</literal> is unique. By default
+   the value of the <literal>amlbcookie</literal> is set to the server ID
+   for the OpenAM instance.</para>
+   <note>
+    <para>When using SSL, the approach requires that you either terminate SSL
+    on the load balancer, or that you re-encrypt traffic from the load balancer
+    to the OpenAM servers.</para>
+   </note>
+   <para>If you must change <literal>amlbcookie</literal> values to make them
+   unique, then your changes take effect after you restart the OpenAM server.
+   (To check, login to the console and check the cookie value in your
+   browser.)</para>
   </step>
   <step>
    <para>Restart each OpenAM server or the web containers where the OpenAM
@@ -107,7 +115,7 @@
  <procedure xml:id="prepare-site-session-data-service">
   <title>To Prepare the Session Data Service</title>
   
-  <para>The session data service relies on Java Message Queue and Berkeley DB
+  <para>The session data service relies on Open Message Queue and Berkeley DB
   Java Edition. You set up the session failover service in a site cluster to
   serve as the highly available session data store.</para>
   
@@ -204,9 +212,9 @@ SUCCESSFUL</screen>
   procedure show OpenAM running in Apache Tomcat.</para>
   
   <step>
-   <para>On each OpenAM server console in the site, select Configuration &gt;
-   Global &gt; Session &gt; Instances &gt; New... to set up session data store
-   access.</para>
+   <para>On one of the OpenAM servers in the site, login to the console, and
+   then select Configuration &gt; Global &gt; Session &gt; Instances &gt; New...
+   to set up session data store access.</para>
 
    <para>Provide a user name for the Session Store User, such as
    <literal>openamuser</literal>, with the same password you entered into the
