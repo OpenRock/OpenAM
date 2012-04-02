@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 
@@ -31,35 +32,30 @@ import java.util.Set;
  */
 public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCode {
 
-    private boolean issued = false;
-
     // TODO javadoc
     public AuthorizationCodeImpl(String id, String userID, SessionClient client, String realm, Set<String> scope, boolean issued, long expireTime) {
         super(id, userID, client, realm, scope, expireTime);
-        this.issued = issued;
+        setIssued(issued);
+        setType();
     }
 
     // TODO javadoc
-    public AuthorizationCodeImpl(JsonValue value) {
-        super(value);
-        this.issued = value.get("issued").asBoolean();
+    public AuthorizationCodeImpl(String id, JsonValue value) {
+        super(id, value);
+        setType();
     }
 
-    // TODO javadoc
-    public JsonValue asJson() {
-        JsonValue value = super.asJson();
-        value.put("type", "authorization_code");
-        value.put("issued", issued);
-        return value;
-    }
-    
     public void setIssued(boolean issued) {
-        this.issued = issued;
+        this.put(OAuth2.StoredToken.ISSUED, issued);
     }
 
     @Override
     public boolean isTokenIssued() {
-        return issued;
+        return this.get(OAuth2.StoredToken.ISSUED).asBoolean();
     }
 
+    protected void setType() {
+        this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.CODE);
+    }
+    
 }

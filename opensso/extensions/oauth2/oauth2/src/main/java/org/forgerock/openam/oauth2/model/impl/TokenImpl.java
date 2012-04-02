@@ -17,10 +17,12 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.model.Token;
 
 import java.util.*;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,50 +31,55 @@ import java.util.*;
  * Time: 10:43 AM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class TokenImpl implements Token {
+public abstract class TokenImpl extends JsonValue implements Token {
 
     private String id;
-    private String userID = null;
-    private String realm = "/";
-    private SessionClient client = null;
-    private Set<String> scope = Collections.emptySet();
-    private long expireTime = 0;
 
-    // TODO javadoc
-    public TokenImpl(String id, String userID, SessionClient client, String realm, Set<String> scope, long expireTime) {
+    /**
+     * Constructor that sets common values in the token object.
+     * @param id the ID of the token, kept out of the JsonValue
+     * @param userID the userID
+     * @param client the client object (id and redirect URI)
+     * @param realm the realm that governs this token
+     * @param scope the set of scopes
+     * @param expiresIn the number of seconds from message generation time that this token is valid
+     */
+    protected TokenImpl(String id, String userID, SessionClient client, String realm, Set<String> scope, long expiresIn) {
+        super(new HashMap<String, Object>());
+
         this.id = id;
-        this.userID = userID;
-        this.client = client;
-        this.realm = realm;
-        this.scope = scope;
-        this.expireTime = expireTime;
+        
+        setUserID(userID);
+        setClient(client);
+        setRealm(realm);
+        setScope(scope);
+
+        // The expiresIn value is a count of the number of seconds that this token should be valid for.
+        // For storage purposes, the token should store the time when the token will expire, so that later retrieval
+        // will allow the expires_in value to be easily and accurately calculated. The expiresIn value should therefore
+        // be translated to a more absolute value.
+        setAbsoluteExpiryTime(calculateAbsoluteExpiry(expiresIn));
     }
 
-    // TODO javadoc
-    public TokenImpl(JsonValue value) {
-        this.id = value.get("id").asString();
-        this.userID = value.get("uuid").asString();
-        this.client = (SessionClient) value.get("client");
-        this.realm = value.get("realm").asString();
-        this.scope = convertScope(value.get("scope").asList());
-        this.expireTime = value.get("expire_time").asLong();
+    /**
+     * Converts a countdown-style lifetime in seconds to a more absolute expiry time suitable for storage.
+     * @param expiresIn lifetime of token in seconds from time of generation
+     * @return expiry time in milliseconds relative to the last epoch
+     */
+    private long calculateAbsoluteExpiry(long expiresIn) {
+        return System.currentTimeMillis() + expiresIn * 1000; // Seconds to milliseconds
     }
 
-    // TODO javadoc
-    public JsonValue asJson() {
-        JsonValue value = new JsonValue(new HashMap<String, Object>());
-        value.add("id", id);
-        value.add("uuid", userID);
-        if (client != null) {
-            value.add("client", client.getClientId());
-        }
-        value.add("realm", realm);
-        value.add("scope", scope);
-        value.add("valid", true);
-        value.add("expire_time", expireTime);
-        return value;
+    /**
+     * Constructs a TokenImpl object using the values in a JsonValue object and an associated ID.
+     * @param id the ID of the token as used when storing/modifying/retrieving the object
+     * @param value the JSON object containing the values for this object
+     */
+    protected TokenImpl(String id, JsonValue value) {
+        super(value);
+        this.id = id;
     }
-    
+
     private Set<String> convertScope(List<Object> scopeList) {
         Set<String> scopeSet = new HashSet<String>();
         for (Object o : scopeList) {
@@ -81,28 +88,33 @@ public abstract class TokenImpl implements Token {
         return scopeSet;
     }
 
-    public void setToken(String id) {
-        this.id = id;
-    }
-
     public void setUserID(String userID) {
-        this.userID = userID;
+        this.put(OAuth2.Params.USERNAME, userID);
     }
 
     public void setRealm(String realm) {
-        this.realm = realm;
+        if (realm == null) {
+            realm = "/";
+        }
+        this.put(OAuth2.Params.REALM, realm);
     }
 
     public void setClient(SessionClient client) {
-        this.client = client;
+        if (client != null) {
+            this.put(OAuth2.Params.CLIENT_ID, client.getClientId());
+            this.put(OAuth2.Params.REDIRECT_URI, client.getRedirectUri());
+        }
     }
 
     public void setScope(Set<String> scope) {
-        this.scope = scope;
+        if (scope == null) {
+            scope = Collections.emptySet();
+        }
+        this.put(OAuth2.Params.SCOPE, scope);
     }
 
-    public void setExpireTime(long expireTime) {
-        this.expireTime = expireTime;
+    public void setAbsoluteExpiryTime(long expiryTime) {
+        this.put(OAuth2.StoredToken.EXPIRY_TIME, expiryTime);
     }
 
     @Override
@@ -112,32 +124,48 @@ public abstract class TokenImpl implements Token {
 
     @Override
     public String getUserID() {
-        return userID;
+        return this.get(OAuth2.Params.USERNAME).asString();
     }
 
     @Override
     public String getRealm() {
-        return realm;
+        return this.get(OAuth2.Params.REALM).asString();
     }
 
     @Override
     public SessionClient getClient() {
-        return client;
+        return new SessionClientImpl(this.get(OAuth2.Params.USERNAME).asString(), this.get(OAuth2.Params.REDIRECT_URI).asString());
     }
 
     @Override
     public Set<String> getScope() {
-        return scope;
+        return convertScope(this.get(OAuth2.Params.SCOPE).asList());
     }
 
     @Override
     public long getExpireTime() {
-        return expireTime;
+        return (getAbsoluteExpiryTime() - System.currentTimeMillis())/1000;
+    }
+
+    /**
+     * Returns the expiry time as stored.
+     * @return time of expiry expressed as milliseconds since the epoch.
+     */
+    public long getAbsoluteExpiryTime() {
+        return get(OAuth2.StoredToken.EXPIRY_TIME).required().asLong();
     }
 
     @Override
     public boolean isExpired() {
-        return (System.currentTimeMillis() > expireTime);
+        return (System.currentTimeMillis() > getAbsoluteExpiryTime());
+    }
+
+    /**
+     * Presents the "type" parameter of the token.
+     * @return the OAuth2 token type.
+     */
+    public String getType() {
+        return this.get(OAuth2.Params.TOKEN_TYPE).asString();
     }
 
 }

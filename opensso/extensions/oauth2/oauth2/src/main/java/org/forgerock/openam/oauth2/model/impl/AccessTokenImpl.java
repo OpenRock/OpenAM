@@ -33,36 +33,31 @@ import java.util.Set;
  */
 public class AccessTokenImpl extends TokenImpl implements AccessToken {
 
-    private String parent;
-
     // TODO javadoc
     public AccessTokenImpl(String id, String parent, String userID, SessionClient client, String realm, Set<String> scope, long expireTime) {
         super(id, userID, client, realm, scope, expireTime);
-        this.parent = parent;
+        setType();
+        setParentToken(parent);
     }
 
     // TODO javadoc
     public AccessTokenImpl(String id, Set<String> scope, long expireTime, Token token) {
         super(id, token.getUserID(), token.getClient(), token.getRealm(), scope, expireTime);
-        this.parent = token.getToken();
+        setType();
     }
 
-    public AccessTokenImpl(JsonValue value) {
-        super(value);
-        this.parent = value.get("parent").asString();
+    public AccessTokenImpl(String id, JsonValue value) {
+        super(id, value);
+        setType();
     }
 
-    // TODO javadoc
-    public JsonValue asJson() {
-        JsonValue value = super.asJson();
-        value.put("type", "access_token");
-        value.put("parent", parent);
-        return value;
+    public void setParentToken(String parent) {
+        this.put(OAuth2.StoredToken.PARENT, parent);
     }
-
+    
     @Override
     public String getParentToken() {
-        return parent;
+        return this.get(OAuth2.StoredToken.PARENT).asString();
     }
 
     @Override
@@ -75,11 +70,14 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     public Map<String, Object> convertToMap() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(OAuth2.Params.ACCESS_TOKEN, getToken());
-        //tokenMap.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
         tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
         tokenMap.put(OAuth2.Params.EXPIRES_IN, getExpireTime() - System.currentTimeMillis());
         // TODO implement or change interface
         return tokenMap;
+    }
+
+    protected void setType() {
+        this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.ACCESS_TOKEN);
     }
 
 }

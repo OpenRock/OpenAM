@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.model.Token;
@@ -37,30 +38,32 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
     // TODO javadoc
     public RefreshTokenImpl(String id, String parent, String userID, SessionClient client, String realm, Set<String> scope, long expireTime) {
         super(id, userID, client, realm, scope, expireTime);
-        this.parent = parent;
+        setType();
+        setParentToken(parent);
     }
 
     // TODO javadoc
     public RefreshTokenImpl(String id, Set<String> scope, long expireTime, Token token) {
         super(id, token.getUserID(), token.getClient(), token.getRealm(), scope, expireTime);
-        this.parent = token.getToken();
+        setType();
     }
 
-    public RefreshTokenImpl(JsonValue value) {
-        super(value);
-        this.parent = value.get("parent").asString();
+    public RefreshTokenImpl(String id, JsonValue value) {
+        super(id, value);
+        setType();
     }
 
-    // TODO javadoc
-    public JsonValue asJson() {
-        JsonValue value = super.asJson();
-        value.put("type", "refresh_token");
-        value.put("parent", parent);
-        return value;
+    public void setParentToken(String parent) {
+        this.put(OAuth2.StoredToken.PARENT, parent);
     }
 
     @Override
     public String getParentToken() {
-        return parent;
+        return this.get(OAuth2.StoredToken.PARENT).asString();
     }
+
+    protected void setType() {
+        this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.REFRESH_TOKEN);
+    }
+
 }

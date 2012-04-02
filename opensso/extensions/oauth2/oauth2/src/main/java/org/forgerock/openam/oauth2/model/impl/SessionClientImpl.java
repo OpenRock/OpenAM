@@ -16,7 +16,10 @@
 
 package org.forgerock.openam.oauth2.model.impl;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+
+import java.util.HashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,13 +28,14 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
  * Time: 2:03 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SessionClientImpl implements SessionClient {
+public class SessionClientImpl extends JsonValue implements SessionClient {
 
     // TODO clean up cases in interface
     private String clientId;
     private String redirectUri;
     
     public SessionClientImpl(String clientId, String redirectUri) {
+        super(new HashMap<String, Object>());
         this.clientId = clientId;
         this.redirectUri = redirectUri;
     }
@@ -45,4 +49,5 @@ public class SessionClientImpl implements SessionClient {
     public String getRedirectUri() {
         return redirectUri;
     }
+
 }
