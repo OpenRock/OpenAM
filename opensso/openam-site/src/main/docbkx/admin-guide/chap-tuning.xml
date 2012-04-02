@@ -36,16 +36,23 @@
  access and federation management services, and to maximize throughput while
  minimizing response times.</para>
  
- <para>The extent to which performance tuning advice applies depends to some
- extent on your requirements, on your workload, and on what resources you have
- available. Test suggestions before rolling them out into production.</para>
+ <note>
+  <para>The recommendations provided here are guidelines for your testing
+  rather than hard and fast rules for every situation. Said another way, the
+  fact that a given setting is configurable implies that no one setting is
+  right in all circumstances.</para>
+
+  <para>The extent to which performance tuning advice applies depends to a large
+  extent on your requirements, on your workload, and on what resources you have
+  available. Test suggestions before rolling them out into production.</para>
+ </note>
  
  <para>As a rule of thumb, an OpenAM server in production with a 3 GB heap can
- handle up to roughly 200,000 user sessions. Although you may be tempted to use
- a larger heap with a 64-bit JVM, smaller heaps are no doubt easier to manage.
- Thus, rather than scaling single servers up to increase the total number of
- simultaneous sessions, consider scaling out by adding more servers instead.
- The suggestions that follow pertain to production servers.</para>
+ handle 100,000 sessions. Although you might be tempted to use a larger heap
+ with a 64-bit JVM, smaller heaps are easier to manage. Thus, rather than
+ scaling single servers up to increase the total number of simultaneous
+ sessions, consider scaling out by adding more servers instead. The suggestions
+ that follow pertain to production servers.</para>
  
  <!-- The following is lifted from the OpenAM wiki work done by Steve Ferris,
  https://wikis.forgerock.org/confluence/display/openam/OpenAM+Performance+Tuning+Guide
@@ -108,9 +115,10 @@
       <row>
        <entry>LDAP Connection Pool Maximum Size</entry>
        <entry>10</entry>
-       <entry><para>The maximum LDAP connection pool size; a good tuning value
-       for this property is 65. Ensure your LDAP server can cope with the
-       maximum number of clients across all the OpenAM servers.</para></entry>
+       <entry><para>The maximum LDAP connection pool size; a high tuning value
+       for this property is 65, though you might well be able to reduce this
+       for your deployment. Ensure your LDAP server can cope with the maximum
+       number of clients across all the OpenAM servers.</para></entry>
       </row>
      </tbody>
     </tgroup>
@@ -326,13 +334,17 @@
       <entry><para><literal>-Dsun.net.client.defaultReadTimeout</literal></para></entry>
       <entry><para>60000</para></entry>
       <entry><para>Controls the read timeout in the Java HTTP client
-      implementation</para></entry>
+      implementation</para>
+      <para>This applies only to the Sun/Oracle HotSpot JVM.</para></entry>
      </row>
      <row>
       <entry><para><literal>-Dsun.net.client.defaultConnectTimeout</literal></para></entry>
-      <entry><para>30000</para></entry>
+      <entry>High setting: <para>30000</para> (30 seconds)</entry>
       <entry><para>Controls the connect timeout in the Java HTTP client
-      implementation</para></entry>
+      implementation</para>
+      <para>When you have hundreds of incoming requests per second, reduce this
+      value to avoid a huge connection queue.</para>
+      <para>This applies only to the Sun/Oracle HotSpot JVM.</para></entry>
      </row>
     </tbody>
    </tgroup>
@@ -370,9 +382,14 @@
       by the JVM</para></entry>
      </row>
      <row>
+      <entry><para><literal>-XX:+PrintGCDetails</literal></para></entry>
+      <entry><para>-</para></entry>
+      <entry><para>Prints detailed information about garbage collection</para></entry>
+     </row>
+     <row>
       <entry><para><literal>-XX:+PrintGCTimeStamps</literal></para></entry>
       <entry><para>-</para></entry>
-      <entry><para>Prints out detailed garbage collection timings</para></entry>
+      <entry><para>Prints detailed garbage collection timings</para></entry>
      </row>
      <row>
       <entry><para><literal>-XX:+HeapDumpOnOutOfMemoryError</literal></para></entry>
