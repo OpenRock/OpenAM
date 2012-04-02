@@ -139,7 +139,8 @@ public abstract class TokenImpl extends JsonValue implements Token {
 
     @Override
     public Set<String> getScope() {
-        return convertScope(this.get(OAuth2.Params.SCOPE).asList());
+        //return convertScope(this.get(OAuth2.Params.SCOPE).asList());
+        return (Set<String>) this.get(OAuth2.Params.SCOPE).getObject();
     }
 
     @Override
