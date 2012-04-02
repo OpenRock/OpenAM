@@ -75,17 +75,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid, SessionClient client) throws OAuthProblemException {
 
         String id = UUID.randomUUID().toString();
-        // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + AUTHZ_CODE_LIFETIME;
+        long expiresIn = AUTHZ_CODE_LIFETIME;
 
-        AuthorizationCodeImpl code = new AuthorizationCodeImpl(id, uuid, client, realm, scope, false, expireTime);
-        JsonValue jsonCode = code.asJson();
+        AuthorizationCodeImpl code = new AuthorizationCodeImpl(id, uuid, client, realm, scope, false, expiresIn);
         JsonValue response = null;
 
         // Store in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, jsonCode);
+            response = accessor.create(id, code);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS", null);
@@ -116,7 +114,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         // Construct an AuthorizationCode object and return it
-        AuthorizationCode ac = new AuthorizationCodeImpl(response.get("value"));
+        // TODO use _id instead of id?
+        AuthorizationCode ac = new AuthorizationCodeImpl(id, response);
         return ac;
     }
 
@@ -162,12 +161,10 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, code);
         // TODO decide where the scope in the access token is checked against the authorization code
 
-        JsonValue value = accessToken.asJson();
-
         // Create in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, value);
+            response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
@@ -191,12 +188,10 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, refreshToken);
         // TODO find out where the scope in the access token is checked against the authorization code
 
-        JsonValue value = accessToken.asJson();
-
         // Create in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, value);
+            response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
@@ -218,12 +213,11 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, null, uuid, null, realm, scope, expireTime);
-        JsonValue value = accessToken.asJson();
 
         // Create in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, value);
+            response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
@@ -246,12 +240,11 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, null, uuid, client, realm, scope, expireTime);
         // TODO should scope be checked against client settings?
-        JsonValue value = accessToken.asJson();
 
         // Create in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, value);
+            response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
@@ -274,12 +267,11 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm, scope, expireTime);
         // TODO should scope be checked against client settings?
-        JsonValue value = accessToken.asJson();
 
         // Create in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, value);
+            response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
@@ -308,8 +300,9 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (response == null) {
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found", "Could not read token in CTS", null);
         }
-        
-        AccessToken accessToken = new AccessTokenImpl(response);
+
+        // TODO use _id rather than id
+        AccessToken accessToken = new AccessTokenImpl(id, response);
         return accessToken;
     }
 
@@ -338,12 +331,11 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         long expireTime = System.currentTimeMillis() + REFRESH_TOKEN_LIFETIME;
 
         RefreshTokenImpl refreshToken = new RefreshTokenImpl(id, null, uuid, null, realm, scope, expireTime);
-        JsonValue value = refreshToken.asJson();
 
         // Create in CTS
         JsonResourceAccessor accessor = new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, value);
+            response = accessor.create(id, refreshToken);
         } catch (JsonResourceException e) {
             // TODO: logging
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(), "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
@@ -374,7 +366,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         // Construct a RefreshToken object and return it
-        RefreshToken rt = new RefreshTokenImpl(response.get("value"));
+        // TODO use _id instead of id?
+        RefreshToken rt = new RefreshTokenImpl(id, response.get("value"));
         return rt;
     }
 
