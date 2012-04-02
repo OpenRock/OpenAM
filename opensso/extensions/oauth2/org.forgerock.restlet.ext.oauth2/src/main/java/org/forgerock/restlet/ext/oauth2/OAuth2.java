@@ -26,6 +26,7 @@ package org.forgerock.restlet.ext.oauth2;
 
 /**
  * TODO Finish this class with all constants
+ * TODO refactor to clean up what is interface, storage, or both
  *
  * @author $author$
  * @version $Revision$ $Date$
@@ -167,6 +168,11 @@ public class OAuth2 {
          */
         public static final String REFRESH_TOKEN = "refresh_token";
 
+        /**
+         * Parameter usage location: token request
+         */
+        public static final String REALM = "realm";
+
     }
 
     public class Token {
@@ -174,6 +180,13 @@ public class OAuth2 {
         public static final String OAUTH_EXPIRES_IN = "expires_in";
         public static final String OAUTH_REFRESH_TOKEN = "refresh_token";
         public static final String OAUTH_TOKEN_TYPE = "token_type";
+    }
+
+    public class StoredToken {
+        public static final String EXPIRY_TIME = "expiry_time";
+        public static final String ISSUED = "issued";
+        public static final String PARENT = "parent";
+        public static final String TYPE = "type";
     }
 
     /**
