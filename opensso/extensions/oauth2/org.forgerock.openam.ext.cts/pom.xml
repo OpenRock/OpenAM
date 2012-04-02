@@ -96,6 +96,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Restlet -->
+        <!-- TODO reevaluate OAuth2 constants, break out into non-restlet package -->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Commons -->
         <dependency>
             <groupId>org.forgerock.commons</groupId>
