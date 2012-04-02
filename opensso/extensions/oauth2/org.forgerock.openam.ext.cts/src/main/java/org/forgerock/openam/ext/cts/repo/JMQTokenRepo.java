@@ -33,9 +33,11 @@ import org.forgerock.json.patch.JsonPatch;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -166,31 +168,31 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
             throw new JsonResourceException(JsonResourceException.BAD_REQUEST, "No value to store was found in the request");
         }
 
+        // Get id from the request, not the value
         String requestId = request.get("id").required().asString();
+
         String primaryKey = null;
-        String secondaryKey = request.get("value").get("parent").asString();
-        long expirationTime = request.get("value").get("expire_time").required().asLong();
+        String secondaryKey = request.get("value").get(OAuth2.StoredToken.PARENT).asString();
+        long expiryTime = request.get("value").get(OAuth2.StoredToken.EXPIRY_TIME).required().asLong();
 
         // Generate the token ID or set to the value provided in the request or payload
         if (requestId != null) {
             primaryKey = requestId;
             request.get("value").required().put("id", primaryKey);
-        } else if (!request.get("value").required().get("id").isNull()) {
-            primaryKey = request.get("value").get("id").asString();
         } else {
             primaryKey = UUID.randomUUID().toString();
-            request.get("value").put("id", primaryKey);
+            //TODO request.get("value").put("id", primaryKey);
         }
 
         // Set expiry time to default
         // TODO make default expiry time configurable
-        if (expirationTime <= 0) {
-            expirationTime = System.currentTimeMillis() + DEFAULTEXPIRYDURATION;
+        if (expiryTime <= 0) {
+            expiryTime = System.currentTimeMillis() + DEFAULTEXPIRYDURATION;
         }
 
         try {
             byte[] blob = SessionUtils.encode(request.get("value").getObject());
-            FAMRecord famRec = new FAMRecord(cts, FAMRecord.WRITE, primaryKey, expirationTime, secondaryKey, 0, null, blob);
+            FAMRecord famRec = new FAMRecord(cts, FAMRecord.WRITE, primaryKey, expiryTime, secondaryKey, 0, null, blob);
             FAMRecord retRec = pSession.send(famRec);
 
             JsonValue retValue = new JsonValue(new HashMap<String, Object>());
@@ -236,12 +238,11 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
             }
             byte[] blob = retRec.getBlob();
             Object retObj = SessionUtils.decode(blob);
-            JsonValue tokenObj = (JsonValue) retObj; // TODO: check cast
+            Map tokenObj = (Map) retObj; // TODO: check cast
 
-            JsonValue retValue = new JsonValue(new HashMap<String, Object>());
+            JsonValue retValue = new JsonValue(tokenObj);
             retValue.put("_id", primaryKey);
             retValue.put("_rev", null); // TODO: relevance of revision
-            retValue.put("value", tokenObj);
             // TODO: confirm Json response object
             return retValue;
 
@@ -398,7 +399,6 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
      * @return the JSON resource response.
      * @throws if there is an exception handling the request.
      */
-    @Override
     public JsonValue handle(JsonValue request) throws JsonResourceException {
         try {
             try {
@@ -439,28 +439,24 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
 
 
     // Overrides from GeneralTaskRunnable
+    // TODO javadoc
 
-    @Override
     public boolean addElement(Object o) {
         throw new IllegalStateException("Not supported");
     }
 
-    @Override
     public boolean removeElement(Object o) {
         throw new IllegalStateException("Not supported");
     }
 
-    @Override
     public boolean isEmpty() {
         throw new IllegalStateException("Not supported");
     }
 
-    @Override
     public long getRunPeriod() {
         return RUNPERIOD;
     }
 
-    @Override
     public void run() {
         String classMethod = "JMQTokenRepository.run: ";
         try {
