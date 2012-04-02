@@ -134,7 +134,7 @@ public abstract class TokenImpl extends JsonValue implements Token {
 
     @Override
     public SessionClient getClient() {
-        return new SessionClientImpl(this.get(OAuth2.Params.USERNAME).asString(), this.get(OAuth2.Params.REDIRECT_URI).asString());
+        return new SessionClientImpl(this.get(OAuth2.Params.CLIENT_ID).asString(), this.get(OAuth2.Params.REDIRECT_URI).asString());
     }
 
     @Override
