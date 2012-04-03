@@ -51,6 +51,12 @@
   <title>Description</title>
   <para>The <command>ssoadm</command> command provides a rich command-line
   interface for configuring OpenAM core services.</para>
+
+  <para>Also see the <citetitle>Installation Guide</citetitle> procedure, <link
+  xlink:href="install-guide#install-openam-admin-tools"
+  xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>To Set Up Administration Tools</citetitle></link> for instructions
+  on setting up the <command>ssoadm</command> command.</para>
  </refsect1>
  <refsect1>
   <title>Global Options</title>
