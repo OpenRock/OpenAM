@@ -31,6 +31,7 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
+import org.restlet.data.Status;
 import org.restlet.resource.Finder;
 import org.restlet.routing.Router;
 
@@ -55,7 +56,7 @@ public class OAuth2RealmRouter extends Router implements OAuth2Provider {
     /**
      * Map of available realms
      */
-    private volatile ConcurrentHashMap<String, Restlet> routes = new ConcurrentHashMap<String, Restlet>();
+    private volatile ConcurrentHashMap<String, Restlet> realmRoutes = new ConcurrentHashMap<String, Restlet>();
 
     /**
      * Constructor.
@@ -70,22 +71,26 @@ public class OAuth2RealmRouter extends Router implements OAuth2Provider {
 
     @Override
     public Restlet getNext(Request request, Response response) {
-        String realm = OAuth2Utils.getRealm(request);
-        Restlet next = null;
-        if (null == realm) {
-            if (null == defaultRealm) {
-                OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "No Default Realm configured").pushException();
+        Restlet next = super.getNext(request, response);
+        if (next == null) {
+            String realm = OAuth2Utils.getRealm(request);
+            response.setStatus(Status.SUCCESS_ACCEPTED);  // TODO Use the default route
+            if (null == realm) {
+                if (null == defaultRealm) {
+                    OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "No Default Realm configured").pushException();
+                } else {
+                    next = defaultRealm;
+                }
             } else {
-                next = defaultRealm;
+                next = realmRoutes.get(realm);
+                if (null == next) {
+                    OAuthProblemException.OAuthError.NOT_FOUND.handle(request, 1 > realmRoutes.size() ?
+                            "There is not Realm configured" : "Realm was not configured").pushException();
+                }
             }
-        } else {
-            next = routes.get(realm);
-            if (null == next) {
-                OAuthProblemException.OAuthError.NOT_FOUND.handle(request, 1 > routes.size() ?
-                        "There is not Realm configured" : "Realm was not configured").pushException();
-            }
+            next = next != null ? next : errorHandler;
         }
-        return next != null ? next : errorHandler;
+        return next;
     }
 
     /**
@@ -93,7 +98,7 @@ public class OAuth2RealmRouter extends Router implements OAuth2Provider {
      */
     public boolean attachRealm(String realm, Restlet next) {
         if (OAuth2Utils.isNotBlank(realm) && null != next) {
-            return null != routes.put(realm, next);
+            return null != realmRoutes.put(realm, next);
         }
         return false;
     }
@@ -103,7 +108,7 @@ public class OAuth2RealmRouter extends Router implements OAuth2Provider {
      */
     public Restlet detachRealm(String realm) {
         if (OAuth2Utils.isNotBlank(realm)) {
-            return routes.remove(realm);
+            return realmRoutes.remove(realm);
         }
         return null;
     }

@@ -24,6 +24,7 @@
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
 
+import org.forgerock.restlet.ext.oauth2.model.Token;
 import org.restlet.security.User;
 
 import java.util.Set;
@@ -71,6 +72,17 @@ public class OAuth2User extends User {
         this.refreshToken = refreshToken;
         this.scope = scope;
         this.state = state;
+    }
+
+    public OAuth2User(Token token) {
+        super(token.getUserID());
+        this.accessToken = token.getToken();
+        this.expiresIn = token.getExpireTime();
+        this.scope = token.getScope();
+
+        //TODO Do we need these?
+        this.refreshToken = null;
+        this.state = null;
     }
 
     public String getAccessToken() {

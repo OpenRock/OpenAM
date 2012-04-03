@@ -32,16 +32,14 @@
         <artifactId>forgerock-parent</artifactId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.forgerock.commons</groupId>
-    <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>org.forgerock.openam.oauth2demo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>bundle</packaging>
-
-    <name>Restlet OAuth2 Extension</name>
+    <packaging>jar</packaging>
+    <name>OpenAM OAuth2 Demo Application</name>
     <properties>
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
-        <jackson.version>1.9.5</jackson.version>
         <restlet.version>2.1-RC3</restlet.version>
     </properties>
 
@@ -68,63 +66,38 @@
             <url>http://maven.restlet.org</url>
         </repository>
     </repositories>
+
     <dependencies>
         <!--    mvn versions:display-plugin-updates
                 mvn versions:display-dependency-updates
                 mvn versions:use-latest-versions
         -->
 
-        <!-- Restlet -->
+        <!-- Java EE -->
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet</artifactId>
-            <version>${restlet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.jackson</artifactId>
-            <version>${restlet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.oauth</artifactId>
-            <version>${restlet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.freemarker</artifactId>
-            <version>${restlet.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.freemarker</groupId>
-                    <artifactId>freemarker</artifactId>
-                </exclusion>
-            </exclusions>
-            <!--scope>provided</scope-->
-        </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.19</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.scribe</groupId>
-            <artifactId>scribe</artifactId>
-            <version>1.3.0</version>
-        </dependency>
-        <!-- Jackson JSON parser -->
-        <!--dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson.version}</version>
-        </dependency-->
 
+
+        <!-- Restlet -->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.restlet.ext.openam</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+            <version>${restlet.version}</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
@@ -136,7 +109,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.3.1</version>
+            <version>6.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -147,6 +120,7 @@
         </dependency>
 
     </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -156,6 +130,7 @@
                     <configuration>
                         <links>
                             <link>http://docs.oracle.com/javase/6/docs/api</link>
+                            <link>http://openam.forgerock.org/doc/public-api</link>
                             <link>http://www.restlet.org/documentation/2.1/jse/api</link>
                             <link>http://www.restlet.org/documentation/2.1/jse/ext</link>
                             <link>http://www.restlet.org/documentation/2.1/jse/engine</link>
@@ -164,30 +139,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Private-Package>org.forgerock.restlet.ext.oauth2.internalll.*</Private-Package>
-                        <Export-Package>
-                            org.forgerock.restlet.ext.oauth2*;version="${project.version}",
-                            freemarker.template;version=2.3.19,
-                            freemarker.cache;version=2.3.19
-                        </Export-Package>
-                        <Import-Package>
-                            !com.sun*,!javax.servlet*,!org.apache*,!org.dom4j*,
-                            !org.jaxen*,!org.jdom*,!org.python*,!javax.el,
-                            !org.w3c.dom.traversal,!org.zeroturnaround.*,*
-                        </Import-Package>
-                        <Embed-Dependency>freemarker</Embed-Dependency>
-                        <_failok>true</_failok>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
     <profiles>
         <profile>

@@ -1,0 +1,65 @@
+<!--
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  ~
+  ~ Copyright © 2012 ForgeRock AS. All rights reserved.
+  ~
+  ~ The contents of this file are subject to the terms
+  ~ of the Common Development and Distribution License
+  ~ (the License). You may not use this file except in
+  ~ compliance with the License.
+  ~
+  ~ You can obtain a copy of the License at
+  ~ http://forgerock.org/license/CDDLv1.0.html
+  ~ See the License for the specific language governing
+  ~ permission and limitations under the License.
+  ~
+  ~ When distributing Covered Code, include this CDDL
+  ~ Header Notice in each file and include the License file
+  ~ at http://forgerock.org/license/CDDLv1.0.html
+  ~ If applicable, add the following below the CDDL Header,
+  ~ with the fields enclosed by brackets [] replaced by
+  ~ your own identifying information:
+  ~ "Portions Copyrighted [year] [name of copyright owner]"
+  ~ $Id$
+  -->
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>The OpenAM OAuth2 Demo Page</title>
+
+    <meta charset="UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport"
+          content="width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=no;">
+
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Alfa+Slab+One' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="css/main.css" type="text/css">
+
+    <link rel="icon" href="icon.png">
+    <link rel="apple-touch-icon" href="button.png">
+</head>
+<body>
+
+<p>AUTHORIZATION_CODE, IMPLICIT, PASSWORD, CLIENT_CREDENTIALS, REFRESH_TOKEN, SAML20_INSERTION</p><br/>
+
+<a href="../demo?flow=AUTHORIZATION_CODE&mode=challengeresponse">Use Authorization Code Flow and Challenge-Response for
+    authentication</a><br/>
+<a href="../demo?flow=IMPLICIT&mode=challengeresponse">Use Implicit Flow and Challenge-Response for
+    authentication</a><br/>
+<a href="../demo?flow=password&mode=challengeresponse">Use Password Flow and Challenge-Response for
+    authentication</a><br/>
+<a href="../demo?flow=CLIENT_CREDENTIALS&mode=challengeresponse">Use Client Credentials Flow and Challenge-Response for
+    authentication</a><br/>
+<a href="../demo?flow=REFRESH_TOKEN&mode=challengeresponse">Use Refresh Token Flow and Challenge-Response for
+    authentication</a><br/>
+
+<a href="../demo?action=flush_token">Delete all access token from user session</a>
+</body>
+</html>
+

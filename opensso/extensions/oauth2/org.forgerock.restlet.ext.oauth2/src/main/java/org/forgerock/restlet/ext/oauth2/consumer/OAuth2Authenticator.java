@@ -24,50 +24,59 @@
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.representation.Representation;
-import org.restlet.security.Authenticator;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.Status;
+import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.security.Verifier;
 
-import java.util.Map;
+import java.util.logging.Level;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * An OAuth2Authenticator does ...
+ *
+ * @author Laszlo Hordos
  */
-public abstract class OAuth2Authenticator<V extends TokenVerifier> extends Authenticator {
+public class OAuth2Authenticator extends ChallengeAuthenticator {
 
     /**
-     * The OAuth2 Token verifier.
+     * The token tokenVerifier.
      */
-    private volatile V verifier;
+    private volatile TokenVerifier tokenVerifier;
 
-    public OAuth2Authenticator(Context context) {
-        super(context);
+    private OAuth2Utils.ParameterLocation parameterLocation = OAuth2Utils.ParameterLocation.HTTP_HEADER;
+
+    public OAuth2Authenticator(Context context, String realm, OAuth2Utils.ParameterLocation tokenLocation, TokenVerifier verifier) {
+        super(context, verifier.getTokenExtractor().getChallengeScheme(), realm);
+        tokenVerifier = verifier;
+        parameterLocation = tokenLocation;
     }
 
-    public OAuth2Authenticator(Context context, boolean optional) {
-        super(context, optional);
+    public OAuth2Authenticator(Context context, boolean optional, String realm, OAuth2Utils.ParameterLocation tokenLocation, TokenVerifier verifier) {
+        super(context, optional, verifier.getTokenExtractor().getChallengeScheme(), realm, verifier.getVerifier(tokenLocation));
+        parameterLocation = tokenLocation;
     }
 
-    public OAuth2Authenticator(Context context, boolean multiAuthenticating, boolean optional, Realm<V> realm) {
-        super(context, multiAuthenticating, optional, realm != null ? realm.getEnroler() : null);
-        verifier = realm != null ? realm.getVerifier() : null;
+    /**
+     * Returns the credentials tokenVerifier.
+     *
+     * @return The credentials tokenVerifier.
+     */
+    public Verifier getVerifier() {
+        return getTokenVerifier().getVerifier(parameterLocation);
     }
 
-    public OAuth2Authenticator(Context context, boolean optional, Realm<V> realm) {
-        super(context, optional, realm != null ? realm.getEnroler() : null);
-        verifier = realm != null ? realm.getVerifier() : null;
-    }
-
-    public V getVerifier() {
-        return verifier;
+    /**
+     * Returns the token tokenVerifier.
+     *
+     * @return The token tokenVerifier.
+     */
+    public TokenVerifier getTokenVerifier() {
+        return tokenVerifier;
     }
 
     /**
@@ -79,64 +88,52 @@ public abstract class OAuth2Authenticator<V extends TokenVerifier> extends Authe
      */
     protected boolean authenticate(Request request, Response response) {
         try {
-            Form parameters = getAuthenticationParameters(request);
-            if (null != parameters && null != getVerifier()) {
-                OAuth2User user = getVerifier().verify(normalizeParameters(parameters, request, response));
-                //TODO Check NPE
-                request.getClientInfo().setUser(user);
-                return true;
-            }
+            return super.authenticate(request, response);
         } catch (OAuthProblemException e) {
             doError(request, response, e);
-            //TODO handle exception. Callback {query,fragment} Response JSON object
         }
         return false;
     }
 
-    protected abstract Map<String, Object> normalizeParameters(Form parameters, Request request, Response response) throws OAuthProblemException;
+    @Override
+    public void challenge(Response response, boolean stale) {
+        if (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(parameterLocation)) {
+            super.challenge(response, stale);
+        }
+    }
 
-    protected abstract void doError(Request request, Response response, OAuthProblemException exception);
+    protected void doError(Request request, Response response, OAuthProblemException exception) {
+        if (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(parameterLocation)) {
+            if (!isOptional()) {
+                if (isRechallenging()) {
+                    boolean loggable = response.getRequest().isLoggable()
+                            && getLogger().isLoggable(Level.FINE);
+
+                    if (loggable) {
+                        getLogger().log(Level.FINE,
+                                "An authentication challenge was requested.");
+                    }
+
+                    response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+                    response.getChallengeRequests().add(getTokenVerifier().getTokenExtractor().
+                            createChallengeRequest(getRealm(), exception));
+                } else {
+                    forbid(response);
+                }
+            }
+        } else {
+            response.setStatus(exception.getStatus());
+        }
+    }
 
 
     /**
-     * Returns the parameters to use for authentication.
-     * <p/>
-     * From Header - Authorization: Bearer vF9dft4qmT
-     * From Header - Authorization: MAC id="h480djs93hd8",ts="1336363200",nonce="dj83hs9s",mac="bhCQXTVyfj5cmA9uKkPFx1zeOXM="
-     * From Query  - ?access_token=vF9dft4qmT
-     * From APPLICATION_WWW_FORM - access_token=vF9dft4qmT
+     * Creates a new challenge request.
      *
-     * @param request The request.
-     * @return The access token taken from a given request.
+     * @param stale Indicates if the new challenge is due to a stale response.
+     * @return A new challenge request.
      */
-    protected Form getAuthenticationParameters(Request request) throws OAuthProblemException {
-        Form result = null;
-        // Use the parameters which was populated with the AuthenticatorHelper
-        if (request.getChallengeResponse() != null) {
-            result = new Form(request.getChallengeResponse().getParameters());
-            getLogger().fine("Found Authorization header" + result.getFirst(OAuth2.Params.ACCESS_TOKEN));
-        }
-        if ((result == null)) {
-            getLogger().fine("No Authorization header - checking query");
-            result = request.getOriginalRef().getQueryAsForm();
-            getLogger().fine("Found Token in query" + result.getFirst(OAuth2.Params.ACCESS_TOKEN));
-
-            // check body if all else fail:
-            if (result == null) {
-                if ((request.getMethod() == Method.POST)
-                        || (request.getMethod() == Method.PUT)
-                        || (request.getMethod() == Method.DELETE)) {
-                    Representation r = request.getEntity();
-                    if ((r != null) && MediaType.APPLICATION_WWW_FORM.equals(r.getMediaType())) {
-                        // Search for an OAuth Token
-                        result = new Form(r);
-                        // restore the entity body
-                        request.setEntity(result.getWebRepresentation());
-
-                    }
-                }
-            }
-        }
-        return result;
+    protected ChallengeRequest createChallengeRequest(boolean stale) {
+        return getTokenVerifier().getTokenExtractor().createChallengeRequest(getRealm());
     }
 }

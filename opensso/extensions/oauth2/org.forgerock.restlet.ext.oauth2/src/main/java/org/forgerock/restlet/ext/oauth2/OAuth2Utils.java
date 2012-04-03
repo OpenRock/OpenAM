@@ -134,8 +134,10 @@ public class OAuth2Utils {
 
     public static final String ACCESS_TOKEN_PATH = "access_token_path";
     public static final String AUTHORIZE_PATH = "authorize_path";
+    public static final String TOKENINFO_PATH = "tokeninfo_path";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String AUTHORIZE = "authorize";
+    public static final String TOKENINFO = "tokeninfo";
     public static final String SCOPE_DELIMITER_CONFIG = "scope_delimiter";
     public static final String SCOPE_DELIMITER = " ";
 
@@ -190,6 +192,17 @@ public class OAuth2Utils {
             }
         } while (null == path && null != parent);
         path = null != path ? path : AUTHORIZE;
+        return path.startsWith("/") ? path : "/" + path;
+    }
+
+    /**
+     * Returns the value of the "tokeninfo_path" parameter.
+     *
+     * @param context The context where to find the parameter.
+     * @return The value of the "tokeninfo_path" parameter.
+     */
+    public static String getTokenInfoPath(Context context) {
+        String path = context.getParameters().getFirstValue(TOKENINFO_PATH, TOKENINFO);
         return path.startsWith("/") ? path : "/" + path;
     }
 
@@ -263,6 +276,16 @@ public class OAuth2Utils {
      */
     public static void setAuthorizePath(String value, Context context) {
         context.getParameters().set(AUTHORIZE_PATH, value);
+    }
+
+    /**
+     * Sets the value of the "tokeninfo_path" parameter.
+     *
+     * @param value   The value of the "tokeninfo_path" parameter
+     * @param context The context where to set the parameter.
+     */
+    public static void setTokenInfoPath(String value, Context context) {
+        context.getParameters().set(TOKENINFO_PATH, value);
     }
 
     /**

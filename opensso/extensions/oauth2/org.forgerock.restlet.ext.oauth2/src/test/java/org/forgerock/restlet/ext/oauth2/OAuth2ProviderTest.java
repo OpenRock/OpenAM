@@ -103,7 +103,7 @@ public class OAuth2ProviderTest {
         client.handle(request, response);
         Form token = new Form(response.getLocationRef().getFragment());
         assertNotNull(token.getFirstValue(OAuth2.Params.ACCESS_TOKEN));
-        assertEquals(token.getFirstValue(OAuth2.Params.TOKEN_TYPE), OAuth2.Bearer.BEARER.toLowerCase());
+        assertEquals(token.getFirstValue(OAuth2.Params.TOKEN_TYPE), OAuth2.Bearer.BEARER);
 
 
         /*client.handle(request, new Uniform() {

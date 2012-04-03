@@ -31,7 +31,9 @@ import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A NAME does ...
@@ -40,8 +42,12 @@ import java.util.Arrays;
  */
 public class ClientIdentityVerifier extends AbstractIdentityVerifier<OAuth2Client> {
 
-    public ClientIdentityVerifier(OpenAMParameters parameters) {
+    private List<String> redirectURI;
+
+    public ClientIdentityVerifier(OpenAMParameters parameters, List<String> redirects) {
         super(parameters);
+        redirectURI = new ArrayList<String>(redirects);
+        redirectURI.add("http://local.identitas.no:9085/openam/oauth2test/code-token.html");
     }
 
     @Override
@@ -50,7 +56,7 @@ public class ClientIdentityVerifier extends AbstractIdentityVerifier<OAuth2Clien
         SSOToken token = authContext.getSSOToken();
         client.put("id", token.getProperty("UserId"));
         client.put("clientType", ClientApplication.ClientType.CONFIDENTIAL.name());
-        client.put("redirectionURIs", Arrays.asList("http://local.identitas.no:9085/openam/oauth2test/code-token.html"));
+        client.put("redirectionURIs", redirectURI);
         client.put("allowedGrantScopes", Arrays.asList("read", "write", "delete"));
         client.put("defaultGrantScopes", Arrays.asList("read"));
         return new OAuth2Client(client);

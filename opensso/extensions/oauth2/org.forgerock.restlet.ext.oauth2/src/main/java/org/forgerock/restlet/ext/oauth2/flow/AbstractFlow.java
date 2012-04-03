@@ -232,7 +232,7 @@ public abstract class AbstractFlow extends ServerResource {
             }
         } else {
             //TODO Use custom StatusServer to set the proper status
-            doCatch(OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),throwable.getMessage()));
+            doCatch(OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), throwable.getMessage()));
             //super.doCatch(throwable);
         }
     }
@@ -246,7 +246,7 @@ public abstract class AbstractFlow extends ServerResource {
     }
 
     /**
-     * @See <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-5.2">5.2.  Error Response</a>
+     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-5.2">5.2.  Error Response</a>
      */
     public Representation doError(OAuthProblemException exception) {
         doError(Status.CLIENT_ERROR_BAD_REQUEST);
@@ -261,8 +261,8 @@ public abstract class AbstractFlow extends ServerResource {
      * missing or invalid, the authorization server SHOULD inform the resource owner of the error, and MUST NOT
      * automatically redirect the user-agent to the invalid redirection URI.
      *
-     * @See <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.2.1">4.1.2.1.  Error Response</a>
-     * @See <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.2.1">4.2.2.1.  Error Response</a>
+     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.2.1">4.1.2.1.  Error Response</a>
+     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.2.1">4.2.2.1.  Error Response</a>
      */
     public Representation doError(OAuthProblemException exception, Reference redirect) {
         if (null != redirect) {

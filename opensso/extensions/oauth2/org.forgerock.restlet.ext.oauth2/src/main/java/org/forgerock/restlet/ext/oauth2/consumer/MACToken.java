@@ -22,36 +22,24 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * $Id$
  */
+
 package org.forgerock.restlet.ext.oauth2.consumer;
 
-import org.restlet.security.Enroler;
-
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * A NAME does ...
+ * <p/>
+ * <pre>
+ *  {
+ *      "access_token":"SlAV32hkKG",
+ *      "token_type":"mac",
+ *      "expires_in":3600,
+ *      "refresh_token":"8xLOxBtZp8",
+ *      "mac_key":"adijq39jdlaska9asud",
+ *      "mac_algorithm":"hmac-sha-256"
+ *  }
+ * </pre>
+ *
+ * @author Laszlo Hordos
  */
-public interface Realm<V extends TokenVerifier> {
-
-
-    /**
-     * Returns the name.
-     *
-     * @return The name.
-     */
-    public String getName();
-
-    /**
-     * Returns a verifier that can check the validity of the credentials
-     * associated to a request.
-     *
-     * @return A verifier.
-     */
-    public V getVerifier();
-
-    /**
-     * Returns an enroler that can add the user roles based on user principals.
-     *
-     * @return An enroler.
-     */
-    public Enroler getEnroler();
+public class MACToken {
 }

@@ -24,29 +24,116 @@
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
 
+import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-
-import java.util.Map;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.Form;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.representation.Representation;
+import org.restlet.security.User;
+import org.restlet.security.Verifier;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * A NAME does ...
+ *
+ * @author Laszlo Hordos
  */
-public interface TokenVerifier {
+public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken> {
 
-    /*
-    @param parameters
-    {
-        "access_token":"1/fFBGRNJru1FQd44AzqT3Zg"
+
+    public abstract User createUser(U token);
+
+    protected abstract T getTokenExtractor();
+
+    protected abstract AccessTokenValidator<U> getTokenValidator();
+
+    public Verifier getVerifier(OAuth2Utils.ParameterLocation tokenLocation) {
+        return new InnerTokenVerifier(tokenLocation);
     }
 
-    @return
-    {
-        "audience":"8819981768.apps.googleusercontent.com",
-        "user_id":"123456789",
-        "scope":"https://gdata.youtube.com",
-        "expires_in":436
+    protected class InnerTokenVerifier implements Verifier {
+
+        public InnerTokenVerifier(OAuth2Utils.ParameterLocation tokenLocation) {
+            if (null == tokenLocation) {
+                throw new RuntimeException("Missing required tokenLocation parameter");
+            }
+            this.tokenLocation = tokenLocation;
+        }
+
+        private OAuth2Utils.ParameterLocation tokenLocation;
+
+        @Override
+        public int verify(Request request, Response response) {
+            int result = RESULT_INVALID;
+            try {
+                U token = null;
+                switch (tokenLocation) {
+                    case HTTP_HEADER: {
+                        if (request.getChallengeResponse() == null) {
+                            result = RESULT_MISSING;
+                            break;
+                        }
+                    }
+                    case HTTP_BODY: {
+                        //Methods without request entity
+                        if (Method.GET.equals(request.getMethod()) || Method.HEAD.equals(request.getMethod())) {
+                            token = getTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_QUERY, request);
+                            break;
+                        }
+                    }
+                    default: {
+                        token = getTokenExtractor().extractToken(tokenLocation, request);
+                    }
+                }
+                if (null == token) {
+                    result = RESULT_MISSING;
+                } else {
+                    U t = getTokenValidator().verify(token);
+                    if (null != t || t.isValid()) {
+                        request.getClientInfo().setUser(createUser(t));
+                        result = RESULT_VALID;
+                    }
+                }
+
+            } catch (OAuthProblemException e) {
+                //TODO add logging
+                throw e;
+            }
+            return result;
+        }
     }
-     */
-    public OAuth2User verify(Map<String, Object> parameters) throws OAuthProblemException;
+
+
+    protected Form getAuthenticationParameters(Request request) throws OAuthProblemException {
+        Form result = null;
+        // Use the parameters which was populated with the AuthenticatorHelper
+        if (request.getChallengeResponse() != null) {
+            result = new Form(request.getChallengeResponse().getParameters());
+            //getLogger().fine("Found Authorization header" + result.getFirst(OAuth2.Params.ACCESS_TOKEN));
+        }
+        if ((result == null)) {
+            //getLogger().fine("No Authorization header - checking query");
+            result = request.getOriginalRef().getQueryAsForm();
+            //getLogger().fine("Found Token in query" + result.getFirst(OAuth2.Params.ACCESS_TOKEN));
+
+            // check body if all else fail:
+            if (result == null) {
+                if ((request.getMethod() == Method.POST)
+                        || (request.getMethod() == Method.PUT)
+                        || (request.getMethod() == Method.DELETE)) {
+                    Representation r = request.getEntity();
+                    if ((r != null) && MediaType.APPLICATION_WWW_FORM.equals(r.getMediaType())) {
+                        // Search for an OAuth Token
+                        result = new Form(r);
+                        // restore the entity body
+                        request.setEntity(result.getWebRepresentation());
+
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

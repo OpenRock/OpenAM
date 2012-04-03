@@ -206,7 +206,7 @@ public class AbstractFlowTest {
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2.Params.ACCESS_TOKEN, token);
                 tokenMap.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
-                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
+                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
                 tokenMap.put(OAuth2.Params.EXPIRES_IN, 3600);
 
                 when(accessToken.convertToMap()).thenReturn(tokenMap);
@@ -277,7 +277,7 @@ public class AbstractFlowTest {
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2.Params.ACCESS_TOKEN, token);
                 tokenMap.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
-                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
+                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
                 tokenMap.put(OAuth2.Params.EXPIRES_IN, 3600);
 
                 when(accessToken.convertToMap()).thenReturn(tokenMap);
@@ -307,7 +307,7 @@ public class AbstractFlowTest {
 
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
+                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
                 tokenMap.put(OAuth2.Params.EXPIRES_IN, 3600);
 
                 when(accessToken.convertToMap()).thenReturn(tokenMap);
@@ -333,7 +333,7 @@ public class AbstractFlowTest {
 
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
+                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
                 tokenMap.put(OAuth2.Params.EXPIRES_IN, 3600);
                 when(accessToken.convertToMap()).thenReturn(tokenMap);
 
@@ -363,7 +363,7 @@ public class AbstractFlowTest {
 
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase());
+                tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
                 tokenMap.put(OAuth2.Params.EXPIRES_IN, 3600);
                 when(accessToken.convertToMap()).thenReturn(tokenMap);
 

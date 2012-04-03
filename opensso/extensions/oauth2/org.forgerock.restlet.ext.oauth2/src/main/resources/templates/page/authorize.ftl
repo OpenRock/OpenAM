@@ -22,34 +22,34 @@
     <aside>
         <form action="${target!'.'}" method="post">
             <h4>The following private info is requested</h4>
-            <#if requestingScopes??>
-                <#list requestingScopes as r><input type="checkbox" name="scope" value="${r}" checked/>
-                    <b>${r}</b><br/>
+        <#if requestingScopes??>
+            <#list requestingScopes as r><input type="checkbox" name="scope" value="${r}" checked/>
+                <b>${r}</b><br/>
+            </#list>
+        </#if>
+        <#if grantedScopes??>
+            <#if grantedScopes?has_content>
+                <hr/>
+                <h4>Previously approved scopes</h4>
+                <#list grantedScopes as g><input type="checkbox" name="scope" value="${g}" checked/>
+                    <b>${g}</b><br/>
                 </#list>
             </#if>
-            <#if grantedScopes??>
-                <#if grantedScopes?has_content>
-                    <hr/>
-                    <h4>Previously approved scopes</h4>
-                    <#list grantedScopes as g><input type="checkbox" name="scope" value="${g}" checked/>
-                        <b>${g}</b><br/>
-                    </#list>
-                </#if>
-            </#if>
+        </#if>
             <br/>
             <!-- Optional parameters -->
-            <#if realm??>
-                <input type="hidden" name="realm" value="${realm}"/>
-            </#if>
-            <#if redirect_uri??>
-                <input type="hidden" name="redirect_uri" value="${redirect_uri}"/>
-            </#if>
-            <#if scope??>
-                <input type="hidden" name="scope" value="${scope}"/>
-            </#if>
-            <#if state??>
-                <input type="hidden" name="state" value="${state}"/>
-            </#if>
+        <#if realm??>
+            <input type="hidden" name="realm" value="${realm}"/>
+        </#if>
+        <#if redirect_uri??>
+            <input type="hidden" name="redirect_uri" value="${redirect_uri}"/>
+        </#if>
+        <#if scope??>
+            <input type="hidden" name="scope" value="${scope}"/>
+        </#if>
+        <#if state??>
+            <input type="hidden" name="state" value="${state}"/>
+        </#if>
             <!-- Required parameters -->
             <input type="hidden" name="response_type" value="${response_type}"/>
             <input type="hidden" name="client_id" value="${client_id}"/>

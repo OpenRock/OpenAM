@@ -88,7 +88,7 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         //assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase()),
+                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
                 MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
@@ -116,7 +116,7 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         //assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER.toLowerCase()),
+                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
                 MapAssert.entry(OAuth2.Params.SCOPE, "read write"),
                 MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override

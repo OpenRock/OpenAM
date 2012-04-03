@@ -42,5 +42,6 @@
         <module>org.forgerock.restlet.ext.openam</module>
         <module>org.forgerock.openam.ext.cts</module>
         <module>oauth2</module>
+        <module>oauth2demo</module>
     </modules>
 </project>

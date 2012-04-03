@@ -149,7 +149,7 @@ public class OAuthProblemException extends ResourceException {
         this.scope = null;
     }
 
-    // Flow builder
+    // ConsumerFlow builder
     public OAuthProblemException description(String description) {
         this.description = description;
         return this;
