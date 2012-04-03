@@ -112,28 +112,12 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
    <para>In the Upgrading OpenAM screen, click Save Report to download an
    OpenAM Upgrade Report listing necessary configuration changes, and
    then click Upgrade.</para>
-   <mediaobject xml:id="figure-upgrade-report">
-    <alt>OpenAM upgrade report screen</alt>
-    <imageobject>
-     <imagedata fileref="images/upgrade-report.png" format="PNG" />
-    </imageobject>
-    <textobject><para>The upgrade report screen lets you keep an upgrade
-    report listing configuration changes in case of error.</para></textobject>
-   </mediaobject>
    <para>Log messages pertaining to upgrade of the embedded directory are
    written to the web container log.</para>
   </step>
   <step>
-   <para>When upgrade completes, click Proceed to Login to login to the
-   OpenAM console and continue your work.</para>
-   <mediaobject xml:id="figure-upgrade-complete">
-    <alt>OpenAM upgrade complete screen</alt>
-    <imageobject>
-     <imagedata fileref="images/upgrade-complete.png" format="PNG" />
-    </imageobject>
-    <textobject><para>The upgrade complete screen tells you the new version
-    of OpenAM is ready to use.</para></textobject>
-   </mediaobject>
+   <para>When upgrade completes, restart OpenAM or the container where it runs,
+   and continue your work.</para>
   </step>
   <step>
    <para>In site deployments with multiple OpenAM servers using the embedded
