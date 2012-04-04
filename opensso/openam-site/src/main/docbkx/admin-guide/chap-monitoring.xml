@@ -222,6 +222,9 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    <para>During development, you might find it useful to log all debug messages
    to a single file. In order to do so, set Merge Debug Files to
    <literal>on</literal>.</para>
+
+   <para>After changing this setting, restart OpenAM or the container in which
+   it runs for the change to take effect.</para>
   </section>
   
   <section xml:id="log-mgmt-agents">
