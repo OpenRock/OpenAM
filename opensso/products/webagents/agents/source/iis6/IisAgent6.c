@@ -24,6 +24,9 @@
  *
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #include <windows.h>
 #include <httpext.h>
@@ -57,30 +60,18 @@ const char REDIRECT_COOKIE_TEMPLATE[] = {
  * at all.
  */
 const char FORBIDDEN_MSG[] = {
-    "HTTP/1.1 403 Forbidden\r\n"
-    "Content-Length: 13\r\n"
-    "Content-Type: text/html\r\n"
-    "\r\n"
     "403 Forbidden"
 };
 
 const char NOTFOUND_MSG[] = {
-    "HTTP/1.1 404 Not Found\r\n"
-    "Content-Length: 13\r\n"
-    "Content-Type: text/html\r\n"
-    "\r\n"
     "404 Not Found"
 };
 
 const char INTERNAL_SERVER_ERROR_MSG[] = {
-    "HTTP/1.1 500 Internal Server Error\r\n"
-    "Content-Length: 25\r\n"
-    "Content-Type: text/html\r\n"
-    "\r\n"
     "500 Internal Server Error"
 };
 
-#define AGENT_DESCRIPTION   "Sun OpenSSO Policy Agent 3.0 for Microsoft IIS 6.0"
+#define AGENT_DESCRIPTION   "ForgeRock OpenAM Policy Agent 3.0 for Microsoft IIS 6.0"
 const CHAR agentDescription[]   = { AGENT_DESCRIPTION };
 #define	MAGIC_STR		"sunpostpreserve"
 #define	POST_PRESERVE_URI	"/dummypost/"MAGIC_STR
@@ -390,7 +381,7 @@ DWORD send_error(EXTENSION_CONTROL_BLOCK *pECB) {
             HSE_REQ_SEND_RESPONSE_HEADER,
             "500 Internal Server Error",
             (LPDWORD) NULL,
-            (LPDWORD) NULL);
+            (LPDWORD) "Content-Type: text/html\r\n\r\n");
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
@@ -408,7 +399,7 @@ DWORD send_notfound(EXTENSION_CONTROL_BLOCK *pECB) {
             HSE_REQ_SEND_RESPONSE_HEADER,
             "404 Not Found",
             (LPDWORD) NULL,
-            (LPDWORD) NULL);
+            (LPDWORD) "Content-Type: text/html\r\n\r\n");
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
@@ -426,7 +417,7 @@ DWORD do_deny(EXTENSION_CONTROL_BLOCK *pECB) {
             HSE_REQ_SEND_RESPONSE_HEADER,
             "403 Forbidden",
             (LPDWORD) NULL,
-            (LPDWORD) NULL);
+            (LPDWORD) "Content-Type: text/html\r\n\r\n");
     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
         am_web_log_error("%s: WriteClient did not succeed: "
@@ -1163,6 +1154,18 @@ static DWORD do_redirect(EXTENSION_CONTROL_BLOCK *pECB,
                         data = INTERNAL_SERVER_ERROR_MSG;
                         data_len = sizeof (INTERNAL_SERVER_ERROR_MSG) - 1;
                         pECB->dwHttpStatusCode = http500;
+                        pECB->ServerSupportFunction(pECB->ConnID,
+                                HSE_REQ_SEND_RESPONSE_HEADER,
+                                "500 Internal Server Error",
+                                (LPDWORD) NULL,
+                                (LPDWORD) "Content-Type: text/html\r\n\r\n");
+                    } else {
+                        pECB->dwHttpStatusCode = http403;
+                        pECB->ServerSupportFunction(pECB->ConnID,
+                                HSE_REQ_SEND_RESPONSE_HEADER,
+                                "403 Forbidden",
+                                (LPDWORD) NULL,
+                                (LPDWORD) "Content-Type: text/html\r\n\r\n");
                     }
                     if ((pECB->WriteClient(pECB->ConnID, (LPVOID) data,
                             (LPDWORD) & data_len, (DWORD) 0)) == FALSE) {
