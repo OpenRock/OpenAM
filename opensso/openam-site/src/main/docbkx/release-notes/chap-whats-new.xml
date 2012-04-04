@@ -66,7 +66,11 @@
    repository.</para>
   </listitem>
   <listitem>
-   <para>OpenAM now uses OpenDJ 2.4.4 as the embedded data store
+   <para>OpenAM now allows you to differentiate Login UI buttons using CSS
+   (OPENAM-977).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now uses OpenDJ 2.4.5 as the embedded data store
    (OPENAM-960).</para>
   </listitem>
   <listitem>
@@ -148,12 +152,20 @@
    (OPENAM-679).</para>
   </listitem>
   <listitem>
+   <para>OpenAM now bundles <filename>click-nodeps.jar</filename>
+   (OPENAM-646).</para>
+  </listitem>
+  <listitem>
    <para>OpenAM now provides additional statistics related to session failover
    (OPENAM-641).</para>
   </listitem>
   <listitem>
    <para>Multiple improvements in the OpenAM upgrade process streamline the
    move to the new version (OPENAM-626).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM <command>amsfo</command> script now starts the session
+   database only after the message queue is up and running (OPENAM-624).</para>
   </listitem>
   <listitem>
    <para>OpenAM now supports interoperability with LDAP servers that implement
@@ -164,6 +176,18 @@
   <listitem>
    <para>OpenAM .NET fedlets now support encrypted assertions
    (OPENAM-604).</para>
+  </listitem>
+  <listitem>
+   <para>The Administration Tools setup script now has better default
+   settings (OPENAM-577).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM console configuration wizard now suggests better values
+   for cookie domains (OPENAM-576).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM .jar files now contain standard MANIFEST entries
+   (OPENAM-570).</para>
   </listitem>
   <listitem>
    <para>The <command>ssoadm</command> can now decode an encrypted password
