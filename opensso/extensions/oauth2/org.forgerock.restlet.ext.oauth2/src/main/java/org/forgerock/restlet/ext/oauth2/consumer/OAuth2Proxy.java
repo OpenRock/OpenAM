@@ -489,8 +489,11 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
 
     /**
      * Get a new instance of the parameters
+     * <p/>
+     * If the initial parameters is null the this method return null as well. If the initial parameters is not null
+     * then it return a new modifiable copy of the original parameters.
      *
-     * @return new instance of initial parameters
+     * @return null or new instance of initial parameters
      */
     public Series<Parameter> getParameters() {
         if (null != parameters) {

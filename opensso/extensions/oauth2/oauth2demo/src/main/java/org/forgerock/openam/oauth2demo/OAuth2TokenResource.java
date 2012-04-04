@@ -25,13 +25,16 @@
 
 package org.forgerock.openam.oauth2demo;
 
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2User;
+import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import org.restlet.security.User;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +50,12 @@ public class OAuth2TokenResource extends ServerResource {
         User u = getClientInfo().getUser();
         if (u instanceof OAuth2User) {
             OAuth2User user = (OAuth2User) u;
+            Object o = getContext().getAttributes().get("org.forgerock.openam.oauth2demo");
+            if (o instanceof URI) {
+                Reference tokenInfo = new Reference(((URI) o).resolve("../oauth2/tokeninfo"));
+                tokenInfo.addQueryParameter(OAuth2.Params.ACCESS_TOKEN, user.getAccessToken());
+                response.put("uri", tokenInfo.toString());
+            }
             response.put("name", user.getIdentifier());
             response.put("access_token", user.getAccessToken());
             response.put("scope", user.getScope());

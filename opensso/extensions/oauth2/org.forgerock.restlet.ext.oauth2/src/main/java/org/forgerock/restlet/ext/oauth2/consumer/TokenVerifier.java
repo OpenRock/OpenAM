@@ -70,17 +70,16 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
             try {
                 U token = null;
                 switch (tokenLocation) {
-                    case HTTP_HEADER: {
-                        if (request.getChallengeResponse() == null) {
-                            result = RESULT_MISSING;
-                            break;
-                        }
-                    }
                     case HTTP_BODY: {
                         //Methods without request entity
                         if (Method.GET.equals(request.getMethod()) || Method.HEAD.equals(request.getMethod())) {
                             token = getTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_QUERY, request);
                             break;
+                        }
+                    }
+                    case HTTP_HEADER: {
+                        if (request.getChallengeResponse() == null) {
+                            return RESULT_MISSING;
                         }
                     }
                     default: {

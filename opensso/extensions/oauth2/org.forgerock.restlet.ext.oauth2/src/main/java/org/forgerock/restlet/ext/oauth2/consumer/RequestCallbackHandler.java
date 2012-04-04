@@ -74,7 +74,7 @@ public interface RequestCallbackHandler<T extends AbstractAccessToken> {
      * <p/>
      * The input parameters are the {@link org.forgerock.restlet.ext.oauth2.consumer.OAuth2Proxy#getParameters()}
      *
-     * @param parameters copy of the parameters of {@link OAuth2Proxy}
+     * @param parameters copy of the parameters of {@link OAuth2Proxy} it can be null
      * @return
      */
     public Series<Parameter> decorateParameters(Series<Parameter> parameters);

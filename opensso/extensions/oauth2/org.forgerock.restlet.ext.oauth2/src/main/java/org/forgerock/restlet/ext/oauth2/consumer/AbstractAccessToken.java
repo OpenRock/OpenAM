@@ -74,7 +74,7 @@ public abstract class AbstractAccessToken implements Serializable {
         String o = token.getFirstValue(OAuth2.Token.OAUTH_EXPIRES_IN);
         if (o instanceof String) {
             //Todo Catch the exception
-            expires_in = Long.decode((String) o);
+            expires_in = Long.decode(o);
         } else {
             expires_in = 0l;
         }

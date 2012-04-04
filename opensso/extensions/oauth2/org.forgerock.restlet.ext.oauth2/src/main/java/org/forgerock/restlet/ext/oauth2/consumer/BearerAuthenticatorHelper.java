@@ -35,6 +35,7 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
+import org.restlet.data.Reference;
 import org.restlet.engine.header.ChallengeWriter;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderReader;
@@ -53,7 +54,7 @@ import java.util.logging.Level;
  */
 public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken> {
 
-    public final static ChallengeScheme HTTP_OAUTH_BEARER = new ChallengeScheme("HTTP_OAUTH_BEARER", OAuth2.Bearer.BEARER,
+    public final static ChallengeScheme HTTP_OAUTH_BEARER = new ChallengeScheme("HTTP_BEARER", OAuth2.Bearer.BEARER,
             "OAuth 2.0 Authorization Protocol: Bearer Tokens");
 
     /**
@@ -234,6 +235,20 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
 
     }
 
+    /**
+     * Append the access_token to the query of resourceRef
+     * TODO implement this method
+     *
+     * @param resourceRef
+     * @param challengeResponse
+     * @param request
+     * @return
+     */
+    @Override
+    public Reference updateReference(Reference resourceRef, ChallengeResponse challengeResponse, Request request) {
+        return super.updateReference(resourceRef, challengeResponse, request);
+    }
+
     public static void saveToken(ChallengeResponse challenge, String token) {
         challenge.getParameters().set(OAuth2.Token.OAUTH_ACCESS_TOKEN, token);
     }
@@ -245,10 +260,6 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
 
     @Override
     protected BearerToken extractRequestToken(ChallengeResponse challengeResponse) throws OAuthProblemException {
-        if (challengeResponse.getParameters().isEmpty()) {
-            //TODO This is a workaround
-            parseResponse(challengeResponse, null, null);
-        }
         Series<Parameter> parameters = challengeResponse.getParameters();
         if (!parameters.isEmpty()) {
             OAuthProblemException exception = extractException(parameters);
@@ -322,26 +333,6 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
         return null;
     }
 
-
-    //    @Override
-//    public BearerToken extract(Response response) {
-//        Map<String, Object> token = extractToken(response);
-//        if (null != token) {
-//            return new BearerToken(token);
-//        }
-//        return null;
-//    }
-//
-//    @Override
-//    public BearerToken extract(Request request) {
-//        Map<String, Object> token = extractToken(request);
-//        if (null != token) {
-//            return new BearerToken(token);
-//        }
-//        return null;
-//        //return (BearerToken) request.getAttributes().get(BearerToken.class.getName());
-//    }
-
     @Override
     public ChallengeResponse createChallengeResponse(BearerToken token) {
         ChallengeResponse response = new ChallengeResponse(HTTP_OAUTH_BEARER);
@@ -367,9 +358,7 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
     public Form createForm(BearerToken token) {
         Form form = new Form();
         form.add(OAuth2.Token.OAUTH_ACCESS_TOKEN, token.getAccessToken());
-        form.add(OAuth2.Token.OAUTH_TOKEN_TYPE, token.getTokenType());
         return form;
     }
-
 
 }

@@ -233,9 +233,10 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
     protected static OAuthProblemException extractException(String error, String error_description, String error_uri) {
         OAuthProblemException exception = null;
         if (null != error) {
-            OAuthProblemException.OAuthError e = Enum.valueOf(OAuthProblemException.OAuthError.class, (String) error);
-            if (null == e) {
-                e = OAuthProblemException.OAuthError.UNKNOWN_ERROR;
+            OAuthProblemException.OAuthError e = OAuthProblemException.OAuthError.UNKNOWN_ERROR;
+            try {
+                e = Enum.valueOf(OAuthProblemException.OAuthError.class, ((String) error).toUpperCase());
+            } catch (IllegalArgumentException ex) {
             }
 
             if (null != error_description) {

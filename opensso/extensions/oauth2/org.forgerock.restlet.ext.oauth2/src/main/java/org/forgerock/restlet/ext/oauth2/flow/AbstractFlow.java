@@ -276,8 +276,18 @@ public abstract class AbstractFlow extends ServerResource {
     //TODO Use flexible util to detect the client-agent and select the proper display
     protected Representation getPage(String templateName, Object dataModel) {
         String display = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DISPLAY, String.class);
-        OAuth2.DisplayType displayType = null != display ? Enum.valueOf(OAuth2.DisplayType.class, display) : OAuth2.DisplayType.PAGE;
-        return getPage(displayType.getFolder(), templateName, dataModel);
+        OAuth2.DisplayType displayType = OAuth2.DisplayType.PAGE;
+        if (OAuth2Utils.isNotBlank(display)) {
+            try {
+                displayType = Enum.valueOf(OAuth2.DisplayType.class, display.toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+        Representation r = getPage(displayType.getFolder(), templateName, dataModel);
+        if (null != r) {
+            return r;
+        }
+        throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "Server can not serve the content of authorization page");
     }
 
     protected Representation getPage(String display, String templateName, Object dataModel) {

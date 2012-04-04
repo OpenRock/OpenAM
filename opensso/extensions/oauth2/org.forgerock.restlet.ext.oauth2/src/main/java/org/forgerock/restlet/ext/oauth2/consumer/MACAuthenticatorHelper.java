@@ -44,7 +44,7 @@ import java.util.logging.Level;
  */
 public class MACAuthenticatorHelper extends AuthenticatorHelper {
 
-    public final static ChallengeScheme HTTP_OAUTH_MAC = new ChallengeScheme("HTTP_OAUTH_MAC", "MAC", "MAC Access Authentication");
+    public final static ChallengeScheme HTTP_OAUTH_MAC = new ChallengeScheme("HTTP_MAC", "MAC", "MAC Access Authentication");
 
     /**
      * Constructor.

@@ -36,6 +36,7 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
 import org.restlet.data.Method;
+import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.engine.util.Base64;
 import org.restlet.ext.servlet.ServletUtils;
@@ -117,7 +118,11 @@ public class RedirectResource extends Redirector {
                     }
                 }
             } catch (OAuthProblemException e) {
-                throw e;
+                target = super.getTargetRef(request, response);
+                for (Parameter parameter : e.getErrorForm()) {
+                    target.addQueryParameter(parameter);
+                }
+                e.printStackTrace();
             } catch (ResourceException e) {
                 throw e;
             }

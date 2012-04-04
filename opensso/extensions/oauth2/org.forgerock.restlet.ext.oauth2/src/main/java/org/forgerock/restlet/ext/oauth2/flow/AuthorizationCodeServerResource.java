@@ -29,6 +29,7 @@ import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
+import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
@@ -46,6 +47,7 @@ import java.util.Set;
 public class AuthorizationCodeServerResource extends AbstractFlow {
 
     protected boolean decision_allow = false;
+    protected Form formPost = null;
 
     /*
         If TLS is not available, the authorization server
@@ -88,7 +90,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             return getPage("authorize.ftl", getDataModel());
         } else {
             decision_allow = true;
-            return authorization();
+            return authorization(getRequest().getEntity());
         }
     }
 
@@ -103,7 +105,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             case AUTHORIZATION_ENDPOINT: {
                 resourceOwner = getAuthenticatedResourceOwner();
 
-                return authorization();
+                return authorization(entity);
             }
             case TOKEN_ENDPOINT: {
                 return token(entity);
@@ -114,14 +116,14 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         }
     }
 
-    public Representation authorization() {
+    public Representation authorization(Representation entity) {
         /*
             When a decision is established, the authorization server directs the
             user-agent to the provided client redirection URI using an HTTP
             redirection response, or by other means available to it via the user-
             agent.
          */
-        if (getDecision()) {
+        if (getDecision(entity)) {
             //Get the granted scope
             String scope_after = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
             //Validate the granted scope
@@ -191,10 +193,10 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
 
     //Get the decision [allow,deny]
-    protected boolean getDecision() {
+    protected boolean getDecision(Representation entity) {
         if (!decision_allow) {
             String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DECISION, String.class);
-            if (OAuth2.Custom.ALLOW.equals(decision)) {
+            if (OAuth2.Custom.ALLOW.equalsIgnoreCase(decision)) {
                 decision_allow = true;
             } else {
                 throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), "Resource Owner did not authorize the request");
@@ -241,5 +243,12 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
      */
     protected AccessToken createAccessToken(AuthorizationCode code) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), code.getScope(), code);
+    }
+
+    protected Form getFormPost(Representation entity) {
+        if (null == formPost) {
+            formPost = new Form(entity);
+        }
+        return formPost;
     }
 }

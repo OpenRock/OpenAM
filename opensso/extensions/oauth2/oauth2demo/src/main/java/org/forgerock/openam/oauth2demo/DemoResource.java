@@ -33,12 +33,15 @@ import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestCallbackHandler;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
+import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.data.Form;
+import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.engine.util.Base64;
+import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
@@ -74,17 +77,25 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
     private volatile boolean redirected = false;
 
-    @Get("json")
+    @Get("html")
     public Representation getStatusInfo() {
         Form parameters = getQuery();
         Map<String, Object> response = new HashMap<String, Object>();
 
+
         //Set Authentication Mode
         String mode = parameters.getFirstValue("mode");
         if (mode != null) {
-            tokenLocation = Enum.valueOf(OAuth2Utils.ParameterLocation.class, mode.toUpperCase());
-            if (tokenLocation == null) tokenLocation = OAuth2Utils.ParameterLocation.HTTP_HEADER;
+            try {
+                tokenLocation = Enum.valueOf(OAuth2Utils.ParameterLocation.class, mode.toUpperCase());
+                if (tokenLocation == null) tokenLocation = OAuth2Utils.ParameterLocation.HTTP_HEADER;
+            } catch (IllegalArgumentException e) {
+            }
         }
+
+        response.put("page_name", "Protected Resource:" +
+                (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(tokenLocation) ? "Header" : "Query"));
+
 
         String action = parameters.getFirstValue("action");
         if ("flush_token".equalsIgnoreCase(action)) {
@@ -92,11 +103,15 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
             if (null != session) {
                 session.removeAttribute(BearerToken.class.getName());
             }
+            response.put("page_action", "Remove existing access_token");
         }
 
         String scopes = parameters.getFirstValue("scope");
         if (scopes instanceof String) {
             scope = OAuth2Utils.split(scopes, " ");
+            if (null != scope) {
+                response.put("page_scope", scope);
+            }
         }
 
         dynamicEndpoint = null != parameters.getFirst("dynamicEndpoint");
@@ -107,18 +122,21 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
                 if (null == customParameters) {
                     customParameters = new Form();
                 }
-                customParameters.add(parameter.getName().substring(3), parameter.getValue());
+                if (null != parameter.getValue()) {
+                    customParameters.add(parameter.getName().substring(3), parameter.getValue());
+                }
             }
         }
 
 
         String flow = parameters.getFirstValue("flow");
-        BearerOAuth2Proxy.Flow flowType = null;
+        BearerOAuth2Proxy.Flow flowType = OAuth2Proxy.Flow.AUTHORIZATION_CODE;
         if (null != flow) {
-            flowType = Enum.valueOf(BearerOAuth2Proxy.Flow.class, flow.toUpperCase());
-        }
-        if (null == flowType) {
-            flowType = OAuth2Proxy.Flow.AUTHORIZATION_CODE;
+            try {
+                flowType = Enum.valueOf(BearerOAuth2Proxy.Flow.class, flow.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                flowType = OAuth2Proxy.Flow.AUTHORIZATION_CODE;
+            }
         }
 
         try {
@@ -134,7 +152,8 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
             response.put(OAuth2.Error.ERROR_DESCRIPTION, e.getStatus().getDescription());
             response.put("status", e.getStatus().getCode());
         }
-        return new JacksonRepresentation<Map>(response);
+
+        return toRepresentation(response, "index.ftl");
     }
 
     private Reference getTarget() {
@@ -155,7 +174,7 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     protected ClientResource getClientResource(Reference reference, OAuth2Proxy.Flow flow) {
         ClientResource clientResource = new ClientResource(getContext(), reference);
         BearerOAuth2Proxy auth2Proxy = new BearerOAuth2Proxy(getContext(), proxy, flow, this);
-        auth2Proxy.setNext(clientResource.getNext());
+        auth2Proxy.setNext(new Client(reference.getSchemeProtocol()));
         clientResource.setNext(auth2Proxy);
         return clientResource;
     }
@@ -173,6 +192,26 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
                     OAuth2TokenStore.class.getName());
         }
     }
+
+    @Override
+    public OAuth2DemoApplication getApplication() {
+        return (OAuth2DemoApplication) super.getApplication();
+    }
+
+    /**
+     * Return a templated representation.
+     *
+     * @param map          The map of parameters.
+     * @param templateName The name of the template.
+     * @return A templated representation.
+     */
+    protected Representation toRepresentation(Map<String, Object> map, String templateName) {
+        return new TemplateRepresentation(templateName, getApplication()
+                .getConfiguration(), map, MediaType.TEXT_HTML);
+    }
+
+
+    // Callback
 
 
     @Override
@@ -242,7 +281,11 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     @Override
     public Series<Parameter> decorateParameters(Series<Parameter> parameters) {
         if (null != customParameters) {
-            parameters.addAll(customParameters);
+            if (null != parameters) {
+                parameters.addAll(customParameters);
+            } else {
+                return customParameters;
+            }
         }
         return parameters;
     }

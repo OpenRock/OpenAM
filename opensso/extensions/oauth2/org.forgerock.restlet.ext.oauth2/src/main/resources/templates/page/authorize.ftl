@@ -54,10 +54,12 @@
             <input type="hidden" name="response_type" value="${response_type}"/>
             <input type="hidden" name="client_id" value="${client_id}"/>
             <!-- Custom parameters -->
-            <input type="hidden" name="decision" value="allow"/>
+            <!--input type="hidden" name="decision" value="allow"/>
             <input type="submit" value="Allow access" class="button save"/>
             <input type="hidden" name="decision" value="deny"/>
-            <input type="submit" value="No Thanks" class="button"/>
+            <input type="submit" value="No Thanks" class="button"/-->
+            <input type="submit" name="decision" class="button gray" value="Allow"/>
+            <input type="submit" name="decision" class="button gray" value="Deny"/>
         </form>
     </aside>
 </div>

@@ -25,6 +25,8 @@
 
 package org.forgerock.openam.oauth2demo;
 
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
@@ -41,7 +43,9 @@ import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
+import org.restlet.ext.freemarker.ContextTemplateLoader;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Redirector;
@@ -61,33 +65,44 @@ import java.util.List;
  * @author Laszlo Hordos
  */
 public class OAuth2DemoApplication extends Application {
+
+    /**
+     * The Freemarker's configuration.
+     */
+    private Configuration configuration;
+
     @Override
     public Restlet createInboundRoot() {
         Router root = new Router(getContext());
 
         String client_id = "demo";
-        if (getContext().getAttributes().get("oauth2.client_id") instanceof String) {
-            client_id = (String) getContext().getAttributes().get("oauth2.client_id");
-        }
-
         String client_secret = "Passw0rd";
-        if (getContext().getAttributes().get("oauth2.client_secret") instanceof String) {
-            client_id = (String) getContext().getAttributes().get("oauth2.client_secret");
-        }
         String username = client_id;
-        if (getContext().getAttributes().get("oauth2.username") instanceof String) {
-            client_id = (String) getContext().getAttributes().get("oauth2.username");
-        }
         String password = client_secret;
-        if (getContext().getAttributes().get("oauth2.password") instanceof String) {
-            client_id = (String) getContext().getAttributes().get("oauth2.password");
-        }
         String scope = null;
-        if (getContext().getAttributes().get("oauth2.scope") instanceof String) {
-            client_id = (String) getContext().getAttributes().get("oauth2.scope");
+        String template_dir = "clap:///templates";
+
+        for (Parameter parameter : getContext().getParameters()) {
+            if ("oauth2.client_id".equals(parameter.getName())) {
+                client_id = parameter.getValue();
+            } else if ("oauth2.client_secret".equals(parameter.getName())) {
+                client_secret = parameter.getValue();
+            } else if ("oauth2.username".equals(parameter.getName())) {
+                username = parameter.getValue();
+            } else if ("oauth2.password".equals(parameter.getName())) {
+                password = parameter.getValue();
+            } else if ("oauth2.scope".equals(parameter.getName())) {
+                scope = parameter.getValue();
+            }
         }
 
+        configuration = new Configuration();
+        try {
+            configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:20, soft:250");
+        } catch (TemplateException e) {
 
+        }
+        configuration.setTemplateLoader(new ContextTemplateLoader(getContext(), template_dir));
 
         //Directory dir = new Directory(getContext(), new Reference("war:///WEB-INF/oauth2demo"));
         Directory dir = new Directory(getContext(), new Reference("clap:///org/forgerock/openam/oauth2demo"));
@@ -195,5 +210,14 @@ public class OAuth2DemoApplication extends Application {
         List<Role> authorizedRoles = new ArrayList<Role>(1);
         authorizedRoles.add(new Role("read", ""));
         return authorizedRoles;
+    }
+
+    /**
+     * Returns the Freemarker's configuration.
+     *
+     * @return The Freemarker's configuration.
+     */
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }
