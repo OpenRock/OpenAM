@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 TOOLS.LV SIA
+ * Portions Copyrighted 2011-2012 ForgeRock AS
  */
 
 #include <limits.h>
@@ -720,82 +720,11 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
 static am_status_t get_request_url(request_rec *r, char **requestURL) {
     const char *thisfunc = "get_request_url()";
     am_status_t status = AM_SUCCESS;
-    const char *args = r->args;
-    char *server_name = NULL;
-    unsigned int port_num = 0;
-    const char *host = NULL;
-    char *http_method = NULL;
-    char port_num_str[40];
-    char *args_sep_str = NULL;
-
-    // Get the host name
-    if (host != NULL) {
-        size_t server_name_len = 0;
-        char *colon_ptr = strchr(host, ':');
-        am_web_log_max_debug("%s: Host: %s", thisfunc, host);
-        if (colon_ptr != NULL) {
-            sscanf(colon_ptr + 1, "%u", &port_num);
-            server_name_len = colon_ptr - host;
-        } else {
-            server_name_len = strlen(host);
-        }
-        server_name = apr_pcalloc(r->pool, server_name_len + 1);
-        memcpy(server_name, host, server_name_len);
-        server_name[server_name_len] = '\0';
-    } else {
-        server_name = (char *) r->hostname;
-    }
-
-    // In case of virtual servers with only a
-    // IP address, use hostname defined in server_req
-    // for the request hostname value
-    if (server_name == NULL) {
-        server_name = (char *) r->server->server_hostname;
-        am_web_log_debug("%s: Host set to server hostname %s.",
-                thisfunc, server_name);
-    }
-    if (server_name == NULL || strlen(server_name) == 0) {
-        am_web_log_error("%s: Could not get the hostname.", thisfunc);
+    *requestURL = ap_construct_url(r->pool, r->unparsed_uri, r);
+    if (*requestURL == NULL) {
         status = AM_FAILURE;
-    } else {
-        am_web_log_debug("%s: hostname = %s", thisfunc, server_name);
     }
-    if (status == AM_SUCCESS) {
-        // Get the port
-        if (port_num == 0) {
-            port_num = r->server->port;
-        }
-        // Virtual servers set the port to 0 when listening on the default port.
-        // This creates problems, so set it back to default port
-        if (port_num == 0) {
-            port_num = ap_default_port(r);
-            am_web_log_debug("%s: Port is 0. Set to default port %u.",
-                    thisfunc, ap_default_port(r));
-        }
-    }
-    am_web_log_debug("%s: port = %u", thisfunc, port_num);
-    sprintf(port_num_str, ":%u", port_num);
-    // Get the protocol
-    http_method = (char *) ap_http_scheme(r);
-    // Get the query
-    if (NULL == args || '\0' == args[0]) {
-        args_sep_str = "";
-        args = "";
-    } else {
-        args_sep_str = "?";
-    }
-    am_web_log_debug("%s: query = %s", thisfunc, args);
-
-    // Construct the url
-    // <method>:<host><:port or nothing><uri><? or nothing><args or nothing>
-    *requestURL = apr_psprintf(r->pool, "%s://%s%s%s%s%s",
-            http_method,
-            server_name,
-            port_num_str,
-            r->uri,
-            args_sep_str,
-            args);
-    am_web_log_debug("%s: Returning request URL = %s.", thisfunc, *requestURL);
+    am_web_log_debug("%s: Returning request URL = %s", thisfunc, *requestURL);
     return status;
 }
 
