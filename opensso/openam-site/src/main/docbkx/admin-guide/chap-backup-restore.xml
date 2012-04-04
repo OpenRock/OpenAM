@@ -97,15 +97,20 @@ Service Configuration was exported.</screen>
   <step>
    <para>Deploy the OpenAM web application as you did for installation, but
    do not start OpenAM or configure it.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
   </step>
   <step>
    <para>Restore files in the configuration directory as necessary.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
   </step>
   <step>
    <para>Restore the bootstrap files as necessary.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
   </step>
   <step>
    <para>Start OpenAM.</para>
+   <para>In a site configuration, perform this step on all servers before
+   proceeding.</para>
   </step>
   <step>
    <para>Restore OpenAM service configuration using the
@@ -123,6 +128,7 @@ Service Configuration was imported.</screen>
   </step>
   <step>
    <para>Restart OpenAM.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
   </step>
  </procedure>
 </chapter>

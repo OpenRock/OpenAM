@@ -56,6 +56,9 @@
  --password-file /tmp/pwd.txt
  --attributevalues iplanet-am-monitoring-enabled=true</screen>
 
+  <para>Restart OpenAM for the changes to take effect. You must also restart
+  OpenAM if you disable monitoring.</para>
+
   <section xml:id="monitoring-web-pages">
    <title>Web Based Monitoring</title>
    
