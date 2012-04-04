@@ -112,7 +112,7 @@
   </license>
  </licenses>
  <properties>
-  <serverDocTargetVersion>10</serverDocTargetVersion>
+  <serverDocTargetVersion>10.0.0</serverDocTargetVersion>
   <agentsDocTargetVersion>3</agentsDocTargetVersion>
   <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
   <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
