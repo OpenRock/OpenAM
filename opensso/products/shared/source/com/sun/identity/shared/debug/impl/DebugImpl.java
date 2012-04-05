@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
+ */
 package com.sun.identity.shared.debug.impl;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -438,7 +441,7 @@ public class DebugImpl implements IDebug {
         String msg,
         Throwable th
     ) {
-        StringBuffer buf = new StringBuffer(prefix);
+        StringBuilder buf = new StringBuilder(prefix);
         buf.append('\n');
         buf.append(msg);
         if(th != null) {
@@ -470,7 +473,7 @@ public class DebugImpl implements IDebug {
     private void resolveDebugFile(String debugDirectory) {
         if (mergeAllMode) {
             debugFilePath = debugDirectory +
-                                 File.separator + CONFIG_DEBUG_MERGEALL_FILE;
+                                 File.separator + wrapFilename(CONFIG_DEBUG_MERGEALL_FILE);
             resolvedName = CONFIG_DEBUG_MERGEALL_FILE;
         } else {
             // Find the bucket this debug belongs to
