@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2012 ForgeRock Inc. All rights reserved.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -258,7 +258,7 @@ public class OAuthConf {
                     OAuthUtil.encodeUriToRedirect(authServiceURL))
                     + param(PARAM_SCOPE, URLEncoder.encode(scope,"UTF-8"))
                     + param(PARAM_CLIENT_SECRET, clientSecret)
-                    + param(PARAM_CODE, code);
+                    + param(PARAM_CODE, URLEncoder.encode(code, "UTF-8"));
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
                     + "the scope", ex);
