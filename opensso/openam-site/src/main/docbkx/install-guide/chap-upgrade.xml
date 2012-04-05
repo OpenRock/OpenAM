@@ -50,10 +50,15 @@
   with respect to earlier versions. If you have already moved to OpenAM 9.5
   or later, follow these steps.</para>
   
-  <step performance="optional">
+  <step>
    <para>If you have customized end user OpenAM files for your deployment,
    build a new .war with the new version of OpenAM that includes your
    customizations.</para>
+  </step>
+  <step>
+   <para>If OpenAM is running in a site deployment with multiple servers,
+   configure your load balancer to take the OpenAM server out of the site
+   pool during upgrade.</para>
   </step>
   <step>
    <para>Stop OpenAM, or the web container where OpenAM is running.</para>
@@ -71,7 +76,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
    <screen>$ cd $HOME
 $ cp -r openam openam-orig</screen>
   </step>
-  <step performance="optional">
+  <step>
    <para>If you have an external configuration directory, make a backup copy
    of the OpenAM configuration.</para>
   </step>
@@ -118,13 +123,16 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
   <step>
    <para>When upgrade completes, restart OpenAM or the container where it runs,
    and continue your work.</para>
-  </step>
-  <step>
    <para>In site deployments with multiple OpenAM servers using the embedded
    OpenDJ store, you must keep the first upgraded server running when upgrading
    the others.</para>
    <para>This allows secondary servers to correctly replicate their embedded
    stores with that of the first server you upgraded.</para>
+  </step>
+  <step>
+   <para>If OpenAM is running in a site deployment with multiple servers,
+   configure your load balancer to return the OpenAM server to the site
+   pool.</para>
   </step>
  </procedure>
  
