@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2012 ForgeRock AS
+    Portions Copyrighted 2010-2012 ForgeRock Inc
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -307,7 +307,7 @@
             <filterchain>
                 <replacetokens>
                     <token key="AGENT_VER" value="3.0-04"/>
-                    <token key="AGENT_ER_VER" value="ER 2"/>
+                    <token key="AGENT_ER_VER" value="ER 3"/>
                     <token key="AGENT_FVB_MARKER" value=""/>
                     <token key="SVN_REVISION" value="${svn.Revision}"/>
                     <token key="BUILD_DATE" value="${build.date}"/>

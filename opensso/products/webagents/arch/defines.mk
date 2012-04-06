@@ -26,7 +26,7 @@
 #
 #
 
-# Portions Copyrighted 2010-2012 ForgeRock AS
+# Portions Copyrighted 2010-2012 ForgeRock Inc
 
 #
 # This makefile defines a number of standard symbols used in by the
@@ -59,7 +59,7 @@ RELEASE_TYPE = ER
 
 # For ER set AGENT_ER_VER (ex: AGENT_ER_VER := ER 1)
 ifeq ($(RELEASE_TYPE), ER)
-AGENT_ER_VER := ER 2
+AGENT_ER_VER := ER 3
 AGENT_ER_TEXT := Exception Release: $(AGENT_ER_VER)
 ADD_README := YES
 else
