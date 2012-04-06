@@ -218,11 +218,14 @@
    are copied during session upgrade (OPENAM-462).</para>
   </listitem>
   <listitem>
-   <para>OpenAM now provides session timeout notification (OPENAM-457).</para>
+   <para>OpenAM now provides session timeout notification (OPENAM-457).
+   The improvement implements a hook for timeout into the session service on
+   the server side. It listens for timeouts on all sessions.</para>
   </listitem>
   <listitem>
-   <para>The OpenAM distributed authentication service now can map HTTP headers
-   when forwarding requests (OPENAM-453). See configuration properties
+   <para>The OpenAM authentication service now can map HTTP headers
+   when forwarding requests (OPENAM-453). This applies both to the distributed
+   and centralized authentication services. See configuration properties
    <literal>openam.retained.http.headers</literal> and
    <literal>openam.forbidden.to.copy.headers</literal>.</para>
   </listitem>
