@@ -72,6 +72,9 @@
   <listitem>
    <para>OpenAM now uses OpenDJ 2.4.5 as the embedded data store
    (OPENAM-960).</para>
+   <para>OpenAM now also uses the OpenDJ LDAP SDK.<footnote><para>The Java EE
+   deployment container in which OpenAM runs can potentially expose leaks in
+   OpenDJ LDAP SDK (OPENDJ-388).</para></footnote></para>
   </listitem>
   <listitem>
    <para>OpenAM now provides JSON output through the identity services REST
