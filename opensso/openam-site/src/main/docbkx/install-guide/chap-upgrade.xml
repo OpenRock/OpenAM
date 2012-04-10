@@ -213,22 +213,4 @@ javax.servlet.ServletException: java.lang.NoClassDefFoundError:
    runs.</para>
   </step>
  </procedure>
-
- <procedure xml:id="upgrade-from-earlier-products">
-  <title>Upgrading From OpenAM 9.0 &amp; Earlier</title>
-  
-  <para>Upgrade from earlier products is briefly described on the OpenAM
-  Wiki.</para>
-
-  <step>
-   <para>Start planning the process by first reading the OpenAM Wiki entry
-   on <link xlink:show="new"
-   xlink:href="https://wikis.forgerock.org/confluence/display/openam/Upgrade+OpenAM+9+to+OpenAM+9.5"
-   >Upgrading to OpenAM 9.5</link>.</para>
-  </step>
-  <step>
-   <para>Carry out the process when your planning and testing are
-   complete.</para>
-  </step>
- </procedure>
 </chapter>
