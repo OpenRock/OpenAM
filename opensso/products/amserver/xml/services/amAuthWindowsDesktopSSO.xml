@@ -92,7 +92,7 @@
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a111">
+                    i18nKey="a106">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -145,7 +145,7 @@
                     <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a111">
+                        i18nKey="a106">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

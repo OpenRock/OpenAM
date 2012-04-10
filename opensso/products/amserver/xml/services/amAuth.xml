@@ -136,7 +136,8 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-admin-auth-module" 
                     type="single_choice" 
-                    syntax="string">
+                    syntax="string"
+                    i18nKey="a104">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className=
@@ -307,7 +308,8 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-org-config"
                     type="single_choice" 
-                    syntax="string">
+                    syntax="string"
+                    i18nKey="a121">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className=
@@ -360,7 +362,8 @@
                  </AttributeSchema> 
                 <AttributeSchema name="sunAMIdentityType"
                     type="multiple_choice"
-                    syntax="string">
+                    syntax="string"
+                    i18nKey="a142">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className= "com.sun.identity.authentication.service.ConfiguredIdentityTypes" />
