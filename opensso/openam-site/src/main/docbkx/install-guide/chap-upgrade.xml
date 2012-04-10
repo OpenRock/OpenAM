@@ -77,8 +77,8 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
 $ cp -r openam openam-orig</screen>
   </step>
   <step>
-   <para>If you have an external configuration directory, make a backup copy
-   of the OpenAM configuration.</para>
+   <para>Make a backup copy of the OpenAM configuration stored in your
+   configuration store.</para>
   </step>
   <step>
    <para>Move the current OpenAM web application aside.</para>
@@ -167,9 +167,8 @@ Upgrade Complete.</screen>
    <para>Restore the old version of OpenAM files, including the .war and the
    configuration directory.</para>
   </step>
-  <step performance="optional">
-   <para>If you are using an external configuration store, restore the earlier
-   version of the configuration store data.</para>
+  <step>
+   <para>Restore the earlier version of the configuration store data.</para>
   </step>
   <step performance="optional">
    <para>If you run OpenAM in Tomcat, remove files from the working directory
