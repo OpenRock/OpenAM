@@ -44,12 +44,12 @@
  configuration.</para>
  
  <para>To manage access to web resources on other servers, you can install
- policy agents that provide tight integration with OpenAM. See the
- <link xlink:href="agent-install-guide#agent-install-guide"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Policy Agent
- Installation Guide</citetitle></link> for instructions on installing OpenAM
- agents in supported web servers and Java EE application containers.</para>
- 
+ policy agents that provide tight integration with OpenAM. See the <link
+ xlink:href="http://openam.forgerock.org/doc/agent-install-guide/index.html"
+ xlink:show="new"><citetitle>Policy Agent Installation Guide</citetitle></link>
+ for instructions on installing OpenAM agents in supported web servers and
+ Java EE application containers.</para>
+
  <section xml:id="prepare-prerequisites">
   <title>Preparing Prerequisite Software</title>
   <indexterm>
