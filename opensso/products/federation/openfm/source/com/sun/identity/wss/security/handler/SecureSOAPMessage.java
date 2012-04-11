@@ -174,6 +174,11 @@ public class SecureSOAPMessage {
              }
              addNameSpaces();
              addSecurityHeader();
+             
+         }
+         
+         if (debug.messageEnabled()) {
+             debug.message("SecureSOAPMessage.Output SOAP message: " + WSSUtils.print(soapMessage.getSOAPPart()));
          }
      }
 
@@ -508,7 +513,7 @@ public class SecureSOAPMessage {
                        WSSConstants.TAG_XML_WSU,
                        WSSConstants.WSU_NS);
 
-             SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
+             SOAPBody body = envelope.getBody();
              body.setAttributeNS(WSSConstants.NS_XML,
                        WSSConstants.TAG_XML_WSU,
                        WSSConstants.WSU_NS);
@@ -532,14 +537,15 @@ public class SecureSOAPMessage {
             " security header");
          }
          try {
+             SOAPPart soapPart = soapMessage.getSOAPPart();
              SOAPEnvelope envelope = soapMessage.getSOAPPart().getEnvelope();
              SOAPHeader header = envelope.getHeader(); 
              if(header == null) {
-                header = soapMessage.getSOAPPart().getEnvelope().addHeader();
+                header = envelope.addHeader();
              }
              checkForAddressingHeaders();
-             SOAPPart soapPart = soapMessage.getSOAPPart();
-             wsseHeader = soapMessage.getSOAPPart().createElementNS(
+             
+             wsseHeader = soapPart.createElementNS(
                           WSSConstants.WSSE_NS,
                           WSSConstants.WSSE_TAG + ":" +
                           WSSConstants.WSSE_SECURITY_LNAME);
@@ -562,7 +568,7 @@ public class SecureSOAPMessage {
              }
 
              //Add time stamp
-             Element timeStamp = soapMessage.getSOAPPart().createElementNS(
+             Element timeStamp = soapPart.createElementNS(
                           WSSConstants.WSU_NS, 
                           WSSConstants.WSU_TAG + ":" +
                           WSSConstants.TIME_STAMP);
@@ -574,7 +580,7 @@ public class SecureSOAPMessage {
              }
              timeStamp.setAttribute(WSSConstants.WSU_ID, tsId);
              wsseHeader.appendChild(timeStamp);
-             Element created = soapMessage.getSOAPPart().createElementNS(
+             Element created = soapPart.createElementNS(
                           WSSConstants.WSU_NS,
                           WSSConstants.WSU_TAG + ":" + WSSConstants.CREATED);
 
@@ -587,7 +593,7 @@ public class SecureSOAPMessage {
                           DateUtils.toUTCDateFormat(createTime))); 
              timeStamp.appendChild(created);
  
-             Element expires = soapMessage.getSOAPPart().createElementNS(
+             Element expires = soapPart.createElementNS(
                           WSSConstants.WSU_NS,
                           WSSConstants.WSU_TAG + ":" + WSSConstants.EXPIRES);
              expires.appendChild(soapPart.createTextNode(
@@ -610,8 +616,7 @@ public class SecureSOAPMessage {
 
      private void checkForAddressingHeaders() throws SecurityException {
          try {
-             SOAPHeader header = soapMessage.getSOAPPart().
-                     getEnvelope().getHeader();
+             SOAPHeader header = soapMessage.getSOAPHeader();
              java.util.Iterator childElements = header.getChildElements();
              while(childElements.hasNext()) {
                 Element childElement = (Element)childElements.next();
@@ -650,6 +655,11 @@ public class SecureSOAPMessage {
      public void sign() 
              throws SecurityException {
 
+         if(debug.messageEnabled()) {
+            debug.message("SecureSOAPMessage.sign:: Before Signing : "+
+            WSSUtils.print(soapMessage.getSOAPPart()));
+         }
+         
          Document doc = toDocument();
          String tokenType = null;
          // securityToken=null if the secmech is Anonymous
@@ -955,7 +965,7 @@ public class SecureSOAPMessage {
         if(signingIds == null) {
            signingIds = new ArrayList();
         }
-        SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
+        SOAPBody body = soapMessage.getSOAPBody();
         String id  = body.getAttribute(WSSConstants.WSU_ID);
         if(signedElements.isEmpty() ||
                 signedElements.contains(WSSConstants.BODY_LNAME)) {
@@ -1099,11 +1109,29 @@ public class SecureSOAPMessage {
       */
      private Document toDocument() throws SecurityException {
         try {
+            
+            /* make sure changes to the soapMessage are persisted before
+             * using writeTo() ... possibly SAAJ bug as 'writeTo()' should always
+             * save the changes first
+             */
+            soapMessage.saveChanges();              
+
+           
             ByteArrayOutputStream bop = new ByteArrayOutputStream();
+            
             soapMessage.writeTo(bop);
+            
+            if (debug.messageEnabled()) {
+                debug.message("SecureSOAPMessage.toDocument:: message used: " + bop.toString());
+            }
+            
             ByteArrayInputStream bin =
                     new ByteArrayInputStream(bop.toByteArray());
-            return XMLUtils.toDOMDocument(bin, WSSUtils.debug);
+            Document doc = XMLUtils.toDOMDocument(bin, WSSUtils.debug);
+            if (debug.messageEnabled()) {
+                debug.message("SecureSOAPMessage.toDocument: Converted SOAPMessage: " + XMLUtils.print(doc));
+            }
+            return doc;
         } catch (Exception ex) {
             debug.error("SecureSOAPMessage.toDocument: Could not" +
             " Convert the SOAP Message to XML document.", ex); 
@@ -1573,8 +1601,8 @@ public class SecureSOAPMessage {
 
      public void setSenderIdentity(String dnsName) {
          try {
-             SOAPHeader header = soapMessage.getSOAPPart().
-                     getEnvelope().getHeader();
+             SOAPPart soapPart = soapMessage.getSOAPPart();
+             SOAPHeader header = soapPart.getEnvelope().getHeader();
              if(header == null) {
                 return;
              }
@@ -1587,7 +1615,7 @@ public class SecureSOAPMessage {
                      header.getElementsByTagNameNS(WSSConstants.wsaNS, "From");
              Element fromElement = null;
              if(childNodes == null || childNodes.getLength() == 0) {
-                fromElement = soapMessage.getSOAPPart().createElementNS(
+                fromElement = soapPart.createElementNS(
                         WSSConstants.wsaNS, "From");
                 fromElement.setAttributeNS(WSSConstants.NS_XML,
                        WSSConstants.TAG_XML_WSU,
@@ -1601,7 +1629,7 @@ public class SecureSOAPMessage {
                 fromElement = (Element)childNodes.item(0);
              }
 
-             Element identityE = soapMessage.getSOAPPart().createElementNS(
+             Element identityE = soapPart.createElementNS(
                      WSSConstants.WSID_NS,
                      WSSConstants.TAG_IDENTITY);
 
@@ -1610,12 +1638,11 @@ public class SecureSOAPMessage {
                           WSSConstants.TAG_XML_WSID,
                           WSSConstants.WSID_NS);
 
-             Element dnsClaim = soapMessage.getSOAPPart().createElementNS(
+             Element dnsClaim = soapPart.createElementNS(
                       WSSConstants.WSID_NS,
                       WSSConstants.TAG_DNSCLAIM);
 
-             org.w3c.dom.Text textNode =
-                     soapMessage.getSOAPPart().createTextNode(dnsName);
+             org.w3c.dom.Text textNode = soapPart.createTextNode(dnsName);
              dnsClaim.appendChild(textNode);
              identityE.appendChild(dnsClaim);
              fromElement.appendChild(identityE);
