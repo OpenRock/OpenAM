@@ -129,9 +129,13 @@
   <itemizedlist>
    <listitem>
     <para>Extensible LDAP schema, required to extend the schema for OpenAM.
-    Schema files are found under <filename>opensso/ldif/</filename> when you
-    unpack the full OpenAM delivery. You might need to adapt the schema
-    definitions before adding them to your directory.</para>
+    First, install OpenAM to use a fresh instance of OpenDJ, such as the
+    embedded OpenDJ server. After installation, study the custom schema
+    definitions from the OpenDJ file,
+    <filename>config/schema/99-user.ldif</filename>, to see what schema
+    definitions you must add to your directory. You might need to adapt the
+    schema definition format before adding the definitions to your
+    directory.</para>
    </listitem>
    <listitem>
     <para>The persistent search request control
