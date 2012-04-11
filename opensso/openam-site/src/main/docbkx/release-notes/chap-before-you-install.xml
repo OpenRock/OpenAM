@@ -68,11 +68,9 @@
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
     <para>JBoss Application Server 7.x</para>
    </listitem>
-<!-- For EA: JSF Library conflict (Mojarra on JSF not JSF-RI)
    <listitem>
     <para>Jetty 7</para>
    </listitem>
- -->
    <listitem>
     <para>Oracle WebLogic 10.3.5</para>
    </listitem>
@@ -90,7 +88,7 @@
    <para>This release of OpenAM works with the following configuration data
    stores.</para>
    <listitem>
-    <para>Embedded (using ForgeRock OpenDJ 2.4.4 for the data store)</para>
+    <para>Embedded (using ForgeRock OpenDJ 2.4.5 for the data store)</para>
     <para>When using the embedded configuration store, you must deploy OpenAM
     on a local file system and not on an NFS-mounted file system.</para>
    </listitem>
@@ -126,8 +124,29 @@
   </itemizedlist>
 
   <para>OpenAM also works with OpenLDAP and other LDAPv3 compliant directory
-  servers. Contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
-  >info@forgerock.com</link> for details.</para>
+  servers. Some features of OpenAM depend on features supported by your
+  directory service, such as the following:</para>
+  <itemizedlist>
+   <listitem>
+    <para>Extensible LDAP schema, required to extend the schema for OpenAM.
+    Schema files are found under <filename>opensso/ldif/</filename> when you
+    unpack the full OpenAM delivery. You might need to adapt the schema
+    definitions before adding them to your directory.</para>
+   </listitem>
+   <listitem>
+    <para>The persistent search request control
+    (OID: <literal>2.16.840.1.113730.3.4.3</literal>).</para>
+   </listitem>
+   <listitem>
+    <para>The Behera Internet-Draft <link xlink:show="new"
+    xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+    >Password Policy for LDAP Directories</link> (for OpenAM password reset,
+    for example)</para>
+   </listitem>
+  </itemizedlist>
+  <para>If you plan to deploy with OpenLDAP or other LDAPv3 directory for
+  user data, make sure you test your solution before you deploy to ensure
+  all OpenAM features that you use work as expected.</para>
  </section>
 
  <section xml:id="browsers-tested">
