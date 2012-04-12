@@ -35,6 +35,7 @@
  provides the following additional features.</para>
 
  <itemizedlist>
+  <title>Major New Features</title>
   <listitem>
    <para>OpenIG, the ForgeRock <link xlink:href="http://openig.forgerock.org/"
    >Identity Gateway</link>, is a high-performance reverse proxy server with
@@ -56,14 +57,6 @@
   </listitem> -->
   <listitem>
    <!-- OPENAM-??? -->
-   <para>Setup wizards make it easier to use OpenDJ as the identity
-   repository.</para>
-  </listitem>
-  <listitem>
-   <para>OpenAM now allows you to differentiate Login UI buttons using CSS
-   (OPENAM-977).</para>
-  </listitem>
-  <listitem>
    <para>OpenAM now uses OpenDJ 2.4.5 as the embedded data store
    (OPENAM-960).</para>
    <para>OpenAM now also uses the OpenDJ LDAP SDK.<footnote><para>The Java EE
@@ -73,20 +66,6 @@
   <listitem>
    <para>OpenAM now provides JSON output through the identity services REST
    interface (OPENAM-940).</para>
-  </listitem>
-  <listitem>
-   <para>OpenAM now allows authentication modules to be installed as a single
-   .jar file (OPENAM-916).</para>
-  </listitem>
-  <listitem>
-   <para>OpenAM has improved console configuration for handling services such
-   as Authentication Core Settings and Identity Repositories (OPENAM-887).</para>
-  </listitem>
-  <listitem>
-   <para>The <command>ssoadm</command> command now provides subcommands to
-   manage entitlement application types: <command>create-appl-type</command>,
-   <command>delete-appl-types</command>, <command>list-appl-types</command>
-   (OPENAM-872).</para>
   </listitem>
   <!-- TODO: reword this when the extension is integrated. -->
 <!--   <listitem>
@@ -103,6 +82,54 @@
    you require more from users when they login from an unfamiliar location,
    from a new device, after a long period during which the account remained
    idle, and so forth.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM supports a new SAML 2.0 IdP Adapter plug-in for additional
+   flexibility. The adapter lets the system handle situations that arise when
+   the identity provider needs to perform additional processing before
+   releasing the assertion, or when interaction with the user is needed before
+   releasing it. The IdP Adapter class implementing the plugin can be
+   configured through the console (OPENAM-700).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides an OAuth 2.0 Client authentication module
+   (OPENAM-679).</para>
+  </listitem>
+  <listitem>
+   <para>Multiple improvements in the OpenAM upgrade process streamline the
+   move to the new version (OPENAM-626).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports interoperability with LDAP servers that implement
+   the (Behera) Internet-Draft, <link
+   xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+   >Password Policy for LDAP Directories</link> (OPENAM-613).</para>
+  </listitem>
+ </itemizedlist>
+
+ <itemizedlist>
+  <title>Additional New Features</title>
+  <listitem>
+   <para>Setup wizards make it easier to use OpenDJ as the identity
+   repository.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now allows you to differentiate Login UI buttons using CSS
+   (OPENAM-977).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now allows authentication modules to be installed as a single
+   .jar file (OPENAM-916).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM has improved console configuration for handling services such
+   as Authentication Core Settings and Identity Repositories (OPENAM-887).</para>
+  </listitem>
+  <listitem>
+   <para>The <command>ssoadm</command> command now provides subcommands to
+   manage entitlement application types: <command>create-appl-type</command>,
+   <command>delete-appl-types</command>, <command>list-appl-types</command>
+   (OPENAM-872).</para>
   </listitem>
   <listitem>
    <para>OpenAM console now includes many more helpful hints and built-in
@@ -137,18 +164,6 @@
    <literal>com.sun.identity.urlchecker.dorequest=false</literal>.</para>
   </listitem>
   <listitem>
-   <para>OpenAM supports a new SAML 2.0 IdP Adapter plug-in for additional
-   flexibility. The adapter lets the system handle situations that arise when
-   the identity provider needs to perform additional processing before
-   releasing the assertion, or when interaction with the user is needed before
-   releasing it. The IdP Adapter class implementing the plugin can be
-   configured through the console (OPENAM-700).</para>
-  </listitem>
-  <listitem>
-   <para>OpenAM now provides an OAuth 2.0 Client authentication module
-   (OPENAM-679).</para>
-  </listitem>
-  <listitem>
    <para>OpenAM now bundles <filename>click-nodeps.jar</filename>
    (OPENAM-646).</para>
   </listitem>
@@ -157,18 +172,8 @@
    (OPENAM-641).</para>
   </listitem>
   <listitem>
-   <para>Multiple improvements in the OpenAM upgrade process streamline the
-   move to the new version (OPENAM-626).</para>
-  </listitem>
-  <listitem>
    <para>The OpenAM <command>amsfo</command> script now starts the session
    database only after the message queue is up and running (OPENAM-624).</para>
-  </listitem>
-  <listitem>
-   <para>OpenAM now supports interoperability with LDAP servers that implement
-   the (Behera) Internet-Draft, <link
-   xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
-   >Password Policy for LDAP Directories</link> (OPENAM-613).</para>
   </listitem>
   <listitem>
    <para>OpenAM .NET fedlets now support encrypted assertions
