@@ -101,6 +101,10 @@ $ mv openam openam-orig ; mv openam.war openam.war.orig</screen>
    <screen>$ cp /path/to/new/OpenAM/deployable-war/opensso.war openam.war</screen>
   </step>
   <step>
+   <para>If your container caches OpenAM files, clear out the cache.</para>
+   <screen>$ rm -rf /path/to/tomcat/work/Catalina/localhost/openam</screen>
+  </step>
+  <step>
    <para>Start the container to run the new OpenAM.</para>
    <screen>$ /etc/init.d/tomcat start
 Password: 
@@ -187,6 +191,10 @@ Upgrade Complete.</screen>
   <step>
    <para>Restore the old version of OpenAM files, including the .war and the
    configuration directory.</para>
+  </step>
+  <step>
+   <para>If your container caches OpenAM files, clear out the cache.</para>
+   <screen>$ rm -rf /path/to/tomcat/work/Catalina/localhost/openam</screen>
   </step>
   <step>
    <para>Restore the earlier version of the configuration store data.</para>
