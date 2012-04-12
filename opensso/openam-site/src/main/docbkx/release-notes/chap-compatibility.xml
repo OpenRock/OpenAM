@@ -156,5 +156,8 @@
 
   <para>The Test Beta Console has been removed. Its functionality is currently
   available through the <command>ssoadm</command> command.</para>
+
+  <para>OpenAM no longer includes the SafeWord and Unix authentication
+  modules.</para>
  </section>
 </chapter>
