@@ -2469,7 +2469,7 @@
      <term>SMTP Gateway Implementation class</term>
      <listitem>
       <para>Class to interact with the mail server. Default:
-      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</literal></para>
+      <literal>org.forgerock. openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</literal></para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-email-gwy-impl</literal></para>
      </listitem>

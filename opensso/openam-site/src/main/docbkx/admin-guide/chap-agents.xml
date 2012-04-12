@@ -518,7 +518,7 @@
       <literal>myserver</literal> in the Map Key field, and enter
       <literal>myserver.mydomain.com</literal> in the Corresponding Map Value
       field. This corresponds to
-      <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]=myserver.mydomain.com</literal>.</para>
+      <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.com</literal>.</para>
       <para>Invalid FQDN values can cause the web server to become unusable
       or render resources inaccessible.</para>
       <para>Property: <literal>com.sun.identity.agents.config.fqdn.mapping</literal></para>
@@ -739,7 +739,7 @@
       enter <literal>UserToken</literal> in the Map Key field, and enter
       <literal>CUSTOM-userid</literal> in
       the Corresponding Map Value field. This corresponds to
-      <literal>com.sun.identity.agents.config.session.attribute.mapping[UserToken]=CUSTOM-userid</literal>.</para>
+      <literal>com.sun.identity.agents.config.session.attribute.mapping[UserToken] =CUSTOM-userid</literal>.</para>
       <para>In most cases, in a destination application where an HTTP header
       name shows up as a request header, it is prefixed by
       <literal>HTTP_</literal>, lower case letters become upper case, and
@@ -867,7 +867,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
        <listitem>
         <para><literal>token=value;Domain=subdomain.domain.com</literal>,
         corresponding to
-        <literal>com.sun.identity.agents.config.cookie.reset[1]=token=value;Domain=subdomain.domain.com</literal></para>
+        <literal>com.sun.identity.agents.config.cookie.reset[1]= token=value;Domain=subdomain.domain.com</literal></para>
        </listitem>
       </itemizedlist>
       <para>Property: <literal>com.sun.identity.agents.config.cookie.reset</literal></para>
@@ -1795,7 +1795,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <literal>myserver</literal> in the Map Key field, and enter
       <literal>myserver.mydomain.com</literal> in the Corresponding Map Value
       field. This corresponds to
-      <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]=myserver.mydomain.com</literal>.</para>
+      <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.com</literal>.</para>
       <para>Property: <literal>com.sun.identity.agents.config.fqdn.mapping</literal></para>
      </listitem>
     </varlistentry>

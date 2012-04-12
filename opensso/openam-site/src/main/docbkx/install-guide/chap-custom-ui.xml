@@ -255,7 +255,7 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
   >realm</replaceable>/<replaceable>client-name</replaceable>/<replaceable
   >file-name</replaceable></literallayout>
 
-  <example xml:id="example-ui-file-lookup">
+  <example xml:id="example-ui-file-lookup"><?dbfo keep-together="auto"?>
    <title>UI File Lookup</title>
 
    <para>OpenAM looks up <filename>Login.jsp</filename> in the following order
