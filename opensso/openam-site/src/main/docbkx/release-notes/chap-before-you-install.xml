@@ -61,9 +61,11 @@
    <listitem>
     <para>GlassFish v2</para>
    </listitem>
+<!-- Commenting out WebSphere given OPENAM-1250
    <listitem>
     <para>IBM WebSphere 7.x</para>
    </listitem>
+-->
    <listitem>
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
     <para>JBoss Application Server 7.x</para>
@@ -73,6 +75,7 @@
    </listitem>
    <listitem>
     <para>Oracle WebLogic 11g Application Server</para>
+    <para>Oracle WebLogic 12c Application Server</para>
    </listitem>
   </itemizedlist>
 
