@@ -74,8 +74,8 @@
     <para>Jetty 7</para>
    </listitem>
    <listitem>
-    <para>Oracle WebLogic 11g Application Server</para>
-    <para>Oracle WebLogic 12c Application Server</para>
+    <para>Oracle WebLogic Server 11g</para>
+    <para>Oracle WebLogic Server 12c</para>
    </listitem>
   </itemizedlist>
 
