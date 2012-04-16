@@ -289,7 +289,7 @@ public class ThreadPool {
             while (true) {
                 try{
                     synchronized (this) {
-                        if ((task == null) && (!shouldTerminate)){
+                        while ((task == null) && (!shouldTerminate)){
                             this.wait();
                         }
                         // need a local copy because they may be changed after
