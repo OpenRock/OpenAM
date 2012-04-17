@@ -1,26 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
+ * Copyright © 2012 ForgeRock. All rights reserved.
  */
 
 package org.forgerock.openam.oauth2demo;
@@ -54,6 +45,7 @@ import org.restlet.util.Series;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -77,6 +69,11 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
     private volatile boolean redirected = false;
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     @Get("html")
     public Representation getStatusInfo() {
         Form parameters = getQuery();
@@ -87,14 +84,19 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
         String mode = parameters.getFirstValue("mode");
         if (mode != null) {
             try {
-                tokenLocation = Enum.valueOf(OAuth2Utils.ParameterLocation.class, mode.toUpperCase());
-                if (tokenLocation == null) tokenLocation = OAuth2Utils.ParameterLocation.HTTP_HEADER;
+                tokenLocation =
+                        Enum.valueOf(OAuth2Utils.ParameterLocation.class, mode.toUpperCase());
+                if (tokenLocation == null) {
+                    tokenLocation = OAuth2Utils.ParameterLocation.HTTP_HEADER;
+                }
             } catch (IllegalArgumentException e) {
+                /* ignored */
             }
         }
 
-        response.put("page_name", "Protected Resource:" +
-                (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(tokenLocation) ? "Header" : "Query"));
+        response.put("page_name", "Protected Resource:"
+                + (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(tokenLocation) ? "Header"
+                                                                                   : "Query"));
 
 
         String action = parameters.getFirstValue("action");
@@ -144,7 +146,12 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
             if (redirected) {
                 return getResponseEntity();
             }
-            response.put("protected", new JacksonRepresentation<Map>(representation, Map.class).getObject());
+            try {
+                response.put("protected",
+                        new JacksonRepresentation<Map>(representation, Map.class).getObject());
+            } catch (IOException e) {
+                /* ignored */
+            }
         } catch (OAuthProblemException e) {
             response = e.getErrorMessage();
         } catch (ResourceException e) {
@@ -164,6 +171,11 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
         return new Reference(root.resolve("./protected/mode2"));
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     protected HttpServletRequest getHttpServletRequest() {
         if (null == servletRequest) {
             servletRequest = ServletUtils.getRequest(getRequest());
@@ -171,6 +183,13 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
         return servletRequest;
     }
 
+    /**
+     * TODO Description.
+     *
+     * @param reference TODO Description
+     * @param flow      TODO Description
+     * @return TODO Description
+     */
     protected ClientResource getClientResource(Reference reference, OAuth2Proxy.Flow flow) {
         ClientResource clientResource = new ClientResource(getContext(), reference);
         BearerOAuth2Proxy auth2Proxy = new BearerOAuth2Proxy(getContext(), proxy, flow, this);
@@ -180,16 +199,18 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     }
 
     /**
-     * Set-up method that can be overridden in order to initialize the state of
-     * the resource. By default it does nothing.
+     * Set-up method that can be overridden in order to initialize the state of the resource. By
+     * default it does nothing.
      *
+     * @throws ResourceException
      * @see #init(org.restlet.Context, org.restlet.Request, org.restlet.Response)
      */
-    protected void doInit() throws ResourceException {
+    protected void doInit() {
         proxy = BearerOAuth2Proxy.popOAuth2Proxy(getContext());
         if (null == proxy) {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required context attribute: " +
-                    OAuth2TokenStore.class.getName());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Missing required context attribute: "
+                            + OAuth2TokenStore.class.getName());
         }
     }
 

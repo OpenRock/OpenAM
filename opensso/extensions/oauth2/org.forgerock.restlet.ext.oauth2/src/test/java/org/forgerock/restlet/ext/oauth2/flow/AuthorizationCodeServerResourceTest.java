@@ -27,6 +27,9 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
+import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.*;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
@@ -34,16 +37,15 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.ext.freemarker.TemplateRepresentation;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
 import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -53,34 +55,36 @@ import static org.testng.Assert.assertTrue;
 public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
     @Test
     public void testValidRequest() throws Exception {
-        Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
 
-        Request request = new Request(Method.GET, reference);
-        request.setChallengeResponse(cr);
+        BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
+        assertNotNull(auth2Proxy);
+
+        AuthorizationCodeRequest factory = auth2Proxy.getAuthorizationCodeRequest().setClientId("cid").
+                setRedirectUri(auth2Proxy.getRedirectionEndpoint().toString()).setState("random");
+        factory.getScope().add("read");
+        factory.getScope().add("write");
+
+
+        Request request = factory.buildRequest();
+        ChallengeResponse resource_owner = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
+        request.setChallengeResponse(resource_owner);
         Response response = new Response(request);
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.CODE);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
 
 
         //handle
         getClient().handle(request, response);
-        assertEquals(response.getStatus(), Status.SUCCESS_OK);
+        assertTrue(response.getStatus().isSuccess());
         assertTrue(response.getEntity() instanceof TemplateRepresentation);
         assertTrue(MediaType.TEXT_HTML.equals(response.getEntity().getMediaType()));
 
-        reference = new Reference("riap://component/test/oauth2/authorize");
-        request = new Request(Method.POST, reference);
-        request.setChallengeResponse(cr);
+        request = new Request(Method.POST, auth2Proxy.getAuthorizationEndpoint());
+        request.setChallengeResponse(resource_owner);
         response = new Response(request);
 
         Form parameters = new Form();
         parameters.add(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.CODE);
-        parameters.add(OAuth2.Params.CLIENT_ID, "cid");
-        parameters.add(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/oauth2/cb");
+        parameters.add(OAuth2.Params.CLIENT_ID, auth2Proxy.getClientId());
+        parameters.add(OAuth2.Params.REDIRECT_URI, auth2Proxy.getRedirectionEndpoint().toString());
         parameters.add(OAuth2.Params.SCOPE, "read write");
         parameters.add(OAuth2.Params.STATE, "random");
         parameters.add(OAuth2.Custom.DECISION, OAuth2.Custom.ALLOW);
@@ -100,31 +104,9 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
             }
         });
 
-        reference = new Reference("riap://component/test/oauth2/access_token");
-        request = new Request(Method.POST, reference);
-        response = new Response(request);
 
-        parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.AUTHORIZATION_CODE);
-        parameters.add(OAuth2.Params.CODE, fragment.getFirstValue(OAuth2.Params.CODE));
-        parameters.add(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/oauth2/cb");
-        request.setEntity(parameters.getWebRepresentation());
-
-
-        //handle
-        getClient().handle(request, response);
-        assertTrue(MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType()));
-        JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(response.getEntity(), Map.class);
-
-        //assert
-        assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
-            @Override
-            public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
-            }
-        });
+        BearerToken token = auth2Proxy.flowAuthorizationToken(fragment.getFirstValue(OAuth2.Params.CODE));
+        assertNotNull(token);
 
     }
 

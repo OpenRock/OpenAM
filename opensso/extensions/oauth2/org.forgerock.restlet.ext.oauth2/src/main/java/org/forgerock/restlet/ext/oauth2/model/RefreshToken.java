@@ -30,5 +30,11 @@ package org.forgerock.restlet.ext.oauth2.model;
  * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-6">6.  Refreshing an Access Token</a>
  */
 public interface RefreshToken extends Token {
+
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     public String getParentToken();
 }

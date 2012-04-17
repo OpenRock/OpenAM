@@ -21,7 +21,6 @@ import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.store.impl.DefaultOAuthTokenStoreImpl;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
 import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
@@ -32,7 +31,6 @@ import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
-import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Restlet;
@@ -56,30 +54,30 @@ import java.util.Set;
  * A NAME does ...
  * <p/>
  * <pre>
- * <!-- Servlet to Restlet adapter declaration (Mandatory) -->
- * <servlet>
- * <servlet-name>RestletAdapter</servlet-name>
- * <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+ * &lt;!-- Servlet to Restlet adapter declaration (Mandatory) --&gt;
+ * &lt;servlet&gt;
+ * &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
+ * &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
  *
- * <!-- Your application class name (Optional - For mode 3) -->
- * <init-param>
- * <param-name>org.restlet.application</param-name>
- * <param-value>org.forgerock.openam.oauth2.OAuth2Application</param-value>
- * </init-param>
+ * &lt;!-- Your application class name (Optional - For mode 3) --&gt;
+ * &lt;init-param&gt;
+ * &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
+ * &lt;param-value&gt;org.forgerock.openam.oauth2.OAuth2Application&lt;/param-value&gt;
+ * &lt;/init-param&gt;
  *
- * <!-- List of supported client protocols (Optional - Only in mode 3) -->
- * <init-param>
- * <param-name>org.restlet.clients</param-name>
- * <param-value>RIAP CLAP FILE</param-value>
- * </init-param>
- * </servlet>
+ * &lt;!-- List of supported client protocols (Optional - Only in mode 3) --&gt;
+ * &lt;init-param&gt;
+ * &lt;param-name&gt;org.restlet.clients&lt;/param-name&gt;
+ * &lt;param-value&gt;RIAP CLAP FILE&lt;/param-value&gt;
+ * &lt;/init-param&gt;
+ * &lt;/servlet&gt;
  *
- * <!-- servlet declaration -->
+ * &lt;!-- servlet declaration --&gt;
  *
- * <servlet-mapping>
- * <servlet-name>RestletAdapter</servlet-name>
- * <url-pattern>/oauth2/*</url-pattern>
- * </servlet-mapping>
+ * &lt;servlet-mapping&gt;
+ * &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
+ * &lt;url-pattern&gt;/oauth2/*&lt;/url-pattern&gt;
+ * &lt;/servlet-mapping&gt;
  * </pre>
  *
  * @author Laszlo Hordos
@@ -100,6 +98,11 @@ public class OAuth2Application extends Application {
         return root;
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     public Restlet activate() {
         Context childContext = getContext().createChildContext();
         Router root = new Router(childContext);
@@ -108,7 +111,8 @@ public class OAuth2Application extends Application {
         redirectURI = currentURI.resolve("../oauth2demo/redirect");
 
         OpenAMParameters parameters = new OpenAMParameters();
-        OpenAMServletAuthenticator authenticator = new OpenAMServletAuthenticator(childContext, parameters);
+        OpenAMServletAuthenticator authenticator =
+                new OpenAMServletAuthenticator(childContext, parameters);
         // This endpoint protected by OpenAM Filter
         root.attach(OAuth2Utils.getAuthorizePath(childContext), authenticator);
 
@@ -117,12 +121,17 @@ public class OAuth2Application extends Application {
 
 
         // Define Authorization Endpoint
-        OAuth2FlowFinder finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT).supportAuthorizationCode().supportClientCredentials().supportImplicit().supportPassword();
+        OAuth2FlowFinder finder =
+                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT)
+                        .supportAuthorizationCode().supportClientCredentials().supportImplicit()
+                        .supportPassword();
         authorizer.setNext(finder);
 
 
-        ChallengeAuthenticator filter = new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
-        filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(), Arrays.asList(redirectURI.toString())));
+        ChallengeAuthenticator filter =
+                new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
+        filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(),
+                Arrays.asList(redirectURI.toString())));
 
         //ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
         // Try to authenticate the client The verifier MUST set
@@ -131,7 +140,9 @@ public class OAuth2Application extends Application {
 
 
         // Define Token Endpoint
-        finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT).supportAuthorizationCode().supportClientCredentials().supportImplicit().supportPassword();
+        finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT)
+                .supportAuthorizationCode().supportClientCredentials().supportImplicit()
+                .supportPassword();
         filter.setNext(finder);
 
 
@@ -144,28 +155,47 @@ public class OAuth2Application extends Application {
         return root;
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     public ClientVerifier getClientVerifier() {
         return new TestClientVerifier();
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     public Verifier getUserVerifier() {
         return new UserIdentityVerifier(new OpenAMParameters());
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     public OAuth2TokenStore getTokenStore() {
         return new DefaultOAuthTokenStoreImpl();
     }
 
     // TEST
 
-
+    /**
+     * Gets the current URI form the Request.
+     *
+     * @return application URI
+     */
     protected URI getCurrentURI() {
         Object o = getContext().getAttributes().get(OAuth2Application.class.getName());
         URI root = null;
 
         if (o instanceof String) {
-            String PATH = (String) o;
-            root = URI.create(PATH.endsWith("/") ? PATH : PATH + "/");
+            String path = (String) o;
+            root = URI.create(path.endsWith("/") ? path : path + "/");
         } else {
             Request request = Request.getCurrent();
             if (null != request) {
@@ -179,7 +209,8 @@ public class OAuth2Application extends Application {
                 //String queryString = servletRequest.getQueryString();          // d=789
 
                 try {
-                    root = new URI(scheme, null, serverName, serverPort, contextPath + servletPath + "/", null, null);
+                    root = new URI(scheme, null, serverName, serverPort,
+                            contextPath + servletPath + "/", null, null);
                 } catch (URISyntaxException e) {
                     // Should not happen
                 }
@@ -191,29 +222,35 @@ public class OAuth2Application extends Application {
         return root;
     }
 
+    /**
+     * A TestClientVerifier is only for testing.
+     */
     private class TestClientVerifier implements ClientVerifier {
 
         @Override
-        public ClientApplication verify(ChallengeResponse challengeResponse) throws OAuthProblemException {
+        public ClientApplication verify(ChallengeResponse challengeResponse) {
             return new TestClientApplication();
         }
 
         @Override
-        public ClientApplication verify(String client_id, String client_secret) throws OAuthProblemException {
+        public ClientApplication verify(String clientId, String clientSecret) {
             return new TestClientApplication();
         }
 
         @Override
-        public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String client_id) {
+        public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String clientId) {
             return null;
         }
 
         @Override
-        public ClientApplication findClient(String client_id) {
+        public ClientApplication findClient(String clientId) {
             return new TestClientApplication();
         }
     }
 
+    /**
+     * A TestClientApplication is only for testing.
+     */
     private class TestClientApplication implements ClientApplication {
 
         @Override

@@ -36,8 +36,10 @@ import org.restlet.data.Reference;
 import org.restlet.engine.util.ChildContext;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
+import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -83,8 +85,12 @@ public class OAuth2Utils {
                             result.putAll(form.getValuesMap());
                         } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
                             JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(request.getEntity(), Map.class);
+                            try {
+                                result.putAll(representation.getObject());
+                            } catch (IOException e) {
+                                throw new ResourceException(e);
+                            }
                             request.setEntity(representation);
-                            result.putAll(representation.getObject());
                         }
                     }
                     return result;

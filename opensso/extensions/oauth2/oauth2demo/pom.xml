@@ -24,7 +24,8 @@
  "Portions Copyrighted [year] [name of copyright owner]"
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -139,6 +140,12 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
@@ -165,7 +172,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <instructions>
-                                <Include-Resource>{maven-resources},target/classes/rebel.xml</Include-Resource>
+                                <Include-Resource>{maven-resources},target/classes/rebel.xml
+                                </Include-Resource>
                             </instructions>
                         </configuration>
                     </plugin>

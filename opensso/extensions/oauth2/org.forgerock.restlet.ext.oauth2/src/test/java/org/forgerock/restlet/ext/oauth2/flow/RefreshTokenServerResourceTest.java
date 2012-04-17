@@ -28,6 +28,8 @@ import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -41,6 +43,7 @@ import org.testng.annotations.Test;
 import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -79,5 +82,14 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
                 return value.containsKey(OAuth2.Params.ACCESS_TOKEN) && value.containsKey(OAuth2.Params.REFRESH_TOKEN);
             }
         });
+    }
+
+    @Test
+    public void testProxy() throws Exception {
+        BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
+        assertNotNull(auth2Proxy);
+        RefreshToken refreshToken = realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null), "test", "admin", "cid");
+        BearerToken token = auth2Proxy.flowRefreshToken(refreshToken.getToken());
+        assertNotNull(token);
     }
 }

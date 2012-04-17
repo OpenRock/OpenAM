@@ -42,10 +42,12 @@
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
         <jackson.version>1.9.3</jackson.version>
-        <restlet.version>2.1-RC3</restlet.version>
+        <restlet.version>2.1-RC4</restlet.version>
+        <openam.version>10.0.0</openam.version>
         <!-- Commons JSON versions -->
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
+        <commons.json-patch.version>1.0.0</commons.json-patch.version>
     </properties>
 
     <repositories>
@@ -86,13 +88,13 @@
         <dependency>
             <groupId>com.forgerock.openam</groupId>
             <artifactId>amserver</artifactId>
-            <version>10.0.0-EA</version>
+            <version>${openam.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.forgerock.openam</groupId>
             <artifactId>sharedlib</artifactId>
-            <version>10.0.0-EA</version>
+            <version>${openam.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -108,12 +110,12 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>org.forgerock.json.resource</artifactId>
-            <version>1.2.2</version>
+            <version>${commons.json-resource.version}</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-patch</artifactId>
-            <version>1.0.0</version>
+            <version>${commons.json-patch.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -153,6 +155,12 @@
             </plugins>
         </pluginManagement>
         <!--plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <!- -plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>

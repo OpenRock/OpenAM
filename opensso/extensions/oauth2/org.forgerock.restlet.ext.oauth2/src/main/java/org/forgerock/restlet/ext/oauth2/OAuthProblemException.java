@@ -149,6 +149,16 @@ public class OAuthProblemException extends ResourceException {
         this.scope = null;
     }
 
+    public OAuthProblemException(Status status, String description, Throwable cause) {
+        super(new Status(status.getCode(), status.getReasonPhrase(), description, status.getUri()), cause);
+        this.description = null;
+        this.errorUri = null;
+        this.request = null;
+        this.redirectTargetPattern = null;
+        this.state = null;
+        this.scope = null;
+    }
+
     // ConsumerFlow builder
     public OAuthProblemException description(String description) {
         this.description = description;

@@ -48,26 +48,49 @@ public interface Token {
     @JsonProperty(OAuth2.Params.ACCESS_TOKEN)
     public String getToken();
 
+    /**
+     * TODO Description.
+     *
+     * @return
+     */
     @JsonIgnore
     public String getUserID();
 
-
+    /**
+     * TODO Description.
+     *
+     * @return
+     */
     public String getRealm();
 
-
+    /**
+     * TODO Description.
+     *
+     * @return
+     */
     @JsonIgnore
     public SessionClient getClient();
 
+    /**
+     * TODO Description.
+     *
+     * @return
+     */
     @JsonIgnore
     public Set<String> getScope();
 
     /**
-     * Get the exact expiration time in POSIX format
+     * Get the exact expiration time in POSIX format.
      *
      * @return long representation of the maximum valid date.
      */
     @JsonIgnore
     public long getExpireTime();
 
+    /**
+     * TODO Description.
+     *
+     * @return
+     */
     public boolean isExpired();
 }

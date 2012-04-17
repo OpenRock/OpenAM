@@ -22,24 +22,26 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import java.util.HashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jonathan
- * Date: 26/3/12
- * Time: 2:03 PM
- * To change this template use File | Settings | File Templates.
+ * TODO Description.
  */
 public class SessionClientImpl extends JsonValue implements SessionClient {
 
     // TODO clean up cases in interface
     private String clientId;
     private String redirectUri;
-    
+
+    /**
+     * TODO Description.
+     *
+     * @param clientId    TODO Description
+     * @param redirectUri TODO Description
+     */
     public SessionClientImpl(String clientId, String redirectUri) {
         super(new HashMap<String, Object>());
         this.clientId = clientId;
         this.redirectUri = redirectUri;
     }
-    
+
     @Override
     public String getClientId() {
         return clientId;

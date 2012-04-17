@@ -1,26 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
+ * Copyright © 2012 ForgeRock. All rights reserved.
  */
 
 package org.forgerock.openam.oauth2demo;
@@ -55,12 +46,25 @@ import java.util.logging.Level;
  */
 public class RedirectResource extends Redirector {
 
-    BearerAuthenticatorHelper helper = new BearerAuthenticatorHelper();
+    private BearerAuthenticatorHelper helper = new BearerAuthenticatorHelper();
 
+    /**
+     * TODO Description.
+     *
+     * @param context        TODO Description
+     * @param targetTemplate TODO Description
+     */
     public RedirectResource(Context context, String targetTemplate) {
         super(context, targetTemplate);
     }
 
+    /**
+     * TODO Description.
+     *
+     * @param context       TODO Description
+     * @param targetPattern TODO Description
+     * @param mode          TODO Description
+     */
     public RedirectResource(Context context, String targetPattern, int mode) {
         super(context, targetPattern, mode);
     }
@@ -71,7 +75,8 @@ public class RedirectResource extends Redirector {
         if (Method.GET.equals(request.getMethod())) {
             try {
                 //Extract token from Implicit flow or Exception
-                BearerToken token = helper.extractToken(OAuth2Utils.ParameterLocation.HTTP_FRAGMENT, request);
+                BearerToken token = helper
+                        .extractToken(OAuth2Utils.ParameterLocation.HTTP_FRAGMENT, request);
 
                 //Extract exception from Authorization Code flow
                 if (null == token) {
@@ -92,7 +97,8 @@ public class RedirectResource extends Redirector {
                 }
                 HttpServletRequest servletRequest = ServletUtils.getRequest(request);
                 if (null != token && null != servletRequest) {
-                    servletRequest.getSession(true).setAttribute(BearerToken.class.getName(), token);
+                    servletRequest.getSession(true)
+                            .setAttribute(BearerToken.class.getName(), token);
                 }
 
                 String state = parameters.getFirstValue(OAuth2.Params.STATE);
@@ -127,8 +133,9 @@ public class RedirectResource extends Redirector {
                 throw e;
             }
         }
-        if (target == null)
+        if (target == null) {
             target = super.getTargetRef(request, response);
+        }
 
         return target;
     }

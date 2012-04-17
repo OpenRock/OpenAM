@@ -42,6 +42,7 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.util.Series;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -196,7 +197,11 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
             }
         } else if (null != response.getEntity() &&
                 MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType())) {
-            token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
+            try {
+                token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
+            } catch (IOException e) {
+                /* ignored */
+            }
         }
         if (null != token) {
             OAuthProblemException exception = extractException(token);

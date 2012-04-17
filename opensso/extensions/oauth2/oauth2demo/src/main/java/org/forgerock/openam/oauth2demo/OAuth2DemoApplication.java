@@ -1,26 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
+ * Copyright © 2012 ForgeRock. All rights reserved.
  */
 
 package org.forgerock.openam.oauth2demo;
@@ -75,18 +66,18 @@ public class OAuth2DemoApplication extends Application {
     public Restlet createInboundRoot() {
         Router root = new Router(getContext());
 
-        String client_id = "demo";
-        String client_secret = "Passw0rd";
-        String username = client_id;
-        String password = client_secret;
+        String clientId = "demo";
+        String clientSecret = "Passw0rd";
+        String username = clientId;
+        String password = clientSecret;
         String scope = null;
-        String template_dir = "clap:///templates";
+        String templateDir = "clap:///templates";
 
         for (Parameter parameter : getContext().getParameters()) {
             if ("oauth2.client_id".equals(parameter.getName())) {
-                client_id = parameter.getValue();
+                clientId = parameter.getValue();
             } else if ("oauth2.client_secret".equals(parameter.getName())) {
-                client_secret = parameter.getValue();
+                clientSecret = parameter.getValue();
             } else if ("oauth2.username".equals(parameter.getName())) {
                 username = parameter.getValue();
             } else if ("oauth2.password".equals(parameter.getName())) {
@@ -100,12 +91,13 @@ public class OAuth2DemoApplication extends Application {
         try {
             configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:20, soft:250");
         } catch (TemplateException e) {
-
+           /* ignored */
         }
-        configuration.setTemplateLoader(new ContextTemplateLoader(getContext(), template_dir));
+        configuration.setTemplateLoader(new ContextTemplateLoader(getContext(), templateDir));
 
         //Directory dir = new Directory(getContext(), new Reference("war:///WEB-INF/oauth2demo"));
-        Directory dir = new Directory(getContext(), new Reference("clap:///org/forgerock/openam/oauth2demo"));
+        Directory dir = new Directory(getContext(),
+                new Reference("clap:///org/forgerock/openam/oauth2demo"));
         root.attach("/static", dir);
 
         URI current = getCurrentURI();
@@ -115,23 +107,27 @@ public class OAuth2DemoApplication extends Application {
         auth2Proxy.pushOAuth2Proxy(getContext());
         auth2Proxy.setAuthorizationEndpoint(new Reference(current.resolve("../oauth2/authorize")));
         auth2Proxy.setTokenEndpoint(new Reference(current.resolve("../oauth2/access_token")));
-        auth2Proxy.setChallengeResponse(new ChallengeResponse(ChallengeScheme.HTTP_BASIC, client_id, client_secret.toCharArray()));
-        auth2Proxy.setClientCredentials(client_id, client_secret);
+        auth2Proxy.setChallengeResponse(new ChallengeResponse(ChallengeScheme.HTTP_BASIC, clientId,
+                clientSecret.toCharArray()));
+        auth2Proxy.setClientCredentials(clientId, clientSecret);
         auth2Proxy.setRedirectionEndpoint(new Reference(current.resolve("./redirect")));
         auth2Proxy.setResourceOwnerCredentials(username, password);
         auth2Proxy.setScope(OAuth2Utils.split(scope, " "));
 
-        RedirectResource redirectResource = new RedirectResource(getContext(), current.resolve("./static/index.html").toString(), Redirector.MODE_CLIENT_FOUND);
+        RedirectResource redirectResource = new RedirectResource(getContext(),
+                current.resolve("./static/index.html").toString(), Redirector.MODE_CLIENT_FOUND);
         root.attach("/redirect", redirectResource);
 
 
         // Validation Resource
         Reference validationServerRef = new Reference(current.resolve("../oauth2/tokeninfo"));
-        AccessTokenValidator<BearerToken> validator = new ValidationServerResource(getContext(), validationServerRef);
+        AccessTokenValidator<BearerToken> validator = new ValidationServerResource(getContext(),
+                validationServerRef);
 
         // Use CHALLENGERESPONSE
         BearerTokenVerifier tokenVerifier = new BearerTokenVerifier(validator);
-        OAuth2Authenticator authenticator = new OAuth2Authenticator(getContext(), null, OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
+        OAuth2Authenticator authenticator = new OAuth2Authenticator(getContext(), null,
+                OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
         authenticator.setEnroler(new DefaultScopeEnroler());
         RoleAuthorizer authorizer = new RoleAuthorizer("RoleAuthorizer1");
         authorizer.setAuthorizedRoles(getAuthorizedRoles());
@@ -141,7 +137,8 @@ public class OAuth2DemoApplication extends Application {
 
 
         // Use PARAMETER
-        authenticator = new OAuth2Authenticator(getContext(), null, OAuth2Utils.ParameterLocation.HTTP_QUERY, tokenVerifier);
+        authenticator = new OAuth2Authenticator(getContext(), null,
+                OAuth2Utils.ParameterLocation.HTTP_QUERY, tokenVerifier);
         authenticator.setEnroler(new DefaultScopeEnroler());
         authorizer = new RoleAuthorizer("RoleAuthorizer2");
         authorizer.setAuthorizedRoles(getAuthorizedRoles());
@@ -151,7 +148,8 @@ public class OAuth2DemoApplication extends Application {
 
 
         OpenAMParameters parameters = new OpenAMParameters();
-        OpenAMServletAuthenticator amauthenticator = new OpenAMServletAuthenticator(getContext(), parameters);
+        OpenAMServletAuthenticator amauthenticator = new OpenAMServletAuthenticator(getContext(),
+                parameters);
         amauthenticator.setNext(DemoResource.class);
         root.attach("/demo", amauthenticator);
         root.attach("/opendemo", DemoResource.class);
@@ -160,13 +158,18 @@ public class OAuth2DemoApplication extends Application {
         return root;
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     protected URI getCurrentURI() {
         Object o = getContext().getAttributes().get(OAuth2DemoApplication.class.getName());
         URI root = null;
 
         if (o instanceof String) {
-            String PATH = (String) o;
-            root = URI.create(PATH.endsWith("/") ? PATH : PATH + "/");
+            String path = (String) o;
+            root = URI.create(path.endsWith("/") ? path : path + "/");
         } else {
             Request request = Request.getCurrent();
             if (null != request) {
@@ -180,7 +183,8 @@ public class OAuth2DemoApplication extends Application {
                 //String queryString = servletRequest.getQueryString();          // d=789
 
                 try {
-                    root = new URI(scheme, null, serverName, serverPort, contextPath + servletPath + "/", null, null);
+                    root = new URI(scheme, null, serverName, serverPort,
+                            contextPath + servletPath + "/", null, null);
 
                     //TODO Find a proper solution
                     Client client = new Client(scheme);

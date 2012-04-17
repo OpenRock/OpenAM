@@ -36,6 +36,7 @@ import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
+import org.restlet.data.Status;
 import org.restlet.engine.header.ChallengeWriter;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderReader;
@@ -279,13 +280,17 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
             JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(request.getEntity(), Map.class);
             //Restore content
             request.setEntity(representation);
-            Map parameters = representation.getObject();
-            OAuthProblemException exception = extractException(parameters);
-            if (null != exception) {
-                throw exception;
-            }
-            if (parameters.containsKey(OAuth2.Token.OAUTH_ACCESS_TOKEN)) {
-                return new BearerToken(parameters);
+            try {
+                Map parameters = representation.getObject();
+                OAuthProblemException exception = exception = extractException(parameters);
+                if (null != exception) {
+                    throw exception;
+                }
+                if (parameters.containsKey(OAuth2.Token.OAUTH_ACCESS_TOKEN)) {
+                    return new BearerToken(parameters);
+                }
+            } catch (IOException e) {
+                throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
             }
         } else if (MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
             Form parameters = new Form(request.getEntity());
@@ -307,7 +312,11 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
         Map<String, Object> token = null;
         if (MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType())) {
             //TODO Catch invalid content
-            token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
+            try {
+                token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
+            } catch (IOException e) {
+                throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
+            }
         }
         if (null != token) {
             OAuthProblemException exception = extractException(token);

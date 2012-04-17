@@ -1,26 +1,17 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
+ * Copyright © 2012 ForgeRock. All rights reserved.
  */
 
 package org.forgerock.openam.oauth2.internal;
@@ -46,8 +37,8 @@ import java.util.logging.Logger;
 /**
  * An AbstractIdentityVerifier does ...
  *
- * @author Laszlo Hordos
- *         TODO Do not use SecretVerifier or use properly
+ * @param <T>
+ * @author Laszlo Hordos TODO Do not use SecretVerifier or use properly
  */
 public abstract class AbstractIdentityVerifier<T extends User> extends SecretVerifier {
 
@@ -56,6 +47,12 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     private String authIndexValue = null;
     private Logger logger;
 
+    /**
+     * Constructor.
+     * <p/>
+     *
+     * @param parameters OpenAM boot properties
+     */
     public AbstractIdentityVerifier(OpenAMParameters parameters) {
         //authIndexType = AuthContext.IndexType.SERVICE;
         authIndexType = AuthContext.IndexType.MODULE_INSTANCE;
@@ -66,7 +63,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
 
 
     @Override
-    public int verify(String identifier, char[] secret) {
+    public int verify(final String identifier, char[] secret) {
         T user = authenticate(identifier, secret);
         if (null != user) {
             return RESULT_VALID;
@@ -82,7 +79,8 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
      * @return The user identifier.
      */
     protected String getIdentifier(Request request, Response response) {
-        return null != request.getChallengeResponse() ? request.getChallengeResponse().getIdentifier() : null;
+        return null != request.getChallengeResponse()
+               ? request.getChallengeResponse().getIdentifier() : null;
     }
 
     /**
@@ -93,7 +91,8 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
      * @return The secret provided by the user.
      */
     protected char[] getSecret(Request request, Response response) {
-        return null != request.getChallengeResponse() ? request.getChallengeResponse().getSecret() : null;
+        return null != request.getChallengeResponse() ? request.getChallengeResponse().getSecret()
+                                                      : null;
     }
 
     /**
@@ -151,13 +150,16 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                 }
                 // there's missing requirements not filled by this
                 if (missing.size() > 0) {
-                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing requirements");
+                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                            "Missing requirements");
                 }
                 lc.submitRequirements(callbacks);
             }
 
             if (logger.isLoggable(Level.FINE)) {
-                logger.log(Level.FINE, "IdentityServicesImpl:authenticate returning an InvalidCredentials exception for invalid passwords.");
+                logger.log(Level.FINE,
+                        "IdentityServicesImpl:authenticate returning an InvalidCredentials"
+                                + " exception for invalid passwords.");
             }
 
             // validate the password..
@@ -166,8 +168,8 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                     // package up the token for transport..
                     ret = createUser(lc);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "IdentityServicesImpl:authContext: " +
-                            "Unable to get SSOToken", e);
+                    logger.log(Level.SEVERE, "IdentityServicesImpl:authContext: "
+                            + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
@@ -180,5 +182,13 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
         return ret;
     }
 
+    /**
+     * Creates new User object.
+     * <p/>
+     *
+     * @param authContext context
+     * @return new User
+     * @throws Exception when something unexpected happens
+     */
     protected abstract T createUser(AuthContext authContext) throws Exception;
 }

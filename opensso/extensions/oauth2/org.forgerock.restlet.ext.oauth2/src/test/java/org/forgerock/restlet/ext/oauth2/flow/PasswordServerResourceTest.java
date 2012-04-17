@@ -27,6 +27,8 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -39,6 +41,7 @@ import org.testng.annotations.Test;
 import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -74,5 +77,13 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
                 return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
             }
         });
+    }
+
+    @Test
+    public void testProxy() throws Exception {
+        BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
+        assertNotNull(auth2Proxy);
+        BearerToken token = auth2Proxy.flowPassword();
+        assertNotNull(token);
     }
 }

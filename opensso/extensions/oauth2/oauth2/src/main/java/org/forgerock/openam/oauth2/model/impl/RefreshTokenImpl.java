@@ -25,34 +25,59 @@ import org.forgerock.restlet.ext.oauth2.model.Token;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jonathan
- * Date: 26/3/12
- * Time: 2:37 PM
- * To change this template use File | Settings | File Templates.
+ * TODO Description.
  */
 public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
 
     private String parent;
 
-    // TODO javadoc
-    public RefreshTokenImpl(String id, String parent, String userID, SessionClient client, String realm, Set<String> scope, long expireTime) {
+    /**
+     * TODO Description.
+     *
+     * @param id         TODO Description
+     * @param parent     TODO Description
+     * @param userID     TODO Description
+     * @param client     TODO Description
+     * @param realm      TODO Description
+     * @param scope      TODO Description
+     * @param expireTime TODO Description
+     */
+    public RefreshTokenImpl(String id, String parent, String userID, SessionClient client,
+                            String realm, Set<String> scope, long expireTime) {
         super(id, userID, client, realm, scope, expireTime);
         setType();
         setParentToken(parent);
     }
 
-    // TODO javadoc
+    /**
+     * TODO Description.
+     *
+     * @param id         TODO Description
+     * @param scope      TODO Description
+     * @param expireTime TODO Description
+     * @param token      TODO Description
+     */
     public RefreshTokenImpl(String id, Set<String> scope, long expireTime, Token token) {
         super(id, token.getUserID(), token.getClient(), token.getRealm(), scope, expireTime);
         setType();
     }
 
+    /**
+     * TODO Description.
+     *
+     * @param id    TODO Description
+     * @param value TODO Description
+     */
     public RefreshTokenImpl(String id, JsonValue value) {
         super(id, value);
         setType();
     }
 
+    /**
+     * TODO Description.
+     *
+     * @param parent TODO Description
+     */
     public void setParentToken(String parent) {
         this.put(OAuth2.StoredToken.PARENT, parent);
     }
@@ -62,6 +87,9 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
         return this.get(OAuth2.StoredToken.PARENT).asString();
     }
 
+    /**
+     * TODO Description.
+     */
     protected void setType() {
         this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.REFRESH_TOKEN);
     }

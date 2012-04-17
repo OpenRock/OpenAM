@@ -24,38 +24,63 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jonathan
- * Date: 26/3/12
- * Time: 10:13 AM
- * To change this template use File | Settings | File Templates.
+ * TODO Description.
  */
 public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCode {
 
-    // TODO javadoc
-    public AuthorizationCodeImpl(String id, String userID, SessionClient client, String realm, Set<String> scope, boolean issued, long expireTime) {
+    /**
+     * TODO Description.
+     *
+     * @param id         TODO Description
+     * @param userID     TODO Description
+     * @param client     TODO Description
+     * @param realm      TODO Description
+     * @param scope      TODO Description
+     * @param issued     TODO Description
+     * @param expireTime TODO Description
+     */
+    public AuthorizationCodeImpl(String id, String userID, SessionClient client, String realm,
+                                 Set<String> scope, boolean issued, long expireTime) {
         super(id, userID, client, realm, scope, expireTime);
         setIssued(issued);
         setType();
     }
 
-    // TODO javadoc
+    /**
+     * TODO Description.
+     *
+     * @param id    TODO Description
+     * @param value TODO Description
+     */
     public AuthorizationCodeImpl(String id, JsonValue value) {
         super(id, value);
         setType();
     }
 
+    /**
+     * TODO Description.
+     *
+     * @param issued TODO Description
+     */
     public void setIssued(boolean issued) {
         this.put(OAuth2.StoredToken.ISSUED, issued);
     }
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     @Override
     public boolean isTokenIssued() {
         return this.get(OAuth2.StoredToken.ISSUED).asBoolean();
     }
 
+    /**
+     * TODO Description.
+     */
     protected void setType() {
         this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.CODE);
     }
-    
+
 }

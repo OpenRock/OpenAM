@@ -33,6 +33,7 @@ import org.restlet.Client;
 import org.restlet.Component;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.Restlet;
 import org.restlet.data.Form;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -94,7 +95,7 @@ public class OAuth2ProviderTest {
         TestResource testable = client.wrap(TestResource.class);
         testable.get();*/
 
-        Client client = component.getContext().getClientDispatcher();
+        Restlet client = component.getContext().getClientDispatcher();
 
         Reference reference = new Reference("riap://component/test/oauth2/authorize?response_type=token&client_iid=cid&scope=read%20write&state=random&redirect_uri=valami");
         Request request = new Request(Method.GET, reference);

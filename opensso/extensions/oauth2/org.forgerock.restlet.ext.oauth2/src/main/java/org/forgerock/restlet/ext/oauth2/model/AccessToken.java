@@ -34,14 +34,28 @@ import java.util.Map;
  */
 public interface AccessToken extends Token {
 
-    public static final String TYPE_MAC = "MAC";
-
     //public lifetime	A maximum access token lifetime of 3600 seconds is RECOMMENDED
 
+    /**
+     * TODO Description.
+     *
+     * @return TODO Description
+     */
     public String getParentToken();
 
+    /**
+     * Gets the {@link RefreshToken} associated with this AccessToken.
+     * <p/>
+     *
+     * @return null if there is no RefreshToken associated
+     */
     @JsonSerialize
     public RefreshToken getRefreshToken();
 
+    /**
+     * Converts the token to Map
+     *
+     * @return new Map representation of this AccessToken
+     */
     public Map<String, Object> convertToMap();
 }

@@ -15,7 +15,8 @@
     <properties>
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
-        <restlet.version>2.1-RC3</restlet.version>
+        <restlet.version>2.1-RC4</restlet.version>
+        <openam.version>10.0.0</openam.version>
     </properties>
 
     <repositories>
@@ -67,21 +68,21 @@
         <dependency>
             <groupId>com.forgerock.openam</groupId>
             <artifactId>amserver</artifactId>
-            <version>10.0.0-EA</version>
+            <version>${openam.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.forgerock.openam</groupId>
             <artifactId>sharedlib</artifactId>
-            <version>10.0.0-EA</version>
+            <version>${openam.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.forgerock.openam</groupId>
             <artifactId>clientsdk</artifactId>
-            <version>10.0.0-EA</version>
+            <version>${openam.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

@@ -26,6 +26,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.internal.OAuth2Component;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
@@ -42,7 +43,11 @@ import org.mockito.stubbing.Answer;
 import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.Component;
+import org.restlet.Restlet;
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Protocol;
+import org.restlet.data.Reference;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.security.MapVerifier;
@@ -133,6 +138,7 @@ public class AbstractFlowTest {
         when(client.getRedirectionURIs()).thenReturn(redirectionURIs);
 
         when(realm.getClientVerifier().verify(anyString(), anyString())).thenReturn(client);
+        when(realm.getClientVerifier().verify(any(ChallengeResponse.class))).thenReturn(client);
         when(realm.getClientVerifier().findClient(matches("cid"))).thenReturn(client);
 
 
@@ -384,6 +390,18 @@ public class AbstractFlowTest {
                 return accessToken;
             }
         });
+
+        BearerOAuth2Proxy auth2Proxy = new BearerOAuth2Proxy(component.getContext(), getClient());
+        auth2Proxy.pushOAuth2Proxy(application.getContext());
+        auth2Proxy.setAuthorizationEndpoint(new Reference("riap://component/test/oauth2/authorize"));
+        auth2Proxy.setTokenEndpoint(new Reference(new Reference("riap://component/test/oauth2/access_token")));
+        auth2Proxy.setChallengeResponse(new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "cid", "admin".toCharArray()));
+        auth2Proxy.setClientCredentials("cid", "admin");
+        auth2Proxy.setRedirectionEndpoint(new Reference("http://localhost:8080/oauth2/cb"));
+        auth2Proxy.setResourceOwnerCredentials("admin", "admin");
+        auth2Proxy.setScope(OAuth2Utils.split("read write", " "));
+        auth2Proxy.pushOAuth2Proxy(component.getContext());
+
     }
 
     @AfterClass
@@ -394,7 +412,7 @@ public class AbstractFlowTest {
         realm.deactivate();
     }
 
-    protected Client getClient() {
+    protected Restlet getClient() {
         return component.getContext().getClientDispatcher();
     }
 

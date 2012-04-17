@@ -108,6 +108,14 @@ public class RequestFactory {
         public Reference build() {
             return build(Context.getCurrent());
         }
+
+        public Request buildRequest(Context context) {
+            return new Request(Method.GET, build(context));
+        }
+
+        public Request buildRequest() {
+            return buildRequest(Context.getCurrent());
+        }
     }
 
     public Form getParameters() {
@@ -123,6 +131,14 @@ public class RequestFactory {
                 }
                 parameters.add(parameter);
             }
+        }
+    }
+
+    protected void setParameterValue(String name, String value) {
+        if (OAuth2Utils.isBlank(value)) {
+            parameters.removeAll(name);
+        } else {
+            parameters.set(name, value);
         }
     }
 
@@ -159,17 +175,17 @@ public class RequestFactory {
         }
 
         public AuthorizationCodeRequest setState(String state) {
-            parameters.set(OAuth2.Params.STATE, state);
+            setParameterValue(OAuth2.Params.STATE, state);
             return this;
         }
 
         public AuthorizationCodeRequest setClientId(String client_id) {
-            parameters.set(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
             return this;
         }
 
         public AuthorizationCodeRequest setRedirectUri(String redirectUri) {
-            parameters.add(OAuth2.Params.REDIRECT_URI, redirectUri);
+            setParameterValue(OAuth2.Params.REDIRECT_URI, redirectUri);
             return this;
         }
     }
@@ -186,17 +202,17 @@ public class RequestFactory {
         }
 
         public ImplicitRequest setState(String state) {
-            parameters.set(OAuth2.Params.STATE, state);
+            setParameterValue(OAuth2.Params.STATE, state);
             return this;
         }
 
         public ImplicitRequest setClientId(String client_id) {
-            parameters.set(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
             return this;
         }
 
         public ImplicitRequest setRedirectUri(String redirectUri) {
-            parameters.add(OAuth2.Params.REDIRECT_URI, redirectUri);
+            setParameterValue(OAuth2.Params.REDIRECT_URI, redirectUri);
             return this;
         }
     }
@@ -215,8 +231,8 @@ public class RequestFactory {
         }
 
         public AuthorizationTokenRequest setClientCredentials(String client_id, String client_secret) {
-            parameters.add(OAuth2.Params.CLIENT_ID, client_id);
-            parameters.add(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -226,12 +242,12 @@ public class RequestFactory {
         }
 
         public AuthorizationTokenRequest setCode(String code) {
-            parameters.add(OAuth2.Params.CODE, code);
+            setParameterValue(OAuth2.Params.CODE, code);
             return this;
         }
 
         public AuthorizationTokenRequest setRedirectUri(String redirectUri) {
-            parameters.add(OAuth2.Params.REDIRECT_URI, redirectUri);
+            setParameterValue(OAuth2.Params.REDIRECT_URI, redirectUri);
             return this;
         }
     }
@@ -248,8 +264,8 @@ public class RequestFactory {
         }
 
         public PasswordRequest setClientCredentials(String client_id, String client_secret) {
-            parameters.add(OAuth2.Params.CLIENT_ID, client_id);
-            parameters.add(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -259,8 +275,8 @@ public class RequestFactory {
         }
 
         public PasswordRequest setResourceOwnerCredentials(String username, String password) {
-            parameters.add(OAuth2.Params.USERNAME, username);
-            parameters.add(OAuth2.Params.PASSWORD, password);
+            setParameterValue(OAuth2.Params.USERNAME, username);
+            setParameterValue(OAuth2.Params.PASSWORD, password);
             return this;
         }
     }
@@ -277,8 +293,8 @@ public class RequestFactory {
         }
 
         public ClientCredentialsRequest setClientCredentials(String client_id, String client_secret) {
-            parameters.add(OAuth2.Params.CLIENT_ID, client_id);
-            parameters.add(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -300,8 +316,8 @@ public class RequestFactory {
         }
 
         public RefreshTokenRequest setClientCredentials(String client_id, String client_secret) {
-            parameters.add(OAuth2.Params.CLIENT_ID, client_id);
-            parameters.add(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -311,7 +327,7 @@ public class RequestFactory {
         }
 
         public RefreshTokenRequest setRefreshToken(String refreshToken) {
-            parameters.add(OAuth2.Params.REFRESH_TOKEN, refreshToken);
+            setParameterValue(OAuth2.Params.REFRESH_TOKEN, refreshToken);
             return this;
         }
     }
