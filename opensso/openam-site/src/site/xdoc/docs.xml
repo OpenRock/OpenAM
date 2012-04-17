@@ -33,7 +33,11 @@
  </properties>
  <body>
   <section name="Core Documentation">
-   <p>This core documentation is in progress as part of the OpenAM project.</p>
+   <p>This core documentation is <strong>in progress</strong> as part of
+   the OpenAM project.</p>
+   <p>For completed, released documentation, see <a
+   href="http://docs.forgerock.org/en/index.html?product=openam"
+   >docs.forgerock.org</a>.</p>
    <dl>
     <dt>OpenAM Release Notes</dt>
     <dd><a href="./doc/OpenAM-Release-Notes.epub">EPUB</a>,

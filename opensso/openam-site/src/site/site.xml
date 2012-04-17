@@ -55,7 +55,11 @@
    <item name="Wiki" href="http://wikis.forgerock.org/openam/" />
   </menu>
   
-  <menu name="OpenAM Documentation">
+  <menu name="Released Documentation">
+   <item name="OpenAM 10.0.0" href="http://docs.forgerock.org/en/index.html?product=openam&amp;version=10.0.0"/>
+  </menu>
+
+  <menu name="OpenAM Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
    <item name="Release Notes" href="./doc/release-notes/index.html" />
    <item name="Installation Guide" href="./doc/install-guide/index.html" />
@@ -65,7 +69,7 @@
    <item name="Javadoc" href="./doc/public-api/index.html" />
   </menu>
 
-  <menu name="Policy Agent Documentation">
+  <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
    <item name="Release Notes" href="./doc/agent-release-notes/index.html" />
    <item name="Install Guide" href="./doc/agent-install-guide/index.html" />
