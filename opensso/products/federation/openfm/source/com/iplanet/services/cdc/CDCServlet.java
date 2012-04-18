@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 package com.iplanet.services.cdc;
 
@@ -395,13 +395,6 @@ public class CDCServlet extends HttpServlet {
             debug.message("CDCServlet.redirectWithAuthNResponse: gotoURL = " + gotoURL);
         }
 
-        // Special characters in the path or the query need to be encoded
-        try {
-            gotoURL = URLEncDec.encodeUrlPath(gotoURL);
-        } catch (MalformedURLException mue) {
-            debug.error("CDCServlet.redirectWithAuthNResponse:MalformedURLException occured",mue);
-            showError(response);
-        }
         if (debug.messageEnabled()) {
             debug.message("CDCServlet.redirectWithAuthNResponse: After encoding: gotoURL = " + gotoURL);
         }
