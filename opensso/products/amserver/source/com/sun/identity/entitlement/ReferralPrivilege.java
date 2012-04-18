@@ -36,6 +36,7 @@ import com.sun.identity.shared.JSONUtils;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -501,6 +502,10 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                     }
                 }
             }
+        }
+        
+        if ( results == null ) {
+        	results = new ArrayList<Entitlement>(0);
         }
         return results;
     }
