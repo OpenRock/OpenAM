@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.cli;
 
 import com.sun.identity.shared.locale.L10NMessage;
@@ -35,7 +38,6 @@ import java.util.Locale;
  * Commandline Interface Exception.
  */
 public class CLIException extends Exception {
-    private Throwable root;
     private int exitCode = 0;
     private String subcommandName;
 
@@ -71,25 +73,23 @@ public class CLIException extends Exception {
     /**
      * Constructs a CLI Exception.
      *
-     * @param e Throwable object.
+     * @param cause Throwable object.
      * @param exitCode Exit code.
      */
-    public CLIException(Throwable e, int exitCode) {
-        super(e.getMessage());
-        root = e;
+    public CLIException(Throwable cause, int exitCode) {
+        super(cause);
         this.exitCode = exitCode;
     }
 
     /**
      * Constructs a CLI Exception.
      *
-     * @param e Throwable object.
+     * @param cause Throwable object.
      * @param exitCode Exit code.
      * @param subcommandName Sub Command Name.
      */
-    public CLIException(Throwable e, int exitCode, String subcommandName) {
-        super(e.getMessage());
-        root = e;
+    public CLIException(Throwable cause, int exitCode, String subcommandName) {
+        super(cause);
         this.exitCode = exitCode;
         this.subcommandName = subcommandName;
     }
@@ -119,8 +119,8 @@ public class CLIException extends Exception {
      * @return localized message.
      */
     public String getL10NMessage(Locale locale) {
-        if ((root != null) && (root instanceof L10NMessage)) {
-            return ((L10NMessage)root).getL10NMessage(locale);
+        if ((getCause() != null) && (getCause() instanceof L10NMessage)) {
+            return ((L10NMessage)getCause()).getL10NMessage(locale);
         }
         return getMessage();
     }
