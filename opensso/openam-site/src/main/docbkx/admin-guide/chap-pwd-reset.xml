@@ -81,10 +81,11 @@
    each realm inherit the global settings.</para>
 
    <step performance="optional">
-    <para>If you use LDAP as the user repository, set the default
-    authentication type for the realm to LDAP rather than the default (Data
-    Store) to prevent authentication from failing after user passwords are
-    reset.</para>
+    <para>If you use LDAP as the user repository and want to be able to force
+    password changes on reset, set the default authentication type for the
+    realm to LDAP rather than the default (Data Store) to prevent
+    authentication from failing after user passwords are reset.</para>
+
     <para>You can change the settings through the OpenAM console. Browse to
     Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
     Authentication &gt; Authentication Chaining &gt; ldapService, and then set
@@ -123,6 +124,7 @@
        <para>Then <filename>WEB-INF/classes/amPasswordReset.properties_fr</filename>
        ought to contain:</para>
        <literallayout class="monospaced">favourite-restaurant=Quel est votre restaurant préféré ?</literallayout>
+       <para>If you change these files, you must restart OpenAM.</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -210,11 +212,14 @@
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>Password Reset Failure Lockout</term>
+      <term>Password Reset Failure Lockout Interval</term>
       <listitem>
-       <para>If Password Reset Failure Lockout is enabled, this specifies the
-       interval during which the user has only Password Reset Failure Lockout
-       Count tries to reset her password before her account is locked.</para>
+       <para>This interval applies when Password Reset Failure Lockout is
+       enabled, and when Password Reset Failure Lockout Count is set. During
+       this interval, a user can try to reset her password the specified
+       number of times before being locked out. For example, if this interval
+       is 5 minutes and the count is set to 3, a user gets 3 tries during
+       a given 5 minute interval to reset her password.</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -225,7 +230,7 @@
        email address such as <literal>admin@example.com</literal>, or
        <literal>admin@host.domain</literal>.</para>
        <para>OpenAM must be able to send mail through an SMTP-capable service
-       for this to work.</para>
+       for this to work. See <xref linkend="set-up-mail-notification" />.</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -262,6 +267,12 @@
       </listitem>
      </varlistentry>
     </variablelist>
+   </step>
+   <step>
+    <para>If you changed Secret Questions in the
+    <filename>WEB-INF/classes/amPasswordReset.properties</filename> file or in
+    any localized versions, restart OpenAM for the changes to take
+    effect.</para>
    </step>
   </procedure>
   
@@ -310,6 +321,7 @@
    <step>
     <para>After the user updates her secret questions, she can use the
     password reset service when necessary.</para>
+
     <mediaobject xml:id="figure-console-secret-questions">
      <alt>The OpenAM secret question page</alt>
      <imageobject>
@@ -318,6 +330,8 @@
      <textobject><para>Authenticated users can change the answers to secret
      questions through the OpenAM console.</para></textobject>
     </mediaobject>
+
+    <note><para>Answers to secret questions are case sensitive.</para></note>
    </step>
   </procedure>
   
