@@ -45,10 +45,10 @@
 
     <tstamp>
         <format property="nightly.date" pattern="yyyyMMdd" offset="-1"
-            unit="day"/>
+                unit="day"/>
     </tstamp>
 
-   <condition property="build.os" value="Linux">
+    <condition property="build.os" value="Linux">
         <os name="linux"/>
     </condition>
 
@@ -102,7 +102,9 @@
         <isset property="target.jdk"/>
     </condition>
     <condition property="target.jdk.set" value="1.5">
-        <not><isset property="target.jdk"/></not>
+        <not>
+            <isset property="target.jdk"/>
+        </not>
     </condition>
 
     <!-- agent version number appended to end of agent zip file name -->
@@ -118,12 +120,13 @@
     <target name="clean">
         <echo message="Dispatch to clean"/>
         <exec executable="gmake" failonerror="true">
-           <arg value="clean" />
+            <arg value="clean" />
         </exec>
     </target>
 
     <target name="all">
         <antcall target="apache22" />
+        <antcall target="apache24" />
         <antcall target="sjsws" />
         <antcall target="apache" />
         <antcall target="proxy40" />
@@ -136,7 +139,7 @@
         <property name="containername" value="apache"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
-            target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
     </target>
 
     <target name="sjsws" depends="preparebuild">
@@ -144,7 +147,7 @@
         <property name="containername" value="sjsws"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
-            target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
     </target>
 
     <target name="proxy40" depends="preparebuild">
@@ -152,7 +155,7 @@
         <property name="containername" value="proxy40"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
-            target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
     </target>
 
     <target name="domino" depends="preparebuild,check.build.domino" 
@@ -161,13 +164,15 @@
         <property name="containername" value="domino"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
-            target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
     </target>
 
     <target name="check.build.domino">
         <condition property="build.domino">
             <and>
-                <not><equals arg1="${build.type}" arg2="64"/></not>
+                <not>
+                    <equals arg1="${build.type}" arg2="64"/>
+                </not>
                 <or>
                     <os name="linux" />
                     <!--os name="sunos" arch="sparc" /-->
@@ -183,31 +188,39 @@
         <property name="containername" value="apache22"/>
         <antcall target="gmake" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
-            target="all" inheritRefs="true"/>
+             target="all" inheritRefs="true"/>
+    </target>
+    
+    <target name="apache24" depends="preparebuild">
+        <echo message="Dispatch to Apache 24"/>
+        <property name="containername" value="apache24"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+             target="all" inheritRefs="true"/>
     </target>
 
     <target name="iis6" depends="preparebuild" if="iis.build.ok">
-         <echo message="Dispatch to iis6"/>
-         <property name="containername" value="iis6"/>
-         <antcall target="gmake" inheritRefs="true"/>
-         <ant antfile="${webagents.basedir}/build_agent.xml"
-             target="all" inheritRefs="true"/>
-     </target>
+        <echo message="Dispatch to iis6"/>
+        <property name="containername" value="iis6"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml"
+              target="all" inheritRefs="true"/>
+    </target>
 
     <target name="iis7" depends="preparebuild" if="iis.build.ok">
-         <echo message="Dispatch to iis7"/>
-         <property name="containername" value="iis7"/>
-         <antcall target="gmake" inheritRefs="true"/>
-         <ant antfile="${webagents.basedir}/build_agent.xml"
-             target="all" inheritRefs="true"/>
-     </target>
+        <echo message="Dispatch to iis7"/>
+        <property name="containername" value="iis7"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml"
+              target="all" inheritRefs="true"/>
+    </target>
 
     <target name="gmake">
         <echo message="Dispatch to compile of agent c code"/>
         <exec executable="gmake" failonerror="true">
-           <arg value="BUILD_DEBUG=${build.debug}" />
-           <arg value="BUILD_AGENT=${containername}" />
-           <arg value="BUILD_TYPE=${build.type}" />
+            <arg value="BUILD_DEBUG=${build.debug}" />
+            <arg value="BUILD_AGENT=${containername}" />
+            <arg value="BUILD_TYPE=${build.type}" />
         </exec>
     </target>
 
@@ -218,17 +231,19 @@
         <filter token="ARCH" value="${build.type.suffix}" />
         <filter token="BUILD_DATE" value="${nightly.date}" />
         <copy file="${webagents.basedir}/agents/source/apache/build_date.js.template"
-            tofile="${webagents.dist.dir}/apache_v20_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/apache_v20_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
-            tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
+                  tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
-            tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
-            tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/proxy40/build_date.js.template"
-            tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
-            tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+              tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <antcall target="prenightly" inheritRefs="true"/>
         <antcall target="all" inheritRefs="true"/>
 <!--
@@ -265,6 +280,7 @@
         <echo message=" proxy40         : builds the Sun Java System Proxy Server 4.0 agent"/>
         <echo message=" domino          : builds the Sun Java System IBM Lotus Domino Server 8.5 agent"/>
         <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
+        <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
         <echo message=" iis6            : builds the Microsoft Internet Information Services 6 agent"/>
         <echo message=" iis7            : builds the Microsoft Internet Information Services 7 agent"/>
         <echo message=" usage           : displays this usage message"/>

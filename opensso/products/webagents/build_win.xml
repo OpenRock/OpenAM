@@ -167,6 +167,7 @@
     
     <target name="all" depends="get-arch" unless="is32bit">
         <antcall target="apache22" />
+        <antcall target="apache24" />
         <antcall target="sjsws" />
         <antcall target="apache" />
         <antcall target="proxy40" />
@@ -212,6 +213,15 @@
     <target name="apache22" depends="preparebuild">
         <echo message="Dispatch to Apache 22"/>
         <property name="containername" value="apache22"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="prenightly" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+             target="all" inheritRefs="true"/>
+    </target>
+    
+    <target name="apache24" depends="preparebuild">
+        <echo message="Dispatch to Apache 24"/>
+        <property name="containername" value="apache24"/>
         <antcall target="nmake" inheritRefs="true"/>
         <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
@@ -348,6 +358,8 @@
               tofile="${webagents.dist.dir}/apache_v20_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
               tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
+                    tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
               tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
@@ -397,6 +409,7 @@
         <echo message=" proxy40         : builds the Sun Java System Proxy Server 4.0 agent"/>
         <echo message=" domino          : builds the Sun Java System IBM Lotus Domino Server 8.5 agent"/>
         <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
+        <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
         <echo message=" iis6            : builds the Microsoft Internet Information Services 6 agent"/>
         <echo message=" iis7            : builds the Microsoft Internet Information Services 7 agent"/>
         <echo message=" sdk             : builds OpenAM C-SDK"/>

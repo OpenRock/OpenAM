@@ -36,6 +36,7 @@ AM_IIS6_SRC = agents\source\iis6\IisAgent6.c
 AM_IIS7_SRC = agents\source\iis7\agent_main.cpp agents\source\iis7\agent_module.cpp agents\source\iis7\Iis7Agent.cpp
 AM_APA_SRC = agents\source\apache\apache_agent.c
 AM_APA22_SRC = agents\source\apache22\apache_agent.c
+AM_APA24_SRC = agents\source\apache24\apache_agent.c
 AM_PROXY4_SRC = agents\source\proxy40\web_agent.c
 AM_SJSWS_SRC = agents\source\sjsws\iws_agent.c
 AM_DOMINO_SRC = agents\source\domino\domino_agent.c
@@ -160,6 +161,15 @@ apache2i : apache22.obj
 		/PDB:"agents\source\apache22\libamapc22.pdb" \
 		/DLL /OUT:agents\source\apache22\libamapc22.dll /LIBPATH:"extlib\WINNT\apache2\lib" agents\source\apache22\apache_agent.obj $(DEP_LIBS) am\source\amsdk.lib libapr-1.lib libaprutil-1.lib libhttpd.lib advapi32.lib
 
+apache24.obj : $(AM_APA24_SRC)
+	$(CC) $(CFLAGS) /I"extlib\WINNT\apache24\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DEAPI /DUSE_EXPAT /DCORE_PRIVATE /DXP_WIN32 /Iagents\source\apache24 /Foagents\source\apache24\ /Tc $(AM_APA24_SRC)
+
+apache24i : apache24.obj
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) /DEF:"agents\source\apache24\libamapc.def" \
+		/PDB:"agents\source\apache24\libamapc24.pdb" \
+		/DLL /OUT:agents\source\apache24\libamapc24.dll /LIBPATH:"extlib\WINNT\apache24\lib" agents\source\apache24\apache_agent.obj $(DEP_LIBS) am\source\amsdk.lib libapr-1.lib libaprutil-1.lib libhttpd.lib advapi32.lib
+
+
 #
 # Apache 2 and 2.2 Agent end
 #
@@ -207,13 +217,14 @@ dominoi	: domino.obj
 # Domino Agent end
 #
 
-all: amsdk.dll cryptit iis6i iis7i apachei apache2i proxy40i sjswsi dominoi
+all: amsdk.dll cryptit iis6i iis7i apachei apache2i apache24i proxy40i sjswsi dominoi
 
 sdk: amsdk.dll cryptit
 iis6: sdk iis6i
 iis7: sdk iis7i
 apache: sdk apachei
 apache22: sdk apache2i
+apache24: sdk apache24i
 proxy40: sdk proxy40i
 sjsws: sdk sjswsi
 domino: sdk dominoi

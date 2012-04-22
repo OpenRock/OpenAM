@@ -29,7 +29,7 @@
 #
 #
 
-# Portions Copyrighted 2010-2011 ForgeRock AS
+# Portions Copyrighted 2010-2012 ForgeRock Inc
 
 USERX_ROOT := ../..
 
@@ -46,12 +46,12 @@ SUBDIRS := common
 
 ifeq ($(BUILD_AGENT),)
 ifeq ($(OS_ARCH), HP-UX)
-SUBDIRS += apache apache22
+SUBDIRS += apache apache22 apache24
 else 
 ifeq ($(OS_ARCH), AIX)
-SUBDIRS += apache apache22
+SUBDIRS += apache apache22 apache24
 else 
-BUILD_AGENT := apache sjsws apache22 proxy40
+BUILD_AGENT := apache sjsws apache22 apache24 proxy40
 endif
 endif
 ifeq ($(OS_ARCH), WINNT)
@@ -84,7 +84,7 @@ SUBDIRS += apache apache22
 endif 
 
 ifeq ($(OS_ARCH), AIX)
-SUBDIRS += apache apache22 domino
+SUBDIRS += apache apache22 apache24 domino
 endif 
 
 all: all_subdirs

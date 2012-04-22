@@ -29,7 +29,7 @@
 # $Id: components.mk,v 1.16 2009/12/01 21:52:55 subbae Exp $
 # 
 #
-
+# Portions Copyrighted 2012 ForgeRock Inc
 #
 # This makefile defines the location of the all of the common components
 # used to build the Agent Pack.
@@ -79,6 +79,13 @@ PROXY40_LIB_DIR = $(PROXY40_DIR)/lib
 APACHE22_DIR = $(EXTERNAL_DIR)/apache22
 APACHE22_INC_DIR = $(APACHE22_DIR)/include
 APACHE22_LIB_DIR = $(APACHE22_DIR)/lib
+
+##########################################
+# Apache 2.4 defines
+##########################################
+APACHE24_DIR = $(EXTERNAL_DIR)/apache24
+APACHE24_INC_DIR = $(APACHE22_DIR)/include
+APACHE24_LIB_DIR = $(APACHE22_DIR)/lib
 
 ######################################################
 # IIS 6.0 Header files
