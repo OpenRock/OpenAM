@@ -224,15 +224,19 @@
   indicating the corresponding properties for use in a local configuration
   file where applicable.<footnote><para>The configuration file syntax is that
   of a standard Java properties file, though backslash escapes can be used only
-  to wrap long lines. See
-  <link xlink:href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29">java.util.Properties.load</link>
-  for a description of the format. The value of a property specified multiple
-  times is not defined.</para></footnote></para>
+  to wrap long lines. See <link
+  xlink:href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29"
+  >java.util.Properties.load</link> for a description of the format. The value
+  of a property specified multiple times is not defined.</para></footnote></para>
   
   <tip>
    <para>To show the agent properties in configuration file format that
    correspond to what you see in the console, click Export Configuration
    after editing agent properties.</para>
+
+   <para>This corresponds to the local Java properties configuration file
+   that is set up when you install an agent, for example in
+   <filename>Agent_001/config/OpenSSOAgentConfiguration.properties</filename>.</para>
   </tip>
   
   <para>After changing properties specified as "Hot swap: no" you must
@@ -404,6 +408,10 @@
       <para>When you omit <replaceable>level</replaceable>, the agent uses the
       default level, which is the level associated with the
       <literal>all</literal> module.</para>
+      <para>The following example used in the local configuration sets the
+      log overall level to debug for all messages.</para>
+      <literallayout class="monospaced"
+      >com.sun.identity.agents.config.debug.level=all:4</literallayout>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -463,6 +471,7 @@
       <para>Periodic interval in minutes in which audit log messages are sent
       to the remote log file.</para>
       <para>Property: <literal>com.sun.identity.agents.config.remote.log.interval</literal></para>
+      <para>Default: 5</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -480,6 +489,7 @@
       <para>Beyond this size limit in bytes the agent rotates the local audit
       log file if rotation is enabled.</para>
       <para>Property: <literal>com.sun.identity.agents.config.local.log.size</literal></para>
+      <para>Default: 50 MB</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -546,6 +556,8 @@
       from accessing <literal>http://host/index.html</literal> by requesting
       <literal>http://host/index.html/hack.gif</literal> when the not enforced
       list includes <literal>http://host/*.gif</literal>.</para>
+      <para>For a more generally applicable setting, see
+      <xref linkend="web-agent-ignore-path-info-properties" />.</para>
       <para>Property: <literal>com.sun.identity.agents.config.ignore.path.info.for.not.enforced.list</literal></para>
      </listitem>
     </varlistentry>
@@ -565,12 +577,12 @@
       (<literal>?</literal>), and cannot be escaped. As it does not match
       <literal>/</literal>, <literal>-*-</literal> does not span multiple
       levels in a URL.</para>
-      <para>Do not mix <literal>*</literal> and <literal>-*-</literal> in the
-      same URL.</para>
+      <para>OpenAM does not let you mix <literal>*</literal> and
+      <literal>-*-</literal> in the same URL.</para>
       <para>Examples include
       <literal>http://www.example.com/logout.html</literal>,
       <literal>http://www.example.com/images/*</literal>,
-      <literal>http://www.example.com/css/*-*</literal>, and
+      <literal>http://www.example.com/css/-*-</literal>, and
       <literal>http://www.example.com/*.jsp?locale=*</literal>.</para>
       <para>Trailing forward slashes are not recognized as part of a resource
       name. Therefore <literal>http://www.example.com/images//</literal> and
@@ -636,7 +648,7 @@
         </listitem>
        </varlistentry>
       </variablelist>
-      <para><literal>com.forgerock.agents.config.notenforced.ip.handler</literal></para>
+      <para>Property: <literal>com.forgerock.agents.config.notenforced.ip.handler</literal></para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -913,6 +925,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Timeout period in seconds for an agent connection with OpenAM auth
       server.</para>
       <para>Property: <literal>com.sun.identity.agents.config.auth.connection.timeout</literal></para>
+      <para>Default: 2</para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -960,7 +973,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Logout Cookies List for Reset</term>
+     <term>Logout Redirect URL</term>
      <listitem>
       <para>User gets redirected to this URL after logout. Specify this
       property alongside a Logout URL List.</para>
@@ -1359,6 +1372,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <listitem>
       <para>When enabled ignore the host and port settings.</para>
       <para>Property: <literal>com.sun.identity.agents.config.proxy.override.host.port</literal></para>
+      <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1551,7 +1565,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Configuration Reload Interval</term>
      <listitem>
       <para>Interval in seconds to fetch agent configuration from OpenAM. Used
-      if notifications are disabled. Default: 3600 (1 hour).</para>
+      if notifications are disabled. Default: 0</para>
       <para>Property: <literal>com.sun.identity.agents.config.load.interval</literal></para>
      </listitem>
     </varlistentry>
@@ -1759,6 +1773,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Beyond this size limit in bytes the agent rotates the local audit
       log file if rotation is enabled.</para>
       <para>Property: <literal>com.sun.identity.agents.config.local.log.size</literal></para>
+      <para>Default: 50 MB</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1960,10 +1975,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       (<literal>?</literal>), and cannot be escaped. As it does not match
       <literal>/</literal>, <literal>-*-</literal> does not span multiple
       levels in a URI.</para>
-      <para>Do not mix <literal>*</literal> and <literal>-*-</literal> in the
-      same URI.</para>
+      <para>OpenAM does not let you mix <literal>*</literal> and
+      <literal>-*-</literal> in the same URI.</para>
       <para>Examples include <literal>/logout.html</literal>,
-      <literal>/images/*</literal>, <literal>/css/*-*</literal>, and
+      <literal>/images/*</literal>, <literal>/css/-*-</literal>, and
       <literal>/*.jsp?locale=*</literal>.</para>
       <para>Trailing forward slashes are not recognized as part of a resource
       name. Therefore <literal>/images//</literal> and
@@ -1972,10 +1987,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Invert Not Enforced URLs</term>
+     <term>Invert Not Enforced URIs</term>
      <listitem>
-      <para>Only enforce not enforced list of URLs. In other words, enforce
-      policy only for those URLs and patterns specified in the list.</para>
+      <para>Only enforce not enforced list of URIs. In other words, enforce
+      policy only for those URIs and patterns specified in the list.</para>
       <para>Property: <literal>com.sun.identity.agents.config.notenforced.uri.invert</literal></para>
      </listitem>
     </varlistentry>
@@ -1993,6 +2008,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>When caching is enabled, this limits the number of not enforced
       URIs cached.</para>
       <para>Property: <literal>com.sun.identity.agents.config.notenforced.uri.cache.size</literal></para>
+      <para>Default: 1000</para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2039,6 +2055,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>When caching is enabled, this limits the number of not enforced
       addresses cached.</para>
       <para>Property: <literal>com.sun.identity.agents.config.notenforced.ip.cache.size</literal></para>
+      <para>Default: 1000</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -2180,15 +2197,6 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
    
    <variablelist xml:id="j2ee-agent-privilege-attributes-properties">
     <title>Privilege Attributes Processing properties</title>
-    <varlistentry>
-     <term>Default Privileged Attribute</term>
-     <listitem>
-      <para>Specifies the list of privileged attributes granted to all users
-      with a valid OpenAM session, such as
-      <literal>AUTHENTICATED_USERS</literal>.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.default.privileged.attribute</literal></para>
-     </listitem>
-    </varlistentry>
     <varlistentry>
      <term>Default Privileged Attribute</term>
      <listitem>
@@ -2451,6 +2459,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Timeout period in milliseconds for OpenAM to determine whether
       to failover between Login URLs when Login URL Probe is enabled.</para>
       <para>Property: <literal>com.sun.identity.agents.config.login.url.probe.timeout</literal></para>
+      <para>Default: 2000</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -2488,6 +2497,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Timeout period in milliseconds for OpenAM to determine whether
       to failover between Logout URLs when Logout URL Probe is enabled.</para>
       <para>Property: <literal>com.sun.identity.agents.config.logout.url.probe.timeout</literal></para>
+      <para>Default: 2000</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -2537,6 +2547,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Specifies the time in minutes after which the policy cache is
       refreshed.</para>
       <para>Property: <literal>com.sun.identity.agents.polling.interval</literal></para>
+      <para>Default: 3</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -2608,6 +2619,14 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Property: <literal>com.sun.identity.agents.config.policy.env.jsession.param</literal></para>
      </listitem>
     </varlistentry>
+    <varlistentry>
+     <term>Use HTTP-Redirect for composite advice</term>
+     <listitem>
+      <para>When enabled, the remote policy client is configured to use
+      HTTP-Redirect instead of HTTP-POST for composite advice.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.policy.advice.use.redirect</literal></para>
+     </listitem>
+    </varlistentry>
    </variablelist>
    
    <variablelist xml:id="j2ee-agent-user-data-cache-service-properties">
@@ -2628,6 +2647,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       specifies the time in minutes after which the agent polls to update
       cached user management data.</para>
       <para>Property: <literal>com.iplanet.am.sdk.remote.pollingTime</literal></para>
+      <para>Default: 1</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -2647,6 +2667,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       specifies the time in minutes after which the agent polls to update
       cached service configuration data.</para>
       <para>Property: <literal>com.sun.identity.sm.cacheTime</literal></para>
+      <para>Default: 1</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -2669,6 +2690,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Specifies the time in seconds after which the session client
       requests an update from OpenAM for cached session information.</para>
       <para>Property: <literal>com.iplanet.am.session.client.polling.period</literal></para>
+      <para>Default: 180</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -2947,7 +2969,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     </varlistentry>
    </variablelist>
    
-   <variablelist xml:id="web-agent-jboss-properties">
+   <variablelist xml:id="j2ee-agent-jboss-properties">
     <title>JBoss Application Server properties</title>
     <varlistentry>
      <term>WebAuthentication Available</term>
@@ -2955,6 +2977,30 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>When enabled, allow programmatic authentication with the JBoss
       container using the WebAuthentication feature.</para>
       <para>Property: <literal>com.sun.identity.agents.config.jboss.webauth.available</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   
+   <variablelist xml:id="j2ee-agent-xss-detection-properties">
+    <title>Cross Site Scripting Detection properties</title>
+    <varlistentry>
+     <term>Possible XSS code elements</term>
+     <listitem>
+      <para>Specifies strings that, when found in the request, cause the agent
+      to redirect the client to an error page.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.xss.code.elements</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>XSS detection redirect URI</term>
+     <listitem>
+      <para>Maps applications to URIs of customized pages to which to redirect
+      clients upon detection of XSS code elements.</para>
+      <para>For example, to redirect clients of MyApp to
+      <literal>/myapp/error.html</literal>, enter MyApp as the Map Key and
+      <literal>/myapp/error.html</literal> as the Corresponding Map
+      Value.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.xss.redirect.uri</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
