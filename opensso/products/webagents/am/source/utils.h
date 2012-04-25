@@ -155,6 +155,7 @@ typedef struct boot_info_t {
     am_log_module_id_t log_module;
     const char *shared_agent_profile_name;
     const char *realm_name;
+    unsigned long ext_url_validation_disable;
 } boot_info_t;
 
 void parseIPAddresses(const std::string &property,

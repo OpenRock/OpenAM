@@ -818,6 +818,13 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
         status = am_properties_get(boot_ptr->properties, parameter,
             &boot_ptr->realm_name);
     }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = "com.forgerock.agents.ext.url.validation.disable";
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 0,
+            &boot_ptr->ext_url_validation_disable);
+    }
 
     // Get the naming URL.
     if (AM_SUCCESS == status) {
@@ -846,16 +853,20 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
                     u.path().c_str(),
                     u.query().c_str(),
                     u.URL().c_str());
-            if (u.host().empty()) {
-                status = AM_FAILURE;
-                am_web_log_error("URL [%s] validation failed. Host name is not resolvable", str.c_str());
-                break;
-            } else if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1)) != 1) {
-                status = AM_FAILURE;
-                am_web_log_error("URL [%s] validation failed with error [%d]", str.c_str(), vrv);
-                break;
+            if (boot_ptr->ext_url_validation_disable == 1) {
+                am_web_log_always("URL [%s] validation disabled", str.c_str());
             } else {
-                am_web_log_always("URL [%s] validation succeeded", str.c_str());
+                if (u.host().empty()) {
+                    status = AM_FAILURE;
+                    am_web_log_error("URL [%s] validation failed. Host name is not resolvable", str.c_str());
+                    break;
+                } else if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1)) != 1) {
+                    status = AM_FAILURE;
+                    am_web_log_error("URL [%s] validation failed with error [%d]", str.c_str(), vrv);
+                    break;
+                } else {
+                    am_web_log_always("URL [%s] validation succeeded", str.c_str());
+                }
             }
         }
         
