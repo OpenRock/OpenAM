@@ -67,11 +67,10 @@ public class ConfigureServerXMLTask extends ServerXMLBase implements ITask {
             //        xmlDoc,
             //        stateAccess);
 
-            if (status) {
                 status = configureRealm(
                         xmlDoc,
                         stateAccess);
-            }
+            
         } catch (Exception ex) {
             Debug.log(
                 "ConfigureServerXMLTask.configureServerLifecycleListener(): "
