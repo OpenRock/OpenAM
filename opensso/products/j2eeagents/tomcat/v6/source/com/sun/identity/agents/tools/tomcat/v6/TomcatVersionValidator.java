@@ -208,7 +208,7 @@ public class TomcatVersionValidator extends ValidatorBase
                     return false;
                 }
 
-                if (majorVersion == 6) {
+                if ((majorVersion == 6) || (majorVersion == 7)) {
                     if (minorVersion == 0) {
                         version60 = true;
                         stateAccess.put(

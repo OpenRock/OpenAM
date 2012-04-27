@@ -63,9 +63,9 @@ public class ConfigureServerXMLTask extends ServerXMLBase implements ITask {
             xmlDoc.setNoValueIndent();
 
             // add the Agent realm and Mbean descriptor
-            status = configureServerLifecycleListener(
-                    xmlDoc,
-                    stateAccess);
+            // status = configureServerLifecycleListener(
+            //        xmlDoc,
+            //        stateAccess);
 
             if (status) {
                 status = configureRealm(

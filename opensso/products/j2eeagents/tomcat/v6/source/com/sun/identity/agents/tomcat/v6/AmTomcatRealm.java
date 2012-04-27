@@ -35,16 +35,19 @@ import com.sun.identity.agents.realm.AmRealmManager;
 import com.sun.identity.agents.realm.IAmRealm;
 
 import org.apache.catalina.realm.RealmBase;
+import org.apache.catalina.Realm;
 import org.apache.catalina.realm.GenericPrincipal;
 
 import java.lang.UnsupportedOperationException;
 
+import java.lang.reflect.Constructor;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -97,7 +100,7 @@ public class AmTomcatRealm extends RealmBase {
         String username,
         String credentials) {
 
-        GenericPrincipal tomcatUser = null;
+        Principal tomcatUser = null;
 
         try {
             AmRealmAuthenticationResult result = amRealm.authenticate(
@@ -135,7 +138,7 @@ public class AmTomcatRealm extends RealmBase {
                 		rolesList.add(role);
                 	}
                 	
-                	tomcatUser = new GenericPrincipal(this,
+                	tomcatUser = instantiateGenericPrincipal(this,
             				username,
             				credentials,
             				rolesList);
@@ -181,6 +184,56 @@ public class AmTomcatRealm extends RealmBase {
             username,
             password);
     }
+    
+    /**
+     * Return the GenericPrincipal associated with the specified username and
+     * credentials, if there is one; otherwise return <code>null</code>.
+     * 
+     * This is here since Tomcat GenericPrincipal changed the method signature
+     * between v6 and v7.
+     *
+     * @param realm
+     *            Realm for the user
+     * @param username
+     *            Username of the Principal to look up
+     * @param credentials
+     *            Password or other credentials to use in authenticating this
+     *            username
+     * @param rolesList
+     *            list of Roles for the User
+     */
+	private Principal instantiateGenericPrincipal(Realm realm,
+			String username,
+			String credentials,
+			List<String>rolesList) {
+		
+		Constructor constructor;
+		Principal	retVal = null;
+		boolean     isV6 = true;
+		
+		try {
+		Constructor[] constructors = GenericPrincipal.class.getConstructors();
+		Class[] parameterTypes = constructors[0].getParameterTypes();
+		
+		if (parameterTypes[0] == Realm.class) {
+			isV6 = true;
+			constructor = GenericPrincipal.class.getConstructor(Realm.class, String.class, String.class, List.class);
+			if (constructor != null) {
+				retVal = (Principal)constructor.newInstance(realm,username,credentials,rolesList);
+			}
+		} else {
+			isV6 = false;
+			constructor = GenericPrincipal.class.getConstructor(String.class, String.class, List.class);
+			if (constructor != null) {
+				retVal = (Principal)constructor.newInstance(username,credentials,rolesList);
+			}
+		}
+		} catch (Exception e) {
+			retVal = null;
+		} 
+		return retVal;
+	}
+
 
     /**
      * Return the Principal associated with the specified username, which
