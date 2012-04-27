@@ -811,24 +811,26 @@ public class XMLDocument implements IXMLUtilsConstants {
                         if (secondToken instanceof BoundedToken) {
                             BoundedToken secondBoundedToken = (BoundedToken) 
                                 secondToken;
-                            if (secondBoundedToken.getName()
-                                    .equals(elementName)) {
-                                if (secondBoundedToken.elementEnd()) {
-                                    element = new XMLElement(this, 
-                                            elementName);
-                                    element.setStartToken(token);
-                                    element.setEndToken(secondBoundedToken);
-                                    element.setAttributes(getAttributes(token
-                                            .getAttributeString(),
-                                            secondBoundedToken
-                                                    .getAttributeString()));
-                                    result.add(element);
-                                    count = count + 2;
-                                } else {
-                                    throw new Exception("Malformed element: "
-                                            + secondBoundedToken
-                                                    .toDebugString());
-                                }
+                            if (!secondBoundedToken.elementStart()) {
+	                            if (secondBoundedToken.getName()
+	                                    .equals(elementName)) {
+	                                if (secondBoundedToken.elementEnd()) {
+	                                    element = new XMLElement(this, 
+	                                            elementName);
+	                                    element.setStartToken(token);
+	                                    element.setEndToken(secondBoundedToken);
+	                                    element.setAttributes(getAttributes(token
+	                                            .getAttributeString(),
+	                                            secondBoundedToken
+	                                                    .getAttributeString()));
+	                                    result.add(element);
+	                                    count = count + 2;
+	                                } else {
+	                                    throw new Exception("Malformed element: "
+	                                            + secondBoundedToken
+	                                                    .toDebugString());
+	                                }
+	                            }
                             }
                         }
                     }
