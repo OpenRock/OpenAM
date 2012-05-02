@@ -271,7 +271,7 @@
      <projectName>OpenAM</projectName>
      <googleAnalyticsId>${gaId}</googleAnalyticsId>
     </configuration>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <executions>
      <execution>
       <id>build-doc</id>
