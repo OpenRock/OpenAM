@@ -244,7 +244,7 @@ int sdk::utils::validate_agent_credentials(url *u, const char *aname, const char
     if (dui != std::string::npos) {
         dpath = u->path().substr(1, dui);
     }
-    std::string postData = sdk::utils::format("username=%s&password=%s&uri=realm=%s", aname, apwd, arealm);
+    std::string postData = sdk::utils::format("username=%s&password=%s&uri=realm%%3D%s%%26module%%3DApplication", aname, apwd, arealm);
     std::string postBuffer = sdk::utils::format("POST /%s/identity/authenticate HTTP/1.0\r\nContent-Type: %s\r\nContent-length: %d\r\nHost: %s\r\nConnection: close\r\n\r\n%s\r\n",
             dpath.c_str(),
             "application/x-www-form-urlencoded",
