@@ -26,42 +26,24 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc.
+ */
+
 package com.sun.identity.saml2.profile;
 
-import com.sun.identity.shared.datastruct.OrderedSet;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.saml.xmlsig.KeyProvider;
-import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.identity.saml2.assertion.AssertionFactory;
-import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.SAML2Repository;
-import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.key.KeyUtil;
-import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
-import com.sun.identity.saml2.logging.LogUtil;
-import com.sun.identity.saml2.protocol.Artifact;
-import com.sun.identity.saml2.protocol.ArtifactResolve;
-import com.sun.identity.saml2.protocol.ArtifactResponse;
-import com.sun.identity.saml2.protocol.ProtocolFactory;
-import com.sun.identity.saml2.protocol.Response;
-import com.sun.identity.saml2.protocol.Status;
-import com.sun.identity.saml2.protocol.StatusCode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
-import java.util.logging.Level;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.MessageFactory;
@@ -70,7 +52,33 @@ import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
 import org.w3c.dom.Element;
+
+import com.sun.identity.common.SystemConfigurationUtil;
+import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.saml.xmlsig.KeyProvider;
+import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Issuer;
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.key.KeyUtil;
+import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.meta.SAML2MetaException;
+import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.protocol.Artifact;
+import com.sun.identity.saml2.protocol.ArtifactResolve;
+import com.sun.identity.saml2.protocol.ArtifactResponse;
+import com.sun.identity.saml2.protocol.ProtocolFactory;
+import com.sun.identity.saml2.protocol.Response;
+import com.sun.identity.saml2.protocol.Status;
+import com.sun.identity.saml2.protocol.StatusCode;
+import com.sun.identity.shared.datastruct.OrderedSet;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * This class handles the artifact resolution request 
@@ -126,7 +134,7 @@ public class IDPArtifactResolution {
                 LogUtil.error(Level.INFO,
                     LogUtil.IDP_METADATA_ERROR, data, null);
                 SAMLUtils.sendError(request, response, 
-                    response.SC_INTERNAL_SERVER_ERROR,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "nullIDPMetaAlias",
                     SAML2Utils.bundle.getString("nullIDPMetaAlias"));
                 return;
@@ -146,7 +154,7 @@ public class IDPArtifactResolution {
                     LogUtil.error(Level.INFO, 
                         LogUtil.INVALID_IDP, data, null);
                     SAMLUtils.sendError(request, response, 
-                        response.SC_INTERNAL_SERVER_ERROR,
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                         "nullIDPEntityID",
                         SAML2Utils.bundle.getString("nullIDPEntityID"));
                     return;
@@ -159,7 +167,7 @@ public class IDPArtifactResolution {
                 LogUtil.error(Level.INFO,
                     LogUtil.IDP_METADATA_ERROR, data, null);
                 SAMLUtils.sendError(request, response, 
-                    response.SC_INTERNAL_SERVER_ERROR, "metaDataError",
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "metaDataError",
                     SAML2Utils.bundle.getString("metaDataError"));
                 return;
             }
@@ -174,7 +182,7 @@ public class IDPArtifactResolution {
                 LogUtil.error(
                     Level.INFO, LogUtil.BINDING_NOT_SUPPORTED, data, null);
                 SAMLUtils.sendError(request, response,
-                   response.SC_BAD_REQUEST, "unsupportedBinding",
+                   HttpServletResponse.SC_BAD_REQUEST, "unsupportedBinding",
                    SAML2Utils.bundle.getString("unsupportedBinding"));
                 return;
             }
@@ -213,13 +221,13 @@ public class IDPArtifactResolution {
                 LogUtil.error(Level.INFO,
                     LogUtil.INVALID_SOAP_MESSAGE, data, null);
                 SAMLUtils.sendError(request, response, 
-                    response.SC_INTERNAL_SERVER_ERROR, "invalidSOAPMessage",
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "invalidSOAPMessage",
                     SAML2Utils.bundle.getString("invalidSOAPMessage") +
                     " " + ex.getMessage());
             } catch (SAML2Exception se) {
                 SAML2Utils.debug.error(classMethod + "SAML2 error", se);
                 SAMLUtils.sendError(request, response, 
-                    response.SC_INTERNAL_SERVER_ERROR,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "unableToCreateArtifactResponse",
                     SAML2Utils.bundle.getString(
                         "unableToCreateArtifactResponse") +
@@ -304,7 +312,7 @@ public class IDPArtifactResolution {
         OrderedSet acsSet = SPSSOFederate.getACSUrl(spSSODescriptor,
             SAML2Constants.HTTP_ARTIFACT);
         String acsURL = (String) acsSet.get(0);
-        String protocolBinding = (String)acsSet.get(1);
+        //String protocolBinding = (String) acsSet.get(1);
 
         String isArtifactResolveSigned = 
            SAML2Utils.getAttributeValueFromSSOConfig(
@@ -344,51 +352,102 @@ public class IDPArtifactResolution {
         String artStr = art.getArtifactValue();
         Response res = 
             (Response)IDPCache.responsesByArtifacts.remove(artStr);
-        String remoteArtURL = null; 
+        String remoteArtURL = null;
+
+        boolean saml2FailoverEnabled = SAML2Utils.isSAML2FailOverEnabled();
+
         if (res == null) {
             // in LB case, artifact may reside on the other server.
-            String remoteServiceURL =
-                 SAML2Utils.getRemoteServiceURL(art.getMessageHandle());
-            if (remoteServiceURL != null) {
-                remoteArtURL = remoteServiceURL +
-                    SAML2Utils.removeDeployUri(request.getRequestURI());
+
+            String targetServerID = SAML2Utils.extractServerId(art
+                    .getMessageHandle());
+
+            if (targetServerID == null) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod
+                            + "target serverID is null");
+                }
+                return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                        "InvalidArtifactId", null);
+            }
+
+            String localServerID = SAML2Utils.getLocalServerID();
+            boolean localTarget = localServerID.equals(targetServerID);
+
+            if (!localTarget) {
+                if (!SystemConfigurationUtil.isValidServerId(targetServerID)) {
+                    if (SAML2Utils.debug.messageEnabled()) {
+                        SAML2Utils.debug.message(classMethod
+                                + "target serverID is not valid: "
+                                + targetServerID);
+                    }
+                    return SAML2Utils.createSOAPFault(
+                            SAML2Constants.CLIENT_FAULT, "InvalidArtifactId",
+                            null);
+                }
                 try {
+                    String remoteServiceURL = SystemConfigurationUtil
+                            .getServerFromID(targetServerID);
+                    remoteArtURL = remoteServiceURL
+                            + SAML2Utils.removeDeployUri(request
+                                    .getRequestURI());
                     SOAPConnection con = SAML2Utils.scf.createConnection();
                     SOAPMessage resMsg = con.call(message, remoteArtURL);
                     return resMsg;
                 } catch (Exception ex) {
                     if (SAML2Utils.debug.messageEnabled()) {
-                        SAML2Utils.debug.message(classMethod +
-                            "unable to forward request to remote server. " +
-                            "remote url = " + remoteArtURL, ex);
+                        SAML2Utils.debug
+                                .message(
+                                        classMethod
+                                                + "unable to forward request to remote server. "
+                                                + "remote url = "
+                                                + remoteArtURL, ex);
                     }
+                    if (!saml2FailoverEnabled) {
+                        return SAML2Utils.createSOAPFault(
+                                SAML2Constants.SERVER_FAULT,
+                                "RemoteArtifactResolutionFailed", null);
+                    }
+                    // when the target server is running but the remote call was
+                    // failed to this server (due to a network error)
+                    // and the saml2failover is enabled, we can still find the
+                    // artifact in the SAML2 repository.
+                    // However the cached entry in the target server will not be
+                    // deleted this way.
                 }
             }
 
-            //Check the Persistent DB store
-            try {
-                if (SAML2Utils.isSAML2FailOverEnabled()) {
+            if (saml2FailoverEnabled) {
+                // Check the Persistent DB store
+                try {
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message("Artifact=" + artStr);
-                    }  
-                    String tmp = (String) SAML2Repository.getInstance().retrieve(artStr);
+                    }
+                    String tmp = (String) SAML2Repository.getInstance()
+                            .retrieve(artStr);
                     res = ProtocolFactory.getInstance().createResponse(tmp);
+                } catch (SAML2Exception e) {
+                    SAML2Utils.debug.error(classMethod + "DB ERROR!!!", e);
+                    return SAML2Utils.createSOAPFault(
+                            SAML2Constants.CLIENT_FAULT,
+                            "UnableToFindResponseInRepo", null);
                 }
-            } catch (SAML2Exception e) {
-                SAML2Utils.debug.error(classMethod + "DB ERROR!!!");
             }
         }
-        if (res == null) {  
-            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, 
-                "UnableToFindResponse", null);
+
+        if (res == null) {
+            return SAML2Utils.createSOAPFault(SAML2Constants.CLIENT_FAULT,
+                    saml2FailoverEnabled ? "UnableToFindResponseInRepo"
+                            : "UnableToFindResponse", null);
         }
+
         // Remove Response from persistent DB
         try {
-            if (SAML2Utils.isSAML2FailOverEnabled()) {
+            if (saml2FailoverEnabled) {
                 SAML2Repository.getInstance().delete(artStr);
             }
         } catch (SAML2Exception e) {
-            SAML2Utils.debug.error(classMethod + "DB ERROR!!!");
+            SAML2Utils.debug.error(classMethod + "Error deleting the SAML object from the repository", e);
         } 
 
         Map props = new HashMap();
@@ -409,7 +468,7 @@ public class IDPArtifactResolution {
         // on SP config setting and sign the assertion.
         IDPSSOUtil.signAndEncryptResponseComponents(
             realm, spEntityID, idpEntityID, res, signAssertion);
- 
+
         ArtifactResponse artResponse = 
                 ProtocolFactory.getInstance().createArtifactResponse();
 

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock Inc.
  */
 
 package com.sun.identity.common;
@@ -36,8 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -64,15 +64,16 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
     private static final String SVC_PLATFORM = "PLATFORM";
     private static final String SVC_NAMING = "NAMING";
 
-    private static boolean ignoreNaming = false;
     private static ConfigurationInstance platformConfig;
     private static ConfigurationInstance namingConfig;
     private static String authenticationURL;
     private static List cookieDomains;
-    private static List serverList;
-    private static List siteList;
-    private static Hashtable serverToIdTable = null;
-    private static Hashtable idToServerTable = null;
+    private static List<String> serverList;
+    private static List<String> siteList;
+    private static Hashtable<String,String> serverToIdTable = null;
+    private static Hashtable<String,String> idToServerTable = null;
+    private static HashMap<String,String> idToSiteTable = null;
+    private static HashMap<String,String> siteToIdTable = null;
     private static boolean platformNamingInitialized = false;
 
     private SystemConfigurationUtil() {
@@ -337,6 +338,21 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
     }
 
     /**
+     * Check whether the given id is a siteId.
+     * 
+     * @param siteID
+     *            The site id to check.
+     * @return true, if the given siteID is an existing site id.
+     */
+    public static boolean isSiteId(String siteID) {
+        if (!platformNamingInitialized) {
+            initPlatformNaming();
+        }
+
+        return idToSiteTable.containsKey(siteID);
+    }
+
+    /**
      * Initializes the properties map.
      *
      * @param properties Map of new properties.
@@ -396,64 +412,66 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
      * Note: This server id should be unique if it's participating
      * in load balancing mode. 
      */
-    private static void storeServerList(Set servers) {
-        if ((servers == null) || servers.isEmpty()) {
+    private static void storeServerAndSiteList(Set<String> servers, Set<String> sites) {
+        int numberOfServers = servers != null ? servers.size() : 0;
+        int numberOfSites = sites != null ? sites.size() : 0;
+        int numberOfItems = numberOfServers + numberOfSites;
+
+        if (numberOfItems == 0) {
             serverList = Collections.EMPTY_LIST;
             serverToIdTable = null;
             idToServerTable = null;
             return;
         }
 
-        int serverSize = servers.size();
-        serverList = new ArrayList(serverSize);
-        serverToIdTable = new Hashtable(serverSize);
-        idToServerTable = new Hashtable(serverSize);
+        serverList = new ArrayList(numberOfItems);
+        serverToIdTable = new Hashtable(numberOfItems);
+        idToServerTable = new Hashtable(numberOfItems);
 
-        Iterator iter = servers.iterator();
-        while(iter.hasNext()) {
-            String serverEntry = (String)iter.next();
-            int index = serverEntry.indexOf("|");
-            if (index != -1) {
-                String server = serverEntry.substring(0, index).toLowerCase();
-                String serverId = serverEntry.substring(
-                        index+1, serverEntry.length());
-
-                index = serverId.indexOf("|");
-                if (index != -1) {
-                    serverId = serverId.substring(0, 2);
+        if (servers != null) {
+            for (String serverEntry : servers) {
+                try {
+                    ServerOrSiteEntry entry = new ServerOrSiteEntry(serverEntry);
+                    serverList.add(entry.getUrl());
+                    idToServerTable.put(entry.getId(), entry.getUrl());
+                    serverToIdTable.put(entry.getUrl(), entry.getId());
+                    if (getDebug().messageEnabled()) {
+                        getDebug().message("SystemConfigUtil.storeServerAndSiteList: " +
+                            "adding server " + entry.getId() + ": " + entry.getUrl());
+                    }
+                } catch (IllegalArgumentException ex) {
+                    getDebug().error("SystemConfigurationUtil.storeServerAndSiteList: " +
+                            "Platform Server List entry is invalid:" + serverEntry);
                 }
-                serverList.add(server);
-                idToServerTable.put(serverId, server);
-                serverToIdTable.put(server, serverId);
-            } else {
-                getDebug().error("SystemConfigurationUtil.storeServerList: " +
-                    "Platform Server List entry is invalid:" + serverEntry);
             }
         }
-    }
 
-    private static void storeSiteList(Set sites) {
-        if ((sites == null) || sites.isEmpty()) {
-            siteList = Collections.EMPTY_LIST;
-            return;
-        }
-
-        siteList = new ArrayList(sites.size());
-
-        Iterator iter = sites.iterator();
-        while(iter.hasNext()) {
-            String siteEntry = (String)iter.next();
-            int index = siteEntry.indexOf("|");
-            if (index != -1) {
-                String site = siteEntry.substring(0, index).toLowerCase();
-                if (getDebug().messageEnabled()) {
-                    getDebug().message("SystemConfigUtil.storeSiteList: " +
-                        "add site" + site);
-                }
-                siteList.add(site);
+        if (sites != null) {
+            if (numberOfSites == 0) {
+                siteList = Collections.EMPTY_LIST;
             } else {
-                getDebug().error("SystemConfigurationUtil.storeSiteList: " +
-                    "Platform Server List entry is invalid:" + siteEntry);
+                siteList = new ArrayList<String>(numberOfSites);
+                idToSiteTable = new HashMap<String, String>(numberOfSites);
+                siteToIdTable = new HashMap<String, String>(numberOfSites);
+            }
+
+            for (String siteEntry : sites) {
+                try {
+                    ServerOrSiteEntry entry = new ServerOrSiteEntry(siteEntry);
+                    serverList.add(entry.getUrl());
+                    siteList.add(entry.getUrl());
+                    idToServerTable.put(entry.getId(), entry.getUrl());
+                    serverToIdTable.put(entry.getUrl(), entry.getId());
+                    idToSiteTable.put(entry.getId(), entry.getUrl());
+                    siteToIdTable.put(entry.getUrl(), entry.getId());
+                    if (getDebug().messageEnabled()) {
+                        getDebug().message("SystemConfigUtil.storeServerAndSiteList: " +
+                            "adding site " + entry.getId() + ": " + entry.getUrl());
+                    }
+                } catch (IllegalArgumentException ex) {
+                    getDebug().error("SystemConfigurationUtil.storeServerAndSiteList: " +
+                            "Platform Site List entry is invalid:" + siteEntry);
+                }
             }
         }
     }
@@ -516,21 +534,17 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
                     cookieDomains.addAll(values);
                 }
 
+                Set<String> servers = (Set)avPairs.get(Constants.PLATFORM_LIST);
+                Set<String> sites = (Set)avPairs.get(Constants.SITE_LIST);
+
                 if (getDebug().messageEnabled()) {
                     getDebug().message("SystemConfigUtil.update: " +
-                        "servers=" + (Set)avPairs.get(Constants.PLATFORM_LIST));
+                        "servers=" + servers);
                     getDebug().message("SystemConfigUtil.update: " +
-                        "sites=" + (Set)avPairs.get(Constants.SITE_LIST));
+                        "sites=" + sites);
                 }
 
-                values = (Set)avPairs.get(Constants.PLATFORM_LIST);
-                if ((values == null) || values.isEmpty()) {
-                    values = (Set)avPairs.get(Constants.SITE_LIST);
-                } else {
-                    values.addAll((Set)avPairs.get(Constants.SITE_LIST));
-                }
-                storeServerList(values);
-                storeSiteList((Set)avPairs.get(Constants.SITE_LIST));
+                storeServerAndSiteList(servers, sites);
             }
         } catch (ConfigurationException ex) {
             getDebug().error("SystemConfigurationUtil.update:", ex);
@@ -563,5 +577,19 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
         update();
 
         platformNamingInitialized = true;
+    }
+
+    /**
+     * Checks whether the given serverID is a really existing serverid in the
+     * current configuration. It returns false if the given id is a siteID!
+     * 
+     * @param serverID
+     *            true if the given serverID is a valid serverID.
+     */
+    public static boolean isValidServerId(String serverID) {
+        if (isSiteId(serverID)) {
+            return false;
+        }
+        return idToServerTable.containsKey(serverID);
     }
 }

@@ -27,88 +27,11 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc.
  */
 
 package com.sun.identity.saml2.common;
 
-import com.sun.identity.common.HttpURLConnectionManager;
-import com.sun.identity.common.SystemConfigurationException;
-import com.sun.identity.common.SystemConfigurationUtil;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.common.TimerPool;
-import com.sun.identity.cot.CircleOfTrustManager;
-import com.sun.identity.cot.CircleOfTrustDescriptor;
-import com.sun.identity.cot.COTException;
-import com.sun.identity.federation.common.FSUtils;
-
-import com.sun.identity.plugin.datastore.DataStoreProvider;
-import com.sun.identity.plugin.datastore.DataStoreProviderException;
-import com.sun.identity.plugin.datastore.DataStoreProviderManager;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.identity.saml.common.SAMLUtilsCommon;
-import com.sun.identity.saml.xmlsig.KeyProvider;
-import com.sun.identity.saml2.assertion.AssertionFactory;
-import com.sun.identity.saml2.assertion.Assertion;
-import com.sun.identity.saml2.assertion.Attribute;
-import com.sun.identity.saml2.assertion.AttributeStatement;
-import com.sun.identity.saml2.assertion.AudienceRestriction;
-import com.sun.identity.saml2.assertion.AuthnStatement;
-import com.sun.identity.saml2.assertion.Conditions;
-import com.sun.identity.saml2.assertion.EncryptedAssertion;
-import com.sun.identity.saml2.assertion.EncryptedAttribute;
-import com.sun.identity.saml2.assertion.EncryptedID;
-import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.assertion.NameID;
-import com.sun.identity.saml2.assertion.Subject;
-import com.sun.identity.saml2.assertion.SubjectConfirmation;
-import com.sun.identity.saml2.assertion.SubjectConfirmationData;
-import com.sun.identity.saml2.idpdiscovery.IDPDiscoveryConstants;
-import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
-import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
-import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
-import com.sun.identity.saml2.jaxb.entityconfig.XACMLAuthzDecisionQueryConfigElement;
-import com.sun.identity.saml2.jaxb.entityconfig.XACMLPDPConfigElement;
-import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
-import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
-import com.sun.identity.saml2.jaxb.metadata.EndpointType;
-import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.key.EncInfo;
-import com.sun.identity.saml2.key.KeyUtil;
-import com.sun.identity.saml2.logging.LogUtil;
-import com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper;
-import com.sun.identity.saml2.plugins.IDPAccountMapper;
-import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
-import com.sun.identity.saml2.plugins.FedletAdapter;
-import com.sun.identity.saml2.plugins.SAML2IDPFinder;
-import com.sun.identity.saml2.plugins.SPAccountMapper;
-import com.sun.identity.saml2.plugins.SPAuthnContextMapper;
-import com.sun.identity.saml2.profile.AuthnRequestInfo;
-import com.sun.identity.saml2.profile.CacheCleanUpScheduler;
-import com.sun.identity.saml2.profile.IDPCache;
-import com.sun.identity.saml2.profile.SPCache;
-import com.sun.identity.saml2.protocol.AuthnRequest;
-import com.sun.identity.saml2.protocol.ProtocolFactory;
-import com.sun.identity.saml2.protocol.RequestAbstract;
-import com.sun.identity.saml2.protocol.RequestedAuthnContext;
-import com.sun.identity.saml2.protocol.Response;
-import com.sun.identity.saml2.protocol.Status;
-import com.sun.identity.saml2.protocol.StatusCode;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.security.cert.CRLValidator;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.whitelist.URLPatternMatcher;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -116,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -133,19 +57,15 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.util.Vector;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -163,17 +83,84 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
+
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.owasp.esapi.ESAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import com.sun.identity.saml2.plugins.JMQSAML2Repository;
+
+import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.common.SystemConfigurationUtil;
+import com.sun.identity.cot.COTException;
+import com.sun.identity.cot.CircleOfTrustDescriptor;
+import com.sun.identity.cot.CircleOfTrustManager;
+import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.plugin.datastore.DataStoreProvider;
+import com.sun.identity.plugin.datastore.DataStoreProviderException;
+import com.sun.identity.plugin.datastore.DataStoreProviderManager;
+import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.plugin.session.SessionManager;
+import com.sun.identity.saml.common.SAMLConstants;
+import com.sun.identity.saml.common.SAMLUtilsCommon;
+import com.sun.identity.saml.xmlsig.KeyProvider;
+import com.sun.identity.saml2.assertion.Assertion;
+import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Attribute;
+import com.sun.identity.saml2.assertion.AudienceRestriction;
+import com.sun.identity.saml2.assertion.AuthnStatement;
+import com.sun.identity.saml2.assertion.Conditions;
+import com.sun.identity.saml2.assertion.EncryptedAssertion;
+import com.sun.identity.saml2.assertion.Issuer;
+import com.sun.identity.saml2.assertion.NameID;
+import com.sun.identity.saml2.assertion.Subject;
+import com.sun.identity.saml2.assertion.SubjectConfirmation;
+import com.sun.identity.saml2.assertion.SubjectConfirmationData;
+import com.sun.identity.saml2.idpdiscovery.IDPDiscoveryConstants;
+import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.XACMLAuthzDecisionQueryConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.XACMLPDPConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
+import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
+import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.key.KeyUtil;
+import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.meta.SAML2MetaException;
+import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper;
+import com.sun.identity.saml2.plugins.FedletAdapter;
+import com.sun.identity.saml2.plugins.IDPAccountMapper;
+import com.sun.identity.saml2.plugins.SAML2IDPFinder;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
+import com.sun.identity.saml2.plugins.SPAccountMapper;
+import com.sun.identity.saml2.plugins.SPAuthnContextMapper;
+import com.sun.identity.saml2.profile.AuthnRequestInfo;
 import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.openam.utils.StringUtils;
-import java.io.OutputStreamWriter;
-import java.util.Set;
-import org.owasp.esapi.ESAPI;
+import com.sun.identity.saml2.profile.CacheCleanUpScheduler;
+import com.sun.identity.saml2.profile.IDPCache;
+import com.sun.identity.saml2.profile.SPCache;
+import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.ProtocolFactory;
+import com.sun.identity.saml2.protocol.RequestAbstract;
+import com.sun.identity.saml2.protocol.RequestedAuthnContext;
+import com.sun.identity.saml2.protocol.Response;
+import com.sun.identity.saml2.protocol.Status;
+import com.sun.identity.saml2.protocol.StatusCode;
+import com.sun.identity.security.cert.CRLValidator;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.shared.whitelist.URLPatternMatcher;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * The <code>SAML2Utils</code> contains utility methods for SAML 2.0
@@ -203,8 +190,6 @@ public class SAML2Utils extends SAML2SDKUtils {
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
     private static final String LOCATION = "Location";
-    private static final String EMPTY = "";
-    private static final char AMP = '&';
     private static final char EQUALS = '=';
     private static final char SEMI_COLON = ';';
     private static final char DOUBLE_QUOTE = '"';
@@ -1580,6 +1565,20 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
     
     /**
+     * Extracts serverID from the specified id.
+     * @param id an id.
+     * @return the extracted id, or null if the given string is too short or null.
+     */
+    public static String extractServerId(String id) {
+        if (id == null || id.length() < 2) {
+            return null;
+        }
+        String serverID = id.substring(id.length() - 2);
+
+        return serverID;
+    }
+
+    /**
      * Gets remote service URL according to server id embedded in specified id.
      * @param id an id.
      * @return remote service URL or null if it is local or an error occurred.
@@ -1589,11 +1588,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message("SAML2Utils.getRemoteServiceURL: id = " + id);
         }
         
-        if (id == null || id.length() < 2) {
-            return null;
-        }
-        
-        String serverID = id.substring(id.length() - 2);
+        String serverID = extractServerId(id);
         
         try {
             String localServerID = SystemConfigurationUtil.getServerID(
@@ -1602,6 +1597,13 @@ public class SAML2Utils extends SAML2SDKUtils {
                 return null;
             }
             
+            if (SystemConfigurationUtil.isSiteId(serverID)) {
+                if (debug.warningEnabled()) {
+                    debug.warning("SAML2Utils.getRemoteServiceURL: the given id refers to a site and not a server: " + serverID);
+                }
+                return null;
+            }
+
             return SystemConfigurationUtil.getServerFromID(serverID);
         } catch (Exception ex) {
             if (debug.messageEnabled()) {
@@ -1670,24 +1672,24 @@ public class SAML2Utils extends SAML2SDKUtils {
         return id;
     }
 
-	/**
-	 * Returns the server id of the local server
-	 */
-	public static String getLocalServerID() {
-		String serverId = null;
-		
-        try {
-            serverId = SystemConfigurationUtil.getServerID(
-                server_protocol, server_host, int_server_port, server_uri);
-		} catch (Exception ex) {
-	    	if (debug.messageEnabled()) {
-	        	debug.message("SAML2Utils.getLocalServerID:", ex);
-	        }
-	    }
+    /**
+     * Returns the server id of the local server
+     */
+    public static String getLocalServerID() {
+        String serverId = null;
 
-	    return serverId;
-	}
-    
+        try {
+            serverId = SystemConfigurationUtil.getServerID(server_protocol,
+                    server_host, int_server_port, server_uri);
+        } catch (Exception ex) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.getLocalServerID:", ex);
+            }
+        }
+
+        return serverId;
+    }
+
     /**
      * Creates <code>SOAPMessage</code> with the input XML String
      * as message body.
@@ -2779,21 +2781,15 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             byte[] handleBytes = new byte[21];
             randomGenerator.nextBytes(handleBytes);
-            if(handleBytes == null){
-                debug.error("NameIdentifierImpl.createNameIdentifier:"
-                        + "Could not generate random handle");
-            } else {
-                Base64 encoder = new Base64();
-                handle = encoder.encode(handleBytes);
-                if (debug.messageEnabled()) {
-                    debug.message("createNameIdentifier String: " + handle);
-                }
+            handle = Base64.encode(handleBytes);
+            if (debug.messageEnabled()) {
+                debug.message("createNameIdentifier String: " + handle);
             }
         } catch (Exception e) {
             debug.message("createNameIdentifier:"
                     + " Exception during proccessing request" + e.getMessage());
         }
-        
+
         return handle;
     }
     
@@ -4160,7 +4156,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 HttpURLConnectionManager.getConnection(url);
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
-            conn.setFollowRedirects(false);
+            HttpURLConnection.setFollowRedirects(false);
             conn.setInstanceFollowRedirects(false);
 
             // replay cookies
@@ -4241,15 +4237,16 @@ public class SAML2Utils extends SAML2SDKUtils {
                 } else {
                     cookieStr.append(SEMI_COLON).append(SAMLConstants.SPACE);
                 }
-				
-				if (cookies[nCookie].getName().equals(sessionCookieName)) {
-                	cookieStr.append(cookies[nCookie].getName())
-	                    .append(EQUALS).append(DOUBLE_QUOTE)
-						.append(cookies[nCookie].getValue()).append(DOUBLE_QUOTE);
-				} else {
-					cookieStr.append(cookies[nCookie].getName())
-	                    .append(EQUALS).append(cookies[nCookie].getValue());	
-				}
+
+                if (cookies[nCookie].getName().equals(sessionCookieName)) {
+                    cookieStr.append(cookies[nCookie].getName()).append(EQUALS)
+                            .append(DOUBLE_QUOTE)
+                            .append(cookies[nCookie].getValue())
+                            .append(DOUBLE_QUOTE);
+                } else {
+                    cookieStr.append(cookies[nCookie].getName()).append(EQUALS)
+                            .append(cookies[nCookie].getValue());
+                }
             }
         }
         if (cookieStr != null) {
@@ -4432,7 +4429,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             List values = (List) attrs.get(SAML2Constants.RELAY_STATE_URL_LIST);
             if (values != null && values.size() != 0) {
                 return values;
-	    }
+            }
         } catch (SAML2MetaException e) {
             debug.message("get SSOConfig failed:", e);
         }
@@ -4525,7 +4522,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 conn.setDoOutput(true);
                 conn.setRequestMethod(POST_METHOD);
             }
-            conn.setFollowRedirects(false);
+            HttpURLConnection.setFollowRedirects(false);
             conn.setInstanceFollowRedirects(false);
 
             // replay cookies
@@ -4541,7 +4538,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             conn.setRequestProperty("Host", request.getHeader("host"));
             conn.setRequestProperty(SAMLConstants.ACCEPT_LANG_HEADER, request.getHeader(SAMLConstants.ACCEPT_LANG_HEADER));
 
-	    // do the remote connection
+            // do the remote connection
             if (isGET) {
                 conn.connect();
             } else {
@@ -4567,10 +4564,10 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
             // Receiving input from Original Federation server...
             if (debug.messageEnabled()) {
-				debug.message(classMethod + "RECEIVING DATA ... ");
+                debug.message(classMethod + "RECEIVING DATA ... ");
                 debug.message(classMethod + "Response Code: " + conn.getResponseCode());
                 debug.message(classMethod + "Response Message: " + conn.getResponseMessage());
-                debug.message(classMethod + "Follow redirect : " + conn.getFollowRedirects());
+                debug.message(classMethod + "Follow redirect : " + HttpURLConnection.getFollowRedirects());
             }
 
             // Check response code
@@ -4617,7 +4614,8 @@ public class SAML2Utils extends SAML2SDKUtils {
 
     // parses the cookies from the response header and adds them in
     // the HTTP response.
-	// TODO: This is a copy from AuthClientUtils, need to refactor into OpenAM common
+    // TODO: This is a copy from AuthClientUtils, need to refactor into OpenAM
+    // common
     private static void processCookies(Map headers,
             HttpServletRequest request, HttpServletResponse response) {
         if (debug.messageEnabled()) {
@@ -4715,12 +4713,14 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
 
     /**
-     * Checks if the provided <code>String</code> is URLEncoded. Our logic
-     * is simple. If the string has % or + character we treat as URL encoded
-     *
-	 * TODO : Copied from AuthClientUtils, refactor
-     * @param s the <code>String</code> we want to check
-     * @return <code>true</code> if the provided string is URLEncoded, 
+     * Checks if the provided <code>String</code> is URLEncoded. Our logic is
+     * simple. If the string has % or + character we treat as URL encoded
+     * 
+     * TODO : Copied from AuthClientUtils, refactor
+     * 
+     * @param s
+     *            the <code>String</code> we want to check
+     * @return <code>true</code> if the provided string is URLEncoded,
      *         <code>false</code> otherwise.
      */
     private static boolean isURLEncoded(String s) {
@@ -4736,12 +4736,17 @@ public class SAML2Utils extends SAML2SDKUtils {
     /**
      * Creates a Cookie with the <code>cookieName</code>,
      * <code>cookieValue</code> for the cookie domains specified.
-     *
- 	 * TODO: Copied from AuthClientUtils Refactor
-     * @param cookieName is the name of the cookie
-     * @param cookieValue is the value fo the cookie
-     * @param cookieDomain Domain for which the cookie is to be set.
-     * @param path The path into which the cookie shall be set
+     * 
+     * TODO: Copied from AuthClientUtils Refactor
+     * 
+     * @param cookieName
+     *            is the name of the cookie
+     * @param cookieValue
+     *            is the value fo the cookie
+     * @param cookieDomain
+     *            Domain for which the cookie is to be set.
+     * @param path
+     *            The path into which the cookie shall be set
      * @return the cookie object.
      */
     public static Cookie createCookie(String cookieName,
