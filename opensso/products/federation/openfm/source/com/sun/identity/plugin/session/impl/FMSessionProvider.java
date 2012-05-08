@@ -432,7 +432,8 @@ public class FMSessionProvider implements SessionProvider {
         HttpServletResponse response  // optional input
     ) throws SessionException {
         try {
-            SSOTokenManager.getInstance().destroyToken((SSOToken)session);
+            SSOToken token = (SSOToken)session;
+            AuthUtils.logout(token.getTokenID().toString(), request, response);
             if ((request != null) && (response != null)) {
                 AuthUtils.clearAllCookies(request, response);
             }
