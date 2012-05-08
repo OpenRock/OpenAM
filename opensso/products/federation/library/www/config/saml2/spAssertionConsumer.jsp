@@ -26,8 +26,9 @@
 
 --%>
 
-
-
+<%--
+    Portions Copyrighted 2012 ForgeRock Inc
+--%>
 
 
 <%@page
@@ -155,8 +156,15 @@ java.util.logging.Level
             se.getMessage());
         return;
     }
-    respInfo = SPACSUtils.getResponse(
-        request, response, orgName, hostEntityId, metaManager);
+    try {
+        respInfo = SPACSUtils.getResponse(
+            request, response, orgName, hostEntityId, metaManager);
+    } catch (SAML2Exception se) {
+        SAMLUtils.sendError(request, response, 
+            response.SC_INTERNAL_SERVER_ERROR, "getResponseError",
+            se.getMessage());
+        return;
+    }
 
     String ecpRelayState = respInfo.getRelayState();
     if ((ecpRelayState != null) && (ecpRelayState.length() > 0)) {
