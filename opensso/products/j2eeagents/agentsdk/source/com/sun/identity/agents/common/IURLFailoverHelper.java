@@ -26,19 +26,28 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.common;
 
 import com.sun.identity.agents.arch.AgentException;
+import com.sun.identity.agents.filter.AmFilterRequestContext;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * The interface for URLFailoverHelper
  */
 public interface IURLFailoverHelper {
-    public abstract void initiailze(
+    public abstract void initialize(
             boolean probeEnabled, 
             boolean isPrioritized, 
             long timeout,
-            String[] urlList) throws AgentException;
+            String[] urlList,
+            Map<String, Set<String>> conditionalUrls) throws AgentException;
 
-    public abstract String getAvailableURL() throws AgentException;
+    public String getAvailableURL(AmFilterRequestContext ctx) throws AgentException;
+    public abstract String getAvailableURL(HttpServletRequest req) throws AgentException;
 }

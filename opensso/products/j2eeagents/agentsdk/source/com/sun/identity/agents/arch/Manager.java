@@ -26,17 +26,23 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.arch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -268,7 +274,7 @@ public class Manager implements IConfigurationKeyConstants,
         
         return result;
     }
-    
+
    /* (non-Javadoc)
     * @see IConfigurationAccess#getConfiguration(java.lang.String)
     */
@@ -291,7 +297,33 @@ public class Manager implements IConfigurationKeyConstants,
         }
         return result;
     }
-    
+
+    /**
+     * @{@inheritDoc}
+     */
+    public Map<String, Set<String>> getParsedConditionalUrls(String id) {
+        Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+        String[] condUrls = getConfigurationStrings(id);
+        if (condUrls != null) {
+            for (String condUrl : condUrls) {
+                int idx;
+                if ((idx = condUrl.indexOf('|')) != -1) {
+                    String domain = condUrl.substring(0, idx);
+                    Set<String> urls = new LinkedHashSet<String>(Arrays.asList(condUrl.substring(idx + 1).split(",")));
+                    if (!urls.isEmpty()) {
+                        result.put(domain, urls);
+                    }
+                }
+            }
+        }
+        if (getModule().isLogMessageEnabled()) {
+            getModule().logMessage("Configuration: parsing conditional URLs for " + id
+                    + " with values " + Arrays.toString(condUrls)
+                    + " resulted in: " + result.toString());
+        }
+        return result;
+    }
+
     /**
      * Constructs a <code>Manager</code> instance using the snapshot of the
      * current system configuraton.

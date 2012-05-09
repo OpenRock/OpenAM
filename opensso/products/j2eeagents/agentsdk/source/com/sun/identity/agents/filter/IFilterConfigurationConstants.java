@@ -47,8 +47,8 @@
 
 
  */
- /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 
@@ -176,7 +176,11 @@ public interface IFilterConfigurationConstants {
 
         "cdsso.cdcservlet.url";
 
+    public static final String CONFIG_CONDITIONAL_LOGIN_URL =
+            "conditional.login.url";
 
+    public static final String CONFIG_CONDITIONAL_LOGOUT_URL =
+            "conditional.logout.url";
 
     public static final String CONFIG_CDSSO_CLOCK_SKEW =
 

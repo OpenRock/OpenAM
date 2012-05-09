@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.common;
 
 
@@ -39,6 +42,7 @@ import com.sun.identity.agents.arch.AgentConfiguration;
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.ServiceResolver;
+import java.util.Set;
 
 
 /**
@@ -117,14 +121,15 @@ public class CommonFactory {
             boolean probeEnabled,
             boolean isPrioritized, 
             long timeout, 
-            String[] urlList) 
+            String[] urlList,
+            Map<String, Set<String>> conditionalUrls)
     	throws AgentException
     {
         IURLFailoverHelper result = null;
         String className = getResolver().getURLFailoverHelperImpl();
         try {
             result = (IURLFailoverHelper) getObject(className);
-            result.initiailze(probeEnabled, isPrioritized, timeout, urlList);
+            result.initialize(probeEnabled, isPrioritized, timeout, urlList, conditionalUrls);
         } catch (Exception ex) {
             throw new AgentException(
                     "Unable to initialize IURLFailoverHelper: "

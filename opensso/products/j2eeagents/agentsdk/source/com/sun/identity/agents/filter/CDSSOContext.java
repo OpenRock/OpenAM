@@ -25,6 +25,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.filter;
 
 import java.net.URLEncoder;
@@ -88,7 +91,7 @@ public class CDSSOContext extends SSOContext implements ICDSSOContext {
     {
         StringBuffer buff = new StringBuffer();
 
-        String cdcServletURL = getCDCServletURL();
+        String cdcServletURL = getCDCServletURL(cxt);
         buff.append(cdcServletURL);
 
         if(cdcServletURL.indexOf("?") != -1) {
@@ -318,8 +321,8 @@ public class CDSSOContext extends SSOContext implements ICDSSOContext {
         return cdssoTokens[INDEX_AUTHN_REQUEST_ID];
     }
 
-    public String getCDCServletURL() throws AgentException {
-        return getCDCServletURLFailoverHelper().getAvailableURL();
+    public String getCDCServletURL(AmFilterRequestContext ctx) throws AgentException {
+        return getCDCServletURLFailoverHelper().getAvailableURL(ctx);
     }
 
     private void setCDSSOCookieName(String name) throws AgentException {
@@ -398,7 +401,8 @@ public class CDSSOContext extends SSOContext implements ICDSSOContext {
                 probeEnabled,
                 isPrioritized,
                 timeout,
-                getConfigurationStrings(CONFIG_CDSSO_CDC_SERVLET_URL)));
+                getConfigurationStrings(CONFIG_CDSSO_CDC_SERVLET_URL),
+                getParsedConditionalUrls(CONFIG_CONDITIONAL_LOGIN_URL)));
     }
 
     private void setCDCServletURLFailoverHelper(IURLFailoverHelper helper) {

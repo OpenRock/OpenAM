@@ -25,6 +25,9 @@
  * $Id: AmFilterRequestContext.java,v 1.9 2008/10/07 17:32:31 huacui Exp $
  *
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.filter;
 
 import java.net.MalformedURLException;
@@ -829,11 +832,11 @@ public class AmFilterRequestContext implements IUtilConstants {
     }
 
     private String getLoginURL() throws AgentException {
-        return getLoginURLFailoverHelper().getAvailableURL();
+        return getLoginURLFailoverHelper().getAvailableURL(this);
     }
 
     private String getLogoutURL() throws AgentException {
-        return getLogoutURLFailoverHelper().getAvailableURL();
+        return getLogoutURLFailoverHelper().getAvailableURL(this);
     }
 
     private IURLFailoverHelper getLoginURLFailoverHelper() {

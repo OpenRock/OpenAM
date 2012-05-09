@@ -26,9 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.arch;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This interface defines all the access APIs available for a given subsystem to
@@ -253,4 +257,18 @@ public interface IConfigurationAccess {
     */
     public String getConfiguration(String id);
 
+    /**
+     * Return a map of domain - conditional login URLs. The format of the
+     * conditional URL property is as follows:
+     * <pre>
+     * a.b.c|http://a.b.c/openam/UI/Login,http://a2.b.c/openam/UI/Login
+     * a.b.c|http://e.d.f/openam/cdcservlet
+     * </pre>
+     * So the domain is separated by <code>|</code> from the login URLs, and the
+     * URLs are using <code>,</code> as delimiter.
+     *
+     * @param id The parameter name for the given conditional URL property
+     * @return a Map of domain - ordered list of login URLs
+     */
+    public Map<String, Set<String>> getParsedConditionalUrls(String id);
 }

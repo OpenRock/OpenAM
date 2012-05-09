@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.opensso.agents.jsr196;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,12 +71,12 @@ public class PsuedoAmFilter extends AmFilter implements IAmFilter {
         IURLFailoverHelper ufh;
         String url = null;
         try {
-        ufh = cf.newURLFailoverHelper(probeEnabled, isPrioritized, 
-                timeout,
-                loginURLs);
-        
-        url = ufh.getAvailableURL();
-        
+            ufh = cf.newURLFailoverHelper(probeEnabled, isPrioritized,
+                    timeout,
+                    loginURLs,
+                    getParsedConditionalUrls(CONFIG_CONDITIONAL_LOGIN_URL));
+
+            url = ufh.getAvailableURL(req);
         } catch (Exception e) {
             throw e;
         }

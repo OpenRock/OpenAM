@@ -25,6 +25,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.filter;
 
 import java.util.List;
@@ -60,7 +63,7 @@ public interface ICDSSOContext extends ISSOContext {
     public abstract String getAuthnRequestID(AmFilterRequestContext cxt)
             throws AgentException;
 
-    public abstract String getCDCServletURL() throws AgentException;
+    public abstract String getCDCServletURL(AmFilterRequestContext ctx) throws AgentException;
 
     public abstract String getCDSSOCookieName();
     

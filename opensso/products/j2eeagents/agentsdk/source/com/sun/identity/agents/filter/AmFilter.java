@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.filter;
 
 import java.util.ArrayList;
@@ -482,7 +485,8 @@ public class AmFilter extends AgentBase
                 probeEnabled,
                 isPrioritized, 
                 timeout,
-                loginURLs));
+                loginURLs,
+                getParsedConditionalUrls(CONFIG_CONDITIONAL_LOGIN_URL)));
     }
     
     private void initLogoutURLFailoverHelper(CommonFactory cf) 
@@ -499,7 +503,8 @@ public class AmFilter extends AgentBase
                 probeEnabled,
                 isPrioritized, 
                 timeout,
-                logoutURLs));
+                logoutURLs,
+                getParsedConditionalUrls(CONFIG_CONDITIONAL_LOGOUT_URL)));
     }
     
     private void setLoginURLFailoverHelper(IURLFailoverHelper helper) {

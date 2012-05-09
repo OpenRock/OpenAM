@@ -26,9 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.arch;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The base class for all agent service classes. This class provides access
@@ -142,7 +146,11 @@ public class AgentBase extends ModuleAccess implements ISystemAccess {
     public String getConfiguration(String id) {
         return getManager().getConfiguration(id);
     }
-    
+
+    public Map<String, Set<String>> getParsedConditionalUrls(String id) {
+        return getManager().getParsedConditionalUrls(id);
+    }
+
    /**
     * Constructs a <code>AgentBase</code> instance using the specified 
     * <code>Manager</code> instance.

@@ -26,18 +26,24 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.common;
 
 
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.IOException;
 
 import com.sun.identity.agents.arch.AgentException;
 import com.sun.identity.agents.arch.AgentServerErrorException;
 import com.sun.identity.agents.arch.Module;
 import com.sun.identity.agents.arch.SurrogateBase;
+import com.sun.identity.agents.filter.AmFilterRequestContext;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -51,11 +57,12 @@ public class URLFailoverHelper extends SurrogateBase
         super(module);
     }
 
-    public void initiailze(
+    public void initialize(
                 boolean probeEnabled, 
                 boolean isPrioritized, 
                 long timeout,
-                String[] urlList) throws AgentException {
+                String[] urlList,
+                Map<String, Set<String>> conditionalUrls) throws AgentException {
         if(urlList.length == 1) {
             if(isLogWarningEnabled()) {
                 logWarning("URLFailoverHelper: Only one URL is specified, "
@@ -68,16 +75,38 @@ public class URLFailoverHelper extends SurrogateBase
         setProbeEnabled(probeEnabled);
         setTimeout(timeout);
         setURLList(urlList);
+        setConditionalUrlList(conditionalUrls);
     }
 
-    public String getAvailableURL() throws AgentException {
+    public String getAvailableURL(AmFilterRequestContext ctx) throws AgentException {
+        return getAvailableURL(ctx.getHttpServletRequest());
+    }
+
+    public String getAvailableURL(HttpServletRequest request) throws AgentException {
         if ((_urlList == null) || (_urlList.length == 0)) {
             return null;
         }
+        String domain = request.getServerName();
+        Set<String> urls = conditionalUrls.get(domain);
+        if (urls != null) {
+            for (String url : urls) {
+                if (isAvailable(url)) {
+                    if(isLogMessageEnabled()) {
+                        logMessage("URLFailoverHelper: conditional URL " + url
+                                    + " is available");
+                    }
+                    return url;
+                }
+            }
+        } else {
+            if (isLogMessageEnabled()) {
+                logMessage("URLFailoverHelper: No conditional URL found for "
+                        + "domain: " + domain + " Falling back to non-conditional URLs.");
+            }
+        }
         String result = null;
         if(isEnabled()) {
-            int index = getCurrentIndex();
-            String url = getURL(index);
+            String url = getCurrentURL();
             if(isAvailable(url)) {
                 result = url;
             } else {
@@ -85,7 +114,7 @@ public class URLFailoverHelper extends SurrogateBase
                     logWarning("URLFailoverHelper: Detected the failure of "
                                + url + ", initiating failover sequence");
                 }
-                int currentIndex = index;
+                int currentIndex = getCurrentIndex();
                 int newIndex = currentIndex;
                 boolean done = false;
                 while( !done) {
@@ -239,6 +268,10 @@ public class URLFailoverHelper extends SurrogateBase
         _urlList = urlList;
     }
 
+    private void setConditionalUrlList(Map<String, Set<String>> conditionalUrls) {
+        this.conditionalUrls = conditionalUrls;
+    }
+
     /**
      * Method getMaxIndex
      *
@@ -319,13 +352,15 @@ public class URLFailoverHelper extends SurrogateBase
 
                 if (thread.isAlive()) {
                     thread.interrupt();
+                    return false;
                 }
 
             } catch (InterruptedException ex) {
                 if(isLogWarningEnabled()) {
                    logWarning("URLFailoverHelper: the url " + url
                                + " is not available", ex);
-                }  
+                }
+                return false;
             }
 
             return this.isAvailable;
@@ -358,6 +393,7 @@ public class URLFailoverHelper extends SurrogateBase
     }    
     
     private String[] _urlList;
+    private Map<String, Set<String>> conditionalUrls;
     private int      _index    = 0;
     private boolean  _disabled = false;
     private boolean _isPrioritized = false;
