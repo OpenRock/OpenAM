@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010 ForgeRock AS
+    Portions Copyrighted 2010-2012 ForgeRock Inc
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -65,6 +65,13 @@
                 <attribute name="label" value="label.Enable" />
             </cc>
             <fieldhelp name="helpenableIDPProxy" defaultValue="samlv2sp.attribute.help.SPenableIDPProxy" />
+        </property>
+        <property>
+            <label name="lblalwaysIdpProxy" defaultValue="samlv2sp.attribute.label.alwaysIdpProxy" labelFor="alwaysIdpProxy" />
+            <cc name="alwaysIdpProxy" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="label.Enable" />
+            </cc>
+            <fieldhelp name="helpalwaysIdpProxy" defaultValue="samlv2sp.attribute.help.SPalwaysIdpProxy" />
         </property>
         <property>
             <label name="lbluseIntroForIDPProxy"

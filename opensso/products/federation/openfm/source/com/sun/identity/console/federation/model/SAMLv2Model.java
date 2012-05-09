@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.console.federation.model;
@@ -234,6 +234,7 @@ public interface SAMLv2Model
 
     
     //IDP PROXY
+    public static final String ALWAYS_IDP_PROXY = "alwaysIdpProxy";
     public static final String ENABLE_IDP_PROXY = "enableIDPProxy";
     public static final String IDP_PROXY_LIST = "idpProxyList";
     public static final String IDP_PROXY_COUNT = "idpProxyCount";

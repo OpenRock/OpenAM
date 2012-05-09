@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.console.federation.model;
@@ -209,6 +209,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaSpMap.put(SP_SESSION_SYNC_ENABLED, Collections.EMPTY_SET);
 
         //IDP PROXY
+        extendedMetaSpMap.put(ALWAYS_IDP_PROXY, Collections.EMPTY_SET);
         extendedMetaSpMap.put(ENABLE_IDP_PROXY, Collections.EMPTY_SET);
         extendedMetaSpMap.put(IDP_PROXY_LIST, Collections.EMPTY_SET);
         extendedMetaSpMap.put(IDP_PROXY_COUNT, Collections.EMPTY_SET);
@@ -360,6 +361,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     //extended Advanced metadata attributes for sp only    
     static {
         //IDP PROXY
+        extendedAdMetaSpMap.put(ALWAYS_IDP_PROXY, Collections.EMPTY_SET);
         extendedAdMetaSpMap.put(ENABLE_IDP_PROXY, Collections.EMPTY_SET);
         extendedAdMetaSpMap.put(IDP_PROXY_LIST, Collections.EMPTY_SET);
         extendedAdMetaSpMap.put(IDP_PROXY_COUNT, Collections.EMPTY_SET);

@@ -26,8 +26,8 @@
  *
  */
 
- /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -35,20 +35,15 @@ package com.sun.identity.saml2.profile;
 import java.util.logging.Level;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.identity.saml2.assertion.AuthnContext;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.NameID; 
 import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.common.AccountUtils;
-import com.sun.identity.saml2.common.NameIDInfoKey;
-import com.sun.identity.saml2.common.QuerySignatureUtil;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
@@ -56,15 +51,12 @@ import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
-import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
-import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.plugins.SAML2IDPFinder;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.IDPEntry;
 import com.sun.identity.saml2.protocol.LogoutRequest;
 import com.sun.identity.saml2.protocol.LogoutResponse;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
@@ -73,11 +65,8 @@ import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Scoping;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map; 
@@ -90,6 +79,7 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.protocol.IDPList;
 import org.w3c.dom.Element;
 
 /**
@@ -132,7 +122,7 @@ public class IDPProxyUtil {
         HttpServletResponse response)
         throws SAML2Exception
     {
-        SAML2IDPFinder  proxyFinder = getIDPProxyFinder(realm, hostedEntityId);
+        SAML2IDPFinder proxyFinder = getIDPProxyFinder(realm, hostedEntityId);
         List idpProviderIDs = proxyFinder.getPreferredIDP(
             authnRequest, hostedEntityId, realm, 
             request, response);
@@ -381,13 +371,47 @@ public class IDPProxyUtil {
                 Scoping newScoping = ProtocolFactory.getInstance().
                     createScoping(); 
                 Integer proxyCountInt = scoping.getProxyCount();
-                int proxyCount = 1; 
+                int proxyCount = 1;
                 if (proxyCountInt != null) {
                     proxyCount = scoping.getProxyCount().intValue();
                     newScoping.setProxyCount(new Integer(proxyCount-1));
                 }
                 newScoping.setIDPList(scoping.getIDPList());
                 newRequest.setScoping(newScoping);
+            } else {
+                //handling the alwaysIdpProxy case -> the incoming request
+                //did not contained a Scoping field
+                SPSSOConfigElement spConfig = getSPSSOConfigByAuthnRequest(realm, origRequest);
+                Map<String, List<String>> spConfigAttrMap = SAML2MetaUtils.getAttributes(spConfig);
+                scoping = ProtocolFactory.getInstance().createScoping();
+                String proxyCountParam = SPSSOFederate.getParameter(spConfigAttrMap,
+                        SAML2Constants.IDP_PROXY_COUNT);
+                if (proxyCountParam != null && (!proxyCountParam.equals(""))) {
+                    int proxyCount = Integer.valueOf(proxyCountParam);
+                    if (proxyCount <= 0) {
+                        scoping.setProxyCount(0);
+                    } else {
+                        //since this is a remote SP configuration, we should
+                        //decrement the proxycount by one
+                        scoping.setProxyCount(proxyCount - 1);
+                    }
+                }
+                List<String> proxyIdPs = spConfigAttrMap.get(
+                        SAML2Constants.IDP_PROXY_LIST);
+                if (proxyIdPs != null && !proxyIdPs.isEmpty()) {
+                    List<IDPEntry> list = new ArrayList<IDPEntry>();
+                    for (String proxyIdP : proxyIdPs) {
+                        IDPEntry entry = ProtocolFactory.getInstance().
+                                createIDPEntry();
+                        entry.setProviderID(proxyIdP);
+                        list.add(entry);
+                    }
+                    IDPList idpList = ProtocolFactory.getInstance().
+                            createIDPList();
+                    idpList.setIDPEntries(list);
+                    scoping.setIDPList(idpList);
+                    newRequest.setScoping(scoping);
+                }
             }
             return newRequest;
         } catch (Exception ex) {
@@ -409,10 +433,27 @@ public class IDPProxyUtil {
         String realm)
         throws SAML2Exception
     {
+        SPSSOConfigElement spConfig;
+        Map spConfigAttrsMap = null;
         Scoping scoping = authnRequest.getScoping();
+
         if (scoping == null) {
+            //let's check if always IdP proxy and IdP Proxy itself is enabled
+            spConfig = getSPSSOConfigByAuthnRequest(realm, authnRequest);
+            if (spConfig != null) {
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spConfig);
+                Boolean alwaysEnabled = SPSSOFederate.getAttrValueFromMap(
+                        spConfigAttrsMap, SAML2Constants.ALWAYS_IDP_PROXY);
+                Boolean proxyEnabled = SPSSOFederate.getAttrValueFromMap(
+                        spConfigAttrsMap, SAML2Constants.ENABLE_IDP_PROXY);
+                if (alwaysEnabled != null && alwaysEnabled
+                        && proxyEnabled != null && proxyEnabled) {
+                    return true;
+                }
+            }
             return false;
-        }    
+        }
+
         Integer proxyCountInt = scoping.getProxyCount(); 
         int proxyCount = 0; 
         if (proxyCountInt == null) {
@@ -425,10 +466,9 @@ public class IDPProxyUtil {
         if (proxyCount <= 0) {
             return false;
         }
-        SPSSOConfigElement spConfig =
+        spConfig =
             IDPSSOUtil.metaManager.getSPSSOConfig(realm, 
             authnRequest.getIssuer().getValue());
-        Map spConfigAttrsMap = null; 
         if (spConfig != null) {
             spConfigAttrsMap = SAML2MetaUtils.getAttributes(spConfig);
         } 
@@ -1058,7 +1098,7 @@ public class IDPProxyUtil {
         try {
             idpProxyFinderName = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
                 realm, idpEntityID, SAML2Constants.PROXY_IDP_FINDER_CLASS);
-            if (idpProxyFinderName == null) {
+            if (idpProxyFinderName == null || idpProxyFinderName.isEmpty()) {
                 idpProxyFinderName =
                     SAML2Constants.DEFAULT_IDP_PROXY_FINDER;
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -1087,5 +1127,11 @@ public class IDPProxyUtil {
         }
 
         return idpProxyFinder;
+    }
+
+    private static SPSSOConfigElement getSPSSOConfigByAuthnRequest(
+            String realm, AuthnRequest request) throws SAML2MetaException {
+        return IDPSSOUtil.metaManager.getSPSSOConfig(
+                realm, request.getIssuer().getValue());
     }
 }
