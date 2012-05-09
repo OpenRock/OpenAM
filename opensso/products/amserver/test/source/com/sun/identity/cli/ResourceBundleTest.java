@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.cli;
 
 import com.iplanet.sso.SSOException;
@@ -161,6 +164,10 @@ public class ResourceBundleTest extends TestBase{
             assert (res.getLocale() == null);
         } catch (MissingResourceException e) {
             //Ignored
+        }
+        if (!locale.isEmpty()) {
+            //clean up the default resourcebundle too, after removing the JP version
+            removeResourceBundle(bundleName, "");
         }
         exiting("removeResourceBundle");
     }

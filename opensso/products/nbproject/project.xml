@@ -27,7 +27,7 @@
 
 -->
 <!--
-    "Portions Copyrighted [2010-2012] [ForgeRock AS]"                                
+    Portions Copyrighted 2010-2012 ForgeRock Inc
 -->
 <project xmlns="http://www.netbeans.org/ns/project/1">
     <type>org.netbeans.modules.ant.freeform</type>
@@ -49,6 +49,12 @@
                     <label>amserver/source</label>
                     <type>java</type>
                     <location>amserver/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>amserver/test/source</label>
+                    <type>java</type>
+                    <location>amserver/test/source</location>
                     <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
@@ -107,6 +113,10 @@
                         <location>amserver/source</location>
                     </source-folder>
                     <source-folder style="packages">
+                        <label>amserver/test/source</label>
+                        <location>amserver/test/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
                         <label>federation/library/source</label>
                         <location>federation/library/source</location>
                     </source-folder>
@@ -150,6 +160,12 @@
                 <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDJ.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/publicsuffix-1.0.1.jar:extlib/geoip-1.2.5.jar:extlib/opendj-ldap-sdk-3.0.0-M1.jar</classpath>
                 <built-to>amserver/built/classes</built-to>
                 <built-to>amserver/built/dist/amserver.jar</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>amserver/test/source</package-root>
+                <unit-tests/>
+                <classpath mode="compile">extlib/j2ee.jar:extlib/testng-5.9-jdk15.jar</classpath>
                 <source-level>1.6</source-level>
             </compilation-unit>
             <compilation-unit>

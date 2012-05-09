@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.idm;
 
 import com.iplanet.sso.SSOException;
@@ -36,10 +39,10 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.test.common.FileHelper;
 import com.sun.identity.test.common.TestBase;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -113,7 +116,9 @@ public class AMIdentityTestBase extends TestBase {
                 amidRealm = "/" + amidRealm;
             }
             assert amidRealm.equals(parentRealm);
-            assert amid.isActive();
+            if (type.equals(IdType.AGENT) || type.equals(IdType.USER)) {
+                assert amid.isActive();
+            }
             assert amid.isExists();
         } catch (Exception e) {
             log(Level.SEVERE, "setup", e.getMessage(), params);
@@ -146,36 +151,35 @@ public class AMIdentityTestBase extends TestBase {
             
             AMIdentity amid = getIdentity(parentRealm,
                 IdUtils.getType(idType), entityName);
-            Set assignableServices = amid.getAssignableServices();
-
+            Set<String> assignableServices = new HashSet<String>(amid.getAssignableServices());
+            Set<String> originallyAssignedServices = (Set<String>) amid.getAssignedServices();
             if (!assignableServices.isEmpty()) {
-                for (Iterator i = assignableServices.iterator(); i.hasNext(); ){
-                    amid.assignService((String)i.next(), Collections.EMPTY_MAP);
+                for (String service : assignableServices) {
+                    amid.assignService(service, Collections.EMPTY_MAP);
                 }
-                Set temp = amid.getAssignableServices();
+                Set<String> temp = amid.getAssignableServices();
                 assert temp.isEmpty();
                 temp = amid.getAssignedServices();
+                assignableServices.addAll(originallyAssignedServices);
                 assert temp.equals(assignableServices);
-
-                for (Iterator i = assignableServices.iterator(); i.hasNext(); ){
-                    amid.unassignService((String)i.next());
+                for (String service : assignableServices) {
+                    amid.unassignService(service);
                 }
                 temp = amid.getAssignableServices();
                 assert temp.equals(assignableServices);
+                assert amid.getAssignedServices().isEmpty();
             }
 
             Set<String> serviceNames = CollectionUtils.parseStringToSet(
-                strServiceNames);
+                    strServiceNames);
             if ((serviceNames != null) && !serviceNames.isEmpty()) {
                 String serviceName = serviceNames.iterator().next();
                 amid.assignService(serviceName, Collections.EMPTY_MAP);
                 Map<String, Set<String>> values = 
                     CollectionUtils.parseStringToMap(svcModificationAttrs);
                 amid.modifyService(serviceName, values);
-                Map verification = amid.getServiceAttributes(serviceName);
-                for (Iterator i = verification.keySet().iterator(); i.hasNext();
-                ) {
-                    String key = (String)i.next();
+                Map<String, Set<String>> verification = amid.getServiceAttributes(serviceName);
+                for (String key : verification.keySet()) {
                     if (values.keySet().contains(key)) {
                         assert values.get(key).equals(verification.get(key));
                     }
@@ -233,7 +237,7 @@ public class AMIdentityTestBase extends TestBase {
      * Sets and gets binary attributes
      *
      * @throws Exception if cannot access to <code>AMIdentity</code> object.
-     *
+     **/
     @Parameters({"parent-realm", "entity-type", "entity-name",
         "entity-binary-attributes"})
     @Test(groups = {"api", "user-base"})
@@ -255,14 +259,15 @@ public class AMIdentityTestBase extends TestBase {
             map.put("telephonenumber", values);
             values[0] = content;
             amid.setBinaryAttributes(map);
+            amid.store();
             
             Set<String> set = new HashSet<String>();
             set.add("telephonenumber");
             Map verify = amid.getBinaryAttributes(set);
+            assert !verify.values().isEmpty();
+            byte[][] verifyArr = (byte[][]) verify.values().iterator().next();
 
-            //TOFIX: verify is empty.
-
-            assert verify.equals(map);
+            assert Arrays.deepEquals(values, verifyArr);
          } catch (Exception e) {
             log(Level.SEVERE, "setGetBinaryAttributes", 
                 e.getMessage(), params);
@@ -271,7 +276,7 @@ public class AMIdentityTestBase extends TestBase {
         }
        
         exiting("setGetBinaryAttributes");
-    } */
+    }
         
     /**
      * Passes an null (Map) to the modify attribute API.
@@ -303,6 +308,32 @@ public class AMIdentityTestBase extends TestBase {
         exiting("modifyWithNullValues");
     }
 
+    @Parameters({"parent-realm", "entity-type", "entity-name"})
+    @Test(groups = {"api", "memberships"}, expectedExceptions = {IdRepoException.class})
+    public void assignMemberTwice(String parentRealm, String idType, String entityName) throws IdRepoException, SSOException {
+        Object[] params = {parentRealm, idType, entityName};
+        entering("assignMemberTwice", params);
+        try {
+            AMIdentity amid1 = createDummyUser(parentRealm, entityName, "1");
+            AMIdentity amid = getIdentity(parentRealm,
+                    IdUtils.getType(idType), entityName);
+
+            amid.addMember(amid1);
+            assert amid1.isMember(amid);
+            // add twice
+            amid.addMember(amid1);
+
+        } catch (SSOException e) {
+            log(Level.SEVERE, "assignMemberTwice", e.getMessage(),
+                    params);
+            e.printStackTrace();
+            throw e;
+        } finally {
+            deleteIdentity(parentRealm, IdType.USER, entityName + "1");
+        }
+        exiting("assignMemberTwice");
+    }
+
     /**
      * Adds and removes members from the <code>AMIdentity</code> object.
      *
@@ -325,8 +356,6 @@ public class AMIdentityTestBase extends TestBase {
             AMIdentity amid = getIdentity(parentRealm,
                 IdUtils.getType(idType), entityName);
             
-            amid.addMember(amid1);
-            // add twice
             amid.addMember(amid1);
 
             assert amid1.isMember(amid);
@@ -411,15 +440,15 @@ public class AMIdentityTestBase extends TestBase {
      */
     @Parameters({"parent-realm", "entity-type", "entity-name",
         "entity-creation-attributes"})
-    @Test(groups = {"api"}, expectedExceptions={IdRepoException.class})
-    public void createIdenityWithLongName(
-        String parentRealm,
-        String idType,
-        String entityName,
-        String createAttributes
+    @Test(groups = {"api"})
+    public void createIdentityWithLongName(
+            String parentRealm,
+            String idType,
+            String entityName,
+            String createAttributes
     ) throws IdRepoException, SSOException {
         Object[] params = {parentRealm, idType, entityName, createAttributes};
-        entering("createIdenityWithLongName", params);
+        entering("createIdentityWithLongName", params);
         try {
             
             String name = entityName;
@@ -429,14 +458,15 @@ public class AMIdentityTestBase extends TestBase {
             IdType type = IdUtils.getType(idType);
             Map values = CollectionUtils.parseStringToMap(createAttributes);
             createIdentity(parentRealm, type, name, values);
+            deleteIdentity(parentRealm, type, name);
         } catch (SSOException e) {
-            log(Level.SEVERE, "createIdenityWithLongName", e.getMessage(), 
+            log(Level.SEVERE, "createIdentityWithLongName", e.getMessage(),
                 params);
             e.printStackTrace();
             throw e;
         }
         
-        exiting("createIdenityWithLongName");
+        exiting("createIdentityWithLongName");
     }
 
 
@@ -551,7 +581,6 @@ public class AMIdentityTestBase extends TestBase {
      * Tests <code>isExists</code> method.
      *
      * @throws Exception if cannot access to <code>AMIdentity</code> object.
-     * TOFIX: Delete an entity but the entity still exist. Check with SDK team
      */
     @Parameters({"parent-realm", "entity-type", "entity-name", 
         "entity-creation-attributes"})
@@ -569,12 +598,15 @@ public class AMIdentityTestBase extends TestBase {
             IdType type = IdUtils.getType(idType);
             AMIdentity a = createIdentity(parentRealm, type, entityName +
                 "exist", values);
-            deleteIdentity(parentRealm, type, entityName + "exist");
+            assert a.isExists();
             AMIdentityRepository repo = new AMIdentityRepository(
                 getAdminSSOToken(), parentRealm);
             IdSearchResults results = repo.searchIdentities(type,
                 entityName + "exist", new IdSearchControl());
             Set resultSets = results.getSearchResults();
+            assert resultSets.size() == 1;
+            deleteIdentity(parentRealm, type, entityName + "exist");
+            resultSets = repo.searchIdentities(type, entityName + "exist", new IdSearchControl()).getSearchResults();
             assert resultSets.isEmpty();
         } catch (Exception e) {
             log(Level.SEVERE, "verifyExistence", e.getMessage(), params);
@@ -700,7 +732,7 @@ public class AMIdentityTestBase extends TestBase {
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
         CollectionUtils.putSetIntoMap("sn", map, "sn" + suffix);
         CollectionUtils.putSetIntoMap("cn", map, "cn" + suffix);
-        CollectionUtils.putSetIntoMap("userpassword", map, suffix);
+        CollectionUtils.putSetIntoMap("userpassword", map, "password" + suffix);
         CollectionUtils.putSetIntoMap("inetuserstatus", map, "Active");
         return createIdentity(parentRealm, IdType.USER, entityName + suffix, 
             map);
@@ -724,7 +756,7 @@ public class AMIdentityTestBase extends TestBase {
                 ssoToken, parentRealm);
             int idx = realm.lastIndexOf("/");
             try {
-                orgMgr.createSubOrganization(realm.substring(idx+1), null);
+                orgMgr.createSubOrganization(realm.substring(idx + 1), null);
             } catch (SMSException e) {
                 //ignore if the sub organization already exists.
             }

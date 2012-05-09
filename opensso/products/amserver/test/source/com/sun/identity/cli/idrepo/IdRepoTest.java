@@ -217,29 +217,30 @@ public class IdRepoTest extends TestBase{
         exiting("getAttributes");
     }
 
-    @Parameters ({"realm", "uid"})
-    @Test(groups = {"cli-idrepo", "show-identity-svcs"},
-        dependsOnMethods = {"createIdentity"})
-    public void getServices(String realm, String uid)
-        throws CLIException {
-        String[] param = {realm, uid};
-        entering("getServices", param);
-        String[] args = {
-            "show-identity-svcs",
-            CLIConstants.PREFIX_ARGUMENT_LONG +
-                IdentityCommand.ARGUMENT_ID_TYPE,
-            "User",
-            CLIConstants.PREFIX_ARGUMENT_LONG +
-                IdentityCommand.ARGUMENT_ID_NAME,
-            uid,
-            CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
-            realm};
-
-        CLIRequest req = new CLIRequest(null, args, getAdminSSOToken());
-        cmdManager.addToRequestQueue(req);
-        cmdManager.serviceRequestQueue();
-        exiting("getServices");
-    }
+//    Duplicate of getIdentityServices?
+//    @Parameters ({"realm", "uid"})
+//    @Test(groups = {"cli-idrepo", "get-identity-svcs"},
+//        dependsOnMethods = {"createIdentity"})
+//    public void getServices(String realm, String uid)
+//        throws CLIException {
+//        String[] param = {realm, uid};
+//        entering("getServices", param);
+//        String[] args = {
+//            "get-identity-svcs",
+//            CLIConstants.PREFIX_ARGUMENT_LONG +
+//                IdentityCommand.ARGUMENT_ID_TYPE,
+//            "User",
+//            CLIConstants.PREFIX_ARGUMENT_LONG +
+//                IdentityCommand.ARGUMENT_ID_NAME,
+//            uid,
+//            CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
+//            realm};
+//
+//        CLIRequest req = new CLIRequest(null, args, getAdminSSOToken());
+//        cmdManager.addToRequestQueue(req);
+//        cmdManager.serviceRequestQueue();
+//        exiting("getServices");
+//    }
     
     @Parameters ({"realm", "uid"})
     @Test(groups = {"cli-idrepo", "list-identity-assignable-svcs"},
@@ -435,14 +436,14 @@ public class IdRepoTest extends TestBase{
     }
  
     @Parameters ({"realm", "uid"})
-    @Test(groups = {"cli-idrepo", "show-identity-svcs"},
+    @Test(groups = {"cli-idrepo", "get-identity-svcs"},
         dependsOnMethods = {"createIdentity"})
     public void getIdentityServices(String realm, String uid)
         throws CLIException {
         String[] param = {realm, uid};
         entering("getIdentityServices", param);
         String[] args = {
-            "show-identity-svcs",
+            "get-identity-svcs",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
             "User",

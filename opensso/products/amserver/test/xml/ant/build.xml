@@ -25,10 +25,13 @@
    $Id: build.xml,v 1.13 2008/11/20 17:53:01 veiming Exp $
 
 -->
+<!--
+   Portions Copyrighted 2012 ForgeRock Inc
+-->
+<project name="openam" default="all">
+    <description>OpenAM - AM Server Unit Tests</description>
 
-<project name="opensso" default="all">
-    <description>Open Web Single Sign-On - test</description>
-
+    <taskdef resource="testngtasks" classpath="lib/testng-5.9-jdk15.jar"/>
     <property name="classes.dir" location="classes"/>
     <property name="test.classes.dir" location="test/classes"/>
     <property name="lib.dir" location="lib"/>
@@ -49,13 +52,23 @@
     </path>
 
     <target name="all">
+        <condition property="debug" value="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9009 -Xnoagent">
+            <isset property="debugTest" />
+        </condition>
+        <property name="debug" value="" />
         <delete dir="${output.dir}" />
         <mkdir dir="${output.dir}" />
         <delete dir="${logs.dir}" />
         <mkdir dir="${logs.dir}" />
 
-
-        <java classname="org.testng.TestNG" fork="true">
+    <testng outputdir="${output.dir}" dumpCommand="true" classpathref="build.class.path">
+        <xmlfileset dir="${testng.dir}" includes="*" />
+        <jvmarg value="-ea" />
+        <jvmarg line="${debug}" />
+        <sysproperty key="bootstrap.dir" value="${bootstrap.dir}" />
+        <sysproperty key="log.level" value="${log.level}" />
+    </testng>
+<!--        <java classname="org.testng.TestNG" fork="true">
             <jvmarg value="-Dbootstrap.dir=${bootstrap.dir}" />
             <jvmarg value="-Dlog.level=${log.level}"/>
             <jvmarg value="-ea"/>
@@ -67,7 +80,7 @@
 	    <arg value="${testng.dir}/log-testng.xml"/>
 	    <arg value="${testng.dir}/policy-testng.xml"/>
             <classpath refid="build.class.path"/>
-        </java>
+        </java-->
 
         <antcall target="report" />
     </target>

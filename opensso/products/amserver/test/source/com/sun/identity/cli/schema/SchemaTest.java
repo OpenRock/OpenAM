@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.cli.schema;
 
 import com.iplanet.sso.SSOException;
@@ -42,6 +45,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.test.common.TestBase;
@@ -97,9 +101,7 @@ public class SchemaTest extends TestBase {
 
             try {
                 createServices(list);
-                ServiceSchemaManager mgr = new ServiceSchemaManager(
-                    TEST_SERVICE, getAdminSSOToken());
-                assert (mgr != null);
+                assert serviceExists(TEST_SERVICE);
                 exiting("loadSchema");
             } catch (CLIException e) {
                 this.log(Level.SEVERE, "loadSchema", e.getMessage());
@@ -115,10 +117,7 @@ public class SchemaTest extends TestBase {
     }
 
     @AfterTest(groups = {"schema", "subschema"})
-    public void deleteService() {
-    /* Issue 76
-        throws CLIException, SMSException, SSOException {
-
+    public void deleteService() throws Exception {
         entering("deleteService", null);
         List<String> serviceNames = new ArrayList<String>();
         serviceNames.add(TEST_SERVICE);
@@ -126,15 +125,13 @@ public class SchemaTest extends TestBase {
 
         try {
             cmdManager.serviceRequestQueue();
-            ServiceSchemaManager mgr = new ServiceSchemaManager(
-            TEST_SERVICE, getAdminSSOToken());
-            assert (mgr == null);
+            assert !serviceExists(TEST_SERVICE);
         } catch (Exception e) {
             this.log(Level.SEVERE, "deleteService", e.getMessage());
             throw e;
         } finally {
             exiting("deleteService");
-        }            */
+        }
     }
 
     
@@ -151,11 +148,9 @@ public class SchemaTest extends TestBase {
             createServices(list);
             ServiceSchemaManager mgr = new ServiceSchemaManager(
                 "TestService1", getAdminSSOToken());
-            assert (mgr != null);
-            mgr = new ServiceSchemaManager("TestService2", getAdminSSOToken());
-            assert (mgr != null);
-            mgr = new ServiceSchemaManager("TestService3", getAdminSSOToken());
-            assert (mgr != null);
+            assert serviceExists("TestService1");
+            assert serviceExists("TestService2");
+            assert serviceExists("TestService3");
             exiting("loadMultipleServices");
         } catch (CLIException e) {
             this.log(Level.SEVERE, "loadMultipleServices", e.getMessage());
@@ -169,12 +164,10 @@ public class SchemaTest extends TestBase {
         }
     }
 
-    @Test(groups = {"schema", "delete-svc", "issue76"},
+    @Test(groups = {"schema", "delete-svc"},
         dependsOnMethods = {"loadMultipleServices"}
     )
-    public void deleteMultipleServices() {
-    /* Issue 76
-        throws CLIException, SMSException, SSOException {
+    public void deleteMultipleServices() throws Exception {
         entering("deleteMultipleServices", null);
         List<String> list = new ArrayList<String>();
         list.add("TestService1");
@@ -183,19 +176,16 @@ public class SchemaTest extends TestBase {
 
         try {
             deleteServices(list);
-            ServiceSchemaManager mgr = new ServiceSchemaManager(
-                "TestService1", getAdminSSOToken());
-            assert (mgr == null);
-            mgr = new ServiceSchemaManager("TestService2", getAdminSSOToken());
-            assert (mgr == null);
-            mgr = new ServiceSchemaManager("TestService3", getAdminSSOToken());
-            assert (mgr == null);
+
+            assert !serviceExists("TestService1");
+            assert !serviceExists("TestService2");
+            assert !serviceExists("TestService3");
         } catch (Exception e) {
             this.log(Level.SEVERE, "deleteMultipleServices", e.getMessage());
             throw e;
         } finally {
             exiting("deleteMultipleServices");
-        }*/
+        }
     }
 
     @Test(groups = {"schema", "set-inheritance"})
@@ -490,9 +480,7 @@ public class SchemaTest extends TestBase {
         
         try {
             cmdManager.serviceRequestQueue();
-            ServiceSchemaManager mgr = new ServiceSchemaManager(
-                TEST_SERVICE, getAdminSSOToken());
-            assert (mgr != null);
+            assert serviceExists(TEST_SERVICE);
             exiting("updateService");
         } catch (CLIException e) {
             this.log(Level.SEVERE, "updateService", e.getMessage());
@@ -713,7 +701,7 @@ public class SchemaTest extends TestBase {
     @Parameters({"subschema"})
     @Test(groups = {"schema", "add-attribute-default-values", "attribute-schema-ops",
         "subschema"},
-        dependsOnMethods = {"addAttributeDefaultValues"}
+        dependsOnMethods = {"showAttributeDefaultValues"}
     )
     public void deleteAttributeDefaultValues(String subschema) 
         throws CLIException, SMSException, SSOException {
@@ -773,10 +761,10 @@ public class SchemaTest extends TestBase {
         }
         AttributeSchema as = serviceSchema.getAttributeSchema("mock-add");
         as.addChoiceValue("testx", "testx");
-        as.addChoiceValue("testy", "testy");
+        //as.addChoiceValue("testy", "testy");
         
         String[] args = (subschema.length() == 0) 
-            ? new String[8] : new String[10];
+            ? new String[7] : new String[9];
         args[0] = "set-attr-defs";
         args[1] = CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SERVICE_NAME;
         args[2] = TEST_SERVICE;
@@ -784,12 +772,12 @@ public class SchemaTest extends TestBase {
         args[4] = "global";
         args[5] = CLIConstants.PREFIX_ARGUMENT_LONG +IArgument.ATTRIBUTE_VALUES;
         args[6] = "mock-add=testx";
-        args[7] = "mock-add=testy";
+        //args[7] = "mock-add=testy";
 
         if (subschema.length() > 0) {
-            args[8] = CLIConstants.PREFIX_ARGUMENT_LONG +
+            args[7] = CLIConstants.PREFIX_ARGUMENT_LONG +
                 IArgument.SUBSCHEMA_NAME;
-            args[9] = subschema;
+            args[8] = subschema;
         }
 
         CLIRequest req = new CLIRequest(null, args, adminSSOToken);
@@ -803,9 +791,9 @@ public class SchemaTest extends TestBase {
             
         as = serviceSchema.getAttributeSchema("mock-add");
         Set defaultValues = as.getDefaultValues();
-        assert (defaultValues.size() == 2);
+        assert (defaultValues.size() == 1);
         assert (defaultValues.contains("testx"));
-        assert (defaultValues.contains("testy"));
+        //assert (defaultValues.contains("testy"));
         exiting("setAttributeDefaults");
     }
     
@@ -1582,7 +1570,7 @@ public class SchemaTest extends TestBase {
         String[] args = (subschema.length() == 0)
             ? new String[7] : new String[9];
 
-        args[0] = "show-attr-defs";
+        args[0] = "get-attr-defs";
         args[1] = CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SERVICE_NAME;
         args[2] = TEST_SERVICE;
         args[3] = CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SCHEMA_TYPE;
@@ -1681,9 +1669,7 @@ public class SchemaTest extends TestBase {
         cmdManager.serviceRequestQueue();
     }
 
-    private void deleteServices(List<String> serviceNames) 
-        throws CLIException {
-        /* Issue 76
+    private void deleteServices(List<String> serviceNames) throws CLIException {
         String[] args = new String[serviceNames.size() +2];
         args[0] = "delete-svc";
         args[1] = CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SERVICE_NAME;
@@ -1694,6 +1680,14 @@ public class SchemaTest extends TestBase {
         CLIRequest req = new CLIRequest(null, args, getAdminSSOToken());
         cmdManager.addToRequestQueue(req);
         cmdManager.serviceRequestQueue();
-        */
+    }
+
+    private boolean serviceExists(String serviceName) throws SMSException, SSOException {
+        try {
+            ServiceSchemaManager mgr = new ServiceSchemaManager(serviceName, getAdminSSOToken());
+            return true;
+        } catch (ServiceNotFoundException snfe) {
+            return false;
+        }
     }
 }

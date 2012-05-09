@@ -1,4 +1,4 @@
-<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -27,9 +27,11 @@
    $Id: cli-testng.xml,v 1.7 2008/06/25 05:44:24 qcheng Exp $
  
 -->
+<!--
+   Portions Copyrighted 2012 ForgeRock Inc
+-->
 
-
-<suite name="OpenSSO_CLI" verbose="1">
+<suite name="OpenAM_CLI" verbose="1">
     <test name="CLI Framework">
         <groups>
             <run>
@@ -111,7 +113,7 @@
     <test name="CLI IdRepo">
         <parameter name="realm" value="/" />
         <parameter name="uid" value="devtestidrepo" />
-        <parameter name="attrs" value="sn=Test cn=Dev userpassword=x inetuserstatus=Active" />
+        <parameter name="attrs" value="sn=Test cn=Dev userpassword=passwordx inetuserstatus=Active" />
         <groups>
             <run>
                 <include name="cli-idrepo" />

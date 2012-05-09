@@ -26,7 +26,7 @@
 
 -->
 <!--
-   "Portions Copyrighted 2010-2011 ForgeRock AS"
+   Portions Copyrighted 2010-2012 ForgeRock Inc
 -->
 
 <project name="opensso" default="usage">
@@ -423,6 +423,11 @@
         </javac>
         <property name="amserver.xacml.done" value="true" />
         <concat destfile="${tracker}" append="true">amserver.xacml.done=true&#10;</concat>
+    </target>
+
+    <target name="test" depends="build">
+        <ant antfile="${sharedlib.dir}/build.xml" inheritRefs="true" target="test" />
+        <ant antfile="${amserver.unittest.dir}/build.xml" inheritRefs="true" target="all" />
     </target>
 
     <target name="usage">

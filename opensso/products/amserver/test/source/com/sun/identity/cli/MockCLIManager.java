@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.cli;
 
 /**
@@ -33,7 +36,7 @@ package com.sun.identity.cli;
  */
 public class MockCLIManager extends CLIDefinitionBase {
     private static String DEFINITION_CLASS =
-        "com.sun.identity.cli.defintion.MockCLI";
+        "com.sun.identity.cli.definition.MockCLI";
 
     /**
      * Constructs an instance of this class.

@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.cli.realm;
 
 import com.iplanet.sso.SSOException;
@@ -249,7 +252,7 @@ public class RealmTest extends TestBase{
         String[] args = {
             "delete-realm-attr",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
-            "/",
+            realm,
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SERVICE_NAME,
             "sunIdentityRepositoryService",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.ATTRIBUTE_NAME,
@@ -345,7 +348,7 @@ public class RealmTest extends TestBase{
         String[] param = {realm};
         entering("getServiceAttribute", param);
         String[] args = {
-            "show-realm-svc-attrs",
+            "get-realm-svc-attrs",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
             realm,
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SERVICE_NAME,
@@ -408,7 +411,7 @@ public class RealmTest extends TestBase{
         String[] param = {realm};
         entering("addRealmAttribute", param);
         String[] args = {
-            "add-realm-attrs",
+            "set-realm-attrs",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
             realm,
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.SERVICE_NAME,

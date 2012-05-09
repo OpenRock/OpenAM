@@ -26,7 +26,7 @@
 
 -->
 <!--
-   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+   Portions Copyrighted 2010-2012 ForgeRock Inc
 -->
 
 <project name="opensso shared library" default="all">
@@ -93,6 +93,14 @@
         </javac>
     </target>
 
+    <target name="test">
+        <javac destdir="${sharedlib.classes.dir}" fork="true" source="${target.jdk.set}" target="${target.jdk.set}" debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${sharedlib.src.dir}" />
+            <compilerarg value="-Xlint:none" />
+            <classpath refid="build.class.path" />
+            <include name="**/com/sun/identity/shared/test/**" />
+        </javac>
+    </target>
     <target name="preparebuild">
         <mkdir dir="${sharedlib.built.dir}"/>
         <mkdir dir="${sharedlib.classes.dir}"/>

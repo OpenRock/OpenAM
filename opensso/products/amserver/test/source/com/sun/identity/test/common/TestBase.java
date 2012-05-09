@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.test.common;
 
 import com.iplanet.services.util.Crypt;
@@ -38,7 +41,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * This class is the base for all <code>OpenSSO</code> unit testcases.
+ * This class is the base for all <code>OpenAM</code> unit testcases.
  * It has commonly used methods; and hopefully we can grow this class
  * to support more methods in future.
  */
@@ -71,8 +74,7 @@ public abstract class TestBase extends UnitTestBase {
      * @return super administrator single sign on token.
      */
     protected SSOToken getAdminSSOToken() {
-        AdminTokenAction action = AdminTokenAction.getInstance();
-        return (SSOToken)AccessController.doPrivileged(
-            (PrivilegedAction<AdminTokenAction>)action);
+        return AccessController.doPrivileged(
+            AdminTokenAction.getInstance());
     }
 }
