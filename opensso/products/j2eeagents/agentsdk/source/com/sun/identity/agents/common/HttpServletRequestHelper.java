@@ -25,7 +25,9 @@
  * $Id: HttpServletRequestHelper.java,v 1.3 2009/01/21 19:00:04 kanduls Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.common;
 
 
@@ -134,32 +136,30 @@ public class HttpServletRequestHelper extends SurrogateBase
 
     public long getDateHeader(String name, long innerValue) {
         long result = -1L;
-        String headerValue = getHeader(name, String.valueOf(innerValue));
-        if (headerValue != null && headerValue.trim().length() > 0) {
-            int index = headerValue.indexOf(";");
-            String dateString = null;
-            if(index == -1) {
-                dateString = headerValue;
-            } else {
-                dateString = headerValue.substring(0, index);
-            }
-            
-            try {
-                SimpleDateFormat sdf =
-                    new SimpleDateFormat(getDateFormatString());
+        String headerValue = null;
+        if (getUserAttributes().containsKey(name)) {
+            Set<String> values = (Set<String>) getUserAttributes().get(name);
+            if (values != null && !values.isEmpty()) {
+                headerValue = values.iterator().next();
+                if (headerValue != null && headerValue.trim().length() > 0) {
+                    try {
+                        SimpleDateFormat sdf =
+                                new SimpleDateFormat(getDateFormatString());
 
-                result = sdf.parse(dateString).getTime();
-            } catch(Exception ex) {
-                throw new IllegalArgumentException("Invalid date header: "
-                                                   + dateString);
+                        result = sdf.parse(headerValue).getTime();
+                    } catch (Exception ex) {
+                        throw new IllegalArgumentException("Invalid date header: "
+                                + headerValue);
+                    }
+                }
             }
         } else {
             result = innerValue;
         }
-        
-        if(isLogMessageEnabled()) {
+
+        if (isLogMessageEnabled()) {
             logMessage("HttpServletRequestHelper.getDateHeader(" + name
-                       + ") => " + result);
+                    + ") => " + result);
         }
 
         return result;

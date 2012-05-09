@@ -25,6 +25,9 @@
  * $Id: AmJettyAgentServiceResolver.java,v 1.1 2009/01/21 18:39:39 kanduls Exp $
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.jetty.v61;
 
 import com.sun.identity.agents.arch.ServiceResolver;
@@ -65,12 +68,4 @@ public class AmJettyAgentServiceResolver extends ServiceResolver {
     public boolean getRealmMembershipCacheFlag() {
         return true;
     }
-    
-    /* (non-Javadoc)
-     * @see ServiceResolver#getHttpServletRequestHelperImpl()
-     */
-    public String getHttpServletRequestHelperImpl() {
-        return AmJettyServletRequestHelper.class.getName();
-    }
 }
-
