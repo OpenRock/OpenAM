@@ -29,7 +29,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Web Agent Configuration Properties</title>
+ <title>Java EE Agent Configuration Properties</title>
 
  <para>Java EE Agents use the following configuration properties. Bootstrap
  properties are always configured locally, whereas other agent configuration
