@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-core'
@@ -52,6 +52,16 @@
 
  <section xml:id="prepare-prerequisites">
   <title>Preparing Prerequisite Software</title>
+
+  <para>OpenAM requires that you provide the fully-qualified domain name (FQDN)
+  when you configure it. Before you set up OpenAM, be sure that your system
+  has an FQDN such as <literal>openam.example.com</literal>. For evaluation
+  purposes, you can give your system an alias using the
+  <filename>/etc/hosts</filename> file on UNIX systems or
+  <filename>%SystemRoot%\system32\drivers\etc\hosts</filename> on Windows. For
+  deployment, make sure the FQDN is properly assigned for example using
+  DNS.</para>
+
   <indexterm>
    <primary>Software requirements</primary>
   </indexterm>
@@ -59,7 +69,7 @@
    <primary>Memory requirements</primary>
   </indexterm>
   <itemizedlist>
-   <para>OpenAM core services require the following prerequisite
+   <para>OpenAM core services also require the following prerequisite
    software installed before you begin OpenAM installation.</para>
    <listitem>
     <para>A Java 6 runtime environment</para>
@@ -89,7 +99,8 @@ Java HotSpot(TM) 64-Bit Server VM (build 20.4-b02-402, mixed mode)</screen>
     Tomcat is installed on <literal>openam.example.com</literal>, and listens
     on the default ports, with no Java Security Manager enabled. The script
     <filename>/etc/init.d/tomcat</filename> manages the service at system
-    startup and shutdown.</para>
+    startup and shutdown. This script assumes you run OpenAM as the user
+    <literal>openam</literal>.</para>
     
     <programlisting language="shell">#!/bin/sh
 #
@@ -106,11 +117,11 @@ export JAVA_OPTS
 
 case "${1}" in
 start)
-  /bin/su mark -c "${CATALINA_HOME}/bin/startup.sh"
+  /bin/su openam -c "${CATALINA_HOME}/bin/startup.sh"
   exit ${?}
   ;;
 stop)
-  /bin/su mark -c "${CATALINA_HOME}/bin/shutdown.sh"
+  /bin/su openam -c "${CATALINA_HOME}/bin/shutdown.sh"
   exit ${?}
   ;;
 *)
@@ -142,7 +153,8 @@ esac
     </itemizedlist>
     <para>The script <filename>/etc/init.d/opendj</filename>, created with the
     OpenDJ <command>create-rc-script</command> command, manages the service
-    at system startup and shutdown.</para>
+    at system startup and shutdown. This script assumes you run OpenDJ as the
+    user <literal>opendj</literal>.</para>
     
     <programlisting language="shell">#!/bin/sh
 #...
@@ -159,15 +171,15 @@ cd ${INSTALL_ROOT}
 # Determine what action should be performed on the server
 case "${1}" in
 start)
-  /bin/su mark -c "${INSTALL_ROOT}/bin/start-ds --quiet"
+  /bin/su opendj -c "${INSTALL_ROOT}/bin/start-ds --quiet"
   exit ${?}
   ;;
 stop)
-  /bin/su mark -c "${INSTALL_ROOT}/bin/stop-ds --quiet"
+  /bin/su opendj -c "${INSTALL_ROOT}/bin/stop-ds --quiet"
   exit ${?}
   ;;
 restart)
-  /bin/su mark -c "${INSTALL_ROOT}/bin/stop-ds --restart --quiet"
+  /bin/su opendj -c "${INSTALL_ROOT}/bin/stop-ds --restart --quiet"
   exit ${?}
   ;;
 *)
@@ -266,6 +278,7 @@ esac
   <para>The <filename>deployable-war/opensso.war</filename> file contains all
   OpenAM server components and samples. How you deploy the .war file depends
   on your web application container.</para>
+
   <procedure xml:id="deploy-openam-on-tomcat">
    <title>To Deploy OpenAM on Tomcat</title>
    <step>
@@ -458,7 +471,10 @@ Using CLASSPATH:
     providing the URL to reach an existing OpenAM instance.</para>
     <para>Alternatively, if you already manage an OpenDJ or DSEE deployment,
     you can choose to store OpenAM configuration data in your existing
-    directory service.</para>
+    directory service. You must, however, create the suffix to store
+    configuration data on the directory server before you configure
+    OpenAM. OpenAM does not create the suffix when you use an external
+    configuration store.</para>
    </step>
    <step>
     <para>In the User Store screen, you configure where OpenAM looks for
