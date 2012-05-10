@@ -25,8 +25,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.agents.filter;
 
@@ -144,9 +144,7 @@ implements ICDSSOResultTaskHandler {
         }
         // Remove the temporary CDSSO Cookie
         response.addCookie(getCDSSOContext().getRemoveCDSSOCookie());
-        AmFilterResult result = new AmFilterResult(
-            AmFilterResultStatus.STATUS_REDIRECT,
-            cdssoTokens[CDSSOContext.INDEX_REQUESTED_URL]);
+        AmFilterResult result = getRedirectResult(cxt, cdssoTokens);
 
         return result;
     }
@@ -187,8 +185,7 @@ implements ICDSSOResultTaskHandler {
 
             // Remove the temporary CDSSO Cookie
             response.addCookie(cdssoContext.getRemoveCDSSOCookie());
-            result = new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT,
-                cdssoTokens[CDSSOContext.INDEX_REQUESTED_URL]);
+            result = getRedirectResult(cxt, cdssoTokens);
         } catch (AgentException ae) {
             logError("CDSSOResultTaskHandler : One or more AuthnResponse "
                    + "conditions might not have been met. Denying "
@@ -201,5 +198,15 @@ implements ICDSSOResultTaskHandler {
 
     protected ICDSSOContext getCDSSOContext() {
         return (ICDSSOContext) getSSOContext();
+    }
+
+    private AmFilterResult getRedirectResult(AmFilterRequestContext ctx, String[] cdssoTokens) {
+        HttpServletRequest request = ctx.getHttpServletRequest();
+        String gotoURL = request.getParameter(ctx.getGotoParameterName());
+        if (gotoURL == null || gotoURL.trim().length() == 0) {
+            gotoURL = cdssoTokens[CDSSOContext.INDEX_REQUESTED_URL];
+        }
+
+        return new AmFilterResult(AmFilterResultStatus.STATUS_REDIRECT, gotoURL);
     }
 }

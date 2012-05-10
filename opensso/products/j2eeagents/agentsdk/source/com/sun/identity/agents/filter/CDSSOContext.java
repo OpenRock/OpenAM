@@ -103,7 +103,8 @@ public class CDSSOContext extends SSOContext implements ICDSSOContext {
         buff.append(cxt.getGotoParameterName());
         buff.append("=");
         String encodedCDSSORedirectURL = URLEncoder.encode(
-            cxt.getBaseURL() + getCDSSORedirectURI());
+            cxt.getBaseURL() + getCDSSORedirectURI() + "?"
+                + cxt.getGotoParameterName() + "=" + URLEncoder.encode(cxt.populateGotoParameterValue()));
         buff.append(encodedCDSSORedirectURL);
 
         /* if resource based authN is enabled, append the original
