@@ -73,8 +73,8 @@
  <xinclude:include href='chap-upgrade.xml' />
 
  <xinclude:include href='chap-troubleshooting.xml' />
- <!-- TODO: Add reference for configuration parameters including new parameters
-      mentioned in the What's new section of the release notes -->
 
+ <xinclude:include href='appendix-web-config-properties.xml' />
+ <xinclude:include href='appendix-jee-config-properties.xml' />
  <index />
 </book>

@@ -1,0 +1,962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012 ForgeRock AS
+  !    
+-->
+<appendix xml:id='appendix-web-config-properties.xml'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Web Agent Configuration Properties</title>
+
+ <para>Web Agents use the following configuration properties. Bootstrap
+ properties are always configured locally, whereas other agent configuration
+ properties are either configured centrally in OpenAM or locally using the
+ agent properties file.</para>
+
+ <section xml:id="web-bootstrap-configuration-properties">
+  <title>Bootstrap Configuration Properties</title>
+
+  <para>These properties are set in
+  <filename>config/OpenSSOAgentBootstrap.properties</filename>.</para>
+
+  <variablelist>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.certdb.password</literal></term>
+    <listitem>
+     <para>When SSL is configured, set this to the password for the certificate
+     database.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.certdb.prefix</literal></term>
+    <listitem>
+     <para>When SSL is configured, set this property if the certificate
+     databases in the directory specified by
+     <literal>com.sun.identity.agents.config.sslcert.dir</literal> have a
+     prefix.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.certificate.alias</literal></term>
+    <listitem>
+     <para>When SSL is configured, set this to the alias of the certificate
+     used to authenticate.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.connect.timeout</literal></term>
+    <listitem>
+     <para>Set this to the number of milliseconds to keep the socket connection
+     open before timing out. The default value is 0 which implies no
+     timeout.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.debug.file</literal></term>
+    <listitem>
+     <para>Set this to the full path of the agent's debug log file.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.debug.level</literal></term>
+    <listitem>
+      <para>Default is <literal>Error</literal>. Increase to
+      <literal>Message</literal> or even <literal>All</literal> for
+      fine-grained detail.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.debug.level</literal></para>
+      <para>Set the level in the configuration file by module using
+      the format <literal><replaceable>module</replaceable>[:<replaceable
+      >level</replaceable>][,<replaceable>module</replaceable>[:<replaceable
+      >level</replaceable>]]*</literal>, where
+      <replaceable>module</replaceable> is one of
+      <literal>AuthService</literal>, <literal>NamingService</literal>,
+      <literal>PolicyService</literal>, <literal>SessionService</literal>,
+      <literal>PolicyEngine</literal>, <literal>ServiceEngine</literal>,
+      <literal>Notification</literal>, <literal>PolicyAgent</literal>,
+      <literal>RemoteLog</literal>, or <literal>all</literal>,
+      and <replaceable>level</replaceable> is one of the following.</para>
+      <itemizedlist>
+       <listitem>
+        <para><literal>0</literal>: Disable logging from specified module</para>
+        <para>At this level the agent nevertheless logs messages having the
+        level value <literal>always</literal>.</para>
+       </listitem>
+       <listitem>
+        <para><literal>1</literal>: Log error messages</para>
+       </listitem>
+       <listitem>
+        <para><literal>2</literal>: Log warning and error messages</para>
+       </listitem>
+       <listitem>
+        <para><literal>3</literal>: Log info, warning, and error messages</para>
+       </listitem>
+       <listitem>
+        <para><literal>4</literal>: Log debug, info, warning, and error messages</para>
+       </listitem>
+       <listitem>
+        <para><literal>5</literal>: Like level 4, but with even more debugging messages</para>
+       </listitem>
+      </itemizedlist>
+      <para>When you omit <replaceable>level</replaceable>, the agent uses the
+      default level, which is the level associated with the
+      <literal>all</literal> module.</para>
+      <para>The following example used in the local configuration sets the
+      log overall level to debug for all messages.</para>
+      <literallayout class="monospaced"
+      >com.sun.identity.agents.config.debug.level=all:4</literallayout>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.forward.proxy.host</literal></term>
+    <listitem>
+     <para>When OpenAM and the agent communicate through a web proxy server
+     configured in forward proxy mode, set this to the proxy server host
+     name.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.forward.proxy.password</literal></term>
+    <listitem>
+     <para>When OpenAM and the agent communicate through a web proxy server
+     configured in forward proxy mode and the proxy server has the agent
+     authenticate using Basic Authentication, set this to the agent's
+     password.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.forward.proxy.port</literal></term>
+    <listitem>
+     <para>When OpenAM and the agent communicate through a web proxy server
+     configured in forward proxy mode, set this to the proxy server port
+     number.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.forward.proxy.user</literal></term>
+    <listitem>
+     <para>When OpenAM and the agent communicate through a web proxy server
+     configured in forward proxy mode and the proxy server has the agent
+     authenticate using Basic Authentication, set this to the agent's
+     user name.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.key</literal></term>
+    <listitem>
+     <para>Set this to the encryption key used to encrypt the agent profile
+     password.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.local.logfile</literal></term>
+    <listitem>
+     <para>Set this to the full path for agent's audit log file.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.naming.url</literal></term>
+    <listitem>
+     <para>Set this to the naming service URL(s) used for naming lookups in
+     OpenAM. Separate multiple URLs with single space characters.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.organization.name</literal></term>
+    <listitem>
+     <para>Set this to the realm name where the agent authenticates to
+     OpenAM.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.password</literal></term>
+    <listitem>
+     <para>Set this to the encrypted version of the password for the agent
+     authenticator. Use the command <command>./agentadmin --encrypt
+     <replaceable>agentInstance</replaceable> <replaceable
+     >passwordFile</replaceable></command> to get the encrypted version.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.profilename</literal></term>
+    <listitem>
+     <para>Set this to the agent profile name.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.receive.timeout</literal></term>
+    <listitem>
+     <para>Set this to the number of milliseconds to wait for a response from
+     OpenAM before timing out and dropping the connection. The default value is
+     0 which implies no timeout.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.sslcert.dir</literal></term>
+    <listitem>
+     <para>When SSL is configured, set this to the directory containing SSL
+     certificate databases.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.tcp.nodelay.enable</literal></term>
+    <listitem>
+     <para>Set to <literal>true</literal> to enable the socket option
+     <literal>TCP_NODELAY</literal>. Default is <literal>false</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.trust.server.certs</literal></term>
+    <listitem>
+     <para>When SSL is configured, set to <literal>false</literal> to trust the
+     OpenAM SSL certificate only if the certificate is found to be correct and
+     valid. Default is <literal>true</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.username</literal></term>
+    <listitem>
+     <para>Set this to the user name of the agent authenticator.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="web-agent-configuration-properties">
+  <title>Agent Configuration Properties</title>
+
+  <para>These properties are set in
+  <filename>config/OpenSSOAgentConfiguration.properties</filename> if your
+  agent uses local configuration. If your agent uses centralized configuration,
+  the properties are set in OpenAM.</para>
+
+  <variablelist>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.access.denied.url</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.agent.logout.url[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.agenturi.prefix</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.anonymous.user.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.anonymous.user.id</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.attribute.multi.value.separator</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.audit.accesstype</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.auth.connection.timeout</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cdsso.cdcservlet.url[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cdsso.cookie.domain[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cdsso.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cleanup.interval</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.client.hostname.header</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.client.ip.header</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.client.ip.validation.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.convert.mbyte.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cookie.name</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cookie.reset.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cookie.reset[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cookie.secure</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.debug.file.rotate</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.debug.file.size</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.debug.level</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.domino.check.name.database</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.domino.ltpa.config.name</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.domino.ltpa.cookie.name</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.domino.ltpa.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.domino.ltpa.org.name</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.encode.cookie.special.chars.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.encode.url.special.chars.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.fetch.from.root.resource</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.fqdn.check.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.fqdn.default</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.fqdn.mapping[]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.get.client.host.name</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.ignore.path.info</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.ignore.path.info.for.not.enforced.list</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.ignore.preferred.naming.url</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.ignore.server.check</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.iis.auth.type</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.iis.filter.priority</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.iis.owa.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.iis.owa.enable.change.protocol</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.iis.owa.enable.session.timeout.url</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.load.balancer.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.local.log.rotate</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.local.log.size</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.locale</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.log.disposition</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.login.url[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.logout.cookie.reset[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.logout.redirect.url</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.logout.url[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.notenforced.ip[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.notenforced.url.attributes.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.notenforced.url.invert</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.notenforced.url[0]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.notification.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.override.host</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.override.notification.url</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.override.port</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.override.protocol</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.policy.cache.polling.interval</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.policy.clock.skew</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.poll.primary.server</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.polling.interval</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postcache.entry.lifetime</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.enable</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.lbcookie</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.profile.attribute.cookie.maxage</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.profile.attribute.cookie.prefix</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.profile.attribute.fetch.mode</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.profile.attribute.mapping[]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.proxy.override.host.port</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.redirect.param</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.remote.log.interval</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.remote.logfile</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.replaypasswd.key</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.response.attribute.fetch.mode</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.response.attribute.mapping[]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.session.attribute.fetch.mode</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.session.attribute.mapping[]</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.sso.cache.polling.interval</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.sso.only</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.url.comparison.case.ignore</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.userid.param</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.userid.param.type</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.client.notification.url</literal></term>
+    <listitem>
+     <para>DESCRIPTION</para>
+     <para>For centralized configuration this property is configured under
+     CONSOLE_LOCATION.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+</appendix>
