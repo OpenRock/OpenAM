@@ -2437,6 +2437,17 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>OpenAM Conditional Login URL (Not yet in OpenAM console)</term>
+     <listitem>
+      <para>The values take the incoming request URL to match and a
+      comma-separated list of URLs to which to redirect incoming users.</para>
+      <para>Property: <literal>com.forgerock.agents.conditional.login.url</literal></para>
+      <para>Example: <literal>com.forgerock.agents.conditional.login.url[0]=
+      login.example.com|http://openam1.example.com/openam/UI/Login,
+      http://openam2.example.com/openam/UI/Login</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>Login URL Prioritized</term>
      <listitem>
       <para>When enabled, OpenAM uses the priority defined in the OpenAM Login
@@ -2473,6 +2484,18 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <literal>http://openam.example.com:8080/openam/UI/Logout</literal>. The
       user is logged out of the OpenAM session when accessing these URLs.</para>
       <para>Property: <literal>com.sun.identity.agents.config.logout.url</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>OpenAM Conditional Logout URL (Not yet in OpenAM console)</term>
+     <listitem>
+      <para>The values take the incoming request URL to match and a
+      comma-separated list of URLs to which to redirect users logging
+      out.</para>
+      <para>Property: <literal>com.forgerock.agents.conditional.logout.url</literal></para>
+      <para>Example: <literal>com.forgerock.agents.conditional.logout.url[0]=
+      logout.example.com|http://openam1.example.com/openam/UI/Logout,
+      http://openam2.example.com/openam/UI/Logout</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
