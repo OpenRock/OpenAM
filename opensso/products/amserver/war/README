@@ -47,8 +47,7 @@ ready for use.
 
 After you have authenticated to the server, you will be brought to an
 administrator console. where you can further configure/administer the
-server.  Refer to
-http://openam.forgerock.org/doc/admin-guide/OpenAM-Admin-Guide.html for
+server.  Refer to http://openam.forgerock.org/doc/admin-guide/index.html for
 more information
 
 %% 2. Building the WAR
