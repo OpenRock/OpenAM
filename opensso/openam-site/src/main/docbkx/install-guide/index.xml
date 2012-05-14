@@ -55,6 +55,8 @@
  
  <xinclude:include href="preface.xml" />
  
+ <xinclude:include href='chap-prepare-install.xml' />
+
  <xinclude:include href='chap-install-core.xml' />
  <xinclude:include href='chap-install-tools.xml' />
  <!-- Fix for OpenAM-1020
