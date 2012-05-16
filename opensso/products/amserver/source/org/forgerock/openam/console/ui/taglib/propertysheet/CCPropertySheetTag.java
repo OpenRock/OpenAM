@@ -73,7 +73,22 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
     private static final String URL_TEMPLATE =
             "<div class=\"helpFooter\"><img width=\"17px\" src=\""
             + CONTEXT_ROOT + "/com_sun_web_ui/images/favicon/favicon.ico\" alt=\"logo\" />"
-            + "<a href=\"http://openam.forgerock.org/doc/{0}\">Read more in the OpenAM online help</a></div>";
+            + "<a href=\"http://docs.forgerock.org/en/index.html?product=openam&version="
+            + getDocVersion() + "&uri={0}\">Read more in the OpenAM online help</a></div>";
+    //
+    // Documentation is currently only available in English, hence the "en".
+    //
+    // URLs use a query string to specify documentation locations. This lets
+    // docs.forgerock.org check the values and avoid some 404s. A populated
+    // href value should therefore look something like this:
+    //   http://docs.forgerock.org/en/index.html?product=openam&version=10.0.0&uri=/release-notes/index.html#fixes
+    //
+    // To guess uri arguments for not-yet-published documentation, have a look
+    // at the documentation in progress at http://openam.forgerock.org/docs.html
+    // For DocBook-based documentation sources, valid uris include
+    // /<book-name>/index.html#<xml:id-value> where the xml:id attribute is
+    // on some element in the source files, src/main/docbkx/<book-name>/*.xml.
+    //
     private static volatile int uniqueID = 0;
 
     @Override
@@ -95,7 +110,29 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             }
         }
     }
-    
+
+    /**
+     * Get version string used in the published documentation. This method makes
+     * the assumption that the version string used in published documentation
+     * corresponds to the first substring up to the initial space in
+     * {@code SystemProperties.get(Constants.AM_VERSION)}, based on the
+     * definition of {@code com.iplanet.am.version} in
+     * {@code products/amserver/war/xml/template/sms/serverdefaults.properties}.
+     *
+     * @return Published documentation version string. Only released versions
+     *         correspond to real, published documentation.
+     */
+    private static String getDocVersion() {
+        String version = SystemProperties.get(Constants.AM_VERSION);
+
+        final int indexFirstSpace = version.indexOf(' ');
+        if (indexFirstSpace > 0) {
+            version = version.substring(0, indexFirstSpace);
+        }
+
+        return version;
+    }
+
     @Override
     protected String getValueHTML(Node valueNode, String labelId, boolean levelThree)
     throws JspException, IllegalArgumentException {
@@ -103,22 +140,22 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             CCDebug.trace1("Property node missing value element");
             return null;
         }
-        
+
         String viewName = getAttributeValue(valueNode, "name", "");
         String tagclassName = getAttributeValue(valueNode, "tagclass", "com.sun.web.ui.taglib.html.CCStaticTextFieldTag");
         View child = null;
-        
+
         if(!tagclassName.equals("com.sun.web.ui.taglib.spacer.CCSpacerTag") &&
                 !tagclassName.equals("org.forgerock.openam.console.ui.taglib.spacer.CCSpacerTag")) {
             child = containerView.getChild(viewName);
         }
-        
+
         CCTagBase tag = getCCTag(tagclassName);
         tag.setName(viewName);
         if (labelId != null) {
             tag.setElementId(labelId);
         }
-        
+
         if (tagclassName.equals("com.sun.web.ui.taglib.html.CCCheckBoxTag")) {
             CCCheckBoxTag cb = (CCCheckBoxTag)tag;
             cb.setStyleLevel(levelThree ? "3" : "2");
@@ -128,20 +165,20 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             rb.setStyleLevel(levelThree ? "3" : "2");
             rb.setElementId(getNextLabelId());
         }
-        
+
         if (valueNode.hasChildNodes()) {
             NodeList childNodeList = valueNode.getChildNodes();
             BodyContent bodyContent = null;
             if (tag instanceof BodyTag) {
-                bodyContent = new CCBodyContentImpl(new CCJspWriterImpl(null, 100, false));   
+                bodyContent = new CCBodyContentImpl(new CCJspWriterImpl(null, 100, false));
             }
-            
+
             OptionList options = null;
-            
+
             if (child != null && (child instanceof SelectableGroup)) {
                 options = new OptionList();
             }
-                
+
             for (int i = 0; i < childNodeList.getLength(); i++) {
                 parseValueChildNode(childNodeList.item(i), tag, bodyContent, options);
             }
@@ -149,36 +186,36 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             if (bodyContent != null) {
                 ((BodyTag)tag).setBodyContent(bodyContent);
             }
-                
+
             if (options != null && options.size() > 0) {
                 ((SelectableGroup)child).setOptions(options);
             }
         }
-        
+
         if (tag.getBundleID() == null) {
             tag.setBundleID(getBundleID());
         }
-        
+
         tag.setTabIndex(getTabIndex());
         String html = null;
-        
+
         if (fireBeginDisplayEvent(containerView, tag)) {
-            html = tag.getHTMLString(getParent(), pageContext, child);    
+            html = tag.getHTMLString(getParent(), pageContext, child);
         }
-        
+
         return fireEndDisplayEvent(containerView, tag, html);
     }
-    
+
     @Override
-    protected void appendSubsection(NonSyncStringBuffer buffer, 
-                                    Node subsection, 
-                                    CCPropertySheetModelInterface model, 
-                                    int level, 
+    protected void appendSubsection(NonSyncStringBuffer buffer,
+                                    Node subsection,
+                                    CCPropertySheetModelInterface model,
+                                    int level,
                                     int labelWidth)
     throws JspException {
         super.appendSubsection(buffer, subsection, model, level, labelWidth);
         String spacer = XMLUtils.getNodeAttributeValue(subsection, "spacer");
-        
+
         if (spacer != null && spacer.equalsIgnoreCase("true")) {
             buffer.append("\n<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" title=\"\"><tr><td>\n")
                   .append(getImageHTMLString(CCImage.DOT, "1", "10"))
