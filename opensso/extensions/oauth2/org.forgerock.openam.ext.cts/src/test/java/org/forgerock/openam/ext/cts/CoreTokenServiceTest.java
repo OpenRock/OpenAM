@@ -52,7 +52,7 @@ public class CoreTokenServiceTest {
 
     }
 
-    @Test
+    @Test(groups = "create")
     public void testCreate() throws Exception {
         Set<String> scopes = new HashSet<String>();
         scopes.add("read");
@@ -75,7 +75,7 @@ public class CoreTokenServiceTest {
         cts.create(request);
     }
 
-    @Test
+    @Test(groups = "needsExisting", dependsOnGroups = "create")
     public void testRead() throws Exception {
         JsonValue request = new JsonValue(new HashMap<String, Object>());
         request.put("id", testUUID);
@@ -84,6 +84,8 @@ public class CoreTokenServiceTest {
         LOGGER.log(Level.INFO, "Running read test with object: " + request.toString());
 
         JsonValue response = cts.read(request);
+
+        LOGGER.log(Level.INFO, "Response: " + response.toString());
 
         assert response != null;
         assert response.get("id").asString().equals(testUUID);
@@ -97,7 +99,7 @@ public class CoreTokenServiceTest {
         }
     }
 
-    @Test
+    @Test(groups = "needsExisting", dependsOnGroups = "create")
     public void testUpdate() throws Exception {
         Set<String> scopes = new HashSet<String>();
         scopes.add("read");
@@ -137,7 +139,7 @@ public class CoreTokenServiceTest {
 
     }
 
-    @Test
+    @Test(dependsOnGroups = "needsExisting")
     public void testDelete() throws Exception {
         JsonValue request = new JsonValue(new HashMap<String, Object>());
         request.put("id", testUUID);
