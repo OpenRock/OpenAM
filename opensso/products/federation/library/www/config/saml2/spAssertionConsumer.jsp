@@ -160,9 +160,12 @@ java.util.logging.Level
         respInfo = SPACSUtils.getResponse(
             request, response, orgName, hostEntityId, metaManager);
     } catch (SAML2Exception se) {
-        SAMLUtils.sendError(request, response, 
-            response.SC_INTERNAL_SERVER_ERROR, "getResponseError",
-            se.getMessage());
+        // Only do a sendError if one hasn't already been called.
+        if (!response.isCommitted()) {
+            SAMLUtils.sendError(request, response,
+                response.SC_INTERNAL_SERVER_ERROR, "getResponseError",
+                se.getMessage());
+        }
         return;
     }
 
