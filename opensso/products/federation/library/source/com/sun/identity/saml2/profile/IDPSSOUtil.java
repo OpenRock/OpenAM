@@ -2942,7 +2942,7 @@ public class IDPSSOUtil {
         try {
             idpAdapterName = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
                 realm, idpEntityID, SAML2Constants.IDP_ADAPTER_CLASS);
-            if (idpAdapterName == null) {
+            if (idpAdapterName == null || idpAdapterName.trim().isEmpty()) {
                 idpAdapterName =
                     SAML2Constants.DEFAULT_IDP_ADAPTER;
                 if (SAML2Utils.debug.messageEnabled()) {
