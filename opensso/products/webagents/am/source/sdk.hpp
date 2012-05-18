@@ -113,7 +113,7 @@ namespace sdk {
         };
 
         int validate_agent_credentials(url *u, const char *aname, const char *apwd,
-                const char *arealm, const char *ssldb, const char *sslpwd, int init);
+                const char *arealm, const char *ssldb, const char *sslpwd, int init, unsigned long timeout);
 
 
     }

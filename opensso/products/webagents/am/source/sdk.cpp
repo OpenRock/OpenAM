@@ -225,7 +225,7 @@ std::string sdk::utils::timestamp(const char *sec) {
 }
 
 int sdk::utils::validate_agent_credentials(url *u, const char *aname, const char *apwd, const char *arealm,
-        const char *ssldb, const char *sslpwd, int init) {
+        const char *ssldb, const char *sslpwd, int init, unsigned long timeout) {
     SECStatus secStatus;
     PRStatus prStatus;
     PRInt32 rv;
@@ -331,7 +331,7 @@ int sdk::utils::validate_agent_credentials(url *u, const char *aname, const char
         goto exit;
     }
 
-    if ((prStatus = PR_Connect(sslSocket, &addr, PR_SecondsToInterval(2))) != PR_SUCCESS) {
+    if ((prStatus = PR_Connect(sslSocket, &addr, PR_SecondsToInterval(timeout))) != PR_SUCCESS) {
         ret = PR_GetError();
         goto exit;
     }

@@ -825,6 +825,13 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
         status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 0,
             &boot_ptr->ext_url_validation_disable);
     }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = "com.forgerock.agents.ext.url.validation.timeout";
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 2,
+            &boot_ptr->ext_url_validation_timeout);
+    }
 
     // Get the naming URL.
     if (AM_SUCCESS == status) {
@@ -860,7 +867,7 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
                     status = AM_FAILURE;
                     am_web_log_error("URL [%s] validation failed. Host name is not resolvable", str.c_str());
                     break;
-                } else if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1)) != 1) {
+                } else if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1, boot_ptr->ext_url_validation_timeout)) != 1) {
                     status = AM_FAILURE;
                     am_web_log_error("URL [%s] validation failed with error [%d]", str.c_str(), vrv);
                     break;

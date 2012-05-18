@@ -156,6 +156,7 @@ typedef struct boot_info_t {
     const char *shared_agent_profile_name;
     const char *realm_name;
     unsigned long ext_url_validation_disable;
+    unsigned long ext_url_validation_timeout;
 } boot_info_t;
 
 void parseIPAddresses(const std::string &property,
