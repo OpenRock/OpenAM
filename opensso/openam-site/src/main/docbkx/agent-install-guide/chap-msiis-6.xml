@@ -184,9 +184,9 @@ Default Web Site (1)
 Web Site Identifier :
 <userinput>1</userinput>
 ...
-Enter the URL where the OpenSSO server is running. Please include the deployment
- URI also as shown in the example (Example: http://opensso.example.com:58080/ope
-nsso):
+Enter the URL where the OpenAM server is running. Please include the deployment
+ URI also as shown in the example (Example: http://openam.example.com:58080/
+ openam):
 <userinput>http://openam.example.com:8080/openam</userinput>
 
 Please enter the Agent Profile name :

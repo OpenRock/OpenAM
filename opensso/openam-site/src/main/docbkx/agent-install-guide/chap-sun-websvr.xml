@@ -204,7 +204,7 @@ SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 Sun Java System Web Server Config Directory :
 /path/to/webserver7/https-www.example.com/config/
-OpenSSO server URL : http://openam.example.com:8080/openam
+OpenAM server URL : http://openam.example.com:8080/openam
 Agent URL : http://www.example.com:8080
 Agent Profile name : Sun Web Server Agent
 Agent Profile Password file name : /tmp/pwd.txt

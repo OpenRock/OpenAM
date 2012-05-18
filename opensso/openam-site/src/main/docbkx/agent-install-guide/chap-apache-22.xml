@@ -211,7 +211,7 @@ $ ./agentadmin --install
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 Apache Server Config Directory : /path/to/apache22/conf 
-OpenSSO server URL : http://openam.example.com:8080/openam 
+OpenAM server URL : http://openam.example.com:8080/openam 
 Agent URL : http://www.example.com:80
 Agent Profile name : Apache Web Agent 
 Agent Profile Password file name : /tmp/pwd.txt 
