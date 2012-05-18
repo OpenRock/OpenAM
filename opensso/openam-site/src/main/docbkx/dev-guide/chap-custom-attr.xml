@@ -96,10 +96,11 @@ Service was added.</screen>
   <tip>
    <para>If you are using OpenDJ as the identity repository, you can update the
    schema through OpenDJ Control Panel &gt; Schema &gt; Manage Schema, as
-   described in the OpenDJ documentation.</para>
+   described in the <link  xlink:show="new"
+   xlink:href="http://opendj.forgerock.org/doc/admin-guide/index.html#update-schema"
+   >OpenDJ documentation</link>.</para>
   </tip>
-  <!-- TODO: olink to OpenDJ docs, such as
-  http://opendj.forgerock.org/doc/admin-guide/OpenDJ-Admin-Guide/chap-schema.html#update-schema -->
+
   <step>
    <para>Prepare the attribute type object class definitions in LDIF
    format.</para>
