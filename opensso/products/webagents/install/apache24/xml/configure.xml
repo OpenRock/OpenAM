@@ -18,7 +18,7 @@
 		</home-dir-locator>
 		<instance-finder-interactions>
 			<interaction lookupkey="CONFIG_DIR">
-				<i18n key="INT_CONFIG_DIR" group="apache22Tools"/>
+				<i18n key="INT_CONFIG_DIR" group="apache24Tools"/>
 				<default-value-finder>
 					<class name="ConfigFinder" type="custom"/>
 				</default-value-finder>

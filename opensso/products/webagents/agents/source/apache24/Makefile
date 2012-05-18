@@ -107,7 +107,7 @@ $(APACHE24_LIB_NAME).o: apache_agent.c
 	$(COMPILE.c) $(APACHE24_CFLAGS) $< $(OUTPUT_OPTION)
 
 SRCS := apache_agent.c
-APACHE22_OBJS := $(patsubst %.c, $(APACHE24_LIB_NAME).o, $(SRCS))
+APACHE24_OBJS := $(patsubst %.c, $(APACHE24_LIB_NAME).o, $(SRCS))
 OBJS := $(APACHE24_OBJS)
 
 EXPORTED_LIBS := $(APACHE24_LIB)

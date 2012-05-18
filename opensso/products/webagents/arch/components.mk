@@ -84,8 +84,8 @@ APACHE22_LIB_DIR = $(APACHE22_DIR)/lib
 # Apache 2.4 defines
 ##########################################
 APACHE24_DIR = $(EXTERNAL_DIR)/apache24
-APACHE24_INC_DIR = $(APACHE22_DIR)/include
-APACHE24_LIB_DIR = $(APACHE22_DIR)/lib
+APACHE24_INC_DIR = $(APACHE24_DIR)/include
+APACHE24_LIB_DIR = $(APACHE24_DIR)/lib
 
 ######################################################
 # IIS 6.0 Header files

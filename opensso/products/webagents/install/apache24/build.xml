@@ -84,7 +84,7 @@
         <!-- Copy locale files -->
         <copy todir="${container.web_agent.locale.dir}">
             <fileset dir="${webagents.install.dir}/${containername}/resources">
-                <include name="apache22Tools.properties"/>
+                <include name="apache24Tools.properties"/>
             </fileset>
         </copy>
 
