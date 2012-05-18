@@ -24,6 +24,9 @@
  *
  * $Id: UserAttributes.java,v 1.2 2009/09/21 18:33:45 dillidorai Exp $
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc.
+ */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.JSONUtils;
@@ -129,7 +132,9 @@ public class UserAttributes implements ResourceAttribute {
                 JSONObject json = new JSONObject(s);
                 propertyName = json.getString("propertyName");
                 propertyValues = JSONUtils.getSet(json, "propertyValues");
-                pResponseProviderName = json.getString("pResponseProviderName");
+                if (json.has("pResponseProviderName")) {
+                    pResponseProviderName = json.getString("pResponseProviderName");
+                }
             } catch (JSONException ex) {
                 PrivilegeManager.debug.error("UserAttribute.setState", ex);
             }
