@@ -275,7 +275,7 @@ Function ConfigureDll()
     xmlDoc.async = false
     xmlDoc.resolveExternals = false
     xmlDoc.validateOnParse = false
-    strCmd = "%systemroot%\system32\inetsrv\appcmd list sites /xml" 
+    strCmd = "%systemroot%\system32\inetsrv\appcmd.exe list sites /xml" 
     Set objExecObject = WshShell.Exec(strCmd)
     xmlDoc.loadXML(objExecObject.StdOut.ReadAll)
     Set objNodeList = xmlDoc.getElementsByTagName("SITE")
@@ -291,11 +291,11 @@ Function ConfigureDll()
      WScript.Echo "Error fetching SITE name."
     End If
     If siteName <> "" then  
-     strCmdInst = "%systemroot%\system32\inetsrv\appcmd install module /name:" + agentName + " /image:" + modulePath + " /add:false"
+     strCmdInst = "%systemroot%\system32\inetsrv\appcmd.exe install module /name:" + agentName + " /image:" + modulePath + " /add:false"
      Set oExecInst = WshShell.Exec(strCmdInst)
      WScript.Echo "Installing policy web agent module in IIS (status: " & oExecInst.Status & ")"
      WScript.Sleep(1000)
-     strCmdAdd = "%systemroot%\system32\inetsrv\appcmd add module /name:" + agentName + " /app.name:" + chr(34) + siteName + "/" + chr(34)
+     strCmdAdd = "%systemroot%\system32\inetsrv\appcmd.exe add module /name:" + agentName + " /app.name:" + chr(34) + siteName + "/" + chr(34)
      Set oExecAdd = WshShell.Exec(strCmdAdd)
      WScript.Echo "Adding policy web agent module to " & chr(34) & siteName & chr(34) & " (status: " & oExecAdd.Status & ")"
     Else
@@ -310,7 +310,7 @@ Function UnconfigureDll()
     xmlDoc.async = false
     xmlDoc.resolveExternals = false
     xmlDoc.validateOnParse = false
-    strCmd = "%systemroot%\system32\inetsrv\appcmd list sites /xml" 
+    strCmd = "%systemroot%\system32\inetsrv\appcmd.exe list sites /xml" 
     Set objExecObject = WshShell.Exec(strCmd)
     xmlDoc.loadXML(objExecObject.StdOut.ReadAll)
     Set objNodeList = xmlDoc.getElementsByTagName("SITE")
@@ -326,10 +326,10 @@ Function UnconfigureDll()
      WScript.Echo "Error fetching SITE name."
     End If
     If siteName <> "" then
-     strCmdDel = "%systemroot%\system32\inetsrv\appcmd delete module " + agentName + " /app.name:" + chr(34) + siteName + "/" + chr(34)
+     strCmdDel = "%systemroot%\system32\inetsrv\appcmd.exe delete module " + agentName + " /app.name:" + chr(34) + siteName + "/" + chr(34)
      Set oExecDel = WshShell.Exec(strCmdDel)
      WScript.Echo "Removing policy web agent module from " & chr(34) & siteName & chr(34) & " (status: " & oExecDel.Status & ")"
-     strCmd = "%systemroot%\system32\inetsrv\appcmd uninstall module " + agentName
+     strCmd = "%systemroot%\system32\inetsrv\appcmd.exe uninstall module " + agentName
      Set oExec = WshShell.Exec(strCmd)
      WScript.Echo "Uninstalling policy web agent module from IIS (status: " & oExec.Status & ")"
     Else

@@ -168,7 +168,7 @@ Function GetAgentDetails(oFSO, dict)
   'Displaying the web sites instances
   WScript.Echo dict("102")
   WScript.Echo ""
-  strCmd = "%systemroot%\system32\inetsrv\appcmd list sites" 
+  strCmd = "%systemroot%\system32\inetsrv\appcmd.exe list sites" 
   Set objExecObject = WshShell.Exec(strCmd)
   Do Until objExecObject.StdOut.AtEndOfStream
      WScript.Echo objExecObject.StdOut.ReadLine
