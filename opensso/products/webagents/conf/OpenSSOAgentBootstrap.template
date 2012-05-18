@@ -27,7 +27,7 @@
 #------------------------------------------------------------------------------
 # Web Agents Bootstrap File
 #
-# OpenSSO Policy Agent 
+# OpenAM Policy Agent 
 #
 # Version: 3.0
 
@@ -141,7 +141,7 @@ com.sun.identity.agents.config.debug.level =
 #         specified by the previous property have a prefix.
 #   - certdb.password: Certificates database password.
 #   - auth.certificate.alias: Certificate alias.
-#   - trust.server.certs: Should agent trust all server certificates when OpenSSO server
+#   - trust.server.certs: Should agent trust all server certificates when OpenAM server
 #         is running SSL? Valid values are {true, false}
 #
 # Hot-Swap Enabled: No
@@ -157,7 +157,7 @@ com.sun.identity.agents.config.trust.server.certs = true
 # Connection timeout related properties
 #
 #   - receive.timeout: Time in milliseconds the agent will wait to receive the
-#       response from OpenSSO server. After the timeout, the connection
+#       response from OpenAM server. After the timeout, the connection
 #       will be drop. A value of 0 means that the agent will wait until 
 #       receiving the response.
 #       WARNING: Invalid value for this property can result in 
@@ -177,8 +177,8 @@ com.sun.identity.agents.config.tcp.nodelay.enable = false
 # Proxy server settings
 #
 # Configure these properties only if a proxy server is in between Agent 
-# and OpenSSO server machine and is configured in forward proxy mode. 
-# In this case all communication between Agent and OpenSSO server 
+# and OpenAM server machine and is configured in forward proxy mode. 
+# In this case all communication between Agent and OpenAM server 
 # should go thru this proxy server
 # 
 #   - proxy.host     - Proxy server host name

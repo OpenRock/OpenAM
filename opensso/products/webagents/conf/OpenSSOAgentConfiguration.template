@@ -27,7 +27,7 @@
 #------------------------------------------------------------------------------
 # Web Agents Configuration Property File
 #
-# OpenSSO Policy Agent 
+# OpenAM Policy Agent 
 #
 # Version: 3.0
 
@@ -52,7 +52,7 @@
 #
 # LOGIN URL
 #   Specifies the login URLs to be used by the Agent to redirect
-#   incoming users without sufficient credentials to the OpenSSO
+#   incoming users without sufficient credentials to the OpenAM
 #   authentication service.
 # Hot-Swap Enabled: Yes
 #
@@ -60,10 +60,10 @@ com.sun.identity.agents.config.login.url[0] = @AM_SERVICES_PROTO@://@AM_SERVICES
 
 #
 # SSO TOKEN COOKIE NAME
-#   The name of the SSO Token cookie used between the OpenSSO server and
+#   The name of the SSO Token cookie used between the OpenAM server and
 #   the Agent.
 #   WARNING: Changing this property without making the corresponding change
-#   to the OpenSSO server will disable the SDK.
+#   to the OpenAM server will disable the SDK.
 # Hot-Swap Enabled: No
 #
 com.sun.identity.agents.config.cookie.name = iPlanetDirectoryPro
@@ -151,7 +151,7 @@ com.sun.identity.agents.config.local.log.size = 52428800
 
 #
 # NOTIFICATION PROPERTIES
-#   - notification.enable: Should the policy SDK use the OpenSSO server notification
+#   - notification.enable: Should the policy SDK use the OpenAM server notification
 #       mechanism to maintain the consistency of its internal cache?  If the value
 #       is false, then a polling mechanism is used to maintain cache consistency.
 #       Possible values are true or false.
@@ -341,7 +341,7 @@ com.sun.identity.agents.config.attribute.multi.value.separator = |
 
 #
 # LOAD BALENCER ENABLE
-#   Indicate where a load balancer is used for OpenSSO 
+#   Indicate where a load balancer is used for OpenAM 
 #   services. Valid values: true | false
 #
 # Hot-Swap Enabled: No
@@ -435,7 +435,7 @@ com.sun.identity.agents.config.fqdn.default = @AGENT_HOST@
 #   Say you want your server to be addressed as xyz.hostname.com whereas the
 #   actual name of the server is abc.hostname.com.  The browsers only knows
 #   xyz.hostname.com and you have specified polices using xyz.hostname.com at
-#   the OpenSSO server policy console, in this file set the mapping as
+#   the OpenAM server policy console, in this file set the mapping as
 #
 #   com.sun.identity.agents.config.fqdn.mapping[valid1]= xyz.hostname.com
 #
@@ -465,7 +465,7 @@ com.sun.identity.agents.config.fqdn.mapping[] =
 #
 # COOKIE RESET ENABLE
 #   This property must be set to true, if this agent needs to
-#   reset cookies in the response before redirecting to OpenSSO server for 
+#   reset cookies in the response before redirecting to OpenAM server for 
 #   Authentication. By default this is set to false.
 #
 # Hot-Swap Enabled: Yes
@@ -475,7 +475,7 @@ com.sun.identity.agents.config.cookie.reset.enable = false
 #
 # COOKIE RESET LIST
 #   This property gives the list of Cookies, that need to be  included 
-#   in the Redirect Response to OpenSSO server.
+#   in the Redirect Response to OpenAM server.
 #   This property is used only if the  Cookie Reset feature is enabled. 
 #
 #   The  Cookie details need to be  specified in the following Format 
@@ -601,11 +601,11 @@ com.sun.identity.agents.config.cdsso.cookie.domain[0] =
 
 #
 # LOGOUT PROCESSING
-#   - logout.url: List of OpenSSO logout page URLs.
+#   - logout.url: List of OpenAM logout page URLs.
 #   - agent.logout.url: List of Applications's Logout URLs.
 #       These URLs are not enforced by policy. 
 #       if set, agent will intercept this URL and destroy the user's session,
-#       if any. And then it will be redirected to the OpenSSO logout URL.
+#       if any. And then it will be redirected to the OpenAM logout URL.
 #       The application's logout URL will be allowed whether or not 
 #       the session destroy is successful.
 #   - logout.cookie.reset: List of cookies to be reset upon logout;
@@ -623,7 +623,7 @@ com.sun.identity.agents.config.logout.redirect.url =
 # FETCH POLICY DECISIONS FROM ROOT RESOURCE
 #   By default, when a policy decision for a resource is needed, 
 #   agent gets and caches the policy decision of the resource and 
-#   all resource from the root of the resource down, from the OpenSSO server.
+#   all resource from the root of the resource down, from the OpenAM server.
 #   For example, if the resource is http://host/a/b/c, the the root of the 
 #   resource is http://host/. This is because more resources from the 
 #   same path are likely to be accessed subsequently. 
@@ -744,9 +744,9 @@ com.sun.identity.agents.config.override.notification.url =
 
 # 
 # The following property defines how long to wait in attempting
-# to connect to an OpenSSO AUTH server.
+# to connect to an OpenAM AUTH server.
 # The default value is 2 seconds. This value needs to be increased
-# when receiving the error "unable to find active OpenSSO Auth server"
+# when receiving the error "unable to find active OpenAM Auth server"
 #
 # Hot-Swap Enabled: Yes
 #
@@ -754,7 +754,7 @@ com.sun.identity.agents.config.auth.connection.timeout =
 
 #
 # IGNORE SERVER ALIVE CHECK
-#   This property indicates whether Agent needs to check whether OpenSSO 
+#   This property indicates whether Agent needs to check whether OpenAM 
 #   server is up and running before doing a 302 redirect
 #
 # Hot-Swap Enabled: Yes
@@ -762,7 +762,7 @@ com.sun.identity.agents.config.auth.connection.timeout =
 com.sun.identity.agents.config.ignore.server.check = false
 
 #
-# POLL PRIMARY OpenSSO SERVER
+# POLL PRIMARY OpenAM SERVER
 #   This property determines the amount of time (in minutes) after which
 #   the agent polls whether the primary server is up and running.
 #   The default value is 5 minutes
@@ -862,16 +862,16 @@ com.sun.identity.agents.config.domino.ltpa.org.name =
 
 #
 # Time in seconds used adjust time difference between Agent machine and
-# OpenSSO server. In the absence of this property and where Agent time differs+
-# from OpenSSO server time you would see agent making policy calls to
-# OpenSSO server even before the policy subject cache has expired
+# OpenAM server. In the absence of this property and where Agent time differs+
+# from OpenAM server time you would see agent making policy calls to
+# OpenAM server even before the policy subject cache has expired
 # (subject timeToLive) or infinite re-direction happening.
 # User still needs to run a time syncing service to keep the time on
-# Agent machine and OpenSSO server machine as close as possible.
+# Agent machine and OpenAM server machine as close as possible.
 #
 # Use this property to adjust for the small time difference in spite of
 # running time syncing service
-# Clock skew in seconds = AgentTime - OpenSSOServerTime
+# Clock skew in seconds = AgentTime - OpenAMServerTime
 com.sun.identity.agents.config.policy.clock.skew = 0
 
 
@@ -880,13 +880,13 @@ com.sun.identity.agents.config.policy.clock.skew = 0
 #   Used when CDSSO is enabled.Default value should be changed only when the
 #   cdcservlet URL has a landing page specified
 #   Example : com.sun.identity.agents.config.cdsso.cdcservlet.url[0] = #
-#   http://host:port/opensso/cdcservlet?goto=http://agent:port/landing.jsp
+#   http://host:port/openam/cdcservlet?goto=http://agent:port/landing.jsp
 #   The parameter is used by the Agent to append the original request URL to this
 #   cdcservlet URL. This parameter is consumed by the landing page to redirect to the
 #   original URL. (property name: com.sun.identity.agents.config.redirect.param)
 #   If com.sun.identity.agents.config.redirect.param = goto2
 #   The complete URL sent for authentication will be
-#   http://host:port/opensso/cdcservlet?goto=http://agent:port/landing.jsp?goto2=http://agent.port/original.jsp
+#   http://host:port/openam/cdcservlet?goto=http://agent:port/landing.jsp?goto2=http://agent.port/original.jsp
 #
 # Hot-Swap Enabled: Yes
 #

@@ -31,17 +31,17 @@
 106 = Enter the Agent profile password file : 
 107 = The password file does not exist.
 
-108 = Enter the URL where the OpenSSO server is running. Please include the deployment URI also as shown in the example (Example: http://opensso.example.com:58080/opensso):
+108 = Enter the URL where the OpenAM server is running. Please include the deployment URI also as shown in the example (Example: http://openam.example.com:58080/openam):
 109 = Invalid server Url.
 110 = Agent Configuration file created : 
-111 = Primary Server Deployment URI [/opensso] :
-112 = Primary Server Console URI [/opensso] :
+111 = Primary Server Deployment URI [/openam] :
+112 = Primary Server Console URI [/openam] :
 
 113 = Failover Server Host :
 114 = Failover Server Protocol [http] :
 115 = Failover Server Port Number
-116 = Failover Server Deployment URI [/opensso] :
-117 = Failover Server Console URI [/opensso] :
+116 = Failover Server Deployment URI [/openam] :
+117 = Failover Server Console URI [/openam] :
 
 118 = Please enter the path to the password file :
 119 = Password file is empty 

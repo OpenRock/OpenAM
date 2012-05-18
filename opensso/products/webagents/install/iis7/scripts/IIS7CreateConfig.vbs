@@ -195,7 +195,7 @@ End Function
 Function GetAccessManagerDetails(oFSO, dict, WshShell)
 
   WScript.Echo "------------------------------------------------"
-  WScript.Echo "Sun OpenSSO Enterprise 8.0" 
+  WScript.Echo "ForgeRock OpenAM" 
   WScript.Echo "------------------------------------------------"
 
   correctServerUrl = false
