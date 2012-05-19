@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010-2011 ForgeRock AS
+   Portions Copyrighted 2010-2012 ForgeRock Inc
 --%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -97,9 +97,6 @@
                                 out.print(MessageFormat.format(
                                     rb.getString("nowriteaccess.title"), paramDir));
                             %>
-                            <ul>
-                                <li><a href="http://wikis.sun.com/display/OpenSSO/Configurator+does+not+write+access+to+user.home+directory"><% out.print(rb.getString("nowriteaccess.doc")); %></a>
-                            </ul>
                             <ul>
                                 <li><a href="<%= deployURI %>/config/options.htm"><% out.print(rb.getString("nowriteaccess.proceed")); %></a><br />
                                 <% out.print(rb.getString("nowriteaccess.proceed.note")); %>
