@@ -32,18 +32,18 @@ import com.atlassian.seraph.util.RedirectUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Category;
 
 /**
  *
  * @author steve
  */
 public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
-    private static final Category log = Category.getInstance(OpenAMJiraAuthenticator.class);
+    private static final Debug debug = Debug.getInstance("OpenAMJiraAuthenticator");
 
     @Override
     public Principal getUser(HttpServletRequest request, HttpServletResponse response) {
@@ -51,28 +51,47 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
 
         try {
             request.getSession(true);
-            log.info("Trying seamless Single Sign-on...");
+            
+            if (debug.messageEnabled()) {
+                debug.message("Trying seamless Single Sign-on...");
+            }
+            
             String username = obtainUsername(request);
-            log.info("Got username = " + username);
+            
+            if (debug.messageEnabled()) {
+                debug.message("Got username = " + username);
+            }
             
             if (username != null) {
                 if (request.getSession() != null && request.getSession().getAttribute(LOGGED_IN_KEY) != null) {
-                    log.info("Session found; user already logged in");
+                    if (debug.messageEnabled()) {
+                        debug.message("Session found; user already logged in");
+                    }
+                    
                     user = (Principal) request.getSession().getAttribute(LOGGED_IN_KEY);
                 } else {
                     user = getUser(username);
-                    log.info("Logged in via SSO, with User " + user);
+                    
+                    if (debug.messageEnabled()) {
+                        debug.message("Logged in via SSO, with User " + user);
+                    }
+                    
                     request.getSession().setAttribute(LOGGED_IN_KEY, user);
                     request.getSession().setAttribute(LOGGED_OUT_KEY, null);
                 }
             } else {
                 String redirectUrl = RedirectUtils.getLoginUrl(request);
-                log.info("Username is null; redirecting to " + redirectUrl);
+                
+                if (debug.messageEnabled()) {
+                    debug.message("Username is null; redirecting to " + redirectUrl);
+                }
+                
                 return null;
             }
         } catch (Exception ex) {
-            log.warn("Exception: " + ex, ex);
+            debug.error("Exception when getting user", ex);
         }
+        
         return user;
 
     }
@@ -84,7 +103,7 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
             SSOTokenManager manager = SSOTokenManager.getInstance();
             token = manager.createSSOToken(request);
         } catch (Exception ex) {
-            log.debug("Error creating SSOToken", ex);
+            debug.error("Error creating SSOToken", ex);
         }
         
         return token;
@@ -97,11 +116,12 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
             SSOTokenManager manager = SSOTokenManager.getInstance();
             result = manager.isValidToken(token);
         } catch (Exception ex) {
-            log.debug("Error validating SSOToken", ex);
+            debug.error("Error validating SSOToken", ex);
         }
         
         return result;
     }
+    
     private String obtainUsername(HttpServletRequest request) {
         String result = null;
         SSOToken token = getToken(request);
@@ -110,7 +130,7 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
             try {
                 result = token.getProperty("UserId");
             } catch (SSOException ssoe) {
-                log.error("Error getting UserId from SSOToken", ssoe);
+                debug.error("Error getting UserId from SSOToken", ssoe);
             }
         }
         
@@ -124,7 +144,7 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
         try {
             result = doLogout(request, response);
         } catch (Exception ex) {
-            log.warn("Exception: " + ex, ex);
+            debug.error("Exception during logout" , ex);
         }
         
         return result;
@@ -133,14 +153,14 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
     private boolean doLogout(HttpServletRequest request, HttpServletResponse response)
     throws AuthenticatorException, IOException {
         if (super.logout(request, response)) {
-            logoutOfOpenSSO(response);
+            logoutOfOpenAM(response);
             return true;
         }
         
         return false;
     }
 
-    private void logoutOfOpenSSO(HttpServletResponse response)
+    private void logoutOfOpenAM(HttpServletResponse response)
     throws IOException {
         String logoutURL = SecurityConfigFactory.getInstance().getLogoutURL();
         
