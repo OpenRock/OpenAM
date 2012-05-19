@@ -25,7 +25,7 @@
  */
 package org.forgerock.openam.extensions.crowd;
 
-import com.atlassian.jira.security.login.SSOSeraphAuthenticator;
+import com.atlassian.jira.security.login.JiraSeraphAuthenticator;
 import com.atlassian.seraph.auth.AuthenticatorException;
 import com.atlassian.seraph.config.SecurityConfigFactory;
 import com.atlassian.seraph.util.RedirectUtils;
@@ -42,7 +42,7 @@ import org.apache.log4j.Category;
  *
  * @author steve
  */
-public class OpenAMJiraAuthenticator extends SSOSeraphAuthenticator {
+public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
     private static final Category log = Category.getInstance(OpenAMJiraAuthenticator.class);
 
     @Override
