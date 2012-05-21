@@ -3194,13 +3194,110 @@
   <variablelist xml:id="servers-advanced-configuration">
    <title>Servers &gt; Advanced</title>
 
-   <para>Use this page to set properties directly.</para>
+   <para>Use this page to set advanced properties directly. A partial list of
+   advanced properties follows.</para>
+
+   <para>For a list of inherited advanced properties, see the table under the
+   Advanced tab for Default Server Settings.</para>
 
    <varlistentry>
-    <term>Advanced Properties</term>
+    <term><literal>com.iplanet.am.cookie.timeToLive</literal></term>
     <listitem>
-     <para>For a list of inherited advanced properties, see the table under
-     the Advanced tab for Default Server Settings.</para>
+     <para><literal>iplanetDirectoryPro</literal> cookie lifetime, in seconds</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.iplanet.am.lbcookie.value</literal></term>
+    <listitem>
+     <para>Used with stick load balancers that can inspect the cookie value.
+     Set this property to a unique value if your load balancer requires it.
+     Restart OpenAM for the change to take effect.</para>
+     <para>Default: 01</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.iplanet.security.SSLSocketFactoryImpl</literal></term>
+    <listitem>
+     <para>SSL socket factory implementation used by OpenAM</para>
+     <para>Default: <literal>com.sun.identity.shared.ldap.factory.JSSESocketFactory</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.embedded.replicationport</literal></term>
+    <listitem>
+     <para>Replication port for embedded OpenDJ directory server.</para>
+     <para>Default: 8989</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.embedded.sync.servers</literal></term>
+    <listitem>
+     <para>Whether to replicate data between embedded directory servers.</para>
+     <para>Default: <literal>on</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.common.systemtimerpool.size</literal></term>
+    <listitem>
+     <para>Default: 3</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.sm.sms_object_class_name</literal></term>
+    <listitem>
+     <para>Default: <literal>com.sun.identity.sm.ldap.SMSEmbeddedLdapObject</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.urlconnection.useCache</literal></term>
+    <listitem>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>console.privileged.users</literal></term>
+    <listitem>
+     <para>Used to assigned privileged console access to particular users.</para>
+     <para>Set to a <literal>|</literal> separated list of users' Universal
+     IDs, such as
+     <literal>console.privileged.users=uid=demo,ou=user,o=openam|uid=demo2,ou=user,o=openam</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>openam.session.allow_persist_am_cookie</literal></term>
+    <listitem>
+     <para>If <literal>true</literal> users can extend the lifetime of the
+     <literal>iplanetDirectoryPro</literal> cookie to
+     <literal>com.iplanet.am.cookie.timeToLive</literal> on a per-session
+     basis, by using the query string
+     <literal>openam.session.persist_am_cookie=Yes</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>openam.session.persist_am_cookie</literal></term>
+    <listitem>
+     <para>If <literal>true</literal> extend the lifetime of the
+     <literal>iplanetDirectoryPro</literal> cookie to
+     <literal>com.iplanet.am.cookie.timeToLive</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>opensso.protocol.handler.pkgs</literal></term>
+    <listitem>
+     <para>TODO</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>org.forgerock.embedded.dsadminport</literal></term>
+    <listitem>
+     <para>Default: 4444</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>ssoadm.disabled</literal></term>
+    <listitem>
+     <para>Set to <literal>true</literal> to enable
+     <filename>ssoadm.jsp</filename>.</para>
     </listitem>
    </varlistentry>
   </variablelist>
