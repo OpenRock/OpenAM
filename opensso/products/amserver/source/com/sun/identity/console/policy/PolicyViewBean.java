@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc 
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.console.policy;
 
@@ -62,7 +63,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import org.owasp.esapi.ESAPI;
 
 public class PolicyViewBean
     extends RealmPropertiesBase
@@ -345,11 +345,9 @@ public class PolicyViewBean
      * @param event Request Invocation Event.
      */
     public void handleTblDataActionHrefRequest(RequestInvocationEvent event) {
-        org.owasp.esapi.Encoder enc = ESAPI.encoder();
         PolicyModel model = (PolicyModel)getModel();
-        String policyName = hexToString(
-            enc.encodeForHTML((String)getDisplayFieldValue(
-            TBL_DATA_ACTION_HREF)));
+        String policyName = hexToString((String)getDisplayFieldValue(
+            TBL_DATA_ACTION_HREF));
         String curRealm = (String)getPageSessionAttribute(
             AMAdminConstants.CURRENT_REALM);
         try {
