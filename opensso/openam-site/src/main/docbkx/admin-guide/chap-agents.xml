@@ -2238,7 +2238,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Privileged Session Attribute</term>
      <listitem>
       <para>Specifies the list of session property names, such as
-      <literal>UserToken</literal>m which hold privileged attributes for
+      <literal>UserToken</literal> which hold privileged attributes for
       authenticated users.</para>
       <para>Property: <literal>com.sun.identity.agents.config.privileged.session.attribute</literal></para>
      </listitem>
