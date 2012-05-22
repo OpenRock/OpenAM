@@ -25,6 +25,10 @@
  * $Id: SpecialRepo.java,v 1.19 2010/01/06 17:41:00 veiming Exp $
  *
  */
+
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.idm.plugins.internal;
 
 import com.iplanet.am.util.SystemProperties;
@@ -514,9 +518,25 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
     public void removeListener() {
         if (scm != null) {
             scm.removeListener(scmListenerId);
+            scm = null;
         }
         if (ssm != null) {
             ssm.removeListener(ssmListenerId);
+            ssm = null;   //make sure old reference get GCed asap
+            
+            //unfortunately, because reposervice is special this is required to 
+            //make sure any old lingering object would be cleaned.
+            try {
+                SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                    AdminTokenAction.getInstance());
+                ssm = new ServiceSchemaManager(adminToken,
+                      IdConstants.REPO_SERVICE, "1.0");
+                ssm.removeListener(ssmListenerId);
+            } catch (SSOException ssoe) {
+                // listener should be removed in first try. ignoring any error
+            } catch (SMSException smse) {
+            	// listener should be removed in first try. ignoring any error
+            }
         }
         repoListener = null;
     }

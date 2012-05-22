@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 package com.sun.identity.sm;
 
@@ -36,6 +36,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.common.DNUtils;
+import com.sun.identity.idm.IdConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.io.ByteArrayInputStream;
@@ -59,7 +60,7 @@ import org.w3c.dom.Node;
  * version. This class implements all the "read" methods and would receive
  * notification when schema changes.
  */
-class ServiceSchemaManagerImpl implements SMSObjectListener {
+public class ServiceSchemaManagerImpl implements SMSObjectListener {
     // Instance variables
     private String serviceName;
 
@@ -320,6 +321,11 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
      * schema for this service and version is changed.
      */
     synchronized String addListener(ServiceListener listener) {
+        return addListener(null, listener);
+    }
+
+    
+    synchronized String addListener(String id, ServiceListener listener) {
         if (listenerObjects == null) {
             listenerObjects = Collections.synchronizedMap(new HashMap());
         }
@@ -329,11 +335,13 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
             listenerId = SMSNotificationManager.getInstance()
                 .registerCallbackHandler(this);
         }
-        String id = SMSUtils.getUniqueID();
+        if (id == null) {
+            id = SMSUtils.getUniqueID();
+        }
         listenerObjects.put(id, listener);
         return (id);
     }
-
+    
     /**
      * Unregisters the listener from the service for the given listener ID. The
      * ID was issued when the listener was registered.
@@ -343,7 +351,7 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
             listenerObjects.remove(listenerID);
             if (listenerObjects.isEmpty()) {
                 SMSNotificationManager.getInstance().removeCallbackHandler(
-                        listenerID);
+                        listenerId);
             }
         }
     }
@@ -540,8 +548,12 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
             }
         }
     }
-    
+
     private void clear() {
+    	clear(false);
+    }
+    
+    private Map clear(boolean forceClear) {
         // Clear the local variable
         // and mark the entry to be invalid and to be GCed.
         // Remove itself from CachedSMSEntry listener list
@@ -550,7 +562,7 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
             smsEntry.clear();
         }
         // Deregister for external notifications if there are no listeners
-        if ((listenerObjects == null) || listenerObjects.isEmpty()) {
+        if (forceClear || (listenerObjects == null) || listenerObjects.isEmpty()) {
             SMSNotificationManager.getInstance().removeCallbackHandler(
                 listenerId);
         }
@@ -558,8 +570,24 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
         xmlSchema = null;
         document = null;
         schemaRoot = null;
+        if (subSchemas!=null && !subSchemas.isEmpty()) {
+            try {
+        	    Set ssiObjects = getSchemaTypes();
+                Iterator ssiIter = ssiObjects.iterator();
+                while (ssiIter.hasNext()) {
+                	SchemaType stype = (SchemaType)ssiIter.next();
+                	ServiceSchemaImpl ssi = getSchema(stype);
+                    ssi.clear();
+                }
+            } catch (SMSException smse) {
+            	debug.error("ServiceSchemaManagerImpl:clear. " +
+                        "Exception getting schema types. " , smse);
+            }
+        }
         subSchemas.clear();
         pluginInterfaces.clear();
+        
+        return listenerObjects;
     }
     
     // Static method to get an instance of this class
@@ -568,9 +596,13 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
         String cacheName = ServiceManager.getCacheIndex(serviceName, version);
         ServiceSchemaManagerImpl ssmi = 
             (ServiceSchemaManagerImpl) schemaManagers.get(cacheName);
+
+        Map listeners = null;
         if (ssmi != null && !ssmi.isValid()) {
             // CachedSMSEntry is not valid. Re-create this object
             schemaManagers.remove(cacheName);
+            // registration to SMSNotificationManager should be removed
+            listeners = ssmi.clear(true);
             ssmi = null;
         }
         if (ssmi != null) {
@@ -588,9 +620,23 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
             if (ssmi == null || !ssmi.isValid()) {
                 // Instantiate and add to cache
                 ssmi = new ServiceSchemaManagerImpl(t, serviceName, version);
+                
+                //listeners that were registered to old ServiceSchemaManagerImpl 
+                //should be added back
+                //sundidentityrepositoryservice will add back new instance of 
+                //SpecialRepo itself so not adding old ones here.
+                if (listeners != null) {
+                    Iterator l = listeners.keySet().iterator();
+                    while (l.hasNext()) {
+                        String id = (String)l.next();
+                    	ServiceListener listener = (ServiceListener) listeners.get(id);
+                        ssmi.addListener(id, listener);
+                    }
+                }
                 schemaManagers.put(cacheName, ssmi);
             }
         }
+
         return (ssmi);
     }
 
@@ -612,7 +658,7 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
     private static Debug debug = SMSEntry.debug;
 
     // Pointers to ServiceSchemaManager instances
-    private static Map schemaManagers = Collections.synchronizedMap(
+    public static Map schemaManagers = Collections.synchronizedMap(
         new HashMap());
 
     private static final int DEFAULT_REVISION = 10;
@@ -625,5 +671,17 @@ class ServiceSchemaManagerImpl implements SMSObjectListener {
         ServiceManager.checkAndEncryptPasswordSyntax(doc, false, encryptObj);
         return SMSSchema.nodeToString(
             XMLUtils.getRootNode(doc, SMSUtils.SERVICE));
+    }
+    
+    public String printListeners() {
+    	if (listenerObjects==null) { return null; }
+    	StringBuilder sb = new StringBuilder();
+    	Iterator iterator = listenerObjects.keySet().iterator();
+    	while(iterator.hasNext()){        
+    	    String key = (String)iterator.next();
+    	    Object val = listenerObjects.get(key);
+    	    sb.append(key +"="+val +"\n");
+    	}
+    	return sb.toString();
     }
 }

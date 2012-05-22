@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 package com.sun.identity.sm;
 
@@ -410,6 +410,29 @@ class ServiceSchemaImpl {
         attrReadOnlyDefaults = Collections
                 .unmodifiableMap(tempUnmodifiableDefaults);
         subSchemas = newSubSchemas;
+    }
+    
+    synchronized void clear() {
+        // org attr-schema
+        if (orgAttrSchema != null) {
+        	orgAttrSchema.clear();
+        	orgAttrSchema = null;
+        }
+    	
+    	// Sub-schemas
+        if (subSchemas.size() > 0) {
+            Iterator items = subSchemas.keySet().iterator();
+            while (items.hasNext()) {
+            	ServiceSchemaImpl ssi = (ServiceSchemaImpl)subSchemas.get(items.next());
+            	ssi.clear();
+            }
+        }
+        
+        //important to clean all reference to ServiceSchemaManagerImpl
+        ssm = null;
+        
+        //finally clear all subschemas
+        subSchemas.clear();
     }
 
     AttributeValidator getAttributeValidator(String attrName) {

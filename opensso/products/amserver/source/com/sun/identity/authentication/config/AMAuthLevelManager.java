@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 package com.sun.identity.authentication.config;
 
@@ -455,7 +455,43 @@ public class AMAuthLevelManager implements ServiceListener {
         // since new modules might be added or old modules removed
         if (serviceName.equals(CORE_AUTH)) {
             initialize();
-        } 
+        } else {
+        	//HashMap will replace if there is existing one already
+        	//this is necessary because ServiceSchemaManagerImpl will 
+        	//be cleared and therefore will be stale
+        	String moduleName = (String)moduleServiceMap.get(serviceName);
+    		if ( !listenerMap.isEmpty() && listenerMap.get(moduleName) != null ) {
+	        	try {
+	                // just in case ssm or scm already has AMAuthLevelManager registered
+	        		// will remove existing one and replace it with new one.
+	        		Iterator it = listenerMap.values().iterator();
+	                while (it.hasNext()) {
+	                     List list = (List) it.next();
+	                     ServiceSchemaManager ssm = (ServiceSchemaManager) list.get(0); 
+	                     String ssmListener = (String) list.get(1);
+	                     ServiceConfigManager scm = (ServiceConfigManager) list.get(2); 
+	                     String scmListener = (String) list.get(3);
+	                     try {
+	                         ssm.removeListener(ssmListener);
+	                         scm.removeListener(scmListener);
+	                     } catch (Exception e) {
+	                         // this is harmless
+	                    	 debug.error("remove listeners ", e);
+	                     }
+	                }
+	                	
+	        		List list = addServiceListener(serviceName);
+	                if (list != null) {
+	                	synchronized (listenerMap) {
+	                	    listenerMap.put(moduleName, list);
+	                	}
+	                }
+	            } catch (Exception e) {
+	                debug.error("can't add listener for " + serviceName, e);
+	                return;
+	            }
+    		}
+        }
         // process auth configuration updates
         updateAuthConfiguration(serviceName, "", "");
         updateGlobalAuthLevelMap(serviceName);

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 
 package com.sun.identity.sm;
@@ -332,6 +332,7 @@ class ServiceConfigImpl implements ServiceListener {
         try {
             if ((ssmi != null) && (serviceSchemaManagerListernerID != null)) {
                 ssmi.removeListener(serviceSchemaManagerListernerID);
+                ssmi = null;
             }
         } catch (Exception ex) {
             debug.error("ServiceConfigImpl.clear Unable to remove " +
