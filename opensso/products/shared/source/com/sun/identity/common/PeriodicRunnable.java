@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.common;
 
 import java.util.HashSet;
@@ -114,9 +117,9 @@ public class PeriodicRunnable extends GeneralTaskRunnable {
             } else {
                 return true;
             }
-            synchronized (thisTurn) {
-                return thisTurn.remove(obj);
-            }
+        }
+        synchronized (thisTurn) {
+            return thisTurn.remove(obj);
         }
     }
     
