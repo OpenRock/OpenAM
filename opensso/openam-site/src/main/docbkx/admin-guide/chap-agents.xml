@@ -282,7 +282,7 @@
     <varlistentry>
      <term>Agent Configuration Change Notification</term>
      <listitem>
-      <para>Enable agent to receive notfication messages from OpenAM server for
+      <para>Enable agent to receive notification messages from OpenAM server for
       configuration changes.</para>
       <para>Property: <literal>com.sun.identity.agents.config.change.notification.enable</literal></para>
      </listitem>
@@ -1306,7 +1306,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Override Request URL Protocol</term>
      <listitem>
       <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
-      load balancer, or proxy.</para>
+      load balancer, or proxy such that the protocol users use is different
+      from the protocol the agent uses. When enabled, the protocol is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
       <para>Property: <literal>com.sun.identity.agents.config.override.protocol</literal></para>
      </listitem>
     </varlistentry>
@@ -1314,7 +1317,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Override Request URL Host</term>
      <listitem>
       <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
-      load balancer, or proxy.</para>
+      load balancer, or proxy such that the host name users use is different
+      from the host name the agent uses. When enabled, the host is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
       <para>Property: <literal>com.sun.identity.agents.config.override.host</literal></para>
      </listitem>
     </varlistentry>
@@ -1322,7 +1328,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Override Request URL Port</term>
      <listitem>
       <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
-      load balancer, or proxy.</para>
+      load balancer, or proxy such that the port users use is different
+      from the port the agent uses. When enabled, the port is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
       <para>Property: <literal>com.sun.identity.agents.config.override.port</literal></para>
      </listitem>
     </varlistentry>
@@ -1330,7 +1339,10 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Override Notification URL</term>
      <listitem>
       <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
-      load balancer, or proxy.</para>
+      load balancer, or proxy such that the URL users use is different
+      from the URL the agent uses. When enabled, the URL is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
       <para>Property: <literal>com.sun.identity.agents.config.override.notification.url</literal></para>
      </listitem>
     </varlistentry>
@@ -1572,7 +1584,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     <varlistentry>
      <term>Agent Configuration Change Notification</term>
      <listitem>
-      <para>Enable agent to receive notfication messages from OpenAM server for
+      <para>Enable agent to receive notification messages from OpenAM server for
       configuration changes.</para>
       <para>Property: <literal>com.sun.identity.agents.config.change.notification.enable</literal></para>
      </listitem>
