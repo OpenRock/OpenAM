@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,13 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.representation;
+
+import org.restlet.Context;
+import org.restlet.data.MediaType;
+import org.restlet.ext.freemarker.ContextTemplateLoader;
+import org.restlet.ext.freemarker.TemplateRepresentation;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -30,16 +34,13 @@ import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.ext.freemarker.ContextTemplateLoader;
-import org.restlet.ext.freemarker.TemplateRepresentation;
-
 
 /**
  * TODO Redesign it to be more flexible
- *
- * @see <a href="http://freemarker.sourceforge.net/docs/pgui_config_templateloading.html">Template loading</a>
+ * 
+ * @see <a
+ *      href="http://freemarker.sourceforge.net/docs/pgui_config_templateloading.html">Template
+ *      loading</a>
  */
 public class TemplateFactory {
     private final Configuration config;
@@ -52,7 +53,7 @@ public class TemplateFactory {
         try {
             TemplateLoader ctx = new ContextTemplateLoader(context, "clap:///");
             TemplateLoader ctl = new ClassTemplateLoader(TemplateFactory.class, "/");
-            TemplateLoader[] loaders = new TemplateLoader[]{ctx, ctl};
+            TemplateLoader[] loaders = new TemplateLoader[] { ctx, ctl };
             MultiTemplateLoader mtl = new MultiTemplateLoader(loaders);
             config.setTemplateUpdateDelay(3600);
             config.setTemplateLoader(mtl);
@@ -60,7 +61,6 @@ public class TemplateFactory {
         } catch (TemplateException e) {
         }
     }
-
 
     public static TemplateFactory newInstance(Context context) {
         return new TemplateFactory(context);
@@ -75,4 +75,3 @@ public class TemplateFactory {
     }
 
 }
-

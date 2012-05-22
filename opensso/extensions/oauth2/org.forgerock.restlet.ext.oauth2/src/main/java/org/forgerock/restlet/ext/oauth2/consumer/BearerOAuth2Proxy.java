@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -32,7 +31,7 @@ import org.restlet.Uniform;
 
 /**
  * A BearerOAuth2Proxy does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, BearerToken> {
@@ -52,37 +51,42 @@ public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, Be
         this.handler = null;
     }
 
-    //--------
+    // --------
 
-    public BearerOAuth2Proxy(BearerOAuth2Proxy oAuth2Proxy, Flow flow, RequestCallbackHandler<BearerToken> handler) {
+    public BearerOAuth2Proxy(BearerOAuth2Proxy oAuth2Proxy, Flow flow,
+            RequestCallbackHandler<BearerToken> handler) {
         super(oAuth2Proxy, flow);
         this.helper = new BearerAuthenticatorHelper();
         this.handler = handler;
     }
 
-    public BearerOAuth2Proxy(BearerOAuth2Proxy oAuth2Proxy, Flow flow, BearerAuthenticatorHelper helper, RequestCallbackHandler handler) {
+    public BearerOAuth2Proxy(BearerOAuth2Proxy oAuth2Proxy, Flow flow,
+            BearerAuthenticatorHelper helper, RequestCallbackHandler handler) {
         super(oAuth2Proxy, flow);
         this.helper = helper;
         this.handler = handler;
     }
 
-    public BearerOAuth2Proxy(Context context, BearerOAuth2Proxy oAuth2Proxy, Flow flow, RequestCallbackHandler<BearerToken> handler) {
+    public BearerOAuth2Proxy(Context context, BearerOAuth2Proxy oAuth2Proxy, Flow flow,
+            RequestCallbackHandler<BearerToken> handler) {
         super(context, oAuth2Proxy, flow);
         this.helper = new BearerAuthenticatorHelper();
         this.handler = handler;
     }
 
-    public BearerOAuth2Proxy(Context context, BearerOAuth2Proxy oAuth2Proxy, Flow flow, BearerAuthenticatorHelper helper, RequestCallbackHandler<BearerToken> handler) {
+    public BearerOAuth2Proxy(Context context, BearerOAuth2Proxy oAuth2Proxy, Flow flow,
+            BearerAuthenticatorHelper helper, RequestCallbackHandler<BearerToken> handler) {
         super(context, oAuth2Proxy, flow);
         this.helper = helper;
         this.handler = handler;
     }
 
-    //--------
+    // --------
 
     @Override
-    public RequestCallbackHandler<BearerToken> getRequestCallbackHandler(Request request, Response response) {
-        //TODO have a Request Wrapper implementation
+    public RequestCallbackHandler<BearerToken> getRequestCallbackHandler(Request request,
+            Response response) {
+        // TODO have a Request Wrapper implementation
         return handler;
     }
 

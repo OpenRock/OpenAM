@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
 
@@ -37,11 +36,10 @@ import org.restlet.security.Verifier;
 
 /**
  * A NAME does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken> {
-
 
     public abstract User createUser(U token);
 
@@ -70,21 +68,24 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
             try {
                 U token = null;
                 switch (tokenLocation) {
-                    case HTTP_BODY: {
-                        //Methods without request entity
-                        if (Method.GET.equals(request.getMethod()) || Method.HEAD.equals(request.getMethod())) {
-                            token = getTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_QUERY, request);
-                            break;
-                        }
+                case HTTP_BODY: {
+                    // Methods without request entity
+                    if (Method.GET.equals(request.getMethod())
+                            || Method.HEAD.equals(request.getMethod())) {
+                        token =
+                                getTokenExtractor().extractToken(
+                                        OAuth2Utils.ParameterLocation.HTTP_QUERY, request);
+                        break;
                     }
-                    case HTTP_HEADER: {
-                        if (request.getChallengeResponse() == null) {
-                            return RESULT_MISSING;
-                        }
+                }
+                case HTTP_HEADER: {
+                    if (request.getChallengeResponse() == null) {
+                        return RESULT_MISSING;
                     }
-                    default: {
-                        token = getTokenExtractor().extractToken(tokenLocation, request);
-                    }
+                }
+                default: {
+                    token = getTokenExtractor().extractToken(tokenLocation, request);
+                }
                 }
                 if (null == token) {
                     result = RESULT_MISSING;
@@ -97,30 +98,30 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                 }
 
             } catch (OAuthProblemException e) {
-                //TODO add logging
+                // TODO add logging
                 throw e;
             }
             return result;
         }
     }
 
-
     protected Form getAuthenticationParameters(Request request) throws OAuthProblemException {
         Form result = null;
         // Use the parameters which was populated with the AuthenticatorHelper
         if (request.getChallengeResponse() != null) {
             result = new Form(request.getChallengeResponse().getParameters());
-            //getLogger().fine("Found Authorization header" + result.getFirst(OAuth2.Params.ACCESS_TOKEN));
+            // getLogger().fine("Found Authorization header" +
+            // result.getFirst(OAuth2.Params.ACCESS_TOKEN));
         }
         if ((result == null)) {
-            //getLogger().fine("No Authorization header - checking query");
+            // getLogger().fine("No Authorization header - checking query");
             result = request.getOriginalRef().getQueryAsForm();
-            //getLogger().fine("Found Token in query" + result.getFirst(OAuth2.Params.ACCESS_TOKEN));
+            // getLogger().fine("Found Token in query" +
+            // result.getFirst(OAuth2.Params.ACCESS_TOKEN));
 
             // check body if all else fail:
             if (result == null) {
-                if ((request.getMethod() == Method.POST)
-                        || (request.getMethod() == Method.PUT)
+                if ((request.getMethod() == Method.POST) || (request.getMethod() == Method.PUT)
                         || (request.getMethod() == Method.DELETE)) {
                     Representation r = request.getEntity();
                     if ((r != null) && MediaType.APPLICATION_WWW_FORM.equals(r.getMediaType())) {

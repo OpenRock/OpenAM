@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-
- Copyright © 2012 ForgeRock AS. All rights reserved.
-
- The contents of this file are subject to the terms
- of the Common Development and Distribution License
- (the License). You may not use this file except in
- compliance with the License.
-
- You can obtain a copy of the License at
- http://forgerock.org/license/CDDLv1.0.html
- See the License for the specific language governing
- permission and limitations under the License.
-
- When distributing Covered Code, include this CDDL
- Header Notice in each file and include the License file
- at http://forgerock.org/license/CDDLv1.0.html
- If applicable, add the following below the CDDL Header,
- with the fields enclosed by brackets [] replaced by
- your own identifying information:
- "Portions Copyrighted [year] [name of copyright owner]"
--->
+  ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  ~
+  ~ Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+  ~
+  ~ The contents of this file are subject to the terms
+  ~ of the Common Development and Distribution License
+  ~ (the License). You may not use this file except in
+  ~ compliance with the License.
+  ~
+  ~ You can obtain a copy of the License at
+  ~ http://forgerock.org/license/CDDLv1.0.html
+  ~ See the License for the specific language governing
+  ~ permission and limitations under the License.
+  ~
+  ~ When distributing Covered Code, include this CDDL
+  ~ Header Notice in each file and include the License file
+  ~ at http://forgerock.org/license/CDDLv1.0.html
+  ~ If applicable, add the following below the CDDL Header,
+  ~ with the fields enclosed by brackets [] replaced by
+  ~ your own identifying information:
+  ~ "Portions Copyrighted [year] [name of copyright owner]"
+  -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -36,12 +36,14 @@
     <groupId>org.forgerock.openam</groupId>
     <artifactId>org.forgerock.openam.oauth2demo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>OpenAM OAuth2 Demo Application</name>
     <properties>
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
-        <restlet.version>2.1-RC3</restlet.version>
+        <restlet.version>2.1-RC4</restlet.version>
+        <jackson.version>1.9.7</jackson.version>
+        <openam.version>10.0.0</openam.version>
     </properties>
 
     <repositories>
@@ -82,6 +84,23 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- OpenAM -->
+        <dependency>
+            <groupId>com.forgerock.openam</groupId>
+            <artifactId>amserver</artifactId>
+            <version>${openam.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.forgerock.openam</groupId>
+            <artifactId>sharedlib</artifactId>
+            <version>${openam.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.forgerock.openam</groupId>
+            <artifactId>clientsdk</artifactId>
+            <version>${openam.version}</version>
+        </dependency>
+
 
         <!-- Restlet -->
         <dependency>
@@ -99,6 +118,33 @@
             <artifactId>org.restlet.ext.servlet</artifactId>
             <version>${restlet.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.freemarker</artifactId>
+            <version>${restlet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.ssl</artifactId>
+            <version>${restlet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.19</version>
+        </dependency>
+
+        <!-- Jackson JSON parser -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
@@ -110,7 +156,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.4</version>
+            <version>6.5.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>

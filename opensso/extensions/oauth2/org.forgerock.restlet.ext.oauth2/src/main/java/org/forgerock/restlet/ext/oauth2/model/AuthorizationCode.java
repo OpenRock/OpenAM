@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.model;
 
@@ -33,13 +32,16 @@ public interface AuthorizationCode extends Token {
     /**
      * Checks if this code was used to issue a token or not
      * <p/>
-     * If an authorization code is used more than once, the authorization server MUST deny the request and SHOULD
-     * revoke (when possible) all tokens previously issued based on that authorization code.
-     * The authorization code is bound to the client identifier and redirection URI.
-     *
-     * @return false if the code was not used to issue a access_token otherwise true
+     * If an authorization code is used more than once, the authorization server
+     * MUST deny the request and SHOULD revoke (when possible) all tokens
+     * previously issued based on that authorization code. The authorization
+     * code is bound to the client identifier and redirection URI.
+     * 
+     * @return false if the code was not used to issue a access_token otherwise
+     *         true
      */
     public boolean isTokenIssued();
 
-    //public lifetime	A maximum authorization code lifetime of 10 minutes is RECOMMENDED
+    // public lifetime A maximum authorization code lifetime of 10 minutes is
+    // RECOMMENDED
 }

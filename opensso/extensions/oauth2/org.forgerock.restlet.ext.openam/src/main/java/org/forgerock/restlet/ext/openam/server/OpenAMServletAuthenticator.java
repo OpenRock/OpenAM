@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,13 +20,11 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.openam.server;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -34,15 +32,17 @@ import org.restlet.Response;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.security.Enroler;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 
 /**
- * An OpenAMServletAuthenticator gets the {@link SSOToken} from the  {@link HttpServletRequest} and authenticates the
+ * An OpenAMServletAuthenticator gets the {@link SSOToken} from the
+ * {@link HttpServletRequest} and authenticates the
  * {@link org.restlet.security.User}.
  * <p/>
  * This class works with the Servlet Extension only!!!
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMServletAuthenticator extends AbstractOpenAMAuthenticator {
@@ -55,14 +55,15 @@ public class OpenAMServletAuthenticator extends AbstractOpenAMAuthenticator {
         super(context, parameters, optional);
     }
 
-    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters, boolean multiAuthenticating, boolean optional, Enroler enroler) {
+    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters,
+            boolean multiAuthenticating, boolean optional, Enroler enroler) {
         super(context, parameters, multiAuthenticating, optional, enroler);
     }
 
-    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters, boolean optional, Enroler enroler) {
+    public OpenAMServletAuthenticator(Context context, OpenAMParameters parameters,
+            boolean optional, Enroler enroler) {
         super(context, parameters, optional, enroler);
     }
-
 
     @Override
     protected SSOToken getToken(Request request, Response response) throws SSOException {

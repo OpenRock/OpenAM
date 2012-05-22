@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,16 +20,16 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.openam;
 
-import com.iplanet.sso.SSOToken;
 import org.restlet.security.User;
+
+import com.iplanet.sso.SSOToken;
 
 /**
  * An OpenAMUser wraps the {@link SSOToken} of the authenticated {@link User}
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMUser extends User {
@@ -37,7 +37,7 @@ public class OpenAMUser extends User {
 
     public OpenAMUser(String name, SSOToken token) {
         super(name);
-        //name = token.getProperty("UserId")
+        // name = token.getProperty("UserId")
         this.token = token;
     }
 

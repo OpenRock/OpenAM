@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam;
+
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.Request;
@@ -39,22 +43,17 @@ import org.restlet.engine.security.AuthenticatorHelper;
 import org.restlet.engine.util.Base64;
 import org.restlet.util.Series;
 
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-
 /**
- * An OpenAMAuthenticatorHelper generates the {@code WWW-Authenticate: OpenAM} challenge request and parse the
- * {@code Authorization: OpenAM } challenge response to get the SSOToken ID.
- *
+ * An OpenAMAuthenticatorHelper generates the {@code WWW-Authenticate: OpenAM}
+ * challenge request and parse the {@code Authorization: OpenAM } challenge
+ * response to get the SSOToken ID.
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
 
     public final static ChallengeScheme HTTP_OPENAM = new ChallengeScheme("HTTP_OPENAM", "OpenAM",
             "OpenAM SSO Authorization Tokens");
-
 
     private final static String SSO_TOKEN_PARAM = "org.forgerock.openam.authentication";
 
@@ -67,7 +66,7 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
 
     @Override
     public void formatRequest(ChallengeWriter cw, ChallengeRequest challenge, Response response,
-                              Series<Header> httpHeaders) throws IOException {
+            Series<Header> httpHeaders) throws IOException {
         if (challenge.getRealm() != null) {
             cw.appendQuotedChallengeParameter("realm", challenge.getRealm());
         }
@@ -75,27 +74,25 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
 
     @Override
     public void formatResponse(ChallengeWriter cw, ChallengeResponse challenge, Request request,
-                               Series<Header> httpHeaders) {
+            Series<Header> httpHeaders) {
         try {
             if (challenge == null) {
-                throw new RuntimeException(
-                        "No challenge provided, unable to encode credentials");
+                throw new RuntimeException("No challenge provided, unable to encode credentials");
             } else {
                 CharArrayWriter credentials = new CharArrayWriter();
                 credentials.write(retrieveSSOToken(challenge));
                 cw.append(Base64.encode(credentials.toCharArray(), "ISO-8859-1", false));
             }
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(
-                    "Unsupported encoding, unable to encode credentials");
+            throw new RuntimeException("Unsupported encoding, unable to encode credentials");
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Unexpected exception, unable to encode credentials", e);
+            throw new RuntimeException("Unexpected exception, unable to encode credentials", e);
         }
     }
 
     @Override
-    public void parseRequest(ChallengeRequest challenge, Response response, Series<Header> httpHeaders) {
+    public void parseRequest(ChallengeRequest challenge, Response response,
+            Series<Header> httpHeaders) {
         if (challenge.getRawValue() != null) {
             HeaderReader<Object> hr = new HeaderReader<Object>(challenge.getRawValue());
 
@@ -116,19 +113,20 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
                             param = null;
                         }
                     } catch (Exception e) {
-                        Context.getCurrentLogger()
-                                .log(Level.WARNING, "Unable to parse the challenge request header parameter", e);
+                        Context.getCurrentLogger().log(Level.WARNING,
+                                "Unable to parse the challenge request header parameter", e);
                     }
                 }
             } catch (Exception e) {
-                Context.getCurrentLogger()
-                        .log(Level.WARNING, "Unable to parse the challenge request header parameter", e);
+                Context.getCurrentLogger().log(Level.WARNING,
+                        "Unable to parse the challenge request header parameter", e);
             }
         }
     }
 
     @Override
-    public void parseResponse(ChallengeResponse challenge, Request request, Series<Header> httpHeaders) {
+    public void parseResponse(ChallengeResponse challenge, Request request,
+            Series<Header> httpHeaders) {
         try {
             byte[] credentialsEncoded = Base64.decode(challenge.getRawValue());
             if (credentialsEncoded == null) {
@@ -150,4 +148,3 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
         return challenge.getParameters().getFirstValue(SSO_TOKEN_PARAM);
     }
 }
-

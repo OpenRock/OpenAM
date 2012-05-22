@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,12 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.util.Collection;
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.restlet.Request;
@@ -32,12 +34,9 @@ import org.restlet.data.Reference;
 import org.restlet.routing.Redirector;
 import org.restlet.util.Series;
 
-import java.util.Collection;
-import java.util.Set;
-
 /**
  * A RequestCallbackHandler does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public interface RequestCallbackHandler<T extends AbstractAccessToken> {
@@ -48,33 +47,42 @@ public interface RequestCallbackHandler<T extends AbstractAccessToken> {
 
     /**
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.1.2>Redirection Endpoint</a>
+     * @see <a href=
+     *      "http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.1.2>Redirecti
+     *      o n Endpoint</a>
      */
     public String getRedirectionEndpoint(Request request, Reference reference);
 
     /**
      * Get the scope for the request.
      * <p/>
-     * If this returns null then the {@link OAuth2Proxy} uses it's own default scope
-     * If it returns an empty set then the {@link OAuth2Proxy} won't set the scope in the request
-     *
+     * If this returns null then the {@link OAuth2Proxy} uses it's own default
+     * scope If it returns an empty set then the {@link OAuth2Proxy} won't set
+     * the scope in the request
+     * 
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.3>Access Token Scope</a>
+     * @see <a href=
+     *      "http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.3>Acces
+     *      s Token Scope</a>
      */
     public Collection<String> getScope(Request request, Set<String> scope);
 
     /**
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.3>Access Token Scope</a>
+     * @see <a href=
+     *      "http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.3>Acces
+     *      s Token Scope</a>
      */
     public String getState(Request request);
 
     /**
      * Get the final custom parameter set of the outgoing OAuth2 request.
      * <p/>
-     * The input parameters are the {@link org.forgerock.restlet.ext.oauth2.consumer.OAuth2Proxy#getParameters()}
-     *
-     * @param parameters copy of the parameters of {@link OAuth2Proxy} it can be null
+     * The input parameters are the
+     * {@link org.forgerock.restlet.ext.oauth2.consumer.OAuth2Proxy#getParameters()}
+     * 
+     * @param parameters
+     *            copy of the parameters of {@link OAuth2Proxy} it can be null
      * @return
      */
     public Series<Parameter> decorateParameters(Series<Parameter> parameters);
@@ -82,13 +90,14 @@ public interface RequestCallbackHandler<T extends AbstractAccessToken> {
     public OAuth2Utils.ParameterLocation getTokenLocation(Request request);
 
     /**
-     * Pass back a handler to redirect the User-Agent to the Authorization Endpoint
+     * Pass back a handler to redirect the User-Agent to the Authorization
+     * Endpoint
      * <p/>
      * The implementation should be:
      * {@code
      * redirector.handle(getRequest(), getResponse());
      * }
-     *
+     * 
      * @param redirector
      */
     public OAuth2Proxy.AuthenticationStatus authorizationRedirect(Redirector redirector);

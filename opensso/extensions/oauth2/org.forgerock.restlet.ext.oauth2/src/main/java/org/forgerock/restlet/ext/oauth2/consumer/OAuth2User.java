@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,14 +20,13 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
 
+import java.util.Set;
+
 import org.forgerock.restlet.ext.oauth2.model.Token;
 import org.restlet.security.User;
-
-import java.util.Set;
 
 /**
  * @author $author$
@@ -62,10 +61,12 @@ public class OAuth2User extends User {
 
     /**
      * Constructor.
-     *
-     * @param identifier The identifier (login).
+     * 
+     * @param identifier
+     *            The identifier (login).
      */
-    public OAuth2User(String identifier, String accessToken, long expiresIn, String refreshToken, Set<String> scope, String state) {
+    public OAuth2User(String identifier, String accessToken, long expiresIn, String refreshToken,
+            Set<String> scope, String state) {
         super(identifier);
         this.accessToken = accessToken;
         this.expiresIn = expiresIn;
@@ -80,7 +81,7 @@ public class OAuth2User extends User {
         this.expiresIn = token.getExpireTime();
         this.scope = token.getScope();
 
-        //TODO Do we need these?
+        // TODO Do we need these?
         this.refreshToken = null;
         this.state = null;
     }

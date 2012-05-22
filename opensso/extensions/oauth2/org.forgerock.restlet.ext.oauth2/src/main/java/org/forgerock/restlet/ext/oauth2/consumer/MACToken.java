@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -28,6 +27,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
 /**
  * A NAME does ...
  * <p/>
+ * 
  * <pre>
  *  {
  *      "access_token":"SlAV32hkKG",
@@ -38,7 +38,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
  *      "mac_algorithm":"hmac-sha-256"
  *  }
  * </pre>
- *
+ * 
  * @author Laszlo Hordos
  */
 public class MACToken {

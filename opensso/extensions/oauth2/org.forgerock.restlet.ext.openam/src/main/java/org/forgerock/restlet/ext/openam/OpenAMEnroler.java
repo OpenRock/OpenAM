@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,25 +20,27 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.openam;
+
+import java.util.Set;
+
+import org.restlet.data.ClientInfo;
+import org.restlet.security.Enroler;
+import org.restlet.security.Role;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import org.restlet.data.ClientInfo;
-import org.restlet.security.Enroler;
-import org.restlet.security.Role;
-
-import java.util.Set;
 
 /**
- * An OpenAMEnroler gets the membership {@link AMIdentity#getMemberships(com.sun.identity.idm.IdType)}} of
- * {@link IdType#GROUP} and populates the {@link org.restlet.data.ClientInfo#getRoles()} collection.
- *
+ * An OpenAMEnroler gets the membership
+ * {@link AMIdentity#getMemberships(com.sun.identity.idm.IdType)} of
+ * {@link IdType#GROUP} and populates the
+ * {@link org.restlet.data.ClientInfo#getRoles()} collection.
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMEnroler implements Enroler {

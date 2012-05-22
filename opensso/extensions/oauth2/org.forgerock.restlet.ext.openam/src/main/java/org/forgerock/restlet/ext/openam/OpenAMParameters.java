@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,30 +20,29 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam;
 
-import org.restlet.data.Protocol;
-import org.restlet.data.Reference;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.restlet.data.Protocol;
+import org.restlet.data.Reference;
 
 /**
  * An OpenAMParameters is a proxy class to AMConfig.properties.
  * <p/>
- * If the OpenAM SDK is available in the class path this class proxies the calls to
- * {@link com.iplanet.am.util.SystemProperties} otherwise it keeps the properties in its own {@link #getAttributes()} Map.
- *
+ * If the OpenAM SDK is available in the class path this class proxies the calls
+ * to {@link com.iplanet.am.util.SystemProperties} otherwise it keeps the
+ * properties in its own {@link #getAttributes()} Map.
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMParameters {
 
     public enum IndexType {
-        SERVICE,
-        MODULE;
+        SERVICE, MODULE;
 
         public String getQueryParameter() {
             return name().toLowerCase();
@@ -59,7 +58,8 @@ public class OpenAMParameters {
     public static final String AM_SERVER_PROTOCOL = "com.iplanet.am.server.protocol";
     public static final String AM_SERVER_HOST = "com.iplanet.am.server.host";
     public static final String AM_SERVER_PORT = "com.iplanet.am.server.port";
-    public static final String AM_SERVICES_DEPLOYMENT_DESCRIPTOR = "com.iplanet.am.services.deploymentDescriptor";
+    public static final String AM_SERVICES_DEPLOYMENT_DESCRIPTOR =
+            "com.iplanet.am.services.deploymentDescriptor";
     public static final String SERVICES_DEBUG_DIRECTORY = "com.iplanet.services.debug.directory";
     public static final String AM_APPLICATION_USERNAME = "com.sun.identity.agents.app.username";
     public static final String AM_APPLICATION_PASSWORD = "com.iplanet.am.service.password";
@@ -86,7 +86,6 @@ public class OpenAMParameters {
     private String orgName = "/";
     private String locale = null;
     private IndexType loginIndexType = null;
-
 
     public OpenAMParameters() {
         this.attributes = new ConcurrentHashMap<String, Object>();
@@ -165,7 +164,8 @@ public class OpenAMParameters {
     }
 
     /**
-     * An user agent configured to access OpenAM, such as UrlAccessAgent set up when OpenAM was installed
+     * An user agent configured to access OpenAM, such as UrlAccessAgent set up
+     * when OpenAM was installed
      */
     public String getApplicationUserName() {
         return getProperty(AM_APPLICATION_USERNAME);
@@ -222,7 +222,7 @@ public class OpenAMParameters {
         return attributes;
     }
 
-    //-------------------------------------------------------------
+    // -------------------------------------------------------------
 
     protected String getProperty(String name) {
         Object value = attributes.get(name);

@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,13 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
+
 package org.forgerock.restlet.ext.oauth2.internal;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -40,13 +44,10 @@ import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
 /**
- * This class can initialise the OAuth2 Endpoint. IT can be a Spring Bean or an OSGi component
- *
+ * This class can initialise the OAuth2 Endpoint. IT can be a Spring Bean or an
+ * OSGi component
+ * 
  * @author $author$
  * @version $Revision$ $Date$
  */
@@ -65,7 +66,6 @@ public class OAuth2Component {
     private String realm = null;
 
     private Logger logger = null;
-
 
     public OAuth2Provider getProvider() {
         return provider;
@@ -121,17 +121,23 @@ public class OAuth2Component {
         root.attach("/resources", directory);
 
         // Define Authorization Endpoint
-        OAuth2FlowFinder finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT).supportAuthorizationCode().supportClientCredentials().supportImplicit().supportPassword();
-        ChallengeAuthenticator au = new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "realm");
+        OAuth2FlowFinder finder =
+                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT)
+                        .supportAuthorizationCode().supportClientCredentials().supportImplicit()
+                        .supportPassword();
+        ChallengeAuthenticator au =
+                new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "realm");
         au.setVerifier(getUserVerifier());
         au.setNext(finder);
 
         // This endpoint protected by OpenAM Filter
         root.attach(OAuth2Utils.getAuthorizePath(childContext), au);
 
-
         // Define Token Endpoint
-        finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT).supportAuthorizationCode().supportClientCredentials().supportImplicit().supportPassword();
+        finder =
+                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT)
+                        .supportAuthorizationCode().supportClientCredentials().supportImplicit()
+                        .supportPassword();
         // Try to authenticate the client The verifier MUST set
         ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
         filter.setVerifier(clientVerifier);
@@ -143,7 +149,7 @@ public class OAuth2Component {
             realm = OAuth2Utils.isNotBlank(realm) ? realm : null;
         }
 
-        //Configure context
+        // Configure context
         childContext.setDefaultVerifier(userVerifier);
         OAuth2Utils.setClientVerifier(clientVerifier, childContext);
         OAuth2Utils.setTokenStore(tokenStore, childContext);
@@ -164,27 +170,21 @@ public class OAuth2Component {
         logger.fine("Realm detached");
     }
 
-
     // Null-Safe logger example
-/*    protected Logger getLogger(Context context) {
-        Handler handler = new Handler(context.getLogger());
-        Class[] interfacesArray = new Class[]{Logger.class};
-        return (Logger) Proxy.newProxyInstance(org.restlet.engine.Engine.getInstance().getClassLoader(), interfacesArray, handler);
-    }
-
-    class Handler implements InvocationHandler {
-        public Logger logger;
-
-        public Handler(Logger sum) {
-            this.logger = sum;
-        }
-
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (null != logger) {
-                return method.invoke(logger, args);
-            } else {
-                return null;
-            }
-        }
-    }*/
+    /*
+     * protected Logger getLogger(Context context) { Handler handler = new
+     * Handler(context.getLogger()); Class[] interfacesArray = new
+     * Class[]{Logger.class}; return (Logger)
+     * Proxy.newProxyInstance(org.restlet.
+     * engine.Engine.getInstance().getClassLoader(), interfacesArray, handler);
+     * }
+     * 
+     * class Handler implements InvocationHandler { public Logger logger;
+     * 
+     * public Handler(Logger sum) { this.logger = sum; }
+     * 
+     * public Object invoke(Object proxy, Method method, Object[] args) throws
+     * Throwable { if (null != logger) { return method.invoke(logger, args); }
+     * else { return null; } } }
+     */
 }

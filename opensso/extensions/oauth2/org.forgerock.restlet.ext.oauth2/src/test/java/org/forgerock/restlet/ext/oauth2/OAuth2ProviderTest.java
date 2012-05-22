@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,16 +20,17 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 import org.forgerock.restlet.ext.oauth2.internal.OAuth2Component;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Provider;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;
 import org.forgerock.restlet.ext.oauth2.representation.ClassDirectoryServerResource;
 import org.restlet.Application;
-import org.restlet.Client;
 import org.restlet.Component;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -41,9 +42,6 @@ import org.restlet.data.Reference;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-
 /**
  * @author $author$
  * @version $Revision$ $Date$
@@ -54,15 +52,18 @@ public class OAuth2ProviderTest {
     protected OAuth2Provider queryProvider;
     protected Component component = new Component();
 
-    //@BeforeClass
+    // @BeforeClass
     public void beforeClass() throws Exception {
         component.getClients().add(Protocol.RIAP); // Enable Client connectors
         component.getClients().add(Protocol.FILE); // Enable Client connectors
         component.getClients().add(Protocol.CLAP); // Enable Client connectors
-        //component.getClients().add(Protocol.HTTP); // Enable Client connectors
-        component.getStatusService().setEnabled(false); // The status service is disabled by default.
+        // component.getClients().add(Protocol.HTTP); // Enable Client
+        // connectors
+        component.getStatusService().setEnabled(false); // The status service is
+                                                        // disabled by default.
         Application application = new Application(component.getContext().createChildContext());
-        application.getTunnelService().setQueryTunnel(false); // query string purism
+        application.getTunnelService().setQueryTunnel(false); // query string
+                                                              // purism
 
         // create InboundRoot
         Router root = new Router(application.getContext());
@@ -78,26 +79,32 @@ public class OAuth2ProviderTest {
         queryProvider = realmRouter;
         application.setInboundRoot(root);
 
-        //Attach to internal routes
+        // Attach to internal routes
         component.getInternalRouter().attach("", application);
     }
 
-    //@Test
+    // @Test
     public void testGetRequestParameter() throws Exception {
         OAuth2Component c = new OAuth2Component();
         c.getConfiguration().put(OAuth2.Custom.REALM, "test");
         c.setProvider(pathProvider);
         c.activate();
 
-        /*ClientResource client = new ClientResource(component.getContext().createChildContext(), "riap://component/test/oauth2/authorize");
-        ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
-        client.setChallengeResponse(challengeResponse);
-        TestResource testable = client.wrap(TestResource.class);
-        testable.get();*/
+        /*
+         * ClientResource client = new
+         * ClientResource(component.getContext().createChildContext(),
+         * "riap://component/test/oauth2/authorize"); ChallengeResponse
+         * challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+         * "admin", "admin"); client.setChallengeResponse(challengeResponse);
+         * TestResource testable = client.wrap(TestResource.class);
+         * testable.get();
+         */
 
         Restlet client = component.getContext().getClientDispatcher();
 
-        Reference reference = new Reference("riap://component/test/oauth2/authorize?response_type=token&client_iid=cid&scope=read%20write&state=random&redirect_uri=valami");
+        Reference reference =
+                new Reference(
+                        "riap://component/test/oauth2/authorize?response_type=token&client_iid=cid&scope=read%20write&state=random&redirect_uri=valami");
         Request request = new Request(Method.GET, reference);
         Response response = new Response(request);
 
@@ -106,15 +113,14 @@ public class OAuth2ProviderTest {
         assertNotNull(token.getFirstValue(OAuth2.Params.ACCESS_TOKEN));
         assertEquals(token.getFirstValue(OAuth2.Params.TOKEN_TYPE), OAuth2.Bearer.BEARER);
 
-
-        /*client.handle(request, new Uniform() {
-            @Override
-            public void handle(Request request, Response response) {
-                System.out.println(response.getStatus());
-                System.out.println(request.getResourceRef());
-                assertNotNull(response);
-            }
-        });*/
+        /*
+         * client.handle(request, new Uniform() {
+         * 
+         * @Override public void handle(Request request, Response response) {
+         * System.out.println(response.getStatus());
+         * System.out.println(request.getResourceRef());
+         * assertNotNull(response); } });
+         */
 
     }
 }

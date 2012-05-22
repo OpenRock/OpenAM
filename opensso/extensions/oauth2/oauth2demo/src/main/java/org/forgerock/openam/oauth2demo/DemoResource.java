@@ -1,20 +1,38 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright © 2012 ForgeRock. All rights reserved.
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2demo;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -43,18 +61,9 @@ import org.restlet.resource.ServerResource;
 import org.restlet.routing.Redirector;
 import org.restlet.util.Series;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A NAME does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class DemoResource extends ServerResource implements RequestCallbackHandler<BearerToken> {
@@ -66,12 +75,11 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     private Series<Parameter> customParameters = null;
     private boolean dynamicEndpoint = false;
 
-
     private volatile boolean redirected = false;
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     @Get("html")
@@ -79,8 +87,7 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
         Form parameters = getQuery();
         Map<String, Object> response = new HashMap<String, Object>();
 
-
-        //Set Authentication Mode
+        // Set Authentication Mode
         String mode = parameters.getFirstValue("mode");
         if (mode != null) {
             try {
@@ -96,8 +103,7 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
         response.put("page_name", "Protected Resource:"
                 + (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(tokenLocation) ? "Header"
-                                                                                   : "Query"));
-
+                        : "Query"));
 
         String action = parameters.getFirstValue("action");
         if ("flush_token".equalsIgnoreCase(action)) {
@@ -118,7 +124,6 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
         dynamicEndpoint = null != parameters.getFirst("dynamicEndpoint");
 
-
         for (Parameter parameter : parameters) {
             if (parameter.getName().startsWith("oa_")) {
                 if (null == customParameters) {
@@ -129,7 +134,6 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
                 }
             }
         }
-
 
         String flow = parameters.getFirstValue("flow");
         BearerOAuth2Proxy.Flow flowType = OAuth2Proxy.Flow.AUTHORIZATION_CODE;
@@ -147,8 +151,8 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
                 return getResponseEntity();
             }
             try {
-                response.put("protected",
-                        new JacksonRepresentation<Map>(representation, Map.class).getObject());
+                response.put("protected", new JacksonRepresentation<Map>(representation, Map.class)
+                        .getObject());
             } catch (IOException e) {
                 /* ignored */
             }
@@ -173,7 +177,7 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     protected HttpServletRequest getHttpServletRequest() {
@@ -185,9 +189,11 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
     /**
      * TODO Description.
-     *
-     * @param reference TODO Description
-     * @param flow      TODO Description
+     * 
+     * @param reference
+     *            TODO Description
+     * @param flow
+     *            TODO Description
      * @return TODO Description
      */
     protected ClientResource getClientResource(Reference reference, OAuth2Proxy.Flow flow) {
@@ -199,18 +205,18 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     }
 
     /**
-     * Set-up method that can be overridden in order to initialize the state of the resource. By
-     * default it does nothing.
-     *
+     * Set-up method that can be overridden in order to initialize the state of
+     * the resource. By default it does nothing.
+     * 
      * @throws ResourceException
-     * @see #init(org.restlet.Context, org.restlet.Request, org.restlet.Response)
+     * @see #init(org.restlet.Context, org.restlet.Request,
+     *      org.restlet.Response)
      */
     protected void doInit() {
         proxy = BearerOAuth2Proxy.popOAuth2Proxy(getContext());
         if (null == proxy) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
-                    "Missing required context attribute: "
-                            + OAuth2TokenStore.class.getName());
+                    "Missing required context attribute: " + OAuth2TokenStore.class.getName());
         }
     }
 
@@ -221,19 +227,19 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
 
     /**
      * Return a templated representation.
-     *
-     * @param map          The map of parameters.
-     * @param templateName The name of the template.
+     * 
+     * @param map
+     *            The map of parameters.
+     * @param templateName
+     *            The name of the template.
      * @return A templated representation.
      */
     protected Representation toRepresentation(Map<String, Object> map, String templateName) {
-        return new TemplateRepresentation(templateName, getApplication()
-                .getConfiguration(), map, MediaType.TEXT_HTML);
+        return new TemplateRepresentation(templateName, getApplication().getConfiguration(), map,
+                MediaType.TEXT_HTML);
     }
 
-
     // Callback
-
 
     @Override
     public BearerToken popAccessToken(Request request) {

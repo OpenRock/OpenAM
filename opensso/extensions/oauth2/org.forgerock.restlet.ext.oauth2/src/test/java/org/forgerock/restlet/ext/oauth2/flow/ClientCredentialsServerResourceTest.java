@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.flow;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
@@ -37,12 +42,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
-
-import java.util.Map;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author $author$
@@ -60,13 +59,13 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
         parameters.add(OAuth2.Params.SCOPE, "read write");
         request.setEntity(parameters.getWebRepresentation());
 
-
-        //handle
+        // handle
         getClient().handle(request, response);
         assertTrue(MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType()));
-        JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(response.getEntity(), Map.class);
+        JacksonRepresentation<Map> representation =
+                new JacksonRepresentation<Map>(response.getEntity(), Map.class);
 
-        //assert
+        // assert
         assertThat(representation.getObject()).includes(
                 MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
                 MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {

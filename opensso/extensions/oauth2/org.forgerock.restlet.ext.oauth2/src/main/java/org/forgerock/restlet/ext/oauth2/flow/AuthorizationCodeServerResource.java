@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,12 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
+
 package org.forgerock.restlet.ext.oauth2.flow;
+
+import java.util.Map;
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -37,212 +40,230 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.routing.Redirector;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author $author$
  * @version $Revision$ $Date$
  */
 public class AuthorizationCodeServerResource extends AbstractFlow {
 
-    protected boolean decision_allow = false;
+    protected boolean decisionIsAllow = false;
     protected Form formPost = null;
 
     /*
-        If TLS is not available, the authorization server
-        SHOULD warn the resource owner about the insecure endpoint prior to
-        redirection.
-    */
+     * If TLS is not available, the authorization server SHOULD warn the
+     * resource owner about the insecure endpoint prior to redirection.
+     */
     @Get("html")
     public Representation represent() {
         /*
-            The authorization server validates the request to ensure all required
-            parameters are present and valid.  If the request is valid, the
-            authorization server authenticates the resource owner and obtains an
-            authorization decision (by asking the resource owner or by
-            establishing approval via other means).
+         * The authorization server validates the request to ensure all required
+         * parameters are present and valid. If the request is valid, the
+         * authorization server authenticates the resource owner and obtains an
+         * authorization decision (by asking the resource owner or by
+         * establishing approval via other means).
          */
         resourceOwner = getAuthenticatedResourceOwner();
         client = validateRemoteClient();
-        //Validate Redirect URI throw exception
-        sessionClient = client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                OAuth2.Params.REDIRECT_URI, String.class));
+        // Validate Redirect URI throw exception
+        sessionClient =
+                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
+                        OAuth2.Params.REDIRECT_URI, String.class));
 
-        String approval_prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT, String.class);
+        String approval_prompt =
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT,
+                        String.class);
 
         if (true) {
             /*
-            APPROVAL_PROMPT = true AND NOT (CLIENT.AUTO_GRANT)
+             * APPROVAL_PROMPT = true AND NOT (CLIENT.AUTO_GRANT)
              */
-            //Build approval page data
+            // Build approval page data
 
-            //The target contains the state
-            String state = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
+            // The target contains the state
+            String state =
+                    OAuth2Utils
+                            .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
 
-            //Get the requested scope
-            String scope_before = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
-            //Validate the granted scope
-            Set<String> checkedScope = getCheckedScope(scope_before, client.getClient().allowedGrantScopes(),
-                    client.getClient().defaultGrantScopes());
-
+            // Get the requested scope
+            String scope_before =
+                    OAuth2Utils
+                            .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+            // Validate the granted scope
+            Set<String> checkedScope =
+                    getCheckedScope(scope_before, client.getClient().allowedGrantScopes(), client
+                            .getClient().defaultGrantScopes());
 
             return getPage("authorize.ftl", getDataModel());
         } else {
-            decision_allow = true;
+            decisionIsAllow = true;
             return authorization(getRequest().getEntity());
         }
     }
 
     @Post("form:json")
     public Representation represent(Representation entity) {
-        //Validate the client
+        // Validate the client
         client = validateRemoteClient();
-        //Validate Redirect URI throw exception
-        sessionClient = client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                OAuth2.Params.REDIRECT_URI, String.class));
+        // Validate Redirect URI throw exception
+        sessionClient =
+                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
+                        OAuth2.Params.REDIRECT_URI, String.class));
         switch (endpointType) {
-            case AUTHORIZATION_ENDPOINT: {
-                resourceOwner = getAuthenticatedResourceOwner();
+        case AUTHORIZATION_ENDPOINT: {
+            resourceOwner = getAuthenticatedResourceOwner();
 
-                return authorization(entity);
-            }
-            case TOKEN_ENDPOINT: {
-                return token(entity);
-            }
-            default: {
-                return null;
-            }
+            return authorization(entity);
+        }
+        case TOKEN_ENDPOINT: {
+            return token(entity);
+        }
+        default: {
+            return null;
+        }
         }
     }
 
     public Representation authorization(Representation entity) {
         /*
-            When a decision is established, the authorization server directs the
-            user-agent to the provided client redirection URI using an HTTP
-            redirection response, or by other means available to it via the user-
-            agent.
+         * When a decision is established, the authorization server directs the
+         * user-agent to the provided client redirection URI using an HTTP
+         * redirection response, or by other means available to it via the user-
+         * agent.
          */
         if (getDecision(entity)) {
-            //Get the granted scope
-            String scope_after = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
-            //Validate the granted scope
-            Set<String> checkedScope = getCheckedScope(scope_after, client.getClient().allowedGrantScopes(),
-                    client.getClient().defaultGrantScopes());
+            // Get the granted scope
+            String scope_after =
+                    OAuth2Utils
+                            .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+            // Validate the granted scope
+            Set<String> checkedScope =
+                    getCheckedScope(scope_after, client.getClient().allowedGrantScopes(), client
+                            .getClient().defaultGrantScopes());
 
-            //Generate Token  resourceOwner, sessionClient, checkedScope, customParameters
+            // Generate Token resourceOwner, sessionClient, checkedScope,
+            // customParameters
             AuthorizationCode token = createAuthorizationCode(checkedScope);
-
 
             Reference location = new Reference(sessionClient.getRedirectUri());
             location.addQueryParameter(OAuth2.Params.CODE, token.getToken());
-            String state = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
+            String state =
+                    OAuth2Utils
+                            .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
             if (OAuth2Utils.isNotBlank(state)) {
                 location.addQueryParameter(OAuth2.Params.STATE, state);
             }
-            Redirector cb = new Redirector(getContext(), location.toString(), Redirector.MODE_CLIENT_FOUND);
+            Redirector cb =
+                    new Redirector(getContext(), location.toString(), Redirector.MODE_CLIENT_FOUND);
             cb.handle(getRequest(), getResponse());
         } else {
-            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), "Resource Owner did not authorize the request");
+            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
+                    "Resource Owner did not authorize the request");
         }
         return getResponseEntity();
     }
 
     public Representation token(Representation entity) {
         /*
-   The authorization server MUST:
-
-   o  require client authentication for confidential clients or for any
-      client that was issued client credentials (or with other
-      authentication requirements),
-   o  authenticate the client if client authentication is included and
-      ensure the authorization code was issued to the authenticated
-      client,
-   o  verify that the authorization code is valid, and
-   o  ensure that the "redirect_uri" parameter is present if the
-      "redirect_uri" parameter was included in the initial authorization
-      request as described in Section 4.1.1, and if included ensure
-      their values are identical.
+         * The authorization server MUST:
+         * 
+         * o require client authentication for confidential clients or for any
+         * client that was issued client credentials (or with other
+         * authentication requirements), o authenticate the client if client
+         * authentication is included and ensure the authorization code was
+         * issued to the authenticated client, o verify that the authorization
+         * code is valid, and o ensure that the "redirect_uri" parameter is
+         * present if the "redirect_uri" parameter was included in the initial
+         * authorization request as described in Section 4.1.1, and if included
+         * ensure their values are identical.
          */
 
         // Find code
-        String code_p = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CODE, String.class);
+        String code_p =
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CODE, String.class);
         AuthorizationCode code = getTokenStore().readAuthorizationCode(code_p);
 
         if (null == code) {
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "authorization code has been user!");
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                    "Authorization code has been user.");
         } else if (code.isTokenIssued()) {
-            //TODO throw Exception
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "authorization code has been user!");
+            // TODO throw Exception
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                    "Authorization code has been user.");
         } else {
-            //TODO Token expire check
+            // TODO Token expire check
             if (code.getExpireTime() - System.currentTimeMillis() < 0 || code.isExpired()) {
-                //Throw expired code
+                // Throw expired code
+                throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
+                        "Authorization code expired.");
             }
-            //TODO validate redirect URI and ClientID
+            // TODO validate redirect URI and ClientID
             if (!code.getClient().equals(sessionClient)) {
-                //Throw redirect_uri mismatch
+                // Throw redirect_uri mismatch
             }
 
-            //Generate Token
+            // Generate Token
             AccessToken token = createAccessToken(code);
             Map<String, Object> response = token.convertToMap();
             return new JacksonRepresentation<Map>(response);
         }
     }
 
-
-    //Get the decision [allow,deny]
+    // Get the decision [allow,deny]
     protected boolean getDecision(Representation entity) {
-        if (!decision_allow) {
-            String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DECISION, String.class);
+        if (!decisionIsAllow) {
+            String decision =
+                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DECISION,
+                            String.class);
             if (OAuth2.Custom.ALLOW.equalsIgnoreCase(decision)) {
-                decision_allow = true;
+                decisionIsAllow = true;
             } else {
-                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), "Resource Owner did not authorize the request");
+                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
+                        "Resource Owner did not authorize the request");
             }
         }
-        return decision_allow;
+        return decisionIsAllow;
     }
-
 
     @Override
     protected String[] getRequiredParameters() {
         Set<String> required = null;
         switch (endpointType) {
-            case AUTHORIZATION_ENDPOINT: {
-                return new String[]{OAuth2.Params.RESPONSE_TYPE, OAuth2.Params.CLIENT_ID};
-            }
-            case TOKEN_ENDPOINT: {
-                return new String[]{OAuth2.Params.GRANT_TYPE, OAuth2.Params.CODE, OAuth2.Params.REDIRECT_URI};
-            }
-            default: {
-                return null;
-            }
+        case AUTHORIZATION_ENDPOINT: {
+            return new String[] { OAuth2.Params.RESPONSE_TYPE, OAuth2.Params.CLIENT_ID };
+        }
+        case TOKEN_ENDPOINT: {
+            return new String[] { OAuth2.Params.GRANT_TYPE, OAuth2.Params.CODE,
+                OAuth2.Params.REDIRECT_URI };
+        }
+        default: {
+            return null;
+        }
         }
     }
 
     /**
      * This method is intended to be overridden by subclasses.
-     *
+     * 
      * @param checkedScope
      * @return
      * @throws OAuthProblemException
      */
     protected AuthorizationCode createAuthorizationCode(Set<String> checkedScope) {
-        return getTokenStore().createAuthorizationCode(checkedScope, OAuth2Utils.getContextRealm(getContext()),
-                resourceOwner.getIdentifier(), sessionClient);
+        return getTokenStore().createAuthorizationCode(checkedScope,
+                OAuth2Utils.getContextRealm(getContext()), resourceOwner.getIdentifier(),
+                sessionClient);
     }
 
     /**
      * This method is intended to be overridden by subclasses.
-     *
+     * 
      * @param code
      * @return
      * @throws OAuthProblemException
      */
     protected AccessToken createAccessToken(AuthorizationCode code) {
-        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), code.getScope(), code);
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
+                code.getScope(), code);
     }
 
     protected Form getFormPost(Representation entity) {

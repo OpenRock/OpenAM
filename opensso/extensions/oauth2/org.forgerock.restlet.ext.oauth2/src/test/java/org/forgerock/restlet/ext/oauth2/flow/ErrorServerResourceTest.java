@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.flow;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -36,12 +41,6 @@ import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
-import java.util.Set;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
 /**
  * @author $author$
  * @version $Revision$ $Date$
@@ -49,21 +48,25 @@ import static org.testng.Assert.assertTrue;
 public class ErrorServerResourceTest extends AbstractFlowTest {
     @Test
     public void testCheckedScope() throws Exception {
-        Set<String> allowedGrantScopes = OAuth2Utils.split("read list write", OAuth2Utils.getScopeDelimiter(null));
+        Set<String> allowedGrantScopes =
+                OAuth2Utils.split("read list write", OAuth2Utils.getScopeDelimiter(null));
         assertThat(allowedGrantScopes).hasSize(3).containsOnly("read", "list", "write");
         Context ctx = new Context();
         OAuth2Utils.setScopeDelimiter(",", ctx);
-        Set<String> defaultGrantScopes = OAuth2Utils.split("read,list", OAuth2Utils.getScopeDelimiter(ctx));
+        Set<String> defaultGrantScopes =
+                OAuth2Utils.split("read,list", OAuth2Utils.getScopeDelimiter(ctx));
         assertThat(defaultGrantScopes).hasSize(2).containsOnly("read", "list");
 
         ErrorServerResource testable = new ErrorServerResource();
-        Set<String> checkedScope = testable.getCheckedScope(null, allowedGrantScopes, defaultGrantScopes);
+        Set<String> checkedScope =
+                testable.getCheckedScope(null, allowedGrantScopes, defaultGrantScopes);
         assertThat(checkedScope).isEqualTo(defaultGrantScopes);
 
         checkedScope = testable.getCheckedScope("read", allowedGrantScopes, defaultGrantScopes);
         assertThat(checkedScope).containsOnly("read");
 
-        checkedScope = testable.getCheckedScope("read delete", allowedGrantScopes, defaultGrantScopes);
+        checkedScope =
+                testable.getCheckedScope("read delete", allowedGrantScopes, defaultGrantScopes);
         assertThat(checkedScope).containsOnly("read");
     }
 
@@ -73,7 +76,7 @@ public class ErrorServerResourceTest extends AbstractFlowTest {
         Request request = new Request(Method.POST, reference);
         Response response = new Response(request);
 
-        //handle
+        // handle
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_NOT_FOUND);
     }
@@ -88,17 +91,15 @@ public class ErrorServerResourceTest extends AbstractFlowTest {
         parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.SAML20.GRANT_TYPE_URI);
         request.setEntity(parameters.getWebRepresentation());
 
-        //handle
+        // handle
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN);
-
 
         reference = new Reference("riap://component/test/oauth2/access_token");
         request = new Request(Method.POST, reference);
         response = new Response(request);
 
-
-        //handle
+        // handle
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_NOT_FOUND);
         assertTrue(response.getEntity() instanceof JacksonRepresentation);

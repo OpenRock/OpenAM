@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -36,14 +40,9 @@ import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.util.Series;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * A NAME does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class RequestFactory {
@@ -58,7 +57,8 @@ public class RequestFactory {
             for (Constructor<?> constructor : factory.getConstructors()) {
                 System.out.println(constructor);
             }
-            Constructor<T> constructor = factory.getConstructor(new Class<?>[]{RequestFactory.class, Reference.class});
+            Constructor<T> constructor =
+                    factory.getConstructor(new Class<?>[] { RequestFactory.class, Reference.class });
             return constructor.newInstance(new RequestFactory(endpoint), endpoint);
         } catch (Exception e) {
             // Should never happen.
@@ -81,7 +81,9 @@ public class RequestFactory {
         }
 
         public Request build(Context context) {
-            Request request = new Request(Method.POST, getEndpoint(), refreshParameters(context).getWebRepresentation());
+            Request request =
+                    new Request(Method.POST, getEndpoint(), refreshParameters(context)
+                            .getWebRepresentation());
             if (null != challengeResponse) {
                 request.setChallengeResponse(challengeResponse);
             }
@@ -151,17 +153,17 @@ public class RequestFactory {
 
     protected Form refreshParameters(Context context) {
         if (scope == null) {
-            //Do nothing
+            // Do nothing
         } else if (scope.isEmpty()) {
             parameters.removeAll(OAuth2.Params.SCOPE);
         } else {
-            parameters.set(OAuth2.Params.SCOPE, OAuth2Utils.join(scope, OAuth2Utils.getScopeDelimiter(context)));
+            parameters.set(OAuth2.Params.SCOPE, OAuth2Utils.join(scope, OAuth2Utils
+                    .getScopeDelimiter(context)));
         }
         return parameters;
     }
 
     //
-
 
     public class AuthorizationCodeRequest extends AuthorizationRequestFactory {
         public AuthorizationCodeRequest(Reference endpoint) {

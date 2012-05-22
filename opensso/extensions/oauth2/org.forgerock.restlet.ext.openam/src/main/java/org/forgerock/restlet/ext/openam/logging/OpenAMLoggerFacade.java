@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,27 +20,28 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam.logging;
 
-import com.sun.identity.shared.debug.Debug;
+import java.util.logging.Logger;
+
 import org.restlet.engine.log.LoggerFacade;
 
-import java.util.logging.Logger;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * An OpenAMLoggerFacade does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMLoggerFacade extends LoggerFacade {
 
     /**
      * Returns an instance of {@link OpenAMLogger}, wrapping the result of
-     * {@link com.sun.identity.shared.debug.Debug#getInstance(String)} where the logger name is "".
-     *
+     * {@link com.sun.identity.shared.debug.Debug#getInstance(String)} where the
+     * logger name is "".
+     * 
      * @return An anonymous logger.
      */
     @Override
@@ -50,9 +51,11 @@ public class OpenAMLoggerFacade extends LoggerFacade {
 
     /**
      * Returns an instance of {@link OpenAMLogger}, wrapping the result of
-     * {@link com.sun.identity.shared.debug.Debug#getInstance(String)} with the logger name.
-     *
-     * @param loggerName The logger name.
+     * {@link com.sun.identity.shared.debug.Debug#getInstance(String)} with the
+     * logger name.
+     * 
+     * @param loggerName
+     *            The logger name.
      * @return An anonymous logger.
      */
     @Override

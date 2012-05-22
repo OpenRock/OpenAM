@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
+import java.io.InputStream;
+import java.util.Map;
 
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -32,12 +37,6 @@ import org.restlet.data.Reference;
 import org.restlet.representation.InputRepresentation;
 import org.testng.annotations.Test;
 
-import java.io.InputStream;
-import java.util.Map;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-
 /**
  * @author $author$
  * @version $Revision$ $Date$
@@ -45,13 +44,14 @@ import static org.testng.Assert.assertNotNull;
 public class OAuth2UtilsTest {
     @Test
     public void testGetRequestParameter() throws Exception {
-        Reference ref = new Reference("https://client.example.com/cb#error=access_denied&state=xyz");
+        Reference ref =
+                new Reference("https://client.example.com/cb#error=access_denied&state=xyz");
         Form form = new Form(ref.getFragment());
         form.add("access_token", "value");
         ref.setFragment(form.getQueryString());
     }
 
-    //@Test
+    // @Test
     public void testJsonPostRequestParameter() throws Exception {
         InputStream is = OAuth2UtilsTest.class.getResourceAsStream("code.json");
         assertNotNull(is);

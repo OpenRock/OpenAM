@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,19 +20,18 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam.logging;
-
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+
 /**
  * An OpenAMLogger does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMLogger extends Logger {
@@ -44,8 +43,9 @@ public class OpenAMLogger extends Logger {
 
     /**
      * Constructor.
-     *
-     * @param debug The OpenAM logger to wrap.
+     * 
+     * @param debug
+     *            The OpenAM logger to wrap.
      */
     public OpenAMLogger(com.sun.identity.shared.debug.Debug debug) {
         super(debug.getName(), null);
@@ -54,9 +54,11 @@ public class OpenAMLogger extends Logger {
 
     /**
      * Constructor.
-     *
-     * @param name               The logger name.
-     * @param resourceBundleName The optional resource bundle name.
+     * 
+     * @param name
+     *            The logger name.
+     * @param resourceBundleName
+     *            The optional resource bundle name.
      */
     protected OpenAMLogger(String name, String resourceBundleName) {
         super(name, resourceBundleName);
@@ -65,8 +67,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs a configuration message. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#message(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void config(String msg) {
@@ -76,8 +79,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs a fine trace. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#message(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void fine(String msg) {
@@ -87,8 +91,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs a finer trace. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#message(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void finer(String msg) {
@@ -98,8 +103,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs a finest trace. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#message(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void finest(String msg) {
@@ -108,7 +114,7 @@ public class OpenAMLogger extends Logger {
 
     /**
      * Returns the wrapped OpenAM logger.
-     *
+     * 
      * @return The wrapped OpenAM logger.
      */
     public com.sun.identity.shared.debug.Debug getDebugLogger() {
@@ -118,8 +124,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs an info message. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#message(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void info(String msg) {
@@ -248,8 +255,9 @@ public class OpenAMLogger extends Logger {
 
     /**
      * Sets the wrapped OpenAM logger.
-     *
-     * @param debug The wrapped OpenAM logger.
+     * 
+     * @param debug
+     *            The wrapped OpenAM logger.
      */
     public void setDebugLogger(com.sun.identity.shared.debug.Debug debug) {
         this.eventDebug = debug;
@@ -258,8 +266,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs a severe message. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#error(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void severe(String msg) {
@@ -269,8 +278,9 @@ public class OpenAMLogger extends Logger {
     /**
      * Logs a warning message. By default, it invokes
      * {@link com.sun.identity.shared.debug.Debug#warning(String)}.
-     *
-     * @param msg The message to log.
+     * 
+     * @param msg
+     *            The message to log.
      */
     @Override
     public void warning(String msg) {

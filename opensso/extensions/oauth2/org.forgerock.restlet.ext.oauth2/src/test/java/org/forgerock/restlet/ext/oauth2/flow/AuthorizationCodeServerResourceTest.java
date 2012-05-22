@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,16 +20,20 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.flow;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.*;
+
+import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
-import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.*;
+import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.AuthorizationCodeRequest;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
@@ -40,13 +44,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.testng.annotations.Test;
-
-import java.util.Map;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author $author$
@@ -59,19 +56,19 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
         assertNotNull(auth2Proxy);
 
-        AuthorizationCodeRequest factory = auth2Proxy.getAuthorizationCodeRequest().setClientId("cid").
-                setRedirectUri(auth2Proxy.getRedirectionEndpoint().toString()).setState("random");
+        AuthorizationCodeRequest factory =
+                auth2Proxy.getAuthorizationCodeRequest().setClientId("cid").setRedirectUri(
+                        auth2Proxy.getRedirectionEndpoint().toString()).setState("random");
         factory.getScope().add("read");
         factory.getScope().add("write");
 
-
         Request request = factory.buildRequest();
-        ChallengeResponse resource_owner = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
+        ChallengeResponse resource_owner =
+                new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         request.setChallengeResponse(resource_owner);
         Response response = new Response(request);
 
-
-        //handle
+        // handle
         getClient().handle(request, response);
         assertTrue(response.getStatus().isSuccess());
         assertTrue(response.getEntity() instanceof TemplateRepresentation);
@@ -90,22 +87,23 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         parameters.add(OAuth2.Custom.DECISION, OAuth2.Custom.ALLOW);
         request.setEntity(parameters.getWebRepresentation());
 
-        //handle
+        // handle
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.REDIRECTION_FOUND);
         Form fragment = response.getLocationRef().getQueryAsForm();
 
-        //assert
-        assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
-            @Override
-            public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.CODE);
-            }
-        });
+        // assert
+        assertThat(fragment.getValuesMap())
+                .includes(MapAssert.entry(OAuth2.Params.STATE, "random")).is(
+                        new Condition<Map<?, ?>>() {
+                            @Override
+                            public boolean matches(Map<?, ?> value) {
+                                return value.containsKey(OAuth2.Params.CODE);
+                            }
+                        });
 
-
-        BearerToken token = auth2Proxy.flowAuthorizationToken(fragment.getFirstValue(OAuth2.Params.CODE));
+        BearerToken token =
+                auth2Proxy.flowAuthorizationToken(fragment.getFirstValue(OAuth2.Params.CODE));
         assertNotNull(token);
 
     }

@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,21 +20,21 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.util.Map;
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.restlet.data.Parameter;
 import org.restlet.util.Series;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A NAME does ...
  * <p/>
+ * 
  * <pre>
  *  {
  *      "access_token":"mF_9.B5f-4.1JqM",
@@ -43,7 +43,7 @@ import java.util.Set;
  *      "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA"
  *  }
  * </pre>
- *
+ * 
  * @author Laszlo Hordos
  */
 public class BearerToken extends AbstractAccessToken {
@@ -58,7 +58,8 @@ public class BearerToken extends AbstractAccessToken {
         super(token);
     }
 
-    public BearerToken(AbstractAccessToken copyToken, Number expires_in, String client_id, String username, Set<String> scope) {
+    public BearerToken(AbstractAccessToken copyToken, Number expires_in, String client_id,
+            String username, Set<String> scope) {
         super(copyToken, expires_in, client_id, username, scope);
     }
 

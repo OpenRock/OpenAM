@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,12 +20,12 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.model;
 
 import java.net.URI;
 import java.util.Set;
+
 
 /**
  * @author $author$
@@ -47,18 +47,19 @@ public interface ClientApplication {
      * <p/>
      * The authorization server SHOULD require the client to provide the
      * complete redirection URI (the client MAY use the "state" request
-     * parameter to achieve per-request customization).  If requiring the
+     * parameter to achieve per-request customization). If requiring the
      * registration of the complete redirection URI is not possible, the
-     * authorization server SHOULD require the registration of the URI
-     * scheme, authority, and path (allowing the client to dynamically vary
-     * only the query component of the redirection URI when requesting
-     * authorization).
+     * authorization server SHOULD require the registration of the URI scheme,
+     * authority, and path (allowing the client to dynamically vary only the
+     * query component of the redirection URI when requesting authorization).
      * <p/>
      * The authorization server MAY allow the client to register multiple
      * redirection endpoints.
-     *
+     * 
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-3.1.2.3">3.1.2.3.  Dynamic Configuration</a>
+     * @see <a
+     *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-3.1.2.3">3.1.2.3.
+     *      Dynamic Configuration</a>
      */
     public Set<URI> getRedirectionURIs();
 
@@ -70,7 +71,7 @@ public interface ClientApplication {
 
     /**
      * We need this unless the max allowed is what's the default scope we allow.
-     *
+     * 
      * @return
      */
     public Set<String> defaultGrantScopes();
@@ -78,12 +79,13 @@ public interface ClientApplication {
     /**
      * Get the auto_grant property of the client
      * <p/>
-     * If "auto_grant" is true then the server does not require the Resource Owner's approval unless the
-     * request has the {@link org.forgerock.restlet.ext.oauth2.OAuth2.Custom#APPROVAL_PROMPT} property and the
-     * value is null.
+     * If "auto_grant" is true then the server does not require the Resource
+     * Owner's approval unless the request has the
+     * {@link org.forgerock.restlet.ext.oauth2.OAuth2.Custom#APPROVAL_PROMPT}
+     * property and the value is null.
      * <p/>
      * This function is not part of the OAuth2 specification
-     *
+     * 
      * @return
      */
     public boolean isAutoGrant();

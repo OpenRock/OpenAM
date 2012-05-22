@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,13 +20,12 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.model;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import java.util.Map;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * @author $author$
@@ -34,11 +33,12 @@ import java.util.Map;
  */
 public interface AccessToken extends Token {
 
-    //public lifetime	A maximum access token lifetime of 3600 seconds is RECOMMENDED
+    // public lifetime A maximum access token lifetime of 3600 seconds is
+    // RECOMMENDED
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     public String getParentToken();
@@ -46,7 +46,7 @@ public interface AccessToken extends Token {
     /**
      * Gets the {@link RefreshToken} associated with this AccessToken.
      * <p/>
-     *
+     * 
      * @return null if there is no RefreshToken associated
      */
     @JsonSerialize
@@ -54,7 +54,7 @@ public interface AccessToken extends Token {
 
     /**
      * Converts the token to Map
-     *
+     * 
      * @return new Map representation of this AccessToken
      */
     public Map<String, Object> convertToMap();

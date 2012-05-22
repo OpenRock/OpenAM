@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,13 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -42,47 +45,48 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.util.Series;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * An AccessTokenExtractor extracts the AccessToken from the Request.
- *
+ * 
  * @author Laszlo Hordos
  */
-public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extends AuthenticatorHelper {
+public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extends
+        AuthenticatorHelper {
 
-    protected AccessTokenExtractor(ChallengeScheme challengeScheme, boolean clientSide, boolean serverSide) {
+    protected AccessTokenExtractor(ChallengeScheme challengeScheme, boolean clientSide,
+            boolean serverSide) {
         super(challengeScheme, clientSide, serverSide);
     }
 
     /**
      * Extracts the access token from the contents of an {@link Response}
-     *
-     * @param response the contents of the response
+     * 
+     * @param response
+     *            the contents of the response
      * @return OAuth2 access token
      */
-    //public abstract T extract(Response response);
+    // public abstract T extract(Response response);
 
     /**
      * Extracts the access token from the contents of an {@link Request}
      * <p/>
      * This method used to get the token from the redirect GET
-     *
-     * @return OAuth2 access token
-     * @ param request the contents of the request
+     * 
+     * @return OAuth2 access token @ param request the contents of the request
      */
-    //public abstract T extract(OAuth2Utils.ParameterLocation tokenLocation, Request request);
+    // public abstract T extract(OAuth2Utils.ParameterLocation tokenLocation,
+    // Request request);
     public abstract ChallengeResponse createChallengeResponse(T token);
 
     public abstract ChallengeRequest createChallengeRequest(String realm);
 
-    public abstract ChallengeRequest createChallengeRequest(String realm, OAuthProblemException exception);
+    public abstract ChallengeRequest createChallengeRequest(String realm,
+            OAuthProblemException exception);
 
     public abstract Form createForm(T token);
 
-    protected abstract T extractRequestToken(ChallengeResponse challengeResponse) throws OAuthProblemException;
+    protected abstract T extractRequestToken(ChallengeResponse challengeResponse)
+            throws OAuthProblemException;
 
     /**
      * @param request
@@ -95,94 +99,100 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
 
     protected abstract T extractRequestToken(Form parameters) throws OAuthProblemException;
 
-
     /**
      * Returns the parameters to use for authentication.
      * <p/>
-     * From Header - Authorization: Bearer vF9dft4qmT
-     * From Header - Authorization: MAC id="h480djs93hd8",ts="1336363200",nonce="dj83hs9s",mac="bhCQXTVyfj5cmA9uKkPFx1zeOXM="
-     * From Query  - ?access_token=vF9dft4qmT
-     * From APPLICATION_WWW_FORM - access_token=vF9dft4qmT
-     *
-     * @param request The request.
+     * From Header - Authorization: Bearer vF9dft4qmT From Header -
+     * Authorization: MAC
+     * id="h480djs93hd8",ts="1336363200",nonce="dj83hs9s",mac=
+     * "bhCQXTVyfj5cmA9uKkPFx1zeOXM=" From Query - ?access_token=vF9dft4qmT From
+     * APPLICATION_WWW_FORM - access_token=vF9dft4qmT
+     * 
+     * @param request
+     *            The request.
      * @return The access token taken from a given request.
      */
-    public T extractToken(OAuth2Utils.ParameterLocation tokenLocation, Request request) throws OAuthProblemException {
+    public T extractToken(OAuth2Utils.ParameterLocation tokenLocation, Request request)
+            throws OAuthProblemException {
         T token = null;
         switch (tokenLocation) {
-            case HTTP_HEADER: {
-                if (null != request.getChallengeResponse()) {
-                    token = extractRequestToken(request.getChallengeResponse());
-                }
-                break;
+        case HTTP_HEADER: {
+            if (null != request.getChallengeResponse()) {
+                token = extractRequestToken(request.getChallengeResponse());
             }
-            case HTTP_BODY: {
-                if (null != request.getEntity() && request.getEntity() instanceof EmptyRepresentation == false) {
-                    token = extractRequestToken(request);
-                }
-                break;
+            break;
+        }
+        case HTTP_BODY: {
+            if (null != request.getEntity()
+                    && request.getEntity() instanceof EmptyRepresentation == false) {
+                token = extractRequestToken(request);
             }
-            case HTTP_QUERY: {
-                if (request.getResourceRef().hasQuery()) {
-                    token = extractRequestToken(request.getResourceRef().getQueryAsForm());
-                }
-                break;
+            break;
+        }
+        case HTTP_QUERY: {
+            if (request.getResourceRef().hasQuery()) {
+                token = extractRequestToken(request.getResourceRef().getQueryAsForm());
             }
-            case HTTP_FRAGMENT: {
-                if (request.getResourceRef().hasFragment()) {
-                    token = extractRequestToken(new Form(request.getResourceRef().getFragment()));
-                }
-                break;
+            break;
+        }
+        case HTTP_FRAGMENT: {
+            if (request.getResourceRef().hasFragment()) {
+                token = extractRequestToken(new Form(request.getResourceRef().getFragment()));
             }
+            break;
+        }
         }
 
-        /*if (request.getResourceRef().hasFragment()) {
-            token = new HashMap<String, Object>(new Form(request.getResourceRef().getFragment()).getValuesMap());
-        } else if (request.getResourceRef().hasQuery()) {
-            token = new HashMap<String, Object>(request.getResourceRef().getQueryAsForm().getValuesMap());
-        }
-        if (null != token) {
-            OAuthProblemException exception = extractException(token);
-            if (exception != null) {
-                throw exception;
-            }
-        }*/
+        /*
+         * if (request.getResourceRef().hasFragment()) { token = new
+         * HashMap<String, Object>(new
+         * Form(request.getResourceRef().getFragment()).getValuesMap()); } else
+         * if (request.getResourceRef().hasQuery()) { token = new
+         * HashMap<String,
+         * Object>(request.getResourceRef().getQueryAsForm().getValuesMap()); }
+         * if (null != token) { OAuthProblemException exception =
+         * extractException(token); if (exception != null) { throw exception; }
+         * }
+         */
         return token;
     }
 
-    public T extractToken(OAuth2Utils.ParameterLocation tokenLocation, Response response) throws OAuthProblemException {
+    public T extractToken(OAuth2Utils.ParameterLocation tokenLocation, Response response)
+            throws OAuthProblemException {
         T token = null;
         switch (tokenLocation) {
-            case HTTP_HEADER: {
-                //TODO Something nice to have
-                /*if (!response.getChallengeRequests().isEmpty()) {
-                    for (ChallengeRequest cr : response.getChallengeRequests()) {
-                        OAuthProblemException exception = extractException(cr.getParameters().getValuesMap());
-                        if (null != exception) {
-                            throw exception;
-                        }
-                    }
-                }*/
-                break;
+        case HTTP_HEADER: {
+            // TODO Something nice to have
+            /*
+             * if (!response.getChallengeRequests().isEmpty()) { for
+             * (ChallengeRequest cr : response.getChallengeRequests()) {
+             * OAuthProblemException exception =
+             * extractException(cr.getParameters().getValuesMap()); if (null !=
+             * exception) { throw exception; } } }
+             */
+            break;
+        }
+        case HTTP_BODY: {
+            if (null != response.getEntity()
+                    && response.getEntity() instanceof EmptyRepresentation == false) {
+                token = extractRequestToken(response);
             }
-            case HTTP_BODY: {
-                if (null != response.getEntity() && response.getEntity() instanceof EmptyRepresentation == false) {
-                    token = extractRequestToken(response);
-                }
-                break;
+            break;
+        }
+        case HTTP_QUERY: {
+            if (Status.REDIRECTION_FOUND.equals(response.getStatus())
+                    && response.getLocationRef().hasQuery()) {
+                token = extractRequestToken(response.getLocationRef().getQueryAsForm());
             }
-            case HTTP_QUERY: {
-                if (Status.REDIRECTION_FOUND.equals(response.getStatus()) && response.getLocationRef().hasQuery()) {
-                    token = extractRequestToken(response.getLocationRef().getQueryAsForm());
-                }
-                break;
+            break;
+        }
+        case HTTP_FRAGMENT: {
+            if (Status.REDIRECTION_FOUND.equals(response.getStatus())
+                    && response.getLocationRef().hasFragment()) {
+                token = extractRequestToken(new Form(response.getLocationRef().getFragment()));
             }
-            case HTTP_FRAGMENT: {
-                if (Status.REDIRECTION_FOUND.equals(response.getStatus()) && response.getLocationRef().hasFragment()) {
-                    token = extractRequestToken(new Form(response.getLocationRef().getFragment()));
-                }
-                break;
-            }
+            break;
+        }
         }
         return token;
     }
@@ -191,12 +201,16 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
         Map<String, Object> token = null;
         if (Status.REDIRECTION_FOUND.equals(response.getStatus())) {
             if (response.getLocationRef().hasFragment()) {
-                token = new HashMap<String, Object>(new Form(response.getLocationRef().getFragment()).getValuesMap());
+                token =
+                        new HashMap<String, Object>(new Form(response.getLocationRef()
+                                .getFragment()).getValuesMap());
             } else if (response.getLocationRef().hasQuery()) {
-                token = new HashMap<String, Object>(response.getLocationRef().getQueryAsForm().getValuesMap());
+                token =
+                        new HashMap<String, Object>(response.getLocationRef().getQueryAsForm()
+                                .getValuesMap());
             }
-        } else if (null != response.getEntity() &&
-                MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType())) {
+        } else if (null != response.getEntity()
+                && MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType())) {
             try {
                 token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
             } catch (IOException e) {
@@ -231,23 +245,27 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
     }
 
     public static OAuthProblemException extractException(Series<Parameter> response) {
-        return extractException(response.getFirstValue(OAuth2.Params.ERROR),
-                response.getFirstValue(OAuth2.Params.ERROR_DESCRIPTION), response.getFirstValue(OAuth2.Params.ERROR_URI));
+        return extractException(response.getFirstValue(OAuth2.Params.ERROR), response
+                .getFirstValue(OAuth2.Params.ERROR_DESCRIPTION), response
+                .getFirstValue(OAuth2.Params.ERROR_URI));
     }
 
-    protected static OAuthProblemException extractException(String error, String error_description, String error_uri) {
+    protected static OAuthProblemException extractException(String error, String error_description,
+            String error_uri) {
         OAuthProblemException exception = null;
         if (null != error) {
             OAuthProblemException.OAuthError e = OAuthProblemException.OAuthError.UNKNOWN_ERROR;
             try {
-                e = Enum.valueOf(OAuthProblemException.OAuthError.class, ((String) error).toUpperCase());
+                e =
+                        Enum.valueOf(OAuthProblemException.OAuthError.class, ((String) error)
+                                .toUpperCase());
             } catch (IllegalArgumentException ex) {
             }
 
             if (null != error_description) {
-                exception = e.handle(/*Request.getCurrent()*/ null, error_description);
+                exception = e.handle(/* Request.getCurrent() */null, error_description);
             } else {
-                exception = e.handle(/*Request.getCurrent()*/ null);
+                exception = e.handle(/* Request.getCurrent() */null);
             }
 
             if (null != error_uri) {

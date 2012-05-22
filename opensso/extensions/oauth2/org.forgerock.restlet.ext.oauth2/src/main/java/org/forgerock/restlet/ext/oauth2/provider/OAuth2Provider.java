@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.provider;
 
@@ -35,14 +34,14 @@ public interface OAuth2Provider {
 
     /**
      * Returns the context.
-     *
+     * 
      * @return The context.
      */
     public Context getContext();
 
     /**
      * Attach a new realm to the OAuth2Provider
-     *
+     * 
      * @param realm
      * @param next
      * @return
@@ -51,7 +50,7 @@ public interface OAuth2Provider {
 
     /**
      * Detach the specified realm from the OAuth2Provider
-     *
+     * 
      * @param realm
      * @return
      */
@@ -59,7 +58,7 @@ public interface OAuth2Provider {
 
     /**
      * Attach the default realm to OAuth2Provider
-     *
+     * 
      * @param next
      * @return
      */
@@ -67,7 +66,7 @@ public interface OAuth2Provider {
 
     /**
      * Detach the default realm from OAuth2Provider
-     *
+     * 
      * @return
      */
     public Restlet detachDefaultRealm();

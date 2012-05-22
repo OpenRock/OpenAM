@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,16 +20,10 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam.server;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.restlet.Context;
@@ -42,9 +36,15 @@ import org.restlet.routing.Redirector;
 import org.restlet.security.Authenticator;
 import org.restlet.security.Enroler;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+
 /**
  * A NAME does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public abstract class AbstractOpenAMAuthenticator extends Authenticator {
@@ -66,7 +66,8 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     /**
      * {@inheritDoc}
      */
-    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean optional) {
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters,
+            boolean optional) {
         super(context, optional);
         this.openamServer = parameters.getOpenAMServerRef();
         init(parameters);
@@ -75,8 +76,8 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     /**
      * {@inheritDoc}
      */
-    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean multiAuthenticating,
-                                       boolean optional, Enroler enroler) {
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters,
+            boolean multiAuthenticating, boolean optional, Enroler enroler) {
         super(context, multiAuthenticating, optional, enroler);
         this.openamServer = parameters.getOpenAMServerRef();
         init(parameters);
@@ -85,7 +86,8 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     /**
      * {@inheritDoc}
      */
-    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters, boolean optional, Enroler enroler) {
+    public AbstractOpenAMAuthenticator(Context context, OpenAMParameters parameters,
+            boolean optional, Enroler enroler) {
         super(context, optional, enroler);
         this.openamServer = parameters.getOpenAMServerRef();
         init(parameters);
@@ -103,7 +105,6 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
         }
     }
 
-
     protected abstract SSOToken getToken(Request request, Response response) throws SSOException;
 
     /**
@@ -116,8 +117,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
             if (null != token) {
                 AMIdentity identity = IdUtils.getIdentity(token);
 
-                OpenAMUser user = new OpenAMUser(identity.getName(),
-                        token);
+                OpenAMUser user = new OpenAMUser(identity.getName(), token);
                 request.getClientInfo().setUser(user);
                 return identity.isActive();
             }
@@ -142,7 +142,8 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
 
         amserver.addQueryParameter("goto", request.getResourceRef().toString());
 
-        Redirector redirector = new Redirector(getContext(), amserver.toString(), Redirector.MODE_CLIENT_FOUND);
+        Redirector redirector =
+                new Redirector(getContext(), amserver.toString(), Redirector.MODE_CLIENT_FOUND);
         redirector.handle(request, response);
     }
 }

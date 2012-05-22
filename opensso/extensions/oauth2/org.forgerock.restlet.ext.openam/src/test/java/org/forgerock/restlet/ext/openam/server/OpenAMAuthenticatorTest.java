@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam.server;
@@ -44,7 +43,7 @@ import org.testng.annotations.Test;
 
 /**
  * An OpenAMAuthenticatorTest does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMAuthenticatorTest extends OpenAMTestBase {
@@ -53,9 +52,9 @@ public class OpenAMAuthenticatorTest extends OpenAMTestBase {
     @BeforeClass
     public void setUp() throws Exception {
         OpenAMParameters parameters = new OpenAMParameters();
-        //Protect the ServerResource
+        // Protect the ServerResource
         OpenAMAuthenticator filter = new OpenAMAuthenticator(new Context(), parameters);
-        //Authorize
+        // Authorize
         OpenAMAuthorizer authorizer = new OpenAMAuthorizer("OAUTH2");
         filter.setNext(authorizer);
         authorizer.setNext(OpenAMAuthenticatorTest.class);
@@ -75,11 +74,10 @@ public class OpenAMAuthenticatorTest extends OpenAMTestBase {
         ClientResource clientResource = new ClientResource(new Context(), "http://localhost:8182");
         Client client = new Client(new Context(), Protocol.HTTP);
 
-        //Pre-Authenticate the Request
+        // Pre-Authenticate the Request
         OpenAMProxy proxy = new OpenAMProxy(clientResource.getContext(), new OpenAMParameters());
         proxy.setNext(client);
         clientResource.setNext(proxy);
-
 
         Representation representation = clientResource.get();
         Assert.assertEquals(representation.getText(), "amadmin");
@@ -89,7 +87,8 @@ public class OpenAMAuthenticatorTest extends OpenAMTestBase {
     @Get
     public Representation represent() {
         if (getRequest().getClientInfo().getUser() instanceof OpenAMUser) {
-            return new StringRepresentation(((OpenAMUser) getRequest().getClientInfo().getUser()).getIdentifier());
+            return new StringRepresentation(((OpenAMUser) getRequest().getClientInfo().getUser())
+                    .getIdentifier());
         }
         return new StringRepresentation("failed");
     }

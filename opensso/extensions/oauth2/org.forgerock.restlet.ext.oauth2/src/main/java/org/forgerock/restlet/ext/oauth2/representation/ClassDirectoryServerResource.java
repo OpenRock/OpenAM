@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.representation;
 
@@ -34,13 +33,15 @@ public class ClassDirectoryServerResource extends DirectoryServerResource {
     /**
      * Returns a representation of the resource at the target URI. Leverages the
      * client dispatcher of the parent directory's context.
-     *
-     * @param resourceUri The URI of the target resource.
+     * 
+     * @param resourceUri
+     *            The URI of the target resource.
      * @return A response with the representation if success.
      */
     protected Response getRepresentation(String resourceUri, boolean wait_for_Restlet_fix) {
         Request request = new Request(Method.GET, resourceUri);
-        request.getAttributes().put("org.restlet.clap.classLoader", ClassDirectoryServerResource.class.getClassLoader());
+        request.getAttributes().put("org.restlet.clap.classLoader",
+                ClassDirectoryServerResource.class.getClassLoader());
         return getClientDispatcher().handle(request);
     }
 

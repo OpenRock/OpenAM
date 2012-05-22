@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,23 +20,23 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.restlet.data.Parameter;
 import org.restlet.util.Series;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A NAME does ...
  * <p/>
+ * 
  * <pre>
  *  {
  *      "access_token":"mF_9.B5f-4.1JqM",
@@ -44,11 +44,10 @@ import java.util.Set;
  *      "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA"
  *  }
  * </pre>
- *
+ * 
  * @author Laszlo Hordos
  */
 public abstract class AbstractAccessToken implements Serializable {
-
 
     private static final long serialVersionUID = -125994904834458501L;
     protected String access_token;
@@ -60,20 +59,18 @@ public abstract class AbstractAccessToken implements Serializable {
     protected String username = null;
     protected Set<String> scope = null;
 
-
     private final Long received = System.currentTimeMillis();
     private final boolean validated;
-
 
     public AbstractAccessToken(Series<Parameter> token) {
         validated = false;
         access_token = token.getFirstValue(OAuth2.Token.OAUTH_ACCESS_TOKEN);
         if (OAuth2Utils.isBlank(access_token)) {
-            //TODO Exception Invalid token
+            // TODO Exception Invalid token
         }
         String o = token.getFirstValue(OAuth2.Token.OAUTH_EXPIRES_IN);
         if (o instanceof String) {
-            //Todo Catch the exception
+            // Todo Catch the exception
             expires_in = Long.decode(o);
         } else {
             expires_in = 0l;
@@ -90,11 +87,11 @@ public abstract class AbstractAccessToken implements Serializable {
         if (o instanceof String) {
             access_token = (String) o;
         } else {
-            //TODO Exception Invalid token
+            // TODO Exception Invalid token
         }
         o = token.get(OAuth2.Token.OAUTH_EXPIRES_IN);
         if (o instanceof String) {
-            //Todo Catch the exception
+            // Todo Catch the exception
             expires_in = Long.decode((String) o);
         } else if (o instanceof Number) {
             expires_in = (Number) o;
@@ -105,7 +102,8 @@ public abstract class AbstractAccessToken implements Serializable {
         }
     }
 
-    public AbstractAccessToken(AbstractAccessToken copyToken, Number expires_in, String client_id, String username, Set<String> scope) {
+    public AbstractAccessToken(AbstractAccessToken copyToken, Number expires_in, String client_id,
+            String username, Set<String> scope) {
         validated = true;
         access_token = copyToken.getAccessToken();
         refresh_token = copyToken.getRefreshToken();
@@ -116,7 +114,6 @@ public abstract class AbstractAccessToken implements Serializable {
     }
 
     public abstract String getTokenType();
-
 
     public String getAccessToken() {
         return access_token;
@@ -137,7 +134,7 @@ public abstract class AbstractAccessToken implements Serializable {
         return expires_in;
     }
 
-    //Todo Use some validation level
+    // Todo Use some validation level
     public boolean isValid() {
         return (System.currentTimeMillis() - received) < expires_in.longValue() * 1000l;
     }

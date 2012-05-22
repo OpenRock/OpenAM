@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,10 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.util.logging.Level;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
@@ -34,11 +35,9 @@ import org.restlet.data.Status;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
 
-import java.util.logging.Level;
-
 /**
  * An OAuth2Authenticator does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OAuth2Authenticator extends ChallengeAuthenticator {
@@ -48,22 +47,26 @@ public class OAuth2Authenticator extends ChallengeAuthenticator {
      */
     private volatile TokenVerifier tokenVerifier;
 
-    private OAuth2Utils.ParameterLocation parameterLocation = OAuth2Utils.ParameterLocation.HTTP_HEADER;
+    private OAuth2Utils.ParameterLocation parameterLocation =
+            OAuth2Utils.ParameterLocation.HTTP_HEADER;
 
-    public OAuth2Authenticator(Context context, String realm, OAuth2Utils.ParameterLocation tokenLocation, TokenVerifier verifier) {
+    public OAuth2Authenticator(Context context, String realm,
+            OAuth2Utils.ParameterLocation tokenLocation, TokenVerifier verifier) {
         super(context, verifier.getTokenExtractor().getChallengeScheme(), realm);
         tokenVerifier = verifier;
         parameterLocation = tokenLocation;
     }
 
-    public OAuth2Authenticator(Context context, boolean optional, String realm, OAuth2Utils.ParameterLocation tokenLocation, TokenVerifier verifier) {
-        super(context, optional, verifier.getTokenExtractor().getChallengeScheme(), realm, verifier.getVerifier(tokenLocation));
+    public OAuth2Authenticator(Context context, boolean optional, String realm,
+            OAuth2Utils.ParameterLocation tokenLocation, TokenVerifier verifier) {
+        super(context, optional, verifier.getTokenExtractor().getChallengeScheme(), realm, verifier
+                .getVerifier(tokenLocation));
         parameterLocation = tokenLocation;
     }
 
     /**
      * Returns the credentials tokenVerifier.
-     *
+     * 
      * @return The credentials tokenVerifier.
      */
     public Verifier getVerifier() {
@@ -72,7 +75,7 @@ public class OAuth2Authenticator extends ChallengeAuthenticator {
 
     /**
      * Returns the token tokenVerifier.
-     *
+     * 
      * @return The token tokenVerifier.
      */
     public TokenVerifier getTokenVerifier() {
@@ -81,9 +84,11 @@ public class OAuth2Authenticator extends ChallengeAuthenticator {
 
     /**
      * Attempts to authenticate the subject sending the request.
-     *
-     * @param request  The request sent.
-     * @param response The response to update.
+     * 
+     * @param request
+     *            The request sent.
+     * @param response
+     *            The response to update.
      * @return True if the authentication succeeded.
      */
     protected boolean authenticate(Request request, Response response) {
@@ -106,17 +111,18 @@ public class OAuth2Authenticator extends ChallengeAuthenticator {
         if (OAuth2Utils.ParameterLocation.HTTP_HEADER.equals(parameterLocation)) {
             if (!isOptional()) {
                 if (isRechallenging()) {
-                    boolean loggable = response.getRequest().isLoggable()
-                            && getLogger().isLoggable(Level.FINE);
+                    boolean loggable =
+                            response.getRequest().isLoggable()
+                                    && getLogger().isLoggable(Level.FINE);
 
                     if (loggable) {
-                        getLogger().log(Level.FINE,
-                                "An authentication challenge was requested.");
+                        getLogger().log(Level.FINE, "An authentication challenge was requested.");
                     }
 
                     response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-                    response.getChallengeRequests().add(getTokenVerifier().getTokenExtractor().
-                            createChallengeRequest(getRealm(), exception));
+                    response.getChallengeRequests().add(
+                            getTokenVerifier().getTokenExtractor().createChallengeRequest(
+                                    getRealm(), exception));
                 } else {
                     forbid(response);
                 }
@@ -126,11 +132,11 @@ public class OAuth2Authenticator extends ChallengeAuthenticator {
         }
     }
 
-
     /**
      * Creates a new challenge request.
-     *
-     * @param stale Indicates if the new challenge is due to a stale response.
+     * 
+     * @param stale
+     *            Indicates if the new challenge is due to a stale response.
      * @return A new challenge request.
      */
     protected ChallengeRequest createChallengeRequest(boolean stale) {

@@ -1,7 +1,7 @@
 <!--
   ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright © 2012 ForgeRock AS. All rights reserved.
+  ~  2012 ForgeRock AS. All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -41,7 +41,7 @@
     <link href='http://fonts.googleapis.com/css?family=Alfa+Slab+One' rel='stylesheet'
           type='text/css'>
 
-    <link rel="stylesheet" href="./static/css/main.css" type="text/css">
+    <link rel="stylesheet" href="../css/main.css" type="text/css">
 
     <link rel="icon" href="icon.png">
     <link rel="apple-touch-icon" href="button.png">
@@ -63,9 +63,9 @@
     <div id="container">
         <div id="header">
             <div id="logo">
-                <a href="./static/index.html" title="idm"><img src="./static/images/logo.png"
-                                                               width="226"
-                                                               height="60" alt="idm logo"/> </a>
+                <a href="../index.html" title="idm"><img src="../images/logo.png"
+                                                         width="226"
+                                                         height="60" alt="idm logo"/> </a>
             </div>
             <!-- #logo-->
 
@@ -75,7 +75,7 @@
 
         <div id="menu">
             <ul>
-                <li class="active-first"><a href="./static/index.html" title="home">Home</a></li>
+                <li class="active-first"><a href="../index.html" title="home">Home</a></li>
                 <li><a href="http://forgerock.com/openam.html" title="OpenAM"
                        target="_blank">OpenAM</a></li>
                 <li><a href="http://forgerock.com/opendj.html" title="OpenDJ"
@@ -89,7 +89,7 @@
         <div id="navi">
             <div id="nav-content">
                 <a href="#" id="home_link" class="gray nodecorate"><span class="orange">Forge</span>Rock</a>
-                <img src="./static/images/navi-next.png" alt="" class="navi-next" align="absmiddle"
+                <img src="../images/navi-next.png" alt="" class="navi-next" align="absmiddle"
                      height="5" width="3">
                 <span style="display: inline;">${page_name}</span>
             </div>
@@ -169,7 +169,7 @@
     <div id="footer">
         <div id="footer-content">
             <a href="http://forgerock.com/" target="_blank"><img
-                    src="./static/images/footer_logo.png" alt="aRockGroupCompany" width="228"
+                    src="../images/footer_logo.png" alt="aRockGroupCompany" width="228"
                     height="41"/></a><br/>
             <a href="mailto: info@forgerock.com" class="orange">info@forgerock.com</a>, or phone +47
             21081746. <br/>

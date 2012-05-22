@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,8 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
+
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
@@ -44,12 +44,12 @@ public class ErrorServerResource extends AbstractFlow {
      * Effectively handles a call without content negotiation of the response
      * entity. The default behavior is to dispatch the call to one of the
      * {@link #get()}, {@link #post(org.restlet.representation.Representation)},
-     * {@link #put(org.restlet.representation.Representation)}, {@link #delete()}, {@link #head()} or
-     * {@link #options()} methods.
-     *
+     * {@link #put(org.restlet.representation.Representation)},
+     * {@link #delete()}, {@link #head()} or {@link #options()} methods.
+     * 
      * @return The response entity.
      * @throws org.restlet.resource.ResourceException
-     *
+     * 
      */
     protected Representation doHandle() throws ResourceException {
         Representation result = null;

@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,16 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.provider;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
@@ -47,25 +53,18 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A ValidationServerResource does ...
  * <p/>
+ * 
  * <pre>
- *
- *
+ * 
+ * 
  * param parameters
  *  {
  *      "access_token":"1/fFBGRNJru1FQd44AzqT3Zg"
  *  }
- *
+ * 
  * return
  *  {
  *      "audience":"client_id",
@@ -75,12 +74,13 @@ import java.util.Set;
  *              ],
  *      "expires_in":436
  *  }
- *
+ * 
  * </pre>
- *
+ * 
  * @author Laszlo Hordos
  */
-public class ValidationServerResource extends ServerResource implements AccessTokenValidator<BearerToken> {
+public class ValidationServerResource extends ServerResource implements
+        AccessTokenValidator<BearerToken> {
 
     private OAuth2TokenStore tokenStore = null;
     private Reference validationServerRef;
@@ -97,15 +97,16 @@ public class ValidationServerResource extends ServerResource implements AccessTo
     /**
      * Set-up method that can be overridden in order to initialize the state of
      * the resource. By default it does nothing.
-     *
-     * @see #init(org.restlet.Context, org.restlet.Request, org.restlet.Response)
+     * 
+     * @see #init(org.restlet.Context, org.restlet.Request,
+     *      org.restlet.Response)
      */
     protected void doInit() throws ResourceException {
         if (null != getRequest() && null != getContext()) {
             tokenStore = OAuth2Utils.getTokenStore(getContext());
             if (null == tokenStore) {
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required context attribute: " +
-                        OAuth2TokenStore.class.getName());
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                        "Missing required context attribute: " + OAuth2TokenStore.class.getName());
             }
         }
     }
@@ -123,7 +124,9 @@ public class ValidationServerResource extends ServerResource implements AccessTo
             String token = call.getFirstValue(OAuth2.Params.ACCESS_TOKEN);
 
             if (null == token) {
-                error = OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Missing access_token");
+                error =
+                        OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                                "Missing access_token");
             } else {
                 AccessToken t = tokenStore.readAccessToken(token);
 
@@ -195,7 +198,9 @@ public class ValidationServerResource extends ServerResource implements AccessTo
             o = remoteToken.get(OAuth2.Params.SCOPE);
             Set<String> scope = null;
             if (o instanceof Collection) {
-                scope = Collections.unmodifiableSet(new HashSet<String>((Collection<? extends String>) o));
+                scope =
+                        Collections.unmodifiableSet(new HashSet<String>(
+                                (Collection<? extends String>) o));
             }
             return new BearerToken(token, expires_in, client_id, username, scope);
         } catch (OAuthProblemException e) {

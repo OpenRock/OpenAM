@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam;
@@ -35,7 +34,7 @@ import org.testng.annotations.BeforeClass;
 public abstract class OpenAMTestBase extends ServerResource {
     @BeforeClass
     protected void checkEnvironment() {
-        //!resourceAvailable
+        // !resourceAvailable
         if (true) {
             throw new SkipException("Skipping tests because resource was not available.");
         }

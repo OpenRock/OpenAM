@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -29,7 +28,7 @@ import org.restlet.security.User;
 
 /**
  * A BearerTokenVerifier does ...
- *
+ * 
  * @author Laszlo Hordos
  */
 public class BearerTokenVerifier extends TokenVerifier<BearerAuthenticatorHelper, BearerToken> {
@@ -42,14 +41,16 @@ public class BearerTokenVerifier extends TokenVerifier<BearerAuthenticatorHelper
         this.helper = new BearerAuthenticatorHelper();
     }
 
-    public BearerTokenVerifier(AccessTokenValidator<BearerToken> validator, BearerAuthenticatorHelper helper) {
+    public BearerTokenVerifier(AccessTokenValidator<BearerToken> validator,
+            BearerAuthenticatorHelper helper) {
         this.validator = validator;
         this.helper = helper;
     }
 
     @Override
     public User createUser(BearerToken token) {
-        return new OAuth2User(token.getUsername(), token.getAccessToken(), token.getExpiresIn().longValue(), token.getRefreshToken(), token.getScope(), null);
+        return new OAuth2User(token.getUsername(), token.getAccessToken(), token.getExpiresIn()
+                .longValue(), token.getRefreshToken(), token.getScope(), null);
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,10 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.provider;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
@@ -35,11 +36,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.Finder;
 import org.restlet.routing.Router;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * This Router sits on an endpoint /openam/oauth2/ and dispatches the request based on the realm to the next Router
- * This can sit on /openam/{realm}/oauth2/ too and do the dispatch
+ * This Router sits on an endpoint /openam/oauth2/ and dispatches the request
+ * based on the realm to the next Router This can sit on /openam/{realm}/oauth2/
+ * too and do the dispatch
  */
 public class OAuth2RealmRouter extends Router implements OAuth2Provider {
 
@@ -56,36 +56,42 @@ public class OAuth2RealmRouter extends Router implements OAuth2Provider {
     /**
      * Map of available realms
      */
-    private volatile ConcurrentHashMap<String, Restlet> realmRoutes = new ConcurrentHashMap<String, Restlet>();
+    private volatile ConcurrentHashMap<String, Restlet> realmRoutes =
+            new ConcurrentHashMap<String, Restlet>();
 
     /**
      * Constructor.
-     *
-     * @param context The context.
+     * 
+     * @param context
+     *            The context.
      */
     public OAuth2RealmRouter(Context context) {
         super(context);
-        errorHandler = Finder.createFinder(ErrorServerResource.class, null, getContext(), getLogger());
+        errorHandler =
+                Finder.createFinder(ErrorServerResource.class, null, getContext(), getLogger());
     }
-
 
     @Override
     public Restlet getNext(Request request, Response response) {
         Restlet next = super.getNext(request, response);
         if (next == null) {
             String realm = OAuth2Utils.getRealm(request);
-            response.setStatus(Status.SUCCESS_ACCEPTED);  // TODO Use the default route
+            response.setStatus(Status.SUCCESS_ACCEPTED); // TODO Use the default
+                                                         // route
             if (null == realm) {
                 if (null == defaultRealm) {
-                    OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "No Default Realm configured").pushException();
+                    OAuthProblemException.OAuthError.NOT_FOUND.handle(request,
+                            "No Default Realm configured").pushException();
                 } else {
                     next = defaultRealm;
                 }
             } else {
                 next = realmRoutes.get(realm);
                 if (null == next) {
-                    OAuthProblemException.OAuthError.NOT_FOUND.handle(request, 1 > realmRoutes.size() ?
-                            "There is not Realm configured" : "Realm was not configured").pushException();
+                    OAuthProblemException.OAuthError.NOT_FOUND.handle(
+                            request,
+                            1 > realmRoutes.size() ? "There is not Realm configured"
+                                    : "Realm was not configured").pushException();
                 }
             }
             next = next != null ? next : errorHandler;

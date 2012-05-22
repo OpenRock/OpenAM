@@ -1,20 +1,38 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright © 2012 ForgeRock. All rights reserved.
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.oauth2.internal.ClientIdentityVerifier;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
@@ -41,45 +59,37 @@ import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
 
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * A NAME does ...
  * <p/>
+ * 
  * <pre>
  * &lt;!-- Servlet to Restlet adapter declaration (Mandatory) --&gt;
  * &lt;servlet&gt;
  * &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
  * &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
- *
+ * 
  * &lt;!-- Your application class name (Optional - For mode 3) --&gt;
  * &lt;init-param&gt;
  * &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
  * &lt;param-value&gt;org.forgerock.openam.oauth2.OAuth2Application&lt;/param-value&gt;
  * &lt;/init-param&gt;
- *
+ * 
  * &lt;!-- List of supported client protocols (Optional - Only in mode 3) --&gt;
  * &lt;init-param&gt;
  * &lt;param-name&gt;org.restlet.clients&lt;/param-name&gt;
  * &lt;param-value&gt;RIAP CLAP FILE&lt;/param-value&gt;
  * &lt;/init-param&gt;
  * &lt;/servlet&gt;
- *
+ * 
  * &lt;!-- servlet declaration --&gt;
- *
+ * 
  * &lt;servlet-mapping&gt;
  * &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
  * &lt;url-pattern&gt;/oauth2/*&lt;/url-pattern&gt;
  * &lt;/servlet-mapping&gt;
  * </pre>
- *
+ * 
  * @author Laszlo Hordos
  */
 public class OAuth2Application extends Application {
@@ -100,7 +110,7 @@ public class OAuth2Application extends Application {
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     public Restlet activate() {
@@ -108,7 +118,8 @@ public class OAuth2Application extends Application {
         Router root = new Router(childContext);
 
         URI currentURI = getCurrentURI();
-        redirectURI = currentURI.resolve("../oauth2demo/redirect");
+
+        redirectURI = currentURI.resolve("../../oauth2demo/oauth2/redirect");
 
         OpenAMParameters parameters = new OpenAMParameters();
         OpenAMServletAuthenticator authenticator =
@@ -119,7 +130,6 @@ public class OAuth2Application extends Application {
         OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
         authenticator.setNext(authorizer);
 
-
         // Define Authorization Endpoint
         OAuth2FlowFinder finder =
                 new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT)
@@ -127,26 +137,25 @@ public class OAuth2Application extends Application {
                         .supportPassword();
         authorizer.setNext(finder);
 
-
         ChallengeAuthenticator filter =
                 new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
-        filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(),
-                Arrays.asList(redirectURI.toString())));
+        filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(), Arrays
+                .asList(redirectURI.toString())));
 
-        //ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
+        // ClientAuthenticationFilter filter = new
+        // ClientAuthenticationFilter(childContext);
         // Try to authenticate the client The verifier MUST set
-        //filter.setVerifier(getClientVerifier());
+        // filter.setVerifier(getClientVerifier());
         root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
 
-
         // Define Token Endpoint
-        finder = new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT)
-                .supportAuthorizationCode().supportClientCredentials().supportImplicit()
-                .supportPassword();
+        finder =
+                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT)
+                        .supportAuthorizationCode().supportClientCredentials().supportImplicit()
+                        .supportPassword();
         filter.setNext(finder);
 
-
-        //Configure context
+        // Configure context
         childContext.setDefaultVerifier(getUserVerifier());
         OAuth2Utils.setClientVerifier(getClientVerifier(), childContext);
         OAuth2Utils.setTokenStore(getTokenStore(), childContext);
@@ -157,7 +166,7 @@ public class OAuth2Application extends Application {
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     public ClientVerifier getClientVerifier() {
@@ -166,7 +175,7 @@ public class OAuth2Application extends Application {
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     public Verifier getUserVerifier() {
@@ -175,7 +184,7 @@ public class OAuth2Application extends Application {
 
     /**
      * TODO Description.
-     *
+     * 
      * @return TODO Description
      */
     public OAuth2TokenStore getTokenStore() {
@@ -186,7 +195,7 @@ public class OAuth2Application extends Application {
 
     /**
      * Gets the current URI form the Request.
-     *
+     * 
      * @return application URI
      */
     protected URI getCurrentURI() {
@@ -200,17 +209,20 @@ public class OAuth2Application extends Application {
             Request request = Request.getCurrent();
             if (null != request) {
                 HttpServletRequest servletRequest = ServletUtils.getRequest(request);
-                String scheme = servletRequest.getScheme();             // http
-                String serverName = servletRequest.getServerName();     // localhost
-                int serverPort = servletRequest.getServerPort();        // 8080
-                String contextPath = servletRequest.getContextPath();   // /openam
-                String servletPath = servletRequest.getServletPath();   // /oauth2demo
-                //String pathInfo = servletRequest.getPathInfo();         // /static/index.html
-                //String queryString = servletRequest.getQueryString();          // d=789
+                String scheme = servletRequest.getScheme(); // http
+                String serverName = servletRequest.getServerName(); // localhost
+                int serverPort = servletRequest.getServerPort(); // 8080
+                String contextPath = servletRequest.getContextPath(); // /openam
+                String servletPath = servletRequest.getServletPath(); // /oauth2demo
+                // String pathInfo = servletRequest.getPathInfo(); //
+                // /static/index.html
+                // String queryString = servletRequest.getQueryString(); //
+                // d=789
 
                 try {
-                    root = new URI(scheme, null, serverName, serverPort,
-                            contextPath + servletPath + "/", null, null);
+                    root =
+                            new URI(scheme, null, serverName, serverPort, contextPath + servletPath
+                                    + "/", null, null);
                 } catch (URISyntaxException e) {
                     // Should not happen
                 }

@@ -1,23 +1,37 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright © 2012 ForgeRock. All rights reserved.
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.internal;
 
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.spi.AuthLoginException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -27,16 +41,12 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.spi.AuthLoginException;
 
 /**
  * An AbstractIdentityVerifier does ...
- *
+ * 
  * @param <T>
  * @author Laszlo Hordos TODO Do not use SecretVerifier or use properly
  */
@@ -50,17 +60,17 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     /**
      * Constructor.
      * <p/>
-     *
-     * @param parameters OpenAM boot properties
+     * 
+     * @param parameters
+     *            OpenAM boot properties
      */
     public AbstractIdentityVerifier(OpenAMParameters parameters) {
-        //authIndexType = AuthContext.IndexType.SERVICE;
+        // authIndexType = AuthContext.IndexType.SERVICE;
         authIndexType = AuthContext.IndexType.MODULE_INSTANCE;
         authIndexValue = parameters.getLoginIndexName();
         realm = parameters.getOrgName();
         logger = Context.getCurrentLogger();
     }
-
 
     @Override
     public int verify(final String identifier, char[] secret) {
@@ -73,26 +83,30 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
 
     /**
      * Returns the user identifier.
-     *
-     * @param request  The request to inspect.
-     * @param response The response to inspect.
+     * 
+     * @param request
+     *            The request to inspect.
+     * @param response
+     *            The response to inspect.
      * @return The user identifier.
      */
     protected String getIdentifier(Request request, Response response) {
-        return null != request.getChallengeResponse()
-               ? request.getChallengeResponse().getIdentifier() : null;
+        return null != request.getChallengeResponse() ? request.getChallengeResponse()
+                .getIdentifier() : null;
     }
 
     /**
      * Returns the secret provided by the user.
-     *
-     * @param request  The request to inspect.
-     * @param response The response to inspect.
+     * 
+     * @param request
+     *            The request to inspect.
+     * @param response
+     *            The response to inspect.
      * @return The secret provided by the user.
      */
     protected char[] getSecret(Request request, Response response) {
         return null != request.getChallengeResponse() ? request.getChallengeResponse().getSecret()
-                                                      : null;
+                : null;
     }
 
     /**
@@ -105,7 +119,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
         if (null == identifier || null == secret) {
             result = RESULT_MISSING;
         } else {
-            //result = verify(identifier, secret);
+            // result = verify(identifier, secret);
             T user = authenticate(identifier, secret);
             if (null != user) {
                 result = RESULT_VALID;
@@ -118,9 +132,11 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
 
     /**
      * Attempt to authenticate using simple user/password credentials.
-     *
-     * @param username Subject's user name.
-     * @param password Subject's password
+     * 
+     * @param username
+     *            Subject's user name.
+     * @param password
+     *            Subject's password
      * @return Subject's token if authenticated.
      */
     public T authenticate(String username, char[] password) {
@@ -185,10 +201,12 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     /**
      * Creates new User object.
      * <p/>
-     *
-     * @param authContext context
+     * 
+     * @param authContext
+     *            context
      * @return new User
-     * @throws Exception when something unexpected happens
+     * @throws Exception
+     *             when something unexpected happens
      */
     protected abstract T createUser(AuthContext authContext) throws Exception;
 }

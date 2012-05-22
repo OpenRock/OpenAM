@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.flow;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
@@ -40,12 +45,6 @@ import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
-import java.util.Map;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-
 /**
  * @author $author$
  * @version $Revision$ $Date$
@@ -58,7 +57,9 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
         Request request = new Request(Method.POST, reference);
         Response response = new Response(request);
 
-        RefreshToken refreshToken = realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null), "test", "admin", "cid");
+        RefreshToken refreshToken =
+                realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null),
+                        "test", "admin", "cid");
 
         Form parameters = new Form();
         parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.Params.REFRESH_TOKEN);
@@ -67,19 +68,20 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
         parameters.add(OAuth2.Params.STATE, "random");
         request.setEntity(parameters.getWebRepresentation());
 
-
-        //handle
+        // handle
         getClient().handle(request, response);
         assertTrue(MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType()));
-        JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(response.getEntity(), Map.class);
+        JacksonRepresentation<Map> representation =
+                new JacksonRepresentation<Map>(response.getEntity(), Map.class);
 
-        //assert
+        // assert
         assertThat(representation.getObject()).includes(
                 MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
                 MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN) && value.containsKey(OAuth2.Params.REFRESH_TOKEN);
+                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2.Params.REFRESH_TOKEN);
             }
         });
     }
@@ -88,7 +90,9 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
     public void testProxy() throws Exception {
         BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
         assertNotNull(auth2Proxy);
-        RefreshToken refreshToken = realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null), "test", "admin", "cid");
+        RefreshToken refreshToken =
+                realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null),
+                        "test", "admin", "cid");
         BearerToken token = auth2Proxy.flowRefreshToken(refreshToken.getToken());
         assertNotNull(token);
     }

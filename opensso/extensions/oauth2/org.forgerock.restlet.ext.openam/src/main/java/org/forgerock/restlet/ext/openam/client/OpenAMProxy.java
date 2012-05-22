@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,11 +20,19 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.openam.client;
 
+import java.util.Map;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextInputCallback;
+import javax.security.auth.callback.TextOutputCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.forgerock.restlet.ext.openam.OpenAMAuthenticatorHelper;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
@@ -40,18 +48,10 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Filter;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextInputCallback;
-import javax.security.auth.callback.TextOutputCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import java.util.Map;
-
 /**
- * A OpenAMProxy transparently authenticates the client before the request. This is a sample class and not optimized yet.
- *
+ * A OpenAMProxy transparently authenticates the client before the request. This
+ * is a sample class and not optimized yet.
+ * 
  * @author Laszlo Hordos
  */
 public class OpenAMProxy extends Filter {
@@ -74,7 +74,7 @@ public class OpenAMProxy extends Filter {
 
     @Override
     protected int beforeHandle(Request request, Response response) {
-        //String token = rest(request, response);
+        // String token = rest(request, response);
         String token = sdk(request, response);
         if (null != token) {
             ChallengeResponse cr = new ChallengeResponse(OpenAMAuthenticatorHelper.HTTP_OPENAM);
@@ -85,9 +85,9 @@ public class OpenAMProxy extends Filter {
         return Filter.STOP;
     }
 
-
     protected String rest(Request request, Response response) {
-        Reference auth = new Reference(params.getOpenAMServerRef().toString() + "/identity/authenticate");
+        Reference auth =
+                new Reference(params.getOpenAMServerRef().toString() + "/identity/authenticate");
         auth.addQueryParameter("username", params.getApplicationUserName());
         auth.addQueryParameter("password", params.getApplicationUserPassword());
 
@@ -98,7 +98,7 @@ public class OpenAMProxy extends Filter {
             ClientResource client = new ClientResource(getContext(), auth);
             Representation body = client.get();
             if (body != null && body instanceof EmptyRepresentation == false) {
-                //token.id=AQIC5wM2LY4Sfcwq-PN5UmgYQ--XlvB2KyZRnEtUoalHeI0.*AAJTSQACMDE.*
+                // token.id=AQIC5wM2LY4Sfcwq-PN5UmgYQ--XlvB2KyZRnEtUoalHeI0.*AAJTSQACMDE.*
                 String token = body.getText();
                 if (token.startsWith(TOKEN_PREFIX)) {
                     return token.substring(TOKEN_PREFIX.length());
@@ -114,7 +114,8 @@ public class OpenAMProxy extends Filter {
 
     protected String sdk(Request request, Response response) {
         try {
-            com.sun.identity.authentication.AuthContext lc = new com.sun.identity.authentication.AuthContext(params.getOrgName());
+            com.sun.identity.authentication.AuthContext lc =
+                    new com.sun.identity.authentication.AuthContext(params.getOrgName());
             if (params.getLocale() == null) {
                 lc.login(com.sun.identity.authentication.AuthContext.IndexType.MODULE_INSTANCE,
                         params.getLoginIndexName());
@@ -137,7 +138,8 @@ public class OpenAMProxy extends Filter {
                 System.out.println("Login succeeded.");
                 try {
                     token = lc.getSSOToken().getTokenID().toString();
-                    for (Map.Entry<String, javax.servlet.http.Cookie> entry : ((Map<String, javax.servlet.http.Cookie>) lc.getCookieTable()).entrySet()) {
+                    for (Map.Entry<String, javax.servlet.http.Cookie> entry : ((Map<String, javax.servlet.http.Cookie>) lc
+                            .getCookieTable()).entrySet()) {
                         request.getCookies().add(entry.getKey(), entry.getValue().getValue());
                     }
                 } catch (Exception e) {
@@ -157,14 +159,16 @@ public class OpenAMProxy extends Filter {
         return null;
     }
 
-    protected void addLoginCallbackMessage(Callback[] callbacks) throws UnsupportedCallbackException {
+    protected void addLoginCallbackMessage(Callback[] callbacks)
+            throws UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof TextOutputCallback) {
                 ((TextOutputCallback) callbacks[i]).getMessage();
             } else if (callbacks[i] instanceof NameCallback) {
                 ((NameCallback) callbacks[i]).setName(params.getApplicationUserName());
             } else if (callbacks[i] instanceof PasswordCallback) {
-                ((PasswordCallback) callbacks[i]).setPassword(params.getApplicationUserPassword().toCharArray());
+                ((PasswordCallback) callbacks[i]).setPassword(params.getApplicationUserPassword()
+                        .toCharArray());
             } else if (callbacks[i] instanceof TextInputCallback) {
                 ((TextInputCallback) callbacks[i]).setText("something");
             } else if (callbacks[i] instanceof ChoiceCallback) {

@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,8 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
+
 package org.forgerock.restlet.ext.oauth2.internal;
 
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2User;
@@ -34,13 +34,15 @@ import org.restlet.security.Role;
  */
 public class DefaultScopeEnroler implements Enroler {
     /**
-     * Attempts to update an authenticated client, with a {@link org.restlet.security.User} properly
-     * defined, by adding the {@link org.restlet.security.Role} that are assigned to this user. Note
-     * that principals could also be added to the {@link org.restlet.data.ClientInfo} if
-     * necessary. The addition could also potentially be based on the presence
-     * of {@link java.security.Principal}.
-     *
-     * @param clientInfo The clientInfo to update.
+     * Attempts to update an authenticated client, with a
+     * {@link org.restlet.security.User} properly defined, by adding the
+     * {@link org.restlet.security.Role} that are assigned to this user. Note
+     * that principals could also be added to the
+     * {@link org.restlet.data.ClientInfo} if necessary. The addition could also
+     * potentially be based on the presence of {@link java.security.Principal}.
+     * 
+     * @param clientInfo
+     *            The clientInfo to update.
      */
     public void enrole(ClientInfo clientInfo) {
         if (null != clientInfo && clientInfo.getUser() instanceof OAuth2User) {

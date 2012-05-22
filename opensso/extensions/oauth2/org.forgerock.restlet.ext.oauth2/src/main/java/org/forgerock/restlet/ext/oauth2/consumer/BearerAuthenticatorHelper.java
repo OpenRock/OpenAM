@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,9 +20,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.logging.Level;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
@@ -44,19 +49,14 @@ import org.restlet.engine.util.Base64;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.util.Series;
 
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-import java.util.logging.Level;
-
 /**
- * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer">The OAuth 2.0 Authorization Protocol: Bearer Tokens</a>
+ * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer">The
+ *      OAuth 2.0 Authorization Protocol: Bearer Tokens</a>
  */
 public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken> {
 
-    public final static ChallengeScheme HTTP_OAUTH_BEARER = new ChallengeScheme("HTTP_BEARER", OAuth2.Bearer.BEARER,
-            "OAuth 2.0 Authorization Protocol: Bearer Tokens");
+    public final static ChallengeScheme HTTP_OAUTH_BEARER = new ChallengeScheme("HTTP_BEARER",
+            OAuth2.Bearer.BEARER, "OAuth 2.0 Authorization Protocol: Bearer Tokens");
 
     /**
      * Constructor.
@@ -67,9 +67,11 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
 
     /**
      * Constructor.
-     *
-     * @param clientSide Indicates if client side authentication is supported.
-     * @param serverSide Indicates if server side authentication is supported.
+     * 
+     * @param clientSide
+     *            Indicates if client side authentication is supported.
+     * @param serverSide
+     *            Indicates if server side authentication is supported.
      */
     public BearerAuthenticatorHelper(boolean clientSide, boolean serverSide) {
         super(BearerAuthenticatorHelper.HTTP_OAUTH_BEARER, clientSide, serverSide);
@@ -77,7 +79,7 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
 
     @Override
     public void formatRequest(ChallengeWriter cw, ChallengeRequest challenge, Response response,
-                              Series<Header> httpHeaders) throws IOException {
+            Series<Header> httpHeaders) throws IOException {
         if (challenge.getRealm() != null) {
             cw.appendQuotedChallengeParameter("realm", challenge.getRealm());
         }
@@ -85,59 +87,65 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
 
     @Override
     public void formatResponse(ChallengeWriter cw, ChallengeResponse challenge, Request request,
-                               Series<Header> httpHeaders) {
+            Series<Header> httpHeaders) {
         try {
             if (challenge == null) {
-                throw new RuntimeException(
-                        "No challenge provided, unable to encode credentials");
+                throw new RuntimeException("No challenge provided, unable to encode credentials");
             } else {
                 CharArrayWriter credentials = new CharArrayWriter();
                 credentials.write(retrieveToken(challenge));
                 cw.append(Base64.encode(credentials.toCharArray(), "ISO-8859-1", false));
             }
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(
-                    "Unsupported encoding, unable to encode credentials");
+            throw new RuntimeException("Unsupported encoding, unable to encode credentials");
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Unexpected exception, unable to encode credentials", e);
+            throw new RuntimeException("Unexpected exception, unable to encode credentials", e);
         }
     }
 
-
     /**
      * Parses an authenticate header into a challenge request. The header is
-     * {@link org.restlet.engine.header.HeaderConstants#HEADER_WWW_AUTHENTICATE}.
+     * {@link org.restlet.engine.header.HeaderConstants#HEADER_WWW_AUTHENTICATE}
+     * .
      * <p/>
-     * Values for the "scope" attribute MUST NOT include characters outside the set %x21 / %x23-5B / %x5D-7E for
-     * representing scope values and %x20 for delimiters between scope values.  Values for the "error" and
-     * "error_description" attributes MUST NOT include characters outside the set %x20-21 / %x23-5B / %x5D-7E.
-     * Values for the "error_uri" attribute MUST conform to the URI-Reference syntax, and thus MUST NOT include
+     * Values for the "scope" attribute MUST NOT include characters outside the
+     * set %x21 / %x23-5B / %x5D-7E for representing scope values and %x20 for
+     * delimiters between scope values. Values for the "error" and
+     * "error_description" attributes MUST NOT include characters outside the
+     * set %x20-21 / %x23-5B / %x5D-7E. Values for the "error_uri" attribute
+     * MUST conform to the URI-Reference syntax, and thus MUST NOT include
      * characters outside the set %x21 / %x23-5B / %x5D-7E.
-     *
-     * @param challenge   The challenge request to update.
-     * @param response    The parent response.
-     * @param httpHeaders The current response HTTP headers.
+     * 
+     * @param challenge
+     *            The challenge request to update.
+     * @param response
+     *            The parent response.
+     * @param httpHeaders
+     *            The current response HTTP headers.
      */
     @Override
-    public void parseRequest(ChallengeRequest challenge, Response response, Series<Header> httpHeaders) {
+    public void parseRequest(ChallengeRequest challenge, Response response,
+            Series<Header> httpHeaders) {
         /*
-            All challenges defined by this specification MUST use the auth-scheme
-            value "Bearer".  This scheme MUST be followed by one or more auth-
-            param values.
-
-A "realm" attribute MAY be included to indicate the scope of protection
-The "scope" attribute is a space-delimited list of scope values indicating the required scope of the access token for accessing the requested resource.
-
-            HTTP/1.1 401 Unauthorized
-            WWW-Authenticate: Bearer realm="example"
-            WWW-Authenticate: Bearer realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple"
-
-            And in response to a protected resource request with an
-            authentication attempt using an expired access token:
-
-            HTTP/1.1 401 Unauthorized
-            WWW-Authenticate: Bearer realm="example",error="invalid_token",error_description="The access token expired"
+         * All challenges defined by this specification MUST use the auth-scheme
+         * value "Bearer". This scheme MUST be followed by one or more auth-
+         * param values.
+         * 
+         * A "realm" attribute MAY be included to indicate the scope of
+         * protection The "scope" attribute is a space-delimited list of scope
+         * values indicating the required scope of the access token for
+         * accessing the requested resource.
+         * 
+         * HTTP/1.1 401 Unauthorized WWW-Authenticate: Bearer realm="example"
+         * WWW-Authenticate: Bearer realm="apps", type=1,
+         * title="Login to \"apps\"", Basic realm="simple"
+         * 
+         * And in response to a protected resource request with an
+         * authentication attempt using an expired access token:
+         * 
+         * HTTP/1.1 401 Unauthorized WWW-Authenticate: Bearer
+         * realm="example",error
+         * ="invalid_token",error_description="The access token expired"
          */
         if (challenge.getRawValue() != null) {
             HeaderReader<Object> hr = new HeaderReader<Object>(challenge.getRawValue());
@@ -159,31 +167,30 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
                             param = null;
                         }
                     } catch (Exception e) {
-                        Context.getCurrentLogger()
-                                .log(Level.WARNING, "Unable to parse the challenge request header parameter", e);
+                        Context.getCurrentLogger().log(Level.WARNING,
+                                "Unable to parse the challenge request header parameter", e);
                     }
                 }
             } catch (Exception e) {
-                Context.getCurrentLogger()
-                        .log(Level.WARNING, "Unable to parse the challenge request header parameter", e);
+                Context.getCurrentLogger().log(Level.WARNING,
+                        "Unable to parse the challenge request header parameter", e);
             }
         }
     }
 
     @Override
-    public void parseResponse(ChallengeResponse challenge, Request request, Series<Header> httpHeaders) {
+    public void parseResponse(ChallengeResponse challenge, Request request,
+            Series<Header> httpHeaders) {
         /*
-        bearer
-        oauth header
-
-        token is b64token
-
-        NOP Authorization: Bearer realm="example" vF9dft4qmT
-        NOP Authorization: Bearer realm=example vF9dft4qmT
-        Authorization: Bearer vF9dft4qmT
-
+         * bearer oauth header
+         * 
+         * token is b64token
+         * 
+         * NOP Authorization: Bearer realm="example" vF9dft4qmT NOP
+         * Authorization: Bearer realm=example vF9dft4qmT Authorization: Bearer
+         * vF9dft4qmT
          */
-        //super.parseResponse(challenge, request, httpHeaders);
+        // super.parseResponse(challenge, request, httpHeaders);
 
         try {
             byte[] credentialsEncoded = Base64.decode(challenge.getRawValue());
@@ -197,56 +204,48 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
             getLogger().log(Level.INFO, "Unable to decode the OpenAM token", e);
         }
 
-
-/*        String raw = challenge.getRawValue();
-
-        if (raw != null && raw.length() > 0) {
-            StringTokenizer st = new StringTokenizer(raw, ",");
-            String realm = st.nextToken();
-
-            if (realm != null && realm.length() > 0) {
-                int eq = realm.indexOf('=');
-
-                if (eq > 0) {
-                    String value = realm.substring(eq + 1).trim();
-                    // Remove the quotes, first and last after trim...
-                    challenge.setRealm(value.substring(1, value.length() - 1));
-                }
-            }
-
-            Series<Parameter> params = new Form();
-
-            while (st.hasMoreTokens()) {
-                String param = st.nextToken();
-
-                if (param != null && param.length() > 0) {
-                    int eq = param.indexOf('=');
-
-                    if (eq > 0) {
-                        String name = param.substring(0, eq).trim();
-                        String value = param.substring(eq + 1).trim();
-                        // Remove the quotes, first and last after trim...
-                        params.add(name, value.substring(1, value.length() - 1));
-                    }
-                }
-            }
-
-            challenge.setParameters(params);
-        }*/
+        /*
+         * String raw = challenge.getRawValue();
+         * 
+         * if (raw != null && raw.length() > 0) { StringTokenizer st = new
+         * StringTokenizer(raw, ","); String realm = st.nextToken();
+         * 
+         * if (realm != null && realm.length() > 0) { int eq =
+         * realm.indexOf('=');
+         * 
+         * if (eq > 0) { String value = realm.substring(eq + 1).trim(); //
+         * Remove the quotes, first and last after trim...
+         * challenge.setRealm(value.substring(1, value.length() - 1)); } }
+         * 
+         * Series<Parameter> params = new Form();
+         * 
+         * while (st.hasMoreTokens()) { String param = st.nextToken();
+         * 
+         * if (param != null && param.length() > 0) { int eq =
+         * param.indexOf('=');
+         * 
+         * if (eq > 0) { String name = param.substring(0, eq).trim(); String
+         * value = param.substring(eq + 1).trim(); // Remove the quotes, first
+         * and last after trim... params.add(name, value.substring(1,
+         * value.length() - 1)); } } }
+         * 
+         * challenge.setParameters(params); }
+         */
 
     }
 
     /**
-     * Append the access_token to the query of resourceRef
-     * TODO implement this method
-     *
+     * Append the access_token to the query of resourceRef TODO implement this
+     * method
+     * 
      * @param resourceRef
      * @param challengeResponse
      * @param request
      * @return
      */
     @Override
-    public Reference updateReference(Reference resourceRef, ChallengeResponse challengeResponse, Request request) {
+    public Reference updateReference(Reference resourceRef, ChallengeResponse challengeResponse,
+            Request request) {
         return super.updateReference(resourceRef, challengeResponse, request);
     }
 
@@ -258,9 +257,9 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
         return challenge.getParameters().getFirstValue(OAuth2.Token.OAUTH_ACCESS_TOKEN);
     }
 
-
     @Override
-    protected BearerToken extractRequestToken(ChallengeResponse challengeResponse) throws OAuthProblemException {
+    protected BearerToken extractRequestToken(ChallengeResponse challengeResponse)
+            throws OAuthProblemException {
         Series<Parameter> parameters = challengeResponse.getParameters();
         if (!parameters.isEmpty()) {
             OAuthProblemException exception = extractException(parameters);
@@ -277,8 +276,9 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
     @Override
     protected BearerToken extractRequestToken(Request request) throws OAuthProblemException {
         if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
-            JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(request.getEntity(), Map.class);
-            //Restore content
+            JacksonRepresentation<Map> representation =
+                    new JacksonRepresentation<Map>(request.getEntity(), Map.class);
+            // Restore content
             request.setEntity(representation);
             try {
                 Map parameters = representation.getObject();
@@ -294,7 +294,7 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
             }
         } else if (MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
             Form parameters = new Form(request.getEntity());
-            //Restore content
+            // Restore content
             request.setEntity(parameters.getWebRepresentation());
             OAuthProblemException exception = extractException(parameters);
             if (null != exception) {
@@ -311,7 +311,7 @@ The "scope" attribute is a space-delimited list of scope values indicating the r
     protected BearerToken extractRequestToken(Response response) throws OAuthProblemException {
         Map<String, Object> token = null;
         if (MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType())) {
-            //TODO Catch invalid content
+            // TODO Catch invalid content
             try {
                 token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
             } catch (IOException e) {

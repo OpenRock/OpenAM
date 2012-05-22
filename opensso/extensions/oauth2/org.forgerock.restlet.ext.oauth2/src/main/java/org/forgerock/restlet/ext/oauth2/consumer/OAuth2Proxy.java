@@ -1,7 +1,7 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,16 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * $Id$
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
@@ -54,19 +60,13 @@ import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
 import org.restlet.util.Series;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
-
 /**
  * An OAuth2Proxy does ...
- *
+ * 
  * @author Laszlo Hordos
  */
-public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken> extends Restlet {
+public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken>
+        extends Restlet {
 
     private Reference authorizationEndpoint = null;
     private Reference tokenEndpoint = null;
@@ -98,7 +98,9 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     /**
      * @param authorizationEndpoint
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.1>Authorization Endpoint</a>
+     * @see <a href=
+     *      "http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.1>Authorizati
+     *      o n Endpoint</a>
      */
     public OAuth2Proxy setAuthorizationEndpoint(Reference authorizationEndpoint) {
         this.authorizationEndpoint = authorizationEndpoint;
@@ -112,7 +114,9 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     /**
      * @param tokenEndpoint
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.2>Token Endpoint</a>
+     * @see <a href=
+     *      "http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.2>Token
+     *      Endpoint</a>
      */
     public OAuth2Proxy setTokenEndpoint(Reference tokenEndpoint) {
         this.tokenEndpoint = tokenEndpoint;
@@ -137,7 +141,9 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
 
     /**
      * @return
-     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.1.2>Redirection Endpoint</a>
+     * @see <a href=
+     *      "http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-3.1.2>Redirecti
+     *      o n Endpoint</a>
      */
     public OAuth2Proxy setRedirectionEndpoint(Reference redirectionEndpoint) {
         this.redirectionEndpoint = redirectionEndpoint;
@@ -228,7 +234,7 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     /**
      * Creates a next Restlet is no one is set. By default, it creates a new
      * {@link Client} based on the protocol of the resource's URI reference.
-     *
+     * 
      * @return The created next Restlet or null.
      */
     protected Uniform createRestletClient() {
@@ -249,23 +255,29 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
 
             result = new Client(getProtocol());
             if (Protocol.HTTPS.equals(p)) {
-//            SslContextFactory factory = new CustomSSLContextFactory(keyManagers, trustManagers, configuration.getClientKeyAlias());
-//            client.getContext().getAttributes().put("sslContextFactory", factory);
+                // SslContextFactory factory = new
+                // CustomSSLContextFactory(keyManagers, trustManagers,
+                // configuration.getClientKeyAlias());
+                // client.getContext().getAttributes().put("sslContextFactory",
+                // factory);
             }
         }
         return result;
     }
 
-
     // Authorization Redirects
 
     public Redirector handleAuthorizationCodeRequest(Request request, Series<Parameter> parameters) {
-        return handleAuthorizationCodeRequest(request.getResourceRef().toString(), null,
-                Base64.encode(request.getResourceRef().normalize().toString().toCharArray(), "ISO-8859-1", false), parameters);
+        return handleAuthorizationCodeRequest(request.getResourceRef().toString(), null, Base64
+                .encode(request.getResourceRef().normalize().toString().toCharArray(),
+                        "ISO-8859-1", false), parameters);
     }
 
-    public Redirector handleAuthorizationCodeRequest(String redirectUri, Collection<String> scope, String state, Series<Parameter> parameters) {
-        AuthorizationCodeRequest factory = getAuthorizationCodeRequest().setRedirectUri(redirectUri).setClientId(getClientId()).setState(state).addParameters(parameters);
+    public Redirector handleAuthorizationCodeRequest(String redirectUri, Collection<String> scope,
+            String state, Series<Parameter> parameters) {
+        AuthorizationCodeRequest factory =
+                getAuthorizationCodeRequest().setRedirectUri(redirectUri)
+                        .setClientId(getClientId()).setState(state).addParameters(parameters);
         if (null != scope) {
             factory.getScope().addAll(scope);
         }
@@ -276,11 +288,15 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
 
     public Redirector handleImplicitRequest(Request request, Series<Parameter> parameters) {
         return handleImplicitRequest(request.getResourceRef().toString(), null,
-                Base64.encode(request.getResourceRef().normalize().toString().toCharArray(), "ISO-8859-1", false), parameters);
+                Base64.encode(request.getResourceRef().normalize().toString().toCharArray(),
+                        "ISO-8859-1", false), parameters);
     }
 
-    public Redirector handleImplicitRequest(String redirectUri, Collection<String> scope, String state, Series<Parameter> parameters) {
-        ImplicitRequest factory = getImplicitRequest().setRedirectUri(redirectUri).setClientId(getClientId()).setState(state).addParameters(parameters);
+    public Redirector handleImplicitRequest(String redirectUri, Collection<String> scope,
+            String state, Series<Parameter> parameters) {
+        ImplicitRequest factory =
+                getImplicitRequest().setRedirectUri(redirectUri).setClientId(getClientId())
+                        .setState(state).addParameters(parameters);
         if (null != scope) {
             factory.getScope().addAll(scope);
         }
@@ -297,11 +313,13 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
      * @throws OAuthProblemException
      */
     public U flowAuthorizationToken(String code, Series<Parameter> parameters) {
-        Request request = getAuthorizationTokenRequest().setCode(code).addParameters(parameters).build();
+        Request request =
+                getAuthorizationTokenRequest().setCode(code).addParameters(parameters).build();
         Response response = new Response(request);
         Uniform client = getClientResource();
         client.handle(request, response);
-        return getAccessTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_BODY, response);
+        return getAccessTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_BODY,
+                response);
     }
 
     /**
@@ -332,7 +350,8 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
         return flowClientCredentials(null != scope ? Arrays.asList(scope) : null, null);
     }
 
-    public U flowRefreshToken(String refreshToken, Collection<String> scope, Series<Parameter> parameters) {
+    public U flowRefreshToken(String refreshToken, Collection<String> scope,
+            Series<Parameter> parameters) {
         RefreshTokenRequest factory = getRefreshTokenRequest(refreshToken);
         return executeTokenFlow(scope, parameters, factory);
     }
@@ -341,7 +360,8 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
         return flowRefreshToken(refreshToken, null != scope ? Arrays.asList(scope) : null, null);
     }
 
-    protected U executeTokenFlow(Collection<String> scope, Series<Parameter> parameters, TokenRequestFactory factory) {
+    protected U executeTokenFlow(Collection<String> scope, Series<Parameter> parameters,
+            TokenRequestFactory factory) {
         if (null != parameters) {
             factory.getParameters().addAll(parameters);
         }
@@ -349,7 +369,8 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
         Request request = factory.build();
         Response response = new Response(request);
         getClientResource().handle(request, response);
-        return getAccessTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_BODY, response);
+        return getAccessTokenExtractor().extractToken(OAuth2Utils.ParameterLocation.HTTP_BODY,
+                response);
     }
 
     protected void setScope(RequestFactory factory, Collection<String> scopes) {
@@ -363,56 +384,57 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     // Request Factories
 
     public AuthorizationCodeRequest getAuthorizationCodeRequest() {
-        return RequestFactory.newInstance(AuthorizationCodeRequest.class, getAuthorizationEndpoint());
+        return RequestFactory.newInstance(AuthorizationCodeRequest.class,
+                getAuthorizationEndpoint());
     }
 
     public ImplicitRequest getImplicitRequest() {
         return RequestFactory.newInstance(ImplicitRequest.class, getAuthorizationEndpoint());
     }
 
-
     public AuthorizationTokenRequest getAuthorizationTokenRequest() {
-        return RequestFactory.newInstance(AuthorizationTokenRequest.class, getTokenEndpoint()).
-                setRedirectUri(getRedirectionEndpoint().toString()).setChallengeResponse(getChallengeResponse()).
-                setClientCredentials(getClientId(), getClientSecret());
+        return RequestFactory.newInstance(AuthorizationTokenRequest.class, getTokenEndpoint())
+                .setRedirectUri(getRedirectionEndpoint().toString()).setChallengeResponse(
+                        getChallengeResponse()).setClientCredentials(getClientId(),
+                        getClientSecret());
     }
 
     public PasswordRequest getPasswordRequest() {
-        return RequestFactory.newInstance(PasswordRequest.class, getTokenEndpoint()).
-                setChallengeResponse(getChallengeResponse()).setClientCredentials(getClientId(), getClientSecret()).
-                setResourceOwnerCredentials(getUsername(), getPassword());
+        return RequestFactory.newInstance(PasswordRequest.class, getTokenEndpoint())
+                .setChallengeResponse(getChallengeResponse()).setClientCredentials(getClientId(),
+                        getClientSecret())
+                .setResourceOwnerCredentials(getUsername(), getPassword());
     }
 
     public ClientCredentialsRequest getClientCredentialsRequest() {
-        return RequestFactory.newInstance(ClientCredentialsRequest.class, getTokenEndpoint()).
-                setChallengeResponse(getChallengeResponse()).setClientCredentials(getClientId(), getClientSecret());
+        return RequestFactory.newInstance(ClientCredentialsRequest.class, getTokenEndpoint())
+                .setChallengeResponse(getChallengeResponse()).setClientCredentials(getClientId(),
+                        getClientSecret());
     }
 
     public RefreshTokenRequest getRefreshTokenRequest(String refreshToken) {
-        return RequestFactory.newInstance(RefreshTokenRequest.class, getTokenEndpoint()).
-                setRefreshToken(refreshToken).setChallengeResponse(getChallengeResponse()).
-                setClientCredentials(getClientId(), getClientSecret());
+        return RequestFactory.newInstance(RefreshTokenRequest.class, getTokenEndpoint())
+                .setRefreshToken(refreshToken).setChallengeResponse(getChallengeResponse())
+                .setClientCredentials(getClientId(), getClientSecret());
     }
 
     public SAML20AssertionRequest getSAML20AssertionRequest() {
         return RequestFactory.newInstance(SAML20AssertionRequest.class, getAuthorizationEndpoint());
     }
 
-
-    //TODO Have it as an inner class this can not work without parent OAuth2Proxy<T, U> oAuth2Proxy
-    //TODO Have a factory method:  public InnerOAuth2Proxy newOAuth2Proxy(Flow flow)
-    //----------------------------------------------------------------------------------------------
+    // TODO Have it as an inner class this can not work without parent
+    // OAuth2Proxy<T, U> oAuth2Proxy
+    // TODO Have a factory method: public InnerOAuth2Proxy newOAuth2Proxy(Flow
+    // flow)
+    // ----------------------------------------------------------------------------------------------
 
     public enum Flow {
         AUTHORIZATION_CODE, IMPLICIT, PASSWORD, CLIENT_CREDENTIALS, REFRESH_TOKEN, SAML20_INSERTION;
     }
 
     public enum AuthenticationStatus {
-        UNAUTHENTICATED,
-        REDIRECTED,
-        AUTHENTICATED;
+        UNAUTHENTICATED, REDIRECTED, AUTHENTICATED;
     }
-
 
     protected OAuth2Proxy(OAuth2Proxy<T, U> oAuth2Proxy, Flow flow) {
         this.oAuth2Proxy = oAuth2Proxy;
@@ -439,7 +461,8 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     private volatile Set<String> scope = null;
     private volatile Series<Parameter> parameters = null;
 
-    public abstract RequestCallbackHandler<U> getRequestCallbackHandler(Request request, Response response);
+    public abstract RequestCallbackHandler<U> getRequestCallbackHandler(Request request,
+            Response response);
 
     public OAuth2Proxy<T, U> getOAuth2Proxy() {
         return oAuth2Proxy;
@@ -447,7 +470,7 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
 
     /**
      * Returns the next Restlet.
-     *
+     * 
      * @return The next Restlet or null.
      */
     public Uniform getNext() {
@@ -459,8 +482,9 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
      * <p/>
      * In addition, this method will set the context of the next Restlet if it
      * is null by passing a reference to its own context.
-     *
-     * @param next The next Restlet.
+     * 
+     * @param next
+     *            The next Restlet.
      */
     public void setNext(Uniform next) {
         if (next instanceof Restlet) {
@@ -481,7 +505,7 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
         if (requiredScope instanceof Set) {
             this.scope = Collections.unmodifiableSet((Set<? extends String>) requiredScope);
         } else if (null == requiredScope) {
-            this.scope = Collections.emptySet(); //TODO Set to null instead
+            this.scope = Collections.emptySet(); // TODO Set to null instead
         } else {
             this.scope = Collections.unmodifiableSet(new HashSet<String>(requiredScope));
         }
@@ -490,9 +514,10 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     /**
      * Get a new instance of the parameters
      * <p/>
-     * If the initial parameters is null the this method return null as well. If the initial parameters is not null
-     * then it return a new modifiable copy of the original parameters.
-     *
+     * If the initial parameters is null the this method return null as well. If
+     * the initial parameters is not null then it return a new modifiable copy
+     * of the original parameters.
+     * 
      * @return null or new instance of initial parameters
      */
     public Series<Parameter> getParameters() {
@@ -506,25 +531,25 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
         this.parameters = parameters;
     }
 
-
     @Override
     public void handle(Request request, Response response) {
         super.handle(request, response);
         if (getNext() != null) {
 
             switch (beforeHandle(request, response)) {
-                case AUTHENTICATED: {
-                    getNext().handle(request, response);
-                    break;
-                }
-                case UNAUTHENTICATED: {
-                    response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-                    break;
-                }
-                case REDIRECTED: {
-                    //The ClientResource should know to STOP processing the request and let the User-Agent to redirected
-                    response.setStatus(Status.REDIRECTION_FOUND);
-                }
+            case AUTHENTICATED: {
+                getNext().handle(request, response);
+                break;
+            }
+            case UNAUTHENTICATED: {
+                response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+                break;
+            }
+            case REDIRECTED: {
+                // The ClientResource should know to STOP processing the request
+                // and let the User-Agent to redirected
+                response.setStatus(Status.REDIRECTION_FOUND);
+            }
             }
 
             // Re-associate the response to the current thread
@@ -536,116 +561,130 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
             }
         } else {
             response.setStatus(Status.SERVER_ERROR_INTERNAL);
-            getLogger()
-                    .warning(
-                            "The Proxy was executed without a next Restlet attached to it.");
+            getLogger().warning("The Proxy was executed without a next Restlet attached to it.");
         }
     }
-
 
     protected AuthenticationStatus beforeHandle(Request request, Response response) {
         RequestCallbackHandler<U> callbackHandler = getRequestCallbackHandler(request, response);
         U token = callbackHandler.popAccessToken(request);
         if (null == token || !token.isValid()) {
 
-            //TODO Call the REFRESH_TOKEN if it's possible
+            // TODO Call the REFRESH_TOKEN if it's possible
             Flow au = getAuthenticationFlow();
             if (null != token && token.hasRefreshToken()) {
                 switch (au) {
-                    case AUTHORIZATION_CODE: {
-                        au = Flow.REFRESH_TOKEN;
-                        break;
-                    }
-                    case PASSWORD: {
-                        au = Flow.REFRESH_TOKEN;
-                        break;
-                    }
+                case AUTHORIZATION_CODE: {
+                    au = Flow.REFRESH_TOKEN;
+                    break;
+                }
+                case PASSWORD: {
+                    au = Flow.REFRESH_TOKEN;
+                    break;
+                }
                 }
             }
             switch (au) {
-                case AUTHORIZATION_CODE: {
-                    return callbackHandler.authorizationRedirect(getOAuth2Proxy().handleAuthorizationCodeRequest(
-                            callbackHandler.getRedirectionEndpoint(request, getOAuth2Proxy().getRedirectionEndpoint()),
-                            callbackHandler.getScope(request, getScope()), callbackHandler.getState(request),
-                            callbackHandler.decorateParameters(getParameters())));
+            case AUTHORIZATION_CODE: {
+                return callbackHandler.authorizationRedirect(getOAuth2Proxy()
+                        .handleAuthorizationCodeRequest(
+                                callbackHandler.getRedirectionEndpoint(request, getOAuth2Proxy()
+                                        .getRedirectionEndpoint()),
+                                callbackHandler.getScope(request, getScope()),
+                                callbackHandler.getState(request),
+                                callbackHandler.decorateParameters(getParameters())));
+            }
+            case IMPLICIT: {
+                return callbackHandler.authorizationRedirect(getOAuth2Proxy()
+                        .handleImplicitRequest(
+                                callbackHandler.getRedirectionEndpoint(request, getOAuth2Proxy()
+                                        .getRedirectionEndpoint()),
+                                callbackHandler.getScope(request, getScope()),
+                                callbackHandler.getState(request),
+                                callbackHandler.decorateParameters(getParameters())));
+            }
+            case PASSWORD: {
+                token =
+                        getOAuth2Proxy().flowPassword(
+                                callbackHandler.getScope(request, getScope()),
+                                callbackHandler.decorateParameters(getParameters()));
+                break;
+            }
+            case CLIENT_CREDENTIALS: {
+                token =
+                        getOAuth2Proxy().flowClientCredentials(
+                                callbackHandler.getScope(request, getScope()),
+                                callbackHandler.decorateParameters(getParameters()));
+                break;
+            }
+            case REFRESH_TOKEN: {
+                if (token == null || !token.hasRefreshToken()) {
+                    return AuthenticationStatus.UNAUTHENTICATED;
                 }
-                case IMPLICIT: {
-                    return callbackHandler.authorizationRedirect(getOAuth2Proxy().handleImplicitRequest(
-                            callbackHandler.getRedirectionEndpoint(request, getOAuth2Proxy().getRedirectionEndpoint()),
-                            callbackHandler.getScope(request, getScope()),
-                            callbackHandler.getState(request), callbackHandler.decorateParameters(getParameters())));
-                }
-                case PASSWORD: {
-                    token = getOAuth2Proxy().flowPassword(callbackHandler.getScope(request, getScope()),
-                            callbackHandler.decorateParameters(getParameters()));
-                    break;
-                }
-                case CLIENT_CREDENTIALS: {
-                    token = getOAuth2Proxy().flowClientCredentials(callbackHandler.getScope(request,
-                            getScope()), callbackHandler.decorateParameters(getParameters()));
-                    break;
-                }
-                case REFRESH_TOKEN: {
-                    if (token == null || !token.hasRefreshToken()) {
-                        return AuthenticationStatus.UNAUTHENTICATED;
-                    }
-                    token = getOAuth2Proxy().flowRefreshToken(token.getRefreshToken(), callbackHandler.
-                            getScope(request, getScope()), callbackHandler.decorateParameters(getParameters()));
-                    break;
-                }
-                case SAML20_INSERTION: {
-                    break;
-                }
+                token =
+                        getOAuth2Proxy().flowRefreshToken(token.getRefreshToken(),
+                                callbackHandler.getScope(request, getScope()),
+                                callbackHandler.decorateParameters(getParameters()));
+                break;
+            }
+            case SAML20_INSERTION: {
+                break;
+            }
             }
             callbackHandler.pushAccessToken(request, token);
         }
         return beforeHandle(token, callbackHandler.getTokenLocation(request), request, response);
     }
 
-    protected AuthenticationStatus beforeHandle(U token, OAuth2Utils.ParameterLocation tokenLocation, Request request, Response response) {
+    protected AuthenticationStatus beforeHandle(U token,
+            OAuth2Utils.ParameterLocation tokenLocation, Request request, Response response) {
         boolean authenticated = token != null;
         if (authenticated) {
             if (null != tokenLocation) {
                 switch (tokenLocation) {
-                    case HTTP_HEADER: {
-                        request.setChallengeResponse(getAccessTokenExtractor().createChallengeResponse(token));
-                        break;
-                    }
-                    case HTTP_BODY: {
-                        if (!Method.GET.equals(request.getMethod()) &&
-                                (request.getEntity() == null ||
-                                        MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType()))) {
-                            Form parameters = getAccessTokenExtractor().createForm(token);
+                case HTTP_HEADER: {
+                    request.setChallengeResponse(getAccessTokenExtractor().createChallengeResponse(
+                            token));
+                    break;
+                }
+                case HTTP_BODY: {
+                    if (!Method.GET.equals(request.getMethod())
+                            && (request.getEntity() == null || MediaType.APPLICATION_WWW_FORM
+                                    .equals(request.getEntity().getMediaType()))) {
+                        Form parameters = getAccessTokenExtractor().createForm(token);
 
-                            if (null != request.getEntity()) {
-                                Set<String> names = parameters.getNames();
-                                for (Parameter parameter : new Form(request.getEntity())) {
-                                    if (names.contains(parameter.getName())) {
-                                        continue;
-                                    }
-                                    parameters.add(parameter);
+                        if (null != request.getEntity()) {
+                            Set<String> names = parameters.getNames();
+                            for (Parameter parameter : new Form(request.getEntity())) {
+                                if (names.contains(parameter.getName())) {
+                                    continue;
                                 }
+                                parameters.add(parameter);
                             }
+                        }
 
-                            request.setEntity(parameters.getWebRepresentation());
-                            break;
-                        }
-                    }
-                    case HTTP_FRAGMENT: {
-                        Form parameters = request.getReferrerRef().hasFragment() ? new Form(request.getReferrerRef().getFragment()) : new Form();
-                        parameters.addAll(getAccessTokenExtractor().createForm(token));
-                        request.getResourceRef().setFragment(parameters.getQueryString());
-                        break;
-                    }
-                    case HTTP_QUERY: {
-                        for (Parameter parameter : getAccessTokenExtractor().createForm(token)) {
-                            request.getResourceRef().addQueryParameter(parameter);
-                        }
+                        request.setEntity(parameters.getWebRepresentation());
                         break;
                     }
                 }
+                case HTTP_FRAGMENT: {
+                    Form parameters =
+                            request.getReferrerRef().hasFragment() ? new Form(request
+                                    .getReferrerRef().getFragment()) : new Form();
+                    parameters.addAll(getAccessTokenExtractor().createForm(token));
+                    request.getResourceRef().setFragment(parameters.getQueryString());
+                    break;
+                }
+                case HTTP_QUERY: {
+                    for (Parameter parameter : getAccessTokenExtractor().createForm(token)) {
+                        request.getResourceRef().addQueryParameter(parameter);
+                    }
+                    break;
+                }
+                }
             }
         }
-        return authenticated ? AuthenticationStatus.AUTHENTICATED : AuthenticationStatus.UNAUTHENTICATED;
+        return authenticated ? AuthenticationStatus.AUTHENTICATED
+                : AuthenticationStatus.UNAUTHENTICATED;
     }
 }

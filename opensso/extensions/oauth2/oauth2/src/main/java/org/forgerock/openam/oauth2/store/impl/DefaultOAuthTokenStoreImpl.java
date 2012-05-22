@@ -1,20 +1,31 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright © 2012 ForgeRock. All rights reserved.
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.store.impl;
+
+import java.util.Set;
+import java.util.UUID;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.JsonResource;
@@ -35,13 +46,10 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.restlet.data.Status;
 
-import java.util.Set;
-import java.util.UUID;
-
 /**
- * Implementation of the OAuthTokenStore interface that uses the CoreTokenService for storing the
- * tokens as JSON objects.
- *
+ * Implementation of the OAuthTokenStore interface that uses the
+ * CoreTokenService for storing the tokens as JSON objects.
+ * 
  * @author Jonathan Scudder
  */
 public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
@@ -61,7 +69,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     /**
      * Constructor, creates the repository instance used.
-     *
+     * 
      * @throws OAuthProblemException
      */
     public DefaultOAuthTokenStoreImpl() {
@@ -76,7 +84,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid,
-                                                     SessionClient client) {
+            SessionClient client) {
 
         String id = UUID.randomUUID().toString();
         long expiresIn = AUTHZ_CODE_LIFETIME;
@@ -167,7 +175,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AccessToken createAccessToken(String accessTokenType, Set<String> scope,
-                                         AuthorizationCode code) {
+            AuthorizationCode code) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -175,7 +183,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, code);
-        // TODO decide where the scope in the access token is checked against the authorization code
+        // TODO decide where the scope in the access token is checked against
+        // the authorization code
 
         // Create in CTS
         JsonResourceAccessor accessor =
@@ -198,7 +207,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AccessToken createAccessToken(String accessTokenType, Set<String> scope,
-                                         RefreshToken refreshToken) {
+            RefreshToken refreshToken) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -206,7 +215,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, refreshToken);
-        // TODO find out where the scope in the access token is checked against the authorization
+        // TODO find out where the scope in the access token is checked against
+        // the authorization
         // code
 
         // Create in CTS
@@ -230,7 +240,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
-                                         String uuid) {
+            String uuid) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -261,7 +271,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
-                                         String uuid, SessionClient client) {
+            String uuid, SessionClient client) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -293,7 +303,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
-                                         String uuid, String clientId) {
+            String uuid, String clientId) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -369,7 +379,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid,
-                                           String clientId) {
+            String clientId) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
