@@ -2623,7 +2623,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Time in seconds used adjust time difference between agent system
       and OpenAM. Clock skew in seconds = AgentTime - OpenAMServerTime.</para>
       <para>Default: 10.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.policy.clock.skew</literal></para>
+      <para>Property: <literal>com.sun.identity.agents.config.policy.clockSkew</literal></para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
