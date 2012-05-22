@@ -2261,7 +2261,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       descriptor, set the key to
       <literal>id=employee,ou=group,o=openam</literal>, and the value to
       <literal>am_employee_role</literal>.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.privileged.session.attribute</literal></para>
+      <para>Property: <literal>com.sun.identity.agents.config.privileged.attribute.mapping</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
