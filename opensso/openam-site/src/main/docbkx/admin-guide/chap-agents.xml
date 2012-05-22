@@ -1234,7 +1234,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       = http://openam.example.com:8080/openam/cdcservlet?goto=
       http://www.example.com/landing.jsp</literal>.
       The agent uses this parameter to append the original request URL
-      to this cdcserlet URL. The landing page consumes this parameter to
+      to this cdcservlet URL. The landing page consumes this parameter to
       redirect to the original URL.</para>
       <para>As an example, if you set this value to <literal>goto2</literal>,
       then the complete URL sent for authentication is
