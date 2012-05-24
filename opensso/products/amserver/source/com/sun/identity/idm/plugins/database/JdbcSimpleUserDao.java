@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc 
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
 package com.sun.identity.idm.plugins.database;
 
@@ -62,21 +63,21 @@ public class JdbcSimpleUserDao implements DaoInterface {
     //and inherit the fields and use them in their own methods if needed
     //for example an implementation could extend this and override the
     //membership methods and add an implementation for groups
-    static String userTableName;
-    static String membershipTableName;
+    String userTableName;
+    String membershipTableName;
     
     //determines whether to use JNDI or JBDC to get Connections to DB
-    static boolean useJNDI;
-    static String datasourceName; //for JNDI style connections
-    static DataSource datasource; //for JNDI style connections
-    static String jdbcDbDriver; //for JDBC style connections
-    static String jdbcDriverDbUrl; //for JDBC style connections
-    static String jdbcDbUser; //for JDBC style connections
-    static String jdbcDbPassword; //for JDBC style connections
-    static Debug debug;
+    boolean useJNDI;
+    String datasourceName; //for JNDI style connections
+    DataSource datasource; //for JNDI style connections
+    String jdbcDbDriver; //for JDBC style connections
+    String jdbcDriverDbUrl; //for JDBC style connections
+    String jdbcDbUser; //for JDBC style connections
+    String jdbcDbPassword; //for JDBC style connections
+    private static Debug debug;
     
     //used to identity this datasource by IdRepo layer code
-    static String databaseURL = null;
+    String databaseURL = null;
     
     static final String SPACE = " ";
     static final String COMMA = ",";
