@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.cli;
 
@@ -232,7 +233,7 @@ public class WebCLIHelper {
                 desc = desc.substring(0, desc.length() -1);
             }
             buff.append("<tr><td valign=\"top\">")
-                .append(desc);
+                .append(escapeTags(desc));
             if (mandatory) {
                 buff.append("<font color=\"red\">*</font>");
             }
