@@ -48,10 +48,8 @@
 #define AM_WEB_EXPORT
 #endif
 
-#if (!defined(WINNT) && !defined(_AMD64_))
-#define AM_WEB_ALLOW_USER_MSG            "User %s was allowed access to %s."
-#define AM_WEB_DENIED_USER_MSG            "User %s was denied access to %s."
-#endif
+#define AM_WEB_ALLOW_USER_MSG            "User %s was allowed access to %s"
+#define AM_WEB_DENIED_USER_MSG            "User %s was denied access to %s"
 
 #include <stdlib.h>
 #include <am.h>

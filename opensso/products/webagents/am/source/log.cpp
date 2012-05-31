@@ -976,42 +976,46 @@ Log::auditLog(const char* auditDisposition,
         ...)
 {
     am_status_t status = AM_SUCCESS;
-    char *logMsg = NULL;
 
-    std::va_list args;
+    int size = MSG_MAX_LEN;
+    std::vector<char> logMsg(size);
+    va_list args;
     va_start(args, format);
-    logMsg = PR_vsmprintf(format, args);
-    if(logMsg != NULL) {
-        
+    int needed = vsnprintf(&logMsg[0], logMsg.size(), format, args);
+    va_end(args);
+    if (needed >= size) {
+        logMsg.resize(needed + 1);
+        va_start(args, format);
+        needed = vsnprintf(&logMsg[0], logMsg.size(), format, args);
+        va_end(args);
+    }
+    if(&logMsg[0] != NULL) {
         if ((strcasecmp(auditDisposition, AUDIT_DISPOSITION_REMOTE) == 0) ||
             (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
             status = doRemoteAuditLog(module,
                 remoteLogLevel,
                 userSSOToken,
-                logMsg
+                &logMsg[0]
                 );
         }
-
         if (status != AM_SUCCESS ||
             (strcasecmp(auditDisposition, AUDIT_DISPOSITION_LOCAL) == 0) ||
             (strcasecmp(auditDisposition, AUDIT_DISPOSITION_ALL) == 0)) {
             try {
                 doLocalAuditLog(module,
                     Log::LOG_INFO,
-                    logMsg,
+                    &logMsg[0],
                     localAuditLogRotate,
                     localAuditFileSize);
             } catch(...) {
                 status = AM_FAILURE;    
             }
         }
-        PR_smprintf_free(logMsg);
     }
     if (status != AM_SUCCESS) {
         Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
                 "Log::auditLog(): Both local and remote audit logging failed.");
     }
-        
     return status;
 }
 

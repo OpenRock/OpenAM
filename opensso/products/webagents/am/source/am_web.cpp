@@ -182,11 +182,6 @@ static int initialized = AM_FALSE;
 static const char* requestIp = "requestIp";
 static const char* requestDnsName = "requestDnsName";
 
-#if defined(WINNT)
-HINSTANCE hInstance;
-#endif
-
-
 extern "C" int decrypt_base64(const char *, char *, const char*);
 extern "C" int decode_base64(const char *, char *);
 
@@ -439,34 +434,6 @@ void getFullQualifiedHostName(const am_map_t env_parameter_map,
 	}
     }
 }
-
-#if (defined(WINNT) || defined(_AMD64_))
-#include "resource.h"
-void get_string(UINT key, char *buf, size_t buflen) {
-
-    if (buf != NULL) {
-	if (LoadString(hInstance, key, buf, buflen) == 0) {
-	    buf[0] = '\0';
-	    return;
-	}
-    }
-    return;
-}
-#elif defined(HPUX) || defined(AIX)
-void get_string(const char *key, char *buf, size_t buflen) {
-  strncpy(buf, key, buflen);
-  return;
-}
-#else
-#include <libintl.h>
-#define domainname "am_web_keys"
-void get_string(const char *key, char *buf, size_t buflen) {
-    if(buf != NULL) {
-	strcpy(buf, (const char *)gettext(key));
-    }
-    return;
-}
-#endif
 
 #if (defined(WINNT) || defined(_AMD64_))
 void mbyte_to_wchar(const char * orig_str,char *new_str, int dest_len)
@@ -1024,26 +991,6 @@ am_agent_init(boolean_t* pAgentInitialized)
     if (AM_SUCCESS == status) {
 
         am_resource_traits_t rsrcTraits;
-        #if !defined(WINNT) && !defined(HPUX) && !defined(AIX)
-        /* Logging locale is set as per the value defined in the properties file
-        However we need to set the rest of locale behaviour so that code
-        conversion routines will work correctly. Setting LC_MESSAGE to a
-        different value  can be useful to run the agent in non English locale
-        and dump the log in English  */
-        if((*agentConfigPtr)->locale != NULL) {
-            setlocale(LC_MESSAGES,(*agentConfigPtr)->locale);
-            setlocale(LC_CTYPE,"");
-            setlocale(LC_NUMERIC,"");
-            setlocale(LC_TIME,"");
-            setlocale(LC_MONETARY,"");
-            am_web_log_info("%s: Logging Locale: %s",
-                            thisfunc, (*agentConfigPtr)->locale);
-        } else {
-            setlocale(LC_ALL,"");
-            am_web_log_info("am_agent_init(): Logging Locale: OS locale");
-        }
-	textdomain(domainname);
-	#endif
 	populate_am_resource_traits(rsrcTraits, agent_config);
 
 	status = am_policy_init((*agentConfigPtr)->properties);
@@ -1767,14 +1714,9 @@ log_access(am_status_t access_status,
     AgentConfigurationRefCntPtr* agentConfigPtr =
         (AgentConfigurationRefCntPtr*) agent_config;
 
-
     am_status_t status = AM_SUCCESS;
     char fmtStr[MSG_MAX_LEN];
-#if (defined(WINNT) || defined(_AMD64_))
-    UINT key = 0;
-#else
     const char *key = NULL;
-#endif
 
     if ((*agentConfigPtr)->log_access_type != LOG_ACCESS_NONE) {
 	switch(access_status) {
@@ -1793,7 +1735,7 @@ log_access(am_status_t access_status,
 	}
 	if (key != NULL) {
 	    memset(fmtStr, 0, sizeof(fmtStr));
-	    get_string(key, fmtStr, sizeof(fmtStr));
+            strncpy(fmtStr, key, sizeof(fmtStr));
             status = Log::auditLog((*agentConfigPtr)->auditLogDisposition,
                     (*agentConfigPtr)->localAuditLogFileRotate,
                     (*agentConfigPtr)->localAuditLogFileSize,
@@ -7281,14 +7223,3 @@ am_web_get_postdata_preserve_URL_parameter(char **queryParameter,
     }
     return status;
 }
-
-#if defined(WINNT)
-AM_BEGIN_EXTERN_C
-BOOL WINAPI DllMain(HINSTANCE hInst, DWORD fdwReason, LPVOID lpvReserved) {
-        if(fdwReason == DLL_PROCESS_ATTACH) {
-		hInstance = hInst;
-        }
-        return TRUE;
-}
-AM_END_EXTERN_C
-#endif
