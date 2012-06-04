@@ -1917,6 +1917,8 @@ public class AccessManager {
         description="Create a new agent configuration.",
         webSupport="true",
         mandatoryOptions={
+            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
+            "agenturl|g|s|Agent URL. e.g. http://www.agent.com:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.com:8080. This option is valid for J2EEAgent and WebAgent.",
             "realm|e|s|Name of realm.",
             "agentname|b|s|Name of agent.",
             "agenttype|t|s|Type of agent. e.g. J2EEAgent, WebAgent"
@@ -1924,8 +1926,6 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
-            "agenturl|g|s|Agent URL. e.g. http://www.agent.com:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.com:8080. This option is valid for J2EEAgent and WebAgent.",
             "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={
@@ -2670,7 +2670,7 @@ public class AccessManager {
         resourceStrings={
             "show-application-type-not-found=Application Type {0} did not exist."})
     private String show_appl_type;
- 
+
     @SubCommandInfo(
         implClassName="org.forgerock.openam.cli.entitlement.DeleteApplicationTypes",
         description="Delete application types.",
@@ -2683,7 +2683,7 @@ public class AccessManager {
         resourceStrings={
             "delete-application-types-succeeded=Application Types {0} were deleted."})
     private String delete_appl_types;
- 
+
     @SubCommandInfo(
         implClassName="org.forgerock.openam.cli.entitlement.CreateApplicationType",
         description="Create application type.",
@@ -2698,7 +2698,7 @@ public class AccessManager {
         resourceStrings={
             "create-application-type-succeeded=Application Type {0} was created."})
     private String create_appl_type;
-    
+
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.entitlement.ListApplications",
         description="List applications in a realm.",
