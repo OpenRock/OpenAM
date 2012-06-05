@@ -64,12 +64,12 @@
 
     <!-- Maven Repositories -->
     <repositories>
-        <!-- Local Project Repository -->
+        <!-- ForgeRock.org Project Repository -->
         <repository>
-            <id>local-additional-non-maven-support_repository</id>
-            <name>Local Dependencies for Non-Maven Artifacts</name>
-            <url>file://additional-non-maven-support_repository</url>
-            <releases>
+          <id>central</id>
+          <name>repo</name>
+          <url>http://maven.forgerock.org/repo/repo</url>
+           <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </releases>
@@ -78,8 +78,8 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
+      </repositories>
         
-    </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>Nexus Public repository</id>
@@ -96,6 +96,20 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name>repo</name>
+          <url>http://maven.forgerock.org/repo/repo</url>
+        </pluginRepository>
+        <pluginRepository>
+          <snapshots />
+          <id>snapshots</id>
+          <name>repo</name>
+          <url>http://maven.forgerock.org/repo/repo</url>
         </pluginRepository>
     </pluginRepositories>
     
