@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <inceptionYear>2010</inceptionYear>
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>com.forgerock</groupId>
+        <artifactId>openam</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>openam-ant</name>
+    <description>...
+    </description>
+    <artifactId>openam-ant</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.com</url>
+    </organization>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <!-- Surefire Tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
+                    </systemPropertyVariables>
+                    <excludes>
+                        <exclude>**/IT_*</exclude>
+                   </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM</Specification-Title>
+                            <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM</Implementation-Title>
+                            <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Built-By>${user.name}</Built-By>
+                            <Build-Jdk>${java.version}</Build-Jdk>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>process-ant-build</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="legacy.generation">
+                                <mkdir dir="${basedir}/target/generated/schema" />
+                                <!-- taskdef name="hibernateTool" classname="org.hibernate.tool.ant.HibernateToolTask" / -->
+                                
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                </dependencies>
+            </plugin>
+
+        </plugins>
+    
+        <resources>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>version_information.txt</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>version_information.txt</include>
+                </includes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    
+    <dependencies>
+    </dependencies>
+</project>
