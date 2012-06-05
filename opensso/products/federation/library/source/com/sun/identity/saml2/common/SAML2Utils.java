@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc.
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.common;
@@ -3882,6 +3882,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         String SAMLmessageName, String SAMLmessageValue, String relayStateName,
         String relayStateValue, String targetURL) throws IOException {
          
+        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache,no-store");
