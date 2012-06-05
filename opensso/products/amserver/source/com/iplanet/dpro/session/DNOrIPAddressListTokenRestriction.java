@@ -32,23 +32,23 @@
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.Misc;
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
-import java.security.AccessController;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Map;
 
 /**
  * <code>DNOrIPAddressListTokenRestriction</code> implements
@@ -205,12 +205,15 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         } else if (context instanceof InetAddress) {
             if (dnRestrictionOnly) {
                 //returning true here lessens the security, but truth to be told
-                //sessionservice endpoint should not be available externally
-                SessionService.sessionDebug.error(
-                     "DNOrIPAddressListTokenRestriction.isSatisfied():"
-                        + "dnRestrictionOnly is true, but IP has been received "
-                        + "as the restriction context, this could be a "
-                        + "suspicious activity");
+                //sessionservice endpoint should not be accessible externally
+                if (SessionService.sessionDebug.warningEnabled()) {
+                    SessionService.sessionDebug.warning(
+                            "DNOrIPAddressListTokenRestriction.isSatisfied():"
+                            + "dnRestrictionOnly is true, but IP has been received "
+                            + "as the restriction context, this could be a "
+                            + "suspicious activity. Received InetAddress is: "
+                            + ((InetAddress) context).toString());
+                }
                 return true;
             } else {
                 if (SessionService.sessionDebug.messageEnabled()) {
