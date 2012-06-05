@@ -125,6 +125,7 @@
     <!-- Build -->
     <build>
         <plugins>
+            
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -136,6 +137,7 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -270,6 +272,12 @@
         </plugins>
         <pluginManagement>
             <plugins>
+            	<plugin>
+          			<groupId>org.apache.maven.plugins</groupId>
+          			<artifactId>maven-antrun-plugin</artifactId>
+          			<version>1.7</version>
+          			 <inherited>true</inherited>
+        		</plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>

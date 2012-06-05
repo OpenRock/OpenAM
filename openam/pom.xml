@@ -38,6 +38,35 @@
                    </excludes>
                 </configuration>
             </plugin>
+            
+             <plugin>
+        	 <groupId>org.apache.maven.plugins</groupId>
+        	 <artifactId>maven-antrun-plugin</artifactId>
+        	 <version>1.7</version>
+        	 <executions>
+          		<execution>
+            	<id>compile</id>
+            	<phase>compile</phase>
+            	<configuration>
+              		<target>
+                		<property name="compile_classpath" refid="maven.compile.classpath"/>
+                		<property name="runtime_classpath" refid="maven.runtime.classpath"/>
+                		<property name="test_classpath" refid="maven.test.classpath"/>
+                		<property name="plugin_classpath" refid="maven.plugin.classpath"/>
+
+                		<ant antfile="${basedir}/products/build.xml">
+                  			<target name="server-nightly"/>
+                		</ant>
+              		</target>
+            	</configuration>
+            	<goals>
+              		<goal>run</goal>
+            	</goals>
+          		</execution>
+        	</executions>
+      		</plugin>
+            
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -63,28 +92,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>process-ant-build</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target if="legacy.generation">
-                                <mkdir dir="${basedir}/target/generated/schema" />
-                                <!-- taskdef name="hibernateTool" classname="org.hibernate.tool.ant.HibernateToolTask" / -->
-                                
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                </dependencies>
-            </plugin>
+			-->
 
         </plugins>
     
@@ -120,5 +128,10 @@
 
     
     <dependencies>
+    	<dependency>
+			<groupId>org.jclouds</groupId>
+			<artifactId>jclouds-antcontrib</artifactId>
+			<version>1.4.0</version>
+		</dependency>
     </dependencies>
 </project>
