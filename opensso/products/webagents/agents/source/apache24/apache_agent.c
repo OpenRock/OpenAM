@@ -503,7 +503,7 @@ static int init_dsame(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp, se
     }
 
 #if defined(LINUX) 					
-    lib_handle = dlopen("libamapc22.so", RTLD_LAZY);
+    lib_handle = dlopen("libamapc24.so", RTLD_LAZY);
     if (!lib_handle) {
         fprintf(stderr, "Error during dlopen(): %s\n", dlerror());
         exit(1);
