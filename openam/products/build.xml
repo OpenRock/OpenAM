@@ -234,7 +234,7 @@
         <filter token="ZIPNAME" value="${zipname.set}" />
         <filter token="BUILD_DATE" value="${time.stamp}" />
 
-        <copy file="openam_link.js.template"
+        <copy file="./products/openam_link.js.template"
             tofile="${prd.nightly.dist.dir}/openfm/openam_link.js" filtering="true"/>
         <copy file="build_date.js.template"
             tofile="${prd.nightly.dist.dir}/openfm/build_date.js" filtering="true"/>
