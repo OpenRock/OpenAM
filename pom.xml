@@ -119,9 +119,33 @@
 
     <!-- Maven Repositories -->
     <repositories>
+    	<repository>
+            <id>maven-central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss.org-nexus-public-repository</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
         <!-- ForgeRock.org Project Repository -->
         <repository>
-          <id>central</id>
+          <id>forgerock-central</id>
           <name>repo</name>
           <url>http://maven.forgerock.org/repo/repo</url>
            <releases>
@@ -133,6 +157,7 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
+   
       </repositories>
         
     <pluginRepositories>
@@ -152,11 +177,12 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
+        
         <pluginRepository>
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
-          <id>central</id>
+          <id>forgerock-central</id>
           <name>repo</name>
           <url>http://maven.forgerock.org/repo/repo</url>
         </pluginRepository>
@@ -166,17 +192,18 @@
           <name>repo</name>
           <url>http://maven.forgerock.org/repo/repo</url>
         </pluginRepository>
+     
     </pluginRepositories>
     
     <!-- For Deployment to ForgeRock Maven Repository -->
     <distributionManagement>
         <repository>
             <id>artifactory.internal</id>
-            <url>dav:https://maven.forgerock.org/repository/internal/</url>
+            <url>https://maven.forgerock.org/repo/</url>
         </repository>
         <snapshotRepository>
             <id>artifactory.snapshots</id>
-            <url>dav:https://maven.forgerock.org/repository/snapshots/</url>
+            <url>https://maven.forgerock.org/repo/</url>
         </snapshotRepository>
     </distributionManagement>
     
@@ -350,17 +377,27 @@
         <pluginManagement>
             <plugins>
             	<plugin>
-          		<groupId>org.apache.maven.plugins</groupId>
-          		<artifactId>maven-antrun-plugin</artifactId>
-          		<version>1.7</version>
-          		<inherited>true</inherited>
-        	</plugin>
+          			<groupId>org.apache.maven.plugins</groupId>
+          			<artifactId>maven-antrun-plugin</artifactId>
+          			<version>1.7</version>
+          			<inherited>true</inherited>
+        		</plugin>
+        		<plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2-beta-5</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>1.4</version>
                     <inherited>true</inherited>
                 </plugin>
+                <plugin>
+          			<groupId>org.apache.maven.plugins</groupId>
+          			<artifactId>maven-deploy-plugin</artifactId>
+          			<version>2.7</version>
+        		</plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>

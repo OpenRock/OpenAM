@@ -25,7 +25,7 @@
     <!-- Build -->
     <build>
         <plugins>
-            
+           
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -38,10 +38,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM External Dependencies Components</Specification-Title>
+                            <Specification-Title>OpenAM External Library References</Specification-Title>
                             <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM External Dependencies Components</Implementation-Title>
+                            <Implementation-Title>OpenAM External Library References</Implementation-Title>
                             <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -51,9 +51,54 @@
                     </archive>
                 </configuration>
             </plugin>
-
+           
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <silent>true</silent>
+                            <stripVersion>false</stripVersion>
+                            <copyPom>false</copyPom>
+                            <type>jar</type>
+                            <outputDirectory>${basedir}/target/extlib</outputDirectory>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>${project.build.finalName}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <tarLongFileMode>gnu</tarLongFileMode>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly_descriptor.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
         </plugins>
-    
         <resources>
             <resource>
                 <filtering>false</filtering>
@@ -61,29 +106,9 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
-                <excludes>
-                    <exclude>version_information.txt</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version_information.txt</include>
-                </includes>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
-
     
     <dependencies>
     	<dependency>
