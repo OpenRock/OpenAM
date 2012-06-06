@@ -13,9 +13,9 @@
     <inceptionYear>2010</inceptionYear>
     <organization>
         <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
+        <url>http://www.forgerock.org</url>
     </organization>
-    <url>http://www.forgerock.com</url>
+    <url>http://www.forgerock.org</url>
 
     <!-- Component Properties -->
     <properties>
@@ -34,14 +34,42 @@
     <!-- Child Modules -->
     <modules>
         
-        <!-- OpenAM Ant Wrapper -->
+        <!-- OpenAM Legacy Ant Wrapper -->
         <module>openam</module>
+
+        <module>openam-shared</module>
+        <module>openam-core</module>
+
 
     </modules>
 
     <!-- Developers -->
     <developers>
        
+        <developer>
+            <id>allan.foster</id>
+            <name>Allan Foster</name>
+            <email>allan.foster@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock US</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>VP Community</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>jamie.nelson</id>
+            <name>Jamie Nelson</name>
+            <email>jamie.nelson@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock US</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>VP Engineering</role>
+            </roles>
+        </developer>
+
         <developer>
             <id>jeff.schenk</id>
             <name>Jeff Schenk</name>
@@ -54,12 +82,39 @@
                 <role>Senior Software Development Engineer</role>
             </roles>
         </developer>
+
+        <developer>
+            <id>jason.lemay</id>
+            <name>Jason Lemay</name>
+            <email>jason.lemay@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock US</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>Software Engineer</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>alin.brici</id>
+            <name>Alin Brici</name>
+            <email>alin.brici@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock US</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>Support Staff</role>
+                <role>Software Engineer</role>
+            </roles>
+        </developer>
+
+	<!-- TODO Add remaining OpenAM Team -->
         
     </developers>
 
     <!-- Contributors -->
     <contributors>
-        
+	<!-- TODO Add OpenAM Additional Contributors -->
     </contributors>
 
     <!-- Maven Repositories -->
@@ -130,14 +185,21 @@
         <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</developerConnection>
     </scm>
-    <!-- Dependency Management -->
+
+    <!-- OpenAM Dependency Management, replaces extlib in all cases. -->
     <dependencyManagement>
         <dependencies>
+        	<dependency>
+				<groupId>org.jclouds</groupId>
+				<artifactId>jclouds-antcontrib</artifactId>
+				<version>1.4.0</version>
+			</dependency>
         </dependencies>  
     </dependencyManagement>
 
     <!-- Build -->
     <build>
+    
         <plugins>
             
             <plugin>
@@ -284,14 +346,15 @@
             </plugin>
             
         </plugins>
+        
         <pluginManagement>
             <plugins>
             	<plugin>
-          			<groupId>org.apache.maven.plugins</groupId>
-          			<artifactId>maven-antrun-plugin</artifactId>
-          			<version>1.7</version>
-          			 <inherited>true</inherited>
-        		</plugin>
+          		<groupId>org.apache.maven.plugins</groupId>
+          		<artifactId>maven-antrun-plugin</artifactId>
+          		<version>1.7</version>
+          		<inherited>true</inherited>
+        	</plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -440,7 +503,7 @@
             </plugins>
         </pluginManagement>
     </build>
-    
+   
     <reporting>
         <plugins>
             <plugin>
