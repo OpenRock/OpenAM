@@ -33,14 +33,14 @@
 
     <!-- Child Modules -->
     <modules>
-        
-        <!-- OpenAM Legacy Ant Wrapper -->
-        <module>openam</module>
-
+        <!-- OpenAM New Modules -->
         <module>openam-shared</module>
         <module>openam-core</module>
-
-
+        <module>openam-extlib</module>
+        
+        <!-- OpenAM Build out extlib for subsequent Legacy antRun -->
+        <!-- OpenAM Legacy Ant Wrapper -->
+        <module>openam</module>
     </modules>
 
     <!-- Developers -->
