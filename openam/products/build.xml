@@ -236,7 +236,7 @@
 
         <copy file="./products/openam_link.js.template"
             tofile="${prd.nightly.dist.dir}/openfm/openam_link.js" filtering="true"/>
-        <copy file="build_date.js.template"
+        <copy file="./products/build_date.js.template"
             tofile="${prd.nightly.dist.dir}/openfm/build_date.js" filtering="true"/>
 
         
