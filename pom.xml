@@ -237,32 +237,83 @@
     <!-- Obtained information from product properties for usage in OpenAM 10.0.0 -->
     
     <!--
-    
-    external.lib=jsr173_api.jar,
-    imq.jar,click-nodeps-2.3.0.jar,jaxrpc-spi.jar,jms.jar,xalan.jar,
-    webservices-tools.jar,jss4.jar,commons-codec-1.4.jar,FastInfoset.jar,
-    webservices-extra-api.jar,webservices-extra.jar,xercesImpl.jar,
-    relaxngDatatype.jar,xsdlib.jar,webservices-rt.jar,jaxrpc-api.jar,jaxrpc-impl.jar,
-    mail.jar,OpenDJ.jar,webservices-api.jar,esapiport.jar,click-extras-2.3.0.jar,
-    jdmkrt.jar,je.jar,json.jar,jstl.jar,asm-3.1.jar,
-    commons-logging-api-1.1.jar,jdom.jar,commons-collections-3.2.1.jar,
-    commons-fileupload-1.2.1.jar,commons-beanutils-1.6.jar,
-    commons-logging-1.1.1.jar,commons-digester-1.8.jar,jsr311-api-1.1.jar,
+    Used External Libs:
+    ~~~~~~~~~~~~~~~~~~~
+    jsr173_api.jar,
+    imq.jar,
+    click-nodeps-2.3.0.jar,
+    jaxrpc-spi.jar,
+    jms.jar,
+    xalan.jar,
+    webservices-tools.jar,
+    jss4.jar,
+    commons-codec-1.4.jar,
+    FastInfoset.jar,
+    webservices-extra-api.jar,
+    webservices-extra.jar,
+    xercesImpl.jar,
+    relaxngDatatype.jar,
+    xsdlib.jar,
+    webservices-rt.jar,j
+    axrpc-api.jar,
+    jaxrpc-impl.jar,
+    mail.jar,
+    OpenDJ.jar,
+    webservices-api.jar,
+    esapiport.jar,c
+    lick-extras-2.3.0.jar,
+    jdmkrt.jar,
+    je.jar,
+    json.jar,
+    jstl.jar,
+    asm-3.1.jar,
+    commons-logging-api-1.1.jar,
+    jdom.jar,
+    commons-collections-3.2.1.jar,
+    commons-fileupload-1.2.1.jar,
+    commons-beanutils-1.6.jar,
+    commons-logging-1.1.1.jar,
+    commons-digester-1.8.jar,
+    jsr311-api-1.1.jar,
     jersey-bundle-1.1.1-ea-SNAPSHOT.jar,
-    oauth-signature-1.1.5-ea-SNAPSHOT.jar,oauth-server-1.1.5-ea-SNAPSHOT.jar,
-    oauth-client-1.1.5-ea-SNAPSHOT.jar,log4j-1.2.8.jar,velocity-1.7.jar,
-    commons-io-2.0.1.jar,commons-lang-2.5.jar,ognl-2.6.9.jar,
-    backport-util-concurrent-2.2.jar,publicsuffix-1.0.1.jar,
+    oauth-signature-1.1.5-ea-SNAPSHOT.jar,
+    oauth-server-1.1.5-ea-SNAPSHOT.jar,
+    oauth-client-1.1.5-ea-SNAPSHOT.jar,
+    log4j-1.2.8.jar,
+    velocity-1.7.jar,
+    commons-io-2.0.1.jar,
+    commons-lang-2.5.jar,
+    ognl-2.6.9.jar,
+    backport-util-concurrent-2.2.jar,
+    publicsuffix-1.0.1.jar,
     opendj-ldap-sdk-3.0.0-M2.jar,
     i18n-core-1.4.0.jar,
-    grizzly-framework-2.1.7.jar,gmbal-api-only-3.0.0-b023.jar,
-    management-api-3.0.0-b012.jar,geoip-1.2.5.jar
+    grizzly-framework-2.1.7.jar,
+    gmbal-api-only-3.0.0-b023.jar,
+    management-api-3.0.0-b012.jar,
+    geoip-1.2.5.jar
     
-	build.lib=j2ee.jar,jaxb-xjc.jar,jaxb-api.jar,jaxb-impl.jar,
-	xmlsec.jar,saaj-impl.jar,jaxb-libs.jar,saaj-api.jar,testng-5.9-jdk15.jar,
-	ant-contrib-1.0b3.jar,jdmktk.jar
+    Used Build Libs:
+    ~~~~~~~~~~~~~~~~~~~
+	j2ee.jar,
+	jaxb-xjc.jar,
+	jaxb-api.jar,
+	jaxb-impl.jar,
+	xmlsec.jar,
+	saaj-impl.jar,
+	jaxb-libs.jar,
+	saaj-api.jar,
+	testng-5.9-jdk15.jar,
+	ant-contrib-1.0b3.jar,
+	jdmktk.jar
 	
-	internal.lib=acmecrypt.jar,authapi.jar,crimsondeb.jar,iaik_jce_full.jar,iaik_ssl.jar
+	Internal Libs:
+    ~~~~~~~~~~~~~~~~~~~
+	acmecrypt.jar,
+	authapi.jar,
+	crimsondeb.jar,
+	iaik_jce_full.jar,
+	iaik_ssl.jar
     
     -->
     
@@ -655,6 +706,75 @@
 				<artifactId>xsdlib</artifactId>
 				<version>20060615</version> <!-- Originally ? -->
 			</dependency>
+			
+			<!-- Legacy External Libraries for OpenAM -->
+			<!-- We need to eventually ween off of these -->
+			<dependency>
+			<groupId>external</groupId>
+			<artifactId>authapi</artifactId>
+			<version>2005-08-12</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>FastInfoset</artifactId>
+			<version>2006-26-09</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>i18-core</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>j2ee</artifactId>
+			<version>2007-18-10</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>jdmkrt</artifactId>
+			<version>2007-01-10</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>jdmktk</artifactId>
+			<version>2007-01-10</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>jss4</artifactId>
+			<version>2007-08-11</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>OpenDJ</artifactId>
+			<version>2012-20-02</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>opendj-ldap-sdk</artifactId>
+			<version>3.0.0-M2</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>publicsuffix</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>swec</artifactId>
+			<version>2002-02-05</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>webservices-extra</artifactId>
+			<version>2008-03-12</version>
+		</dependency>
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>webservices-extra-api</artifactId>
+			<version>2003-09-04</version>
+		</dependency>			
+			
 			
         </dependencies>  
     </dependencyManagement>
