@@ -325,6 +325,7 @@
 				<groupId>org.jclouds</groupId>
 				<artifactId>jclouds-antcontrib</artifactId>
 				<version>1.4.0</version>
+				<scope>compile</scope>
 			</dependency>
 			
 			<dependency>
@@ -449,8 +450,6 @@
 			
 			<!-- TODO i18n-core -->
 			
-			<!-- TODO icefaces-->
-			
 			<dependency>
 				<groupId>com.sun.messaging.mq</groupId>
 				<artifactId>imq</artifactId>
@@ -550,8 +549,6 @@
 				<artifactId>jms</artifactId>
 				<version>4.4.2</version> <!-- Originally ? -->
 			</dependency>
-		
-			<!-- TODO jsf -->
 		
 			<dependency>
 				<groupId>org.json</groupId>
@@ -728,6 +725,7 @@
 			<groupId>external</groupId>
 			<artifactId>j2ee</artifactId>
 			<version>2007-18-10</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>external</groupId>
@@ -738,6 +736,7 @@
 			<groupId>external</groupId>
 			<artifactId>jdmktk</artifactId>
 			<version>2007-01-10</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>external</groupId>
