@@ -105,10 +105,6 @@
         	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
     
-    	<dependency>
-	   		<groupId>org.jclouds</groupId>
-	   		<artifactId>jclouds-antcontrib</artifactId>
-		</dependency>
     </dependencies>
     
 </project>

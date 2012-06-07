@@ -320,14 +320,13 @@
     
     <dependencyManagement>
         <dependencies>
-        	
         	<dependency>
-				<groupId>org.jclouds</groupId>
-				<artifactId>jclouds-antcontrib</artifactId>
-				<version>1.4.0</version>
+				<groupId>ant-contrib</groupId>
+				<artifactId>ant-contrib</artifactId>
+				<version>1.0b3</version>
 				<scope>compile</scope>
 			</dependency>
-			
+        	
 			<dependency>
 				<groupId>asm</groupId>
 				<artifactId>asm</artifactId>
