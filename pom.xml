@@ -321,10 +321,10 @@
     <dependencyManagement>
         <dependencies>
         	<dependency>
-				<groupId>ant-contrib</groupId>
-				<artifactId>ant-contrib</artifactId>
-				<version>1.0b3</version>
-				<scope>compile</scope>
+				<groupId>external</groupId>
+  				<artifactId>ant-contrib</artifactId>
+  				<version>1.0b3</version>
+				<!-- <scope>compile</scope> -->
 			</dependency>
         	
 			<dependency>
