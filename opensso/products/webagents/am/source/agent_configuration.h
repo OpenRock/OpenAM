@@ -117,6 +117,7 @@ public:
     Utils::url_info_list_t cdsso_server_url_list;
     PRBool notification_enable;
     const char *notification_url;
+    int nurl_local_alloc;
     PRBool url_comparison_ignore_case;
     PostCache *postcache_handle;
     unsigned long postcacheentry_life;
@@ -231,6 +232,7 @@ public:
         this->lock = (PRLock *) NULL;
         this->notification_enable = AM_FALSE;
         this->notification_url = NULL;
+        this->nurl_local_alloc = 0;
         this->url_comparison_ignore_case = false;
         this->postcacheentry_life = 0;
         this->postcache_handle = NULL;

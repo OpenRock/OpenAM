@@ -1052,7 +1052,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
             && this->notification_url != NULL
             && strlen(this->notification_url) > 0) {
         am_web_log_debug("%s: normalizing notification URL: %s", thisfunc, this->notification_url);
-        int local_alloc = 0;
+        this->nurl_local_alloc = 0;
         try {
             std::string notURL_str;
             const char* normURL = NULL;
@@ -1065,7 +1065,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
                 this->notification_url = strdup(normURL);
                 if (!this->notification_url) {
                     status = AM_NO_MEMORY;
-                } else local_alloc = 1;
+                } else this->nurl_local_alloc = 1;
             }
         } catch (InternalException& exc) {
             am_web_log_error("%s: InternalException encountered while normalizing notification URL, status %s", thisfunc,
@@ -1079,7 +1079,7 @@ am_status_t AgentConfiguration::populateAgentProperties()
             /*on error allow agent to continue with notifications disabled*/
             status = AM_SUCCESS;
             this->notification_enable = AM_FALSE;
-            if (local_alloc == 1 && this->notification_url) {
+            if (this->nurl_local_alloc == 1 && this->notification_url) {
                 free((void *) this->notification_url);
                 this->notification_url = NULL;
             }
@@ -1452,7 +1452,7 @@ void AgentConfiguration::cleanup_properties()
         }
     }
 
-    if (this->notification_url) {
+    if (this->nurl_local_alloc == 1 && this->notification_url) {
         free((void *) this->notification_url);
         this->notification_url = NULL;
     }
