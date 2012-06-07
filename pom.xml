@@ -35,6 +35,8 @@
     <modules>
         <!-- OpenAM New Modules -->
         <module>openam-shared</module>
+        <module>openam-exceptions</module>
+        <module>openam-interfaces</module>
         <module>openam-core</module>
         <module>openam-extlib</module>
         
