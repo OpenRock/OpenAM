@@ -707,9 +707,9 @@
 				<version>20060615</version> <!-- Originally ? -->
 			</dependency>
 			
-			<!-- Legacy External Libraries for OpenAM -->
-			<!-- We need to eventually ween off of these -->
-			<dependency>
+		<!-- Legacy External Libraries for OpenAM -->
+		<!-- We need to eventually ween off of these -->
+		<dependency>
 			<groupId>external</groupId>
 			<artifactId>authapi</artifactId>
 			<version>2005-08-12</version>
