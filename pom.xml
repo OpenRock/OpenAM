@@ -442,24 +442,6 @@
 				<artifactId>jersey-server</artifactId>
 				<version>1.1.1-ea</version>
 			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-				<artifactId>oauth-client</artifactId>
-				<version>1.1.5.2</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-				<artifactId>oauth-server</artifactId>
-				<version>1.1.5.2</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-				<artifactId>oauth-signature</artifactId>
-				<version>1.1.5.2</version>
-			</dependency>
 		
 			<dependency>
 				<groupId>com.sun.messaging.mq</groupId>
@@ -487,6 +469,83 @@
 				<version>1.1.1</version>
 			</dependency>
             
+            <!-- TODO jss4 org/mozilla/jss -->
+            
+            <dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.1.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.16</version> <!-- Originally1.2.8 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>1.4.5</version> <!-- Originally ? -->
+			</dependency>
+			
+			<dependency>
+				<groupId>org.glassfish.external</groupId>
+				<artifactId>management-api</artifactId>
+				<version>3.1.0-b001</version> <!-- Originally ? -->
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+				<artifactId>oauth-client</artifactId>
+				<version>1.1.5.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+				<artifactId>oauth-server</artifactId>
+				<version>1.1.5.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+				<artifactId>oauth-signature</artifactId>
+				<version>1.1.5.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>ognl</groupId>
+				<artifactId>ognl</artifactId>
+				<version>2.6.9</version> <!-- Originally ? -->
+			</dependency>
+			
+			<!-- TODO publicsuffix -->
+			
+			<dependency>
+				<groupId>com.github.relaxng</groupId>
+				<artifactId>relaxngDatatype</artifactId>
+				<version>2011.1</version> <!-- Originally ? -->
+			</dependency>
+			
+			<dependency>
+				<groupId>rome</groupId>
+				<artifactId>rome</artifactId>
+				<version>1.0</version> 
+			</dependency>
+			
+			<dependency>
+				<groupId>javax.xml.soap</groupId>
+				<artifactId>saaj-api</artifactId>
+				<version>1.3.4</version> <!-- Originally ? -->
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.xml.messaging.saaj</groupId>
+				<artifactId>saaj-impl</artifactId>
+				<version>1.3.19</version> <!-- Originally ? -->
+			</dependency>
+			
+			
 			
         </dependencies>  
     </dependencyManagement>
