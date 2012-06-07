@@ -216,11 +216,187 @@
     <!-- OpenAM Dependency Management, replaces extlib in all cases. -->
     <dependencyManagement>
         <dependencies>
+        	
         	<dependency>
 				<groupId>org.jclouds</groupId>
 				<artifactId>jclouds-antcontrib</artifactId>
 				<version>1.4.0</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>asm</groupId>
+				<artifactId>asm</artifactId>
+				<version>3.3.1</version> <!-- Originally 3.1 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>backport-util-concurrent</groupId>
+				<artifactId>backport-util-concurrent</artifactId>
+				<version>3.1</version> <!-- Originally 2.2 -->
+			</dependency>
+            
+            <dependency>
+				<groupId>org.apache.click</groupId>
+				<artifactId>click-extras</artifactId>
+				<version>2.3.0</version>
+			</dependency>
+            
+            <dependency>
+				<groupId>org.apache.click</groupId>
+				<artifactId>click-nodeps</artifactId>
+				<version>2.3.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>1.8.3</version> <!-- Originally 1.6 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.6</version> <!-- Originally 1.4 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>3.2.1</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>2.1</version> <!-- Originally 1.8.3 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>1.2.2</version> <!-- Originally 1.8.3 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.3</version> <!-- Originally 2.0.1 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.6</version> <!-- Originally 2.5 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.1.1</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging-api</artifactId>
+				<version>1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>berkeleydb</groupId>
+				<artifactId>berkeleydb</artifactId>
+				<version>1.5.1</version> <!-- Originally ? -->
+			</dependency>	            
+			
+			<dependency>
+				<groupId>javax.el</groupId>
+				<artifactId>el-api</artifactId>
+				<version>2.2</version> <!-- Originally 1.0 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.el</groupId>
+				<artifactId>el-ri</artifactId>
+				<version>1.0</version>
+			</dependency>
+            
+            <dependency>
+				<groupId>org.owasp.esapi</groupId>
+				<artifactId>esapi</artifactId>
+				<version>2.0.1</version> <!-- Originally ? -->
+			</dependency>
+            
+            <dependency>
+				<groupId>org.kohsuke</groupId>
+				<artifactId>geoip</artifactId>
+				<version>1.2.5</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.glassfish.gmbal</groupId>
+				<artifactId>gmbal-api-only</artifactId>
+				<version>3.2.0-b003</version> <!-- Originally 3.0.0-b023 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>org.glassfish.grizzly</groupId>
+				<artifactId>grizzly-framework</artifactId>
+				<version>2.2.9</version> <!-- Originally 3.0.0-b023 -->
+			</dependency>
+			
+			
+			
+			
+			
+			
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-bundle</artifactId>
+				<version>1.1.1-ea</version> <!-- Originally 1.1.1-ea-SNAPSHOT -->
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>1.1.1-ea</version> <!-- Originally 1.1.1-ea-SNAPSHOT -->
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-core</artifactId>
+				<version>1.1.1-ea</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-server</artifactId>
+				<version>1.1.1-ea</version>
+			</dependency>
+			
+			
+			
+			
+			<dependency>
+				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+				<artifactId>oauth-client</artifactId>
+				<version>1.1.5.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+				<artifactId>oauth-server</artifactId>
+				<version>1.1.5.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+				<artifactId>oauth-signature</artifactId>
+				<version>1.1.5.2</version>
+			</dependency>
+		
+		
+		
+		
+			
         </dependencies>  
     </dependencyManagement>
 
