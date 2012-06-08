@@ -682,7 +682,8 @@
 			<dependency>
 				<groupId>org.testng</groupId>
 				<artifactId>testng</artifactId>
-				<version>5.9</version>
+				<version>6.5.2</version>
+				<scope>test</scope>
 			</dependency>
             
             <dependency>
