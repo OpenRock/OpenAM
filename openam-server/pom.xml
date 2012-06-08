@@ -11,12 +11,12 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-core</name>
-    <description>OpenAM Core Components
+    <name>openam-server</name>
+    <description>OpenAM Server Component
     </description>
-    <artifactId>openam-core</artifactId>
+    <artifactId>openam-server</artifactId>
     <version>10.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.com</url>
@@ -24,6 +24,7 @@
 
     <!-- Build -->
     <build>
+	<finalName>openam</finalName>
         <plugins>
             <!-- Surefire Tests -->
             <plugin>
@@ -39,29 +40,44 @@
                 </configuration>
             </plugin>
             
-            <plugin>
+	    <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <artifactId>maven-war-plugin</artifactId>
                 <configuration>
+                    <outputFileNameMapping>@{artifactId}@.@{extension}@</outputFileNameMapping>
+                    <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
                     <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Core</Specification-Title>
+                            <Specification-Title>OpenAm Server</Specification-Title>
                             <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Core</Implementation-Title>
+                            <Implementation-Title>OpenAM Server</Implementation-Title>
                             <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Built-By>${user.name}</Built-By>
-                            <Build-Jdk>${java.version}</Build-Jdk>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
                     </archive>
+                    <webResources>
+                        <webResource>
+                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                            <includes>
+                                <include>dispatcher-servlet.xml</include>
+                                <include>web.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                    </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <delimiters>
+                        <delimiter>${*}</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
                 </configuration>
             </plugin>
 
@@ -99,18 +115,13 @@
 
     
     <dependencies>
-    	<dependency>
-	   	<groupId>org.forgerock</groupId>
-        	<artifactId>openam-shared</artifactId>
-        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-	</dependency>
-    	<dependency>
-	   	<groupId>org.forgerock</groupId>
-        	<artifactId>openam-schema</artifactId>
-        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-	</dependency>
-    
+
+		<dependency>
+                	<groupId>org.forgerock</groupId>
+                	<artifactId>openam-core</artifactId>
+                	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+        	</dependency>
+
     </dependencies>
     
 </project>
-

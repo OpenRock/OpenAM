@@ -11,10 +11,10 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-core</name>
-    <description>OpenAM Interface Components 
+    <name>openam-schema</name>
+    <description>OpenAM Schemata Components 
     </description>
-    <artifactId>openam-interfaces</artifactId>
+    <artifactId>openam-schema</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
@@ -51,10 +51,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Core</Specification-Title>
+                            <Specification-Title>OpenAM Schemata</Specification-Title>
                             <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Core</Implementation-Title>
+                            <Implementation-Title>OpenAM Schemata</Implementation-Title>
                             <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
