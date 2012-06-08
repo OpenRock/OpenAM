@@ -70,7 +70,7 @@
   <step>
    <para>Add the list of domains, such as <literal>.example.com</literal> to
    the Cookies Domain List (configuration file property:
-   <literal>com.sun.identity.agents.config.cookie.domain</literal>).</para>
+   <literal>com.sun.identity.agents.config.cdsso.cookie.domain</literal>).</para>
   </step>
   <step>
    <para>Save your work.</para>

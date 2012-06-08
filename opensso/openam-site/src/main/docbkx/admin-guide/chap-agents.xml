@@ -848,7 +848,7 @@
       include the following.</para>
       <literallayout class="monospaced">com.sun.identity.agents.config.cdsso.cookie.domain[0]=.example.com 
 com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayout>
-      <para>Property: <literal>com.sun.identity.agents.config.cookie.domain</literal></para>
+      <para>Property: <literal>com.sun.identity.agents.config.cdsso.cookie.domain</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
