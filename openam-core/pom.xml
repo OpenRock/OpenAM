@@ -447,7 +447,7 @@
 		 	<!-- This version is different from what is out in central. Very Bad! -->
 		 	<groupId>external</groupId>
   			<artifactId>ant-contrib</artifactId>
-  			<version>1.0b3</version>
+  			<version>1.0b3</version> 
 		</dependency>
 	    <dependency>
 			<groupId>external</groupId>
