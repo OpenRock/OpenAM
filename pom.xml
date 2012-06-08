@@ -2,6 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
    
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.56 2009/11/21 00:36:40 huacui Exp $
+
+-->
+<!--
+   "Portions Copyrighted 2010-2011 ForgeRock AS"
+-->
+   
     <!-- Component Definition -->
     <name>openam</name>
     <groupId>org.forgerock</groupId>
@@ -10,7 +41,7 @@
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
-    <inceptionYear>2010</inceptionYear>
+    <inceptionYear>2010</inceptionYear> <!-- Need correct Year -->
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.org</url>
@@ -80,7 +111,7 @@
             <organization>ForgeRock US</organization>
             <organizationUrl>http://www.forgerock.com</organizationUrl>
             <roles>
-                <role>Mavenizer</role>
+                <role>Build Master</role>
                 <role>Senior Software Development Engineer</role>
             </roles>
         </developer>
@@ -321,11 +352,12 @@
     <dependencyManagement>
         <dependencies>
         	<dependency>
-				<groupId>ant-contrib</groupId>
-				<artifactId>ant-contrib</artifactId>
-				<version>1.0b3</version>
-				<scope>compile</scope>
-			</dependency>
+			<groupId>ant-contrib</groupId>
+			<artifactId>ant-contrib</artifactId>
+			<version>1.0b3</version>
+			<!-- TODO - Needs to be scoped as compile eventually -->
+			<!-- <scope>compile</scope> -->
+	        </dependency>
         	
 			<dependency>
 				<groupId>asm</groupId>
@@ -724,7 +756,8 @@
 			<groupId>external</groupId>
 			<artifactId>j2ee</artifactId>
 			<version>2007-18-10</version>
-			<scope>provided</scope>
+			<!-- TODO - Needs to be scoped as provided eventually -->
+			<!-- <scope>provided</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>external</groupId>
