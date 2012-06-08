@@ -756,7 +756,7 @@
 		</dependency>
 		<dependency>
 			<groupId>external</groupId>
-			<artifactId>i18-core</artifactId>
+			<artifactId>i18n-core</artifactId>
 			<version>1.4.0</version>
 		</dependency>
 		<dependency>

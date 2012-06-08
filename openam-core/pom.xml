@@ -458,7 +458,7 @@
 		</dependency>
 		<dependency>
 			<groupId>external</groupId>
-			<artifactId>i18-core</artifactId>
+			<artifactId>i18n-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>external</groupId>
