@@ -29,7 +29,7 @@
 <jxb:bindings version="1.0"
                xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
                xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <jxb:bindings schemaLocation="wsfederation/xmldsig-core-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/xmldsig-core-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.xmlsig">
          <jxb:javadoc>
@@ -42,7 +42,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/oasis-200401-wss-wssecurity-utility-1.0.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/oasis-200401-wss-wssecurity-utility-1.0.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.wsu">
          <jxb:javadoc>
@@ -55,7 +55,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/oasis-200401-wss-wssecurity-secext-1.0.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/oasis-200401-wss-wssecurity-secext-1.0.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.wsse">
          <jxb:javadoc>
@@ -68,7 +68,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/ws-addr.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/ws-addr.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.wsaddr">
          <jxb:javadoc>
@@ -81,7 +81,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/ws-policy.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/ws-policy.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.wspolicy">
          <jxb:javadoc>
@@ -94,7 +94,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/ws-securitypolicy-1.2.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/ws-securitypolicy-1.2.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.wsspolicy">
          <jxb:javadoc>
@@ -107,7 +107,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/ws-federation.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/ws-federation.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.wsfederation">
          <jxb:javadoc>
@@ -120,7 +120,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="wsfederation/entity-config-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/wsfederation/entity-config-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.entityconfig">
          <jxb:javadoc>
