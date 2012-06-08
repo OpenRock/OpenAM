@@ -46,170 +46,21 @@
     </description>
     <artifactId>openam-schema</artifactId>
     <version>10.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.com</url>
     </organization>
 
-    <!-- Build -->
-    <build>
-        <plugins>
-            <!-- Surefire Tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                   </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.3.1</version>
-                <executions>
-                    <execution>
-                        <id>xjc-liberty</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-               </executions>
-               <configuration>
-                    <extension>true</extension>
-                    <staleFlag>${project.build.directory}/jaxb2/.xjcStaleFlag-liberty</staleFlag>
-                    <bindingDirectory>${basedir}/src/main/xjb/</bindingDirectory>
-                    <bindingFiles>liberty.xjb</bindingFiles>
-                    <schemaDirectory>${basedir}/src/main/xsd/liberty/</schemaDirectory>
-               </configuration>
-           </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.3.1</version>
-                <executions>
-                    <execution>
-                        <id>xjc-saml2</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-               </executions>
-               <configuration>
-                    <extension>true</extension>
-                    <staleFlag>${project.build.directory}/jaxb2/.xjcStaleFlag-saml2</staleFlag>
-                    <bindingDirectory>${basedir}/src/main/xjb/</bindingDirectory>
-                    <bindingFiles>saml2.xjb</bindingFiles>
-                    <schemaDirectory>${basedir}/src/main/xsd/saml2/</schemaDirectory>
-               </configuration>
-           </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.3.1</version>
-                <executions>
-                    <execution>
-                        <id>xjc-wsfederation</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-               </executions>
-               <configuration>
-                    <extension>true</extension>
-                    <staleFlag>${project.build.directory}/jaxb2/.xjcStaleFlag-wsfederation</staleFlag>
-                    <bindingDirectory>${basedir}/src/main/xjb/</bindingDirectory>
-                    <bindingFiles>wsfederation.xjb</bindingFiles>
-                    <schemaDirectory>${basedir}/src/main/xsd/wsfederation/</schemaDirectory>
-               </configuration>
-           </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.3.1</version>
-                <executions>
-                    <execution>
-                        <id>xjc-xacml</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-               </executions>
-               <configuration>
-                    <extension>true</extension>
-                    <staleFlag>${project.build.directory}/jaxb2/.xjcStaleFlag-xacml</staleFlag>
-                    <bindingDirectory>${basedir}/src/main/xjb/</bindingDirectory>
-                    <bindingFiles>xacml-core-v3.xjb</bindingFiles>
-                    <schemaDirectory>${basedir}/src/main/xsd/xacml/</schemaDirectory>
-               </configuration>
-           </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                        <manifestEntries>
-                            <Specification-Title>OpenAM Schemata</Specification-Title>
-                            <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Schemata</Implementation-Title>
-                            <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Built-By>${user.name}</Built-By>
-                            <Build-Jdk>${java.version}</Build-Jdk>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-
-        </plugins>
+    <!-- Child Modules -->
+    <modules>
+        <!-- OpenAM New Modules -->
+        <module>liberty-schema</module>
+        <module>saml2-schema</module>
+        <module>wsfederation-schema</module>
+        <module>xacml3-schema</module>
+    </modules>
     
-        <resources>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>version_information.txt</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version_information.txt</include>
-                </includes>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
-    </build>
 
     
     <dependencies>
