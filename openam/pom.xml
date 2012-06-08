@@ -63,8 +63,8 @@
                 <version>10.1.0-SNAPSHOT</version> <!-- This Version -->
         </dependency>
 		<dependency>
-				<groupId>external</groupId>
-  				<artifactId>ant-contrib</artifactId>
+				<groupId>ant-contrib</groupId>
+				<artifactId>ant-contrib</artifactId>
 		</dependency>
     </dependencies>
     
