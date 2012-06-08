@@ -194,8 +194,22 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
-        
-        <!-- ForgeRock.org Project Repository -->
+   
+   		<repository>
+            <id>codehaus</id>
+            <name>Codehaus Maven 2.x Release Repository</name>
+            <url>http://repository.codehaus.org</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+   
+   		<!-- ForgeRock.org Project Repository -->
         <repository>
           <id>forgerock-central</id>
           <name>repo</name>
@@ -216,10 +230,16 @@
         <pluginRepository>
             <id>Nexus Public repository</id>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+             <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>Codehaus repository</id>
             <url>http://repository.codehaus.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>apache-snapshots</id>
@@ -821,6 +841,14 @@
 			<artifactId>webservices-rt</artifactId>
 			<version>2009-29-07</version>
 		</dependency>		
+		
+		<!-- Dependencies for various Plug-ins -->
+		<dependency>
+			<groupId>org.functionaljava</groupId>
+			<artifactId>fj</artifactId>
+			<version>2.19</version>
+			<scope>compile</scope>
+		</dependency>
 			
         </dependencies>  
     </dependencyManagement>

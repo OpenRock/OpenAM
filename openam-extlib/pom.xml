@@ -107,6 +107,30 @@
             </plugin>
             
             <plugin>
+           		<!-- Create Symbolic Links for Artifacts for Legacy Building -->
+        		<groupId>org.codehaus.mojo.unix</groupId>
+				<artifactId>unix-common</artifactId>
+        		<extensions>true</extensions>
+        		<configuration>
+          			<assembly>
+            
+            			<symlink>
+              				<path>target/extlib/json-20090211.jar</path>
+              				<value>target/extlib/json.jar</value>
+            			</symlink>
+            			
+          			</assembly>
+        		</configuration>
+        		 <dependencies>
+        			<dependency>
+						<groupId>org.functionaljava</groupId>
+						<artifactId>fj</artifactId>
+						<version>2.19</version>
+					</dependency>
+				</dependencies>
+      		</plugin>
+            
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -141,6 +165,7 @@
     </build>
     
     <dependencies>
+    
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>openam-core</artifactId> <!-- This Project Final Artifact to build. -->
