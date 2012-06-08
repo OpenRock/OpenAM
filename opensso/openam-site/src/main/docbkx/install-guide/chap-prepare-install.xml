@@ -244,7 +244,10 @@ esac
   startup and shutdown. This script assumes you run OpenAM as the user
   <literal>openam</literal>.</para>
 
-   <programlisting language="shell">#!/bin/sh
+  <para>OpenAM core services require a minimum JVM heap size of 1 GB, and a
+  permanent generation size of 256 MB.</para>
+
+  <programlisting language="shell">#!/bin/sh
 #
 # tomcat
 #
@@ -647,8 +650,9 @@ $ diff -c /path/to/jboss7/domain/configuration/domain.orig
  <section xml:id="prepare-jetty-7">
   <title>Preparing Jetty 7</title>
 
-  <para>When you deploy OpenAM, make sure you start Jetty with enough
-  memory.</para>
+  <para>When you deploy OpenAM, make sure you start Jetty with enough memory.
+  OpenAM core services require a minimum JVM heap size of 1 GB, and a
+  permanent generation size of 256 MB.</para>
 
   <screen>$ cd /path/to/jetty
 $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
