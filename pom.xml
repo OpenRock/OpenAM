@@ -981,11 +981,13 @@
 					<groupId>org.codehaus.mojo.unix</groupId>
 					<artifactId>unix-common</artifactId>
 					<version>1.0-alpha-5</version>
+					<inherited>true</inherited>
             	</plugin>
             	<plugin>
             		<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxb2-maven-plugin</artifactId>
 					<version>1.3.1</version>
+					<inherited>true</inherited>
             	</plugin>
             	<plugin>
           			<groupId>org.apache.maven.plugins</groupId>
