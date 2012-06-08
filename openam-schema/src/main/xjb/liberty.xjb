@@ -31,7 +31,7 @@
                xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 
-  <jxb:bindings schemaLocation="cs-sstc-schema-assertion-01.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/cs-sstc-schema-assertion-01.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.assertion">
          <jxb:javadoc>
@@ -45,7 +45,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="cs-sstc-schema-protocol-01.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/cs-sstc-schema-protocol-01.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.protocol">
          <jxb:javadoc>
@@ -58,7 +58,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="idff-entity-config-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/idff-entity-config-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
 	<jxb:package name="com.sun.identity.federation.jaxb.entityconfig">
 	 <jxb:javadoc>
@@ -71,7 +71,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="lib-arch-authentication-context.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-authentication-context.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.ac">
          <jxb:javadoc>
@@ -85,7 +85,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-disco-svc.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-disco-svc.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.disco.jaxb">
          <jxb:javadoc>
@@ -99,7 +99,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="liberty-idwsf-disco-svc-v1.1.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/liberty-idwsf-disco-svc-v1.1.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.disco.jaxb11">
          <jxb:javadoc>
@@ -113,7 +113,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-interact-svc.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-interact-svc.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.interaction.jaxb">
          <jxb:javadoc>
@@ -127,7 +127,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-metadata.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-metadata.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.meta.jaxb">
          <jxb:javadoc>
@@ -141,7 +141,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-paos.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-paos.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.paos.jaxb">
          <jxb:javadoc>
@@ -155,7 +155,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-protocols-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-protocols-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.ps">
          <jxb:javadoc>
@@ -169,7 +169,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-security-fmwk.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-security-fmwk.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.security">
          <jxb:javadoc>
@@ -183,7 +183,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-arch-soap-binding.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-arch-soap-binding.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.soapbinding.jaxb">
          <jxb:javadoc>
@@ -197,7 +197,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="liberty-idwsf-soap-binding-v1.1.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/liberty-idwsf-soap-binding-v1.1.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.soapbinding.jaxb11">
          <jxb:javadoc>
@@ -211,7 +211,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-id-sis-pp.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-id-sis-pp.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.idpp.jaxb">
          <jxb:javadoc>
@@ -225,7 +225,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="secext.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/secext.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.secext">
          <jxb:javadoc>
@@ -238,7 +238,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="soap.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/soap.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.soap">
          <jxb:javadoc>
@@ -252,7 +252,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="utility.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/utility.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.utility">
          <jxb:javadoc>
@@ -266,7 +266,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="xenc-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/xenc-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.xmlenc">
          <jxb:javadoc>
@@ -280,7 +280,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="xmldsig-core-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/xmldsig-core-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.xmlsig">
          <jxb:javadoc>
@@ -294,7 +294,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="discoentry.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/discoentry.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.disco.plugins.jaxb">
          <jxb:javadoc>
@@ -307,7 +307,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="ppextension.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/ppextension.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.idpp.plugin.jaxb">
          <jxb:javadoc>
@@ -321,7 +321,7 @@
   </jxb:bindings>
 
 
-  <jxb:bindings schemaLocation="lib-idwsf-authn-svc.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="liberty/lib-idwsf-authn-svc.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.liberty.ws.authnsvc.jaxb">
          <jxb:javadoc>
