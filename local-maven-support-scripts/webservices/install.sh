@@ -18,4 +18,14 @@ mvn -e -X org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file \
                        -Dpackaging=jar \
                        -DgeneratePom=true \
                        -DuniqueVersion=true
+                       
+mvn -e -X org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file \
+                       -DlocalRepositoryPath=../../local-maven-support-repository \
+                       -Dfile=webservices-rt.jar \
+                       -DgroupId=external \
+                       -DartifactId=webservices-rt \
+                       -Dversion=2009-29-07 \
+                       -Dpackaging=jar \
+                       -DgeneratePom=true \
+                       -DuniqueVersion=true
 

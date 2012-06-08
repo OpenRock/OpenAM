@@ -447,7 +447,6 @@
 		 	<!-- This version is different from what is out in central. Very Bad! -->
 		 	<groupId>external</groupId>
   			<artifactId>ant-contrib</artifactId>
-  			<version>1.0b3</version> 
 		</dependency>
 	    <dependency>
 			<groupId>external</groupId>
@@ -473,6 +472,10 @@
 			<groupId>external</groupId>
 			<artifactId>jdmktk</artifactId>
 		</dependency>
+		<dependency>
+			 <groupId>external</groupId>
+  			 <artifactId>jsr173_api</artifactId>
+  		</dependency>
 		<dependency>
 			<groupId>external</groupId>
 			<artifactId>jss4</artifactId>
@@ -501,7 +504,10 @@
 			<groupId>external</groupId>
 			<artifactId>webservices-extra-api</artifactId>
 		</dependency>			
-			
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>webservices-rt</artifactId>
+		</dependency>		
     
     
     </dependencies>

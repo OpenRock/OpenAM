@@ -676,6 +676,8 @@
 				<groupId>org.testng</groupId>
 				<artifactId>testng</artifactId>
 				<version>6.5.2</version>
+				<!-- TODO - Needs to be scoped as test eventually -->
+				<!-- <scope>test</scope> -->
 				<scope>test</scope>
 			</dependency>
             
@@ -776,6 +778,11 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			 <groupId>external</groupId>
+  			 <artifactId>jsr173_api</artifactId>
+  			 <version>2004-30-01</version>
+  		</dependency>
+		<dependency>
 			<groupId>external</groupId>
 			<artifactId>jss4</artifactId>
 			<version>2007-08-11</version>
@@ -810,7 +817,11 @@
 			<artifactId>webservices-extra-api</artifactId>
 			<version>2003-09-04</version>
 		</dependency>			
-			
+		<dependency>
+			<groupId>external</groupId>
+			<artifactId>webservices-rt</artifactId>
+			<version>2009-29-07</version>
+		</dependency>		
 			
         </dependencies>  
     </dependencyManagement>

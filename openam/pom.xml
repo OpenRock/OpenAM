@@ -92,10 +92,6 @@
                 <artifactId>openam-extlib</artifactId>
                 <version>10.1.0-SNAPSHOT</version> <!-- This Version -->
         </dependency>
-		<dependency>
-				<groupId>ant-contrib</groupId>
-				<artifactId>ant-contrib</artifactId>
-		</dependency>
     </dependencies>
     
     
