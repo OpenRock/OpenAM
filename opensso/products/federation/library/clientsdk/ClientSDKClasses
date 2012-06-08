@@ -11,6 +11,7 @@ com/sun/identity/common/RecoverableTimerTask.class
 com/sun/identity/common/RunnableTimerTask.class
 com/sun/identity/common/ScheduleableAction.class
 com/sun/identity/common/ScheduleableGroupAction.class
+com/sun/identity/common/ServerOrSiteEntry.class
 com/sun/identity/common/ShutdownListener.class
 com/sun/identity/common/ShutdownManager.class
 com/sun/identity/common/ShutdownServletContextListener.class
