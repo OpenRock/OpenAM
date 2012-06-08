@@ -678,7 +678,6 @@
 				<version>6.5.2</version>
 				<!-- TODO - Needs to be scoped as test eventually -->
 				<!-- <scope>test</scope> -->
-				<scope>test</scope>
 			</dependency>
             
             <dependency>
