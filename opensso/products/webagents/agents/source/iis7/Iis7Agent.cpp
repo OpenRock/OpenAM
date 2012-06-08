@@ -905,7 +905,12 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext,
                     retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
                     break;
 	}
-
+       
+        if (post_page != NULL) {
+		free(post_page);
+		post_page = NULL;
+	}
+        
 	if (requestMethod != NULL) {
 		free(requestMethod);
 		requestMethod = NULL;
@@ -1305,6 +1310,8 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
 			}
 		}
 	}
+        if (requestURL != NULL) free(requestURL);
+        if (origRequestURL != NULL) free(origRequestURL);
 	return status;
 }
 

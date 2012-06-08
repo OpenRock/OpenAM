@@ -442,7 +442,8 @@ am_status_t AgentProfileService::fetchAndUpdateAgentConfigCacheInternal
                                      am_status_to_string(status));
                     status = AM_REST_ATTRS_SERVICE_FAILURE;
                 }                
-            }           
+            }
+            am_properties_destroy(tmpPropPtr);
     }
     //Insert the AMAgentConfiguration object in the hast table with the current
     //time stamp as its key.

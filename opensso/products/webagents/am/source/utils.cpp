@@ -376,27 +376,26 @@ Utils::getTTL(const PRIVATE_NAMESPACE_NAME::XMLElement &element,
     return retVal;
 }
 
-
 am_resource_match_t
 compare_sub_pat(const char *r1, const char *r2,
-		const am_resource_traits_t *traits,bool fwdcmp) {
-    am_resource_match_t result = AM_EXACT_PATTERN_MATCH;                    
-    
+        const am_resource_traits_t *traits, bool fwdcmp) {
+    am_resource_match_t result = AM_EXACT_PATTERN_MATCH;
+
     if (r1 != NULL && r2 != NULL) {
         string r1_str(r1);
         string r2_str(r2);
-        string::size_type r1_loc = r1_str.find("?",0);
-        string::size_type r2_loc = r2_str.find("?",0);
-    
+        string::size_type r1_loc = r1_str.find("?", 0);
+        string::size_type r2_loc = r2_str.find("?", 0);
+
         // First thing to check is whether r1 or r2 have a "?" in it.
         // This requires extra pattern matching. If neither one of them 
-	// have it, we can ignore the below check and continue as before.
+        // have it, we can ignore the below check and continue as before.
         if ((r1_loc != string::npos) || (r2_loc != string::npos)) {
             // We have a "?" in either the pattern or the match_string
             // Need to parse them and see whether they are matching or 
             // not
             if ((r1_loc != string::npos) && (r2_loc == string::npos) ||
-                (r1_loc == string::npos) && (r2_loc != string::npos)) {
+                    (r1_loc == string::npos) && (r2_loc != string::npos)) {
                 // Either one of them does not have a "?", it is a no match
                 return AM_NO_MATCH;
             }
@@ -404,34 +403,34 @@ compare_sub_pat(const char *r1, const char *r2,
             // continue further. The algorithm is to do strchr the pattern and
             // the match string at "?" and send this each of the pattern 
             // tokens and match tokens to the match_patterns algorithm. Also
-	    // perform the similar call for the remainder of the pattern and
-	    // the match string
+            // perform the similar call for the remainder of the pattern and
+            // the match string
             const char *tmp_r1 = r1;
             const char *tmp_r2 = r2;
-            char *pattern = NULL;            
+            char *pattern = NULL;
             char *match_str = NULL;
             int pattern_len = 0;
             int match_len = 0;
-        
-	    pattern_len = strlen(r1)+1;
-	    pattern = (char *)malloc(pattern_len);
-	    memset(pattern, '\0', pattern_len);
+
+            pattern_len = strlen(r1) + 1;
+            pattern = (char *) malloc(pattern_len);
+            memset(pattern, '\0', pattern_len);
 
             tmp_r1 = strchr(r1, '?');
             if (tmp_r1 != NULL) {
-                match_len = strlen(r2)+1;
-                match_str = (char *)malloc(match_len);
-		memset(match_str, '\0', match_len);
+                match_len = strlen(r2) + 1;
+                match_str = (char *) malloc(match_len);
+                memset(match_str, '\0', match_len);
 
                 tmp_r2 = strchr(r2, '?');
                 if (tmp_r2 != NULL) {
                     strncpy(pattern, r1, tmp_r1 - r1);
                     strncpy(match_str, r2, tmp_r2 - r2);
-                    
+
                     if (pattern != NULL && match_str != NULL) {
                         result = match_patterns(pattern, match_str,
-                                         B_TRUE==traits->ignore_case,false,
-                                         traits->separator);            
+                                B_TRUE == traits->ignore_case, false,
+                                traits->separator);
                         if (result != AM_NO_MATCH) {
                             // success so far, continue for the remainder of 
                             // the pattern and the match string 
@@ -442,36 +441,32 @@ compare_sub_pat(const char *r1, const char *r2,
                             tmp_r1++;
                             tmp_r2++;
 
-                            strcpy(pattern,tmp_r1);
-                            strcpy(match_str,tmp_r2);
+                            strcpy(pattern, tmp_r1);
+                            strcpy(match_str, tmp_r2);
 
                             if (pattern != NULL && match_str != NULL) {
                                 result = match_patterns(pattern, match_str,
-                                         B_TRUE==traits->ignore_case,false,
-                                         traits->separator);            
+                                        B_TRUE == traits->ignore_case, false,
+                                        traits->separator);
                             }
                         }
                     }
-                    if (pattern != NULL)
-                        free(pattern);
-                    if (match_str != NULL)
-                        free(match_str);
                 } else {
-                    if (match_str != NULL)
-                        free(match_str);
                     result = AM_NO_MATCH;
                 }
-          } else {
-              result = AM_NO_MATCH;
-          }
-        return result;
-      }
+            } else {
+                result = AM_NO_MATCH;
+            }
+            if (pattern != NULL) free(pattern);
+            if (match_str != NULL) free(match_str);
+            return result;
+        }
     }
-    
-    if((result = match_patterns(r1, r2,
-				B_TRUE==traits->ignore_case,false,
-                                traits->separator)) != AM_NO_MATCH)
-	return result;
+
+    if ((result = match_patterns(r1, r2,
+            B_TRUE == traits->ignore_case, false,
+            traits->separator)) != AM_NO_MATCH)
+        return result;
 
     string r_1(r1);
 #if defined(_AMD64_)
@@ -480,18 +475,18 @@ compare_sub_pat(const char *r1, const char *r2,
     int size = r_1.size() - 1;
 #endif
 
-    if(*(r1 + size) == '*')
-	return AM_NO_MATCH;
+    if (*(r1 + size) == '*')
+        return AM_NO_MATCH;
 
-    if(*(r1 + size) != traits->separator) {
-	PUSH_BACK_CHAR(r_1,traits->separator);
+    if (*(r1 + size) != traits->separator) {
+        PUSH_BACK_CHAR(r_1, traits->separator);
     }
 
     r_1.append(STAR);
 
-    if(match_patterns(r_1.c_str(), r2, B_TRUE==traits->ignore_case,false,
-                      traits->separator) != AM_NO_MATCH)
-	return AM_SUB_RESOURCE_MATCH;
+    if (match_patterns(r_1.c_str(), r2, B_TRUE == traits->ignore_case, false,
+            traits->separator) != AM_NO_MATCH)
+        return AM_SUB_RESOURCE_MATCH;
 
     return AM_NO_MATCH;
 }
