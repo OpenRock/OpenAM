@@ -74,6 +74,8 @@
         <!-- OpenAM Build out extlib for subsequent Legacy antRun -->
         <!-- OpenAM Legacy Ant Wrapper -->
         <module>openam</module>
+        <!-- Final Packaging Artifact -->
+        <module>openam-distribution</module>
     </modules>
 
     <!-- Developers -->
