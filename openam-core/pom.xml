@@ -443,7 +443,13 @@
 			
 		<!-- Legacy External Libraries for OpenAM -->
 		<!-- We need to eventually ween off of these -->
-		<dependency>
+		 <dependency>
+		 	<!-- This version is different from what is out in central. Very Bad! -->
+		 	<groupId>external</groupId>
+  			<artifactId>ant-contrib</artifactId>
+  			<version>1.0b3</version>
+		</dependency>
+	    <dependency>
 			<groupId>external</groupId>
 			<artifactId>authapi</artifactId>
 		</dependency>

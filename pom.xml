@@ -353,13 +353,6 @@
     
     <dependencyManagement>
         <dependencies>
-        	<dependency>
-			<groupId>ant-contrib</groupId>
-			<artifactId>ant-contrib</artifactId>
-			<version>1.0b3</version>
-			<!-- TODO - Needs to be scoped as compile eventually -->
-			<!-- <scope>compile</scope> -->
-	        </dependency>
         	
 			<dependency>
 				<groupId>asm</groupId>
@@ -740,6 +733,15 @@
 			
 		<!-- Legacy External Libraries for OpenAM -->
 		<!-- We need to eventually ween off of these -->
+		<dependency>
+			<groupId>external</groupId>
+			<!-- This version is different from what is out in central. Very Bad! -->
+			<artifactId>ant-contrib</artifactId>
+			<version>1.0b3</version>
+			<!-- TODO - Needs to be scoped as compile eventually -->
+			<!-- <scope>compile</scope> -->
+	        </dependency>
+		
 		<dependency>
 			<groupId>external</groupId>
 			<artifactId>authapi</artifactId>
