@@ -26,11 +26,11 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: build.xml,v 1.56 2009/11/21 00:36:40 huacui Exp $
+   $Id: pom.xml,v 1.00 2012/06/08 08:26:00 jeff.schenk initial $
 
 -->
 <!--
-   "Portions Copyrighted 2010-2011 ForgeRock AS"
+   "Portions Copyrighted 2010-2012 ForgeRock AS"
 -->
     
     <!-- Parent Project -->
