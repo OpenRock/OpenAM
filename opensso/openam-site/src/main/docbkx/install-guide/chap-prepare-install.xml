@@ -622,6 +622,14 @@ $ diff -c /path/to/jboss7/domain/configuration/domain.orig
 
      <variablelist>
       <varlistentry>
+       <term><literal>-Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true</literal></term>
+       <listitem>
+        <para>Make sure that headers include the <literal>Expires</literal>
+        attribute rather than only <literal>Max-Age</literal>, as some versions
+        of Internet Explorer do not support <literal>Max-Age</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term><literal>-server</literal></term>
        <listitem>
         <para>Use <literal>-server</literal> rather than
