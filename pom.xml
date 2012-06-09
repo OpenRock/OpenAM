@@ -228,6 +228,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
+        
         <pluginRepository>
             <id>Codehaus repository</id>
             <url>http://repository.codehaus.org/</url>
@@ -235,10 +236,20 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
+        
         <pluginRepository>
             <id>apache-snapshots</id>
             <name>Apache Snapshot Repository</name>
             <url>http://repository.apache.org/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+        
+        <pluginRepository>
+            <id>jetty-releases</id>
+            <name>Jetty Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/jetty-releases/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -252,6 +263,7 @@
           <name>repo</name>
           <url>http://maven.forgerock.org/repo/repo</url>
         </pluginRepository>
+        
         <pluginRepository>
           <snapshots />
           <id>snapshots</id>
@@ -836,14 +848,6 @@
 			<version>2009-29-07</version>
 		</dependency>		
 		
-		<!-- Dependencies for various Plug-ins -->
-		<dependency>
-			<groupId>org.functionaljava</groupId>
-			<artifactId>fj</artifactId>
-			<version>2.19</version>
-			<scope>compile</scope>
-		</dependency>
-			
         </dependencies>  
     </dependencyManagement>
 
@@ -1000,11 +1004,18 @@
         <pluginManagement>
             <plugins>
             	<plugin>
+      				<groupId>org.mortbay.jetty.toolchain</groupId>
+      				<artifactId>unix-maven-plugin</artifactId>
+      				<version>1.0-alpha-6.1</version>
+    			</plugin>
+    			<!--
+            	<plugin>
 					<groupId>org.codehaus.mojo.unix</groupId>
 					<artifactId>unix-common</artifactId>
 					<version>1.0-alpha-5</version>
 					<inherited>true</inherited>
             	</plugin>
+            	-->
             	<plugin>
             		<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxb2-maven-plugin</artifactId>

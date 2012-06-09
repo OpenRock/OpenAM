@@ -102,8 +102,8 @@
             
             <plugin>
            		<!-- Create Symbolic Links for Artifacts for Legacy Building -->
-        		<groupId>org.codehaus.mojo.unix</groupId>
-				<artifactId>unix-common</artifactId>
+        		<groupId>org.mortbay.jetty.toolchain</groupId>
+				<artifactId>unix-maven-plugin</artifactId>
         		<extensions>true</extensions>
         		<configuration>
           			<assembly>
@@ -115,13 +115,16 @@
             			
           			</assembly>
         		</configuration>
-        		 <dependencies>
+        		<!--
+        		<dependencies>
         			<dependency>
 						<groupId>org.functionaljava</groupId>
 						<artifactId>fj</artifactId>
 						<version>2.19</version>
+						<type>jar</type>
 					</dependency>
 				</dependencies>
+				-->
       		</plugin>
             
             <plugin>
