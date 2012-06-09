@@ -101,31 +101,38 @@
             </plugin>
             
             <plugin>
-           		<!-- Create Symbolic Links for Artifacts for Legacy Building -->
-        		<groupId>org.mortbay.jetty.toolchain</groupId>
-				<artifactId>unix-maven-plugin</artifactId>
-        		<extensions>true</extensions>
-        		<configuration>
-          			<assembly>
-            
-            			<symlink>
-              				<path>target/extlib/json-20090211.jar</path>
-              				<value>target/extlib/json.jar</value>
-            			</symlink>
-            			
-          			</assembly>
-        		</configuration>
-        		<!--
-        		<dependencies>
-        			<dependency>
-						<groupId>org.functionaljava</groupId>
-						<artifactId>fj</artifactId>
-						<version>2.19</version>
-						<type>jar</type>
-					</dependency>
-				</dependencies>
-				-->
-      		</plugin>
+                <groupId>com.pyx4j</groupId>
+                <artifactId>maven-junction-plugin</artifactId>
+                <executions>
+                    <execution>
+                    	<id>link</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>link</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>unlink</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>unlink</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+
+                    <links>
+                        
+                        <link>
+                            <dst>target/extlib/json.jar</dst>
+                            <src>target/extlib/json-20090211.jar</src>
+                        </link>
+                       
+                    </links>
+
+                    
+                </configuration>
+            </plugin>
             
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -203,9 +203,20 @@
             </snapshots>
         </repository>
    
+   		<repository>
+            <id>pyx4j-web-snapshot</id>
+            <url>http://www.pyx4me.com/maven2-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+   
    		<!-- ForgeRock.org Project Repository -->
         <repository>
-          <id>forgerock-central</id>
+          <id>forgerock-release</id>
           <name>repo</name>
           <url>http://maven.forgerock.org/repo/repo</url>
            <releases>
@@ -213,7 +224,7 @@
                 <updatePolicy>always</updatePolicy>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
@@ -256,19 +267,32 @@
         </pluginRepository>
         
         <pluginRepository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>forgerock-central</id>
-          <name>repo</name>
-          <url>http://maven.forgerock.org/repo/repo</url>
+            <id>pyx4j-web-snapshot</id>
+            <url>http://www.pyx4me.com/maven2-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </pluginRepository>
         
         <pluginRepository>
-          <snapshots />
-          <id>snapshots</id>
+          <id>forgerock-release</id>
           <name>repo</name>
           <url>http://maven.forgerock.org/repo/repo</url>
+           <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+        
+        <pluginRepository>
+          <id>forgerock-internal</id>
+          <name>repo</name>
+          <url>http://maven.forgerock.org/repo/repo</url>
+          <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </pluginRepository>
      
     </pluginRepositories>
@@ -276,11 +300,11 @@
     <!-- For Deployment to ForgeRock Maven Repository -->
     <distributionManagement>
         <repository>
-            <id>artifactory.internal</id>
+            <id>artifactory.release</id>
             <url>https://maven.forgerock.org/repo/</url>
         </repository>
         <snapshotRepository>
-            <id>artifactory.snapshots</id>
+            <id>artifactory.internal</id>
             <url>https://maven.forgerock.org/repo/</url>
         </snapshotRepository>
     </distributionManagement>
@@ -938,7 +962,7 @@
                     <description>OpenAM Java Documentation.
                     </description>
                     <bottom>
-                        <![CDATA[Copyright &#169 2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
+                        <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
                 </configuration>
                 <executions>
                     <execution>
@@ -1004,18 +1028,11 @@
         <pluginManagement>
             <plugins>
             	<plugin>
-      				<groupId>org.mortbay.jetty.toolchain</groupId>
-      				<artifactId>unix-maven-plugin</artifactId>
-      				<version>1.0-alpha-6.1</version>
-    			</plugin>
-    			<!--
-            	<plugin>
-					<groupId>org.codehaus.mojo.unix</groupId>
-					<artifactId>unix-common</artifactId>
-					<version>1.0-alpha-5</version>
+            		<groupId>com.pyx4j</groupId>
+                	<artifactId>maven-junction-plugin</artifactId>
+                	<version>1.0.3-SNAPSHOT</version>
 					<inherited>true</inherited>
             	</plugin>
-            	-->
             	<plugin>
             		<groupId>org.codehaus.mojo</groupId>
 					<artifactId>jaxb2-maven-plugin</artifactId>
