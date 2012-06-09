@@ -84,8 +84,6 @@
                </executions>
                <configuration>
                     <extension>true</extension>
-                    <bindingDirectory>${basedir}/src/main/xsd/</bindingDirectory>
-                    <bindingFiles>xacml-core-v3.xjb</bindingFiles>
                </configuration>
            </plugin>
 

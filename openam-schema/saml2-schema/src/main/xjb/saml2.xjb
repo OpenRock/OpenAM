@@ -34,7 +34,7 @@
                xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
                xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <jxb:bindings schemaLocation="../xsd/saml2/xenc-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/xenc-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.xmlenc">
          <jxb:javadoc>
@@ -47,7 +47,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/xmldsig-core-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/xmldsig-core-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.xmlsig">
          <jxb:javadoc>
@@ -60,7 +60,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/saml-schema-assertion-2.0.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/saml-schema-assertion-2.0.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.assertion">
          <jxb:javadoc>
@@ -73,7 +73,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/saml-schema-metadata-2.0.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/saml-schema-metadata-2.0.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.metadata">
          <jxb:javadoc>
@@ -86,7 +86,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/sstc-saml-metadata-ext-query.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-metadata-ext-query.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.metadataextquery">
          <jxb:javadoc>
@@ -99,7 +99,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/sstc-saml-metadata-x509-query.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-metadata-x509-query.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.metadatax509query">
          <jxb:javadoc>
@@ -112,7 +112,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/entity-config-schema.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/entity-config-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.entityconfig">
          <jxb:javadoc>
@@ -125,7 +125,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/sstc-metadata-attr.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/sstc-metadata-attr.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.metadataattr">
          <jxb:javadoc>
@@ -138,7 +138,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/sstc-saml-attribute-ext.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-attribute-ext.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.metadataattrext">
          <jxb:javadoc>
@@ -151,7 +151,7 @@
     </jxb:schemaBindings>
   </jxb:bindings>
 
-  <jxb:bindings schemaLocation="../xsd/saml2/sstc-saml-idp-discovery.xsd" node="/xs:schema">
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-idp-discovery.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.saml2.jaxb.metadataidpdiscovery">
          <jxb:javadoc>

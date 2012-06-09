@@ -54,11 +54,14 @@
 
     <!-- Child Modules -->
     <modules>
-        <!-- OpenAM New Modules -->
-        <module>liberty-schema</module>
+        <module>xacml3-schema</module>
         <module>saml2-schema</module>
         <module>wsfederation-schema</module>
-        <module>xacml3-schema</module>
+        <module>liberty-schema</module>
+        <!-- OpenAM New Modules 
+        <module>liberty-schema</module>
+        <module>saml2-schema</module>
+        <module>wsfederation-schema</module>   -->
     </modules>
     
 
