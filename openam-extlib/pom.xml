@@ -122,11 +122,15 @@
                 <configuration>
 
                     <links>
-                        
+                        <!-- TODO finish the links... -->
                         <link>
                             <dst>target/extlib/json.jar</dst>
                             <src>target/extlib/json-20090211.jar</src>
                         </link>
+                       
+                       
+                       
+                       
                        
                     </links>
 

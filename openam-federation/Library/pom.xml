@@ -123,24 +123,44 @@
 
     
     <dependencies>
+    	<dependency>
+	   		<groupId>org.forgerock</groupId>
+        	<artifactId>openam-shared</artifactId>
+        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+		</dependency>
+		<dependency>
+			<groupId>org.forgerock</groupId>
+			<artifactId>openam-schema</artifactId>
+			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+		</dependency>
+    	<dependency>
+	   		<groupId>org.forgerock</groupId>
+        	<artifactId>xacml3-schema</artifactId>
+        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+		</dependency>
+		<dependency>
+			<groupId>org.forgerock</groupId>
+     		<artifactId>saml2-schema</artifactId>
+			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+      	</dependency>
+      	<dependency>
+	   		<groupId>org.forgerock</groupId>
+        	<artifactId>wsfederation-schema</artifactId>
+        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+		</dependency>
+   		<dependency>
+			<groupId>org.forgerock</groupId>
+			<artifactId>liberty-schema</artifactId>
+			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+		</dependency>
 		<dependency>
 			<groupId>org.forgerock</groupId>
      		<artifactId>openam-core</artifactId>
 			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
       	</dependency>
-      	<dependency>
-	   		<groupId>org.forgerock</groupId>
-        	<artifactId>openam-shared</artifactId>
-        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-		</dependency>
    		<dependency>
 			<groupId>org.forgerock</groupId>
 			<artifactId>openam-extlib</artifactId>
-			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-		</dependency>
-   		<dependency>
-			<groupId>org.forgerock</groupId>
-			<artifactId>openam-schema</artifactId>
 			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
     </dependencies>

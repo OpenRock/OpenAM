@@ -52,13 +52,7 @@
         <module>saml2-schema</module>
         <module>wsfederation-schema</module>
         <module>liberty-schema</module>
-        <!-- OpenAM New Modules 
-        <module>liberty-schema</module>
-        <module>saml2-schema</module>
-        <module>wsfederation-schema</module>   -->
     </modules>
-    
-
     
     <dependencies>
     	<dependency>
@@ -66,7 +60,6 @@
         	<artifactId>openam-shared</artifactId>
         	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
         </dependency>
-    
     </dependencies>
     
 </project>
