@@ -73,10 +73,10 @@
                     <archive>
                         <manifestEntries>
                             <Specification-Title>OpenAm Server</Specification-Title>
-                            <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
                             <Implementation-Title>OpenAM Server</Implementation-Title>
-                            <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>

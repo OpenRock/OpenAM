@@ -76,10 +76,10 @@
                         </manifest>
                         <manifestEntries>
                             <Specification-Title>OpenAM Shared Components</Specification-Title>
-                            <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
                             <Implementation-Title>OpenAM Shared Components</Implementation-Title>
-                            <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
                             <Build-Jdk>${java.version}</Build-Jdk>

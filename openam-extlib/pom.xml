@@ -63,10 +63,10 @@
                         </manifest>
                         <manifestEntries>
                             <Specification-Title>OpenAM External Library References</Specification-Title>
-                            <Specification-Version>${pom.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
                             <Implementation-Title>OpenAM External Library References</Implementation-Title>
-                            <Implementation-Version>${pom.version} - ${maven.build.timestamp}</Implementation-Version>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
                             <Build-Jdk>${java.version}</Build-Jdk>
@@ -172,7 +172,7 @@
     
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
-        	<artifactId>openam-core</artifactId> <!-- This Project Final Artifact to build. -->
+        	<artifactId>openam-core</artifactId>
         	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
     

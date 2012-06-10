@@ -53,18 +53,5 @@
         <module>Library</module>
     </modules>
     
-    <dependencies>
-		<dependency>
-			<groupId>org.forgerock</groupId>
-			<artifactId>openam-core</artifactId>
-			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-		</dependency>
-		<dependency>
-			<groupId>org.forgerock</groupId>
-			<artifactId>openam-core</artifactId>
-			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-		</dependency>
-    </dependencies>
-    
 </project>
 
