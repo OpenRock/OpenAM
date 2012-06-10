@@ -226,7 +226,7 @@
                 <enabled>true</enabled>
             </snapshots>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
         </repository>
    
@@ -289,7 +289,7 @@
                 <enabled>true</enabled>
             </snapshots>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
         </pluginRepository>
         
@@ -1046,7 +1046,7 @@
             	<plugin>
             		<groupId>com.pyx4j</groupId>
                 	<artifactId>maven-junction-plugin</artifactId>
-                	<version>1.0.3-SNAPSHOT</version>
+                	<version>1.0.3</version>
 					<inherited>true</inherited>
             	</plugin>
             	<plugin>
