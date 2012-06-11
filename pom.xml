@@ -41,22 +41,32 @@
         <url>http://www.forgerock.org</url>
     </organization>
     <url>http://www.forgerock.org</url>
-    
-    <!--
-    TODO Fix this for correct settings...
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+    </issueManagement>
+
     <licenses>
-		<license>
-			<name>LGPL</name>
-			<url>LICENSE</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	-->
-	
-	<issueManagement>
-		<system>jira</system>
-		<url>https://bugster.forgerock.org/jira/secure/Dashboard.jspa</url>
-	</issueManagement>
+        <license>
+            <name>CDDL-1.0</name>
+            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <comments>Common Development and Distribution License (CDDL) 1.0.
+                This license applies to OpenAM source code as indicated in the
+                sources themselves.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>CC BY-NC-ND 3.0</name>
+            <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+            <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+                Unported. This license applies to the site content, and to the
+                documentation as indicated in the documentation source code.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <!-- Component Properties -->
     <properties>
@@ -178,8 +188,30 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
-    
-    	<repository>
+
+        <!-- ForgeRock.org Project Repository -->
+        <repository>
+            <id>forgerock-staging-repository</id>
+            <name>ForgeRock Release Repository</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>forgerock-snapshots-repository</id>
+            <name>ForgeRock Snapshot Repository</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+
+        <repository>
             <id>maven-central</id>
             <url>http://repo1.maven.org/maven2/</url>
             <releases>
@@ -229,23 +261,8 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-   
-   		<!-- ForgeRock.org Project Repository -->
-        <repository>
-          <id>forgerock-release</id>
-          <name>repo</name>
-          <url>http://maven.forgerock.org/repo/repo</url>
-           <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-   
-      </repositories>
+
+    </repositories>
         
     <pluginRepositories>
         <pluginRepository>
@@ -312,24 +329,38 @@
         </pluginRepository>
      
     </pluginRepositories>
-    
+
+
     <!-- For Deployment to ForgeRock Maven Repository -->
     <distributionManagement>
         <repository>
-            <id>artifactory.release</id>
-            <url>https://maven.forgerock.org/repo/</url>
+            <id>forgerock-staging-repository</id>
+            <name>ForgeRock Release Repository</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
         </repository>
         <snapshotRepository>
-            <id>artifactory.internal</id>
-            <url>https://maven.forgerock.org/repo/</url>
+            <id>forgerock-snapshots-repository</id>
+            <name>ForgeRock Snapshot Repository</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-    
+
     <!-- Source Control -->
     <scm>
         <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</developerConnection>
     </scm>
+
+    <!-- TODO - Establish correct scm information. -->
+    <!--
+    <scm>
+        <url>https://svn.forgerock.org/openam/trunk/opensso/</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    -->
+
 
     <!-- OpenAM Dependency Management, replaces extlib in all cases. -->
     
