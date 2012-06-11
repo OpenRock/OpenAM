@@ -75,7 +75,7 @@
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>
             <zipfileset dir="${sharedlib.classes.dir}" />
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
         </jar>
         <checksum file="${sharedlib.dist.dir}//opensso-sharedlib.jar"
             algorithm="SHA" fileext=".sha" />

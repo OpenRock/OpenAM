@@ -139,7 +139,7 @@
                 <attribute name="Version" value="${version}"/>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <fileset dir="${library.xml.dir}" includes="*.xml" />
             <fileset dir="${library.res.dir}" includes="*.template" />
             <zipfileset dir="${library.classes.dir}"
@@ -153,7 +153,7 @@
                 <attribute name="Version" value="${version}"/>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <zipfileset dir="${library.classes.dir}"
                 includes="com/sun/identity/saml2/idpdiscovery/*.class" />
         </jar>

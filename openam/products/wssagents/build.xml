@@ -129,7 +129,7 @@
                 <attribute name="Version" value="${version}"/>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <fileset dir="${wssagents.res.dir}">
                 <filename name="META-INF/services/*"/>    
             </fileset>
@@ -183,7 +183,7 @@
             <fileset dir="${wssagents.classes.dir}/com">
                 <include name=".version" />
             </fileset>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <zipfileset dir="${wssagents.classes.dir}" includes="com/sun/identity/wssagents/jaxws/client/ClientFilter.class,com/sun/identity/wssagents/jaxws/client/ClientHandler.class,com/sun/identity/wssagents/jaxws/server/ServerHandler.class"/>
         </jar>
 
@@ -197,7 +197,7 @@
         <delete dir="${zip.temp.dir}" />
         <mkdir dir="${zip.temp.dir}" />
 
-        <copy file="${products.license.dir}/license.txt"
+        <copy file="/license/license.txt"
             tofile="${zip.temp.dir}/license.txt" />
         <copy file="${wssagents.basedir}/docs/README.wssagents-jax-ws-zip"
             tofile="${zip.temp.dir}/README" />
@@ -366,7 +366,7 @@
         <mkdir dir="${zip.temp.dir}" />
 
         <copy todir="${zip.temp.dir}">
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
         </copy>
         <copy file="${wssagents.basedir}/docs/README.wssagentszip"
             tofile="${zip.temp.dir}/README" />

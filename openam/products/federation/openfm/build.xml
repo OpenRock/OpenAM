@@ -173,7 +173,7 @@
                 <attribute name="Version" value="${openfm.version}"/>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <fileset dir="${openfm.dir}/resources"
                 includes="META-INF/services/*"
                 excludes="META-INF/services/com.sun.xml.ws.assembler.ClientPipelineHook, 
@@ -307,7 +307,7 @@
                 <attribute name="Version" value="${openfm.version}"/>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <zipfileset dir="${openfm.built.publicapidocs.dir}"/>
         </jar>
     </target>

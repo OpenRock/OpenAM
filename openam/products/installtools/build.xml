@@ -63,7 +63,7 @@
             <manifest>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>   
-            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="/license" includes="license.txt" />
             <fileset dir="${installtools.classes.dir}">
                 <patternset refid="installtool-classes"/>
             </fileset>         
@@ -74,7 +74,7 @@
             <manifest>
                 <attribute name="Create-On" value="${touch.time}"/>
             </manifest>   
-            <fileset dir="${products.license.dir}" includes="*.txt" />
+            <fileset dir="/license" includes="*.txt" />
             <fileset dir="${installtools.classes.dir}">
                 <patternset refid="installtool-launcher-classes"/>
             </fileset>
