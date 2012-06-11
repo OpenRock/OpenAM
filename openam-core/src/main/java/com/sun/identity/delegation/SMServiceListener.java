@@ -120,7 +120,7 @@ public class SMServiceListener implements ServiceListener {
         // If event type is delete,
         // remove realm privileges for the organization
         if ((serviceComponent == null) || (serviceComponent.length() == 0)) {
-            if (type == REMOVED) {
+            if (type == ServiceListener.REMOVED) {
                 // Schedule the task to delete delegation policies
                 DeleteDelegationPolicyTask task =
                     new DeleteDelegationPolicyTask(orgName);
@@ -130,7 +130,7 @@ public class SMServiceListener implements ServiceListener {
                         " GN: " + groupName + " SC: " + serviceComponent);
                 }
                 SystemTimer.getTimer().schedule(task, 0);
-            } else if (type == ADDED) {
+            } else if (type == ServiceListener.ADDED) {
                 // Create the delegation policies
                 SSOToken token = (SSOToken) AccessController.doPrivileged(
                     AdminTokenAction.getInstance());

@@ -437,7 +437,7 @@ public abstract class AgentProfileViewBean
             passPgSessionMap(vb);
             String url = this.getDefaultDisplayURL();
             int idx = url.indexOf("/", 1);
-            url = "target/generated-sources" + url.substring(idx);
+            url = ".." + url.substring(idx);
             vb.setTargetViewBeanURL(url);
             vb.forwardTo(getRequestContext());
         } else {
