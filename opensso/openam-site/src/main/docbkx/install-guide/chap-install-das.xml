@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-das'
@@ -77,11 +77,11 @@
    <para>Unpack the <filename>opensso.war</filename> file into a temporary
    directory.</para>
    <screen>$ mkdir -p /tmp/das ; cd /tmp/das
-$ jar xf /path/to/OpenAM/deployable-war/opensso.war</screen>
+$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
   </step>
   <step>
    <para>Create the <filename>das.war</filename> file.</para>
-   <screen>$ cd /path/to/OpenAM/deployable-war
+   <screen>$ cd ~/Downloads/opensso/deployable-war
 $ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
   </step>
  </procedure>

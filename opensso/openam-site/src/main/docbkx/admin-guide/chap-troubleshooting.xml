@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-troubleshooting'
@@ -68,7 +68,7 @@ mark      1739     1  0 14:47...</screen>
      <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
      with appropriate permissions, and repack <filename>opensso.war</filename>
      with the adjusted file before deploying that.</para>
-     <screen>$ cd /path/to/OpenAM/deployable-war/
+     <screen>$ cd ~/Downloads/opensso/deployable-war/
 $ mkdir unpacked ; cd unpacked
 $ jar xf ../opensso.war
 $ vi WEB-INF/classes/bootstrap.properties 
@@ -178,13 +178,13 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      finished box if you want OpenAM to add the schema to OpenDJ. The box is
      not selected by default.</para>
      <para>The full version of OpenAM includes directory server schema in the
-     <filename>/path/to/OpenAM/ldif/</filename> directory. To add the schema
+     <filename>~/Downloads/opensso/ldif/</filename> directory. To add the schema
      to OpenDJ afterwards, you can try the following command.</para>
      <screen>$ /path/to/OpenDJ/bin/ldapmodify
  --port 1389
  --bindDN "cn=Directory Manager"
  --bindPassword password
- --filename /path/to/OpenAM/ldif/fam_sds_schema.ldif
+ --filename ~/Downloads/opensso/ldif/fam_sds_schema.ldif
 Processing MODIFY request for CN=schema
 MODIFY operation successful for DN CN=schema</screen>
     </answer>

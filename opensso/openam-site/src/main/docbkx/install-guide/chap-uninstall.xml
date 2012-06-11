@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-uninstall'
@@ -109,9 +109,9 @@ $ rm ./Downloads/openam_nightly_20110808.zip</screen>
    <para>If you cannot find the unpacked version, you might search for the
    directory named <filename>deployable-war</filename>.</para>
    <screen>$ locate deployable-war/
-/path/to/OpenAM/deployable-war/README
+~/Downloads/opensso/deployable-war/README
 ...
-$ rm -rf /path/to/OpenAM</screen>
+$ rm -rf ~/Downloads/opensso/</screen>
   </step>
  </procedure>
 </chapter>

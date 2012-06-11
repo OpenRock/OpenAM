@@ -131,7 +131,7 @@
    <para>For example, you can install the session tools in the OpenAM
    configuration directory.</para>
    <screen>$ cd $HOME/openam
-$ unzip /path/to/OpenAM/tools/ssoSessionTools.zip
+$ unzip ~/Downloads/opensso/tools/ssoSessionTools.zip
 ...
 $ ./setup
 Name of the directory to install the scripts (example: sfoscripts):sfoscripts

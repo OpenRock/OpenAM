@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-csdk'
@@ -41,8 +41,8 @@
  unpacked the full version of OpenAM. To prepare to install OpenAM C SDK, first
  unzip <filename>agent-csdk.zip</filename>.</para>
 
- <screen>$ unzip /path/to/OpenAM/libraries/native/agent-csdk/agent-csdk.zip
-Archive:  /path/to/OpenAM/libraries/native/agent-csdk/agent-csdk.zip
+ <screen>$ unzip ~/Downloads/opensso/libraries/native/agent-csdk/agent-csdk.zip
+Archive:  ~/Downloads/opensso/libraries/native/agent-csdk/agent-csdk.zip
   inflating: README
   inflating: agent-csdk-linux-32.tar.gz
   inflating: agent-csdk-linux-64.tar.gz

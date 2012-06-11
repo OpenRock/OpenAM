@@ -36,7 +36,8 @@
   <secondary>Tools (ssoadm, etc.)</secondary>
  </indexterm>
  <para>OpenAM tools are found in the <filename>tools/</filename> directory
- where you unpacked the archive of the entire package.</para>
+ where you unpacked the archive of the entire package, such as
+ <filename>~/Downloads/opensso/tools/</filename>.</para>
  <variablelist>
   <varlistentry>
    <term><filename>README</filename></term>
@@ -88,8 +89,8 @@
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
-   <screen>$ cd /path/to/admin/tools
-$ unzip /path/to/OpenAM/tools/ssoAdminTools.zip
+   <screen>$ cd /path/to/openam-tools/admin
+$ unzip ~/Downloads/opensso/tools/ssoAdminTools.zip
 ...
   inflating: template/windows/bin/amverifyarchive.bat.template
   inflating: template/windows/bin/ssoadm.bat.template</screen>
@@ -101,11 +102,11 @@ $ unzip /path/to/OpenAM/tools/ssoAdminTools.zip
    located.</para>
    <screen>$ ./setup
 Path to config files of OpenAM server [/home/mark/openam]:
-Debug Directory [/path/to/admin/tools/debug]:
-Log Directory [/path/to/admin/tools/log]:
-The scripts are properly setup under directory: /path/to/admin/tools/openam
-Debug directory is /path/to/admin/tools/debug.
-Log directory is /path/to/admin/tools/log.
+Debug Directory [/path/to/openam-tools/admin/debug]:
+Log Directory [/path/to/openam-tools/admin/log]:
+The scripts are properly setup under directory: /path/to/openam-tools/admin/openam
+Debug directory is /path/to/openam-tools/admin/debug.
+Log directory is /path/to/openam-tools/admin/log.
 The version of this tools.zip is: (2011-July-11 00:05)
 The version of your server instance is: (2011-July-11 00:05)</screen>
    <para>After setup, the tools are located under a directory named after the
@@ -155,7 +156,8 @@ http://openam.example.com:8080/openam</screen>
    <para>You add a <literal>com.iplanet.am.naming.map.site.to.server</literal>
    property to the <command>java</command> command in the script.</para>
    <literallayout class="monospaced">-D"com.iplanet.am.naming.map.site.to.server=
-<replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable>[,<replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable> ...]"</literallayout>
+   <replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable>[,<replaceable
+   >lb-url</replaceable>=<replaceable>openam-url</replaceable> ...]"</literallayout>
    <para>Notice that the mapping is a comma separated list of server URLs,
    <replaceable>openam-url</replaceable>, in the site with the load balancer
    URL, <replaceable>lb-url</replaceable>. For example, if your site is behind
@@ -184,8 +186,9 @@ http://openam.example.com:8080/openam</screen>
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
-   <screen>$ unzip /path/to/OpenAM/tools/ssoConfiguratorTools.zip 
-Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
+   <screen>$ cd /path/to/openam-tools/config
+$ unzip ~/Downloads/opensso/tools/ssoConfiguratorTools.zip 
+Archive:  ~/Downloads/opensso/tools/ssoConfiguratorTools.zip
   inflating: README.setup
   inflating: configurator.jar
   inflating: sampleconfiguration
@@ -219,7 +222,8 @@ Archive:  /path/to/OpenAM/tools/ssoConfiguratorTools.zip
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
-   <screen>$ unzip /path/to/OpenAM/tools/ssoDiagnosticTools.zip
+   <screen>$ cd /path/to/openam-tools/diagnostic
+$ unzip ~/Downloads/opensso/tools/ssoDiagnosticTools.zip
 ...
   inflating: services/webcontainer/service.xml
   inflating: ssodtool.bat

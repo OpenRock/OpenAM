@@ -179,11 +179,15 @@ esac
   entire package as a .zip archive, only the OpenAM .war file, only the
   administrative tools as a .zip archive, or only the OpenAM source code
   used to build the release.</para>
-  
+
+  <para>After you download the .zip archive, unzip it to access the
+  content:</para>
+  <screen>$ cd ~/Downloads ; unzip openam_<?eval ${serverDocTargetVersion}?>.zip</screen>
+
   <variablelist>
-   <para>After you unzip the archive of the entire package, you get an
-   <filename>opensso</filename> directory including a README, a set of license
-   files, and the following directories. See the <link
+   <para>When you unzip the archive of the entire package, you get a
+   <filename>~/Downloads/opensso/</filename> directory including a README, a
+   set of license files, and the following directories. See the <link
    xlink:href="reference#chap-file-layout"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>File
     Layout</citetitle> reference</link> for details.</para>
@@ -324,7 +328,7 @@ esac
 
   <screen>$ mkdir openam
 $ cd openam
-$ jar -xf /path/to/OpenAM/deployable-war/opensso.war
+$ jar -xf ~/Downloads/opensso/deployable-war/opensso.war
 $ vi WEB-INF/classes/bootstrap.properties
 $ grep ^config WEB-INF/classes/bootstrap.properties
 configuration.dir=/home/jboss-user/openam</screen>
@@ -389,7 +393,7 @@ $ cat WEB-INF/jboss-web.xml</screen>
 
   <screen>$ mkdir openam
 $ cd openam
-$ jar -xf /path/to/OpenAM/deployable-war/opensso.war
+$ jar -xf ~/Downloads/opensso/deployable-war/opensso.war
 $ vi WEB-INF/classes/bootstrap.properties
 $ grep ^config WEB-INF/classes/bootstrap.properties
 configuration.dir=/home/jboss-user/openam

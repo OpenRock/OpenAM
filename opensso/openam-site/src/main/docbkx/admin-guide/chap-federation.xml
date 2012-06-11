@@ -363,11 +363,11 @@
      <para>Unpack the <filename>opensso.war</filename> file into a temporary
      directory.</para>
      <screen>$ mkdir /tmp/ipds; cd /tmp/ipds
-$ jar xf /path/to/OpenAM/deployable-war/opensso.war</screen>
+$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
     </step>
     <step>
      <para>Create the <filename>ipds.war</filename> file.</para>
-     <screen>$ cd /path/to/OpenAM/deployable-war
+     <screen>$ cd ~/Downloads/opensso/deployable-war
 $ sh createwar.sh --staging /tmp/ipds --type idpdiscovery --warfile ipds.war
 
 WAR file was created.</screen>

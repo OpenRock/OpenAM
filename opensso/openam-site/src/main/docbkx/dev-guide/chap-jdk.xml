@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-jdk'
@@ -38,12 +38,12 @@
  <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
  in the <filename>samples/opensso-client.zip</filename> where you unpacked
  the full version of OpenAM, such as
- <filename>/path/to/OpenAM/samples/opensso-client.zip</filename>. To prepare
+ <filename>~/Downloads/opensso/samples/opensso-client.zip</filename>. To prepare
  to install the OpenAM Java SDK, first unzip
  <filename>opensso-client.zip</filename>.</para>
  
  <screen>$ mkdir -p /path/to/openam-client ; cd /path/to/openam-client
-$ unzip /path/to/OpenAM/samples/opensso-client.zip</screen>
+$ unzip ~/Downloads/opensso/samples/opensso-client.zip</screen>
 
  <para>As a result, you have two directories that include the SDK and also
  sample command-line and web-based client applications.</para>
