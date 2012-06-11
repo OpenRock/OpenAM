@@ -81,6 +81,10 @@
  
  <procedure xml:id="install-openam-admin-tools">
   <title>To Set Up Administration Tools</title>
+
+  <step>
+   <para>Make sure OpenAM is installed on the system before proceeding.</para>
+  </step>
   <step>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>
@@ -104,7 +108,8 @@ $ unzip ~/Downloads/opensso/tools/ssoAdminTools.zip
 Path to config files of OpenAM server [/home/mark/openam]:
 Debug Directory [/path/to/openam-tools/admin/debug]:
 Log Directory [/path/to/openam-tools/admin/log]:
-The scripts are properly setup under directory: /path/to/openam-tools/admin/openam
+The scripts are properly setup under directory:
+ /path/to/openam-tools/admin/openam
 Debug directory is /path/to/openam-tools/admin/debug.
 Log directory is /path/to/openam-tools/admin/log.
 The version of this tools.zip is: (2011-July-11 00:05)
