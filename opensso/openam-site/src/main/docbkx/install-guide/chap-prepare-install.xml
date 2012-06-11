@@ -93,17 +93,23 @@
    <listitem>
     <para>A supported identity repository for user identity data</para>
 
-    <para>See the <link xlink:href="release-notes#chap-before-you-install"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
-    Notes</citetitle></link> for a list. If you plan to use OpenAM for
-    evaluation or testing, definitely use the embedded LDAP server as a
-    configuration store and identity repository. ForgeRock also recommends
-    using the embedded LDAP server as the configuration store when you have
-    four or fewer instances of OpenAM in production.</para>
+    <para>For evaluation you can use the embedded OpenDJ LDAP directory server,
+    which ships as part of OpenAM and that you can install as part of the OpenAM
+    configuration process. Evaluation does not therefore require a separate user
+    data or configuration store.</para>
 
-    <para>Examples use OpenDJ as the identity repository. OpenDJ is installed
-    on <literal>openam.example.com</literal>, and listens on the following
-    ports.</para>
+    <para>When moving to put OpenAM in production use a separate user data
+    store in most cases. Also if you have more than four OpenAM servers in your
+    production deployment, then use a separate LDAP directory server for the
+    configuration store as well. See the <link
+    xlink:href="release-notes#chap-before-you-install"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+    Notes</citetitle></link> for a list of supported external stores.</para>
+
+    <para>Examples in the documentation that show a separate user data
+    repository use OpenDJ unless otherwise indicated. In such examples OpenDJ
+    is installed on <literal>openam.example.com</literal>, and listens on the
+    following ports.</para>
 
     <itemizedlist>
      <listitem><para>Port 1389 for LDAP requests and StartTLS</para></listitem>
@@ -163,9 +169,9 @@ esac
   <indexterm>
    <primary>Downloading OpenAM</primary>
   </indexterm>
-  <para>Download OpenAM releases from <link
-  xlink:href='http://forgerock.com/downloads.html'
-  >http://forgerock.com/downloads.html</link>. At the download location you
+  <para>Download OpenAM releases from <link xlink:show="new"
+  xlink:href="http://forgerock.org/openam.html"
+  >http://forgerock.org/openam.html</link>. At the download location you
   find links to stable releases, nightly builds for testing, previous
   releases, and also OpenAM policy agent releases.</para>
   
