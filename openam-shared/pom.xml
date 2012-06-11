@@ -49,6 +49,7 @@
     <!-- Build -->
     <build>
         <plugins>
+
             <!-- Surefire Tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -66,7 +67,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
                 <configuration>
                     <archive>
                         <index>true</index>
