@@ -135,13 +135,13 @@ $</screen>
   </step>
   <step>
    <para>Verify that you have properly configured the samples.</para>
-   <screen>$ sh scripts/Login.sh
-Realm (e.g. /): 
-Login module name (e.g. DataStore or LDAP): LDAP
-Login locale (e.g. en_US or fr_FR): en_US
-LDAP: Obtained login context
-User Name:bjensen
-Password:hifalutin
+   <screen>$ sh scripts/Login.sh 
+Realm (e.g. /): /
+Login module name (e.g. DataStore or LDAP): DataStore
+Login locale (e.g. en_US or fr_FR): fr_FR
+DataStore: Obtained login context
+Nom d'utilisateur?:demo
+Mot de passe?:changeit
 Login succeeded.
 Logged Out!!</screen>
   </step>
