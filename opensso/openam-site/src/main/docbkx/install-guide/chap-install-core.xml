@@ -51,9 +51,89 @@
  for instructions on installing OpenAM agents in supported web servers and
  Java EE application containers.</para>
 
-  <para>The <filename>deployable-war/opensso.war</filename> file contains all
-  OpenAM server components and samples. How you deploy the .war file depends
-  on your web application container.</para>
+ <para>The <filename>deployable-war/opensso.war</filename> file contains all
+ OpenAM server components and samples. How you deploy the .war file depends
+ on your web application container.</para>
+
+ <table xml:id="decide-how-to-install" pgwide="1">
+  <title>Deciding How To Install OpenAM</title>
+  <tgroup cols="2">
+   <thead>
+    <row>
+     <entry>If you want to...</entry>
+     <entry>Then see...</entry>
+    </row>
+   </thead>
+   <tbody>
+    <row>
+     <entry>Install quickly for evaluation using default settings</entry>
+     <entry><xref linkend="deploy-openam" /> and <xref
+     linkend="configure-openam-defaults" /></entry>
+    </row>
+    <row>
+     <entry>Install core OpenAM and the console, choosing settings</entry>
+     <entry><xref linkend="deploy-openam" /> and <xref
+     linkend="configure-openam-custom" /></entry>
+    </row>
+    <row>
+     <entry>Erase the configuration and start over</entry>
+     <entry><xref linkend="delete-config-start-over" /></entry>
+    </row>
+    <row>
+     <entry>Perform a command-line install</entry>
+     <entry><xref linkend="deploy-openam" /> and <link
+     xlink:href="install-guide#install-openam-config-tools"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+     Configuration Tools</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Upgrade OpenAM</entry>
+     <entry><link xlink:href="install-guide#chap-upgrade"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Upgrading
+     OpenAM Core Services</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Install OpenAM with no console</entry>
+     <entry><link xlink:href="install-guide#chap-install-core-only"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
+     OpenAM Core Only</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Install <command>ssoadm</command> and other tools</entry>
+     <entry><link xlink:href="install-guide#chap-install-tools"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
+     OpenAM Tools</citetitle></link>, or <link
+     xlink:href="admin-guide#openam-ssoadm-jsp-overview"
+     xlink:role="http://docbook.org/xlink/role/olink">OpenAM ssoadm.jsp</link>
+     in the <citetitle>Administration Guide</citetitle></entry>
+    </row>
+    <row>
+     <entry>Install OpenAM in your DMZ</entry>
+     <entry><link xlink:href="install-guide#chap-install-das"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
+     OpenAM Distributed Authentication</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Skin OpenAM for your organization</entry>
+     <entry><link xlink:href="install-guide#chap-custom-ui"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing
+     the OpenAM End User Pages</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Set up high availability in a site configuration</entry>
+     <entry><link xlink:href="install-guide#chap-session-failover"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Setting Up
+     OpenAM Session Failover</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Uninstall OpenAM</entry>
+     <entry><link xlink:href="install-guide#chap-uninstall"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Removing
+     OpenAM Software</citetitle></link></entry>
+    </row>
+   </tbody>
+  </tgroup>
+ </table>
 
  <procedure xml:id="deploy-openam">
    <title>To Deploy OpenAM</title>
@@ -89,7 +169,7 @@
  </procedure>
 
  <procedure xml:id="configure-openam-defaults">
-  <title>To Configure OpenAM With Defaults (For Testing)</title>
+  <title>To Configure OpenAM With Defaults (For Evaluation)</title>
   <para>The default configuration option will basically configure the
   embedded OpenDJ instance on default ports (if the ports are already in use,
   OpenAM will look for a free port) as both configuration store and identity
