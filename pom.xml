@@ -70,8 +70,6 @@
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Artifact Signing Properties -->
-        <gpg.skip.signing>true</gpg.skip.signing> <!-- For now we skip Signing -->
     </properties>
 
     <!-- Child Modules -->
@@ -1001,7 +999,7 @@
                 <inherited>true</inherited>
                 <configuration>
                     <!-- All Sources -->
-                    <includePom>true</includePom>
+                    <includePom>false</includePom>  <!-- Do not include POMs in Source artifacts -->
                     <excludeResources>false</excludeResources>
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <useDefaultManifestFile>true</useDefaultManifestFile>
@@ -1018,24 +1016,30 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
+                <groupId>net.ju-n.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <version>1.0.1</version>
                 <executions>
                     <execution>
-                        <id>sign-artifacts</id>
+                        <id>generate-checksum</id>
                         <phase>verify</phase>
                         <goals>
-                            <goal>sign</goal>
+                            <goal>artifacts</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <skip>${gpg.skip.signing}</skip>
-                    <!-- TODO needs to be addressed for proper Signing -->
-                    <defaultKeyring>false</defaultKeyring>
-                    <passphrase>OpenAM_ForgeRock_2012</passphrase>
-                    <secretKeyring>OpenAM</secretKeyring>
-                    <keyname>OpenAM</keyname>
+                    <!-- Specified as false if a Project has no artifacts such as a parent pom. -->
+                    <failOnError>false</failOnError>
+                    <csvSummary>true</csvSummary>
+                    <csvSummaryFile>OpenAM-artifact-${project.build.finalName}-checksums.csv</csvSummaryFile>
+                    <xmlSummary>true</xmlSummary>
+                    <xmlSummaryFile>OpenAM-artifact-${project.build.finalName}-checksums.xml</xmlSummaryFile>
+                    <algorithms>
+                        <algorithm>SHA</algorithm>
+                    </algorithms>
+                    <individualFiles>true</individualFiles>
+                    <quiet>true</quiet>
                 </configuration>
             </plugin>
 
@@ -1143,9 +1147,9 @@
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.4</version>
+                    <groupId>net.ju-n.maven.plugins</groupId>
+                    <artifactId>checksum-maven-plugin</artifactId>
+                    <version>1.0.1</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
@@ -1212,25 +1216,6 @@
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.axis2.maven2</groupId>
-                    <artifactId>axis2-maven-tools</artifactId>
-                    <version>1.4.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-java2wsdl-maven-plugin</artifactId>
-                    <version>1.4.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-mar-maven-plugin</artifactId>
-                    <version>1.41</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <includeDependencies>false</includeDependencies>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.0</version>
@@ -1249,11 +1234,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>javancss-maven-plugin</artifactId>
                     <version>2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.gmaven</groupId>
-                    <artifactId>gmaven-plugin</artifactId>
-                    <version>1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
