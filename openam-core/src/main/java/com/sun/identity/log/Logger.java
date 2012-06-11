@@ -439,7 +439,7 @@ public class Logger extends java.util.logging.Logger {
      */
     public static synchronized java.util.logging.Logger getLogger(String name)
     {
-        if ((name == null) || (name.length() == 0) || name.indexOf("..") >= 0)
+        if ((name == null) || (name.length() == 0) || name.indexOf("target/generated-sources") >= 0)
         {
             /* Do not allow logging if logName has "..". */
             return null;
@@ -509,7 +509,7 @@ public class Logger extends java.util.logging.Logger {
     public static synchronized java.util.logging.Logger getLogger(
         String name, String rbName)
     {
-        if ((name == null) || (name.length() == 0) || name.indexOf("..") >= 0) {
+        if ((name == null) || (name.length() == 0) || name.indexOf("target/generated-sources") >= 0) {
             /* Do not allow logging if logName has "..". */
             return null;
         }

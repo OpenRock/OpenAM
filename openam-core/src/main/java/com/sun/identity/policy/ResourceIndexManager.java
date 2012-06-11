@@ -29,7 +29,7 @@
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
  */
-package  com.sun.identity.policy;
+package com.sun.identity.policy;
 
 import java.util.Set;
 import java.util.HashSet;

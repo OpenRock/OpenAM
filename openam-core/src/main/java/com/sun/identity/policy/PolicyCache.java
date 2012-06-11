@@ -366,14 +366,14 @@ public class PolicyCache implements ServiceListener {
         if ( serviceComponent.startsWith(POLICIES_COMPONENT)) {
             String cacheKey = buildCacheKey(serviceName, version,
                     orgName, groupName, serviceComponent);
-            if ( changeType == ServiceListener.ADDED) { // 1
+            if ( changeType == ADDED) { // 1
                 if ( DEBUG.messageEnabled() ) {
                     DEBUG.message ("SMS Notification- policy added -"
                             + "Refreshing policy for cacheKey=" 
                             + cacheKey);
                 }
                 newPolicy = refreshPolicy(cacheKey);
-            } else if ( changeType == ServiceListener.REMOVED ) { // 2
+            } else if ( changeType == REMOVED) { // 2
                 if ( DEBUG.messageEnabled() ) {
                     DEBUG.message ("SMS Notification- policy removed -"
                             + " cacheKey=" 
@@ -381,7 +381,7 @@ public class PolicyCache implements ServiceListener {
                 }
                 oldPolicy=  (Policy) policies.get(cacheKey);
                 policies.put(cacheKey,  null);
-            } else if ( changeType == ServiceListener.MODIFIED ) { // 4
+            } else if ( changeType == MODIFIED) { // 4
                 oldPolicy=  (Policy) policies.get(cacheKey);
                 if ( DEBUG.messageEnabled() ) {
                     DEBUG.message ("SMS Notification- policy modified -"

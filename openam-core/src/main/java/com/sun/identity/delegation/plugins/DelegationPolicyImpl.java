@@ -1057,7 +1057,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
                "DelegationPolicyImpl: org config changed: " + orgName);
         }
         synchronized(idRepoListeners) {
-            if (type == ServiceListener.ADDED) {
+            if (type == ADDED) {
                 if (idRepoListeners.get(orgName) == null) {
                     try {
                         AMIdentityRepository idRepo = 
@@ -1075,7 +1075,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
                         "organization config changes. ", e); 
                     }
                 }
-            } else if (type == ServiceListener.REMOVED) {
+            } else if (type == REMOVED) {
                 idRepoListeners.remove(orgName);
                 if (DelegationManager.debug.messageEnabled()) {
                     DelegationManager.debug.message(
