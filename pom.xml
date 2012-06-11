@@ -895,7 +895,26 @@
     <build>
     
         <plugins>
-            
+
+            <plugin>
+                <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+                <artifactId>maven-svn-revision-number-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <entries>
+                            <entry>
+                                <prefix>svn-revision</prefix>
+                            </entry>
+                        </entries>
+                    </configuration>
+            </plugin>
+
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1032,9 +1051,9 @@
                     <!-- Specified as false if a Project has no artifacts such as a parent pom. -->
                     <failOnError>false</failOnError>
                     <csvSummary>true</csvSummary>
-                    <csvSummaryFile>OpenAM-artifact-${project.build.finalName}-checksums.csv</csvSummaryFile>
+                    <csvSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.csv</csvSummaryFile>
                     <xmlSummary>true</xmlSummary>
-                    <xmlSummaryFile>OpenAM-artifact-${project.build.finalName}-checksums.xml</xmlSummaryFile>
+                    <xmlSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.xml</xmlSummaryFile>
                     <algorithms>
                         <algorithm>SHA</algorithm>
                     </algorithms>
@@ -1120,7 +1139,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>1.7</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
@@ -1150,6 +1169,12 @@
                     <groupId>net.ju-n.maven.plugins</groupId>
                     <artifactId>checksum-maven-plugin</artifactId>
                     <version>1.0.1</version>
+                    <inherited>true</inherited>
+                </plugin>
+                <plugin>
+                    <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+                    <artifactId>maven-svn-revision-number-plugin</artifactId>
+                    <version>1.7</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
