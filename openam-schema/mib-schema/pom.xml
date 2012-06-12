@@ -57,8 +57,8 @@
                 <version>1.7</version>
                 <executions>
                     <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
+                        <id>generate-mib-source</id>
+                        <phase>validate</phase>
                         <configuration>
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
@@ -66,7 +66,7 @@
                                 <mkdir dir="target/mib-generated-sources" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true"
                                       classpath="${compile_classpath}">
-                                    <arg line="-X:use-display-hint -d &quot;target/mib&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
+                                    <arg line="-X:use-display-hint -d &quot;target/mib-generated-sources&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
                                 </java>
 
                             </target>
@@ -79,14 +79,13 @@
             </plugin>
 
             <plugin>
-                <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>${java.source.version}</source>
                     <target>${java.target.version}</target>
                     <encoding>UTF-8</encoding>
-                    <generatedSourcesDirectory>target/mib-generated-sources</generatedSourcesDirectory>
+                    <source>target/mib-generated-sources</source>
                 </configuration>
             </plugin>
 
