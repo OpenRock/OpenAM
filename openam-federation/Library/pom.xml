@@ -142,11 +142,15 @@
         	<artifactId>xacml3-schema</artifactId>
         	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
+
+        <!--
 		<dependency>
 			<groupId>org.forgerock</groupId>
      		<artifactId>saml2-schema</artifactId>
-			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+			<version>10.1.0-SNAPSHOT</version>
       	</dependency>
+        -->
+
       	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>wsfederation-schema</artifactId>
@@ -157,11 +161,13 @@
 			<artifactId>liberty-schema</artifactId>
 			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
+        <!--
 		<dependency>
 			<groupId>org.forgerock</groupId>
      		<artifactId>openam-core</artifactId>
-			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+			<version>10.1.0-SNAPSHOT</version>
       	</dependency>
+        -->
    		<dependency>
 			<groupId>org.forgerock</groupId>
 			<artifactId>openam-extlib</artifactId>

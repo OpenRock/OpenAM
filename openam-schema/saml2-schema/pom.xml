@@ -158,11 +158,39 @@
     
     <dependencies>
     	<dependency>
-	   	<groupId>org.forgerock</groupId>
+	   	    <groupId>org.forgerock</groupId>
         	<artifactId>openam-shared</artifactId>
         	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
         </dependency>
-    
+
+        <!--
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>Library</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        -->
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+        </dependency>
+
     </dependencies>
     
 </project>

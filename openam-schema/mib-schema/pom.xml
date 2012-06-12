@@ -50,7 +50,12 @@
     <build>
         <plugins>
 
-            <!-- Generate MIB Source Files to prepare for Compliation -->
+            <!-- Generate MIB Source Files to prepare for Compilation -->
+
+            <!-- ForgeRock US ~ Jeff.Schenk@ forgerock.com
+                 For some reason generated-sourced is not being used by the compiler!
+                 so to fix, the hack is to generate into the src/main/java tree.
+                 Very Bad, perhaps a maven bug, still unsure, but working with this pattern for now. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -58,17 +63,22 @@
                 <executions>
                     <execution>
                         <id>generate-mib-source</id>
-                        <phase>validate</phase>
+                        <phase>generate-sources</phase>
                         <configuration>
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
                                 <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
-                                <mkdir dir="target/mib-generated-sources" />
+                                <echo message="Removing Existing Generated Source."/>
+
+                                <delete includeEmptyDirs="true">
+                                    <fileset dir="src/main/java"/>
+                                </delete>
+
+                                <mkdir dir="src/main/java/com/sun/identity/monitoring" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true"
                                       classpath="${compile_classpath}">
-                                    <arg line="-X:use-display-hint -d &quot;target/mib-generated-sources&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
+                                    <arg line="-X:use-display-hint -d &quot;src/main/java/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
                                 </java>
-
                             </target>
                         </configuration>
                         <goals>
@@ -76,17 +86,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.source.version}</source>
-                    <target>${java.target.version}</target>
-                    <encoding>UTF-8</encoding>
-                    <source>target/mib-generated-sources</source>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -120,38 +119,9 @@
             </plugin>
 
         </plugins>
-    
-        <resources>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>version_information.txt</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version_information.txt</include>
-                </includes>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
+
     </build>
 
-    
     <dependencies>
     	<dependency>
 	   	<groupId>org.forgerock</groupId>
@@ -162,7 +132,14 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>jdmktk</artifactId>
+            <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>jdmkrt</artifactId>
+        </dependency>
+
     </dependencies>
     
 </project>

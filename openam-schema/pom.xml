@@ -48,11 +48,11 @@
 
     <!-- Child Modules -->
     <modules>
+        <module>mib-schema</module>
         <module>xacml3-schema</module>
         <module>saml2-schema</module>
         <module>wsfederation-schema</module>
         <module>liberty-schema</module>
-        <module>mib-schema</module>
     </modules>
     
     <dependencies>
