@@ -157,7 +157,12 @@
 			<artifactId>liberty-schema</artifactId>
 			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
-    
+
+        <dependency>
+            <groupId>com.iplanet.jato</groupId>
+            <artifactId>jato</artifactId>
+        </dependency>
+
     <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
     		<dependency>
 				<groupId>asm</groupId>
