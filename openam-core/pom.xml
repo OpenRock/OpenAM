@@ -163,6 +163,11 @@
             <artifactId>jato</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc</artifactId>
+        </dependency>
+
     <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
     		<dependency>
 				<groupId>asm</groupId>
