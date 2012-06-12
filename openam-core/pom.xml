@@ -49,6 +49,9 @@
     <!-- Build -->
     <build>
         <plugins>
+
+            <!-- JAXB Generation for Diagnostic -->
+
             <!-- Surefire Tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

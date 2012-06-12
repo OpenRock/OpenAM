@@ -1115,9 +1115,8 @@
                 <executions>
                     <execution>
                        <id>attach-javadoc</id>
-                        <phase>verify</phase>
+                        <phase>site</phase>
                         <goals>
-                            <!-- <goal>aggregate</goal>  -->
                             <goal>jar</goal>
                         </goals>
                     </execution>
@@ -1138,7 +1137,7 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <phase>verify</phase>
+                        <phase>site</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
