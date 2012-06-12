@@ -189,6 +189,11 @@
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.java.dev.msv.datatype.xsd</groupId>
+            <artifactId>xsdlib</artifactId>
+        </dependency>
+
     </dependencies>
     
 </project>

@@ -90,7 +90,7 @@
         <module>openam-core</module>
         <module>openam-federation</module>
         <module>openam-server</module>
-        <module>openam-extlib</module>
+        <!-- <module>openam-extlib</module -->
         <!-- OpenAM Build out extlib for subsequent Legacy antRun -->
         <!-- OpenAM Legacy Ant Wrapper -->
         <module>openam</module>
