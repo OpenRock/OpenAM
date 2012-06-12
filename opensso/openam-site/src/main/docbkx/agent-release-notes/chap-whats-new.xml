@@ -39,6 +39,13 @@
 
   <itemizedlist>
    <listitem>
+    <para>TODO: For new, see JIRA for a complete list</para>
+   </listitem>
+   <listitem>
+    <para>Policy agents now support IPv6 for notenforced IP addresses
+    (OPENAM-1256).</para>
+   </listitem>
+   <listitem>
     <para>Policy agents now let you preserve POST data when working with
     URI-based load balancing (OPENAM-980).</para>
    </listitem>
