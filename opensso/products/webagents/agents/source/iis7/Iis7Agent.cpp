@@ -387,570 +387,561 @@ static void send_error(IHttpContext* pHttpContext) {
         am_web_log_error("send_error(): WriteEntityChunks failed.");
     }
 }
+
 /*
-*This function gets invoked at every request by OnBeginRequest.
-*
-* */
-REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext, 
-										   IHttpEventProvider* pProvider)
-{
-	const char* thisfunc = "ProcessRequest";
-	am_status_t status = AM_SUCCESS;
-	am_status_t status_tmp = AM_SUCCESS;
-	REQUEST_NOTIFICATION_STATUS retStatus = RQ_NOTIFICATION_CONTINUE;
-	string requestURL;
-	string origRequestURL;
-	string pathInfo;
-	PCSTR reqMethod = NULL;
-	char* requestMethod = NULL;
-	DWORD requestMethodSize = 0;
-	CHAR* orig_req_method = NULL;
-	CHAR* dpro_cookie = NULL;
-	BOOL isLocalAlloc = FALSE;    
-	BOOL redirectRequest = FALSE;
-	CHAR* post_page = NULL;
-	CHAR *set_cookies_list = NULL;
-	CHAR *set_headers_list = NULL;
-	CHAR *request_hdrs = NULL;
-	const char *clientIP_hdr_name = NULL;
-	const char *clientHostname_hdr_name = NULL;
-	PCSTR clientIP_hdr = NULL;
-	PCSTR clientHostname_hdr = NULL;
-	char *clientIP = NULL;
-	BOOL isClientIPLocalAlloc = TRUE;
-	char *clientHostname = NULL;
-	char* logout_url = NULL;
-	CHAR *tmpPecb = NULL;
-	am_map_t env_parameter_map = NULL;
-	tOphResources OphResources = RESOURCE_INITIALIZER;
-	tOphResources* pOphResources = &OphResources;
-	void *args[] = {(void *) tmpPecb, (void *) &set_headers_list,
-		(void *) &set_cookies_list, (void *) &request_hdrs };
-	void *agent_config=NULL;
-	string response = "";
+ *This function gets invoked at every request by OnBeginRequest.
+ *
+ * */
+REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext, IHttpEventProvider* pProvider) {
+    const char* thisfunc = "ProcessRequest";
+    am_status_t status = AM_SUCCESS;
+    am_status_t status_tmp = AM_SUCCESS;
+    REQUEST_NOTIFICATION_STATUS retStatus = RQ_NOTIFICATION_CONTINUE;
+    string requestURL;
+    string origRequestURL;
+    string pathInfo;
+    PCSTR reqMethod = NULL;
+    char* requestMethod = NULL;
+    DWORD requestMethodSize = 0;
+    CHAR* orig_req_method = NULL;
+    CHAR* dpro_cookie = NULL;
+    BOOL isLocalAlloc = FALSE;
+    BOOL redirectRequest = FALSE;
+    CHAR* post_page = NULL;
+    CHAR *set_cookies_list = NULL;
+    CHAR *set_headers_list = NULL;
+    CHAR *request_hdrs = NULL;
+    const char *clientIP_hdr_name = NULL;
+    const char *clientHostname_hdr_name = NULL;
+    PCSTR clientIP_hdr = NULL;
+    PCSTR clientHostname_hdr = NULL;
+    char *clientIP = NULL;
+    BOOL isClientIPLocalAlloc = TRUE;
+    char *clientHostname = NULL;
+    char* logout_url = NULL;
+    CHAR *tmpPecb = NULL;
+    am_map_t env_parameter_map = NULL;
+    tOphResources OphResources = RESOURCE_INITIALIZER;
+    tOphResources* pOphResources = &OphResources;
+    void *args[] = {(void *) tmpPecb, (void *) &set_headers_list,
+        (void *) &set_cookies_list, (void *) &request_hdrs};
+    void *agent_config = NULL;
+    string response = "";
 
 
-	IHttpRequest* req = pHttpContext->GetRequest();
-	IHttpResponse* res = pHttpContext->GetResponse();
+    IHttpRequest* req = pHttpContext->GetRequest();
+    IHttpResponse* res = pHttpContext->GetResponse();
 
-	am_web_log_debug("ProcessRequest -- Starting");
+    am_web_log_debug("ProcessRequest -- Starting");
 
-	if (readAgentConfigFile == FALSE) {
-            EnterCriticalSection(&initLock);
-            if (readAgentConfigFile == FALSE) {
-                if (loadAgentPropertyFile(pHttpContext) == FALSE) {
-                    am_web_log_error("%s: Agent bootstrap failed.", thisfunc);
-                    do_deny(pHttpContext);
-                    retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-                    LeaveCriticalSection(&initLock);
-                    return retStatus;
-                }
-                readAgentConfigFile = TRUE;
+    if (readAgentConfigFile == FALSE) {
+        EnterCriticalSection(&initLock);
+        if (readAgentConfigFile == FALSE) {
+            if (loadAgentPropertyFile(pHttpContext) == FALSE) {
+                am_web_log_error("%s: Agent bootstrap failed.", thisfunc);
+                do_deny(pHttpContext);
+                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                LeaveCriticalSection(&initLock);
+                return retStatus;
             }
-            LeaveCriticalSection(&initLock);
+            readAgentConfigFile = TRUE;
         }
-	// Initialize agent
-	if(agentInitialized != B_TRUE){
-		EnterCriticalSection(&initLock);
-		if(agentInitialized != B_TRUE){
-			am_web_log_debug("%s: Will call init", thisfunc);
-			init_at_request(); 
-			if(agentInitialized != B_TRUE){
-				am_web_log_error("%s: Agent intialization failed.", thisfunc);
-				do_deny(pHttpContext);
-				retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-				LeaveCriticalSection(&initLock);
-				return retStatus;
-			}  else {
-				am_web_log_debug("ProcessRequest: Agent intialized");
-			}
-		}
-		LeaveCriticalSection(&initLock);
-	}
-	agent_config = am_web_get_agent_configuration();
-	if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE)){
-		isCdssoEnabled = TRUE;
-	}
-
-        res->DisableKernelCache(9);
-
-	// Get the request url
-	status = get_request_url(pHttpContext, requestURL, origRequestURL,
-		pathInfo, agent_config);
-	// Handle notification
-	if ((status == AM_SUCCESS) &&
-		(B_TRUE == am_web_is_notification(origRequestURL.c_str(), 
-		agent_config)))
-	{ 
-		string data="";
-		GetEntity(pHttpContext, data);
-		am_web_handle_notification(data.c_str(), data.size(), agent_config);
-		OphResourcesFree(pOphResources);
-		send_ok(pHttpContext);
-		retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-		am_web_delete_agent_configuration(agent_config);
-		return retStatus;
-	}
-	// Get the request method
-	if (status == AM_SUCCESS) {
-		status = GetVariable(pHttpContext,"REQUEST_METHOD", &reqMethod,
-			&requestMethodSize, TRUE);
-	}
-	if (status == AM_SUCCESS) {
-		if(requestMethodSize > 0) {
-			requestMethod = (char*)malloc(requestMethodSize + 1);
-			if (requestMethod != NULL) {
-				memset(requestMethod, 0, requestMethodSize+1);
-				strncpy(requestMethod, (char*)reqMethod, requestMethodSize);
-				am_web_log_debug("%s: requestMethod = %s", 
-					thisfunc, requestMethod);
-			} else {
-				am_web_log_error("%s: Not enough memory to ", 
-					"allocate orig_req_method.", thisfunc);
-				status = AM_NO_MEMORY;
-			}
-		}
-	}
-	// Get the HTTP_COOKIE header
-	if (status == AM_SUCCESS) {
-		status = GetVariable(pHttpContext,"HTTP_COOKIE", 
-			&pOphResources->cookies, &pOphResources->cbCookies, FALSE);
-	}
-	// Check for SSO Token in Http Cookie
-	if (status == AM_SUCCESS) {
-		if (pOphResources->cbCookies > 0) {
-			char *cookieValue = NULL;
-			int length = 0;
-			int i = 0;
-			const char *cookieName = am_web_get_cookie_name(agent_config);
-			// Look for the iPlanetDirectoryPro cookie
-			if (cookieName != NULL) {
-				cookieValue = strstr((char *)(pOphResources->cookies), cookieName);
-				while (cookieValue) {
-					char *marker = strstr(cookieValue+1, cookieName);
-					if (marker) {
-						cookieValue = marker;
-					} else {
-						break;
-					}
-				}
-				if (cookieValue != NULL) {
-					cookieValue = strchr(cookieValue ,'=');
-				}
-				if (cookieValue != NULL) {
-					cookieValue = &cookieValue[1]; // 1 vs 0 skips over '='
-					// find the end of the cookie
-					length = 0;
-					for (i=0;(cookieValue[i] != ';') &&
-						(cookieValue[i] != '\0'); i++) {
-							length++;
-					}
-					if (length < URL_SIZE_MAX-1) {
-						if (length > 0) {
-							dpro_cookie = (CHAR *) malloc(length+1);
-							if (dpro_cookie != NULL) {
-								strncpy(dpro_cookie, cookieValue, length);
-								dpro_cookie[length] = '\0';
-								isLocalAlloc = TRUE;
-								am_web_log_debug("%s: SSO token found in "
-									" cookie header.", thisfunc);
-							} 
-							else {
-								am_web_log_error("%s: Unable to allocate memory"
-									" for cookie, size = %u", thisfunc, length);
-								status = AM_NO_MEMORY;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if (status == AM_SUCCESS) {
-		if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
-			status = check_for_post_data(pHttpContext, (char *)requestURL.c_str(), &post_page,
-				agent_config);
-		}
-	}
-
-	// Create the environment map
-	if (status == AM_SUCCESS) {
-		status = am_map_create(&env_parameter_map);
-	}
-	// If there is a proxy in front of the agent, the user can set in the
-	// properties file the name of the headers that the proxy uses to set
-	// the real client IP and host name. In that case the agent needs
-	// to use the value of these headers to process the request
-	//
-	// Get the client IP address header set by the proxy, if there is one
-
-	if (status == AM_SUCCESS) {
-		clientIP_hdr_name = (PCSTR) am_web_get_client_ip_header_name(agent_config);
-		if (clientIP_hdr_name != NULL) {
-			status = GetVariable(pHttpContext,clientIP_hdr_name, 
-				&clientIP_hdr, NULL, FALSE);
-		}
-	}
-	// Get the client host name header set by the proxy, if there is one
-	if (status == AM_SUCCESS) {
-		clientHostname_hdr_name = 
-			(PCSTR) am_web_get_client_hostname_header_name(agent_config);
-		if (clientHostname_hdr_name != NULL) {
-			status = GetVariable(pHttpContext,clientHostname_hdr_name, 
-				&clientHostname_hdr, NULL, FALSE);
-
-		}
-	}
-	// If the client IP and host name headers contain more than one
-	// value, take the first value.
-	if (status == AM_SUCCESS) {
-		if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
-			status = am_web_get_client_ip_host((char *) clientIP_hdr,
-				(char *) clientHostname_hdr,
-				&clientIP, &clientHostname);
-		}
-	}
-	// Set the IP address and host name in the environment map
-	if ((status == AM_SUCCESS) && (clientIP != NULL)) {
-		isClientIPLocalAlloc = FALSE;
-		status = am_web_set_host_ip_in_env_map(clientIP, clientHostname,
-			env_parameter_map, agent_config);
-	}
-	// If the client IP was not obtained previously,
-	// get it from the REMOTE_ADDR header.
-	if ((status == AM_SUCCESS) && (clientIP == NULL)) {
-		PCSTR tmpClientIP = NULL;
-		DWORD tmpClientIPLength = 0;
-		status = GetVariable(pHttpContext,"REMOTE_ADDR", 
-			&tmpClientIP, &tmpClientIPLength, FALSE);
-		isClientIPLocalAlloc = TRUE;
-		clientIP = (char*)malloc(tmpClientIPLength + 1);
-		memset(clientIP, 0, tmpClientIPLength + 1);
-		strncpy(clientIP, (char*)tmpClientIP, tmpClientIPLength);
-	}
-
-	//  process post data in CDSSO
-	if (status == AM_SUCCESS) 
-	{
-		//In CDSSO mode, check if the sso token is in the post data
-		if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) && 
-			(strcmp(requestMethod, REQUEST_METHOD_POST) == 0)) 
-		{
-			if (dpro_cookie == NULL && (post_page != NULL ||
-				am_web_is_url_enforced(requestURL.c_str(), pathInfo.c_str(), 
-				clientIP, agent_config) == B_TRUE))
-			{
-				GetEntity(pHttpContext, response);
-				if (status == AM_SUCCESS) {
-					//Set original method to GET
-					orig_req_method = strdup(REQUEST_METHOD_GET);
-					if (orig_req_method != NULL) {
-						am_web_log_debug("%s: Request method set to GET.", 
-							thisfunc);
-					} else {
-						am_web_log_error("%s: Not enough memory to ", 
-							"allocate orig_req_method.", thisfunc);
-						status = AM_NO_MEMORY;
-					}
-					if (status == AM_SUCCESS) {
-						pHttpContext->GetRequest()->SetHttpMethod(orig_req_method);
-						if(dpro_cookie != NULL) {
-							free(dpro_cookie);
-							dpro_cookie = NULL;
-						}
-						char* req_url= new char [requestURL.size()+1];
-						strcpy(req_url,requestURL.c_str());
-						status = am_web_check_cookie_in_post(args, &dpro_cookie, 
-							&req_url, &orig_req_method, requestMethod,
-							(char*)response.c_str(), B_FALSE, set_cookie, 
-							set_method, agent_config);
-						if (status == AM_SUCCESS) {
-                                                    requestURL = req_url;
-                                                    isLocalAlloc = FALSE;
-                                                    am_web_log_debug("%s: SSO token found in assertion.", thisfunc);
-                                                    redirectRequest = TRUE;
-                                                } else if (status == AM_NO_MEMORY) {
-                                                    am_web_log_debug("%s: Error locating SSO token in assertion. Responding with an error page.", thisfunc);
-                                                    status = AM_FAILURE;
-						} else {
-                                                    am_web_log_debug("%s: SSO token not found in assertion. Redirecting to login page.", thisfunc);
-                                                    status = AM_INVALID_SESSION;
-						}
-						if(req_url != NULL) {
-							delete [] req_url;
-							req_url = NULL;
-						}
-					}
-				}
-			}
-		}
-	}
-	// Check if the user is authorized to access the resource.
-	if (status == AM_SUCCESS) {
-		status = am_web_is_access_allowed(dpro_cookie, requestURL.c_str(),
-			pathInfo.c_str(), requestMethod,
-			clientIP,
-			env_parameter_map,
-			&OphResources.result,
-			agent_config);
-		am_web_log_debug("%s: status after "
-			"am_web_is_access_allowed = %s (%d)",thisfunc,
-			am_status_to_string(status), status);
-		am_map_destroy(env_parameter_map);
-	}
-        /* avoid caching of any unauthenticated response */
-        if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && status != AM_SUCCESS) {
-            res->SetHeader("Cache-Control", "no-store", (USHORT)strlen("no-store"), TRUE);
-            res->SetHeader("Cache-Control", "no-cache", (USHORT)strlen("no-cache"), TRUE);
-            res->SetHeader("Pragma", "no-cache", (USHORT)strlen("no-cache"), TRUE);
-            res->SetHeader("Expires", "0", (USHORT)strlen("0"), TRUE);
+        LeaveCriticalSection(&initLock);
+    }
+    // Initialize agent
+    if (agentInitialized != B_TRUE) {
+        EnterCriticalSection(&initLock);
+        if (agentInitialized != B_TRUE) {
+            am_web_log_debug("%s: Will call init", thisfunc);
+            init_at_request();
+            if (agentInitialized != B_TRUE) {
+                am_web_log_error("%s: Agent intialization failed.", thisfunc);
+                do_deny(pHttpContext);
+                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+                LeaveCriticalSection(&initLock);
+                return retStatus;
+            } else {
+                am_web_log_debug("ProcessRequest: Agent intialized");
+            }
         }
-	//  Check for status and proceed accordingly
-	switch(status) {
-		case AM_SUCCESS:
-			if (am_web_is_logout_url(requestURL.c_str(), agent_config) 
-				== B_TRUE)
-			{
-				(void)am_web_logout_cookies_reset(reset_cookie, args, 
-					agent_config);
-			}
-			status = am_web_result_attr_map_set(&OphResources.result,
-				set_header, set_cookie_in_response,
-				set_header_attr_as_cookie,
-				get_cookie_sync, args, agent_config);
-			if (status == AM_SUCCESS) {
-				if ((set_headers_list != NULL) || (set_cookies_list != NULL) 
-					|| (redirectRequest == TRUE)) {
-						status = set_request_headers(pHttpContext, args);
-				}
-			}
-			if (status == AM_SUCCESS) {
-				if (post_page != NULL) {
-					char *lbCookieHeader = NULL;
-					// If post_ page is not null it means that the request 
-					// contains the "/dummypost/sunpostpreserve" string and
-					// that the post data of the original request need to be
-					// posted.
-					// If using a LB cookie, it needs to be set to NULL there.
-					// If am_web_get_postdata_preserve_lbcookie() returns
-					// AM_INVALID_ARGUMENT, it means that the sticky session
-					// feature is disabled (ie no LB) or that the sticky
-					// session mode is URL.
-					status_tmp = am_web_get_postdata_preserve_lbcookie(
-						&lbCookieHeader, B_TRUE,
-						agent_config);
-					if (status_tmp == AM_NO_MEMORY) {
-						retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-					} else {
-						if (status_tmp == AM_SUCCESS) {
-							am_web_log_debug("%s: Setting LB cookie for "
-								"post data preservation to null.",
-								thisfunc);
-							set_cookie(lbCookieHeader, args);
-						}
-						retStatus = send_post_data(pHttpContext, post_page,
-							set_cookies_list);
-					}
-					if (lbCookieHeader != NULL) {
-						am_web_free_memory(lbCookieHeader);
-						lbCookieHeader = NULL;
-					}
-				} else { 
-					if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) {
-						//this call sets only cookies
-						set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
-					}
-					//now set remote user
-					if (pOphResources->result.remote_user != NULL) {
-						const char * ruser = pOphResources->result.remote_user;
-						wchar_t *remoteUser = (wchar_t *)pHttpContext->
-							AllocateRequestMemory((DWORD) (strlen(ruser)+1)
-							* sizeof(wchar_t));
-						mbstowcs( remoteUser, ruser, strlen(ruser) + 1);
-						pHttpContext->SetServerVariable("REMOTE_USER", remoteUser);
-					}
-					if (redirectRequest == TRUE) {
-						am_web_log_debug("%s: Request redirected to orignal url "
-							"after return from CDC servlet",thisfunc);
+        LeaveCriticalSection(&initLock);
+    }
+    agent_config = am_web_get_agent_configuration();
+    if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE)) {
+        isCdssoEnabled = TRUE;
+    }
 
-						retStatus = redirect_to_request_url(pHttpContext,
-							requestURL.c_str(), request_hdrs);
-					} else {
-						retStatus = RQ_NOTIFICATION_CONTINUE;
-					}
-					if (set_cookies_list != NULL) {
-						free(set_cookies_list);
-						set_cookies_list = NULL;
-					}
-				}
-			}
-			break;
+    res->DisableKernelCache(9);
 
-		case AM_INVALID_SESSION:
-			am_web_log_info("%s: Invalid session.",thisfunc);
-                        // reset ldap cookies on invalid session.
-			am_web_do_cookies_reset(reset_cookie, args, agent_config);
-			// reset the CDSSO cookie 
-			if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
-				am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
-				if(cdStatus != AM_SUCCESS) {
-					am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
-				}
-			}
-			// If the post data preservation feature is enabled
-			// save the post data in the cache for post requests.
-			if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
-				&& B_TRUE == am_web_is_postpreserve_enabled(agent_config))
-			{
-				status = process_request_with_post_data_preservation
-					(pHttpContext, status, &pOphResources->result,
-					(char *)requestURL.c_str(), args, (char *)response.c_str(), agent_config);
-			} else {
-				status = do_redirect(pHttpContext, status, &OphResources.result,
-					requestURL.c_str(), requestMethod, args, agent_config);
-                                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-			}
-			{
-				HRESULT hr;
-				// Buffer to store the byte count.
-				DWORD cbSent = 0;
-				// Buffer to store if asyncronous completion is pending.
-				BOOL fCompletionExpected = false;
-				hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
-
-			}
-			break;
-
-		case AM_ACCESS_DENIED:
-			am_web_log_info("%s: Access denied to %s",thisfunc,
-				OphResources.result.remote_user ?
-				OphResources.result.remote_user : "unknown user");
-			// reset ldap and CDSSO cookies
-			if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
-                            am_web_do_cookies_reset(reset_cookie, args, agent_config);
-                            am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
-                            if(cdStatus != AM_SUCCESS) {
-                                am_web_log_error("%s: CDSSO reset cookie failed",thisfunc);
+    // Get the request url
+    status = get_request_url(pHttpContext, requestURL, origRequestURL,
+            pathInfo, agent_config);
+    // Handle notification
+    if ((status == AM_SUCCESS) &&
+            (B_TRUE == am_web_is_notification(origRequestURL.c_str(),
+            agent_config))) {
+        string data = "";
+        GetEntity(pHttpContext, data);
+        am_web_handle_notification(data.c_str(), data.size(), agent_config);
+        OphResourcesFree(pOphResources);
+        send_ok(pHttpContext);
+        retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+        am_web_delete_agent_configuration(agent_config);
+        return retStatus;
+    }
+    // Get the request method
+    if (status == AM_SUCCESS) {
+        status = GetVariable(pHttpContext, "REQUEST_METHOD", &reqMethod,
+                &requestMethodSize, TRUE);
+    }
+    if (status == AM_SUCCESS) {
+        if (requestMethodSize > 0) {
+            requestMethod = (char*) malloc(requestMethodSize + 1);
+            if (requestMethod != NULL) {
+                memset(requestMethod, 0, requestMethodSize + 1);
+                strncpy(requestMethod, (char*) reqMethod, requestMethodSize);
+                am_web_log_debug("%s: requestMethod = %s",
+                        thisfunc, requestMethod);
+            } else {
+                am_web_log_error("%s: Not enough memory to ",
+                        "allocate orig_req_method.", thisfunc);
+                status = AM_NO_MEMORY;
+            }
+        }
+    }
+    // Get the HTTP_COOKIE header
+    if (status == AM_SUCCESS) {
+        status = GetVariable(pHttpContext, "HTTP_COOKIE",
+                &pOphResources->cookies, &pOphResources->cbCookies, FALSE);
+    }
+    // Check for SSO Token in Http Cookie
+    if (status == AM_SUCCESS) {
+        if (pOphResources->cbCookies > 0) {
+            char *cookieValue = NULL;
+            int length = 0;
+            int i = 0;
+            const char *cookieName = am_web_get_cookie_name(agent_config);
+            // Look for the iPlanetDirectoryPro cookie
+            if (cookieName != NULL) {
+                cookieValue = strstr((char *) (pOphResources->cookies), cookieName);
+                while (cookieValue) {
+                    char *marker = strstr(cookieValue + 1, cookieName);
+                    if (marker) {
+                        cookieValue = marker;
+                    } else {
+                        break;
+                    }
+                }
+                if (cookieValue != NULL) {
+                    cookieValue = strchr(cookieValue, '=');
+                }
+                if (cookieValue != NULL) {
+                    cookieValue = &cookieValue[1]; // 1 vs 0 skips over '='
+                    // find the end of the cookie
+                    length = 0;
+                    for (i = 0; (cookieValue[i] != ';') &&
+                            (cookieValue[i] != '\0'); i++) {
+                        length++;
+                    }
+                    if (length < URL_SIZE_MAX - 1) {
+                        if (length > 0) {
+                            dpro_cookie = (CHAR *) malloc(length + 1);
+                            if (dpro_cookie != NULL) {
+                                strncpy(dpro_cookie, cookieValue, length);
+                                dpro_cookie[length] = '\0';
+                                isLocalAlloc = TRUE;
+                                am_web_log_debug("%s: SSO token found in "
+                                        " cookie header.", thisfunc);
+                            } else {
+                                am_web_log_error("%s: Unable to allocate memory"
+                                        " for cookie, size = %u", thisfunc, length);
+                                status = AM_NO_MEMORY;
                             }
-			}
-			// If the post data preservation feature is enabled
-			// save the post data in the cache for post requests.
-			// This needs to be done when the access has been denied
-			// in case there is a composite advice.
-			if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
-				&& B_TRUE == am_web_is_postpreserve_enabled(agent_config))
-			{
-				status = process_request_with_post_data_preservation
-					(pHttpContext, status, &pOphResources->result,
-					(char *)requestURL.c_str(), args, (char *)response.c_str(), agent_config);
-			} else {
-				status = do_redirect(pHttpContext, status, &OphResources.result,
-					requestURL.c_str(), requestMethod, 
-					args, agent_config);
-                                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-			}
-                        {
-				HRESULT hr;
-				// Buffer to store the byte count.
-				DWORD cbSent = 0;
-				// Buffer to store if asynchronous completion is pending.
-				BOOL fCompletionExpected = false;
-				hr = res->Flush(false,false,&cbSent,&fCompletionExpected);
-			}
-			break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-		case AM_INVALID_FQDN_ACCESS:
-			am_web_log_info("%s: Invalid FQDN access",thisfunc);
-			status = do_redirect(pHttpContext, status, &OphResources.result,
-				requestURL.c_str(), requestMethod, 
-				args, agent_config);
+    if (status == AM_SUCCESS) {
+        if (B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+            status = check_for_post_data(pHttpContext, (char *) requestURL.c_str(), &post_page,
+                    agent_config);
+        }
+    }
+
+    // Create the environment map
+    if (status == AM_SUCCESS) {
+        status = am_map_create(&env_parameter_map);
+    }
+    // If there is a proxy in front of the agent, the user can set in the
+    // properties file the name of the headers that the proxy uses to set
+    // the real client IP and host name. In that case the agent needs
+    // to use the value of these headers to process the request
+    //
+    // Get the client IP address header set by the proxy, if there is one
+
+    if (status == AM_SUCCESS) {
+        clientIP_hdr_name = (PCSTR) am_web_get_client_ip_header_name(agent_config);
+        if (clientIP_hdr_name != NULL) {
+            status = GetVariable(pHttpContext, clientIP_hdr_name,
+                    &clientIP_hdr, NULL, FALSE);
+        }
+    }
+    // Get the client host name header set by the proxy, if there is one
+    if (status == AM_SUCCESS) {
+        clientHostname_hdr_name =
+                (PCSTR) am_web_get_client_hostname_header_name(agent_config);
+        if (clientHostname_hdr_name != NULL) {
+            status = GetVariable(pHttpContext, clientHostname_hdr_name,
+                    &clientHostname_hdr, NULL, FALSE);
+
+        }
+    }
+    // If the client IP and host name headers contain more than one
+    // value, take the first value.
+    if (status == AM_SUCCESS) {
+        if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
+            status = am_web_get_client_ip_host((char *) clientIP_hdr,
+                    (char *) clientHostname_hdr,
+                    &clientIP, &clientHostname);
+        }
+    }
+    // Set the IP address and host name in the environment map
+    if ((status == AM_SUCCESS) && (clientIP != NULL)) {
+        isClientIPLocalAlloc = FALSE;
+        status = am_web_set_host_ip_in_env_map(clientIP, clientHostname,
+                env_parameter_map, agent_config);
+    }
+    // If the client IP was not obtained previously,
+    // get it from the REMOTE_ADDR header.
+    if ((status == AM_SUCCESS) && (clientIP == NULL)) {
+        PCSTR tmpClientIP = NULL;
+        DWORD tmpClientIPLength = 0;
+        status = GetVariable(pHttpContext, "REMOTE_ADDR",
+                &tmpClientIP, &tmpClientIPLength, FALSE);
+        isClientIPLocalAlloc = TRUE;
+        clientIP = (char*) malloc(tmpClientIPLength + 1);
+        memset(clientIP, 0, tmpClientIPLength + 1);
+        strncpy(clientIP, (char*) tmpClientIP, tmpClientIPLength);
+    }
+
+    //  process post data in CDSSO
+    if (status == AM_SUCCESS) {
+        //In CDSSO mode, check if the sso token is in the post data
+        if ((am_web_is_cdsso_enabled(agent_config) == B_TRUE) &&
+                (strcmp(requestMethod, REQUEST_METHOD_POST) == 0)) {
+            if (dpro_cookie == NULL && (post_page != NULL ||
+                    am_web_is_url_enforced(requestURL.c_str(), pathInfo.c_str(),
+                    clientIP, agent_config) == B_TRUE)) {
+                GetEntity(pHttpContext, response);
+                if (status == AM_SUCCESS) {
+                    //Set original method to GET
+                    orig_req_method = strdup(REQUEST_METHOD_GET);
+                    if (orig_req_method != NULL) {
+                        am_web_log_debug("%s: Request method set to GET.",
+                                thisfunc);
+                    } else {
+                        am_web_log_error("%s: Not enough memory to ",
+                                "allocate orig_req_method.", thisfunc);
+                        status = AM_NO_MEMORY;
+                    }
+                    if (status == AM_SUCCESS) {
+                        pHttpContext->GetRequest()->SetHttpMethod(orig_req_method);
+                        if (dpro_cookie != NULL) {
+                            free(dpro_cookie);
+                            dpro_cookie = NULL;
+                        }
+                        char* req_url = NULL;
+                        req_url = new char [requestURL.size() + 1];
+                        strcpy(req_url, requestURL.c_str());
+                        status = am_web_check_cookie_in_post(args, &dpro_cookie,
+                                &req_url, &orig_req_method, requestMethod,
+                                (char *) response.c_str(), B_FALSE, set_cookie,
+                                set_method, agent_config);
+                        if (status == AM_SUCCESS) {
+                            requestURL = req_url;
+                            isLocalAlloc = FALSE;
+                            am_web_log_debug("%s: SSO token found in assertion.", thisfunc);
+                            redirectRequest = TRUE;
+                        } else if (status == AM_NO_MEMORY) {
+                            am_web_log_debug("%s: Error locating SSO token in assertion. Responding with an error page.", thisfunc);
+                            status = AM_FAILURE;
+                        } else {
+                            am_web_log_debug("%s: SSO token not found in assertion. Redirecting to login page.", thisfunc);
+                            status = AM_INVALID_SESSION;
+                        }
+                        if (req_url != NULL) {
+                            delete [] req_url;
+                            req_url = NULL;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // Check if the user is authorized to access the resource.
+    if (status == AM_SUCCESS) {
+        status = am_web_is_access_allowed(dpro_cookie, requestURL.c_str(),
+                pathInfo.c_str(), requestMethod,
+                clientIP,
+                env_parameter_map,
+                &OphResources.result,
+                agent_config);
+        am_web_log_debug("%s: status after "
+                "am_web_is_access_allowed = %s (%d)", thisfunc,
+                am_status_to_string(status), status);
+        am_map_destroy(env_parameter_map);
+    }
+    /* avoid caching of any unauthenticated response */
+    if (am_web_is_cache_control_enabled(agent_config) == B_TRUE && status != AM_SUCCESS) {
+        res->SetHeader("Cache-Control", "no-store", (USHORT) strlen("no-store"), TRUE);
+        res->SetHeader("Cache-Control", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+        res->SetHeader("Pragma", "no-cache", (USHORT) strlen("no-cache"), TRUE);
+        res->SetHeader("Expires", "0", (USHORT) strlen("0"), TRUE);
+    }
+    //  Check for status and proceed accordingly
+    switch (status) {
+        case AM_SUCCESS:
+            if (am_web_is_logout_url(requestURL.c_str(), agent_config)
+                    == B_TRUE) {
+                (void) am_web_logout_cookies_reset(reset_cookie, args,
+                        agent_config);
+            }
+            status = am_web_result_attr_map_set(&OphResources.result,
+                    set_header, set_cookie_in_response,
+                    set_header_attr_as_cookie,
+                    get_cookie_sync, args, agent_config);
+            if (status == AM_SUCCESS) {
+                if ((set_headers_list != NULL) || (set_cookies_list != NULL)
+                        || (redirectRequest == TRUE)) {
+                    status = set_request_headers(pHttpContext, args);
+                }
+            }
+            if (status == AM_SUCCESS) {
+                if (post_page != NULL) {
+                    char *lbCookieHeader = NULL;
+                    // If post_ page is not null it means that the request 
+                    // contains the "/dummypost/sunpostpreserve" string and
+                    // that the post data of the original request need to be
+                    // posted.
+                    // If using a LB cookie, it needs to be set to NULL there.
+                    // If am_web_get_postdata_preserve_lbcookie() returns
+                    // AM_INVALID_ARGUMENT, it means that the sticky session
+                    // feature is disabled (ie no LB) or that the sticky
+                    // session mode is URL.
+                    status_tmp = am_web_get_postdata_preserve_lbcookie(
+                            &lbCookieHeader, B_TRUE,
+                            agent_config);
+                    if (status_tmp == AM_NO_MEMORY) {
                         retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-			break;
+                    } else {
+                        if (status_tmp == AM_SUCCESS) {
+                            am_web_log_debug("%s: Setting LB cookie for "
+                                    "post data preservation to null.",
+                                    thisfunc);
+                            set_cookie(lbCookieHeader, args);
+                        }
+                        retStatus = send_post_data(pHttpContext, post_page,
+                                set_cookies_list);
+                    }
+                    if (lbCookieHeader != NULL) {
+                        am_web_free_memory(lbCookieHeader);
+                        lbCookieHeader = NULL;
+                    }
+                } else {
+                    if (set_cookies_list != NULL && strlen(set_cookies_list) > 0) {
+                        //this call sets only cookies
+                        set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
+                    }
+                    //now set remote user
+                    if (pOphResources->result.remote_user != NULL) {
+                        const char * ruser = pOphResources->result.remote_user;
+                        wchar_t *remoteUser = (wchar_t *)pHttpContext->
+                                AllocateRequestMemory((DWORD) (strlen(ruser) + 1)
+                                * sizeof (wchar_t));
+                        mbstowcs(remoteUser, ruser, strlen(ruser) + 1);
+                        pHttpContext->SetServerVariable("REMOTE_USER", remoteUser);
+                    }
+                    if (redirectRequest == TRUE) {
+                        am_web_log_debug("%s: Request redirected to orignal url "
+                                "after return from CDC servlet", thisfunc);
 
-		case AM_REDIRECT_LOGOUT:
-			status = am_web_get_logout_url(&logout_url, agent_config);
-			if(status == AM_SUCCESS) {
-				if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
-					am_status_t cdStatus = 
-						am_web_do_cookie_domain_set(set_cookie, args, 
-						EMPTY_STRING, agent_config);
-					if (set_cookies_list != NULL &&
-						strlen(set_cookies_list) > 0) 
-					{
-						set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
-					}
-					if(cdStatus != AM_SUCCESS) {
-					}
-				}
-				res->Redirect(logout_url, true, false);
-                                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-			} else {
-				am_web_log_debug("%s: am_web_get_logout_url failed. ");
-				retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-			}
-			if (set_cookies_list != NULL) {
-				free(set_cookies_list);
-				set_cookies_list = NULL;
-			}
-			am_web_free_memory(logout_url);
-			break;
+                        retStatus = redirect_to_request_url(pHttpContext,
+                                requestURL.c_str(), request_hdrs);
+                    } else {
+                        retStatus = RQ_NOTIFICATION_CONTINUE;
+                    }
+                    if (set_cookies_list != NULL) {
+                        free(set_cookies_list);
+                        set_cookies_list = NULL;
+                    }
+                }
+            }
+            break;
 
-		case AM_INVALID_ARGUMENT:
-		case AM_NO_MEMORY:
-		case AM_FAILURE:
-		default:
-		    am_web_log_error("%s: status: %s (%d)", thisfunc, am_status_to_string(status), status);
-                    send_error(pHttpContext);
-                    retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
-                    break;
-	}
-       
-        if (post_page != NULL) {
-		free(post_page);
-		post_page = NULL;
-	}
-        
-	if (requestMethod != NULL) {
-		free(requestMethod);
-		requestMethod = NULL;
-	}
+        case AM_INVALID_SESSION:
+            am_web_log_info("%s: Invalid session.", thisfunc);
+            // reset ldap cookies on invalid session.
+            am_web_do_cookies_reset(reset_cookie, args, agent_config);
+            // reset the CDSSO cookie 
+            if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
+                if (cdStatus != AM_SUCCESS) {
+                    am_web_log_error("%s: CDSSO reset cookie failed", thisfunc);
+                }
+            }
+            // If the post data preservation feature is enabled
+            // save the post data in the cache for post requests.
+            if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
+                    && B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+                status = process_request_with_post_data_preservation
+                        (pHttpContext, status, &pOphResources->result,
+                        (char *) requestURL.c_str(), args, (char *) response.c_str(), agent_config);
+            } else {
+                status = do_redirect(pHttpContext, status, &OphResources.result,
+                        requestURL.c_str(), requestMethod, args, agent_config);
+                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+            }
+        {
+            HRESULT hr;
+            // Buffer to store the byte count.
+            DWORD cbSent = 0;
+            // Buffer to store if asyncronous completion is pending.
+            BOOL fCompletionExpected = false;
+            hr = res->Flush(false, false, &cbSent, &fCompletionExpected);
 
-	if (request_hdrs != NULL) {
-		free(request_hdrs);
-		request_hdrs = NULL;
-	}
+        }
+            break;
 
-	if(dpro_cookie != NULL) {
-		if(isLocalAlloc) {
-			free(dpro_cookie);
-		} else {
-			am_web_free_memory(dpro_cookie);
-		}
-		dpro_cookie = NULL;
-	}
+        case AM_ACCESS_DENIED:
+            am_web_log_info("%s: Access denied to %s", thisfunc,
+                    OphResources.result.remote_user ?
+                    OphResources.result.remote_user : "unknown user");
+            // reset ldap and CDSSO cookies
+            if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                am_web_do_cookies_reset(reset_cookie, args, agent_config);
+                am_status_t cdStatus = am_web_do_cookie_domain_set(set_cookie, args, EMPTY_STRING, agent_config);
+                if (cdStatus != AM_SUCCESS) {
+                    am_web_log_error("%s: CDSSO reset cookie failed", thisfunc);
+                }
+            }
+            // If the post data preservation feature is enabled
+            // save the post data in the cache for post requests.
+            // This needs to be done when the access has been denied
+            // in case there is a composite advice.
+            if (strcmp(requestMethod, REQUEST_METHOD_POST) == 0
+                    && B_TRUE == am_web_is_postpreserve_enabled(agent_config)) {
+                status = process_request_with_post_data_preservation
+                        (pHttpContext, status, &pOphResources->result,
+                        (char *) requestURL.c_str(), args, (char *) response.c_str(), agent_config);
+            } else {
+                status = do_redirect(pHttpContext, status, &OphResources.result,
+                        requestURL.c_str(), requestMethod,
+                        args, agent_config);
+                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+            }
+        {
+            HRESULT hr;
+            // Buffer to store the byte count.
+            DWORD cbSent = 0;
+            // Buffer to store if asynchronous completion is pending.
+            BOOL fCompletionExpected = false;
+            hr = res->Flush(false, false, &cbSent, &fCompletionExpected);
+        }
+            break;
 
-	if (orig_req_method != NULL) {
-		free(orig_req_method);
-		orig_req_method = NULL;
-	}
-	if(clientIP != NULL) {
-		if(isClientIPLocalAlloc) {
-			free(clientIP);
-		} else {
-			am_web_free_memory(clientIP);
-		}
-		clientIP = NULL;
-	}
-	if (clientHostname != NULL) {
-		am_web_free_memory(clientHostname);
-		clientHostname = NULL;
-	}
+        case AM_INVALID_FQDN_ACCESS:
+            am_web_log_info("%s: Invalid FQDN access", thisfunc);
+            status = do_redirect(pHttpContext, status, &OphResources.result,
+                    requestURL.c_str(), requestMethod,
+                    args, agent_config);
+            retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+            break;
 
-	OphResourcesFree(pOphResources);
-	am_web_delete_agent_configuration(agent_config);
+        case AM_REDIRECT_LOGOUT:
+            status = am_web_get_logout_url(&logout_url, agent_config);
+            if (status == AM_SUCCESS) {
+                if (am_web_is_cdsso_enabled(agent_config) == B_TRUE) {
+                    am_status_t cdStatus =
+                            am_web_do_cookie_domain_set(set_cookie, args,
+                            EMPTY_STRING, agent_config);
+                    if (set_cookies_list != NULL &&
+                            strlen(set_cookies_list) > 0) {
+                        set_headers_in_context(pHttpContext, set_cookies_list, FALSE);
+                    }
+                    if (cdStatus != AM_SUCCESS) {
+                    }
+                }
+                res->Redirect(logout_url, true, false);
+                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+            } else {
+                am_web_log_debug("%s: am_web_get_logout_url failed. ");
+                retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+            }
+            if (set_cookies_list != NULL) {
+                free(set_cookies_list);
+                set_cookies_list = NULL;
+            }
+            am_web_free_memory(logout_url);
+            break;
 
-	return retStatus;
+        case AM_INVALID_ARGUMENT:
+        case AM_NO_MEMORY:
+        case AM_FAILURE:
+        default:
+            am_web_log_error("%s: status: %s (%d)", thisfunc, am_status_to_string(status), status);
+            send_error(pHttpContext);
+            retStatus = RQ_NOTIFICATION_FINISH_REQUEST;
+            break;
+    }
+
+    if (post_page != NULL) {
+        free(post_page);
+        post_page = NULL;
+    }
+
+    if (requestMethod != NULL) {
+        free(requestMethod);
+        requestMethod = NULL;
+    }
+
+    if (request_hdrs != NULL) {
+        free(request_hdrs);
+        request_hdrs = NULL;
+    }
+
+    if (dpro_cookie != NULL) {
+        if (isLocalAlloc) {
+            free(dpro_cookie);
+        } else {
+            am_web_free_memory(dpro_cookie);
+        }
+        dpro_cookie = NULL;
+    }
+
+    if (orig_req_method != NULL) {
+        free(orig_req_method);
+        orig_req_method = NULL;
+    }
+    if (clientIP != NULL) {
+        if (isClientIPLocalAlloc) {
+            free(clientIP);
+        } else {
+            am_web_free_memory(clientIP);
+        }
+        clientIP = NULL;
+    }
+    if (clientHostname != NULL) {
+        am_web_free_memory(clientHostname);
+        clientHostname = NULL;
+    }
+
+    OphResourcesFree(pOphResources);
+    am_web_delete_agent_configuration(agent_config);
+
+    return retStatus;
 }
 
 /*

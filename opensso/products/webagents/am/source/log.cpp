@@ -828,53 +828,46 @@ throw () {
 
 // log a message to remote server with a user token id given 
 // for the remote server to fill in with user token details.
-am_status_t 
-Log::rlog(ModuleId module, int remote_log_level, 
-	  const char *user_sso_token, const char *format, ...)
-    throw()
-{
+
+am_status_t
+Log::rlog(ModuleId module, int remote_log_level,
+        const char *user_sso_token, const char *format, ...) throw () {
     am_status_t status = AM_SUCCESS;
     char *logMsg = NULL;
     std::string logMessage;
     bool cookieEncoded = false;
 
-    if (rmtLogSvc == NULL || !remoteInitialized) { 
-	status = AM_SERVICE_NOT_INITIALIZED;
-    }
-    else {
-	std::va_list args;
-	va_start(args, format);
-	logMsg = PR_vsmprintf(format, args);
-	logMessage = logMsg;
-	if (logMsg != NULL) {
-
+    if (rmtLogSvc == NULL || !remoteInitialized) {
+        status = AM_SERVICE_NOT_INITIALIZED;
+    } else {
+        std::va_list args;
+        va_start(args, format);
+        logMsg = PR_vsmprintf(format, args);
+        logMessage = logMsg;
+        if (logMsg != NULL) {
             if (logMsg[0] == '\0') {
-                Log::log(Log::ALL_MODULES, Log::LOG_WARNING,
-                    "Log Record Message is empty");
+                Log::log(Log::ALL_MODULES, Log::LOG_WARNING, "Log Record Message is empty");
+                if (logMsg != NULL) PR_smprintf_free(logMsg);
+                va_end(args);
                 return status;
             }
-
-	    try {
-		LogRecord logRecord(
-			    static_cast<LogRecord::Level>(remote_log_level), 
-			    logMessage);
-	        std::string userSSOToken = user_sso_token;
-		cookieEncoded = userSSOToken.find('%') != std::string::npos;
-	        if (cookieEncoded) {
-		    userSSOToken = Http::decode(std::string(user_sso_token));
-	        }
-		logRecord.populateTokenDetails(userSSOToken);
-		status = rmtLogSvc->sendLog("", logRecord, "");	
-	    }
-	    catch (std::exception& exs) {
-		status = AM_FAILURE;
-	    }
-	    catch (...) {
-		status = AM_FAILURE;
-	    }
-	    PR_smprintf_free(logMsg);
-	}
-	va_end(args);
+            try {
+                LogRecord logRecord(static_cast<LogRecord::Level> (remote_log_level), logMessage);
+                std::string userSSOToken = user_sso_token;
+                cookieEncoded = userSSOToken.find('%') != std::string::npos;
+                if (cookieEncoded) {
+                    userSSOToken = Http::decode(std::string(user_sso_token));
+                }
+                logRecord.populateTokenDetails(userSSOToken);
+                status = rmtLogSvc->sendLog("", logRecord, "");
+            } catch (std::exception& exs) {
+                status = AM_FAILURE;
+            } catch (...) {
+                status = AM_FAILURE;
+            }
+            PR_smprintf_free(logMsg);
+        }
+        va_end(args);
     }
     return status;
 }

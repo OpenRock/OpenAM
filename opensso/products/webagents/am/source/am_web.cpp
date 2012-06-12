@@ -1254,66 +1254,63 @@ am_status_t eval_action_results_map(const KeyValueMap &action_results_map,
 }
 
 extern "C" AM_WEB_EXPORT am_status_t
-am_web_get_token_from_assertion(char * enc_assertion, 
-                                char **token,
-                                void* agent_config )
-{
-    AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
-
+am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_config) {
+    AgentConfigurationRefCntPtr* agentConfigPtr = (AgentConfigurationRefCntPtr*) agent_config;
 
     const char *thisfunc = "am_web_get_token_from_assertion()";
     am_status_t status = AM_FAILURE;
-    char * str = NULL;
+    char *str = NULL;
     char *tmp1 = NULL;
     char *tmp2 = NULL;
-    char * dec_assertion = NULL;
+    char *dec_assertion = NULL;
     char buf[1024] = {'\0'};
 
     dec_assertion = am_web_http_decode(enc_assertion, strlen(enc_assertion));
-    // Add null check to avoid crashes
-    // - forward port fix in CRT (604)
-    if(dec_assertion != NULL) {
-        tmp1 = strchr(dec_assertion, '=');
-    }
-
-    if ((tmp1 != NULL)  &&
-      !(strncmp(dec_assertion, LARES_PARAM, strlen(LARES_PARAM)))) {
+    if (dec_assertion != NULL) tmp1 = strchr(dec_assertion, '=');
+    if ((tmp1 != NULL) && !(strncmp(dec_assertion, LARES_PARAM, strlen(LARES_PARAM)))) {
         tmp2 = tmp1 + 1;
         if (*tmp2 == NULL) {
-	    am_web_log_error("Empty LARES parameter received");
-	    status = AM_NO_MEMORY;
-	    return status;
-	}
+            am_web_log_error("Empty LARES parameter received");
+            status = AM_NO_MEMORY;
+            if (dec_assertion != NULL) {
+                free(dec_assertion);
+                dec_assertion = NULL;
+            }
+            return status;
+        }
         decode_base64(tmp2, tmp1);
-	am_web_log_debug("Received Authn Response = %s", tmp1);
-	if (*tmp1 == NULL) {
-	    am_web_log_error("Improper LARES parameter received");
-	    status = AM_FAILURE;
-	    return status;
-	}
+        am_web_log_debug("Received Authn Response = %s", tmp1);
+        if (*tmp1 == NULL) {
+            am_web_log_error("Improper LARES parameter received");
+            status = AM_FAILURE;
+            if (dec_assertion != NULL) {
+                free(dec_assertion);
+                dec_assertion = NULL;
+            }
+            return status;
+        }
         str = tmp1;
 
         try {
-	    std::string name;
+            std::string name;
             XMLTree tree(false, str, strlen(str));
             XMLElement rootElement = tree.getRootElement();
-	    rootElement.getName(name);
-	    am_web_log_debug("Root Element name=%s", name.c_str());
-    	    std::string attrVal;
-    	    std::string elemValue;
-    	    XMLElement subElem;
-	    if(rootElement.getSubElement(ELEMENT_ASSERTION, subElem)) {
-		    am_web_log_debug("saml:Assertion found");
-		if(subElem.getSubElement(ELEMENT_AUTHN_STATEMENT, subElem)) {
-			am_web_log_debug("saml:AuthenticationStatement found");
-		    if(subElem.getSubElement(ELEMENT_SUBJECT, subElem)) {
-			    am_web_log_debug("saml:Subject found");
-			if(subElem.getSubElement(
-				    ELEMENT_NAME_IDENTIFIER, subElem)) {
-				am_web_log_debug(
-					"lib:IDPProvidedNameIdentifier found");
-			    if (subElem.getValue(elemValue)) {
+            rootElement.getName(name);
+            am_web_log_debug("Root Element name=%s", name.c_str());
+            std::string attrVal;
+            std::string elemValue;
+            XMLElement subElem;
+            if (rootElement.getSubElement(ELEMENT_ASSERTION, subElem)) {
+                am_web_log_debug("saml:Assertion found");
+                if (subElem.getSubElement(ELEMENT_AUTHN_STATEMENT, subElem)) {
+                    am_web_log_debug("saml:AuthenticationStatement found");
+                    if (subElem.getSubElement(ELEMENT_SUBJECT, subElem)) {
+                        am_web_log_debug("saml:Subject found");
+                        if (subElem.getSubElement(
+                                ELEMENT_NAME_IDENTIFIER, subElem)) {
+                            am_web_log_debug(
+                                    "lib:IDPProvidedNameIdentifier found");
+                            if (subElem.getValue(elemValue)) {
                                 am_web_log_debug("Value found(elemVal)=%s", elemValue.c_str());
                                 if (((*agentConfigPtr)->cdsso_cookie_urlencode) == B_FALSE) {
                                     am_http_cookie_decode(elemValue.c_str(), buf, 1024);
@@ -1327,46 +1324,42 @@ am_web_get_token_from_assertion(char * enc_assertion,
                             } else {
                                 am_web_log_debug("Element value for IDPProvidedNameIdentifier not found");
                             }
-			} else {
-				am_web_log_debug("Element "
-				    "lib:IDPProvidedNameIdentifier not found");
-			}
-		    } else {
-			    am_web_log_debug("Element saml:Subject not found");
-		    }
-		} else {
-			am_web_log_debug(
-				"Element AuthenticationStatement not found");
-		}
-	    } else {
-		    am_web_log_debug("Element saml:Assertion not found");
-	    }
-	} catch(XMLTree::ParseException &ex) {
-	    am_web_log_error("Could not find %s cookie in the Liberty "
-		             "AuthnResponse", (*agentConfigPtr)->cookie_name);
-	    status = AM_NOT_FOUND;
+                        } else {
+                            am_web_log_debug("Element "
+                                    "lib:IDPProvidedNameIdentifier not found");
+                        }
+                    } else {
+                        am_web_log_debug("Element saml:Subject not found");
+                    }
+                } else {
+                    am_web_log_debug(
+                            "Element AuthenticationStatement not found");
+                }
+            } else {
+                am_web_log_debug("Element saml:Assertion not found");
+            }
+        } catch (XMLTree::ParseException &ex) {
+            am_web_log_error("Could not find %s cookie in the Liberty "
+                    "AuthnResponse", (*agentConfigPtr)->cookie_name);
+            status = AM_NOT_FOUND;
+        } catch (std::bad_alloc& exb) {
+            status = AM_NO_MEMORY;
+        } catch (std::exception& exs) {
+            am_web_log_error("%s: exception caught: %s", thisfunc, exs.what());
+            status = AM_FAILURE;
+        } catch (...) {
+            am_web_log_error("%s: unknown exception caught.", thisfunc);
+            status = AM_FAILURE;
         }
-	catch (std::bad_alloc& exb) {
-	    status = AM_NO_MEMORY;
-	}
-	catch (std::exception& exs) {
-	    am_web_log_error("%s: exception caught: %s", thisfunc, exs.what());
-	    status = AM_FAILURE;
-	}
-	catch (...) {
-	    am_web_log_error("%s: unknown exception caught.", thisfunc);
-	    status = AM_FAILURE;
-	}
-	if((*token != NULL) && (strlen(*token) > 0)) {
-	    status = AM_SUCCESS;
-	    am_web_log_debug("Token value found: \"%s\"", *token);
-	}
+        if ((*token != NULL) && (strlen(*token) > 0)) {
+            status = AM_SUCCESS;
+            am_web_log_debug("Token value found: \"%s\"", *token);
+        }
     }
-    if(dec_assertion!=NULL)
-    {
+    if (dec_assertion != NULL) {
         free(dec_assertion);
         dec_assertion = NULL;
-	}
+    }
     return status;
 }
 
