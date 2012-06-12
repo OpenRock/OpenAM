@@ -393,8 +393,8 @@
     mail.jar,
     OpenDJ.jar,
     webservices-api.jar,
-    esapiport.jar,c
-    lick-extras-2.3.0.jar,
+    esapiport.jar,
+    click-extras-2.3.0.jar,
     jdmkrt.jar,
     je.jar,
     json.jar,
