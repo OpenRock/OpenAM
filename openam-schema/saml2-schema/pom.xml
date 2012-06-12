@@ -163,14 +163,6 @@
         	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
         </dependency>
 
-        <!--
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>Library</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-        -->
-
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
