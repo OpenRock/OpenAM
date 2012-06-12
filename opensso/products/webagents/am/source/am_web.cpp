@@ -185,6 +185,7 @@ static const char* requestDnsName = "requestDnsName";
 extern "C" int decrypt_base64(const char *, char *, const char*);
 extern "C" int decode_base64(const char *, char *);
 
+extern "C" int ip_match(const char *ip, const char **list, unsigned int listsize, void (*log)(const char *, ...));
 
 static Utils::boot_info_t boot_info = {
     NULL,           // AGENT PROPERTIES LOCATION
@@ -203,147 +204,30 @@ AgentProfileService* agentProfileService;
  *                    -------- helper functions --------
  */
 
-#define IPCOMP(addr, n) ((addr >> (24 - 8 * n)) & 0xFF)
-
-static inline int am_floor(const double x) {
-    return x < 0 ? (int) x == x ? (int) x : (int) x - 1 : (int) x;
-}
-
-static const uint32_t CIDR2MASK[] = {0x00000000, 0x80000000,
-    0xC0000000, 0xE0000000, 0xF0000000, 0xF8000000, 0xFC000000,
-    0xFE000000, 0xFF000000, 0xFF800000, 0xFFC00000, 0xFFE00000,
-    0xFFF00000, 0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
-    0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000, 0xFFFFF800,
-    0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00, 0xFFFFFF80, 0xFFFFFFC0,
-    0xFFFFFFE0, 0xFFFFFFF0, 0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE,
-    0xFFFFFFFF};
-
-static inline uint32_t max_block(uint32_t w) {
-    uint32_t res;
-    res = 32;
-    while (res > 0) {
-        uint32_t mask = CIDR2MASK[ res - 1 ];
-        uint32_t maskedBase = w & mask;
-        if (maskedBase != w) {
-            break;
+static void release_ip_list(char **list, unsigned int listsize) {
+    unsigned int i;
+    if (list != NULL) {
+        for (i = 0; i < listsize; i++) {
+            if (list[i] != NULL) free(list[i]);
         }
-        res--;
+        free(list);
     }
-    return res;
-}
-
-static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string> *list);
-
-static boolean_t notenforced_ip_range_cidr_match(const char *ip, std::string const& str) {
-    uint32_t start, end;
-    char *st = NULL, *en = NULL, *p = NULL, *p_buf = NULL;
-    char buf[128];
-    char tbf[19];
-    std::set<std::string> all;
-    memset(buf, 0, sizeof (buf));
-    strncpy(buf, str.c_str(), sizeof (buf) - 1);
-    if ((p = strtok_r(buf, "-", &p_buf)) == NULL) {
-        return B_FALSE;
-    }
-    st = strdup(p);
-    if ((start = inet_addr(p)) == -1) {
-        free(st);
-        return B_FALSE;
-    }
-    if ((p = strtok_r(NULL, "-", &p_buf)) != NULL) {
-        en = strdup(p);
-        if ((end = inet_addr(p)) == -1) {
-            free(st);
-            free(en);
-            return B_FALSE;
-        }
-    } else {
-        free(st);
-        return B_FALSE;
-    }
-    start = ntohl(start);
-    end = ntohl(end);
-    while (end >= start) {
-        int maxsize = max_block(start);
-        double x = log(end - start + 1.0) / log(2.0);
-        int maxdiff = (char) (32 - am_floor(x));
-        if (maxsize < maxdiff) {
-            maxsize = maxdiff;
-        }
-        memset(tbf, 0, sizeof (tbf));
-        if (snprintf(tbf, sizeof (tbf), "%u.%u.%u.%u/%i", IPCOMP(start, 0), IPCOMP(start, 1), IPCOMP(start, 2), IPCOMP(start, 3), maxsize) != -1) {
-            all.insert(std::string(tbf));
-        }
-        start += ((32 - maxsize) != 0) ? 2 << ((32 - maxsize) - 1) : 1;
-    }
-    free(st);
-    free(en);
-    if (am_web_is_max_debug_on()) {
-        am_web_log_max_debug("notenforced_ip_range_cidr_match(): IP range %s is transformed to the following CIDR list:", str.c_str());
-        for (std::set<std::string>::const_iterator iplv = all.begin(); iplv != all.end(); ++iplv) {
-            std::string const& sv = *iplv;
-            am_web_log_max_debug("[%s]", sv.c_str());
-        }
-    }
-    if (notenforced_ip_cidr_match(ip, &all) == B_TRUE) {
-        return B_TRUE;
-    }
-    return B_FALSE;
 }
 
 static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string> *list) {
-    int mask;
-    uint32_t t, s, e, ipt;
-    uint32_t lx;
-    char *p = NULL, *p_buf = NULL;
-    char buf[64];
-    /*check if CIDR value list is not empty or IP address sent in is valid IP address*/
-    if (list == NULL || list->empty() || (ipt = inet_addr(ip)) == -1) {
-        return B_FALSE;
-    }
-    for (std::set<std::string>::const_iterator iplv = list->begin(); iplv != list->end(); ++iplv) {
-        std::string const& str = *iplv;
-        if (strchr(str.c_str(), '-') != NULL && strchr(str.c_str(), '/') == NULL) {
-            /* we support IP range only in a following notation
-             *           192.168.1.1-192.168.2.3
-             **/
-            if (notenforced_ip_range_cidr_match(ip, str) == B_TRUE) {
-                return B_TRUE;
-            } else {
-                continue;
-            }
+    char **al = NULL;
+    int als = 0;
+    if (list == NULL || list->empty()) return B_FALSE;
+    al = (char **) malloc(list->size());
+    if (al != NULL) {
+        for (std::set<std::string>::const_iterator iplv = list->begin(); iplv != list->end(); ++iplv) {
+            std::string const& str = *iplv;
+            al[als] = strdup(str.c_str());
+            als++;
         }
-        /*clean out buffer*/
-        memset(buf, 0, sizeof (buf));
-        /*copy CIDR value from set element to buffer*/
-        strncpy(buf, str.c_str(), sizeof (buf) - 1);
-        if ((p = strtok_r(buf, "/", &p_buf)) == NULL) {
-            continue;
-        }
-        if ((lx = inet_addr(p)) == -1) {
-            continue;
-        }
-        if ((p = strtok_r(NULL, "/", &p_buf)) != NULL) {
-            mask = atoi(p);
-            if (mask < 0 || mask > 32) {
-                /* invalid mask */
-                am_web_log_error("notenforced_ip_cidr_match(): invalid mask [%d] for range [%s]", mask, str.c_str());
-                continue;
-            }
-        } else {
-            /* single IP address*/
-            mask = 32;
-        }
-        lx = htonl(lx);
-        t = htonl(ipt);
-        s = (lx & (~((1 << (32 - mask)) - 1) & 0xFFFFFFFF));
-        e = (lx | (((1 << (32 - mask)) - 1) & 0xFFFFFFFF));
-        if (t >= s && t <= e) {
-            am_web_log_debug("notenforced_ip_cidr_match(): found ip [%s] in range [%s]", ip, str.c_str());
-            return B_TRUE;
-        } else {
-            am_web_log_debug("notenforced_ip_cidr_match(): ip [%s] is not in range [%s]", ip, str.c_str());
-        }
+        int r = ip_match(ip, (const char **) al, list->size(), am_web_log_info);
+        release_ip_list(al, list->size());
+        return r > 0 ? B_TRUE : B_FALSE;
     }
     return B_FALSE;
 }

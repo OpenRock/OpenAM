@@ -99,15 +99,18 @@ CFLAGS = /O2 /Oi /GL /Gy /D _WINDLL /FD /D_CRT_SECURE_NO_WARNINGS \
 crypt_util.obj	: am\source\crypt_util.c
 	$(CC) $(CFLAGS) $(DEP_INCPATH) /Foam\source\crypt_util.obj am\source\crypt_util.c
 
+notenforcedip.obj : am\source\notenforcedip.c
+	$(CC) $(CFLAGS) $(DEP_INCPATH) /Foam\source\notenforcedip.obj am\source\notenforcedip.c
+
 cryptutil.obj	: am\source\crypt_util.c
 	$(CC) $(CFLAGS) /MT $(DEP_INCPATH) /U _WINDLL /U AM_BUILDING_LIB /Foam\source\cryptutil.obj am\source\crypt_util.c
 				
 AM_WIN32_OBJECTS = $(AM_WIN32_SRC:.cpp=.obj)
 
-amsdk.dll : crypt_util.obj $(AM_WIN32_OBJECTS)
+amsdk.dll : crypt_util.obj notenforcedip.obj $(AM_WIN32_OBJECTS)
 	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /DEF:"am\source\amsdk.def" \
 		   /PDB:"am\source\amsdk.pdb" \
-		   /DLL /OUT:"am\source\amsdk.dll" am\source\crypt_util.obj $(AM_WIN32_OBJECTS) $(DEP_LIBS) wininet.lib Ws2_32.lib
+		   /DLL /OUT:"am\source\amsdk.dll" am\source\crypt_util.obj am\source\notenforcedip.obj $(AM_WIN32_OBJECTS) $(DEP_LIBS) wininet.lib Ws2_32.lib
 
 cryptit : cryptutil.obj
 	$(LINK) $(LDFLAGS) /SUBSYSTEM:CONSOLE /OUT:"am\source\cryptit.exe" am\source\cryptutil.obj 

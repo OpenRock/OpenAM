@@ -28,7 +28,7 @@
 #
 #
 
-# "Portions Copyrighted [2010] [ForgeRock AS]"
+# Portions Copyrighted 2010-2012 ForgeRock AS
 
 override BUILD_MODULE=USERX
 
@@ -41,10 +41,6 @@ ifndef REAL_SRC_DIR
 endif
 
 SUBDIRS := samples test
-
-ifeq ($(BUILD_AGENT), iis7)
-	DEBUG_FLAGS := -Zi -O2 -DNDEBUG
-endif
 
 vpath %.c $(REAL_SRC_DIR)
 vpath %.cpp $(REAL_SRC_DIR)
@@ -102,11 +98,8 @@ OBJS := action_decision.o \
 	xml_attribute.o \
 	xml_element.o \
 	xml_tree.o \
-	sdk.o
-
-ifeq ($(OS_ARCH), WINNT)
-OBJS += am_web.res
-endif
+	sdk.o \
+	notenforcedip.o
 
 DEPENDS := $(OBJS:.o=.d)
 
@@ -124,16 +117,9 @@ EXPORTED_HDRS := \
 	am_utils.h \
 	am_web.h
 
-ifeq ($(OS_ARCH), WINNT)
-STD_LIB_NAME := amsdk
-STD_STATIC_LIB_NAME := amsdk_static
-STD_LIB := $(STD_LIB_NAME)$(SO_EXT)
-STD_STATIC_LIB := $(STD_STATIC_LIB_NAME)$(LIB_EXT)
-else
 STD_LIB_NAME := libamsdk
 STD_LIB := $(STD_LIB_NAME)$(SO_EXT).$(AGENT_MAJOR_VER)
 STD_STATIC_LIB := $(STD_LIB_NAME)$(STATIC_EXT)
-endif
 
 STD_LIB_MAP_FILE := $(STD_LIB_NAME)$(MAPFILE_EXT)
 TEST_LIB_NAME := $(STD_LIB_NAME)_test
@@ -142,9 +128,6 @@ TEST_LIB_MAP_FILE := $(TEST_LIB_NAME)$(MAPFILE_EXT)
 
 EXPORTED_LIBS := $(STD_LIB)
 EXPORTED_STATIC_LIBS := $(STD_STATIC_LIB)
-ifeq ($(OS_ARCH), WINNT)
-EXPORTED_LIBS += $(STD_LIB_NAME).lib
-endif
 
 $(TEST_LIB_MAP_FILE): $(OBJS) $(STD_LIB_MAP_FILE)
 	$(NM) -ng $(filter %.o, $^) | \
@@ -152,11 +135,7 @@ $(TEST_LIB_MAP_FILE): $(OBJS) $(STD_LIB_MAP_FILE)
 		awk 'NF == 3 && $$2 != "U" { printf "\t\t%s;\n", $$3 }' | \
 		egrep -v '^		(\?\?_[EG]|\$$)' | \
 		sort | uniq > $@.tmp
-ifeq ($(OS_ARCH), WINNT)
-	cat $(filter %$(MAPFILE_EXT), $^) $@.tmp > $@ || $(RM) $@
-else
 	( sed -e '/local:/,/\*;/d' < $(filter %$(MAPFILE_EXT), $^) ; $(ECHO) "\nSUNWprivate_1.0 {\n 	global:" ; cat $@.tmp ; $(ECHO) "\n\tlocal:\n\t\t*;\n};" ) > $@ || $(RM) $@
-endif
 	$(RM) $@.tmp
 
 
@@ -182,22 +161,8 @@ INCLUDE_FLAGS := -I$(REAL_SRC_DIR) -I$(NSPR_INC_DIR) -I$(NSS_INC_DIR) -I$(LIBXML
 LDFLAGS += -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) \
 	-L$(LIBXML_LIB_DIR)
 
-ifeq ($(OS_ARCH), WINNT)
-ifdef   OS_IS_CYGWIN
-LDFLAGS += -LIBPATH:$(NSS_LIB_DIR) -LIBPATH:$(NSPR_LIB_DIR) \
-	-LIBPATH:$(LIBXML_LIB_DIR)
-endif
-endif
-
 $(STD_LIB)_LDLIBS := $(NSS_DYNAMIC_LIBS) $(NSPR_LIBS)
 
-ifeq ($(OS_ARCH), WINNT)
-ifdef   OS_IS_CYGWIN
-$(STD_LIB)_LDLIBS += user32.lib
-else
-$(STD_LIB)_LDLIBS += -luser32
-endif
-endif
 
 $(TEST_LIB)_LDLIBS := $($(STD_LIB)_LDLIBS)
 ifeq ($(OS_ARCH), SunOS)
@@ -248,14 +213,10 @@ ifeq ($(ADD_README), YES)
 endif
 
 softlink_so:
-ifeq ($(OS_ARCH), WINNT)
-# nothing
-else
 	@set -e; (cd $(DEST_LIB_DIR); \
 	$(RM) $(STD_LIB_NAME)$(SO_EXT); \
 	ln -s $(STD_LIB) $(STD_LIB_NAME)$(SO_EXT); \
 	)
-endif
 ifeq ($(OS_ARCH), SunOS)
 	@set -e; (cd $(DEST_LIB_DIR); \
 	)
@@ -268,30 +229,14 @@ clean: clean_headers clean_libs clean_objs clean_subdirs
 	$(RM) $(DEST_BIN_DIR)/$(CRYPT_EXE)
 	$(RM) $(DEST_LIB_DIR)/$(STD_LIB_NAME)$(SO_EXT)
 	$(RM) $(DEST_LIB_DIR)/$(STD_LIB_NAME)$(STATIC_EXT)
-ifeq ($(OS_ARCH), WINNT)
-	$(RM) $(STD_LIB_NAME).exp $(TEST_LIB_NAME).exp $(TEST_LIB_NAME).lib
-	$(RM) *.pdb
-	$(RM) crypt_util_program.o
-endif
 
 $(DEST_BIN_DIR)/$(CRYPT_EXE): $(DEST_BIN_DIR)
-ifeq ($(OS_ARCH), WINNT)
-ifdef   OS_IS_CYGWIN
-	$(CC) -DWINNT -Fe$(CRYPT_EXE) -Focrypt_util_program.o crypt_util.c
-	${MT} -manifest $(MSCRT_DIR)/Microsoft.VC90.CRT.manifest -outputresource:$(CRYPT_EXE)\;1
-else
-	$(CC) -DWINNT -c crypt_util.c -o crypt_util_program.o
-	$(CC) -o $(CRYPT_EXE) crypt_util_program.o
-	${MT} -manifest $(MSCRT_DIR)/Microsoft.VC90.CRT.manifest -outputresource:$(CRYPT_EXE)\;1
-endif
-else
 ifeq ($(BUILD_TYPE), 32)
 	$(CC) -m32 -c crypt_util.c -o crypt_util_program.o
 	$(CC) -m32 -o $(CRYPT_EXE) crypt_util_program.o
 else
 	$(CC) -c crypt_util.c -o crypt_util_program.o
 	$(CC) -o $(CRYPT_EXE) crypt_util_program.o
-endif
 endif
 	$(CP) $(CRYPT_EXE) $(DEST_BIN_DIR)
 
