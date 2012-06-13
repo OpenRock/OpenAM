@@ -99,9 +99,6 @@
                                     <arg value="../../openam-core/src/main/resources/xml/jaxrpc/config.xml" />
                                 </java>
                             </target>
-
-
-
                         </configuration>
                         <goals>
                             <goal>run</goal>
