@@ -82,7 +82,7 @@
                             <sourceRoot>${project.build.directory}/generated-sources/idsvcs</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>../../openam-core/src/main/resources/xml/IdentityServices.wsdl</wsdl>
+                                    <wsdl>${project.basedir}/src/main/resources/xml/IdentityServices.wsdl</wsdl>
                                     <extraargs>
                                         <extraarg>-verbose</extraarg>
                                     </extraargs>
