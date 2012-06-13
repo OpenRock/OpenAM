@@ -50,16 +50,30 @@
     <build>
         <plugins>
 
-            <!-- Generate MIB Source Files to prepare for Compilation -->
+            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/mib</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-            <!-- ForgeRock US ~ Jeff.Schenk@ forgerock.com
-                 For some reason generated-sourced is not being used by the compiler!
-                 so to fix, the hack is to generate into the src/main/java tree.
-                 Very Bad, perhaps a maven bug, still unsure, but working with this pattern for now. -->
+            <!-- Generate MIB Source Files to prepare for Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
                 <executions>
                     <execution>
                         <id>generate-mib-source</id>
@@ -68,16 +82,11 @@
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
                                 <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
-                                <echo message="Removing Existing Generated Source."/>
 
-                                <delete includeEmptyDirs="true">
-                                    <fileset dir="src/main/java"/>
-                                </delete>
-
-                                <mkdir dir="src/main/java/com/sun/identity/monitoring" />
+                                <mkdir dir="target/generated-sources/mib/com/sun/identity/monitoring" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true"
                                       classpath="${compile_classpath}">
-                                    <arg line="-X:use-display-hint -d &quot;src/main/java/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
+                                    <arg line="-X:use-display-hint -d &quot;target/generated-sources/mib/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
                                 </java>
                             </target>
                         </configuration>
