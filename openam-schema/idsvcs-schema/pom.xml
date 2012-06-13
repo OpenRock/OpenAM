@@ -89,7 +89,7 @@
                                     <extraargs>
                                         <extraarg>-impl</extraarg>
                                         <extraarg>-server</extraarg>
-                                        <extraarg>-verbose</extraarg>
+                                        <!-- <extraarg>-verbose</extraarg> -->
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>

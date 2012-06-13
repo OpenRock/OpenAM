@@ -79,19 +79,40 @@
                         <id>generate-wsdl</id>
                         <phase>process-classes</phase>
                         <configuration>
-                                <className>com.sun.identity.jaxrpc.IdentityManagementServices</className>
-                                <classpathElements>
-                                    <classpathElement>${project.basedir}/src/main/resources/config.xml</classpathElement>
-                                </classpathElements>
-                                <genServer>true</genServer>
+                                <!-- <databinding>${project.basedir}/src/main/resources/config.xml</databinding>  -->
+                                <outputFile>${project.build.directory}/generated/wsdl/IdentityManagementServices.wsdl</outputFile>
+                                <className>com.sun.identity.idsvcs.opensso.IdentityServicesImpl</className>
+                                <genServer>false</genServer>
                                 <genWsdl>true</genWsdl>
-                                <verbose>true</verbose>
+                                <verbose>false</verbose>
                         </configuration>
                         <goals>
                             <goal>java2ws</goal>
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>idsvcs-schema</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
+
+                    <!-- Dependencies required for JAVA2WS  -->
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-beans</artifactId>
+                        <version>3.0.6.RELEASE</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-context</artifactId>
+                        <version>3.0.6.RELEASE</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -126,9 +147,26 @@
 
         </plugins>
 
+        <resources>
+            <resource>
+                <filtering>false</filtering>
+                <directory>${project.build.directory}/generated/wsdl</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+         </resources>
+
     </build>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>idsvcs-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
+        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
