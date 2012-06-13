@@ -83,9 +83,13 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${project.basedir}/src/main/resources/xml/IdentityServices.wsdl</wsdl>
+                                    <!-- TODO Including the Package name is not working..... -->
+
+                                    <!--
                                     <bindingFiles>
                                         <bindingFile>${basedir}/src/main/resources/xml/IdentityServicesConfig.xml</bindingFile>
                                     </bindingFiles>
+                                    -->
                                     <extraargs>
                                         <extraarg>-impl</extraarg>
                                         <extraarg>-server</extraarg>

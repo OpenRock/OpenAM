@@ -49,15 +49,14 @@
     <!-- Build -->
     <build>
         <plugins>
-
-            <!-- Establish our generated-sources Directory for Inclusion. -->
+            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>add-source</id>
-                        <phase>generate-sources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
@@ -113,6 +112,7 @@
                         <version>3.0.6.RELEASE</version>
                     </dependency>
                 </dependencies>
+
             </plugin>
 
             <plugin>
