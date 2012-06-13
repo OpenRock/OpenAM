@@ -84,7 +84,7 @@
                                 <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
                                 <mkdir dir="target/generated-sources/idsvcs" />
 
-                                <copy file="../../openam-core/src/main/resources/xml/IdentityServices.xml"
+                                <copy file="../../openam-core/src/main/resources/xml/IdentityServices.wsdl"
                                       tofile="target/generated-sources/idsvcs/IdentityServices.wsdl" />
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
                                     <classpath>
@@ -96,7 +96,7 @@
                                     <arg value="-gen:server" />
                                     <arg value="-d" />
                                     <arg value="target/generated-sources/idsvcs" />
-                                    <arg value="target/generated-sources/idsvcs/IdentityServicesConfig.xml" />
+                                    <arg value="../../openam-core/src/main/resources/xml/jaxrpc/config.xml" />
                                 </java>
                             </target>
 
