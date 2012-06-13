@@ -58,23 +58,26 @@
                 <version>1.7</version>
                 <executions>
                     <execution>
-                        <id>generate-mib-source</id>
+                        <id>generate-jaxrpc-source</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <target>
-                                <property name="compile_classpath" refid="maven.compile.classpath"/>
-                                <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
-                                <echo message="Removing Existing Generated Source."/>
-
-                                <delete includeEmptyDirs="true">
-                                    <fileset dir="src/main/java"/>
-                                </delete>
-
-                                <mkdir dir="src/main/java/com/sun/identity/monitoring" />
-                                <java classname="com.sun.jdmk.tools.MibGen" fork="true"
-                                      classpath="${compile_classpath}">
-                                    <arg line="-X:use-display-hint -d &quot;src/main/java/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
+                            <target name="jaxrpc" unless="amserver.jaxrpc.done">
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+                                    <classpath refid="build.class.path"/>
+                                    <classpath>
+                                        <pathelement path="${java.home}/../lib/tools.jar"/>
+                                    </classpath>
+                                    <arg value="-classpath" />
+                                    <arg value="${amserver.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/webservices-api.jar" />
+                                    <arg value="-gen:server" />
+                                    <arg value="-d" />
+                                    <arg value="${amserver.classes.dir}" />
+                                    <arg value="${amserver.jaxrpc.xml.dir}/config.xml" />
                                 </java>
+                                <move file="${amserver.classes.dir}/IdentityManagementServices.wsdl"
+                                      tofile="${amserver.classes.dir}/jaxrpc/IdentityManagementServices.wsdl" />
+                                <property name="amserver.jaxrpc.done" value="true" />
+                                <concat destfile="${tracker}" append="true">amserver.jaxrpc.done=true&#10;</concat>
                             </target>
                         </configuration>
                         <goals>
