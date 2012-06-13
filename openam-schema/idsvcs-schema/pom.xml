@@ -50,12 +50,30 @@
     <build>
         <plugins>
 
-            <!-- Generate Identity Services Source Files to prepare for Compilation -->
+            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/idsvcs</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
+            <!-- Generate Identity Services Source Files to prepare for Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
                 <executions>
                     <execution>
                         <id>generate-idsvcs-source</id>
@@ -64,8 +82,7 @@
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
                                 <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
-                                <echo message="Removing Existing Generated Source."/>
-
+                                <mkdir dir="target/generated-sources/idsvcs" />
 
                                 <copy file="${amserver.warbase.dir}/xml/IdentityServices.wsdl"
                                       tofile="IdentityServices.wsdl" />
@@ -81,7 +98,6 @@
                                     <arg value="${amserver.classes.dir}" />
                                     <arg value="${amserver.jaxrpc.xml.dir}/IdentityServicesConfig.xml" />
                                 </java>
-                                <delete file="IdentityServices.wsdl" />
                             </target>
 
 
@@ -105,10 +121,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM MIB Schemata</Specification-Title>
+                            <Specification-Title>OpenAM Identity Services</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM MIB Schemata</Implementation-Title>
+                            <Implementation-Title>OpenAM Identity Services</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
