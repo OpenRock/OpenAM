@@ -168,6 +168,18 @@
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>idsvcs-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>jaxrpc-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
+        </dependency>
 
         <dependency>
             <groupId>com.iplanet.jato</groupId>

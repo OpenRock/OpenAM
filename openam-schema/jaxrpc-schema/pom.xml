@@ -63,43 +63,37 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources/mib</source>
+                                <source>${project.build.directory}/generated-sources/jaxrpc</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Generate MIB Source Files to prepare for Compilation -->
+            <!-- Generate jaxrpc Source Files to prepare for Compilation -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-jaxrpc-source</id>
+                        <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <target name="jaxrpc" unless="amserver.jaxrpc.done">
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <classpath>
-                                        <pathelement path="${java.home}/../lib/tools.jar"/>
-                                    </classpath>
-                                    <arg value="-classpath" />
-                                    <arg value="${amserver.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/webservices-api.jar" />
-                                    <arg value="-gen:server" />
-                                    <arg value="-d" />
-                                    <arg value="${amserver.classes.dir}" />
-                                    <arg value="${amserver.jaxrpc.xml.dir}/config.xml" />
-                                </java>
-                                <move file="${amserver.classes.dir}/IdentityManagementServices.wsdl"
-                                      tofile="${amserver.classes.dir}/jaxrpc/IdentityManagementServices.wsdl" />
-                                <property name="amserver.jaxrpc.done" value="true" />
-                                <concat destfile="${tracker}" append="true">amserver.jaxrpc.done=true&#10;</concat>
-                            </target>
+                            <sourceRoot>${project.build.directory}/generated-sources/jaxrpc</sourceRoot>
+                            <defaultOptions>
+                                <bindingFiles>
+                                    <bindingFile>../../openam-core/src/main/resources/xml/jaxrpc/config.xml</bindingFile>
+                                </bindingFiles>
+                                <noAddressBinding>true</noAddressBinding>
+                            </defaultOptions>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>../../openam-core/src/main/resources/xml/jaxrpc/IdentityServicesConfig.wsdl</wsdl>
+                                </wsdlOption>
+                            </wsdlOptions>
                         </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>wsdl2java</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -141,7 +135,43 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-common-utilities</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.rpc</groupId>
+            <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-api</artifactId>
+        </dependency>
+
     </dependencies>
-    
+
+
 </project>
 

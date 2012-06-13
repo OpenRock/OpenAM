@@ -63,7 +63,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources/idsvcs</source>
+                                <source>${project.build.directory}/generated-sources/idsvcs</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -72,36 +72,22 @@
 
             <!-- Generate Identity Services Source Files to prepare for Compilation -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-idsvcs-source</id>
+                        <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <target>
-                                <property name="compile_classpath" refid="maven.compile.classpath"/>
-                                <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
-                                <mkdir dir="target/generated-sources/idsvcs" />
-
-                                <copy file="../../openam-core/src/main/resources/xml/IdentityServices.wsdl"
-                                      tofile="target/generated-sources/idsvcs/IdentityServices.wsdl" />
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
-                                    <classpath>
-                                        <pathelement path="${compile_classpath}"/>
-                                        <pathelement path="${java.home}/../lib/tools.jar"/>
-                                    </classpath>
-                                    <arg value="-classpath" />
-                                    <arg value="${compile_classpath}" />
-                                    <arg value="-gen:server" />
-                                    <arg value="-d" />
-                                    <arg value="./target/generated-sources/idsvcs" />
-                                    <arg value="../../openam-core/src/main/resources/xml/jaxrpc/config.xml" />
-                                </java>
-                            </target>
+                            <sourceRoot>${project.build.directory}/generated-sources/idsvcs</sourceRoot>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>../../openam-core/src/main/resources/xml/IdentityServices.wsdl</wsdl>
+                                </wsdlOption>
+                            </wsdlOptions>
                         </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>wsdl2java</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -144,6 +130,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-common-utilities</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
         </dependency>
@@ -156,6 +147,16 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-libs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.rpc</groupId>
+            <artifactId>jaxrpc-impl</artifactId>
         </dependency>
 
         <dependency>

@@ -63,7 +63,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources/mib</source>
+                                <source>${project.build.directory}/generated-sources/mib</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -83,10 +83,10 @@
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
                                 <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
 
-                                <mkdir dir="target/generated-sources/mib/com/sun/identity/monitoring" />
+                                <mkdir dir="${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true"
                                       classpath="${compile_classpath}">
-                                    <arg line="-X:use-display-hint -d &quot;target/generated-sources/mib/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
+                                    <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
                                 </java>
                             </target>
                         </configuration>
