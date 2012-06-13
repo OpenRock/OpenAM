@@ -50,7 +50,7 @@
     <build>
         <plugins>
 
-            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
+            <!-- Establish our generated-sources Directory for Inclusion. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -63,7 +63,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-sources/jaxrpc</source>
+                                <source>${project.build.directory}/generated/wsdl</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -73,30 +73,22 @@
             <!-- Generate jaxrpc Source Files to prepare for Compilation -->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
+                <artifactId>cxf-java2ws-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-sources</phase>
+                        <id>generate-wsdl</id>
+                        <phase>process-classes</phase>
                         <configuration>
-                            <sourceRoot>${project.build.directory}/generated-sources/jaxrpc</sourceRoot>
-                            <defaultOptions>
-                                <bindingFiles>
-                                    <bindingFile>../../openam-core/src/main/resources/xml/jaxrpc/config.xml</bindingFile>
-                                </bindingFiles>
-                                <noAddressBinding>true</noAddressBinding>
-                            </defaultOptions>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>../../openam-core/src/main/resources/xml/IdentityServicesConfig.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-verbose</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
+                                <className>com.sun.identity.jaxrpc.IdentityManagementServices</className>
+                                <classpathElements>
+                                    <classpathElement>${project.basedir}/src/main/resources/config.xml</classpathElement>
+                                </classpathElements>
+                                <genServer>true</genServer>
+                                <genWsdl>true</genWsdl>
+                                <verbose>true</verbose>
                         </configuration>
                         <goals>
-                            <goal>wsdl2java</goal>
+                            <goal>java2ws</goal>
                         </goals>
                     </execution>
                 </executions>

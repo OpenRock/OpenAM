@@ -70,7 +70,7 @@
                 </executions>
             </plugin>
 
-            <!-- Generate Identity Services Source Files to prepare for Compilation -->
+            <!-- Generate Identity Services Source Files from WSDL to prepare for Compilation -->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -87,6 +87,7 @@
                                         <bindingFile>${basedir}/src/main/resources/xml/IdentityServicesConfig.xml</bindingFile>
                                     </bindingFiles>
                                     <extraargs>
+                                        <extraarg>-impl</extraarg>
                                         <extraarg>-server</extraarg>
                                         <extraarg>-verbose</extraarg>
                                     </extraargs>

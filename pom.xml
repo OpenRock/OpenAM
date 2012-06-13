@@ -1455,6 +1455,11 @@
                     <artifactId>cxf-codegen-plugin</artifactId>
                     <version>${cxf.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-java2ws-plugin</artifactId>
+                    <version>${cxf.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
