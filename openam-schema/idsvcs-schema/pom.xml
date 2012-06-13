@@ -83,6 +83,9 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>../../openam-core/src/main/resources/xml/IdentityServices.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-verbose</extraarg>
+                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>

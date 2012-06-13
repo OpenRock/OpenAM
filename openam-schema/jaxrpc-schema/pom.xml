@@ -88,7 +88,10 @@
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>../../openam-core/src/main/resources/xml/jaxrpc/IdentityServicesConfig.wsdl</wsdl>
+                                    <wsdl>../../openam-core/src/main/resources/xml/IdentityServicesConfig.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-verbose</extraarg>
+                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
