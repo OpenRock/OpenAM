@@ -1936,7 +1936,7 @@ public class AccessManager {
             "server-url-invalid=Server URL is invalid.",
             "agent-url-invalid=Agent URL is invalid.",
             "does-not-support-agent-creation={0} did not support agent creation.",
-            "agent-creation-pwd-needed=Password for agent is required for creating agent. datafile or attributevalues needs to have value for userpassword.",
+            "agent-creation-pwd-needed=An agent password is required when you create the agent configuration. Either datafile or attributevalues must include a value for the userpassword attribute.",
             "create-agent-succeeded=Agent configuration was created."
         }
     )
