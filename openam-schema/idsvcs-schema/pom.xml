@@ -95,7 +95,7 @@
                                     <arg value="${compile_classpath}" />
                                     <arg value="-gen:server" />
                                     <arg value="-d" />
-                                    <arg value="target/generated-sources/idsvcs" />
+                                    <arg value="./target/generated-sources/idsvcs" />
                                     <arg value="../../openam-core/src/main/resources/xml/jaxrpc/config.xml" />
                                 </java>
                             </target>
