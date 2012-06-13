@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-   
-<!--
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- -->
-   
+
+    <!--
+    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+    *
+    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    *
+    * The contents of this file are subject to the terms
+    * of the Common Development and Distribution License
+    * (the License). You may not use this file except in
+    * compliance with the License.
+    *
+    * You can obtain a copy of the License at
+    * http://forgerock.org/license/CDDLv1.0.html
+    * See the License for the specific language governing
+    * permission and limitations under the License.
+    *
+    * When distributing Covered Code, include this CDDL
+    * Header Notice in each file and include the License file
+    * at http://forgerock.org/license/CDDLv1.0.html
+    * If applicable, add the following below the CDDL Header,
+    * with the fields enclosed by brackets [] replaced by
+    * your own identifying information:
+    * "Portions Copyrighted [year] [name of copyright owner]"
+    *
+    -->
+
     <!-- Component Definition -->
     <name>OpenAM</name>
     <groupId>org.forgerock</groupId>
@@ -35,7 +36,8 @@
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
-    <inceptionYear>2010</inceptionYear> <!-- Need correct Year -->
+    <inceptionYear>2010</inceptionYear>
+    <!-- Need correct Year -->
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.org</url>
@@ -103,7 +105,7 @@
 
     <!-- Developers -->
     <developers>
-       
+
         <developer>
             <id>allan.foster</id>
             <name>Allan Foster</name>
@@ -166,18 +168,18 @@
             </roles>
         </developer>
 
-	<!-- TODO Add remaining OpenAM Team -->
-        
+        <!-- TODO Add remaining OpenAM Team -->
+
     </developers>
 
     <!-- Contributors -->
     <contributors>
-	<!-- TODO Add OpenAM Additional Contributors -->
+        <!-- TODO Add OpenAM Additional Contributors -->
     </contributors>
 
     <!-- Maven Repositories -->
     <repositories>
-    	 <!-- Local Project Repository -->
+        <!-- Local Project Repository -->
         <repository>
             <id>local-maven-support-repository</id>
             <name>Local Dependencies for Non-Maven Artifacts and Legacy Versions</name>
@@ -226,7 +228,7 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
-        
+
         <repository>
             <id>jboss.org-nexus-public-repository</id>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
@@ -239,8 +241,8 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
-   
-   		<repository>
+
+        <repository>
             <id>codehaus</id>
             <name>Codehaus Maven 2.x Release Repository</name>
             <url>http://repository.codehaus.org</url>
@@ -253,8 +255,8 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
-   
-   		<repository>
+
+        <repository>
             <id>pyx4j-web-snapshot</id>
             <url>http://www.pyx4me.com/maven2-snapshot</url>
             <snapshots>
@@ -266,16 +268,16 @@
         </repository>
 
     </repositories>
-        
+
     <pluginRepositories>
         <pluginRepository>
             <id>Nexus Public repository</id>
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-             <snapshots>
+            <snapshots>
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-        
+
         <pluginRepository>
             <id>Codehaus repository</id>
             <url>http://repository.codehaus.org/</url>
@@ -283,7 +285,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-        
+
         <pluginRepository>
             <id>apache-snapshots</id>
             <name>Apache Snapshot Repository</name>
@@ -292,7 +294,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-        
+
         <pluginRepository>
             <id>jetty-releases</id>
             <name>Jetty Releases</name>
@@ -301,7 +303,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-        
+
         <pluginRepository>
             <id>pyx4j-web-snapshot</id>
             <url>http://www.pyx4me.com/maven2-snapshot</url>
@@ -312,25 +314,25 @@
                 <enabled>true</enabled>
             </releases>
         </pluginRepository>
-        
+
         <pluginRepository>
-          <id>forgerock-release</id>
-          <name>repo</name>
-          <url>http://maven.forgerock.org/repo/repo</url>
-           <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
+            <id>forgerock-release</id>
+            <name>repo</name>
+            <url>http://maven.forgerock.org/repo/repo</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </pluginRepository>
-        
+
         <pluginRepository>
-          <id>forgerock-internal</id>
-          <name>repo</name>
-          <url>http://maven.forgerock.org/repo/repo</url>
-          <snapshots>
+            <id>forgerock-internal</id>
+            <name>repo</name>
+            <url>http://maven.forgerock.org/repo/repo</url>
+            <snapshots>
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-     
+
     </pluginRepositories>
 
 
@@ -366,9 +368,9 @@
 
 
     <!-- OpenAM Dependency Management, replaces extlib in all cases. -->
-    
+
     <!-- Obtained information from product properties for usage in OpenAM 10.0.0 -->
-    
+
     <!--
     Used External Libs:
     ~~~~~~~~~~~~~~~~~~~
@@ -428,259 +430,287 @@
     
     Used Build Libs:
     ~~~~~~~~~~~~~~~~~~~
-	j2ee.jar,
-	jaxb-xjc.jar,
-	jaxb-api.jar,
-	jaxb-impl.jar,
-	xmlsec.jar,
-	saaj-impl.jar,
-	jaxb-libs.jar,
-	saaj-api.jar,
-	testng-5.9-jdk15.jar,
-	ant-contrib-1.0b3.jar,
-	jdmktk.jar
-	
-	Internal Libs:
+    j2ee.jar,
+    jaxb-xjc.jar,
+    jaxb-api.jar,
+    jaxb-impl.jar,
+    xmlsec.jar,
+    saaj-impl.jar,
+    jaxb-libs.jar,
+    saaj-api.jar,
+    testng-5.9-jdk15.jar,
+    ant-contrib-1.0b3.jar,
+    jdmktk.jar
+
+    Internal Libs:
     ~~~~~~~~~~~~~~~~~~~
-	acmecrypt.jar,
-	authapi.jar,
-	crimsondeb.jar,
-	iaik_jce_full.jar,
-	iaik_ssl.jar
+    acmecrypt.jar,
+    authapi.jar,
+    crimsondeb.jar,
+    iaik_jce_full.jar,
+    iaik_ssl.jar
     
     -->
-    
-    
+
+
     <dependencyManagement>
         <dependencies>
-        	
-			<dependency>
-				<groupId>asm</groupId>
-				<artifactId>asm</artifactId>
-				<version>3.3.1</version> <!-- Originally 3.1 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>backport-util-concurrent</groupId>
-				<artifactId>backport-util-concurrent</artifactId>
-				<version>3.1</version> <!-- Originally 2.2 -->
-			</dependency>
-            
-            <dependency>
-				<groupId>org.apache.click</groupId>
-				<artifactId>click-extras</artifactId>
-				<version>2.3.0</version>
-			</dependency>
-            
-            <dependency>
-				<groupId>org.apache.click</groupId>
-				<artifactId>click-nodeps</artifactId>
-				<version>2.3.0</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-beanutils</groupId>
-				<artifactId>commons-beanutils</artifactId>
-				<version>1.8.3</version> <!-- Originally 1.6 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<version>1.6</version> <!-- Originally 1.4 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>3.2.1</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-digester</groupId>
-				<artifactId>commons-digester</artifactId>
-				<version>2.1</version> <!-- Originally 1.8.3 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-fileupload</groupId>
-				<artifactId>commons-fileupload</artifactId>
-				<version>1.2.2</version> <!-- Originally 1.8.3 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>2.3</version> <!-- Originally 2.0.1 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>2.6</version> <!-- Originally 2.5 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.1.1</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging-api</artifactId>
-				<version>1.1</version>
-			</dependency>
 
-			<dependency>
-				<groupId>berkeleydb</groupId>
-				<artifactId>berkeleydb</artifactId>
-				<version>1.5.1</version> <!-- Originally ? -->
-			</dependency>	            
-			
-			<dependency>
-				<groupId>javax.el</groupId>
-				<artifactId>el-api</artifactId>
-				<version>2.2</version> <!-- Originally 1.0 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.el</groupId>
-				<artifactId>el-ri</artifactId>
-				<version>1.0</version>
-			</dependency>
-            
             <dependency>
-				<groupId>org.owasp.esapi</groupId>
-				<artifactId>esapi</artifactId>
-				<version>2.0.1</version> <!-- Originally ? -->
-			</dependency>
-            
+                <groupId>asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>3.3.1</version>
+                <!-- Originally 3.1 -->
+            </dependency>
+
             <dependency>
-				<groupId>org.kohsuke</groupId>
-				<artifactId>geoip</artifactId>
-				<version>1.2.5</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.glassfish.gmbal</groupId>
-				<artifactId>gmbal-api-only</artifactId>
-				<version>3.2.0-b003</version> <!-- Originally 3.0.0-b023 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>org.glassfish.grizzly</groupId>
-				<artifactId>grizzly-framework</artifactId>
-				<version>2.2.9</version> <!-- Originally 3.0.0-b023 -->
-			</dependency>
-			
-			<!-- TODO i18n-core -->
-			
-			<dependency>
-				<groupId>com.sun.messaging.mq</groupId>
-				<artifactId>imq</artifactId>
-				<version>4.4.2</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>org.glassfish.mq</groupId>
-				<artifactId>imq</artifactId>
-				<version>4.5.2</version> <!-- Originally 4.1 ? -->
-			</dependency>
-			
-			<!-- TODO j2ee -->
-			
-			<dependency>
-				<groupId>javax.xml.bind</groupId>
-				<artifactId>jaxb-api</artifactId>
-				<version>1.0.6</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-impl</artifactId>
-				<version>1.0.6</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-libs</artifactId>
-				<version>1.0.6</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-xjc</artifactId>
-				<version>1.0.6</version> <!-- Originally ? -->
-			</dependency>
-            
+                <groupId>backport-util-concurrent</groupId>
+                <artifactId>backport-util-concurrent</artifactId>
+                <version>3.1</version>
+                <!-- Originally 2.2 -->
+            </dependency>
+
             <dependency>
-				<groupId>javax.xml</groupId>
-				<artifactId>jaxrpc-api</artifactId>
-				<version>1.1</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.xml.rpc</groupId>
-				<artifactId>jaxrpc-impl</artifactId>
-				<version>1.1.3_01</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.xml.rpc</groupId>
-				<artifactId>jaxrpc-spi</artifactId>
-				<version>1.1.3_01</version> <!-- Originally ? -->
-			</dependency>
-			
-			<!-- TODO jmx -->
-			
-			<dependency>
-				<groupId>org.jdom</groupId>
-				<artifactId>jdom</artifactId>
-				<version>2.0.1</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sleepycat</groupId>
-				<artifactId>je</artifactId>
-				<version>4.0.92</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-bundle</artifactId>
-				<version>1.1.1-ea</version> <!-- Originally 1.1.1-ea-SNAPSHOT -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-client</artifactId>
-				<version>1.1.1-ea</version> <!-- Originally 1.1.1-ea-SNAPSHOT -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-core</artifactId>
-				<version>1.1.1-ea</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-server</artifactId>
-				<version>1.1.1-ea</version>
-			</dependency>
-		
-			<dependency>
-				<groupId>com.sun.messaging.mq</groupId>
-				<artifactId>jms</artifactId>
-				<version>4.4.2</version> <!-- Originally ? -->
-			</dependency>
-		
-			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20090211</version> <!-- Originally ? -->
-			</dependency>
+                <groupId>org.apache.click</groupId>
+                <artifactId>click-extras</artifactId>
+                <version>2.3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.click</groupId>
+                <artifactId>click-nodeps</artifactId>
+                <version>2.3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.8.3</version>
+                <!-- Originally 1.6 -->
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.6</version>
+                <!-- Originally 1.4 -->
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-digester</groupId>
+                <artifactId>commons-digester</artifactId>
+                <version>2.1</version>
+                <!-- Originally 1.8.3 -->
+            </dependency>
+
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.2.2</version>
+                <!-- Originally 1.8.3 -->
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.3</version>
+                <!-- Originally 2.0.1 -->
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+                <!-- Originally 2.5 -->
+            </dependency>
+
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging-api</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>berkeleydb</groupId>
+                <artifactId>berkeleydb</artifactId>
+                <version>1.5.1</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>javax.el</groupId>
+                <artifactId>el-api</artifactId>
+                <version>2.2</version>
+                <!-- Originally 1.0 -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.el</groupId>
+                <artifactId>el-ri</artifactId>
+                <version>1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
+                <version>2.0.1</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.kohsuke</groupId>
+                <artifactId>geoip</artifactId>
+                <version>1.2.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.gmbal</groupId>
+                <artifactId>gmbal-api-only</artifactId>
+                <version>3.2.0-b003</version>
+                <!-- Originally 3.0.0-b023 -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-framework</artifactId>
+                <version>2.2.9</version>
+                <!-- Originally 3.0.0-b023 -->
+            </dependency>
+
+            <!-- TODO i18n-core -->
+
+            <dependency>
+                <groupId>com.sun.messaging.mq</groupId>
+                <artifactId>imq</artifactId>
+                <version>4.4.2</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.mq</groupId>
+                <artifactId>imq</artifactId>
+                <version>4.5.2</version>
+                <!-- Originally 4.1 ? -->
+            </dependency>
+
+            <!-- TODO j2ee -->
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>1.0.6</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>1.0.6</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-libs</artifactId>
+                <version>1.0.6</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-xjc</artifactId>
+                <version>1.0.6</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml</groupId>
+                <artifactId>jaxrpc-api</artifactId>
+                <version>1.1</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.rpc</groupId>
+                <artifactId>jaxrpc-impl</artifactId>
+                <version>1.1.3_01</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.rpc</groupId>
+                <artifactId>jaxrpc-spi</artifactId>
+                <version>1.1.3_01</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <!-- TODO jmx -->
+
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom</artifactId>
+                <version>2.0.1</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>4.0.92</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-bundle</artifactId>
+                <version>1.1.1-ea</version>
+                <!-- Originally 1.1.1-ea-SNAPSHOT -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>1.1.1-ea</version>
+                <!-- Originally 1.1.1-ea-SNAPSHOT -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-core</artifactId>
+                <version>1.1.1-ea</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>1.1.1-ea</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.messaging.mq</groupId>
+                <artifactId>jms</artifactId>
+                <version>4.4.2</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20090211</version>
+                <!-- Originally ? -->
+            </dependency>
 
             <dependency>
                 <groupId>com.iplanet.jato</groupId>
@@ -760,271 +790,290 @@
                 <version>2008-08-08</version>
             </dependency>
 
-			<dependency>
-				<groupId>javax.xml.stream</groupId>
-				<artifactId>stax-api</artifactId>
-				<version>1.0-2</version>
-			</dependency>
-            
             <dependency>
-				<groupId>javax.ws.rs</groupId>
-				<artifactId>jsr311-api</artifactId>
-				<version>1.1.1</version>
-			</dependency>
-            
+                <groupId>javax.xml.stream</groupId>
+                <artifactId>stax-api</artifactId>
+                <version>1.0-2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
             <!-- TODO jss4 org/mozilla/jss -->
-            
+
             <dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>jstl</artifactId>
-				<version>1.1.2</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.16</version> <!-- Originally1.2.8 -->
-			</dependency>
-			
-			<dependency>
-				<groupId>javax.mail</groupId>
-				<artifactId>mail</artifactId>
-				<version>1.4.5</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>org.glassfish.external</groupId>
-				<artifactId>management-api</artifactId>
-				<version>3.1.0-b001</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-				<artifactId>oauth-client</artifactId>
-				<version>1.1.5.2</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-				<artifactId>oauth-server</artifactId>
-				<version>1.1.5.2</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-				<artifactId>oauth-signature</artifactId>
-				<version>1.1.5.2</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>ognl</groupId>
-				<artifactId>ognl</artifactId>
-				<version>2.6.9</version> <!-- Originally ? -->
-			</dependency>
-			
-			<!-- TODO opendj-ldap-sdk-3.0.0-M2 -->
-			
-			<!-- TODO publicsuffix -->
-			
-			<dependency>
-				<groupId>com.github.relaxng</groupId>
-				<artifactId>relaxngDatatype</artifactId>
-				<version>2011.1</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>rome</groupId>
-				<artifactId>rome</artifactId>
-				<version>1.0</version> 
-			</dependency>
-			
-			<dependency>
-				<groupId>javax.xml.soap</groupId>
-				<artifactId>saaj-api</artifactId>
-				<version>1.3.4</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>com.sun.xml.messaging.saaj</groupId>
-				<artifactId>saaj-impl</artifactId>
-				<version>1.3.19</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>org.testng</groupId>
-				<artifactId>testng</artifactId>
-				<version>6.5.2</version>
-				<!-- TODO - Needs to be scoped as test eventually -->
-				<!-- <scope>test</scope> -->
-			</dependency>
-            
+                <groupId>javax.servlet</groupId>
+                <artifactId>jstl</artifactId>
+                <version>1.1.2</version>
+            </dependency>
+
             <dependency>
-				<groupId>org.apache.velocity</groupId>
-				<artifactId>velocity</artifactId>
-				<version>1.7</version>
-			</dependency>
-            
-			<dependency>
-				<groupId>javax.xml.ws</groupId>
-				<artifactId>jaxws-api</artifactId>
-				<version>2.2.8</version> <!-- Originally ? -->
-			</dependency>
-            
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
+                <!-- Originally1.2.8 -->
+            </dependency>
+
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.5</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.external</groupId>
+                <artifactId>management-api</artifactId>
+                <version>3.1.0-b001</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                <artifactId>oauth-client</artifactId>
+                <version>1.1.5.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                <artifactId>oauth-server</artifactId>
+                <version>1.1.5.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                <artifactId>oauth-signature</artifactId>
+                <version>1.1.5.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ognl</groupId>
+                <artifactId>ognl</artifactId>
+                <version>2.6.9</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <!-- TODO opendj-ldap-sdk-3.0.0-M2 -->
+
+            <!-- TODO publicsuffix -->
+
+            <dependency>
+                <groupId>com.github.relaxng</groupId>
+                <artifactId>relaxngDatatype</artifactId>
+                <version>2011.1</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>rome</groupId>
+                <artifactId>rome</artifactId>
+                <version>1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.soap</groupId>
+                <artifactId>saaj-api</artifactId>
+                <version>1.3.4</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.messaging.saaj</groupId>
+                <artifactId>saaj-impl</artifactId>
+                <version>1.3.19</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.5.2</version>
+                <!-- TODO - Needs to be scoped as test eventually -->
+                <!-- <scope>test</scope> -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>1.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.ws</groupId>
+                <artifactId>jaxws-api</artifactId>
+                <version>2.2.8</version>
+                <!-- Originally ? -->
+            </dependency>
+
             <!-- TODO webservices-extra-api -->
-            
+
             <!-- TODO webservices-extra -->
-            
+
             <dependency>
-				<groupId>com.sun.xml.ws</groupId>
-				<artifactId>jaxws-rt</artifactId>
-				<version>2.2.7-promoted-b73</version> <!-- Originally ? -->
-			</dependency>
-            
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-rt</artifactId>
+                <version>2.2.7-promoted-b73</version>
+                <!-- Originally ? -->
+            </dependency>
+
             <dependency>
-				<groupId>com.sun.tools.ws</groupId>
-				<artifactId>webservices-tools</artifactId>
-				<version>2.1-b16</version> <!-- Originally ? -->
-			</dependency>
-            
+                <groupId>com.sun.tools.ws</groupId>
+                <artifactId>webservices-tools</artifactId>
+                <version>2.1-b16</version>
+                <!-- Originally ? -->
+            </dependency>
+
             <dependency>
-				<groupId>xalan</groupId>
-				<artifactId>xalan</artifactId>
-				<version>2.7.1</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.10.0</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>xml-security</groupId>
-				<artifactId>xmlsec</artifactId>
-				<version>1.3.0</version> <!-- Originally ? -->
-			</dependency>
-			
-			<dependency>
-				<groupId>net.java.dev.msv.datatype.xsd</groupId>
-				<artifactId>xsdlib</artifactId>
-				<version>20060615</version> <!-- Originally ? -->
-			</dependency>
-			
-		<!-- Legacy External Libraries for OpenAM -->
-		<!-- We need to eventually ween off of these -->
-		<dependency>
-			<groupId>external</groupId>
-			<!-- This version is different from what is out in central. Very Bad! -->
-			<artifactId>ant-contrib</artifactId>
-			<version>1.0b3</version>
-			<!-- TODO - Needs to be scoped as compile eventually -->
-			<!-- <scope>compile</scope> -->
-	        </dependency>
-		 
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>authapi</artifactId>
-			<version>2005-08-12</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>FastInfoset</artifactId>
-			<version>2006-26-09</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>i18n-core</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>j2ee</artifactId>
-			<version>2007-18-10</version>
-			<!-- TODO - Needs to be scoped as provided eventually -->
-			<!-- <scope>provided</scope> -->
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>jdmkrt</artifactId>
-			<version>2007-01-10</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>jdmktk</artifactId>
-			<version>2007-01-10</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			 <groupId>external</groupId>
-  			 <artifactId>jsr173_api</artifactId>
-  			 <version>2004-30-01</version>
-  		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>jss4</artifactId>
-			<version>2007-08-11</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>OpenDJ</artifactId>
-			<version>2012-20-02</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>opendj-ldap-sdk</artifactId>
-			<version>3.0.0-M2</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>publicsuffix</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>swec</artifactId>
-			<version>2002-02-05</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>webservices-extra</artifactId>
-			<version>2008-03-12</version>
-		</dependency>
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>webservices-extra-api</artifactId>
-			<version>2003-09-04</version>
-		</dependency>			
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>webservices-rt</artifactId>
-			<version>2009-29-07</version>
-		</dependency>		
-		
-        </dependencies>  
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>2.7.1</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>2.10.0</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>xml-security</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>1.3.0</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <dependency>
+                <groupId>net.java.dev.msv.datatype.xsd</groupId>
+                <artifactId>xsdlib</artifactId>
+                <version>20060615</version>
+                <!-- Originally ? -->
+            </dependency>
+
+            <!-- Legacy External Libraries for OpenAM -->
+            <!-- We need to eventually ween off of these -->
+            <dependency>
+                <groupId>external</groupId>
+                <!-- This version is different from what is out in central. Very Bad! -->
+                <artifactId>ant-contrib</artifactId>
+                <version>1.0b3</version>
+                <!-- TODO - Needs to be scoped as compile eventually -->
+                <!-- <scope>compile</scope> -->
+            </dependency>
+
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>authapi</artifactId>
+                <version>2005-08-12</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>FastInfoset</artifactId>
+                <version>2006-26-09</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>i18n-core</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>j2ee</artifactId>
+                <version>2007-18-10</version>
+                <!-- TODO - Needs to be scoped as provided eventually -->
+                <!-- <scope>provided</scope> -->
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jdmkrt</artifactId>
+                <version>2007-01-10</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jdmktk</artifactId>
+                <version>2007-01-10</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jsr173_api</artifactId>
+                <version>2004-30-01</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jss4</artifactId>
+                <version>2007-08-11</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>OpenDJ</artifactId>
+                <version>2012-20-02</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>opendj-ldap-sdk</artifactId>
+                <version>3.0.0-M2</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>publicsuffix</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>swec</artifactId>
+                <version>2002-02-05</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-extra</artifactId>
+                <version>2008-03-12</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-extra-api</artifactId>
+                <version>2003-09-04</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-rt</artifactId>
+                <version>2009-29-07</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-api</artifactId>
+                <version>2009-14-01</version>
+            </dependency>
+
+        </dependencies>
     </dependencyManagement>
 
     <!-- Build -->
     <build>
-    
+
         <plugins>
 
             <plugin>
                 <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
                 <artifactId>maven-svn-revision-number-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>revision</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <entries>
-                            <entry>
-                                <prefix>svn-revision</prefix>
-                            </entry>
-                        </entries>
-                    </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <entries>
+                        <entry>
+                            <prefix>svn-revision</prefix>
+                        </entry>
+                    </entries>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -1038,7 +1087,7 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1059,7 +1108,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1073,7 +1122,7 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1093,7 +1142,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -1114,7 +1163,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                       <id>attach-javadoc</id>
+                        <id>attach-javadoc</id>
                         <phase>site</phase>
                         <goals>
                             <goal>jar</goal>
@@ -1129,7 +1178,8 @@
                 <inherited>true</inherited>
                 <configuration>
                     <!-- All Sources -->
-                    <includePom>false</includePom>  <!-- Do not include POMs in Source artifacts -->
+                    <includePom>false</includePom>
+                    <!-- Do not include POMs in Source artifacts -->
                     <excludeResources>false</excludeResources>
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <useDefaultManifestFile>true</useDefaultManifestFile>
@@ -1162,9 +1212,11 @@
                     <!-- Specified as false if a Project has no artifacts such as a parent pom. -->
                     <failOnError>false</failOnError>
                     <csvSummary>true</csvSummary>
-                    <csvSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.csv</csvSummaryFile>
+                    <csvSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.csv
+                    </csvSummaryFile>
                     <xmlSummary>true</xmlSummary>
-                    <xmlSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.xml</xmlSummaryFile>
+                    <xmlSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.xml
+                    </xmlSummaryFile>
                     <algorithms>
                         <algorithm>SHA</algorithm>
                     </algorithms>
@@ -1209,7 +1261,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javancss-maven-plugin</artifactId>
@@ -1219,24 +1271,24 @@
                     </includes>
                 </configuration>
             </plugin>
-            
+
         </plugins>
-        
+
         <pluginManagement>
             <plugins>
-            	<plugin>
-            		<groupId>com.pyx4j</groupId>
-                	<artifactId>maven-junction-plugin</artifactId>
-                	<version>1.0.3</version>
-					<inherited>true</inherited>
-            	</plugin>
+                <plugin>
+                    <groupId>com.pyx4j</groupId>
+                    <artifactId>maven-junction-plugin</artifactId>
+                    <version>1.0.3</version>
+                    <inherited>true</inherited>
+                </plugin>
 
-            	<plugin>
-            		<groupId>org.codehaus.mojo</groupId>
-					<artifactId>jaxb2-maven-plugin</artifactId>
-					<version>1.3.1</version>
-					<inherited>true</inherited>
-            	</plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jaxb2-maven-plugin</artifactId>
+                    <version>1.3.1</version>
+                    <inherited>true</inherited>
+                </plugin>
 
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1245,13 +1297,13 @@
                     <inherited>true</inherited>
                 </plugin>
 
-            	<plugin>
-          			<groupId>org.apache.maven.plugins</groupId>
-          			<artifactId>maven-antrun-plugin</artifactId>
-          			<version>1.7</version>
-          			<inherited>true</inherited>
-        		</plugin>
-        		<plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.7</version>
+                    <inherited>true</inherited>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.2-beta-5</version>
@@ -1263,10 +1315,10 @@
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
-          			<groupId>org.apache.maven.plugins</groupId>
-          			<artifactId>maven-deploy-plugin</artifactId>
-          			<version>2.7</version>
-        		</plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
@@ -1393,7 +1445,7 @@
             </plugins>
         </pluginManagement>
     </build>
-   
+
     <reporting>
         <plugins>
             <plugin>

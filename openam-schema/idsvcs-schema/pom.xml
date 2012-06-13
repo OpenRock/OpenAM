@@ -84,19 +84,19 @@
                                 <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
                                 <mkdir dir="target/generated-sources/idsvcs" />
 
-                                <copy file="${amserver.warbase.dir}/xml/IdentityServices.wsdl"
-                                      tofile="IdentityServices.wsdl" />
+                                <copy file="${project.basedir}/../openam-core/src/main/resources/xml/jaxrpc/IdentityServices.wsdl"
+                                      tofile="target/generated-sources/idsvcs/IdentityServices.wsdl" />
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
-                                    <classpath refid="build.class.path"/>
                                     <classpath>
+                                        <pathelement path="${compile_classpath}"/>
                                         <pathelement path="${java.home}/../lib/tools.jar"/>
                                     </classpath>
                                     <arg value="-classpath" />
-                                    <arg value="${amserver.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/webservices-api.jar" />
+                                    <arg value="${compile_classpath}" />
                                     <arg value="-gen:server" />
                                     <arg value="-d" />
-                                    <arg value="${amserver.classes.dir}" />
-                                    <arg value="${amserver.jaxrpc.xml.dir}/IdentityServicesConfig.xml" />
+                                    <arg value="target/generated-sources/idsvcs" />
+                                    <arg value="target/generated-sources/idsvcs/IdentityServicesConfig.xml" />
                                 </java>
                             </target>
 
@@ -145,6 +145,26 @@
     </build>
 
     <dependencies>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-api</artifactId>
+        </dependency>
 
     </dependencies>
     

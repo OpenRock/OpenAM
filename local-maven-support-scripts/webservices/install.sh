@@ -29,3 +29,13 @@ mvn -e -X org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file \
                        -DgeneratePom=true \
                        -DuniqueVersion=true
 
+mvn -e -X org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file \
+                       -DlocalRepositoryPath=../../local-maven-support-repository \
+                       -Dfile=webservices-api.jar \
+                       -DgroupId=external \
+                       -DartifactId=webservices-api \
+                       -Dversion=2009-14-01 \
+                       -Dpackaging=jar \
+                       -DgeneratePom=true \
+                       -DuniqueVersion=true
+
