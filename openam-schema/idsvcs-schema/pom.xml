@@ -83,7 +83,11 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${project.basedir}/src/main/resources/xml/IdentityServices.wsdl</wsdl>
+                                    <bindingFiles>
+                                        <bindingFile>${basedir}/src/main/resources/xml/IdentityServicesConfig.xml</bindingFile>
+                                    </bindingFiles>
                                     <extraargs>
+                                        <extraarg>-server</extraarg>
                                         <extraarg>-verbose</extraarg>
                                     </extraargs>
                                 </wsdlOption>
