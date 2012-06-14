@@ -26,9 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.federation.model;
 
-import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
@@ -47,7 +49,6 @@ import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerEndpointElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerNameElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory;
-import com.sun.identity.wsfederation.jaxb.wsfederation.DescriptionType;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,32 +57,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Iterator;
 
-public class WSFedPropertiesModelImpl extends EntityModelImpl 
-    implements WSFedPropertiesModel 
+public class WSFedPropertiesModelImpl extends EntityModelImpl
+    implements WSFedPropertiesModel
 {
     private static Map GEN_DATA_MAP = new HashMap(6);
     private static Map GEN_DUAL_DATA_MAP = new HashMap(8);
     private static Map SPEX_DATA_MAP = new HashMap(28);
     private static Map IDPSTD_DATA_MAP = new HashMap(2);
     private static Map IDPEX_DATA_MAP = new HashMap(32);
-    
+
     private WSFederationMetaManager metaManager = null;
     static {
         GEN_DATA_MAP.put(TF_DISPNAME, Collections.EMPTY_SET);
         GEN_DATA_MAP.put(TFTOKENISSUER_NAME, Collections.EMPTY_SET);
         GEN_DATA_MAP.put(TFTOKENISSUER_ENDPT, Collections.EMPTY_SET);
     }
-    
+
     static {
         GEN_DUAL_DATA_MAP.put(TF_DISPNAME, Collections.EMPTY_SET);
         GEN_DUAL_DATA_MAP.put(TFIDPDISP_NAME, Collections.EMPTY_SET);
         GEN_DUAL_DATA_MAP.put(TFTOKENISSUER_NAME, Collections.EMPTY_SET);
         GEN_DUAL_DATA_MAP.put(TFTOKENISSUER_ENDPT, Collections.EMPTY_SET);
     }
-    
+
     static {
         SPEX_DATA_MAP.put(TF_DISPNAME, Collections.EMPTY_SET);
         SPEX_DATA_MAP.put(TFSPAUTOFED_ENABLED, Collections.EMPTY_SET);
@@ -101,7 +101,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         SPEX_DATA_MAP.put(TFACCT_HOMEREALM_DISC_SERVICE, Collections.EMPTY_SET);
         SPEX_DATA_MAP.put(COT_LIST, Collections.EMPTY_SET);
     }
-    
+
     static {
         IDPEX_DATA_MAP.put(TF_DISPNAME, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFSIGNCERT_ALIAS, Collections.EMPTY_SET);
@@ -111,7 +111,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         IDPEX_DATA_MAP.put(TFIDPAUTH_CONTMAPPER, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFIDPACCT_MAPPER, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFIDPATTR_MAPPER, Collections.EMPTY_SET);
-        IDPEX_DATA_MAP.put(TFIDPATTR_MAP, Collections.EMPTY_SET);        
+        IDPEX_DATA_MAP.put(TFIDPATTR_MAP, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFNAMEID_FORMAT, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFNAMEID_ATTRIBUTE, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(TFNAME_INCLU_DOMAIN, Collections.EMPTY_SET);
@@ -119,14 +119,14 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         IDPEX_DATA_MAP.put(TFUPN_DOMAIN, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(COT_LIST, Collections.EMPTY_SET);
     }
-    
+
     static {
         // TBD-  once backend api is complete
         IDPSTD_DATA_MAP.put(TFCLAIM_TYPES, Collections.EMPTY_SET);
     }
-    
-    protected WSFederationMetaManager getWSFederationMetaManager() 
-        throws WSFederationMetaException 
+
+    protected WSFederationMetaManager getWSFederationMetaManager()
+        throws WSFederationMetaException
     {
         if (metaManager == null) {
             metaManager = new WSFederationMetaManager();
@@ -138,7 +138,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
     public WSFedPropertiesModelImpl(HttpServletRequest req,  Map map) {
         super(req, map);
     }
-    
+
     /**
      * Returns a map with service provider attributes and values.
      *
@@ -149,12 +149,12 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
      *     attrubutes based on the realm and fedId passed.
      */
     public Map getServiceProviderAttributes(String realm, String fedId)
-        throws AMConsoleException 
+        throws AMConsoleException
     {
         Map SPAttributes = null;
         try {
             WSFederationMetaManager metaManager = getWSFederationMetaManager();
-            SPSSOConfigElement spconfig = 
+            SPSSOConfigElement spconfig =
                 metaManager.getSPSSOConfig(realm,fedId);
             if (spconfig != null) {
                 SPAttributes =  WSFederationMetaUtils.getAttributes(spconfig);
@@ -166,7 +166,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return (SPAttributes != null) ? SPAttributes : Collections.EMPTY_MAP;
     }
-    
+
     /**
      * Returns a <code>Map</code> with identity provider attributes and values.
      *
@@ -177,12 +177,12 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
      *     attrubutes based on the realm and fedId passed.
      */
     public Map getIdentityProviderAttributes(String realm, String fedId)
-        throws AMConsoleException 
+        throws AMConsoleException
     {
         Map IDPAttributes = null;
         try {
             WSFederationMetaManager metaManager = getWSFederationMetaManager();
-            IDPSSOConfigElement idpconfig = 
+            IDPSSOConfigElement idpconfig =
                 metaManager.getIDPSSOConfig(realm,fedId);
             if (idpconfig != null) {
                 IDPAttributes = WSFederationMetaUtils.getAttributes(idpconfig);
@@ -194,9 +194,9 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return (IDPAttributes != null) ? IDPAttributes : Collections.EMPTY_MAP;
     }
-    
+
     /**
-     * Returns the <code>FederationElement</code> for the given realm and 
+     * Returns the <code>FederationElement</code> for the given realm and
      * federation ID.
      *
      * @param realm to which the entity belongs.
@@ -206,9 +206,9 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
      *     Object.
      */
     public FederationElement getEntityDesc(String realm, String fedId)
-        throws AMConsoleException 
+        throws AMConsoleException
     {
-        
+
         FederationElement fedElem = null;
         try {
             fedElem =
@@ -223,7 +223,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return fedElem;
     }
-    
+
     /**
      * Returns TokenIssuerName for the FederationElement passed.
      *
@@ -240,7 +240,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return tkname;
     }
-    
+
     /**
      * Returns TokenIssuerEndPoint for the FederationElement passed.
      *
@@ -257,7 +257,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return tkEndpt;
     }
-    
+
     /**
      * Returns display name of claim type.
      *
@@ -274,7 +274,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         } catch (WSFederationMetaException we) {
             UriNamedclaimTypes = null;
         }
-        
+
         //assuming there is only 1 claim type object now
         if(UriNamedclaimTypes != null) {
             int iClaim = 0;
@@ -287,7 +287,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return displayName;
     }
-    
+
     /**
      * Saves the attribute values from the General page.
      *
@@ -325,21 +325,33 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                     tknissName = (String) i.next();
                 }
             } else if (key.equals(TF_DISPNAME)) {
-                HashSet set = (HashSet) idpStdValues.get(key);
-                Map tmpMap = new HashMap(2);
-                tmpMap.put(TF_DISPNAME, set);
                 if (role.equals(EntityModel.SERVICE_PROVIDER)) {
+                    HashSet set = (HashSet) idpStdValues.get(key);
+                    // Get the current map of extended SP values
+                    Map tmpMap = getExtendedValues(role, realm, fedId);
+                    // Replace existing value
+                    tmpMap.put(TF_DISPNAME, set);
                     setSPExtAttributeValues(realm, fedId, tmpMap, location);
                 } else if (role.equals(EntityModel.IDENTITY_PROVIDER)) {
+                    HashSet set = (HashSet) idpStdValues.get(key);
+                    // Get the current map of extended IDP values
+                    Map tmpMap = getExtendedValues(role, realm, fedId);
+                    // Replace existing value
+                    tmpMap.put(TF_DISPNAME, set);
                     setIDPExtAttributeValues(realm, fedId, tmpMap, location);
                 } else if (role.equals(DUAL)) {
+                    HashSet set = (HashSet) idpStdValues.get(key);
+                    // Get the current map of extended SP values
+                    Map tmpMap = getExtendedValues(EntityModel.SERVICE_PROVIDER, realm, fedId);
+                    // Replace existing value
+                    tmpMap.put(TF_DISPNAME, set);
                     setSPExtAttributeValues(realm, fedId, tmpMap, location);
-                    HashSet idpset = 
-                        (HashSet) idpStdValues.get(TFIDPDISP_NAME);
-                    Map idptmpMap = new HashMap(2);
-                    idptmpMap.put(TF_DISPNAME, idpset);
-                    setIDPExtAttributeValues(
-                        realm, fedId, idptmpMap, location);
+                    // Get the current map of extended IDP values
+                    tmpMap = getExtendedValues(EntityModel.IDENTITY_PROVIDER, realm, fedId);
+                    set = (HashSet) idpStdValues.get(TFIDPDISP_NAME);
+                    // Replace existing value
+                    tmpMap.put(TF_DISPNAME, set);
+                    setIDPExtAttributeValues(realm, fedId, tmpMap, location);
                 }
             }
         }
@@ -348,7 +360,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             WSFederationMetaManager metaManager = getWSFederationMetaManager();
             FederationElement fedElem =
                 metaManager.getEntityDescriptor(realm, fedId);
-            if (fedElem == null) {  
+            if (fedElem == null) {
                 if (debug.warningEnabled()) {
                     debug.warning(
                         "WSFedPropertiesModelImpl.setGenAttributeValues:"+
@@ -357,7 +369,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                 throw new AMConsoleException("invalid.federation.element");
             } else {
                 for (Iterator iter = fedElem.getAny().iterator();
-                    iter.hasNext(); ) 
+                    iter.hasNext(); )
                 {
                     Object o = iter.next();
                     if (o instanceof TokenIssuerEndpointElement) {
@@ -369,14 +381,14 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                 }
                 metaManager.setFederation(realm, fedElem);
             }
-            
+
         } catch (WSFederationMetaException e) {
             debug.warning
                 ("WSFedPropertiesModelImpl.setGenAttributeValues", e);
             throw new AMConsoleException(e.getMessage());
         }
     }
-    
+
     /**
      * Saves the extended metadata attribute values for the SP.
      *
@@ -419,7 +431,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             throw new AMConsoleException(e.getMessage());
         }
     }
-    
+
     /**
      * Saves the standard attribute values for the SP.
      *
@@ -452,7 +464,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                 BaseConfigType baseConfig = (BaseConfigType)idpsso;
                 updateBaseConfig(idpsso, idpExtValues, role);
             }
-            
+
             //saves the new configuration by passing new fed element created
             metaManager.setEntityConfig(realm,fed);
         } catch (JAXBException e) {
@@ -465,7 +477,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             throw new AMConsoleException(getErrorString(e));
         }
     }
-    
+
     /**
      * Saves the standard attribute values for the IDP.
      *
@@ -491,12 +503,12 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         String value = null;
         UriNamedClaimTypesOfferedElement UriNamedclaimTypes = null;
         try {
-            UriNamedclaimTypes = 
+            UriNamedclaimTypes =
                 getWSFederationMetaManager().getUriNamedClaimTypesOffered(
                     fedElem);
         } catch (WSFederationMetaException we) {
             UriNamedclaimTypes = null;
-        }        
+        }
 
         if(UriNamedclaimTypes != null) {
             int iClaim = 0;
@@ -551,7 +563,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             throw new AMConsoleException(e.getMessage());
         }
     }
-    
+
     /**
      * Retrieves the IDPSSOConfigElement .
      *
@@ -573,7 +585,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return idpsso;
     }
-    
+
     /**
      * Retrieves the SPSSOConfigElement.
      *
@@ -595,7 +607,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return spsso;
     }
-    
+
     /**
      * Updates the BaseConfig Object with the map of values passed.
      *
@@ -630,8 +642,8 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             }
         }
     }
-    
-    
+
+
    /**
      * Creates the extended config object when it does not exist.
      * @param realm to which the entity belongs.
@@ -651,14 +663,14 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
     ) throws WSFederationMetaException, JAXBException, AMConsoleException {
         try {
             ObjectFactory objFactory = new ObjectFactory();
-            WSFederationMetaManager metaManager = 
+            WSFederationMetaManager metaManager =
                 getWSFederationMetaManager();
             FederationElement edes =
                 metaManager.getEntityDescriptor(realm, fedId);
             if (edes == null) {
 	        if (debug.warningEnabled()) {
                     debug.warning(
-                        "WSFedPropertiesModelImpl.createExtendedObject: " + 
+                        "WSFedPropertiesModelImpl.createExtendedObject: " +
 		        "No such entity: " + fedId);
                 }
                 String[] data = {realm, fedId};
@@ -667,7 +679,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             FederationConfigElement eConfig =
                 metaManager.getEntityConfig(realm, fedId);
             if (eConfig == null) {
-                BaseConfigType bctype = null;                
+                BaseConfigType bctype = null;
                 FederationConfigElement ele =
                     objFactory.createFederationConfigElement();
                 ele.setFederationID(fedId);
@@ -678,7 +690,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                 // Decide which role EntityDescriptorElement includes
                 // Right now, it is either an SP or an IdP or dual role
                 if (isDualRole(edes)) {
-                    
+
                     //for dual role create both idp and sp config objects
                     BaseConfigType bctype_idp = null;
                     BaseConfigType bctype_sp = null;
@@ -694,7 +706,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                     bctype = createAttributeElement(keys, bctype);
                     ll.add(bctype);
                 } else if (role.equals(SERVICE_PROVIDER)) {
-                    bctype = objFactory.createSPSSOConfigElement();                    
+                    bctype = objFactory.createSPSSOConfigElement();
                     bctype = createAttributeElement(keys, bctype);
                     ll.add(bctype);
                 }
@@ -708,7 +720,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             throw new AMConsoleException(getErrorString(e));
         }
     }
-    
+
     /**
      * Returns BaseConfig object after updating with Attribute Elements.
      * @param values contain the keys for extended metadata attributes.
@@ -736,7 +748,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return bconfig;
     }
-    
+
     /**
      * Retrieves a count of the TokenIssuerEndpointElement
      *     which would help in determining whether dual role or not.
@@ -760,7 +772,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         return dual;
     }
-    
+
     /**
      * Returns a map of wsfed general attributes.
      *
@@ -769,7 +781,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
     public Map getGenAttributes() {
         return GEN_DATA_MAP;
     }
-    
+
     /**
      * Returns a map of wsfed general attribute values for dual role.
      *
@@ -778,7 +790,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
     public Map getDualRoleAttributes() {
         return GEN_DUAL_DATA_MAP;
     }
-    
+
     /**
      * Returns a map of Wsfed Service Provider extended attributes.
      *
@@ -787,7 +799,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
     public Map getSPEXDataMap() {
         return SPEX_DATA_MAP;
     }
-    
+
     /**
      * Returns a map of ext Wsfed Identity Provider extended attributes.
      *
@@ -796,7 +808,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
     public Map getIDPEXDataMap() {
         return IDPEX_DATA_MAP;
     }
-    
+
     /**
      * Returns a map of Wsfed Identity Provider Standard attributes.
      *
@@ -823,5 +835,43 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             }
         }
         return val;
+    }
+
+    /**
+     * Returns a map of extended attribute values based on the role, SP or IDP,
+     * for the given realm and federation id.
+     *
+     * @param role Either EntityModel.SERVICE_PROVIDER or EntityModel.IDENTITY_PROVIDER
+     * @param realm The realm for this entity
+     * @param fedId The id of the entity
+     * @return a Map of extended attribute values as Sets of values.
+     * throws AMConsoleException for any issues collecting the values.
+     */
+    private Map getExtendedValues(String role, String realm, String fedId)
+            throws AMConsoleException {
+
+        Map result = new HashMap();
+        Map map = null;
+
+        if (EntityModel.SERVICE_PROVIDER.equals(role)) {
+            map = getServiceProviderAttributes(realm, fedId);
+        } else if (EntityModel.IDENTITY_PROVIDER.equals(role)) {
+            map = getIdentityProviderAttributes(realm, fedId);
+        }
+
+        if (map != null) {
+            Set entries = map.entrySet();
+            Iterator iterator = entries.iterator();
+
+            //the list of values is converted to a set
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry)iterator.next();
+                result.put((String)entry.getKey(),
+                        returnEmptySetIfValueIsNull(
+                        convertListToSet((List)entry.getValue())));
+            }
+        }
+
+        return result;
     }
 }
