@@ -25,6 +25,9 @@
 :
 : $Id: amsessiondb.bat,v 1.4 2008/06/30 16:52:52 qcheng Exp $
 :
+: Portions Copyrighted 2012 ForgeRock Inc
+: Portions Copyrighted 2012 Open Source Solution Technology Corporation
+:
 
 setlocal
 set JAVA_HOME=JDK_PATH
@@ -37,5 +40,5 @@ set CLASSPATH=%IMQ_JAR_PATH%\imq.jar;%JMS_JAR_PATH%\jms.jar;%AM_HOME%\ext\je.jar
 
 set JAVA_OPTS=""
 
-%JAVA_HOME%/bin/java.exe %JAVA_OPTS% -classpath "%CLASSPATH%" com.sun.identity.ha.jmqdb.client.FAMHaDB %*
+"%JAVA_HOME%/bin/java.exe" %JAVA_OPTS% -classpath "%CLASSPATH%" com.sun.identity.ha.jmqdb.client.FAMHaDB %*
 endlocal

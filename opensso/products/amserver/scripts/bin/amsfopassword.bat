@@ -25,11 +25,14 @@
 :
 : $Id: amsfopassword.bat,v 1.4 2008/06/30 16:52:52 qcheng Exp $
 :
+: Portions Copyrighted 2012 ForgeRock Inc
+: Portions Copyrighted 2012 Open Source Solution Technology Corporation
+:
 
 setlocal
 set JAVA_HOME=JDK_PATH
 set AM_HOME=BASEDIR\PRODUCT_DIR
 set CLASSPATH=%AM_HOME%\locale;%AM_HOME%\lib\am_sessiondb.jar
 
-%JAVA_HOME%/bin/java.exe -classpath "%CLASSPATH%" com.sun.identity.ha.jmqdb.client.FAMSFOPassword %*
+"%JAVA_HOME%/bin/java.exe" -classpath "%CLASSPATH%" com.sun.identity.ha.jmqdb.client.FAMSFOPassword %*
 endlocal
