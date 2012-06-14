@@ -86,20 +86,26 @@
         <cxf.version>2.5.4</cxf.version>
     </properties>
 
-    <!-- Child Modules -->
+    <!-- OpenAM Child Modules -->
     <modules>
-        <!-- OpenAM New Modules -->
+        <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
+        <!-- OpenAM Schema Modules -->
         <module>openam-schema</module>
+        <!-- OpenAM Core Module -->
         <module>openam-core</module>
+        <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
-
+         <!-- OpenAM Server -->
         <module>openam-server</module>
 
         <!-- <module>openam-extlib</module -->
         <!-- OpenAM Build out extlib for subsequent Legacy antRun -->
         <!-- OpenAM Legacy Ant Wrapper -->
         <!-- <module>openam</module  -->
+
+        <!-- Diagnostics Artifact -->
+        <module>openam-diagnostics</module>
 
         <!-- Final Packaging Artifact -->
         <module>openam-distribution</module>
