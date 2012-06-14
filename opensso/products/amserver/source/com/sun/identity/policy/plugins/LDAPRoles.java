@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
 package com.sun.identity.policy.plugins;
 
@@ -307,7 +308,7 @@ public class LDAPRoles implements Subject {
         try {
             LDAPSearchResults res = null;
             LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                authid, authpw);
+                3, authid, authpw);
             LDAPSearchRequest searchRequest =
                 LDAPRequestParser.parseSearchRequest(baseDN, roleSearchScope,
                 searchFilter, attrs, false, timeLimit,
@@ -315,7 +316,24 @@ public class LDAPRoles implements Subject {
             try {
                 ld = connPool.getConnection();
                 // connect to the server to authenticate
-                ld.authenticate(bindRequest);
+                try {
+                    ld.authenticate(bindRequest);
+                } catch (LDAPException connEx) {
+                    // fallback to ldap v2 if v3 is not supported
+                    if (connEx.getLDAPResultCode() ==
+                        LDAPException.PROTOCOL_ERROR)
+                    {
+                        if (debug.messageEnabled()) {
+                            debug.message("LDAPRoles.getValidValues(): "+
+                            "Bind with LDAPv3 failed, retrying with v2");
+                        }
+                        bindRequest = LDAPRequestParser.parseBindRequest(
+                                2, authid, authpw);
+                        ld.authenticate(bindRequest);
+                    } else {
+                        throw connEx;
+                    }
+                }
                 res = ld.search(searchRequest);
             } finally {
                 if (ld != null) {
