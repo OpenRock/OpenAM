@@ -32,7 +32,7 @@
 <project name="Open Federation Library" default="usage">
                 
     <description>Open Federation</description>
-    <import file="../../products.xml" />
+    <import file="../../openam/products/products.xml" />
     <import file="library.xml" />
     <property name="library.version" value="${opensso.version}" />
 

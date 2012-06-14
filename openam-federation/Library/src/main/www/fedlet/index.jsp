@@ -104,7 +104,7 @@
         if (createConfig) {
             // copy all files under conf to fedletHomeDir
             String[] files = new String[] {
-                "FederationConfig.properties",
+                    "FederationConfig.properties",
                 "idp.xml",
                 "idp-extended.xml",
                 "sp.xml",
@@ -168,8 +168,8 @@
             }
 
             File dir = new File(fedletHomeDir);
-            File file = new File(fedletHomeDir + File.separator + 
-                "FederationConfig.properties");
+            File file = new File(fedletHomeDir + File.separator +
+                    "FederationConfig.properties");
             if (!dir.exists() || !dir.isDirectory()) {
                 out.println("<p><br><b>Fedlet configuration home directory does not exist.</b>");
                 if (confExist) {
