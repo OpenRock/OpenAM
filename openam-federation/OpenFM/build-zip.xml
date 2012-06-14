@@ -32,7 +32,7 @@
    Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
-<project name="openssozip" default="all" basedir=".">
+<project name="openssozip" default="all" basedir="../../openam/products/federation/openfm">
     <description>Open SSO: opensso.zip Creation</description>
 
     <!-- enforce invocation via top level build only -->

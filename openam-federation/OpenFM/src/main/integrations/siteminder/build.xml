@@ -27,7 +27,7 @@
 
 -->
 
-<project name="SiteminderIntegration" default="all" basedir=".">
+<project name="SiteminderIntegration" default="all" basedir="">
     <description>Builds, tests, and runs the project stockclient.</description>
     <path id="build.class.path">
       <pathelement location="build/classes"/>

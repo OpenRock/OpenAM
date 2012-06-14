@@ -40,8 +40,8 @@
         </condition>
     </fail>
 
-    <import file="../../wssagents/wssagents.xml" />
-    <import file="../../oauth/oauth.xml" />
+    <import file="../../openam/products/wssagents/wssagents.xml" />
+    <import file="../../openam/products/oauth/oauth.xml" />
     <property name="war.package.dir" location="${openfm.built.war.dir}/package"/>
     <property name="war.webinf.classes.dir" location="${openfm.built.war.dir}/package/WEB-INF/classes"/>
     <property name="war.packageweb.dir" location="${openfm.built.war.dir}/packageweb"/>
