@@ -83,7 +83,7 @@
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Version Properties -->
-        <cxf.version>2.5.4</cxf.version>
+
     </properties>
 
     <!-- OpenAM Child Modules -->
@@ -104,8 +104,8 @@
         <!-- OpenAM Legacy Ant Wrapper -->
         <!-- <module>openam</module  -->
 
-        <!-- Diagnostics Artifact -->
-        <module>openam-diagnostics</module>
+        <!-- Tools Artifacts -->
+        <!-- Temporarily move this out of the way.... <module>openam-tools</module> -->
 
         <!-- Final Packaging Artifact -->
         <module>openam-distribution</module>
@@ -469,12 +469,6 @@
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1.1</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-common-utilities</artifactId>
-                <version>${cxf.version}</version>
             </dependency>
 
             <dependency>
@@ -1462,16 +1456,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>taglist-maven-plugin</artifactId>
                     <version>2.4</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-codegen-plugin</artifactId>
-                    <version>${cxf.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-java2ws-plugin</artifactId>
-                    <version>${cxf.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
