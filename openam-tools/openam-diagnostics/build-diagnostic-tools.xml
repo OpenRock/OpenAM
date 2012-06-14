@@ -31,7 +31,7 @@
 <!--
    Portions Copyrighted 2011 ForgeRock AS
 -->
-<project name="diagnostic" default="createZipFile" basedir=".">
+<project name="diagnostic" default="createZipFile" basedir="../../openam/products/amserver">
     <description>OpenWebSingle Sign-On: Diagnostic Tool</description>
 
     <fail message="*** jdk target is not set ***">

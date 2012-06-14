@@ -31,7 +31,7 @@
    Portions Copyrighted 2010-2011 ForgeRock AS
 -->
 
-<project name="amadm" default="createZipFile" basedir=".">
+<project name="amadm" default="createZipFile" basedir="../openam/products/amserver">
     <description>OpenWebSingle Sign-On: Tools.zip Creation</description>
     <fail message="*** nightly build may be built from top level only ***">
       <condition>
