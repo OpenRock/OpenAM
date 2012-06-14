@@ -50,27 +50,56 @@
     <build>
         <plugins>
 
-            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
+            <!-- Generate MIB Source Files to prepare for Compilation -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>add-source</id>
+                        <id>generate-mib-source</id>
                         <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
                         <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/idsvcs</source>
-                            </sources>
+                            <target name="idsvcs">
+                                <property name="build.class.path" refid="maven.compile.classpath"/>
+                                <echo message="Using Maven Compile classpath: ${build.class.path}"/>
+
+                                <copy file="${project.basedir}/src/main/resources/xml/IdentityServices.wsdl"
+                                      tofile="${project.build.directory}/classes/IdentityServices.wsdl" />
+
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
+                                      classpath="${build.class.path}">
+                                    <arg value="-verbose" />
+                                    <arg value="-g" />
+                                    <arg value="-gen:server" />
+                                    <arg value="-d" />
+                                    <arg value="${project.build.directory}/classes" />
+                                    <arg value="${project.basedir}/src/main/resources/xml/IdentityServicesConfig.xml" />
+                                </java>
+                            </target>
                         </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.xml.rpc</groupId>
+                        <artifactId>jaxrpc-impl</artifactId>
+                        <version>1.1.3_01</version>
+                        <!-- Originally ? -->
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
-            <!-- Generate Identity Services Source Files from WSDL to prepare for Compilation -->
+            <!--
+
+            <! - Generate Identity Services Source Files from WSDL to prepare for Compilation
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -83,17 +112,9 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${project.basedir}/src/main/resources/xml/IdentityServices.wsdl</wsdl>
-                                    <!-- TODO Including the Package name is not working..... -->
-
-                                    <!--
-                                    <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/xml/IdentityServicesConfig.xml</bindingFile>
-                                    </bindingFiles>
-                                    -->
                                     <extraargs>
                                         <extraarg>-impl</extraarg>
                                         <extraarg>-server</extraarg>
-                                        <!-- <extraarg>-verbose</extraarg> -->
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
@@ -104,6 +125,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -141,10 +163,12 @@
 
     <dependencies>
 
+        <!--
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-utilities</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>javax.xml.bind</groupId>

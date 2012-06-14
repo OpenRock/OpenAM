@@ -49,25 +49,6 @@
     <!-- Build -->
     <build>
         <plugins>
-            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated/wsdl</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 
             <!-- Generate jaxrpc Source Files to prepare for Compilation -->
             <plugin>
@@ -79,8 +60,8 @@
                         <phase>process-classes</phase>
                         <configuration>
                                 <!-- <databinding>${project.basedir}/src/main/resources/config.xml</databinding>  -->
-                                <outputFile>${project.build.directory}/generated/wsdl/IdentityManagementServices.wsdl</outputFile>
-                                <className>com.sun.identity.idsvcs.opensso.IdentityServicesImpl</className>
+                                <outputFile>${project.build.directory}/classes/IdentityManagementServices.wsdl</outputFile>
+                                <className>com.sun.identity.idsvcs.IdentityServicesImpl</className>
                                 <genServer>false</genServer>
                                 <genWsdl>true</genWsdl>
                                 <verbose>false</verbose>
@@ -146,16 +127,6 @@
             </plugin>
 
         </plugins>
-
-        <resources>
-            <resource>
-                <filtering>false</filtering>
-                <directory>${project.build.directory}/generated/wsdl</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-         </resources>
 
     </build>
 
