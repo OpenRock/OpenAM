@@ -51,6 +51,8 @@
     <build>
         <plugins>
             <!-- Generate jaxrpc WSDL -->
+            <!-- see http://docs.oracle.com/cd/E17802_01/webservices/webservices/docs/1.5/jaxrpc/jaxrpc-tools.html
+                 for Documentation on the wscompile tool. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -59,7 +61,7 @@
                         <id>generate-mib-source</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <target name="jaxrpc" unless="amserver.jaxrpc.done">
+                            <target name="jaxrpc">
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
                                     <classpath refid="build.class.path"/>
                                     <classpath>
@@ -74,8 +76,6 @@
                                 </java>
                                 <move file="${amserver.classes.dir}/IdentityManagementServices.wsdl"
                                       tofile="${amserver.classes.dir}/jaxrpc/IdentityManagementServices.wsdl" />
-                                <property name="amserver.jaxrpc.done" value="true" />
-                                <concat destfile="${tracker}" append="true">amserver.jaxrpc.done=true&#10;</concat>
                             </target>
 
 
@@ -98,52 +98,6 @@
                         <version>1.1.1</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-
-
-            <!-- Generate jaxrpc Source Files to prepare for Compilation -->
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-java2ws-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-wsdl</id>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <!-- <databinding>${project.basedir}/src/main/resources/config.xml</databinding>  -->
-                            <outputFile>${project.build.directory}/classes/IdentityManagementServices.wsdl</outputFile>
-                            <className>com.sun.identity.idsvcs.IdentityServicesImpl</className>
-                            <genServer>false</genServer>
-                            <genWsdl>true</genWsdl>
-                            <verbose>false</verbose>
-                        </configuration>
-                        <goals>
-                            <goal>java2ws</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-
-                    <dependency>
-                        <groupId>org.forgerock</groupId>
-                        <artifactId>idsvcs-schema</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                        <!-- This Version -->
-                    </dependency>
-
-                    <!-- Dependencies required for JAVA2WS  -->
-                    <dependency>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-beans</artifactId>
-                        <version>3.0.6.RELEASE</version>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
-                        <version>3.0.6.RELEASE</version>
-                    </dependency>
-                </dependencies>
 
             </plugin>
 
@@ -158,10 +112,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM MIB Schemata</Specification-Title>
+                            <Specification-Title>OpenAM Identity Services JAXRPC</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM MIB Schemata</Implementation-Title>
+                            <Implementation-Title>OpenAM Identity Services JAXRPC</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}
                             </Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
