@@ -49,7 +49,7 @@
     <!-- Child Modules -->
     <modules>
         <module>openam-installtools</module>
-        <module>openam-diagnostics</module>
+        <!-- Temporarily move this out of the way....  <module>openam-diagnostics</module>  -->
     </modules>
     
 </project>

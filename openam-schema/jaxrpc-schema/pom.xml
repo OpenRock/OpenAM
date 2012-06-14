@@ -63,7 +63,6 @@
                         <configuration>
                             <target name="jaxrpc">
                                 <property name="build.class.path" refid="maven.compile.classpath"/>
-                                <echo message="Using Maven Compile classpath: ${build.class.path}"/>
 
                                 <mkdir dir="${project.build.directory}/classes" />
 
@@ -83,11 +82,6 @@
                                 <!-- Clean-up duplicate generated WSDL and Classes -->
                                 <delete file="${project.basedir}/IdentityManagementServices.wsdl" />
 
-                                <!--
-                                <delete includeemptydirs="true">
-                                    <fileset dir="${project.basedir}/com" includes="**/**"/>
-                                </delete>
-                                -->
                             </target>
                         </configuration>
                         <goals>

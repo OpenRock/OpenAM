@@ -81,7 +81,6 @@
                         <configuration>
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
-                                <echo message="Using Maven Compile classpath: ${compile_classpath}"/>
 
                                 <mkdir dir="${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true"
