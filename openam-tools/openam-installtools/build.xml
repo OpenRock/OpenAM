@@ -30,7 +30,7 @@
 
     <description>OpenSSO Install Tools Library</description>
 
-    <import file="../products.xml" />
+    <import file="../../openam/products/products.xml" />
     <import file="installtools.xml" />
 
     <fail message="*** jdk target is not set ***">

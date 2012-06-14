@@ -48,6 +48,7 @@
 
     <!-- Child Modules -->
     <modules>
+        <module>openam-installtools</module>
         <module>openam-diagnostics</module>
     </modules>
     
