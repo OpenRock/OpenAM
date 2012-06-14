@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
 package com.sun.identity.log.handlers;
 
@@ -87,8 +88,15 @@ public class SecureELFFormatter extends Formatter {
       * @param logRecord The logRecord to be formatted
       * @return The string formed by formatting the logRecord
       */
-    public String format(com.sun.identity.log.LogRecord logRecord) {
-        Map logInfoTable = logRecord.getLogInfoMap();
+    @Override
+    public String format(java.util.logging.LogRecord logRecord) {
+        Map logInfoTable = null;
+        
+        if ((LogManagerUtil.isAMLoggingMode()) &&
+            (logRecord instanceof com.sun.identity.log.ILogRecord)) {
+            logInfoTable = ((com.sun.identity.log.ILogRecord) logRecord)
+                .getLogInfoMap();
+        }
 
         StringBuilder sbuffer = new StringBuilder();
         StringBuilder stringForMAC = new StringBuilder();
@@ -155,7 +163,7 @@ public class SecureELFFormatter extends Formatter {
         // status is "on", if yes then add MAC field and SIGN field to the
         // headers and also generate MAC and write it to the file.
         String key = LogConstants.SIGNATURE_FIELDNAME;
-        if (logInfoTable.containsKey(key)) {
+        if ((logInfoTable != null) && (logInfoTable.containsKey(key))) {
             sbuffer.append("-\t").append(logInfoTable.get(key));
         } else {
             try {
@@ -172,68 +180,7 @@ public class SecureELFFormatter extends Formatter {
         sbuffer.append("\n");
         return sbuffer.toString();
     }
-    
-    /**
-     * Format the given record as per ELF and return a formatted string. <p>
-     *
-     * For ELF Specifications refer <LI> www.w3.org/TR/WD-logfile.html</LI>
-     * @param logRecord The logRecord to be formatted
-     * @return The string formed by formatting the logRecord
-     */
-    public String format(java.util.logging.LogRecord logRecord) {
-
-        if ((LogManagerUtil.isAMLoggingMode()) &&
-            (logRecord instanceof com.sun.identity.log.ILogRecord)) {
-            return format((com.sun.identity.log.LogRecord) logRecord);
-        }
-
-        StringBuilder sbuffer = new StringBuilder();
-        StringBuilder stringForMAC = new StringBuilder();
-            
-        try {
-            String[] allFields = lmanager.getAllFields();
-            Set selectedFields = lmanager.getSelectedFieldSet();
-            String strTime = secureTimestampGenerator.getTimestamp();
-            sbuffer.append("\"").append(strTime).append("\"\t");
-            stringForMAC.append("\"").append(strTime).append("\"");
-            StringBuffer message = processString(formatMessage(logRecord));
-            boolean escapeDone = false;
-            for (int i = 0; i < message.length(); i++) {
-                if ((message.charAt(i) == ' ') || (message.charAt(i) == '\t')) {
-                    sbuffer.append("\"").append(message).append("\"\t");
-                    stringForMAC.append("\"").append(message).append("\"");
-                    escapeDone = true;
-                    break;
-                }
-            }
-            if (!escapeDone) {
-                sbuffer.append(message).append("\t");
-                stringForMAC.append(message);
-            }
-            for (int i = 2; i < allFields.length; i ++) {
-                sbuffer.append("-").append("\t");
-                stringForMAC.append("-");
-            }
-        } catch (Exception e) {
-            Debug.error("SecureELFFormatter: Exception in String Handling", e);
-        }
-        // adding Secure logging related code here. Check whether the security
-        // status is "on", if yes then add MAC field and SIGN field to the
-        // headers and also generate MAC and write it to the file.
-        try {
-            Object [] obj = {logRecord.getLoggerName()};
-            String mac = 
-               fieldGenerator.generateLogField(stringForMAC.toString(),obj);
-            sbuffer.append(mac).append("\t").append("-");
-        } catch (Exception e) {
-            Debug.error("SecureLFFormatter: couldnot generate mac", e);
-            sbuffer.append("\"MAC NOT AVAILABLE\"")
-                   .append("\t").append("-");
-        }
-        sbuffer.append("\n");
-        return sbuffer.toString();
-    }
-    
+        
     /**
      * According to ELF, the log file should start with a #Version which
      * specifies the ELF version used followed by a #Fields line which specifies
