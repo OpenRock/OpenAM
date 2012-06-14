@@ -79,7 +79,7 @@
                             <Specification-Title>OpenAM Diagnostics</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM DIagnostics</Implementation-Title>
+                            <Implementation-Title>OpenAM Diagnostics</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}
                             </Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
