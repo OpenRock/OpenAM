@@ -51,25 +51,12 @@
     <build>
         <finalName>openam</finalName>
         <plugins>
-            <!-- Surefire Tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <outputFileNameMapping>@{artifactId}@.@{extension}@</outputFileNameMapping>
+                    <outputFileNameMapping>openam.war</outputFileNameMapping>
                     <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
                     <archive>
                         <manifestEntries>
@@ -96,6 +83,7 @@
                     </webResources>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

@@ -68,7 +68,6 @@
 
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
                                       classpath="${build.class.path}">
-                                    <arg value="-verbose" />
                                     <arg value="-g" />
                                     <arg value="-gen:server" />
                                     <arg value="-d" />
