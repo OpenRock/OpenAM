@@ -42,7 +42,7 @@ public void jspInit()
     String deployuri = SystemConfigurationUtil.getProperty(
         "com.iplanet.am.services.deploymentDescriptor");
     if ((deployuri == null) || (deployuri.length() == 0)) {
-        deployuri = "../../..";
+        deployuri = "";
     }
 %>
 <html>

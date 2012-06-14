@@ -35,7 +35,7 @@ import="com.sun.identity.common.SystemConfigurationUtil"
     deployuri = SystemConfigurationUtil.getProperty(
         "com.iplanet.am.services.deploymentDescriptor");
     if ((deployuri == null) || (deployuri.length() == 0)) {
-        deployuri = "../../..";
+        deployuri = "";
     }
 %>
 

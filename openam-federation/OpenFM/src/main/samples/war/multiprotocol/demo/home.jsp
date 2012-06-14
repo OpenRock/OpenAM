@@ -53,7 +53,7 @@
         "com.iplanet.am.services.deploymentDescriptor");
     String UNIVERSAL_IDENTIFIER = "sun.am.UniversalIdentifier";
     if ((deployuri == null) || (deployuri.length() == 0)) {
-        deployuri = "../../..";
+        deployuri = "";
     }
 
     String utf8 = "UTF-8";
