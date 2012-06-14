@@ -218,7 +218,7 @@ static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string>
     char **al = NULL;
     int als = 0;
     if (list == NULL || list->empty()) return B_FALSE;
-    al = (char **) malloc(list->size());
+    al = (char **) malloc(list->size() * sizeof(char *));
     if (al != NULL) {
         for (std::set<std::string>::const_iterator iplv = list->begin(); iplv != list->end(); ++iplv) {
             std::string const& str = *iplv;
