@@ -82,9 +82,12 @@
 
                                 <!-- Clean-up duplicate generated WSDL and Classes -->
                                 <delete file="${project.basedir}/IdentityManagementServices.wsdl" />
+
+                                <!--
                                 <delete includeemptydirs="true">
                                     <fileset dir="${project.basedir}/com" includes="**/**"/>
                                 </delete>
+                                -->
                             </target>
                         </configuration>
                         <goals>
@@ -124,6 +127,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
+                    <forceCreation>true</forceCreation>
                     <archive>
                         <index>true</index>
                         <manifest>
