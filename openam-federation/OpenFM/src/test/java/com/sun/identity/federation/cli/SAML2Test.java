@@ -32,7 +32,7 @@ import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.CLIRequest;
 import com.sun.identity.cli.CommandManager;
-import com.sun.identity.cli.DevNullOutputWriter;
+import com.sun.identity.cli.entitlement.DevNullOutputWriter;
 import com.sun.identity.cli.IArgument;
 import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.CircleOfTrustDescriptor;

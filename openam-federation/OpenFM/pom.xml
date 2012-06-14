@@ -132,16 +132,19 @@
 			<artifactId>openam-core</artifactId>
 			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
-		<dependency>
-			<groupId>org.forgerock</groupId>
-			<artifactId>openam-shared</artifactId>
-			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
-		</dependency>
+
 		<dependency>
 			<groupId>org.forgerock</groupId>
 			<artifactId>Library</artifactId>
 			<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
 		</dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     
 </project>

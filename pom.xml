@@ -88,26 +88,27 @@
 
     <!-- OpenAM Child Modules -->
     <modules>
+
         <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
+
         <!-- OpenAM Schema Modules -->
         <module>openam-schema</module>
+
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
+
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
-         <!-- OpenAM Server -->
+
+        <!-- OpenAM Server -->
         <module>openam-server</module>
 
-        <!-- <module>openam-extlib</module -->
-        <!-- OpenAM Build out extlib for subsequent Legacy antRun -->
-        <!-- OpenAM Legacy Ant Wrapper -->
-        <!-- <module>openam</module  -->
-
         <!-- Tools Artifacts -->
-        <!-- Temporarily move this out of the way.... <module>openam-tools</module> -->
+        <module>openam-tools</module>
 
-        <!-- Final Packaging Artifact -->
+        <!-- Final Packaging Artifacts -->
+        <!-- Temporarily move this out of the way.... <module>openam-extlib</module> -->
         <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
 
   </modules>
@@ -906,8 +907,7 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>6.5.2</version>
-                <!-- TODO - Needs to be scoped as test eventually -->
-                <!-- <scope>test</scope> -->
+                <scope>test</scope>
             </dependency>
 
             <dependency>
