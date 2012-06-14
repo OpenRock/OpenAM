@@ -686,18 +686,11 @@
                 <!-- Originally ? -->
             </dependency>
 
-            <!-- This is the cirrent version of SleepyCat,
-                 however, not compatible with a previous used version.
             <dependency>
                 <groupId>com.sleepycat</groupId>
                 <artifactId>je</artifactId>
                 <version>4.0.92</version>
-            </dependency>
-            -->
-            <dependency>
-                <groupId>com.sleepycat</groupId>
-                <artifactId>je</artifactId>
-                <version>external</version>
+                <!-- Originally ? -->
             </dependency>
 
             <dependency>
