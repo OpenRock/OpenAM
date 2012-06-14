@@ -42,7 +42,7 @@ public class LogoJPanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource(
-           "/com/sun/identity/diagnostic/base/core/ui/gui/images/sunLogo.jpg")));
+                "/com/sun/identity/diagnostic/base/core/ui/gui/images/sunLogo.jpg")));
         add(jLabel2, java.awt.BorderLayout.EAST);
 
         jLabel1.setFont(new java.awt.Font("SansSerif", 1, 24));

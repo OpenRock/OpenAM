@@ -81,9 +81,9 @@ public class MainJPanel extends javax.swing.JPanel implements ToolConstants {
     private static CounterThread counterThread;
     
     public static final String SELECTED_ICON =
-        "/com/sun/identity/diagnostic/base/core/ui/gui/images/BlubOnIcon.gif";
+            "/com/sun/identity/diagnostic/base/core/ui/gui/images/BlubOnIcon.gif";
     public static final String NOT_SELECTED_ICON =
-        "/com/sun/identity/diagnostic/base/core/ui/gui/images/BlubOffIcon.gif";
+            "/com/sun/identity/diagnostic/base/core/ui/gui/images/BlubOffIcon.gif";
    
     private final ResourceBundle rb =
          ResourceBundle.getBundle(ToolConstants.RESOURCE_BUNDLE_NAME);

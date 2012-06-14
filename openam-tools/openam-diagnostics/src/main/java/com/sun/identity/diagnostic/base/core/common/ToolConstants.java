@@ -136,7 +136,7 @@ public interface ToolConstants {
     * Locations of web containers' icon.
     */
    public static final String[] WEB_CONTAINERS_ICON = {
-       "/com/sun/identity/diagnostic/base/core/ui/gui/images/GlassfishIcon.gif",
+           "/com/sun/identity/diagnostic/base/core/ui/gui/images/GlassfishIcon.gif",
        "/com/sun/identity/diagnostic/base/core/ui/gui/images/SunIcon.gif",
        "/com/sun/identity/diagnostic/base/core/ui/gui/images/BEAIcon.gif",
        "/com/sun/identity/diagnostic/base/core/ui/gui/images/IBMIcon.gif"};
