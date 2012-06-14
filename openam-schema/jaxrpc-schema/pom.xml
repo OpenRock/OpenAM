@@ -58,27 +58,34 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-mib-source</id>
+                        <id>generate-jaxrpc-wsdl</id>
                         <phase>generate-sources</phase>
                         <configuration>
                             <target name="jaxrpc">
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <classpath>
-                                        <pathelement path="${java.home}/../lib/tools.jar"/>
-                                    </classpath>
-                                    <arg value="-classpath" />
-                                    <arg value="${amserver.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/webservices-api.jar" />
+                                <property name="build.class.path" refid="maven.compile.classpath"/>
+                                <echo message="Using Maven Compile classpath: ${build.class.path}"/>
+
+                                <mkdir dir="${project.build.directory}/classes" />
+
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
+                                      classpath="${build.class.path}">
+                                    <arg value="-verbose" />
+                                    <arg value="-g" />
                                     <arg value="-gen:server" />
                                     <arg value="-d" />
-                                    <arg value="${amserver.classes.dir}" />
-                                    <arg value="${amserver.jaxrpc.xml.dir}/config.xml" />
+                                    <arg value="${project.build.directory}/classes" />
+                                    <arg value="${project.basedir}/src/main/resources/xml/jaxrpc/config.xml" />
                                 </java>
-                                <move file="${amserver.classes.dir}/IdentityManagementServices.wsdl"
-                                      tofile="${amserver.classes.dir}/jaxrpc/IdentityManagementServices.wsdl" />
+
+                                <move file="${project.build.directory}/classes/IdentityManagementServices.wsdl"
+                                      tofile="${project.build.directory}/classes/jaxrpc/IdentityManagementServices.wsdl" />
+
+                                <!-- Clean-up duplicate generated WSDL and Classes -->
+                                <delete file="${project.basedir}/IdentityManagementServices.wsdl" />
+                                <delete includeemptydirs="true">
+                                    <fileset dir="${project.basedir}/com" includes="**/**"/>
+                                </delete>
                             </target>
-
-
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -86,6 +93,18 @@
                     </execution>
                 </executions>
                 <dependencies>
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>idsvcs-schema</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>openam-core</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
                     <dependency>
                         <groupId>com.sun.xml.rpc</groupId>
                         <artifactId>jaxrpc-impl</artifactId>
@@ -146,8 +165,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-utilities</artifactId>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
         </dependency>
 
         <dependency>
@@ -181,7 +202,6 @@
         </dependency>
 
     </dependencies>
-
 
 </project>
 
