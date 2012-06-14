@@ -108,11 +108,11 @@
         <!-- Temporarily move this out of the way.... <module>openam-tools</module> -->
 
         <!-- Final Packaging Artifact -->
-        <module>openam-distribution</module>
+        <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
 
-    </modules>
+  </modules>
 
-    <!-- Developers -->
+  <!-- Developers -->
     <developers>
 
         <developer>
