@@ -108,7 +108,7 @@
         <module>openam-tools</module>
 
         <!-- Final Packaging Artifacts -->
-        <!-- Temporarily move this out of the way.... <module>openam-extlib</module> -->
+        <module>openam-extlib</module>
         <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
 
   </modules>

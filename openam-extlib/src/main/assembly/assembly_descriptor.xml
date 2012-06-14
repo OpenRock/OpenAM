@@ -11,7 +11,7 @@
         <!-- Extlib Dependencies -->
         <fileSet>
             <directory>${basedir}/target/extlib</directory>
-            <outputDirectory>${basedir}/openam/products/extlib</outputDirectory>
+            <outputDirectory>${basedir}/target</outputDirectory>
             <includes>
                 <include>**/**</include>
             </includes>
