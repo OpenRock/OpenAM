@@ -156,13 +156,6 @@
             <!-- This Version -->
         </dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-diagnostics</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-
     </dependencies>
 
 </project>
