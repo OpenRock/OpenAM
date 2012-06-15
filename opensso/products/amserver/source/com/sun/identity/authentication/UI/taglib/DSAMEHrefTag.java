@@ -27,7 +27,8 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock Inc.
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.UI.taglib;
 
@@ -132,6 +133,8 @@ implements BodyTag {
                 // as JSP tag attributes
                 appendQueryParams(buffer);
                 
+                buffer.append("\"");
+                
                 if (getTarget() != null) {
                     buffer.append(" target=\"")
                     .append(getTarget())
@@ -148,8 +151,6 @@ implements BodyTag {
                 appendCommonHtmlAttributes(buffer);
                 appendJavaScriptAttributes(buffer);
                 appendStyleAttributes(buffer);
-                
-                buffer.append("\"");
                 
                 buffer.append(">");
                 displayed = true;
