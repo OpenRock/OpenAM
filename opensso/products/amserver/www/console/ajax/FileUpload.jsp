@@ -25,6 +25,10 @@
    $Id: FileUpload.jsp,v 1.4 2009/08/07 23:39:08 asyhuang Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <%@page import="com.iplanet.sso.SSOException"%>
 <%@page import="com.iplanet.sso.SSOToken"%>
@@ -97,11 +101,25 @@
                         rb, "file.upload.size.limit.exceeded", debug);               
                 out.println("<div id=\"data\">" + "Error: " + data + "</div>");
             } else {               
+				// Parses a content-type String for the boundary.
+                String contentType = request.getContentType();
+                if (contentType == null) {
+                    contentType = request.getHeader("Content-Type");
+                }
+                String boundary = "";
+                if (contentType != null && contentType.lastIndexOf("boundary=") != -1) {
+                    boundary = contentType.substring(contentType.lastIndexOf("boundary=") + 9);
+                    if (boundary.endsWith("\n")) {
+                        boundary = boundary.substring(0, boundary.length()-1);
+                    }
+                }
+
+
                 String data = buff.toString();
                 int idx = data.indexOf("filename=\"");
                 idx = data.indexOf("\n\n", idx);
                 data = data.substring(idx + 2);
-                idx = data.lastIndexOf("\n-----------------");
+                idx = data.lastIndexOf("\n--" + boundary);
                 data = data.substring(0, idx);
                 data = data.replace("<", "&lt;");
                 data = data.replace(">", "&gt;");               
