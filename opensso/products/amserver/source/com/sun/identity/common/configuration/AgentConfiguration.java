@@ -24,6 +24,8 @@
  *
  * $Id: AgentConfiguration.java,v 1.52 2010/01/07 18:07:39 veiming Exp $
  *
+ * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.common.configuration;
@@ -1037,7 +1039,11 @@ public class AgentConfiguration {
                     Set set = (Set)attrValues.get(key);
                     String v = ((set != null) && !set.isEmpty()) ? 
                         (String)set.iterator().next() : "";
-                    results.add(key.substring(attrName.length()) + "=" + v);
+                    if (key.indexOf(DEVICE_KEY) == 0) {
+                        results.add(v);
+                    } else {
+                        results.add(key.substring(attrName.length()) + "=" + v);
+                    }
                     keysToDelete.add(key);
                 }
             }
