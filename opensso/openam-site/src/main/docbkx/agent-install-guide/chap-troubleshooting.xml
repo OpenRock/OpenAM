@@ -32,18 +32,23 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Troubleshooting</title>
  <indexterm><primary>Troubleshooting</primary></indexterm>
- <para>This chapter offers solutions to common problems when installing OpenAM
+ <para>This chapter offers solutions to issues during installation of OpenAM
   policy agents.</para>
  
  <qandaset xml:id="solutions-to-common-issues" defaultlabel="qanda">
   <title>Solutions to Common Issues</title>
 
-  <qandaentry xml:id="replace-this-id-with-one-that-reflects-the-question">
+   <para>This section offers solutions to common problems when installing 
+  OpenAM policy agents.</para>
+  
+  <qandaentry xml:id="debug-file-and-SELinux">
    <question>
-    <para>TODO?</para>
+    <para>I am trying to install the policy agent on SELinux and I am getting error messages
+  after installation. What happened?</para>
    </question>
    <answer>
-    <para>TODO.</para>
+    <para>SELinux must be properly configured to connect the WPA and Openam
+  nodes. Either re-configure SELinux or disable it, then reinstall the policy agent.</para>
    </answer>
   </qandaentry>
 
