@@ -35,10 +35,10 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-extlib</name>
-    <description>OpenAM Build Legacy extlib for subsequent antRun.
+    <name>openam-external-libraries</name>
+    <description>OpenAM External Library Dependencies
     </description>
-    <artifactId>openam-extlib</artifactId>
+    <artifactId>openam-external-libraries</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
@@ -95,7 +95,7 @@
                             <stripVersion>false</stripVersion>
                             <copyPom>false</copyPom>
                             <type>jar</type>
-                            <outputDirectory>${basedir}/target/extlib</outputDirectory>
+                            <outputDirectory>${basedir}/target/lib</outputDirectory>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
