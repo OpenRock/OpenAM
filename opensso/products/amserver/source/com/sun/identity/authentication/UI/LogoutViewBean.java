@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.authentication.UI;
 
@@ -61,6 +61,9 @@ import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.locale.L10NMessage;
+import com.sun.identity.sm.DNMapper;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 /**
  * This class is a default implementation of <code>LogoutViewBean</code> auth 
@@ -117,7 +120,6 @@ public class LogoutViewBean extends AuthViewBeanBase {
             intSess = AuthD.getSession(sessionID);
             if (intSess != null) {
                 populateL10NFileAttrs(intSess);
-                gotoUrl = AuthUtils.getValidGotoURL(request, orgDN);
                 String localeStr =  intSess.getProperty(ISAuthConstants.LOCALE);
                 // I18N get resource bundle
                 locale = com.iplanet.am.util.Locale.getLocale(localeStr);
@@ -152,6 +154,36 @@ public class LogoutViewBean extends AuthViewBeanBase {
                     logoutDebug.message("LogoutViewBean.forwardTo: "
                         + " Cannot get Login URL");
                 }
+            }
+        }
+
+        // If there is a gotoUrl value and the orgDN is null do some additional processing
+        if (orgDN == null && isGotoSet()) {
+            if (logoutDebug.messageEnabled()) {
+                logoutDebug.message("OrgDN was null, getting from request for goto validation");
+            }
+            // First check if there is a org parameter in request, for example realm=/sub-realm
+            String orgParm = AuthUtils.getOrgParam(AuthUtils.parseRequestParameters(request));
+            if (orgParm == null) {
+                if (logoutDebug.messageEnabled()) {
+                    logoutDebug.message("Attempting to get orgDN from AuthUtils for serverName " + request.getServerName());
+                }
+                orgDN = AuthUtils.getOrganizationDN(request.getServerName(), true, request);
+            } else {
+                if (logoutDebug.messageEnabled()) {
+                    logoutDebug.message("Attempting to get orgDN from AuthUtils for orgParm " + orgParm);
+                }
+                orgDN = AuthUtils.getOrganizationDN(orgParm, true, request);
+            }
+            if (orgDN == null) {
+                // Last resort, get it from the root domain
+                orgDN = DNMapper.orgNameToDN("/");
+            }
+        }
+        if (isGotoSet()) {
+            gotoUrl = AuthUtils.getValidGotoURL(request, orgDN);
+            if (logoutDebug.messageEnabled()) {
+                logoutDebug.message("Goto after validation for orgDN: " + orgDN + " gotoUrl: " + gotoUrl);
             }
         }
         
