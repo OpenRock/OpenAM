@@ -119,7 +119,24 @@
             </resource>
             <resource>
                 <filtering>false</filtering>
-                <directory>src/main/resources/locale</directory>
+                <directory>src/main/resources/locale/</directory>
+                <targetPath>${project.build.directory}/classes</targetPath>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+                <excludes>
+                    <exclude>de_DE</exclude>
+                    <exclude>es_ES</exclude>
+                    <exclude>fr_FR</exclude>
+                    <exclude>ja_JP</exclude>
+                    <exclude>ko_KR</exclude>
+                    <exclude>zh_CN</exclude>
+                    <exclude>zh_TW</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/de_DE/</directory>
                 <targetPath>${project.build.directory}/classes</targetPath>
                 <includes>
                     <include>*.properties</include>
@@ -127,7 +144,23 @@
             </resource>
             <resource>
                 <filtering>false</filtering>
-                <directory>src/main/resources/locale/de_DE</directory>
+                <directory>src/main/resources/locale/es_ES/</directory>
+                <targetPath>${project.build.directory}/classes/</targetPath>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/fr_FR/</directory>
+                <targetPath>${project.build.directory}/classes/</targetPath>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/ja_JP/</directory>
                 <targetPath>${project.build.directory}/classes</targetPath>
                 <includes>
                     <include>*.properties</include>
@@ -135,7 +168,7 @@
             </resource>
             <resource>
                 <filtering>false</filtering>
-                <directory>src/main/resources/locale/de_DE</directory>
+                <directory>src/main/resources/locale/ko_KR/</directory>
                 <targetPath>${project.build.directory}/classes</targetPath>
                 <includes>
                     <include>*.properties</include>
@@ -143,7 +176,7 @@
             </resource>
             <resource>
                 <filtering>false</filtering>
-                <directory>src/main/resources/locale/de_DE</directory>
+                <directory>src/main/resources/locale/zh_CN/</directory>
                 <targetPath>${project.build.directory}/classes</targetPath>
                 <includes>
                     <include>*.properties</include>
@@ -151,47 +184,7 @@
             </resource>
             <resource>
                 <filtering>false</filtering>
-                <directory>src/main/resources/locale/es_ES</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/fr_FR</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/ja_JP</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/ko_KR</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/zh_CN</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/zh_TW</directory>
+                <directory>src/main/resources/locale/zh_TW/</directory>
                 <targetPath>${project.build.directory}/classes</targetPath>
                 <includes>
                     <include>*.properties</include>
