@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.websphere;
 
 import java.security.cert.X509Certificate;
@@ -131,7 +134,8 @@ public class AmRealmUserRegistry extends AgentBase
         try {
             AuthContext authContext =
                     new AuthContext(AgentConfiguration.getOrganizationName());
-            authContext.login();
+            authContext.login(AuthContext.IndexType.MODULE_INSTANCE,
+                    IApplicationSSOTokenProvider.MODULE_APPLICATION);
             if (authContext.hasMoreRequirements()) {
                 Callback[] callbacks = authContext.getRequirements();
                 if (callbacks != null) {
