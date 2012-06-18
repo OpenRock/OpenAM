@@ -114,17 +114,81 @@
                     <include>**/*</include>
                 </includes>
                 <excludes>
-                    <exclude>version_information.txt</exclude>
+                    <exclude>locale</exclude>
                 </excludes>
             </resource>
             <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale</directory>
                 <includes>
-                    <include>version_information.txt</include>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/de_DE</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/de_DE</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/de_DE</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/es_ES</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/fr_FR</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/ja_JP</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/ko_KR</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/zh_CN</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources/locale/zh_TW</directory>
+                <includes>
+                    <include>*.properties</include>
                 </includes>
             </resource>
         </resources>
+
         <testResources>
             <testResource>
                 <filtering>false</filtering>
@@ -134,6 +198,8 @@
                 </includes>
             </testResource>
         </testResources>
+
+
     </build>
 
 
