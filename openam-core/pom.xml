@@ -250,11 +250,6 @@
         </dependency>
 
         <dependency>
-            <groupId>berkeleydb</groupId>
-            <artifactId>berkeleydb</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>javax.el</groupId>
             <artifactId>el-api</artifactId>
         </dependency>
