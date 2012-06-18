@@ -66,6 +66,7 @@
                         <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>
                         <Value>org.forgerock.openam.authentication.modules.adaptive.Adaptive</Value>
 			<Value>org.forgerock.openam.authentication.modules.oauth2.OAuth</Value>
+			<Value>org.forgerock.openam.authentication.modules.oath.OATH</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"
