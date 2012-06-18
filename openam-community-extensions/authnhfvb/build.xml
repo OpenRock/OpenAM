@@ -22,9 +22,9 @@
    Copyright 2008 Sun Microsystems Inc. All Rights Reserved
 -->
 
-<project name="HitachiFvAuth" default="all" basedir=".">
+<project name="HitachiFvAuth" default="all" basedir="">
     <description>Builds Hitachi Finger Vein Auth Module</description>
-    <property file="./build.properties"/>
+    <property file="build.properties"/>
     <condition property="wsimport-script-suffix" value=".bat">
         <os family="windows"/>
     </condition>
