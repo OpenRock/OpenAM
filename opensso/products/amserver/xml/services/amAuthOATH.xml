@@ -64,7 +64,7 @@
 			 validator="RequiredValueValidator"
 			 i18nKey="a502">
           <DefaultValues>
-            <Value>postalAddress</Value>
+            <Value></Value>
           </DefaultValues>
         </AttributeSchema>
 	<AttributeSchema name="iplanet-am-auth-oath-algorithm"
@@ -93,7 +93,7 @@
 			 syntax="string"
 			 i18nKey="a505">
 	  <DefaultValues>
-	    <Value>telephoneNumber</Value>
+	    <Value></Value>
 	  </DefaultValues>
 	</AttributeSchema>
 	<AttributeSchema name="iplanet-am-auth-oath-add-checksum"
@@ -137,7 +137,7 @@
                          syntax="string"
                          i18nKey="a510">
           <DefaultValues>
-            <Value>mail</Value>
+            <Value></Value>
           </DefaultValues>
         </AttributeSchema>
         <SubSchema name="serverconfig" inheritance="multiple">
@@ -162,7 +162,7 @@
 			   syntax="string"
 			   i18nKey="a502">
             <DefaultValues>
-              <Value>postalAddress</Value>
+              <Value></Value>
             </DefaultValues>
           </AttributeSchema>
           <AttributeSchema name="iplanet-am-auth-oath-algorithm"
@@ -190,7 +190,7 @@
 			   syntax="string"
 			   i18nKey="a505">
             <DefaultValues>
-	      <Value>telephoneNumber</Value>
+	      <Value></Value>
             </DefaultValues>
           </AttributeSchema>
           <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
@@ -234,7 +234,7 @@
                          syntax="string"
                          i18nKey="a510">
           <DefaultValues>
-            <Value>mail</Value>
+            <Value></Value>
           </DefaultValues>
         </AttributeSchema>
         </SubSchema>
