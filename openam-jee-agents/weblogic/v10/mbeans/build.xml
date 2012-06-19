@@ -53,7 +53,7 @@
 	<mkdir dir="${mbeans.build.dir}"/>
 	<mkdir dir="${mbeans.dist.dir}"/>
 	<copy file="${weblogic.lib.dir}/commo.dtd" todir="${mbeans.build.dir}"/> 
-	<copy file="./AgentAuthenticator.xml" todir="${mbeans.build.dir}"/> 
+	<copy file="AgentAuthenticator.xml" todir="${mbeans.build.dir}"/>
     </target>
 
     <!-- build class path -->

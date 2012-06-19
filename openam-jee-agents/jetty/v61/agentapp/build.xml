@@ -28,7 +28,7 @@
 
 -->
 
-<project name="agentApp" basedir = "." default="build">
+<project name="agentApp" basedir = "" default="build">
 
     <property name="appname" value="agentapp"/>
     <property name="agentapp.jsp.dir" value="${basedir}/jsp"/>

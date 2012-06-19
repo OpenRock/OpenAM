@@ -27,7 +27,7 @@
 
 -->
 
-<project name="LoanRequestorClient" default="all" basedir=".">
+<project name="LoanRequestorClient" default="all" basedir="">
     <description>Builds, tests, and runs the project LoanRequestorClient.</description>
     <property file="../../glassfish.properties"/>
     <condition property="wsimport-script-suffix" value=".bat">

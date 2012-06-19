@@ -30,8 +30,8 @@
 -->
 <project name="Open WSS Agents" default="usage">
     <description>Open Web Services Security Agents</description>
-    <import file="../products.xml" />
-    <import file="../amserver/amserver.xml" />
+    <import file="../openam/products/products.xml" />
+    <import file="../openam/products/amserver/amserver.xml" />
     <import file="../federation/openfm/openfm.xml" />
     <import file="../federation/library/library.xml" />
     <import file="../installtools/installtools.xml" />

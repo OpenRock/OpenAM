@@ -27,7 +27,7 @@
 
 -->
 
-<project name="StandAloneStockClient" default="default" basedir=".">
+<project name="StandAloneStockClient" default="default" basedir="">
     <description>Builds, tests, and runs the project stockclient.</description>
     <property file="../glassfish.properties"/>
     <property name="is.java-client.module" value="true"/>

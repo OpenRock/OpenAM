@@ -28,7 +28,7 @@
 
 -->
 
-<project name="agentApp" basedir = "." default="rebuild">
+<project name="agentApp" basedir = "" default="rebuild">
     
     <target name="rebuild" depends="clean,buildWAR"/>
     

@@ -28,7 +28,7 @@
 
 -->
 
-<project name="agentApp" basedir = "." default="rebuild">
+<project name="agentApp" basedir = "" default="rebuild">
     <property name="built.dir" value="${basedir}/built"/>
     <property name="jboss_v40.source.etc.dir" value="${basedir}/../etc"/>
     <target name="rebuild" depends="clean,build40"/>

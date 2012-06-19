@@ -24,7 +24,7 @@
    Copyright 2007 Sun Microsystems Inc. All Rights Reserved
 -->
 
-<project name="CreateProviders" default="all" basedir=".">
+<project name="CreateProviders" default="all" basedir="">
     <description>Configures the WSS providers and set up AMConfig.properties</description>
     <property file="ProviderConfig.properties"/>
     <property name="built.dir" value="built"/>

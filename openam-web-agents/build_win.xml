@@ -39,7 +39,7 @@
     <property name="build.type" value="32"/>
 
 
-    <import file="../products.xml" />
+    <import file="../openam/products/products.xml" />
     <import file="../installtools/installtools.xml" />
     <import file="webagents.xml" />
 
@@ -145,9 +145,9 @@
             <fileset dir="am" includes="**/*.exp"/>
             <fileset dir="am" includes="**/*.exe"/>
             <fileset dir="am" includes="**/*.res"/>
-            <fileset dir="." includes="*.pdb"/>
-            <fileset dir="." includes="*.idb"/>
-            <fileset dir="." includes="svn.properties"/>
+            <fileset dir="../openam/products/webagents" includes="*.pdb"/>
+            <fileset dir="../openam/products/webagents" includes="*.idb"/>
+            <fileset dir="../openam/products/webagents" includes="svn.properties"/>
         </delete>
         <delete verbose="true" includeemptydirs="true">
             <fileset dir="built" includes="**/**" />

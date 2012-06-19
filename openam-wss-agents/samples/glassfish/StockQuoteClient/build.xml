@@ -27,7 +27,7 @@
 
 -->
 
-<project name="StockQuoteClient" default="all" basedir=".">
+<project name="StockQuoteClient" default="all" basedir="">
     <description>Builds, tests, and runs the project stockclient.</description>
     <property file="../glassfish.properties"/>
     <condition property="wsimport-script-suffix" value=".bat">
