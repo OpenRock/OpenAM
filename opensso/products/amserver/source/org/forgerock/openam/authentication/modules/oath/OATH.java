@@ -378,6 +378,9 @@ public class OATH extends AMLoginModule {
         //get secret key
         secretKey = (String)(secretKeySet.iterator().next());
         
+        //get rid of white space in string (messes witht he data converter)
+        secretKey = secretKey.replaceAll("\\s+", "");
+        
         //check size of key
         if (secretKey.isEmpty() || secretKey == null){
             debug.error("OATH" + 
