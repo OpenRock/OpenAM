@@ -51,6 +51,82 @@
     <build>
         <finalName>openam</finalName>
         <plugins>
+            <!-- Generate MIB Source Files to prepare for Compilation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-mib-source</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <target>
+                                <property name="compile_classpath" refid="maven.compile.classpath"/>
+
+                                <mkdir dir="${project.build.directory}/classes" />
+                                <property name="server.resources" value="${project.basedir}/src/main/resources"/>
+                                <!-- Align the locale for WAR Inclusion. -->
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/de_DE">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/es_ES">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/fr_FR">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/ja_JP">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/ko_KR">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/zh_CN">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/locale/zh_TW">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+
+
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <delimiters>
+                        <delimiter>${*}</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -93,16 +169,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <delimiters>
-                        <delimiter>${*}</delimiter>
-                    </delimiters>
-                    <useDefaultDelimiters>false</useDefaultDelimiters>
-                </configuration>
-            </plugin>
 
         </plugins>
 
@@ -114,82 +180,10 @@
                     <include>**/*</include>
                 </includes>
                 <excludes>
-                    <exclude>locale</exclude>
+                    <exclude>locale/**</exclude>
                 </excludes>
             </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-                <excludes>
-                    <exclude>de_DE</exclude>
-                    <exclude>es_ES</exclude>
-                    <exclude>fr_FR</exclude>
-                    <exclude>ja_JP</exclude>
-                    <exclude>ko_KR</exclude>
-                    <exclude>zh_CN</exclude>
-                    <exclude>zh_TW</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/de_DE/</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/es_ES/</directory>
-                <targetPath>${project.build.directory}/classes/</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/fr_FR/</directory>
-                <targetPath>${project.build.directory}/classes/</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/ja_JP/</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/ko_KR/</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/zh_CN/</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources/locale/zh_TW/</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
+
         </resources>
 
         <testResources>
