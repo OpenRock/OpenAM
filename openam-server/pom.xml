@@ -149,6 +149,48 @@
                                     </fileset>
                                 </copy>
 
+                                <!-- Align the openfm-locale for WAR Inclusion. -->
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/openfm-locale">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/openfm-locale/de_DE">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/openfm-locale/es_ES">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/√locale/fr_FR">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/openfm-locale/ja_JP">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/openfm-locale/ko_KR">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/federation-locale/zh_CN">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/federation-locale/zh_TW">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+
 
 
                             </target>
@@ -225,6 +267,7 @@
                 <excludes>
                     <exclude>locale/**</exclude>
                     <exclude>federation-locale/**</exclude>
+                    <exclude>openfm-locale/**</exclude>
                 </excludes>
             </resource>
 
