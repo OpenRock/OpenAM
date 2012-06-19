@@ -64,7 +64,16 @@
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
 
                                 <mkdir dir="${project.build.directory}/classes" />
+
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
+
+                                <!-- Align the DTDs for WAR Inclusion. -->
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/dtd">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+
                                 <!-- Align the locale for WAR Inclusion. -->
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
                                     <fileset dir="${server.resources}/locale">
@@ -268,6 +277,7 @@
                     <exclude>locale/**</exclude>
                     <exclude>federation-locale/**</exclude>
                     <exclude>openfm-locale/**</exclude>
+                    <exclude>dtd/**</exclude>
                 </excludes>
             </resource>
 
