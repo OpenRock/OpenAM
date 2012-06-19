@@ -166,7 +166,7 @@
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/√locale/fr_FR">
+                                    <fileset dir="${server.resources}/openfm-locale/fr_FR">
                                         <include name="*.properties" />
                                     </fileset>
                                 </copy>
@@ -181,12 +181,12 @@
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/zh_CN">
+                                    <fileset dir="${server.resources}/openfm-locale/zh_CN">
                                         <include name="*.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/zh_TW">
+                                    <fileset dir="${server.resources}/openfm-locale/zh_TW">
                                         <include name="*.properties" />
                                     </fileset>
                                 </copy>
