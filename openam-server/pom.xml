@@ -51,13 +51,13 @@
     <build>
         <finalName>openam</finalName>
         <plugins>
-            <!-- Generate MIB Source Files to prepare for Compilation -->
+            <!-- Pre-Packaging steop for WAR elements. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-mib-source</id>
+                        <id>war-pre-packaging</id>
                         <phase>validate</phase>
                         <configuration>
                             <target>
