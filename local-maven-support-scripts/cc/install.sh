@@ -93,7 +93,7 @@ mvn -e -X org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file \
                        -DlocalRepositoryPath=../../local-maven-support-repository \
                        -Dfile=cc_zh_CN.jar \
                        -DgroupId=com.sun.web.ui \
-                       -DartifactId=cc_zh_CC \
+                       -DartifactId=cc_zh_CN \
                        -Dversion=2008-08-08 \
                        -Dpackaging=jar \
                        -DgeneratePom=true \
