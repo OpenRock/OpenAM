@@ -67,9 +67,9 @@
 
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
 
-                                <!-- Align the DTDs for WAR Inclusion. -->
+                                <!-- Align the Service Definitions for WAR Inclusion. -->
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/dtd">
+                                    <fileset dir="${server.resources}/services">
                                         <include name="*.properties" />
                                     </fileset>
                                 </copy>
@@ -277,7 +277,7 @@
                     <exclude>locale/**</exclude>
                     <exclude>federation-locale/**</exclude>
                     <exclude>openfm-locale/**</exclude>
-                    <exclude>dtd/**</exclude>
+                    <exclude>services/**</exclude>
                 </excludes>
             </resource>
 
