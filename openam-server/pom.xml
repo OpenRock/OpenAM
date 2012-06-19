@@ -70,7 +70,7 @@
                                 <!-- Align the Service Definitions for WAR Inclusion. -->
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
                                     <fileset dir="${server.resources}/services">
-                                        <include name="*.properties" />
+                                        <include name="*.*" />
                                     </fileset>
                                 </copy>
 
@@ -278,6 +278,8 @@
                     <exclude>federation-locale/**</exclude>
                     <exclude>openfm-locale/**</exclude>
                     <exclude>services/**</exclude>
+                    <exclude>distUI/**</exclude>
+                    <exclude>UI/**</exclude>
                 </excludes>
             </resource>
 
