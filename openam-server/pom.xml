@@ -221,7 +221,7 @@
                     <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
                     <archive>
                         <manifestEntries>
-                            <Specification-Title>OpenAm Server</Specification-Title>
+                            <Specification-Title>OpenAM Server</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
                             <Implementation-Title>OpenAM Server</Implementation-Title>
