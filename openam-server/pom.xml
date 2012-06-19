@@ -67,6 +67,13 @@
 
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
 
+                                <!-- Align the Console Definitions for WAR Inclusion. -->
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/console">
+                                        <include name="*.properties" />
+                                    </fileset>
+                                </copy>
+
                                 <!-- Align the Service Definitions for WAR Inclusion. -->
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
                                     <fileset dir="${server.resources}/services">
@@ -274,6 +281,7 @@
                     <include>**/*</include>
                 </includes>
                 <excludes>
+                    <exclude>console/**</exclude>
                     <exclude>locale/**</exclude>
                     <exclude>federation-locale/**</exclude>
                     <exclude>openfm-locale/**</exclude>
@@ -334,6 +342,67 @@
             <artifactId>OpenFM</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
+        </dependency>
+
+        <!-- Additional Dependencies for AM Server -->
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_de</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_es</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_fr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_it</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_ja</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_ko</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_sv</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh_CN</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh_HK</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh_TW</artifactId>
         </dependency>
 
     </dependencies>
