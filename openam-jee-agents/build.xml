@@ -32,7 +32,7 @@
                 
     <description>OpenSSO Policy Agents for J2EE Servers</description>
 
-    <import file="../products.xml" />
+    <import file="../openam/products/products.xml" />
     <import file="j2eeagents.xml" />
 
     <!-- global environment -->
