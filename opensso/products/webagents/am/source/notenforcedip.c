@@ -5,6 +5,7 @@
 
 #ifdef _MSC_VER
 #define WIN32_LEAN_AND_MEAN
+#define NTDDI_VERSION 0x0501
 #include <winsock2.h>
 #include <in6addr.h>
 #include <ws2tcpip.h>
@@ -22,6 +23,44 @@ static const unsigned char inverted_bits[8] = {0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF
 static uint8_t zero[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static uint8_t one6[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static uint8_t one4[16] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+#ifdef _MSC_VER
+int inet_pton(int af, const char *src, void *dst) {
+    struct sockaddr_storage ss;
+    int size = sizeof (ss);
+    char src_copy[INET6_ADDRSTRLEN + 1];
+    memset(&(ss), 0, sizeof (ss));
+    strncpy(src_copy, src, INET6_ADDRSTRLEN + 1);
+    src_copy[INET6_ADDRSTRLEN] = 0;
+    if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr *) &ss, &size) == 0) {
+        switch (af) {
+            case AF_INET:
+                *(struct in_addr *) dst = ((struct sockaddr_in *) &ss)->sin_addr;
+                return 1;
+            case AF_INET6:
+                *(struct in6_addr *) dst = ((struct sockaddr_in6 *) &ss)->sin6_addr;
+                return 1;
+        }
+    }
+    return 0;
+}
+
+const char *inet_ntop(int af, const void *src, char *dst, socklen_t size) {
+    struct sockaddr_storage ss;
+    unsigned long s = size;
+    memset(&(ss), 0, sizeof (ss));
+    ss.ss_family = af;
+    switch (af) {
+        case AF_INET:
+            ((struct sockaddr_in *) &ss)->sin_addr = *(struct in_addr *) src;
+            break;
+        case AF_INET6:
+            ((struct sockaddr_in6 *) &ss)->sin6_addr = *(struct in6_addr *) src;
+            break;
+    }
+    return (WSAAddressToString((struct sockaddr *) &ss, sizeof (ss), NULL, dst, &s) == 0) ? dst : NULL;
+}
+#endif
 
 static int address(const char *ip, uint8_t *addr) {
     struct in_addr a4;
