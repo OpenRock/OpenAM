@@ -51,7 +51,7 @@
     <build>
         <finalName>openam</finalName>
         <plugins>
-            <!-- Pre-Packaging steop for WAR elements. -->
+            <!-- Pre-Packaging step for WAR elements. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -60,351 +60,430 @@
                         <id>war-pre-packaging</id>
                         <phase>validate</phase>
                         <configuration>
-                            <target>
-                                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                            <target name="war-pre-packaging">
+                                <property name="build.class.path" refid="maven.compile.classpath"/>
 
-                                <mkdir dir="${project.build.directory}/classes" />
+                                <mkdir dir="${project.build.directory}/classes"/>
 
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
 
-                                <!-- Align the Console Definitions for WAR Inclusion. -->
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/console">
-                                        <include name="*.properties" />
+                                <property name="amserver.target.resources.dir" value="${project.build.directory}/classes"/>
+                                <property name="amserver.resources.i18n.dir" value="${server.resources}/locale"/>
+
+
+                                <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
+                                    <fileset dir="${amserver.resources.i18n.dir}">
+                                        <include name="**/*.properties"/>
+                                        <exclude name="Services.properties"/>
+                                        <exclude name="ums.properties"/>
+                                        <exclude name="sso.properties"/>
+                                        <exclude name="SMS.properties"/>
+                                        <exclude name="authentication_util.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <!-- Align the Service Definitions for WAR Inclusion. -->
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/services">
-                                        <include name="*.*" />
+                                <copy todir="${amserver.target.resources.dir}" filtering="true">
+                                    <fileset dir="${amserver.resources.i18n.dir}">
+                                        <include name="*.properties"/>
+                                        <exclude name="Services.properties"/>
+                                        <exclude name="ums.properties"/>
+                                        <exclude name="sso.properties"/>
+                                        <exclude name="SMS.properties"/>
+                                        <exclude name="authentication_util.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+
+                                <!--
+                                <copy todir="${amserver.target.resources.dir}" filtering="true">
+                                    <fileset dir="${amserver.resources.i18n.dir}"
+                                             includes="*.properties"/>
+                                    <fileset dir="${amserver.console.res.dir}" includes="*.properties"/>
+                                    <fileset dir="${amserver.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.console.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.jaxrpc.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.services.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.authmodule.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.dtd.xml.dir}"
+                                             includes="**/*.dtd" excludes="dtd/sms.dtd"/>
+                                </copy>
+                                -->
+
+                                <concat destfile="${amserver.target.resources.dir}/amSDK.properties">
+                                    <fileset dir="${amserver.resources.i18n.dir}">
+                                        <include name="Services.properties"/>
+                                        <include name="DSConfig.properties"/>
+                                        <include name="ums.properties"/>
+                                        <include name="sso.properties"/>
+                                        <include name="SMS.properties"/>
+                                        <include name="authentication_util.properties"/>
+                                    </fileset>
+                                </concat>
+
+                                <java classname="com.sun.identity.tools.nightly.MergeSDKProperties"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="${amserver.resources.i18n.dir}"/>
+                                    <arg value="${amserver.target.resources.dir}"/>
+                                </java>
+
+                                <!--
+
+                                <copy file="${amserver.target.resources.dir}/amSDK.properties"
+                                      tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
+                                <copy file="${amserver.dtd.xml.dir}/smsflatfile.dtd"
+                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm/flatfile"/>
+                                <copy file="${amserver.dtd.xml.dir}/policyAdmin.dtd"
+                                      todir="${amserver.target.resources.dir}/com/sun/identity/policy"/>
+                                <copy file="${amserver.dtd.xml.dir}/sms.dtd"
+                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm"/>
+                                <copy todir="${amserver.target.resources.dir}/com/sun/identity/log/messageid">
+                                    <fileset dir="${amserver.log.xml.dir}">
+                                        <include name="*.xml"/>
+                                        <include name="*.dtd"/>
                                     </fileset>
                                 </copy>
 
-                                <!-- Align the locale for WAR Inclusion. -->
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/de_DE">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/es_ES">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/fr_FR">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/ja_JP">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/ko_KR">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/zh_CN">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/locale/zh_TW">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <!-- Align the federation-locale for WAR Inclusion. -->
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/de_DE">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/es_ES">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/fr_FR">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/ja_JP">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/ko_KR">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/zh_CN">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/federation-locale/zh_TW">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <!-- Align the openfm-locale for WAR Inclusion. -->
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/de_DE">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/es_ES">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/fr_FR">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/ja_JP">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/ko_KR">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/zh_CN">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/classes" overwrite="false">
-                                    <fileset dir="${server.resources}/openfm-locale/zh_TW">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                </copy>
+                                -->
 
 
+                            <!-- Align the Console Definitions for WAR Inclusion. -->
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/console">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
 
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+                            <!-- Align the Service Definitions for WAR Inclusion. -->
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/services">
+                                    <include name="*.*"/>
+                                </fileset>
+                            </copy>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <delimiters>
-                        <delimiter>${*}</delimiter>
-                    </delimiters>
-                    <useDefaultDelimiters>false</useDefaultDelimiters>
-                </configuration>
-            </plugin>
+                            <!-- Align the locale for WAR Inclusion.
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/de_DE">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/es_ES">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/fr_FR">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/ja_JP">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/ko_KR">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/zh_CN">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/locale/zh_TW">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            -->
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <outputFileNameMapping>openam.war</outputFileNameMapping>
-                    <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
-                    <archive>
-                        <manifestEntries>
-                            <Specification-Title>OpenAM Server</Specification-Title>
-                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Server</Implementation-Title>
-                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
-                            </Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                        </manifestEntries>
-                    </archive>
-                    <webResources>
-                        <webResource>
-                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
-                            <includes>
-                                <include>dispatcher-servlet.xml</include>
-                                <include>web.xml</include>
-                            </includes>
-                            <targetPath>WEB-INF</targetPath>
-                            <filtering>true</filtering>
-                        </webResource>
-                        <webResource>
-                            <directory>${basedir}/src/main/webapp/META-INF</directory>
-                            <includes>
-                                <include>dispatcher-servlet.xml</include>
-                                <include>web.xml</include>
-                            </includes>
-                            <targetPath>META-INF</targetPath>
-                            <filtering>true</filtering>
-                        </webResource>
-                    </webResources>
-                </configuration>
-            </plugin>
+                            <!-- Align the federation-locale for WAR Inclusion. -->
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/de_DE">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/es_ES">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/fr_FR">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/ja_JP">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/ko_KR">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/zh_CN">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/federation-locale/zh_TW">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+
+                            <!-- Align the openfm-locale for WAR Inclusion. -->
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/de_DE">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/es_ES">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/fr_FR">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/ja_JP">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/ko_KR">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/zh_CN">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy todir="${project.build.directory}/classes" overwrite="false">
+                                <fileset dir="${server.resources}/openfm-locale/zh_TW">
+                                    <include name="*.properties"/>
+                                </fileset>
+                            </copy>
 
 
-        </plugins>
+                        </target>
+                    </configuration>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
 
-        <resources>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>console/**</exclude>
-                    <exclude>locale/**</exclude>
-                    <exclude>federation-locale/**</exclude>
-                    <exclude>openfm-locale/**</exclude>
-                    <exclude>services/**</exclude>
-                    <exclude>distUI/**</exclude>
-                    <exclude>UI/**</exclude>
-                </excludes>
-            </resource>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+                <delimiters>
+                    <delimiter>${*}</delimiter>
+                </delimiters>
+                <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+        </plugin>
 
-        </resources>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+                <outputFileNameMapping>openam.war</outputFileNameMapping>
+                <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
+                <archive>
+                    <manifestEntries>
+                        <Specification-Title>OpenAM Server</Specification-Title>
+                        <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                        <Specification-Vendor>ForgeRock</Specification-Vendor>
+                        <Implementation-Title>OpenAM Server</Implementation-Title>
+                        <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                        </Implementation-Version>
+                        <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                        <Build-Time>${maven.build.timestamp}</Build-Time>
+                    </manifestEntries>
+                </archive>
+                <webResources>
+                    <webResource>
+                        <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                        <includes>
+                            <include>dispatcher-servlet.xml</include>
+                            <include>web.xml</include>
+                        </includes>
+                        <targetPath>WEB-INF</targetPath>
+                        <filtering>true</filtering>
+                    </webResource>
+                    <webResource>
+                        <directory>${basedir}/src/main/webapp/META-INF</directory>
+                        <includes>
+                            <include>dispatcher-servlet.xml</include>
+                            <include>web.xml</include>
+                        </includes>
+                        <targetPath>META-INF</targetPath>
+                        <filtering>true</filtering>
+                    </webResource>
+                </webResources>
+            </configuration>
+        </plugin>
 
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
+
+    </plugins>
+
+    <resources>
+        <resource>
+            <filtering>false</filtering>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude>console/**</exclude>
+                <exclude>locale/**</exclude>
+                <exclude>federation-locale/**</exclude>
+                <exclude>openfm-locale/**</exclude>
+                <exclude>services/**</exclude>
+                <exclude>distUI/**</exclude>
+                <exclude>UI/**</exclude>
+            </excludes>
+        </resource>
+
+    </resources>
+
+    <testResources>
+        <testResource>
+            <filtering>false</filtering>
+            <directory>src/test/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </testResource>
+    </testResources>
 
 
-    </build>
+</build>
 
 
-    <dependencies>
+<dependencies>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
+<dependency>
+    <groupId>org.forgerock</groupId>
+    <artifactId>openam-core</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <!-- This Version -->
+</dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-installtools</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
+<dependency>
+    <groupId>org.forgerock</groupId>
+    <artifactId>openam-installtools</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <!-- This Version -->
+</dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-external-libraries</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
+<dependency>
+    <groupId>org.forgerock</groupId>
+    <artifactId>openam-external-libraries</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <!-- This Version -->
+</dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>Library</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
+<dependency>
+    <groupId>org.forgerock</groupId>
+    <artifactId>Library</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <!-- This Version -->
+</dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>OpenFM</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
+<dependency>
+    <groupId>org.forgerock</groupId>
+    <artifactId>OpenFM</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <!-- This Version -->
+</dependency>
 
-        <!-- Additional Dependencies for AM Server -->
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc</artifactId>
-        </dependency>
+<!-- Additional Dependencies for AM Server -->
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_de</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_de</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_es</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_es</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_fr</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_fr</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_it</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_it</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_ja</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_ja</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_ko</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_ko</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_sv</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_sv</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_zh</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_CN</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_zh_CN</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_HK</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_zh_HK</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_TW</artifactId>
-        </dependency>
+<dependency>
+    <groupId>com.sun.web.ui</groupId>
+    <artifactId>cc_zh_TW</artifactId>
+</dependency>
 
-    </dependencies>
+</dependencies>
 
-</project>
+        </project>
