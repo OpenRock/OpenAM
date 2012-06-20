@@ -325,13 +325,13 @@ Install log file location:
   <title>Custom Apache 2.2 Web Policy Agent Installation</title>
   
   <para>When running multiple Apache 2.2 servers on the same host, use
-  <command>agentadmin --custom-install</command>.</para>
+  <command>./agentadmin --custom-install</command>.</para>
   
   <para>When performing a scripted, silent installation, use
-  <command>agentadmin --install --saveResponse
+  <command>./agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
   to create a response file for scripted installation. Then install silently
-  using <command>agentadmin --install --useResponse
+  using <command>./agentadmin --install --useResponse
   <replaceable>response-file</replaceable></command>.</para>
  </section>
  
