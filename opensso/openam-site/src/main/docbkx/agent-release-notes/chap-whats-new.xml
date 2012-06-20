@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-whats-new'
@@ -40,6 +40,12 @@
   <itemizedlist>
    <listitem>
     <para>TODO: For new, see JIRA for a complete list</para>
+   </listitem>
+   <listitem>
+    <para>If you have already validated the URLs in your web policy agent
+    configuration, you can disable URL validation during the bootstrap phase
+    using the <literal>com.forgerock.agents.ext.url.validation.disable</literal>
+    property (OPENAM-1270).</para>
    </listitem>
    <listitem>
     <para>Policy agents now support IPv6 for notenforced IP addresses
