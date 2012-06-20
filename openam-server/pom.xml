@@ -70,6 +70,12 @@
                                 <property name="amserver.target.resources.dir" value="${project.build.directory}/classes"/>
                                 <property name="amserver.resources.i18n.dir" value="${server.resources}/locale"/>
 
+                                <mkdir dir="${project.build.directory}/classes/templates/opendj"/>
+                                <copy todir="${project.build.directory}/classes/templates/opendj" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-external-libraries/binary">
+                                        <include name="opendj.zip"/>
+                                    </fileset>
+                                </copy>
 
                                 <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
                                     <fileset dir="${amserver.resources.i18n.dir}">
