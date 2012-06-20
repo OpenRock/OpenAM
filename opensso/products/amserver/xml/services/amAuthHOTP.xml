@@ -144,7 +144,18 @@
                         <Value>SMS and E-mail</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
+		<AttributeSchema
+		   name="sunAMAuthHOTPAutoClicking"
+		   cosQualifier="default" type="single"
+		   syntax="boolean" i18nKey="a520">
+		  <BooleanValues>
+		    <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+		    <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+		  </BooleanValues>
+		  <DefaultValues>
+		    <Value>false</Value>
+		  </DefaultValues>
+		</AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="sunAMAuthHOTPAuthLevel"
                         type="single"
@@ -247,11 +258,23 @@
                             <Value>SMS and E-mail</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                 </SubSchema>
+		    <AttributeSchema
+                      name="sunAMAuthHOTPAutoClicking"
+                      cosQualifier="default" type="single"
+                      syntax="boolean" i18nKey="a520">
+                      <BooleanValues>
+			<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+			<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+		      </BooleanValues>
+                      <DefaultValues>
+			<Value>false</Value>
+                      </DefaultValues>
+		    </AttributeSchema>
+                </SubSchema>
             </Organization>
         </Schema>
         <Configuration>
-            <OrganizationConfiguration name="/">
+          <OrganizationConfiguration name="/">
                 <AttributeValuePair>
                     <Attribute name="sunAMAuthHOTPAuthLevel"/>
                     <Value>0</Value>

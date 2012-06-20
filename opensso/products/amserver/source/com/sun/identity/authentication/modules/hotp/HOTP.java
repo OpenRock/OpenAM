@@ -101,6 +101,13 @@ public class HOTP extends AMLoginModule {
     String codeValidityDuration = null;
     String codeLength = null;
     String codeDelivery = null;
+    
+    private int START_STATE = 2;
+   
+    private static final String AUTO_CLICKING = "sunAMAuthHOTPAutoClicking";
+    private static final String SKIP_HOTP = "skipHOTP";
+    boolean skip = false;
+    boolean hotpAutoClicking = false;
 
     public HOTP() {
         amAuthHOTP = "amAuthHOTP";
@@ -147,13 +154,20 @@ public class HOTP extends AMLoginModule {
             debug.error("HOTP.init() : " + "Unable to set userName : ", e);
         }
         this.sharedState = sharedState;
+        
+        if(sharedState.containsKey(SKIP_HOTP)) {
+            skip = (Boolean) sharedState.get(SKIP_HOTP);
+        }
+      
+        hotpAutoClicking = CollectionHelper.getMapAttr(options, AUTO_CLICKING).equals("true") ? true : false;
     }
 
     public int process(Callback[] callbacks, int state)
             throws AuthLoginException {
-        currentState = state;
-        int retVal = 0;
-        int action = 0;
+        if(skip) {
+            debug.message("Skipping HOTP module");
+            return ISAuthConstants.LOGIN_SUCCEED;
+        }
         try {
             if (userName == null || userName.length() == 0) {
                 // session upgrade case. Need to find the user ID from the old
@@ -174,34 +188,55 @@ public class HOTP extends AMLoginModule {
                 if (userName == null || userName.length() == 0) {
                     throw new AuthLoginException("amAuth", "noUserName", null);
                 }
+            } 
+        } catch (SSOException e) {
+                debug.error("HOTP.process() : " + "SSOException", e);
+                throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
             }
-
-            if (currentState == ISAuthConstants.LOGIN_START) {
-                // callback[1] is OTP code
+        
+        if( state == 1) {
+            if(hotpAutoClicking) {
+                debug.message("Auto sending OTP code");
+                try {
+                    sentHOTPCode = sendHOTPCode();
+                    substituteHeader(START_STATE, bundle.getString("send.success"));
+                } catch (AuthLoginException ale) {
+                    substituteHeader(START_STATE, bundle.getString("send.fail"));
+                }
+            }
+            return START_STATE;
+        }
+        
+        currentState = state;
+        int retVal = 0;
+        int action = 0;
+        try {    
+            if (currentState == START_STATE) {
+                // callback[0] is OTP code
                 // callback[1] is user selected button index
                 // action = 0 is Submit HOTP Code Button
                 // action = 1 is Request HOTP COde Button
                 if (callbacks != null && callbacks.length == 2) {
                     action =
-                            ((ConfirmationCallback)
-                            callbacks[1]).getSelectedIndex();
+                        ((ConfirmationCallback)
+                        callbacks[1]).getSelectedIndex();
                     if (debug.messageEnabled()) {
                         debug.message("HOTP.process() : " + "LOGIN page button index: " + action);
                     }
 
                     if (action == 0) { //Submit HOTP Code
                         enteredHOTPCode = String.valueOf(((PasswordCallback)
-                                callbacks[0]).getPassword());
+                            callbacks[0]).getPassword());
                         if (sentHOTPCode == null ||
-                                sentHOTPCode.length() == 0 ||
-                                enteredHOTPCode == null ||
-                                enteredHOTPCode.length() == 0) {
+                            sentHOTPCode.length() == 0 ||
+                            enteredHOTPCode == null ||
+                            enteredHOTPCode.length() == 0) {
                             if (debug.messageEnabled()) {
                                 debug.message("HOTP.process() : " + "invalid HOTP code");
                             }
                             setFailureID(userName); 
                             throw new InvalidPasswordException("amAuth",
-                                    "invalidPasswd", null);
+                                "invalidPasswd", null);
 
                         }
                         // Enfore the code validate time HOTP module config
@@ -238,12 +273,13 @@ public class HOTP extends AMLoginModule {
                     } else { // Send HOTP Code
                         try {
                             sentHOTPCode = sendHOTPCode();
-                            substituteHeader(ISAuthConstants.LOGIN_START, bundle.getString("send.success"));
+                            
+                            substituteHeader(START_STATE, bundle.getString("send.success"));
                         } catch (AuthLoginException ale) {
                             //it's already logged so we just handle the exception
-                            substituteHeader(ISAuthConstants.LOGIN_START, bundle.getString("send.failure"));
+                            substituteHeader(START_STATE, bundle.getString("send.failure"));
                         }
-                        return ISAuthConstants.LOGIN_START;
+                        return START_STATE;
                     }
                 } else {
                     setFailureID(userName);
@@ -261,10 +297,6 @@ public class HOTP extends AMLoginModule {
             }
             throw new AuthLoginException(amAuthHOTP, "authFailed", null, ex);
 
-        } catch (SSOException e) {
-            debug.error("HOTP.process() : " + "SSOException", e);
-            throw new InvalidPasswordException("amAuth",
-                    "invalidPasswd", null);
         }
     }
 
