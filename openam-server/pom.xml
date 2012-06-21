@@ -83,6 +83,18 @@
                                         <include name="opendj.zip"/>
                                     </fileset>
                                 </copy>
+                                <mkdir dir="${openam.target}/images"/>
+                                <copy todir="${openam.target}/images" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/images">
+                                        <include name="**/**"/>
+                                    </fileset>
+                                </copy>
+                                <mkdir dir="${openam.target}/css"/>
+                                <copy todir="${openam.target}/css" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/css">
+                                        <include name="**/**"/>
+                                    </fileset>
+                                </copy>
 
                                 <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
                                     <fileset dir="${amserver.resources.i18n.dir}">

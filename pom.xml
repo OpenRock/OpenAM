@@ -738,7 +738,6 @@
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc</artifactId>
                 <version>2008-08-08</version>
-                <scope>runtime</scope>
             </dependency>
 
             <dependency>
