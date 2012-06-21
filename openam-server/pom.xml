@@ -177,8 +177,8 @@
 
 
                                 <!-- Align the Config Definitions for WAR Inclusion. -->
-                                <mkdir dir="${openam.target}/config" />
-                                <copy todir="${openam.target}/config" overwrite="false">
+                                <mkdir dir="${project.build.directory}/classes/config"/>
+                                <copy todir="${project.build.directory}/classes/config" overwrite="false">
                                     <fileset dir="${server.resources}/config">
                                         <include name="agent/**"/>
                                         <include name="auth/**"/>
@@ -193,6 +193,15 @@
                                         <include name="upgrade/**"/>
                                         <include name="userstore/**"/>
                                         <include name="wizard/**"/>
+                                        <exclude name="*.htm" />
+                                        <exclude name="*.properties"/>
+                                    </fileset>
+                                </copy>
+                                <!-- Align the Config Definitions for WAR Inclusion. -->
+                                <copy todir="${project.build.directory}/classes" overwrite="false">
+                                    <fileset dir="${server.resources}/config">
+                                        <include name="*.htm"/>
+                                        <include name="*.properties"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
@@ -670,12 +679,13 @@
                 <excludes>
                     <exclude>config/**</exclude>
                     <exclude>console/**</exclude>
+                    <exclude>distUI/**</exclude>
                     <exclude>locale/**</exclude>
                     <exclude>federation-locale/**</exclude>
                     <exclude>openfm-locale/**</exclude>
                     <exclude>services/**</exclude>
-                    <exclude>distUI/**</exclude>
                     <exclude>UI/**</exclude>
+                    <exclude>*.conf</exclude>
                 </excludes>
             </resource>
 
