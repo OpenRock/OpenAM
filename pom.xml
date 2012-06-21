@@ -738,72 +738,84 @@
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_de</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_es</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_fr</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_it</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_ja</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_ko</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_sv</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh_CN</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh_HK</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh_TW</artifactId>
                 <version>2008-08-08</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
@@ -1373,7 +1385,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1-beta-1</version>
+                    <version>2.2</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>

@@ -629,25 +629,66 @@
                     </archive>
                     <webResources>
                         <webResource>
-                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                            <directory>${basedir}/src/main/webapp</directory>
                             <includes>
-                                <include>dispatcher-servlet.xml</include>
-                                <include>web.xml</include>
+                                <include>**/**</include>
                             </includes>
-                            <targetPath>WEB-INF</targetPath>
+                            <excludes>
+                                <exclude>META-INF</exclude>
+                                <exclude>WEB-INF</exclude>
+                            </excludes>
+                            <targetPath></targetPath>
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
                             <directory>${basedir}/src/main/webapp/META-INF</directory>
                             <includes>
-                                <include>dispatcher-servlet.xml</include>
-                                <include>web.xml</include>
+                                <include>**/**</include>
                             </includes>
                             <targetPath>META-INF</targetPath>
                             <filtering>true</filtering>
                         </webResource>
+                        <webResource>
+                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                            <includes>
+                                <include>web.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
                     </webResources>
                 </configuration>
+                <dependencies>
+
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>openam-external-libraries</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>openam-core</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>Library</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>OpenFM</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                        <!-- This Version -->
+                    </dependency>
+
+                </dependencies>
             </plugin>
 
 
@@ -693,98 +734,9 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
             <artifactId>openam-installtools</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-external-libraries</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>Library</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>OpenFM</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-
-        <!-- Additional Dependencies for AM Server -->
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_de</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_es</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_fr</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_it</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_ja</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_ko</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_sv</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_CN</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_HK</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_TW</artifactId>
         </dependency>
 
     </dependencies>

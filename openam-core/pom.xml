@@ -183,6 +183,67 @@
             <artifactId>cc</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_de</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_es</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_fr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_it</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_ja</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_ko</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_sv</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh_CN</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh_HK</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.web.ui</groupId>
+            <artifactId>cc_zh_TW</artifactId>
+        </dependency>
+
+
         <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
         <dependency>
             <groupId>asm</groupId>
