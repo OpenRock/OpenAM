@@ -176,31 +176,6 @@
                                     </fileset>
                                 </copy>
 
-
-                                <!-- Align the Config Definitions for WAR Inclusion. -->
-                                <!--
-                                <mkdir dir="${project.build.directory}/classes/config"/>
-                                <copy todir="${project.build.directory}/classes/config" overwrite="false">
-                                    <fileset dir="${server.resources}/config">
-                                        <include name="agent/**"/>
-                                        <include name="auth/**"/>
-                                        <include name="authc/**"/>
-                                        <include name="circle/**"/>
-                                        <include name="dlg/**"/>
-                                        <include name="federation/**"/>
-                                        <include name="identityProvider/**"/>
-                                        <include name="realm/**"/>
-                                        <include name="resource/**"/>
-                                        <include name="serviceProvider/**"/>
-                                        <include name="upgrade/**"/>
-                                        <include name="userstore/**"/>
-                                        <include name="wizard/**"/>
-                                        <exclude name="*.htm"/>
-                                        <exclude name="*.properties"/>
-                                    </fileset>
-                                </copy>
-                                -->
-
                                 <!-- Align the Config Definitions for WAR Inclusion. -->
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
                                     <fileset dir="${server.resources}/config">
@@ -289,9 +264,13 @@
                                             <fileset dir="${openfm.res.dir}" includes="*.properties" />
                                             <fileset dir="${library.xml.dir}" includes="*.xsl" />
                                         </copy>
+
+
                                         <copy todir="${war.package.dir}/WEB-INF/classes">
                                             <fileset dir="${oauth.config.res.dir}" includes="*.properties" />
                                         </copy>
+
+
                                         <copy file="${fedlibrary.dist.dir}/idpdiscovery.jar"
                                             tofile="${war.package.dir}/WEB-INF/lib/idpdiscovery.jar" />
                                         <copy file="${fedlibrary.dist.dir}/openfedlib.jar"
@@ -307,6 +286,9 @@
 
                                         <copy todir="${war.package.dir}/WEB-INF/lib"
                                               file="${oauth.dist.dir}/oauthservice.jar"/>
+
+
+
 
                                         <copy todir="${war.package.dir}/config/auth/default">
                                             <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
@@ -650,7 +632,6 @@
                             <directory>${basedir}/src/main/webapp/WEB-INF</directory>
                             <includes>
                                 <include>dispatcher-servlet.xml</include>
-                                <include>config/**</include>
                                 <include>web.xml</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
