@@ -63,21 +63,22 @@
                             <target name="war-pre-packaging">
                                 <property name="build.class.path" refid="maven.compile.classpath"/>
 
-                                <mkdir dir="${project.build.directory}/classes" />
+                                <mkdir dir="${project.build.directory}/classes"/>
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
 
-                                <mkdir dir="${project.build.directory}/openam" />
-                                <property name="openam.target" value="${project.build.directory}/openam" />
+                                <mkdir dir="${project.build.directory}/openam"/>
+                                <property name="openam.target" value="${project.build.directory}/openam"/>
 
                                 <property name="amserver.target.resources.dir"
                                           value="${project.build.directory}/classes"/>
 
                                 <property name="amserver.resources.i18n.dir" value="${server.resources}/locale"/>
-                                <property name="library.resources.i18n.dir" value="${server.resources}/federation-locale" />
-                                <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale" />
+                                <property name="library.resources.i18n.dir"
+                                          value="${server.resources}/federation-locale"/>
+                                <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale"/>
 
-                                <mkdir dir="${project.build.directory}/classes/template/opendj"/>
-                                <copy todir="${project.build.directory}/classes/template/opendj" filtering="false">
+                                <mkdir dir="${openam.target}/WEB-INF/template/opendj"/>
+                                <copy todir="${openam.target}/WEB-INF/template/opendj" filtering="false">
                                     <fileset dir="${project.basedir}/../openam-external-libraries/binary">
                                         <include name="opendj.zip"/>
                                     </fileset>
@@ -177,6 +178,7 @@
 
 
                                 <!-- Align the Config Definitions for WAR Inclusion. -->
+                                <!--
                                 <mkdir dir="${project.build.directory}/classes/config"/>
                                 <copy todir="${project.build.directory}/classes/config" overwrite="false">
                                     <fileset dir="${server.resources}/config">
@@ -193,15 +195,18 @@
                                         <include name="upgrade/**"/>
                                         <include name="userstore/**"/>
                                         <include name="wizard/**"/>
-                                        <exclude name="*.htm" />
+                                        <exclude name="*.htm"/>
                                         <exclude name="*.properties"/>
                                     </fileset>
                                 </copy>
+                                -->
+
                                 <!-- Align the Config Definitions for WAR Inclusion. -->
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
                                     <fileset dir="${server.resources}/config">
                                         <include name="*.htm"/>
                                         <include name="*.properties"/>
+                                        <include name="license.txt"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" overwrite="false">
@@ -240,19 +245,17 @@
                                 -->
 
 
-
                                 <!-- Align in Federation Elements -->
                                 <copy todir="${amserver.target.resources.dir}" flatten="true">
-                                    <fileset dir="${library.resources.i18n.dir}" includes="**/*.properties" />
-                                    <fileset dir="${openfm.resources.i18n.dir}" includes="**/*.properties" />
+                                    <fileset dir="${library.resources.i18n.dir}" includes="**/*.properties"/>
+                                    <fileset dir="${openfm.resources.i18n.dir}" includes="**/*.properties"/>
                                 </copy>
 
                                 <copy todir="${amserver.target.resources.dir}" flatten="true">
-                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties" />
-                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties" />
+                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties"/>
+                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties"/>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
-
 
 
                                 <!--
@@ -261,176 +264,175 @@
 
 
 
-        <copy todir="${war.package.dir}/WEB-INF/wsdl">
-            <fileset dir="${openfm.dir}/wsdl" includes="*" excludes="famsts-client.wsdl"/>
-        </copy>
+                                        <copy todir="${war.package.dir}/WEB-INF/wsdl">
+                                            <fileset dir="${openfm.dir}/wsdl" includes="*" excludes="famsts-client.wsdl"/>
+                                        </copy>
 
-        <copy todir="${war.package.dir}/WEB-INF">
-            <fileset dir="${openfm.dir}/xml/wss" includes="sun-jaxws.xml"/>
-        </copy>
+                                        <copy todir="${war.package.dir}/WEB-INF">
+                                            <fileset dir="${openfm.dir}/xml/wss" includes="sun-jaxws.xml"/>
+                                        </copy>
 
-        <copy todir="${war.package.dir}/WEB-INF/classes/META-INF/services">
-            <fileset dir="${openfm.dir}/resources/META-INF/services" includes="*" excludes="com.sun.xml.ws.assembler.ClientPipelineHook, com.sun.xml.ws.api.pipe.TransportPipeFactory"/>
-        </copy>
+                                        <copy todir="${war.package.dir}/WEB-INF/classes/META-INF/services">
+                                            <fileset dir="${openfm.dir}/resources/META-INF/services" includes="*" excludes="com.sun.xml.ws.assembler.ClientPipelineHook, com.sun.xml.ws.api.pipe.TransportPipeFactory"/>
+                                        </copy>
 
-        <copy todir="${war.package.dir}/WEB-INF/template/openfm">
-            <fileset dir="${openfm.ldif.dir}" includes="*.ldif"/>
-        </copy>
-
-
-
-
-        <copy todir="${war.package.dir}/WEB-INF/classes">
-            <fileset dir="${library.res.dir}" includes="*.properties"
-                excludes="FederationConfig.properties,FederationPerServer.properties" />
-            <fileset dir="${openfm.res.dir}" includes="*.properties" />
-            <fileset dir="${library.xml.dir}" includes="*.xsl" />
-        </copy>
-        <copy todir="${war.package.dir}/WEB-INF/classes">
-            <fileset dir="${oauth.config.res.dir}" includes="*.properties" />
-        </copy>
-        <copy file="${fedlibrary.dist.dir}/idpdiscovery.jar"
-            tofile="${war.package.dir}/WEB-INF/lib/idpdiscovery.jar" />
-        <copy file="${fedlibrary.dist.dir}/openfedlib.jar"
-            tofile="${war.package.dir}/WEB-INF/lib/openfedlib.jar" />
-        <copy file="${fm.dist.dir}/console.jar"
-            tofile="${war.package.dir}/WEB-INF/lib/console.jar" />
-        <copy file="${fm.dist.dir}/opensso.jar"
-            tofile="${war.package.dir}/WEB-INF/lib/opensso.jar" />
-
-        <ant dir="${wssagents.basedir}" target="jars" />
-        <copy todir="${war.package.dir}/WEB-INF/lib"
-              file="${wssagents.dist.dir}/openssowssproviders.jar"/>
-
-        <copy todir="${war.package.dir}/WEB-INF/lib"
-              file="${oauth.dist.dir}/oauthservice.jar"/>
-
-        <copy todir="${war.package.dir}/config/auth/default">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_en">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_ja">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_ko">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_zh">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_zh_CN">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_de">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_es">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/auth/default_fr">
-            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-        </copy>
-
-        <copy file="${openfm.dir}/www/jsp/ssoadm.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validatorMain.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validatorStatus.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validateWait.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validator.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validatorFooter.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validatorRpt.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/validatorAuthFail.jsp" todir="${war.package.dir}" />
-        <copy file="${openfm.dir}/www/jsp/proxyidpfinder.jsp" todir="${war.package.dir}" />
-
-        <copy file="${library.dir}/www/config/federation/index.html" todir="${war.package.dir}/config/federation" />
-
-        <copy todir="${war.package.dir}/config/federation/default">
-            <fileset dir="${library.dir}/www/config/federation"
-                includes="*.jsp,*.html" />
-        </copy>
-
-        <copy todir="${war.package.dir}/config/federation/default_en">
-            <fileset dir="${library.dir}/www/config/federation"
-                includes="*.jsp,*.html" />
-        </copy>
-
-        <copy todir="${war.package.dir}/fed_images">
-            <fileset dir="${library.dir}/www/config/federation/fed_images"
-                includes="*" />
-        </copy>
-
-        <copy todir="${war.package.dir}/fed_css">
-            <fileset dir="${library.dir}/www/config/federation/fed_css"
-                includes="*" />
-        </copy>
-
-        <copy file="${library.dir}/www/config/saml2/index.html" todir="${war.package.dir}/saml2" />
-
-        <copy todir="${war.package.dir}/saml2/jsp">
-            <fileset dir="${library.dir}/www/config/saml2"
-                includes="*.jsp,*.html" />
-        </copy>
-
-        <copy file="${library.dir}/www/config/wsfederation/index.html" todir="${war.package.dir}/wsfederation" />
-
-        <copy todir="${war.package.dir}/wsfederation/jsp">
-            <fileset dir="${library.dir}/www/config/wsfederation"
-                includes="*.jsp,*.html" />
-        </copy>
-
-        <copy todir="${war.package.dir}/oauth">
-            <fileset dir="${oauth.www.dir}/jsp"
-                includes="*.jsp" />
-            <fileset dir="${oauth.www.dir}/jsp"
-                includes="index.html" />
-        </copy>
-
-        <copy todir="${war.package.dir}/console">
-            <fileset dir="${openfm.dir}/www/console" excludes="Configurator.jsp" />
-        </copy>
-
-        <copy overwrite="true" todir="${war.package.dir}">
-            <fileset file="${openfm.dir}/deployable-war/index.html"/>
-        </copy>
-
-        <replaceregexp flags="s"
-            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
-            match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
-            replace="\1&#10;&lt;ChoiceValue i18nKey=&quot;a144&quot;&gt;WebServicesClients&lt;/ChoiceValue&gt;"/>
-
-        <replaceregexp flags="s"
-            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
-            match="(iplanet-am-policy-selected-subjects.+?&lt;DefaultValues&gt;)"
-            replace="\1&#10;&lt;Value&gt;WebServicesClients&lt;/Value&gt;"/>
-
-        <replaceregexp flags="s"
-            file="${war.package.dir}/WEB-INF/classes/amPolicy.xml"
-            match="(&lt;PluginSchema.+?)(&lt;/Service&gt;)"
-            replace="\1&#10;&lt;PluginSchema name=&quot;WebServicesClients&quot; interfaceName=&quot;Subject&quot; className=&quot;com.sun.identity.policy.plugins.WebServicesClients&quot; i18nFileName=&quot;amPolicy&quot; i18nKey=&quot;SunIdentityServer-subject-WebServicesClients-name&quot; /&gt;&#10;\2" />
-
-        <replaceregexp flags="s"
-            file="${war.package.dir}/WEB-INF/classes/amPolicy.properties"
-            match="(.+)"
-            replace="\1&#10;SunIdentityServer-subject-WebServicesClients-name=Web Services Clients&#10;webservicesclients_subject_invalid_user_names=Invalid Web Services Clients for this subject.&#10;" />
-
-        <replaceregexp flags="s"
-            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.properties"
-            match="(.+)"
-            replace="\1&#10;a144=Web Services Clients&#10;" />
--->
+                                        <copy todir="${war.package.dir}/WEB-INF/template/openfm">
+                                            <fileset dir="${openfm.ldif.dir}" includes="*.ldif"/>
+                                        </copy>
 
 
 
-<!--
+
+                                        <copy todir="${war.package.dir}/WEB-INF/classes">
+                                            <fileset dir="${library.res.dir}" includes="*.properties"
+                                                excludes="FederationConfig.properties,FederationPerServer.properties" />
+                                            <fileset dir="${openfm.res.dir}" includes="*.properties" />
+                                            <fileset dir="${library.xml.dir}" includes="*.xsl" />
+                                        </copy>
+                                        <copy todir="${war.package.dir}/WEB-INF/classes">
+                                            <fileset dir="${oauth.config.res.dir}" includes="*.properties" />
+                                        </copy>
+                                        <copy file="${fedlibrary.dist.dir}/idpdiscovery.jar"
+                                            tofile="${war.package.dir}/WEB-INF/lib/idpdiscovery.jar" />
+                                        <copy file="${fedlibrary.dist.dir}/openfedlib.jar"
+                                            tofile="${war.package.dir}/WEB-INF/lib/openfedlib.jar" />
+                                        <copy file="${fm.dist.dir}/console.jar"
+                                            tofile="${war.package.dir}/WEB-INF/lib/console.jar" />
+                                        <copy file="${fm.dist.dir}/opensso.jar"
+                                            tofile="${war.package.dir}/WEB-INF/lib/opensso.jar" />
+
+                                        <ant dir="${wssagents.basedir}" target="jars" />
+                                        <copy todir="${war.package.dir}/WEB-INF/lib"
+                                              file="${wssagents.dist.dir}/openssowssproviders.jar"/>
+
+                                        <copy todir="${war.package.dir}/WEB-INF/lib"
+                                              file="${oauth.dist.dir}/oauthservice.jar"/>
+
+                                        <copy todir="${war.package.dir}/config/auth/default">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_en">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_ja">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_ko">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_zh">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_zh_CN">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_de">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_es">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/auth/default_fr">
+                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+                                        </copy>
+
+                                        <copy file="${openfm.dir}/www/jsp/ssoadm.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validatorMain.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validatorStatus.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validateWait.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validator.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validatorFooter.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validatorRpt.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/validatorAuthFail.jsp" todir="${war.package.dir}" />
+                                        <copy file="${openfm.dir}/www/jsp/proxyidpfinder.jsp" todir="${war.package.dir}" />
+
+                                        <copy file="${library.dir}/www/config/federation/index.html" todir="${war.package.dir}/config/federation" />
+
+                                        <copy todir="${war.package.dir}/config/federation/default">
+                                            <fileset dir="${library.dir}/www/config/federation"
+                                                includes="*.jsp,*.html" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/config/federation/default_en">
+                                            <fileset dir="${library.dir}/www/config/federation"
+                                                includes="*.jsp,*.html" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/fed_images">
+                                            <fileset dir="${library.dir}/www/config/federation/fed_images"
+                                                includes="*" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/fed_css">
+                                            <fileset dir="${library.dir}/www/config/federation/fed_css"
+                                                includes="*" />
+                                        </copy>
+
+                                        <copy file="${library.dir}/www/config/saml2/index.html" todir="${war.package.dir}/saml2" />
+
+                                        <copy todir="${war.package.dir}/saml2/jsp">
+                                            <fileset dir="${library.dir}/www/config/saml2"
+                                                includes="*.jsp,*.html" />
+                                        </copy>
+
+                                        <copy file="${library.dir}/www/config/wsfederation/index.html" todir="${war.package.dir}/wsfederation" />
+
+                                        <copy todir="${war.package.dir}/wsfederation/jsp">
+                                            <fileset dir="${library.dir}/www/config/wsfederation"
+                                                includes="*.jsp,*.html" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/oauth">
+                                            <fileset dir="${oauth.www.dir}/jsp"
+                                                includes="*.jsp" />
+                                            <fileset dir="${oauth.www.dir}/jsp"
+                                                includes="index.html" />
+                                        </copy>
+
+                                        <copy todir="${war.package.dir}/console">
+                                            <fileset dir="${openfm.dir}/www/console" excludes="Configurator.jsp" />
+                                        </copy>
+
+                                        <copy overwrite="true" todir="${war.package.dir}">
+                                            <fileset file="${openfm.dir}/deployable-war/index.html"/>
+                                        </copy>
+
+                                        <replaceregexp flags="s"
+                                            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
+                                            match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
+                                            replace="\1&#10;&lt;ChoiceValue i18nKey=&quot;a144&quot;&gt;WebServicesClients&lt;/ChoiceValue&gt;"/>
+
+                                        <replaceregexp flags="s"
+                                            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
+                                            match="(iplanet-am-policy-selected-subjects.+?&lt;DefaultValues&gt;)"
+                                            replace="\1&#10;&lt;Value&gt;WebServicesClients&lt;/Value&gt;"/>
+
+                                        <replaceregexp flags="s"
+                                            file="${war.package.dir}/WEB-INF/classes/amPolicy.xml"
+                                            match="(&lt;PluginSchema.+?)(&lt;/Service&gt;)"
+                                            replace="\1&#10;&lt;PluginSchema name=&quot;WebServicesClients&quot; interfaceName=&quot;Subject&quot; className=&quot;com.sun.identity.policy.plugins.WebServicesClients&quot; i18nFileName=&quot;amPolicy&quot; i18nKey=&quot;SunIdentityServer-subject-WebServicesClients-name&quot; /&gt;&#10;\2" />
+
+                                        <replaceregexp flags="s"
+                                            file="${war.package.dir}/WEB-INF/classes/amPolicy.properties"
+                                            match="(.+)"
+                                            replace="\1&#10;SunIdentityServer-subject-WebServicesClients-name=Web Services Clients&#10;webservicesclients_subject_invalid_user_names=Invalid Web Services Clients for this subject.&#10;" />
+
+                                        <replaceregexp flags="s"
+                                            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.properties"
+                                            match="(.+)"
+                                            replace="\1&#10;a144=Web Services Clients&#10;" />
+                                -->
+
+
+                                <!--
 
         <java classname="com.sun.identity.setup.InsertContent" fork="true">
             <classpath refid="build.class.path"/>
@@ -648,6 +650,7 @@
                             <directory>${basedir}/src/main/webapp/WEB-INF</directory>
                             <includes>
                                 <include>dispatcher-servlet.xml</include>
+                                <include>config/**</include>
                                 <include>web.xml</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
