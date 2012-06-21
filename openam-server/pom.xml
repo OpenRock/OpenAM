@@ -613,7 +613,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <outputFileNameMapping>openam.war</outputFileNameMapping>
+                    <!-- <outputFileNameMapping>openam.war</outputFileNameMapping> -->
                     <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
                     <archive>
                         <manifestEntries>
