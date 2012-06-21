@@ -40,6 +40,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String SECURID = "com.sun.identity.authentication.modules.securid.SecurID";
     private final static String ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
     private final static String OAUTH2 = "org.forgerock.openam.authentication.modules.oauth2.OAuth";
+    private final static String OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
     
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
@@ -64,6 +65,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         Set<String> defaultValues = existingAttr.getDefaultValues();
         
         if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2) &&
+            defaultValues.contains(OATH) &&
             !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
             // nothing to do
             return null;
@@ -72,6 +74,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         defaultValues.add(SECURID);
         defaultValues.add(ADAPTIVE);
         defaultValues.add(OAUTH2);
+        defaultValues.add(OATH);
         defaultValues.remove(SAFEWORD);
         defaultValues.remove(UNIX);
         newAttr = updateDefaultValues(newAttr, defaultValues);
