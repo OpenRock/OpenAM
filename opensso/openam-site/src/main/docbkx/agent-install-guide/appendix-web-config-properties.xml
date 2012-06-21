@@ -104,7 +104,6 @@
       <para>Default is <literal>Error</literal>. Increase to
       <literal>Message</literal> or even <literal>All</literal> for
       fine-grained detail.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.debug.level</literal></para>
       <para>Set the level in the configuration file by module using
       the format <literal><replaceable>module</replaceable>[:<replaceable
       >level</replaceable>][,<replaceable>module</replaceable>[:<replaceable
