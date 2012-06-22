@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.01.00-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -39,7 +39,7 @@
     <description>OpenAM Schemata Components 
     </description>
     <artifactId>saml2-schema</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+  <version>10.01.00-SNAPSHOT</version>n>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -160,7 +160,7 @@
     	<dependency>
 	   	    <groupId>org.forgerock</groupId>
         	<artifactId>openam-shared</artifactId>
-        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+     <version>10.01.00-SNAPSHOT</version>ion> <!-- This Version -->
         </dependency>
 
         <dependency>

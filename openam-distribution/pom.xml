@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.01.00-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -39,7 +39,7 @@
     <description>OpenAM Final Module to Build Distribution for subsequent delivery and deployment.
     </description>
     <artifactId>openam-distribution</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+  <version>10.01.00-SNAPSHOT</version>n>
     <packaging>pom</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -113,7 +113,7 @@
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>openam-ant</artifactId> <!-- This Project Final Artifact to build. -->
-        	<version>10.1.0-SNAPSHOT</version> <!-- This Version -->
+     <version>10.01.00-SNAPSHOT</version>ion> <!-- This Version -->
 		</dependency>
     
     </dependencies>

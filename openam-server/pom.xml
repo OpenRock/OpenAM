@@ -32,7 +32,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.01.00-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -40,7 +40,7 @@
     <description>OpenAM Server Component
     </description>
     <artifactId>openam-server</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+    <version>10.01.00-SNAPSHOT</version>
     <packaging>war</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -76,6 +76,15 @@
                                 <property name="library.resources.i18n.dir"
                                           value="${server.resources}/federation-locale"/>
                                 <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale"/>
+
+                                <property name="core.xml.dir"
+                                          value="${project.basedir}/../openam-core/src/main/resources/xml" />
+
+                                <property name="library.xml.dir"
+                                          value="${project.basedir}/../openam-federation/Library/src/main/resources/xml" />
+
+                                <property name="federation.xml.dir"
+                                          value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
 
                                 <mkdir dir="${openam.target}/WEB-INF/template/opendj"/>
                                 <copy todir="${openam.target}/WEB-INF/template/opendj" filtering="false">
@@ -151,8 +160,9 @@
                                 </copy>
 
                                 <copy todir="${openam.target}/WEB-INF" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss">
-                                    <include name="sun-jaxws.xml"/>
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss">
+                                        <include name="sun-jaxws.xml"/>
                                     </fileset>
                                 </copy>
 
@@ -164,7 +174,8 @@
                                 </copy>
 
                                 <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/Library/src/main/resources/xml">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/Library/src/main/resources/xml">
                                         <include name="*.xsl"/>
                                         <include name="*.xml"/>
                                         <exclude name="web.xml"/>
@@ -179,20 +190,24 @@
                                     </fileset>
                                 </copy>
                                 <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-schema/idsvcs-schema/src/main/resources/xml">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-schema/idsvcs-schema/src/main/resources/xml">
                                         <include name="*.wsdl"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-schema/jaxrpc-schema/target/classes/jaxrpc">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-schema/jaxrpc-schema/target/classes/jaxrpc">
                                         <include name="IdentityManagementServices.wsdl"/>
                                     </fileset>
                                 </copy>
 
                                 <!-- Align in fedlet -->
                                 <mkdir dir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
-                                <copy todir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/Library/target/classes/com/sun/identity/fedlet/ag">
+                                <copy todir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/"
+                                      filtering="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/Library/target/classes/com/sun/identity/fedlet/ag">
                                         <include name="UserData.class"/>
                                         <include name="AssertionGen.class"/>
                                         <include name="MetaDataParser.class"/>
@@ -272,61 +287,80 @@
                                 </copy>
 
                                 <copy todir="${openam.target}/config/auth/default" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_en" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_en" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_de" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_de" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_es" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_es" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_fr" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_fr" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_ja" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_ja" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_ko" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_ko" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_zh" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_zh" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_zh_CN" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_zh_CN" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${openam.target}/config/auth/default_zh_TW" filtering="false" overwrite="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                <copy todir="${openam.target}/config/auth/default_zh_TW" filtering="false"
+                                      overwrite="false">
+                                    <fileset
+                                            dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
                                         <include name="*.*"/>
                                     </fileset>
                                 </copy>
@@ -411,397 +445,224 @@
                                 <mkdir dir="${openam.target}/WEB-INF/classes/META-INF/services"/>
                                 <copy todir="${openam.target}/WEB-INF/classes/META-INF/services" overwrite="false">
                                     <fileset dir="src/main/webapp/META-INF/services">
-                                        <include name="com.sun.xml.ws.api.security.trust.STSAttributeProvider" />
-                                        <include name="com.sun.xml.ws.api.security.trust.STSAuthorizationProvider" />
-                                        <include name="com.sun.xml.ws.api.security.trust.STSTokenProvider" />
-                                        <include name="com.sun.xml.ws.api.security.trust.config.STSConfiguration" />
-                                        <include name="com.sun.xml.ws.api.security.trust.config.STSConfigurationProvider" />
-                                        <include name="com.sun.xml.ws.assembler.ServerPipelineHook" />
+                                        <include name="com.sun.xml.ws.api.security.trust.STSAttributeProvider"/>
+                                        <include name="com.sun.xml.ws.api.security.trust.STSAuthorizationProvider"/>
+                                        <include name="com.sun.xml.ws.api.security.trust.STSTokenProvider"/>
+                                        <include name="com.sun.xml.ws.api.security.trust.config.STSConfiguration"/>
+                                        <include
+                                                name="com.sun.xml.ws.api.security.trust.config.STSConfigurationProvider"/>
+                                        <include name="com.sun.xml.ws.assembler.ServerPipelineHook"/>
                                     </fileset>
                                 </copy>
 
+                                <replaceregexp flags="s"
+                                               file="${openam.target}/WEB-INF/classes/amPolicyConfig.xml"
+                                               match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
+                                               replace="\1&#10;&lt;ChoiceValue i18nKey=&quot;a144&quot;&gt;WebServicesClients&lt;/ChoiceValue&gt;"/>
+
+                                <replaceregexp flags="s"
+                                               file="${openam.target}/WEB-INF/classes/amPolicyConfig.xml"
+                                               match="(iplanet-am-policy-selected-subjects.+?&lt;DefaultValues&gt;)"
+                                               replace="\1&#10;&lt;Value&gt;WebServicesClients&lt;/Value&gt;"/>
+
+                                <replaceregexp flags="s"
+                                               file="${openam.target}/WEB-INF/classes/amPolicy.xml"
+                                               match="(&lt;PluginSchema.+?)(&lt;/Service&gt;)"
+                                               replace="\1&#10;&lt;PluginSchema name=&quot;WebServicesClients&quot; interfaceName=&quot;Subject&quot; className=&quot;com.sun.identity.policy.plugins.WebServicesClients&quot; i18nFileName=&quot;amPolicy&quot; i18nKey=&quot;SunIdentityServer-subject-WebServicesClients-name&quot; /&gt;&#10;\2"/>
+
+                                <replaceregexp flags="s"
+                                               file="${openam.target}/WEB-INF/classes/amPolicy.properties"
+                                               match="(.+)"
+                                               replace="\1&#10;SunIdentityServer-subject-WebServicesClients-name=Web Services Clients&#10;webservicesclients_subject_invalid_user_names=Invalid Web Services Clients for this subject.&#10;"/>
+
+                                <replaceregexp flags="s"
+                                               file="${openam.target}/WEB-INF/classes/amPolicyConfig.properties"
+                                               match="(.+)"
+                                               replace="\1&#10;a144=Web Services Clients&#10;"/>
+
+
+                               ../openam-federation/Library/src/main/resources/xml
+
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
+                                    <arg value="${library.xml.dir}/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;!- - servlet declaration - -&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
+                                    <arg value="${library.xml.dir}/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;!- - servlet mapping - -&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;endpoint.+?/&gt;"/>
+                                    <arg value="${library.xml.dir}/jaxrpc-ri-runtime.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/jaxrpc-ri-runtime.xml"/>
+                                    <arg value="&lt;/endpoints&gt;"/>
+                                </java>
 
                                 <!--
-
-                                  <copy todir="${amserver.target.resources.dir}" filtering="true">
-                                    <fileset dir="${amserver.resources.i18n.dir}"
-                                             includes="*.properties"/>
-                                    <fileset dir="${amserver.console.res.dir}" includes="*.properties"/>
-                                    <fileset dir="${amserver.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.console.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.jaxrpc.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.services.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.authmodule.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.dtd.xml.dir}"
-                                             includes="**/*.dtd" excludes="dtd/sms.dtd"/>
-                                </copy>
-
-                                <copy file="${amserver.target.resources.dir}/amSDK.properties"
-                                      tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
-                                <copy file="${amserver.dtd.xml.dir}/smsflatfile.dtd"
-                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm/flatfile"/>
-                                <copy file="${amserver.dtd.xml.dir}/policyAdmin.dtd"
-                                      todir="${amserver.target.resources.dir}/com/sun/identity/policy"/>
-                                <copy file="${amserver.dtd.xml.dir}/sms.dtd"
-                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm"/>
-                                <copy todir="${amserver.target.resources.dir}/com/sun/identity/log/messageid">
-                                    <fileset dir="${amserver.log.xml.dir}">
-                                        <include name="*.xml"/>
-                                        <include name="*.dtd"/>
-                                    </fileset>
-                                </copy>
-
-                            <mkdir dir="${war.package.dir}/WEB-INF/template/openfm"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/wsdl"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF/services"/>
-
-
-
-
-                                        <copy todir="${war.package.dir}/WEB-INF/classes/META-INF/services">
-                                            <fileset dir="${openfm.dir}/resources/META-INF/services" includes="*" excludes="com.sun.xml.ws.assembler.ClientPipelineHook, com.sun.xml.ws.api.pipe.TransportPipeFactory"/>
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/WEB-INF/template/openfm">
-                                            <fileset dir="${openfm.ldif.dir}" includes="*.ldif"/>
-                                        </copy>
-
-
-
-
-                                        <copy todir="${war.package.dir}/WEB-INF/classes">
-                                            <fileset dir="${library.res.dir}" includes="*.properties"
-                                                excludes="FederationConfig.properties,FederationPerServer.properties" />
-                                            <fileset dir="${openfm.res.dir}" includes="*.properties" />
-                                            <fileset dir="${library.xml.dir}" includes="*.xsl" />
-                                        </copy>
-
-
-                                        <copy todir="${war.package.dir}/WEB-INF/classes">
-                                            <fileset dir="${oauth.config.res.dir}" includes="*.properties" />
-                                        </copy>
-
-
-                                        <copy file="${fedlibrary.dist.dir}/idpdiscovery.jar"
-                                            tofile="${war.package.dir}/WEB-INF/lib/idpdiscovery.jar" />
-                                        <copy file="${fedlibrary.dist.dir}/openfedlib.jar"
-                                            tofile="${war.package.dir}/WEB-INF/lib/openfedlib.jar" />
-                                        <copy file="${fm.dist.dir}/console.jar"
-                                            tofile="${war.package.dir}/WEB-INF/lib/console.jar" />
-                                        <copy file="${fm.dist.dir}/opensso.jar"
-                                            tofile="${war.package.dir}/WEB-INF/lib/opensso.jar" />
-
-                                        <ant dir="${wssagents.basedir}" target="jars" />
-                                        <copy todir="${war.package.dir}/WEB-INF/lib"
-                                              file="${wssagents.dist.dir}/openssowssproviders.jar"/>
-
-                                        <copy todir="${war.package.dir}/WEB-INF/lib"
-                                              file="${oauth.dist.dir}/oauthservice.jar"/>
-
-
-
-
-                                        <copy todir="${war.package.dir}/config/auth/default">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_en">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_ja">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_ko">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_zh">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_zh_CN">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_de">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_es">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/auth/default_fr">
-                                            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
-                                        </copy>
-
-                                        <copy file="${openfm.dir}/www/jsp/ssoadm.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validatorMain.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validatorStatus.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validateWait.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validator.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validatorFooter.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validatorRpt.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/validatorAuthFail.jsp" todir="${war.package.dir}" />
-                                        <copy file="${openfm.dir}/www/jsp/proxyidpfinder.jsp" todir="${war.package.dir}" />
-
-                                        <copy file="${library.dir}/www/config/federation/index.html" todir="${war.package.dir}/config/federation" />
-
-                                        <copy todir="${war.package.dir}/config/federation/default">
-                                            <fileset dir="${library.dir}/www/config/federation"
-                                                includes="*.jsp,*.html" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/config/federation/default_en">
-                                            <fileset dir="${library.dir}/www/config/federation"
-                                                includes="*.jsp,*.html" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/fed_images">
-                                            <fileset dir="${library.dir}/www/config/federation/fed_images"
-                                                includes="*" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/fed_css">
-                                            <fileset dir="${library.dir}/www/config/federation/fed_css"
-                                                includes="*" />
-                                        </copy>
-
-                                        <copy file="${library.dir}/www/config/saml2/index.html" todir="${war.package.dir}/saml2" />
-
-                                        <copy todir="${war.package.dir}/saml2/jsp">
-                                            <fileset dir="${library.dir}/www/config/saml2"
-                                                includes="*.jsp,*.html" />
-                                        </copy>
-
-                                        <copy file="${library.dir}/www/config/wsfederation/index.html" todir="${war.package.dir}/wsfederation" />
-
-                                        <copy todir="${war.package.dir}/wsfederation/jsp">
-                                            <fileset dir="${library.dir}/www/config/wsfederation"
-                                                includes="*.jsp,*.html" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/oauth">
-                                            <fileset dir="${oauth.www.dir}/jsp"
-                                                includes="*.jsp" />
-                                            <fileset dir="${oauth.www.dir}/jsp"
-                                                includes="index.html" />
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/console">
-                                            <fileset dir="${openfm.dir}/www/console" excludes="Configurator.jsp" />
-                                        </copy>
-
-                                        <copy overwrite="true" todir="${war.package.dir}">
-                                            <fileset file="${openfm.dir}/deployable-war/index.html"/>
-                                        </copy>
-
-                                        <replaceregexp flags="s"
-                                            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
-                                            match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
-                                            replace="\1&#10;&lt;ChoiceValue i18nKey=&quot;a144&quot;&gt;WebServicesClients&lt;/ChoiceValue&gt;"/>
-
-                                        <replaceregexp flags="s"
-                                            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
-                                            match="(iplanet-am-policy-selected-subjects.+?&lt;DefaultValues&gt;)"
-                                            replace="\1&#10;&lt;Value&gt;WebServicesClients&lt;/Value&gt;"/>
-
-                                        <replaceregexp flags="s"
-                                            file="${war.package.dir}/WEB-INF/classes/amPolicy.xml"
-                                            match="(&lt;PluginSchema.+?)(&lt;/Service&gt;)"
-                                            replace="\1&#10;&lt;PluginSchema name=&quot;WebServicesClients&quot; interfaceName=&quot;Subject&quot; className=&quot;com.sun.identity.policy.plugins.WebServicesClients&quot; i18nFileName=&quot;amPolicy&quot; i18nKey=&quot;SunIdentityServer-subject-WebServicesClients-name&quot; /&gt;&#10;\2" />
-
-                                        <replaceregexp flags="s"
-                                            file="${war.package.dir}/WEB-INF/classes/amPolicy.properties"
-                                            match="(.+)"
-                                            replace="\1&#10;SunIdentityServer-subject-WebServicesClients-name=Web Services Clients&#10;webservicesclients_subject_invalid_user_names=Invalid Web Services Clients for this subject.&#10;" />
-
-                                        <replaceregexp flags="s"
-                                            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.properties"
-                                            match="(.+)"
-                                            replace="\1&#10;a144=Web Services Clients&#10;" />
+                                remove duplicate entries in FederationConfig.properties against
+                                AMConfig.properties
                                 -->
+                                <java classname="com.sun.identity.setup.ConsolidateConfig"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="${openam.target}/WEB-INF/classes/AMConfig.properties"/>
+                                    <arg value="${library.res.dir}/FederationPerServer.properties"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/AMConfig.properties"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.ConsolidateConfig"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <classpath refid="build.class.path"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/serverdefaults.properties"/>
+                                    <arg value="${library.res.dir}/FederationConfig.properties"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/serverdefaults.properties"/>
+                                </java>
 
+                                <!-- update amConsoleConfig with federation tabs -->
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <classpath refid="build.class.path"/>
+                                    <arg value="&lt;tab id=\&quot;2\&quot;.+?/tab&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/amConsoleConfig.xml"/>
+                                    <arg value="&lt;tab id=\&quot;4\&quot;"/>
+                                </java>
+
+
+                                <!-- entities profile tabs -->
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;profile id=\&quot;SAMLv2\&quot;&gt;.+?&lt;/profile&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/amConsoleConfig.xml"/>
+                                    <arg value="&lt;/profiletabs&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;profile id=\&quot;wsfed\&quot;&gt;.+?&lt;/profile&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/amConsoleConfig.xml"/>
+                                    <arg value="&lt;/profiletabs&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;profile id=\&quot;idff\&quot;&gt;.+?&lt;/profile&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/amConsoleConfig.xml"/>
+                                    <arg value="&lt;/profiletabs&gt;"/>
+                                </java>
+
+
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
+                                    <arg value="${library.xml.dir}/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;!- - servlet declaration - -&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
+                                    <arg value="${library.xml.dir}/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;!- - servlet mapping - -&gt;"/>
+                                </java>
+
+                                <!-- update web.xml with fed servlet info -->
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;! - - context param - -&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;! - - servlet declaration - -&gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
+                                    <arg value="${openfm.dir}/xml/console/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;! - - servlet mapping - - &gt;"/>
+                                </java>
+
+
+                                <!-- update web.xml with FAM STS info -->
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;listener&gt;.+?&lt;/listener&gt;"/>
+                                    <arg value="${openfm.dir}/xml/wss/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;! - - listener declaration - - &gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
+                                    <arg value="${openfm.dir}/xml/wss/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;! - - servlet declaration - - &gt;"/>
+                                </java>
+                                <java classname="com.sun.identity.setup.InsertContent"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
+                                    <arg value="${openfm.dir}/xml/wss/web.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/web.xml"/>
+                                    <arg value="&lt;!- - servlet mapping - -&gt;"/>
+                                </java>
+
+                                <java classname="com.sun.identity.setup.MergeProperties"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="configuratorPlugins"/>
+                                    <arg value="fmConfiguratorPlugins"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/configuratorPlugins.properties"/>
+                                </java>
+
+                                <java classname="com.sun.identity.setup.MergeProperties"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="serviceNames"/>
+                                    <arg value="fmServiceNames"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/serviceNames.properties"/>
+                                </java>
+
+                                <java classname="com.sun.identity.setup.MergeProperties"
+                                      fork="true" failOnError="true" classpath="${build.class.path}">
+                                    <arg value="serviceDefaultValues"/>
+                                    <arg value="fmServiceDefaultValues"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/serviceDefaultValues.properties"/>
+                                </java>
+
+                                <java classname="com.sun.identity.setup.MergeProperties" fork="true">
+                                    <arg value="configuratorTagSwap"/>
+                                    <arg value="fmConfiguratorTagSwap"/>
+                                    <arg value="${openam.target}/WEB-INF/classes/configuratorTagSwap.properties"/>
+                                </java>
+
+                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
+                                    <arg value="&lt;endpoint.+?/&gt;"/>
+                                    <arg value="${library.xml.dir}/jaxrpc-ri-runtime.xml"/>
+                                    <arg value="${openam.target}/WEB-INF/jaxrpc-ri-runtime.xml"/>
+                                    <arg value="&lt;/endpoints&gt;"/>
+                                </java>
 
                                 <!--
-
-        <java classname="com.sun.identity.setup.InsertContent" fork="true">
-            <classpath refid="build.class.path"/>
-            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
-            <arg value="${library.xml.dir}/web.xml" />
-            <arg value="${war.package.dir}/WEB-INF/web.xml" />
-            <arg value="&lt;!- - servlet declaration - -&gt;" />
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent" fork="true">
-            <classpath refid="build.class.path"/>
-            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
-            <arg value="${library.xml.dir}/web.xml" />
-            <arg value="${war.package.dir}/WEB-INF/web.xml" />
-            <arg value="&lt;!- - servlet mapping - -&gt;" />
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent" fork="true">
-            <classpath refid="build.class.path"/>
-            <arg value="&lt;endpoint.+?/&gt;" />
-            <arg value="${library.xml.dir}/jaxrpc-ri-runtime.xml" />
-            <arg value="${war.package.dir}/WEB-INF/jaxrpc-ri-runtime.xml" />
-            <arg value="&lt;/endpoints&gt;" />
-        </java>
-
-
-        < ! - -
-            remove duplicate entries in FederationConfig.properties against
-            AMConfig.properties
-        - - >
-                                <java classname="com.sun.identity.setup.ConsolidateConfig" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="${war.package.dir}/WEB-INF/classes/AMConfig.properties" />
-                                    <arg value="${library.res.dir}/FederationPerServer.properties" />
-                                    <arg value="${war.package.dir}/WEB-INF/classes/AMConfig.properties" />
-                                </java>
-                                <java classname="com.sun.identity.setup.ConsolidateConfig" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="${war.package.dir}/WEB-INF/classes/serverdefaults.properties" />
-                                    <arg value="${library.res.dir}/FederationConfig.properties" />
-                                    <arg value="${war.package.dir}/WEB-INF/classes/serverdefaults.properties" />
-                                </java>
-
-                                <! - - update amConsoleConfig with federation tabs - - >
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;tab id=\&quot;2\&quot;.+?/tab&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
-                                    <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
-                                    <arg value="&lt;tab id=\&quot;4\&quot;" />
-                                </java>
-
-
-
-
-                                <! - - entities profile tabs - - >
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;profile id=\&quot;SAMLv2\&quot;&gt;.+?&lt;/profile&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
-                                    <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
-                                    <arg value="&lt;/profiletabs&gt;" />
-                                </java>
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;profile id=\&quot;wsfed\&quot;&gt;.+?&lt;/profile&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
-                                    <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
-                                    <arg value="&lt;/profiletabs&gt;" />
-                                </java>
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;profile id=\&quot;idff\&quot;&gt;.+?&lt;/profile&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
-                                    <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
-                                    <arg value="&lt;/profiletabs&gt;" />
-                                </java>
-
-
-                                <! - - update web.xml with fed servlet info - - >
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/web.xml" />
-                                    <arg value="${war.package.dir}/WEB-INF/web.xml" />
-                                    <arg value="&lt;! - - context param - -&gt;" />
-                                </java>
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/web.xml" />
-                                    <arg value="${war.package.dir}/WEB-INF/web.xml" />
-                                    <arg value="&lt;! - - servlet declaration - -&gt;" />
-                                </java>
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
-                                    <arg value="${openfm.dir}/xml/console/web.xml" />
-                                    <arg value="${war.package.dir}/WEB-INF/web.xml" />
-                                    <arg value="&lt;! - - servlet mapping - - &gt;" />
-                                </java>
-
-
-
-
-                                <! - - update web.xml with FAM STS info - - >
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;listener&gt;.+?&lt;/listener&gt;" />
-                                    <arg value="${openfm.dir}/xml/wss/web.xml" />
-                                    <arg value="${war.package.dir}/WEB-INF/web.xml" />
-                                    <arg value="&lt;! - - listener declaration - - &gt;" />
-                                </java>
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
-                                    <arg value="${openfm.dir}/xml/wss/web.xml" />
-                                    <arg value="${war.package.dir}/WEB-INF/web.xml" />
-                                    <arg value="&lt;! - - servlet declaration - - &gt;" />
-                                </java>
-                                <java classname="com.sun.identity.setup.InsertContent" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
-                                    <arg value="${openfm.dir}/xml/wss/web.xml" />
-                                    <arg value="${war.package.dir}/WEB-INF/web.xml" />
-                                    <arg value="&lt;!- - servlet mapping - -&gt;" />
-                                </java>
-
-                                <java classname="com.sun.identity.setup.MergeProperties" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <classpath>
-                                        <pathelement path="${war.package.dir}/WEB-INF/classes"/>
-                                    </classpath>
-                                    <arg value="configuratorPlugins" />
-                                    <arg value="fmConfiguratorPlugins" />
-                                    <arg value="${war.package.dir}/WEB-INF/classes/configuratorPlugins.properties" />
-                                </java>
-
-                                <java classname="com.sun.identity.setup.MergeProperties" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <classpath>
-                                        <pathelement path="${war.package.dir}/WEB-INF/classes"/>
-                                    </classpath>
-                                    <arg value="serviceNames" />
-                                    <arg value="fmServiceNames" />
-                                    <arg value="${war.package.dir}/WEB-INF/classes/serviceNames.properties" />
-                                </java>
-
-                                <java classname="com.sun.identity.setup.MergeProperties" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <classpath>
-                                        <pathelement path="${war.package.dir}/WEB-INF/classes"/>
-                                        <pathelement path="${openfm.res.dir}"/>
-                                    </classpath>
-                                    <arg value="serviceDefaultValues" />
-                                    <arg value="fmServiceDefaultValues" />
-                                    <arg value="${war.package.dir}/WEB-INF/classes/serviceDefaultValues.properties" />
-                                </java>
-
-                                <java classname="com.sun.identity.setup.MergeProperties" fork="true">
-                                    <classpath refid="build.class.path"/>
-                                    <classpath>
-                                        <pathelement path="${war.package.dir}/WEB-INF/classes"/>
-                                    </classpath>
-                                    <arg value="configuratorTagSwap" />
-                                    <arg value="fmConfiguratorTagSwap" />
-                                    <arg value="${war.package.dir}/WEB-INF/classes/configuratorTagSwap.properties" />
-                                </java>
-
-                                <mkdir dir="${war.packageweb.dir}" />
-                                <move file="${war.package.dir}/WEB-INF/web.xml" tofile="${war.packageweb.dir}/web.xml" />
-
+                                <mkdir dir="${war.packageweb.dir}"/>
+                                <move file="${openam.target}/WEB-INF/web.xml" tofile="${war.packageweb.dir}/web.xml"/>
                                 -->
+
 
                                 <!-- add federation server samples to the WAR -->
-                                <!--mkdir dir="${war.package.dir}/samples" />
-                                <copy todir="${war.package.dir}/samples">
+                                <!--mkdir dir="${openam.target}/samples" />
+                                <copy todir="${openam.target}/samples">
                                     <fileset dir="${openfm.samples.dir}/war"
                                          excludes="**/CVS" />
                                 </copy-->
@@ -880,28 +741,28 @@
                     <dependency>
                         <groupId>org.forgerock</groupId>
                         <artifactId>openam-external-libraries</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
+                        <version>10.01.00-SNAPSHOT</version>
                         <!-- This Version -->
                     </dependency>
 
                     <dependency>
                         <groupId>org.forgerock</groupId>
                         <artifactId>openam-core</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
+                        <version>10.01.00-SNAPSHOT</version>
                         <!-- This Version -->
                     </dependency>
 
                     <dependency>
                         <groupId>org.forgerock</groupId>
                         <artifactId>Library</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
+                        <version>10.01.00-SNAPSHOT</version>
                         <!-- This Version -->
                     </dependency>
 
                     <dependency>
                         <groupId>org.forgerock</groupId>
                         <artifactId>OpenFM</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
+                        <version>10.01.00-SNAPSHOT</version>
                         <!-- This Version -->
                     </dependency>
 
@@ -952,7 +813,7 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-installtools</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.01.00-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
 
