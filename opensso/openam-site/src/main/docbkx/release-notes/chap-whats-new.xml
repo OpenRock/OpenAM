@@ -31,7 +31,7 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
 
- <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
+ <para>OpenAM <?eval ${currentMajorVersion}?> fixes a number of issues, and
  provides the following additional features.</para>
 
  <itemizedlist>
@@ -46,15 +46,15 @@
    capabilities for applications that cannot be modified to use the Fedlet and
    SAML 2.0.</para>
   </listitem>
-<!--   <listitem>
-   <para>OpenAM now supports YubiKey authentication. The YubiKey simplifies
+  <listitem>
+   <para>OpenAM now supports YubiKey<superscript>®</superscript> authentication. The YubiKey simplifies
    the process of logging in with a One Time Password token as it does not
    require the user to re-type long pass codes from a display device into the
    login field of the computer. The YubiKey is inserted in the USB-port of any
    computer and the OTP is generated and automatically entered with a simple
    touch of a button on the YubiKey, and without the need of any client
    software or drivers.</para>
-  </listitem> -->
+  </listitem>
   <listitem>
    <!-- OPENAM-??? -->
    <para>OpenAM now uses OpenDJ 2.4.5 as the embedded data store
@@ -86,6 +86,16 @@
    authentication. Adaptive risk authentication lets you require more from users
    when they login from an unfamiliar location, from a new device, after a long
    period during which the account remained idle, and so forth.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports Open Authentication (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-727"
+   xlink:show="new">OPENAM-727</link>). The module provides the user with a one-time password based either on 
+   a HMAC one-time password or a time-based one-time password. OATH lets you 
+   determine which type of one-time password is best for your users when they 
+   need to login with a password generating device. Devices can range from a 
+   smartphone or a dedicated device, such as YubiKey. It uses the the standard 
+   that allows authentication to occur from a single protocol.</para>
   </listitem>
   <listitem>
    <para>OpenAM supports a new SAML 2.0 IdP Adapter plug-in for additional

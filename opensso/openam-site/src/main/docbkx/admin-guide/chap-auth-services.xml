@@ -177,7 +177,7 @@
   does. Configuring the module that connects to Active Directory over LDAP to
   authenticate a user using user name and password requires connection
   information and details about where to search for users, whereas configuring
-  the HOTP module for one-time password authentication requires information
+  the HOTP module for OTP authentication requires information
   about the password length and the mail server or SMS gateway for sending the
   password during authentication.</para>
   
@@ -2272,6 +2272,158 @@
     </varlistentry>
    </variablelist>
   </section>
+  
+   <section xml:id="OATH-module-conf-hints">
+   <title>Hints For the OATH Module</title>
+   <para>The Open Authentication (OATH) module provides a more secure method for users to 
+      access their accounts with the help of a device, such as their mobile phone or 
+      Yubikey. Users can log into OpenAm and update their information more securely from
+      a one-time password (OTP) displayed on their device. The OATH module includes the
+      <link xlink:show="new" xlink:href="http://www.openauthentication.org/about/"
+      >OATH standard protocols</link> (<link xlink:show="new"
+      xlink:href="http://tools.ietf.org/html/rfc4226">RFC 4226</link> and 
+      <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6238">
+      RFC 6238</link>). The OATH module has several enhancements to the
+      HMAC One-Time Password (HOTP) Authentication Module, but does not replace the original
+      module for those already using HOTP prior to the 10.1.0 release. The OATH module includes 
+      HOTP authentication and Time-Based One-Time Password (TOTP) authentication. Both types
+      of authentication require an OATH compliant device that can provide the OTP.</para>
+   <indexterm>
+   <primary>Authentication</primary>
+   <secondary>Open Authentication (OATH)</secondary>
+   </indexterm>
+   
+   <para> HOTP authentication generates the OTP every time the user requests a new OTP
+      on their device. The device tracks the number of times the user requests a new OTP, called
+      the counter. The OTP displays for a period of time you designate in the setup, so the 
+      user may be further in the counter on their device than on their account. OpenAM will resynchronize
+      the counter when the user finally logs in. To accommodate this, you set the number of 
+      passwords a user can generate before their device cannot be resynchronized. For example, if 
+      you set the number of HOTP Window Size to 50 and a two-year old presses the button 30 on the
+      user's device to generate a new OTP, the counter in OpenAM will review the OTPs until
+      it reaches the OTP entered by the user. If the two-year old presses the button 51 times,
+      you will need to reset the counter to match the number on the device's counter before the
+      user can login to OpenAM. HOTP authentication does not check earlier passwords, so if the 
+      user attempts to reset the counter on their device, they will not be able to login until
+      you reset the counter in OpenAM to match their device.</para>
+   <para>TOTP authentication constantly generates a new OTP based on a time interval you specify.
+      The device tracks the last two passwords generated and the current password. The Last Login Time
+      monitors the time when a user logs in to make sure that user is not logged in several times
+      within the present time period. Once a user log into OpenAM, they must wait for the time it 
+      takes TOTP to generate the next two passwords and display them. This prevents others from 
+      being able to access the users account using the OTP they entered. The user's account can be
+      accessed again after the generation of the third new OTP is generated and displayed on their
+      device.For this reason, the TOTP Time-Step Interval should not be so long as to
+      lock users out, with a recommended time of 30 seconds.</para>
+   <para>An authentication chain can be created to generate an OTP from 
+      either HOTP or TOTP.</para>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>iPlanetAMAuthOATHService</literal></para>
+   
+   <variablelist>
+    <varlistentry>
+     <term>One Time Password Length (in digits)</term>
+     <listitem>
+      <para>Set the length of the OTP between 6 and 9 digits long. The default value is 6 digits.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHPasswordLength</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Secret Key Attribute Name</term>
+     <listitem>
+      <para>The name of the attribute where the key will be stored in the user profile.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHSecretKeyAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>OATH Algorithm</term>
+     <listitem>
+      <para>Select whether to use HOTP or TOTP. You can create an authentication chain to
+      allow for a greater variety of devices. The default value is HOTP.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHAlgorithm</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>HOTP Window Size</term>
+     <listitem>
+      <para>The number of requests that the system and the device can be off to resynchronize 
+      the password. If a user passes this number of requests before logging 
+      into the system, the password will not work. The default value is 100.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHHOTPWindowSize</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Counter Attribute Name</term>
+     <listitem>
+      <para>The name of the HOTP attribute where the counter will be stored in the user profile.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHHOTPCounterAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Add Checksum Digit</term>
+     <listitem>
+      <para>Adds a checksum digit at the end of the HOTP password to verify it was entered correctly. 
+      The default value is No.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHAddChecksum</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Truncation Offset</term>
+     <listitem>
+      <para>Advanced feature that is device specific. Any value below 0 or above 15 will turn off 
+      the functionality. The default value is -1. If not required by the device, leave at the default 
+      setting.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHTruncationOffset</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>TOTP Time Step Interval</term>
+     <listitem>
+      <para>Defines how long the password will appear on the user's device (in seconds).
+      We recommend keeping this number low, for example 30 seconds, because once a user
+      logs out, they will not be able to login again until two full time cycles have passed.
+      The default value is 30 seconds.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHSizeofTimeStep</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>TOTP Time Steps</term>
+     <listitem>
+      <para>The number of requests that the system and the device can be off to resynchronize 
+      the password. If a user passes this number of requests before logging into the system,
+      the password will not work. The default value is 2.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHStepsinWindow</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Last Login Time</term>
+     <listitem>
+      <para>The name of the attribute where both HOTP and TOTP authentication will store information
+      on when a person last logged in.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iPlanetAMAuthOATHLastLoginTimeAttributeName</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPAuthLevel</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>  
+ 
   
   <section xml:id="oauth2-module-conf-hints">
    <title>Hints For the OAuth 2.0 Authentication Module</title>
