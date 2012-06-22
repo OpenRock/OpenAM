@@ -83,12 +83,14 @@
                                         <include name="opendj.zip"/>
                                     </fileset>
                                 </copy>
+
                                 <mkdir dir="${openam.target}/images"/>
                                 <copy todir="${openam.target}/images" filtering="false">
                                     <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/images">
                                         <include name="**/**"/>
                                     </fileset>
                                 </copy>
+
                                 <mkdir dir="${openam.target}/css"/>
                                 <copy todir="${openam.target}/css" filtering="false">
                                     <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/css">
@@ -118,6 +120,43 @@
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
+
+                                <mkdir dir="${openam.target}/config/federation/default_en"/>
+                                <copy todir="${openam.target}/config/federation/default_en" filtering="false">
+                                    <fileset dir="${project.basedir}/src/main/webapp/config/federation/default">
+                                        <include name="**/**"/>
+                                    </fileset>
+                                </copy>
+
+                                <mkdir dir="${openam.target}/WEB-INF/classes"/>
+                                <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
+                                    <fileset dir="${project.basedir}/src/main/resources">
+                                        <include name="FederationManagerCLI.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+
+                                <mkdir dir="${openam.target}/WEB-INF/classes"/>
+                                <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
+                                    <fileset dir="${project.basedir}/src/main/resources">
+                                        <include name="FederationManagerCLI.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml/console">
+                                        <include name="amAccessControl.xml"/>
+                                        <include name="amConsoleConfig.xml"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml/console">
+                                        <include name="amAccessControl.xml"/>
+                                        <include name="amConsoleConfig.xml"/>
+                                    </fileset>
+                                </copy>
+
 
                                 <!--
                                 <copy todir="${amserver.target.resources.dir}" filtering="true">
