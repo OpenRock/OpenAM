@@ -40,7 +40,7 @@ public class JarUtility extends CLIUtility {
                 fileseparator + "bin" + fileseparator + "jar");
         StringBuffer jarBuff =
                 new StringBuffer(System.getProperty("java.home")).
-                append(fileseparator).append("src/main").append(fileseparator).
+                append(fileseparator).append("..").append(fileseparator).
                 append("bin").append(fileseparator).append("jar");
         String jarPath = jarBuff.toString();
         File jarFile = new File(jarPath);

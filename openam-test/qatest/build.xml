@@ -30,9 +30,9 @@
 -->
 <project name="OpenSSO QA Test Framework" default="usage" basedir="">
 
-    <import file="build.properties"/>
-    <import file="xml/ant/opensso-properties.xml"/>
-    <import file="xml/ant/opensso-common.xml"/>
+    <import file="./build.properties"/>
+    <import file="./xml/ant/opensso-properties.xml"/>
+    <import file="./xml/ant/opensso-common.xml"/>
     <target name="checkAntVersion" description="Ensure that we're running ant 1.7.1 or above">
       <fail message="Please execute QATEST using ant 1.7.1 or above">
         <condition>
