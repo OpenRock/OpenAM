@@ -36,11 +36,11 @@ public class JarUtility extends CLIUtility {
 
     /** Creates a new instance of JarUtility */
     public JarUtility() {
-        super(System.getProperty("java.home") + fileseparator + ".." +
+        super(System.getProperty("java.home") + fileseparator + "src/main" +
                 fileseparator + "bin" + fileseparator + "jar");
         StringBuffer jarBuff =
                 new StringBuffer(System.getProperty("java.home")).
-                append(fileseparator).append("..").append(fileseparator).
+                append(fileseparator).append("src/main").append(fileseparator).
                 append("bin").append(fileseparator).append("jar");
         String jarPath = jarBuff.toString();
         File jarFile = new File(jarPath);
