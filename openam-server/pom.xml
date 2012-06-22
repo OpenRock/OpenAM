@@ -87,7 +87,8 @@
                                 <mkdir dir="${openam.target}/images"/>
                                 <copy todir="${openam.target}/images" filtering="false">
                                     <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/images">
-                                        <include name="**/**"/>
+                                        <include name="button/**"/>
+                                        <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
@@ -136,15 +137,9 @@
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
-                                <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
-                                    <include name="FederationManagerCLI.properties"/>
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${openam.target}" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
-                                        <include name="*.*"/>
+                                <copy todir="${openam.target}/WEB-INF" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss">
+                                    <include name="sun-jaxws.xml"/>
                                     </fileset>
                                 </copy>
 
@@ -163,13 +158,47 @@
                                     </fileset>
                                 </copy>
 
+                                <mkdir dir="${openam.target}/WEB-INF/wsdl"/>
+                                <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/wsdl">
+                                        <include name="*.wsdl"/>
+                                        <include name="*.xsd"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-schema/idsvcs-schema/src/main/resources/xml">
+                                        <include name="*.wsdl"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-schema/jaxrpc-schema/target/classes/jaxrpc">
+                                        <include name="IdentityManagementServices.wsdl"/>
+                                    </fileset>
+                                </copy>
+
+                                <!-- Align in fedlet -->
+                                <mkdir dir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
+                                <copy todir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/Library/target/classes/com/sun/identity/fedlet/ag">
+                                        <include name="UserData.class"/>
+                                        <include name="AssertionGen.class"/>
+                                        <include name="MetaDataParser.class"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/WEB-INF/fedlet" filtering="false">
+                                    <fileset dir="src/main/resources">
+                                        <include name="FederationConfig.properties"/>
+                                    </fileset>
+                                </copy>
+
                                 <!-- Align in auth -->
                                 <mkdir dir="${openam.target}/config/auth"/>
                                 <copy todir="${openam.target}/config/auth" flatten="true">
                                     <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
-                                <copy todir="${openam.target}/config/auth" flatten="true">
+                                <copy todir="${openam.target}/config/auth/default_en" flatten="true">
                                     <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
                                 </copy>
                                 <copy todir="${openam.target}/config/auth/default_de" flatten="true">
@@ -186,6 +215,9 @@
                                 </copy>
                                 <copy todir="${openam.target}/config/auth/default_ko" flatten="true">
                                     <fileset dir="src/main/webapp/config/auth/default_ko" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_zh" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_zh_CN" includes="*.*"/>
                                 </copy>
                                 <copy todir="${openam.target}/config/auth/default_zh_CN" flatten="true">
                                     <fileset dir="src/main/webapp/config/auth/default_zh_CN" includes="*.*"/>
@@ -212,6 +244,9 @@
                                 <copy todir="${openam.target}/config/auth/default_ko" overwrite="false">
                                     <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
                                 </copy>
+                                <copy todir="${openam.target}/config/auth/default_zh" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
                                 <copy todir="${openam.target}/config/auth/default_zh_CN" overwrite="false">
                                     <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
                                 </copy>
@@ -222,7 +257,69 @@
                                 <copy todir="${openam.target}/config/auth">
                                     <fileset dir="src/main/webapp/config/auth" includes="index.html"/>
                                 </copy>
+                                <copy todir="${openam.target}/config/">
+                                    <fileset dir="src/main/resources/config" includes="options.htm"/>
+                                </copy>
 
+                                <copy todir="${openam.target}/config/auth/default" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_en" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_de" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_es" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_fr" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_ja" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_ko" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_zh" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_zh_CN" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_zh_TW" filtering="false" overwrite="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
+                                    </fileset>
+                                </copy>
 
                                 <!--
                                 <copy todir="${amserver.target.resources.dir}" filtering="true">
