@@ -455,6 +455,9 @@
                                     </fileset>
                                 </copy>
 
+
+                                <!--
+
                                 <replaceregexp flags="s"
                                                file="${openam.target}/WEB-INF/classes/amPolicyConfig.xml"
                                                match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
@@ -480,8 +483,9 @@
                                                match="(.+)"
                                                replace="\1&#10;a144=Web Services Clients&#10;"/>
 
+                                -->
 
-                               ../openam-federation/Library/src/main/resources/xml
+                                <!-- Build up web.xml -->
 
                                 <java classname="com.sun.identity.setup.InsertContent"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
@@ -509,6 +513,7 @@
                                 remove duplicate entries in FederationConfig.properties against
                                 AMConfig.properties
                                 -->
+                                <!--
                                 <java classname="com.sun.identity.setup.ConsolidateConfig"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
                                     <arg value="${openam.target}/WEB-INF/classes/AMConfig.properties"/>
@@ -522,8 +527,10 @@
                                     <arg value="${library.res.dir}/FederationConfig.properties"/>
                                     <arg value="${openam.target}/WEB-INF/classes/serverdefaults.properties"/>
                                 </java>
+                                -->
 
                                 <!-- update amConsoleConfig with federation tabs -->
+                                <!--
                                 <java classname="com.sun.identity.setup.InsertContent"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
                                     <classpath refid="build.class.path"/>
@@ -532,9 +539,10 @@
                                     <arg value="${openam.target}/WEB-INF/classes/amConsoleConfig.xml"/>
                                     <arg value="&lt;tab id=\&quot;4\&quot;"/>
                                 </java>
-
+                                -->
 
                                 <!-- entities profile tabs -->
+                                <!--
                                 <java classname="com.sun.identity.setup.InsertContent"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
                                     <arg value="&lt;profile id=\&quot;SAMLv2\&quot;&gt;.+?&lt;/profile&gt;"/>
@@ -572,8 +580,10 @@
                                     <arg value="${openam.target}/WEB-INF/web.xml"/>
                                     <arg value="&lt;!- - servlet mapping - -&gt;"/>
                                 </java>
+                                -->
 
                                 <!-- update web.xml with fed servlet info -->
+                                <!--
                                 <java classname="com.sun.identity.setup.InsertContent"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
                                     <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;"/>
@@ -595,9 +605,10 @@
                                     <arg value="${openam.target}/WEB-INF/web.xml"/>
                                     <arg value="&lt;! - - servlet mapping - - &gt;"/>
                                 </java>
-
+                                -->
 
                                 <!-- update web.xml with FAM STS info -->
+                                <!--
                                 <java classname="com.sun.identity.setup.InsertContent"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
                                     <arg value="&lt;listener&gt;.+?&lt;/listener&gt;"/>
@@ -653,6 +664,7 @@
                                     <arg value="${openam.target}/WEB-INF/jaxrpc-ri-runtime.xml"/>
                                     <arg value="&lt;/endpoints&gt;"/>
                                 </java>
+                                -->
 
                                 <!--
                                 <mkdir dir="${war.packageweb.dir}"/>
