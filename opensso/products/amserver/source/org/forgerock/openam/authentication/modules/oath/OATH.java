@@ -430,7 +430,7 @@ public class OATH extends AMLoginModule {
                     //throw exception
                     debug.error("OATH" + 
                                 ".checkOTP() : " + 
-                                "Secret key setting is empty or null");
+                                "Counter value is empty or null");
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 }
                 try {
