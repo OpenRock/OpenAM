@@ -84,6 +84,13 @@
                                     </fileset>
                                 </copy>
 
+                                <mkdir dir="${openam.target}/WEB-INF/template/sms"/>
+                                <copy todir="${openam.target}/WEB-INF/template/sms" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml">
+                                        <include name="serverconfig.xml"/>
+                                    </fileset>
+                                </copy>
+
                                 <mkdir dir="${openam.target}/images"/>
                                 <copy todir="${openam.target}/images" filtering="false">
                                     <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/images">
