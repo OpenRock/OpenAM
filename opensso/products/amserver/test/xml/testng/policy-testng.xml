@@ -59,11 +59,11 @@
     </test>
     -->
 
-    <test name="issue-735" parallel="false">
+    <!--<test name="issue-735" parallel="false">
         <classes>
             <class name="com.sun.identity.policy.client.Issue735Test"/>
         </classes>
-    </test>
+    </test>-->
 
     <!--
     <test name="issue-736" parallel="false">

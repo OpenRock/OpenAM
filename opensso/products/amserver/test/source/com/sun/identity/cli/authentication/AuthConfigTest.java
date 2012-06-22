@@ -43,6 +43,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterGroups;
 
 
 /**
@@ -75,8 +76,8 @@ public class AuthConfigTest extends TestBase{
         env.put(CLIConstants.SYS_PROPERTY_OUTPUT_WRITER, outputWriter);
         cmdManager = new CommandManager(env);
     }
-
-
+    
+    
     @Parameters ({"realm"})
     @Test(groups = {"cli-authconfig", "ops", "list-auth-instances"})
     public void listAuthInstances(String realm)
@@ -115,7 +116,7 @@ public class AuthConfigTest extends TestBase{
         cmdManager.serviceRequestQueue();
         exiting("createAuthInstance");
     }
-
+    
     @Parameters ({"realm"})
     @Test(groups = {"cli-authconfig", "ops", "list-auth-cfgs"})
     public void listAuthConfigurations(String realm)
@@ -133,9 +134,10 @@ public class AuthConfigTest extends TestBase{
         cmdManager.serviceRequestQueue();
         exiting("listAuthConfigurations");
     }
-
+    
     @Parameters ({"realm"})
-    @Test(groups = {"cli-authconfig", "ops", "create-auth-cfg"})
+    @Test(groups = {"cli-authconfig", "ops", "create-auth-cfg"},
+            dependsOnMethods = {"createAuthInstance"})
     public void createAuthConfiguration(String realm)
         throws CLIException, AMConfigurationException {
         String[] param = {realm};
@@ -159,7 +161,7 @@ public class AuthConfigTest extends TestBase{
  * because there is not notification in place. Auth configuration and instance
  * cannot be returned by the AMAuthConfigurationManager after they are created.
  * Works OK with Sun DS as configuration datastore.
-
+ 
     @Parameters ({"realm"})
     @Test(groups = {"cli-authconfig", "ops", "update-auth-instance"},
         dependsOnMethods = {"createAuthInstance"})
@@ -250,7 +252,7 @@ public class AuthConfigTest extends TestBase{
     }
     
     @Parameters ({"realm"})
-    @Test(groups = {"cli-authconfig", "delete-auth-instances"},
+    @Test(groups = {"cli-authconfig", "delete-auth-instances"}, alwaysRun=true, 
         dependsOnGroups = {"ops"}, 
         dependsOnMethods = {"deleteAuthConfiguration"})
     public void deleteAuthInstance(String realm)
@@ -273,7 +275,7 @@ public class AuthConfigTest extends TestBase{
     }
     
     @Parameters ({"realm"})
-    @Test(groups = {"cli-authconfig", "delete-auth-cfgs"},
+    @Test(groups = {"cli-authconfig", "delete-auth-cfgs"}, alwaysRun=true,
         dependsOnGroups = {"ops"})
     public void deleteAuthConfiguration(String realm)
         throws CLIException, AMConfigurationException {
@@ -293,5 +295,5 @@ public class AuthConfigTest extends TestBase{
         cmdManager.serviceRequestQueue();
         exiting("deleteAuthConfiguration");
     }
-*/
+    */
 }

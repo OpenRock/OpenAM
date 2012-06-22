@@ -67,8 +67,8 @@ public class IdRepoTest extends TestBase{
     private CommandManager cmdManager;
     private static DevNullOutputWriter outputWriter = new DevNullOutputWriter();
     
-    private static final String TOP_LEVEL_ADMIN_ROLE = "Top-Level Admin Role";
-    private static final String DUMMY_ROLE = "IdRepoDevUnitTestRole";
+    private static final String TOP_LEVEL_ADMIN_GROUP = "Top-Level Admin Group";
+    private static final String DUMMY_GROUP = "IdRepoDevUnitTestGroup";
 
     /**
      * Creates a new instance of <code>IdRepoTest</code>
@@ -470,10 +470,10 @@ public class IdRepoTest extends TestBase{
             "show-members",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_NAME,
-            TOP_LEVEL_ADMIN_ROLE,
+            DUMMY_GROUP,
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 GetMembers.ARGUMENT_MEMBERSHIP_IDTYPE,
             "User",
@@ -503,7 +503,7 @@ public class IdRepoTest extends TestBase{
             uid,
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 GetMemberships.ARGUMENT_MEMBERSHIP_IDTYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
             realm};
 
@@ -520,14 +520,15 @@ public class IdRepoTest extends TestBase{
         throws CLIException, IdRepoException, SSOException {
         String[] param = {realm, uid};
         entering("addMember", param);
+        createDummyGroup(realm);
         String[] args = {
             "add-member",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_NAME,
-            TOP_LEVEL_ADMIN_ROLE,
+            DUMMY_GROUP,
             CLIConstants.PREFIX_ARGUMENT_LONG + 
                 IdentityCommand.ARGUMENT_MEMBER_IDNAME,
             uid,
@@ -542,11 +543,11 @@ public class IdRepoTest extends TestBase{
         cmdManager.addToRequestQueue(req);
         cmdManager.serviceRequestQueue();
         
-        AMIdentity role = new AMIdentity(
-            adminSSOToken, TOP_LEVEL_ADMIN_ROLE, IdType.ROLE, realm, null);
+        AMIdentity group = new AMIdentity(
+            adminSSOToken, DUMMY_GROUP, IdType.GROUP, realm, null);
         AMIdentity user = new AMIdentity(
             adminSSOToken, uid, IdType.USER, realm, null);
-        Set members = role.getMembers(IdType.USER);
+        Set members = group.getMembers(IdType.USER);
         assert (members.contains(user));
         exiting("addMember");
     }
@@ -562,10 +563,10 @@ public class IdRepoTest extends TestBase{
             "remove-member",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_NAME,
-            TOP_LEVEL_ADMIN_ROLE,
+            DUMMY_GROUP,
             CLIConstants.PREFIX_ARGUMENT_LONG + 
                 IdentityCommand.ARGUMENT_MEMBER_IDNAME,
             uid,
@@ -580,13 +581,14 @@ public class IdRepoTest extends TestBase{
         cmdManager.addToRequestQueue(req);
         cmdManager.serviceRequestQueue();
         
-        AMIdentity role = new AMIdentity(
-            adminSSOToken, TOP_LEVEL_ADMIN_ROLE, IdType.ROLE, realm, null);
-        Set members = role.getMembers(IdType.USER);
+        AMIdentity group = new AMIdentity(
+            adminSSOToken, DUMMY_GROUP, IdType.GROUP, realm, null);
+        Set members = group.getMembers(IdType.USER);
         for (Iterator i = members.iterator(); i.hasNext(); ) {
             AMIdentity x = (AMIdentity)i.next();
             assert (!x.getName().equals(uid));
         }
+        deleteDummyGroup(realm);
         exiting("removeMember");
     }
     
@@ -601,10 +603,10 @@ public class IdRepoTest extends TestBase{
             "show-privileges",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_NAME,
-            TOP_LEVEL_ADMIN_ROLE,
+            TOP_LEVEL_ADMIN_GROUP,
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
             realm};
 
@@ -620,17 +622,17 @@ public class IdRepoTest extends TestBase{
         dependsOnMethods = {"createIdentity"})
     public void addPrivileges(String realm)
         throws CLIException, IdRepoException, DelegationException, SSOException{
-        createDummyRole(realm);
+        createDummyGroup(realm);
         String[] param = {realm};
         entering("addPrivileges", param);
         String[] args = {
             "add-privileges",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_NAME,
-            DUMMY_ROLE,
+            DUMMY_Group,
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.PRIVILEGES,
             "PolicyAdmin",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
@@ -644,7 +646,7 @@ public class IdRepoTest extends TestBase{
         DelegationManager mgr = new DelegationManager(
             adminSSOToken, realm);
         AMIdentity amid = new AMIdentity(
-            adminSSOToken, DUMMY_ROLE, IdType.ROLE, realm, null);
+            adminSSOToken, DUMMY_GROUP, IdType.GROUP, realm, null);
         Set results = mgr.getPrivileges(amid.getUniversalId());
         boolean found = false;
         for (Iterator i = results.iterator(); i.hasNext() && !found; ) {
@@ -666,10 +668,10 @@ public class IdRepoTest extends TestBase{
             "remove-privileges",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_TYPE,
-            "Role",
+            "Group",
             CLIConstants.PREFIX_ARGUMENT_LONG +
                 IdentityCommand.ARGUMENT_ID_NAME,
-            DUMMY_ROLE,
+            DUMMY_GROUP,
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.PRIVILEGES,
             "PolicyAdmin",
             CLIConstants.PREFIX_ARGUMENT_LONG + IArgument.REALM_NAME,
@@ -683,34 +685,34 @@ public class IdRepoTest extends TestBase{
         DelegationManager mgr = new DelegationManager(
             adminSSOToken, realm);
         AMIdentity amid = new AMIdentity(
-            adminSSOToken, DUMMY_ROLE, IdType.ROLE, realm, null);
+            adminSSOToken, DUMMY_GROUP, IdType.GROUP, realm, null);
         Set results = mgr.getPrivileges(amid.getUniversalId());
         boolean found = false;
         for (Iterator i = results.iterator(); i.hasNext() && !found; ) {
             DelegationPrivilege p = (DelegationPrivilege)i.next();
             found = p.getName().equals("PolicyAdmin");
         }
-        deleteDummyRole(realm);
+        deleteDummyGroup(realm);
         assert !found;
         exiting("removePrivileges");
     }
     */
     
-    private AMIdentity createDummyRole(String realm)
+    private AMIdentity createDummyGroup(String realm)
         throws IdRepoException, SSOException {
         AMIdentityRepository amir = new AMIdentityRepository(
             getAdminSSOToken(), realm);
-        return amir.createIdentity(IdType.ROLE, DUMMY_ROLE, 
+        return amir.createIdentity(IdType.GROUP, DUMMY_GROUP, 
             Collections.EMPTY_MAP);
     }
     
-    private void deleteDummyRole(String realm)
+    private void deleteDummyGroup(String realm)
         throws IdRepoException, SSOException {
         SSOToken adminSSOToken = getAdminSSOToken();
         AMIdentityRepository amir = new AMIdentityRepository(
             adminSSOToken, realm);
         AMIdentity amid = new AMIdentity(
-            adminSSOToken, DUMMY_ROLE, IdType.ROLE, realm, null);
+            adminSSOToken, DUMMY_GROUP, IdType.GROUP, realm, null);
         Set<AMIdentity> set = new HashSet<AMIdentity>(2);
         set.add(amid);
         amir.deleteIdentities(set);

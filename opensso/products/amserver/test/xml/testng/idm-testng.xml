@@ -82,30 +82,6 @@
         </classes>
     </test>
 
-    <test name="IdRepo_Role">
-        <parameter name="parent-realm" value="/idpoUnitTest" />
-        <parameter name="entity-type" value="role" />
-        <parameter name="entity-name" value="myrole" />
-        <parameter name="entity-creation-attributes" value="" />
-        <parameter name="entity-modify-attributes" value="" />
-        <parameter name="entity-required-attributes" value="" />
-        <parameter name="entity-modify-service1-name" value="iPlanetAMSessionService" />
-        <parameter name="entity-modify-service1-attributes" value="iplanet-am-session-max-session-time=200;iplanet-am-session-max-idle-time=50" />
-        <parameter name="entity-binary-attributes" value="" />
-        <groups>
-            <run>
-                <include name="api" />
-                <include name="service" />
-                <exclude name="ldap" />
-                <include name="memberships" />
-                <exclude name="user-base" />
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
-        </classes>
-    </test>
-
     <test name="IdRepo_User">
         <parameter name="parent-realm" value="/idpoUnitTest" />
         <parameter name="entity-type" value="user" />
@@ -169,30 +145,6 @@
                 <include name="api" />
                 <include name="ldap" />
                 <exclude name="service" />
-                <include name="memberships" />
-                <exclude name="user-base" />
-            </run>
-        </groups>
-        <classes>
-            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
-        </classes>
-    </test>
-
-    <test name="IdRepo_subRealm_Role">
-        <parameter name="parent-realm" value="/idpoUnitTest/subrealm" />
-        <parameter name="entity-type" value="role" />
-        <parameter name="entity-name" value="sub-myrole" />
-        <parameter name="entity-creation-attributes" value="" />
-        <parameter name="entity-modify-attributes" value="" />
-        <parameter name="entity-required-attributes" value="" />
-        <parameter name="entity-modify-service1-name" value="iPlanetAMSessionService" />
-        <parameter name="entity-modify-service1-attributes" value="iplanet-am-session-max-session-time=200;iplanet-am-session-max-idle-time=50" />
-        <parameter name="entity-binary-attributes" value="" />
-        <groups>
-            <run>
-                <include name="api" />
-                <include name="service" />
-                <exclude name="ldap" />
                 <include name="memberships" />
                 <exclude name="user-base" />
             </run>

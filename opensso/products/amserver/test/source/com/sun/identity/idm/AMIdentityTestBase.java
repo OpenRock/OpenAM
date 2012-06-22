@@ -151,24 +151,6 @@ public class AMIdentityTestBase extends TestBase {
             
             AMIdentity amid = getIdentity(parentRealm,
                 IdUtils.getType(idType), entityName);
-            Set<String> assignableServices = new HashSet<String>(amid.getAssignableServices());
-            Set<String> originallyAssignedServices = (Set<String>) amid.getAssignedServices();
-            if (!assignableServices.isEmpty()) {
-                for (String service : assignableServices) {
-                    amid.assignService(service, Collections.EMPTY_MAP);
-                }
-                Set<String> temp = amid.getAssignableServices();
-                assert temp.isEmpty();
-                temp = amid.getAssignedServices();
-                assignableServices.addAll(originallyAssignedServices);
-                assert temp.equals(assignableServices);
-                for (String service : assignableServices) {
-                    amid.unassignService(service);
-                }
-                temp = amid.getAssignableServices();
-                assert temp.equals(assignableServices);
-                assert amid.getAssignedServices().isEmpty();
-            }
 
             Set<String> serviceNames = CollectionUtils.parseStringToSet(
                     strServiceNames);

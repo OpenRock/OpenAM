@@ -371,7 +371,7 @@ public class AMLogTest extends TestBase {
         }
 
         // first record has the column names
-        if (numRecs != (numRecsExp + 1)) {
+        if (numRecs != (numRecsExp + 2)) {
             throw new AMLogException("Number of records read (" +
                 numRecs + ") doesn't match expected (" +
                 (numRecsExp+1) + ")");
@@ -453,7 +453,7 @@ public class AMLogTest extends TestBase {
             throw new AMLogException("readLogQuery:Exception: " +
                 e.getMessage());
         }
-        if (numRecs != (recsWritten + 1)) {
+        if (numRecs != (recsWritten + 2)) {
             throw new AMLogException("Number of records read test 1 (" +
                 numRecs + ") doesn't match expected (" +
                 (recsWritten+1) + ")");
@@ -544,8 +544,8 @@ public class AMLogTest extends TestBase {
                 (numRecs-1) + ") doesn't match expected (1)");
         }
 
-        // assume MessageID is in column 3 (starting from 0)
-        temp = result[1][3];
+        // assume MessageID is in column 8 (starting from 0)
+        temp = result[1][8];
         if (!temp.contains("XX2")) {
             throw new AMLogException("Read test 3: record = " +
                 temp + ", not XX2");

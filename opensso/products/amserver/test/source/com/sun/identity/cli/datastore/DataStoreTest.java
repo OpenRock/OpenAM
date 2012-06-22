@@ -40,6 +40,8 @@ import java.util.Map;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
 
 /**
@@ -91,7 +93,7 @@ public class DataStoreTest extends TestBase{
     }
 
     @Parameters ({"realm"})
-        @Test(groups = {"cli-datastore", "ops", "create-datastore"})
+    @Test(groups = {"cli-datastore", "ops", "create-datastore"})
     public void createDataStore(String realm)
         throws CLIException {
         String[] param = {realm};
@@ -143,12 +145,10 @@ public class DataStoreTest extends TestBase{
         cmdManager.addToRequestQueue(req);
         cmdManager.serviceRequestQueue();
         exiting("updateDataStore");
-    } 
+    } */
     
     @Parameters ({"realm"})
-    @Test(groups = {"cli-datastore", "delete-datastores"},
-        dependsOnGroups = {"ops"}
-    )
+    @AfterSuite(groups = {"cli-datastore", "delete-datastores"})
     public void deleteDataStores(String realm)
         throws CLIException {
         String[] param = {realm};
@@ -166,6 +166,5 @@ public class DataStoreTest extends TestBase{
         cmdManager.addToRequestQueue(req);
         cmdManager.serviceRequestQueue();
         exiting("deleteDataStores");
-    } 
-*/
+    }
 }
