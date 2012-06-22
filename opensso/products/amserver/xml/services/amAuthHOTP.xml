@@ -25,7 +25,8 @@
     "Portions Copyrighted [year] [name of copyright owner]"
 
    $Id: amAuthHOTP.xml,v 1.2 2010/01/27 21:46:02 qcheng Exp $
-
+   
+   "Portions Copyrighted 2012 ForgeRock AS"
 -->
 
 
@@ -156,6 +157,30 @@
 		    <Value>false</Value>
 		  </DefaultValues>
 		</AttributeSchema>
+		<AttributeSchema name="openamTelephoneAttribute"
+				 type="single"
+				 syntax="string"
+				 i18nKey="a510">
+		  <DefaultValues>
+		    <Value>telephoneNumber</Value>
+		  </DefaultValues>
+		</AttributeSchema>
+		<AttributeSchema name="openamSMSCarrrierAttribute"
+				 type="single"
+				 syntax="string"
+				 i18nKey="a511">
+		  <DefaultValues>
+		    <Value></Value>
+		  </DefaultValues>
+		</AttributeSchema>
+		<AttributeSchema name="openamEmailAttribute"
+				 type="single"
+				 syntax="string"
+				 i18nKey="a512">
+		  <DefaultValues>
+		    <Value>mail</Value>
+		  </DefaultValues>
+		</AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="sunAMAuthHOTPAuthLevel"
                         type="single"
@@ -270,6 +295,30 @@
 			<Value>false</Value>
                       </DefaultValues>
 		    </AttributeSchema>
+                    <AttributeSchema name="openamTelephoneAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a510">
+                      <DefaultValues>
+			<Value>telephoneNumber</Value>
+                      </DefaultValues>
+		    </AttributeSchema>
+		    <AttributeSchema name="openamSMSCarrrierAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a511">
+                      <DefaultValues>
+			<Value></Value>
+		      </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openamEmailAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a512">
+                      <DefaultValues>
+			<Value>mail</Value>
+                      </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

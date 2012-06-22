@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2012 ForgeRock AS
  */
 
 package com.sun.identity.authentication.modules.hotp;
@@ -108,6 +108,13 @@ public class HOTP extends AMLoginModule {
     private static final String SKIP_HOTP = "skipHOTP";
     boolean skip = false;
     boolean hotpAutoClicking = false;
+    
+    private static String ATTRIBUTEPHONE = "openamTelephoneAttribute";
+    private static String ATTRIBUTECARRIER = "openamSMSCarrrierAttribute";
+    private static String ATTRIBUTEEMAIL = "openamEmailAttribute";
+    private String telephoneAttribute = null;
+    private String carrierAttribute = null;
+    private String emailAttribute = null;
 
     public HOTP() {
         amAuthHOTP = "amAuthHOTP";
@@ -142,6 +149,15 @@ public class HOTP extends AMLoginModule {
                 CODEVALIDITYDURATION);
         codeLength = CollectionHelper.getMapAttr(options, CODELENGTH);
         codeDelivery = CollectionHelper.getMapAttr(options, CODEDELIVERY);
+        
+        telephoneAttribute = CollectionHelper.getMapAttr(options, ATTRIBUTEPHONE);
+        carrierAttribute = CollectionHelper.getMapAttr(options, ATTRIBUTECARRIER);
+        emailAttribute = CollectionHelper.getMapAttr(options, ATTRIBUTEEMAIL);
+        if (debug.messageEnabled()) {
+            debug.message("HOTP.init() : " + "telephone attribute=" + telephoneAttribute);
+            debug.message("HOTP.init() : " + "carrier attribute=" + carrierAttribute);
+            debug.message("HOTP.init() : " + "email attribute=" + emailAttribute);
+        }
 
         java.util.Locale locale = getLoginLocale();
         bundle = amCache.getResBundle(amAuthHOTP, locale);
@@ -272,8 +288,7 @@ public class HOTP extends AMLoginModule {
 
                     } else { // Send HOTP Code
                         try {
-                            sentHOTPCode = sendHOTPCode();
-                            
+                            sentHOTPCode = sendHOTPCode();                           
                             substituteHeader(START_STATE, bundle.getString("send.success"));
                         } catch (AuthLoginException ale) {
                             //it's already logged so we just handle the exception
@@ -394,24 +409,64 @@ public class HOTP extends AMLoginModule {
 
             Object[] ids = results.toArray();
             AMIdentity id = (AMIdentity) ids[0];
-            Set telephoneNumbers = id.getAttribute("telephoneNumber");
-            Set emails = id.getAttribute("mail");
+            
+            if (telephoneAttribute==null || telephoneAttribute.trim().length()==0) {
+                telephoneAttribute="telephoneNumber";
+            }
+            if (debug.messageEnabled()) {
+                debug.message("HOTP.sendSMS() : " + "Using phone attribute of " + telephoneAttribute);
+            }
+            Set telephoneNumbers = id.getAttribute(telephoneAttribute);
 
             String phone = null;
             Iterator itor = null;
             if (telephoneNumbers != null && !telephoneNumbers.isEmpty()) {
+            // use the first number in the set
                 itor = telephoneNumbers.iterator();
                 phone = (String) itor.next();
+                if (carrierAttribute!=null && carrierAttribute.trim().length()>0) {
+            // add in the carrier
+                    Set carriers = id.getAttribute(carrierAttribute);
+                    if (carriers != null && !carriers.isEmpty()) {
+                        Iterator itca = carriers.iterator();
+                        String carrier = (String) itca.next();
+                        if (carrier.startsWith("@")) {
+                            phone=phone.concat(carrier);
+                        } else {
+                            phone=phone.concat("@"+carrier);
+                        }
+                        if (debug.messageEnabled()) {
+                            debug.message("HOTP.sendSMS() : " + "Using carrier attribute of " + carrierAttribute);
+                        }
+                    }
+                }
                 if (debug.messageEnabled()) {
                     debug.message("HOTP.sendSMS() : " + "IdRepoException : phone number found "
-                            + phone + " with username : " + userName);
+                        + phone + " with username : " + userName);
+                    /*
+                     * Log a message if the carrier is unknown.  The SMSGateway module is designed to use AT&T's SMS gateway
+                     * as default.  Not sure why the product uses a default in this situation instead of simply not attempting  
+                     * to send a text message but we don't want to break any existing installations so just log it for debug
+                     * purposes.
+                     *  
+                     */
+                    if (!phone.contains("@")) {
+                        debug.message("HOTP.sendSMS() : " + "No carrier detected - SMSGateway module will use default of @txt.att.net ");
+                    }
                 }
             } else {
                 if (debug.messageEnabled()) {
                     debug.message("HOTP.sendSMS() : " + "IdRepoException : no phone number found " +
-                            " with username : " + userName);
+                        " with username : " + userName);
                 }
             }
+            if (emailAttribute==null || emailAttribute.trim().length()==0) {
+                emailAttribute="mail";
+            }
+            if (debug.messageEnabled()) {
+                debug.message("HOTP.sendSMS() : " + "Using email attribute of " + emailAttribute);
+            }
+            Set emails = id.getAttribute(emailAttribute);
 
             String mail = null;
             if (emails != null && !emails.isEmpty()) {
