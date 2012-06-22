@@ -137,6 +137,12 @@
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
+                                <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
+                                        <include name="FederationManagerCLI.properties"/>
+                                    </fileset>
+                                </copy>
+
                                 <copy todir="${openam.target}/WEB-INF" filtering="false">
                                     <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss">
                                     <include name="sun-jaxws.xml"/>
@@ -257,9 +263,6 @@
                                 <copy todir="${openam.target}/config/auth">
                                     <fileset dir="src/main/webapp/config/auth" includes="index.html"/>
                                 </copy>
-                                <copy todir="${openam.target}/config/">
-                                    <fileset dir="src/main/resources/config" includes="options.htm"/>
-                                </copy>
 
                                 <copy todir="${openam.target}/config/auth/default" filtering="false" overwrite="false">
                                     <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
@@ -321,21 +324,6 @@
                                     </fileset>
                                 </copy>
 
-                                <!--
-                                <copy todir="${amserver.target.resources.dir}" filtering="true">
-                                    <fileset dir="${amserver.resources.i18n.dir}"
-                                             includes="*.properties"/>
-                                    <fileset dir="${amserver.console.res.dir}" includes="*.properties"/>
-                                    <fileset dir="${amserver.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.console.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.jaxrpc.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.services.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.authmodule.xml.dir}" includes="*.xml"/>
-                                    <fileset dir="${amserver.dtd.xml.dir}"
-                                             includes="**/*.dtd" excludes="dtd/sms.dtd"/>
-                                </copy>
-                                -->
-
                                 <concat destfile="${amserver.target.resources.dir}/amSDK.properties">
                                     <fileset dir="${amserver.resources.i18n.dir}">
                                         <include name="Services.properties"/>
@@ -355,25 +343,6 @@
 
                                 <copy file="${amserver.target.resources.dir}/amSDK.properties"
                                       tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
-
-                                <!--
-
-                                <copy file="${amserver.target.resources.dir}/amSDK.properties"
-                                      tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
-                                <copy file="${amserver.dtd.xml.dir}/smsflatfile.dtd"
-                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm/flatfile"/>
-                                <copy file="${amserver.dtd.xml.dir}/policyAdmin.dtd"
-                                      todir="${amserver.target.resources.dir}/com/sun/identity/policy"/>
-                                <copy file="${amserver.dtd.xml.dir}/sms.dtd"
-                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm"/>
-                                <copy todir="${amserver.target.resources.dir}/com/sun/identity/log/messageid">
-                                    <fileset dir="${amserver.log.xml.dir}">
-                                        <include name="*.xml"/>
-                                        <include name="*.dtd"/>
-                                    </fileset>
-                                </copy>
-
-                                -->
 
 
                                 <!-- Align the Console Definitions for WAR Inclusion. -->
@@ -405,35 +374,6 @@
                                 </copy>
 
 
-                                <!--
-
-
-                            <mkdir dir="${war.package.dir}/WEB-INF/template/openfm"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/wsdl"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF/services"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/fedlet"/>
-                            <mkdir dir="${war.package.dir}/WEB-INF/fedlet/AG"/>
-                        <mkdir dir="${war.package.dir}/WEB-INF/fedlet/AG/conf"/>
-
-
-
-
-
-
-                        <copy file="${library.dir}/built/classes/com/sun/identity/fedlet/ag/AssertionGen.class"
-                                tofile="${war.package.dir}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/AssertionGen.class" />
-
-                        <copy file="${library.dir}/built/classes/com/sun/identity/fedlet/ag/UserData.class"
-                                tofile="${war.package.dir}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/UserData.class" />
-
-                        <copy file="${library.dir}/built/classes/com/sun/identity/fedlet/ag/MetaDataParser.class"
-                                tofile="${war.package.dir}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/MetaDataParser.class" />
-
-
-                                -->
-
-
                                 <!-- Align in Federation Elements -->
                                 <copy todir="${amserver.target.resources.dir}" flatten="true">
                                     <fileset dir="${library.resources.i18n.dir}" includes="**/*.properties"/>
@@ -447,19 +387,59 @@
                                 </copy>
 
 
+                                <!-- Remaining Bits -->
+                                <copy todir="${openam.target}/config" overwrite="false">
+                                    <fileset dir="${server.resources}/config">
+                                        <include name="*.htm"/>
+                                    </fileset>
+                                </copy>
+
+                                <mkdir dir="${openam.target}/js"/>
+                                <copy todir="${openam.target}/js" overwrite="false">
+                                    <fileset dir="src/main/webapp/com_sun_web_ui/js">
+                                        <include name="browserVersion.js"/>
+                                    </fileset>
+                                </copy>
+
+
+
                                 <!--
 
+                                  <copy todir="${amserver.target.resources.dir}" filtering="true">
+                                    <fileset dir="${amserver.resources.i18n.dir}"
+                                             includes="*.properties"/>
+                                    <fileset dir="${amserver.console.res.dir}" includes="*.properties"/>
+                                    <fileset dir="${amserver.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.console.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.jaxrpc.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.services.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.authmodule.xml.dir}" includes="*.xml"/>
+                                    <fileset dir="${amserver.dtd.xml.dir}"
+                                             includes="**/*.dtd" excludes="dtd/sms.dtd"/>
+                                </copy>
+
+                                <copy file="${amserver.target.resources.dir}/amSDK.properties"
+                                      tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
+                                <copy file="${amserver.dtd.xml.dir}/smsflatfile.dtd"
+                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm/flatfile"/>
+                                <copy file="${amserver.dtd.xml.dir}/policyAdmin.dtd"
+                                      todir="${amserver.target.resources.dir}/com/sun/identity/policy"/>
+                                <copy file="${amserver.dtd.xml.dir}/sms.dtd"
+                                      todir="${amserver.target.resources.dir}/com/sun/identity/sm"/>
+                                <copy todir="${amserver.target.resources.dir}/com/sun/identity/log/messageid">
+                                    <fileset dir="${amserver.log.xml.dir}">
+                                        <include name="*.xml"/>
+                                        <include name="*.dtd"/>
+                                    </fileset>
+                                </copy>
+
+                            <mkdir dir="${war.package.dir}/WEB-INF/template/openfm"/>
+                            <mkdir dir="${war.package.dir}/WEB-INF/wsdl"/>
+                            <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF"/>
+                            <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF/services"/>
 
 
 
-
-                                        <copy todir="${war.package.dir}/WEB-INF/wsdl">
-                                            <fileset dir="${openfm.dir}/wsdl" includes="*" excludes="famsts-client.wsdl"/>
-                                        </copy>
-
-                                        <copy todir="${war.package.dir}/WEB-INF">
-                                            <fileset dir="${openfm.dir}/xml/wss" includes="sun-jaxws.xml"/>
-                                        </copy>
 
                                         <copy todir="${war.package.dir}/WEB-INF/classes/META-INF/services">
                                             <fileset dir="${openfm.dir}/resources/META-INF/services" includes="*" excludes="com.sun.xml.ws.assembler.ClientPipelineHook, com.sun.xml.ws.api.pipe.TransportPipeFactory"/>
@@ -679,6 +659,9 @@
                                     <arg value="&lt;tab id=\&quot;4\&quot;" />
                                 </java>
 
+
+
+
                                 <! - - entities profile tabs - - >
                                 <java classname="com.sun.identity.setup.InsertContent" fork="true">
                                     <classpath refid="build.class.path"/>
@@ -725,6 +708,9 @@
                                     <arg value="${war.package.dir}/WEB-INF/web.xml" />
                                     <arg value="&lt;! - - servlet mapping - - &gt;" />
                                 </java>
+
+
+
 
                                 <! - - update web.xml with FAM STS info - - >
                                 <java classname="com.sun.identity.setup.InsertContent" fork="true">
@@ -827,7 +813,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <!-- <outputFileNameMapping>openam.war</outputFileNameMapping> -->
                     <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
                     <archive>
                         <manifestEntries>
