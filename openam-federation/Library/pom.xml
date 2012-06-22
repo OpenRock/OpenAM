@@ -39,7 +39,7 @@
     <description>OpenAM Federation Library Components
     </description>
     <artifactId>Library</artifactId>
-  <version>10.01.00-SNAPSHOT</version>n>
+    <version>10.01.00-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -130,28 +130,31 @@
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>openam-shared</artifactId>
-     <version>10.01.00-SNAPSHOT</version>ion> <!-- This Version -->
+            <version>10.01.00-SNAPSHOT</version>
 		</dependency>
 
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>xacml3-schema</artifactId>
-   <version>10.01.00-SNAPSHOT</version>rsion> <!-- This Version -->
+            <version>10.01.00-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.forgerock</groupId>
-     		<artifactId>saml2-schema</artifac<version>10.01.00-SNAPSHOT</version>version>
+     		<artifactId>saml2-schema</artifactId>
+            <version>10.01.00-SNAPSHOT</version>
       	</dependency>
 
       	<dependency>
 	   		<groupId>org.forgerock</groupId>
-        	<artifactId>wsfederation-schema</artifactId><version>10.01.00-SNAPSHOT</version></version> <!-- This Version -->
+        	<artifactId>wsfederation-schema</artifactId>
+              <version>10.01.00-SNAPSHOT</version>
 		</dependency>
 
    		<dependency>
 			<groupId>org.forgerock</groupId>
-			<artifactId>liberty-schema</art<version>10.01.00-SNAPSHOT</version>OT</version> <!-- This Version -->
+			<artifactId>liberty-schema</artifactId>
+            <version>10.01.00-SNAPSHOT</version>
 		</dependency>
 
         <dependency>

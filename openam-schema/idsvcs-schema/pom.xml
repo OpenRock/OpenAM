@@ -39,7 +39,7 @@
     <description>OpenAM Identity Services Schema Components
     </description>
     <artifactId>idsvcs-schema</artifactId>
-  <version>10.01.00-SNAPSHOT</version>n>
+    <version>10.01.00-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>

@@ -39,7 +39,7 @@
     <description>OpenAM Federation
     </description>
     <artifactId>OpenFM</artifactId>
-  <version>10.01.00-SNAPSHOT</version>n>
+    <version>10.01.00-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -129,12 +129,14 @@
     <dependencies>
 		<dependency>
 			<groupId>org.forgerock</groupId>
-			<artifactId>openam-core</artifactId><version>10.01.00-SNAPSHOT</version>ion> <!-- This Version -->
+			<artifactId>openam-core</artifactId>
+            <version>10.01.00-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.forgerock</groupId>
-			<artifactId>Library</artifactI<version>10.01.00-SNAPSHOT</version>rsion> <!-- This Version -->
+			<artifactId>Library</artifactId>
+            <version>10.01.00-SNAPSHOT</version>
 		</dependency>
 
         <dependency>

@@ -39,7 +39,7 @@
     <description>OpenAM XACML3 Schemata  
     </description>
     <artifactId>xacml3-schema</artifactId>
-  <version>10.01.00-SNAPSHOT</version>n>
+    <version>10.01.00-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -146,9 +146,9 @@
     
     <dependencies>
     	<dependency>
-	   	<groupId>org.forgerock</groupId>
+	   	    <groupId>org.forgerock</groupId>
         	<artifactId>openam-shared</artifactId>
-     <version>10.01.00-SNAPSHOT</version>ion> <!-- This Version -->
+            <version>10.01.00-SNAPSHOT</version>
         </dependency>
 
         <dependency>
