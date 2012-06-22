@@ -130,16 +130,21 @@
 
                                 <mkdir dir="${openam.target}/WEB-INF/classes"/>
                                 <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
-                                    <fileset dir="${project.basedir}/src/main/resources">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
                                         <include name="FederationManagerCLI.properties"/>
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
-                                <mkdir dir="${openam.target}/WEB-INF/classes"/>
                                 <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
-                                    <fileset dir="${project.basedir}/src/main/resources">
-                                        <include name="FederationManagerCLI.properties"/>
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
+                                    <include name="FederationManagerCLI.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${openam.target}" filtering="false">
+                                    <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                                        <include name="*.*"/>
                                     </fileset>
                                 </copy>
 
@@ -151,10 +156,71 @@
                                 </copy>
 
                                 <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
-                                    <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml/console">
-                                        <include name="amAccessControl.xml"/>
-                                        <include name="amConsoleConfig.xml"/>
+                                    <fileset dir="${project.basedir}/../openam-federation/Library/src/main/resources/xml">
+                                        <include name="*.xsl"/>
+                                        <include name="*.xml"/>
+                                        <exclude name="web.xml"/>
                                     </fileset>
+                                </copy>
+
+                                <!-- Align in auth -->
+                                <mkdir dir="${openam.target}/config/auth"/>
+                                <copy todir="${openam.target}/config/auth" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_de" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_de" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_es" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_es" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_fr" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_fr" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_ja" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_ja" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_ko" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_ko" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_zh_CN" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_zh_CN" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_zh_TW" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default_zh_TW" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default" flatten="true">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth/default_de" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/authdefault_es" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_fr" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_ja" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_ko" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_zh_CN" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+                                <copy todir="${openam.target}/config/auth/default_zh_TW" overwrite="false">
+                                    <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+                                </copy>
+
+                                <copy todir="${openam.target}/config/auth">
+                                    <fileset dir="src/main/webapp/config/auth" includes="index.html"/>
                                 </copy>
 
 
