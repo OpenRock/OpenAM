@@ -185,11 +185,6 @@
 
         <dependency>
             <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
             <artifactId>cc_de</artifactId>
         </dependency>
 

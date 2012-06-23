@@ -82,8 +82,8 @@
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Version Properties -->
-
+        <!-- Product Properties File Inclusion during Build -->
+        <openam.properties>openam.properties</openam.properties>
     </properties>
 
     <!-- OpenAM Child Modules -->
@@ -1103,6 +1103,26 @@
             </plugin>
 
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${openam.properties}</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -1159,7 +1179,7 @@
                     <disableXmlReport>false</disableXmlReport>
                     <forkMode>once</forkMode>
                     <systemPropertyVariables>
-                        <system_config>${environment}</system_config>
+                        <system_config>${openam.properties}</system_config>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -1307,6 +1327,13 @@
 
         <pluginManagement>
             <plugins>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0-alpha-2</version>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
