@@ -826,7 +826,6 @@
             <groupId>org.forgerock</groupId>
             <artifactId>openam-installtools</artifactId>
             <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
 
     </dependencies>
