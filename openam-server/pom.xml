@@ -710,7 +710,7 @@
                         WEB-INF/lib/j2ee-2007-18-10.jar,
                         WEB-INF/lib/el-api-2.2.jar,
                         WEB-INF/lib/servlet-api.jar,
-                        WEB-INF/lib/jersey*.jar
+                        WEB-INF/lib/jersey-core-1.1.5.2.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
@@ -756,78 +756,7 @@
                     </webResources>
 
                 </configuration>
-                <dependencies>
 
-                    <dependency>
-                        <groupId>org.forgerock</groupId>
-                        <artifactId>openam-external-libraries</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                        <!-- This Version -->
-                        <exclusions>
-                            <exclusion>
-                                <groupId>com.sun.jersey</groupId>
-                                <artifactId>jersey-bundle</artifactId>
-                            </exclusion>
-
-                        </exclusions>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.forgerock</groupId>
-                        <artifactId>openam-core</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                        <!-- This Version -->
-                        <exclusions>
-                            <exclusion>
-                                <groupId>com.sun.jersey</groupId>
-                                <artifactId>jersey-bundle</artifactId>
-                            </exclusion>
-                            <exclusion>
-                                <groupId>com.sun.jersey</groupId>
-                                <artifactId>jersey-core</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.forgerock</groupId>
-                        <artifactId>Library</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                        <!-- This Version -->
-                        <exclusions>
-                            <exclusion>
-                                <groupId>com.sun.jersey</groupId>
-                                <artifactId>jersey-bundle</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.forgerock</groupId>
-                        <artifactId>OpenFM</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                        <!-- This Version -->
-                        <exclusions>
-                            <exclusion>
-                                <groupId>com.sun.jersey</groupId>
-                                <artifactId>jersey-bundle</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>javax.ws.rs</groupId>
-                        <artifactId>jsr311-api</artifactId>
-                        <version>1.1.1</version>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>com.sun.jersey</groupId>
-                                <artifactId>jersey-bundle</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-
-                </dependencies>
             </plugin>
 
 
@@ -874,6 +803,30 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-installtools</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>Library</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>OpenFM</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-external-libraries</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
