@@ -48,7 +48,7 @@
 
     <!-- Child Modules -->
     <modules>
-        <!-- OpenAM New Modules -->
+        <!-- OpenAM Federation Modules -->
         <module>openam-federation-library</module>
         <module>OpenFM</module>
     </modules>

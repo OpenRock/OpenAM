@@ -818,7 +818,7 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>Library</artifactId>
+            <artifactId>openam-federation-library</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 

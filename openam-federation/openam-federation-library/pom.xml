@@ -38,7 +38,7 @@
     <name>Library</name>
     <description>OpenAM Federation Library Components
     </description>
-    <artifactId>Library</artifactId>
+    <artifactId>openam-federation-library</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
