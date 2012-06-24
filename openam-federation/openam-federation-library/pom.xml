@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>Library</name>
+    <name>openam-federation-library</name>
     <description>OpenAM Federation Library Components
     </description>
     <artifactId>openam-federation-library</artifactId>

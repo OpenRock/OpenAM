@@ -81,7 +81,7 @@
                                           value="${project.basedir}/../openam-core/src/main/resources/xml"/>
 
                                 <property name="library.xml.dir"
-                                          value="${project.basedir}/../openam-federation/Library/src/main/resources/xml"/>
+                                          value="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml"/>
 
                                 <property name="federation.xml.dir"
                                           value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml"/>
@@ -175,7 +175,7 @@
 
                                 <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
                                     <fileset
-                                            dir="${project.basedir}/../openam-federation/Library/src/main/resources/xml">
+                                            dir="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml">
                                         <include name="*.xsl"/>
                                         <include name="*.xml"/>
                                         <exclude name="web.xml"/>
@@ -207,7 +207,7 @@
                                 <copy todir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/"
                                       filtering="false">
                                     <fileset
-                                            dir="${project.basedir}/../openam-federation/Library/target/classes/com/sun/identity/fedlet/ag">
+                                            dir="${project.basedir}/../openam-federation/openam-federation-library/target/classes/com/sun/identity/fedlet/ag">
                                         <include name="UserData.class"/>
                                         <include name="AssertionGen.class"/>
                                         <include name="MetaDataParser.class"/>
