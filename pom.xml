@@ -700,26 +700,6 @@
                 <!-- Originally 1.1.1-ea-SNAPSHOT -->
             </dependency>
 
-            <!--
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-client</artifactId>
-                <version>1.1.1-ea</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>1.1.1-ea</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>1.1.1-ea</version>
-            </dependency>
-            -->
-
             <dependency>
                 <groupId>com.sun.messaging.mq</groupId>
                 <artifactId>jms</artifactId>

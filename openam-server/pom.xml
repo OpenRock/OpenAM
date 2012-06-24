@@ -710,7 +710,11 @@
                         WEB-INF/lib/j2ee-2007-18-10.jar,
                         WEB-INF/lib/el-api-2.2.jar,
                         WEB-INF/lib/servlet-api.jar,
-                        WEB-INF/lib/jersey-core-1.1.5.2.jar
+                        WEB-INF/lib/jersey-core-1.1.5.2.jar,
+                        WEB-INF/lib/jaxb-api-1.0.6.jar,
+                        WEB-INF/lib/jaxb-impl-1.0.6.jar,
+                        WEB-INF/lib/jaxb-libs-1.0.6.jar,
+                        WEB-INF/lib/jaxb-xjc-1.0.6.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
