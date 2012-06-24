@@ -101,6 +101,12 @@
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
 
+        <!-- Final Packaging Artifacts -->
+        <module>openam-external-libraries</module>
+
+        <!-- OpenAM OAuth Token Service -->
+        <module>openam-oauth</module>
+
         <!-- OpenAM Server -->
         <module>openam-server</module>
 
@@ -108,7 +114,6 @@
         <module>openam-tools</module>
 
         <!-- Final Packaging Artifacts -->
-        <module>openam-external-libraries</module>
         <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
 
   </modules>
