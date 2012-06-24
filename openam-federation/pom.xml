@@ -49,7 +49,7 @@
     <!-- Child Modules -->
     <modules>
         <!-- OpenAM New Modules -->
-        <module>Library</module>
+        <module>openam-federation-library</module>
         <module>OpenFM</module>
     </modules>
 

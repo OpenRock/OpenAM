@@ -35,7 +35,7 @@
 
     <property name="openfm.version" value="${opensso.version}" />
     <import file="../../openam/products/products.xml" />
-    <import file="../library/library.xml" />
+    <import file="../openam-federation-library/library.xml" />
     <import file="openfm.xml" />
 
     <fail message="*** jdk target is not set ***">

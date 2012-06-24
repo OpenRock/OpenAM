@@ -42,11 +42,11 @@
         </condition>
     </fail>
 
-    <property name="libtracker" value="${library.basedir}/tracker.properties" />
+    <property name="libtracker" value="openam-federation-library/tracker.properties" />
     <touch file="${libtracker}" />
 
     <property name="fedlibrary.clientsdkbase.dir"
-        value="${library.basedir}/clientsdk"/>
+        value="openam-federation-library/clientsdk"/>
 
     <!-- build class path -->
     <path id="build.class.path">

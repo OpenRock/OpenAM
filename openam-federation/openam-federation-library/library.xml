@@ -1,0 +1,5 @@
+<project name="library">
+    <dirname property="library.basedir" file="${ant.file.library}"/>
+    <property file="openam-federation-library/library.properties"/>
+    <property file="openam-federation-library/tracker.properties"/>
+</project>
