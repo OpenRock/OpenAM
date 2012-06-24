@@ -78,13 +78,13 @@
                                 <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale"/>
 
                                 <property name="core.xml.dir"
-                                          value="${project.basedir}/../openam-core/src/main/resources/xml" />
+                                          value="${project.basedir}/../openam-core/src/main/resources/xml"/>
 
                                 <property name="library.xml.dir"
-                                          value="${project.basedir}/../openam-federation/Library/src/main/resources/xml" />
+                                          value="${project.basedir}/../openam-federation/Library/src/main/resources/xml"/>
 
                                 <property name="federation.xml.dir"
-                                          value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
+                                          value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml"/>
 
                                 <mkdir dir="${openam.target}/WEB-INF/template/opendj"/>
                                 <copy todir="${openam.target}/WEB-INF/template/opendj" filtering="false">
@@ -487,6 +487,8 @@
 
                                 <!-- Build up web.xml -->
 
+                                <!-- TODO NEED TO BE ADDRESSED Files do not exist yet....  -->
+
                                 <java classname="com.sun.identity.setup.InsertContent"
                                       fork="true" failOnError="true" classpath="${build.class.path}">
                                     <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
@@ -704,7 +706,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <packagingExcludes>WEB-INF/lib/servlet-api.jar</packagingExcludes>
+                    <packagingExcludes>
+                        WEB-INF/lib/j2ee-2007-18-10.jar,
+                        WEB-INF/lib/el-api-2.2.jar,
+                        WEB-INF/lib/servlet-api.jar,
+                        WEB-INF/lib/jersey*.jar
+                    </packagingExcludes>
                     <archive>
                         <manifestEntries>
                             <Specification-Title>OpenAM Server</Specification-Title>
@@ -747,6 +754,7 @@
                             <filtering>true</filtering>
                         </webResource>
                     </webResources>
+
                 </configuration>
                 <dependencies>
 
@@ -755,6 +763,13 @@
                         <artifactId>openam-external-libraries</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                         <!-- This Version -->
+                        <exclusions>
+                            <exclusion>
+                                <groupId>com.sun.jersey</groupId>
+                                <artifactId>jersey-bundle</artifactId>
+                            </exclusion>
+
+                        </exclusions>
                     </dependency>
 
                     <dependency>
@@ -762,6 +777,16 @@
                         <artifactId>openam-core</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                         <!-- This Version -->
+                        <exclusions>
+                            <exclusion>
+                                <groupId>com.sun.jersey</groupId>
+                                <artifactId>jersey-bundle</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>com.sun.jersey</groupId>
+                                <artifactId>jersey-core</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
 
                     <dependency>
@@ -769,6 +794,12 @@
                         <artifactId>Library</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                         <!-- This Version -->
+                        <exclusions>
+                            <exclusion>
+                                <groupId>com.sun.jersey</groupId>
+                                <artifactId>jersey-bundle</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
 
                     <dependency>
@@ -776,6 +807,24 @@
                         <artifactId>OpenFM</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                         <!-- This Version -->
+                        <exclusions>
+                            <exclusion>
+                                <groupId>com.sun.jersey</groupId>
+                                <artifactId>jersey-bundle</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>jsr311-api</artifactId>
+                        <version>1.1.1</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>com.sun.jersey</groupId>
+                                <artifactId>jersey-bundle</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
 
                 </dependencies>
