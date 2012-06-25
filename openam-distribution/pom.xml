@@ -110,7 +110,7 @@
     
     <dependencies>
 
-        <!-- This Project Final Artifact to build. -->
+        <!-- This Project's Final Artifact use. -->
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>openam-server</artifactId>
