@@ -232,7 +232,7 @@
 
         <repository>
             <id>maven-central</id>
-            <url>http://repo1.maven.org/maven2/</url>
+            <url>http://maven.forgerock.org/repo/maven-central</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -241,93 +241,11 @@
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
-        </repository>
-
-        <repository>
-            <id>jboss.org-nexus-public-repository</id>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>codehaus</id>
-            <name>Codehaus Maven 2.x Release Repository</name>
-            <url>http://repository.codehaus.org</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>pyx4j-web-snapshot</id>
-            <url>http://www.pyx4me.com/maven2-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
         </repository>
 
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>Nexus Public repository</id>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>Codehaus repository</id>
-            <url>http://repository.codehaus.org/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>apache-snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>http://repository.apache.org/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>jetty-releases</id>
-            <name>Jetty Releases</name>
-            <url>https://oss.sonatype.org/content/repositories/jetty-releases/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>pyx4j-web-snapshot</id>
-            <url>http://www.pyx4me.com/maven2-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
 
         <pluginRepository>
             <id>forgerock-openam-plugin-releases</id>
@@ -344,6 +262,19 @@
             <url>http://maven.forgerock.org/repo/openam-snapshots</url>
             <snapshots>
                 <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>maven-central-plugins</id>
+            <url>http://maven.forgerock.org/repo/maven-central</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </snapshots>
         </pluginRepository>
 
@@ -370,92 +301,7 @@
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</developerConnection>
     </scm>
 
-    <!-- OpenAM Dependency Management, replaces extlib in all cases. -->
-
-    <!-- Obtained information from product properties for usage in OpenAM 10.0.0 -->
-
-    <!--
-    Used External Libs:
-    ~~~~~~~~~~~~~~~~~~~
-    jsr173_api.jar,
-    imq.jar,
-    click-nodeps-2.3.0.jar,
-    jaxrpc-spi.jar,
-    jms.jar,
-    xalan.jar,
-    webservices-tools.jar,
-    jss4.jar,
-    commons-codec-1.4.jar,
-    FastInfoset.jar,
-    webservices-extra-api.jar,
-    webservices-extra.jar,
-    xercesImpl.jar,
-    relaxngDatatype.jar,
-    xsdlib.jar,
-    webservices-rt.jar,j
-    axrpc-api.jar,
-    jaxrpc-impl.jar,
-    mail.jar,
-    OpenDJ.jar,
-    webservices-api.jar,
-    esapiport.jar,
-    click-extras-2.3.0.jar,
-    jdmkrt.jar,
-    je.jar,
-    json.jar,
-    jstl.jar,
-    asm-3.1.jar,
-    commons-logging-api-1.1.jar,
-    jdom.jar,
-    commons-collections-3.2.1.jar,
-    commons-fileupload-1.2.1.jar,
-    commons-beanutils-1.6.jar,
-    commons-logging-1.1.1.jar,
-    commons-digester-1.8.jar,
-    jsr311-api-1.1.jar,
-    jersey-bundle-1.1.1-ea-SNAPSHOT.jar,
-    oauth-signature-1.1.5-ea-SNAPSHOT.jar,
-    oauth-server-1.1.5-ea-SNAPSHOT.jar,
-    oauth-client-1.1.5-ea-SNAPSHOT.jar,
-    log4j-1.2.8.jar,
-    velocity-1.7.jar,
-    commons-io-2.0.1.jar,
-    commons-lang-2.5.jar,
-    ognl-2.6.9.jar,
-    backport-util-concurrent-2.2.jar,
-    publicsuffix-1.0.1.jar,
-    opendj-ldap-sdk-3.0.0-M2.jar,
-    i18n-core-1.4.0.jar,
-    grizzly-framework-2.1.7.jar,
-    gmbal-api-only-3.0.0-b023.jar,
-    management-api-3.0.0-b012.jar,
-    geoip-1.2.5.jar
-    
-    Used Build Libs:
-    ~~~~~~~~~~~~~~~~~~~
-    j2ee.jar,
-    jaxb-xjc.jar,
-    jaxb-api.jar,
-    jaxb-impl.jar,
-    xmlsec.jar,
-    saaj-impl.jar,
-    jaxb-libs.jar,
-    saaj-api.jar,
-    testng-5.9-jdk15.jar,
-    ant-contrib-1.0b3.jar,
-    jdmktk.jar
-
-    Internal Libs:
-    ~~~~~~~~~~~~~~~~~~~
-    acmecrypt.jar,
-    authapi.jar,
-    crimsondeb.jar,
-    iaik_jce_full.jar,
-    iaik_ssl.jar
-    
-    -->
-
-
+    <!-- Dependency Management -->
     <dependencyManagement>
         <dependencies>
 
