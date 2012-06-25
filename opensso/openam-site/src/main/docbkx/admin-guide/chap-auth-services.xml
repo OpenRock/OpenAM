@@ -1643,6 +1643,11 @@
    For the HOTP module to use either attribute, the Email Address must contain
    a valid email address, or the Telephone Number must contain a valid
    SMS telephone number such as <literal>18285551212@txt.att.net</literal>.</para>
+   <para>You can set the HOTP module to automatically generate a password when
+   users begin logging into the system. You can also setup a mobile phone, 
+   mobile carrier, and email attributes for tighter controls over where 
+   the messages are generated and what provider the messages go through to reach
+   the user.</para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>HMAC One-Time Password (HOTP)</secondary>
@@ -1736,6 +1741,42 @@
       <para>Send the one-time password by SMS, by mail, or both.</para>
       <para><command>ssoadm</command> attribute:
       <literal>sunAMAuthHOTPasswordDelivery</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mobile Phone Number Attribute Names</term>
+     <listitem>
+      <para>Provides the attribute name used for the text message. The 
+      default value is <literal>telephoneNumber</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openamTelephoneAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mobile Carrier Attribute Name</term>
+     <listitem>
+      <para>Provides the name of the carrier that will send the text
+      message.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openamSMSCarrierAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Email Attribute Name</term>
+     <listitem>
+      <para>Provides the attribute name used to email the OTP. The
+      default value is <literal>mail</literal> (email).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openamEmailAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Auto Send OTP Code</term>
+     <listitem>
+      <para>Setup the HOTP module to automatically generate an email
+      or text message when users begin the login process. </para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPAutoClicking</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
