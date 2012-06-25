@@ -29,6 +29,8 @@
 
 package com.sun.identity.saml2.assertion.impl;
 
+import java.io.Serializable;
+
 import org.w3c.dom.Element;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.saml2.assertion.NameIDType;
@@ -45,7 +47,7 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
  *    Format
  *    SPProvidedID
  */
-public abstract class NameIDTypeImpl implements NameIDType {
+public abstract class NameIDTypeImpl implements NameIDType, Serializable {
 
     private boolean isMutable = true;
     private String value;

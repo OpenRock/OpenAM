@@ -47,7 +47,7 @@ import java.io.Serializable;
  *  such as <code>Subject</code> and <code>SubjectConfirmation</code>
  *  elements, and in various protocol messages.
  */
-public class NameIDImpl extends NameIDTypeImpl implements NameID,Serializable {
+public class NameIDImpl extends NameIDTypeImpl implements NameID {
 
     public static final String NAME_ID_ELEMENT = "NameID";
 
