@@ -30,7 +30,6 @@
 package com.sun.identity.saml2.assertion.impl;
 
 import java.io.Serializable;
-
 import org.w3c.dom.Element;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.saml2.assertion.NameIDType;
