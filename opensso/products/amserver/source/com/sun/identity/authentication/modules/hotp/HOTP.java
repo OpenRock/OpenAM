@@ -110,7 +110,7 @@ public class HOTP extends AMLoginModule {
     boolean hotpAutoClicking = false;
     
     private static String ATTRIBUTEPHONE = "openamTelephoneAttribute";
-    private static String ATTRIBUTECARRIER = "openamSMSCarrrierAttribute";
+    private static String ATTRIBUTECARRIER = "openamSMSCarrierAttribute";
     private static String ATTRIBUTEEMAIL = "openamEmailAttribute";
     private String telephoneAttribute = null;
     private String carrierAttribute = null;

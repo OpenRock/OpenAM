@@ -165,7 +165,7 @@
 		    <Value>telephoneNumber</Value>
 		  </DefaultValues>
 		</AttributeSchema>
-		<AttributeSchema name="openamSMSCarrrierAttribute"
+		<AttributeSchema name="openamSMSCarrierAttribute"
 				 type="single"
 				 syntax="string"
 				 i18nKey="a511">
@@ -303,7 +303,7 @@
 			<Value>telephoneNumber</Value>
                       </DefaultValues>
 		    </AttributeSchema>
-		    <AttributeSchema name="openamSMSCarrrierAttribute"
+		    <AttributeSchema name="openamSMSCarrierAttribute"
                                      type="single"
                                      syntax="string"
                                      i18nKey="a511">
