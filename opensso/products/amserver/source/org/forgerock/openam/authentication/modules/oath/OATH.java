@@ -94,6 +94,9 @@ public class OATH extends AMLoginModule {
     private static final String LAST_LOGIN_TIME_ATTRIBUTE_NAME = 
             "iplanet-am-auth-oath-last-login-time-attribute-name";
     
+    //32 characters 4 bits per character (HEX)
+    private static final int MIN_SECRET_KEY_LENGTH = 32;
+    
     //module attribute holders
     private int passLen = 0;
     private String secretKeyAttrName = null;
@@ -347,6 +350,13 @@ public class OATH extends AMLoginModule {
         
         Set<String> secretKeySet = null; 
         try {
+            if (secretKeyAttrName == null || secretKeyAttrName.isEmpty()){
+                debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "invalid secret key attribute name : ");
+                throw new AuthLoginException(amAuthOATH, "authFailed", null);
+            }
+            
             secretKeySet = id.getAttribute(secretKeyAttrName);
         } catch (IdRepoException e){
             debug.error("OATH" + 
@@ -380,12 +390,26 @@ public class OATH extends AMLoginModule {
         
         //get rid of white space in string (messes witht he data converter)
         secretKey = secretKey.replaceAll("\\s+", "");
-        
+        //convert secretKey to lowercase
+        secretKey = secretKey.toLowerCase();
+        //make sure secretkey is even length
+        if ((secretKey.length() % 2) != 0){
+            secretKey = "0" + secretKey;
+        }
+   
         //check size of key
         if (secretKey.isEmpty() || secretKey == null){
             debug.error("OATH" + 
                         ".checkOTP() : " + 
                         "Secret key is not a valid");
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+        
+        //make sure secretkey is 128bits long or longer
+        if (secretKey.length() < MIN_SECRET_KEY_LENGTH){
+            debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "Secret key is less than 128 bits long");
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
         
@@ -410,6 +434,12 @@ public class OATH extends AMLoginModule {
                
                 Set<String> counterSet = null;
                 try {
+                    if (counterAttrName == null || counterAttrName.isEmpty()){
+                        debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "invalid counter attribute name : ");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
                     counterSet = id.getAttribute(counterAttrName);
                 } catch (IdRepoException e){
                     debug.error("OATH" + 
@@ -477,6 +507,12 @@ public class OATH extends AMLoginModule {
                 //get Last login time
                 Set<String> lastLoginTimeSet = null;
                 try {
+                    if (loginTimeAttrName == null || loginTimeAttrName.isEmpty()){
+                        debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "invalid login time attribute name : ");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
                     lastLoginTimeSet = id.getAttribute(loginTimeAttrName);
                 } catch (IdRepoException e){
                     debug.error("OATH" + 
@@ -552,7 +588,7 @@ public class OATH extends AMLoginModule {
         } catch (Exception e){
             debug.error("OATH" + 
                         ".checkOTP() : " + 
-                        "Failed to generate one time pasword", 
+                        "checkOTP process failed : ", 
                         e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
