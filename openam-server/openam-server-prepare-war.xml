@@ -452,6 +452,10 @@
             <arg value="${openam.target}/WEB-INF/web.xml"/>
             <arg value="&lt;!- - servlet mapping - -&gt;"/>
         </java>
+
+
+
+        <!--
         <java classname="com.sun.identity.setup.InsertContent"
               fork="true" failOnError="false" classpath="${build.class.path}">
             <arg value="&lt;endpoint.+?/&gt;"/>
@@ -459,6 +463,8 @@
             <arg value="${openam.target}/WEB-INF/jaxrpc-ri-runtime.xml"/>
             <arg value="&lt;/endpoints&gt;"/>
         </java>
+        -->
+
 
         <!--
         remove duplicate entries in FederationConfig.properties against
