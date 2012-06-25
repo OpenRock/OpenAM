@@ -32,7 +32,7 @@
 <project name="top" default="usage">
                 
     <description>Open Web Single Sign-On</description>
-    <import file="products.xml" />
+    <import file="../../../products.xml" />
     <import file="amserver/amserver.xml" />
     <import file="federation/library/library.xml" />
     <import file="federation/openfm/openfm.xml" />

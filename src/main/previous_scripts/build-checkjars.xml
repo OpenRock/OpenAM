@@ -28,7 +28,7 @@
 
 <project name="opensso" default="all">
     <description>Check the existence of external libraries</description>
-    <import file="products.xml" />
+    <import file="../../../products.xml" />
 
     <taskdef name="foreach" classname="net.sf.antcontrib.logic.ForEach">
         <classpath>
