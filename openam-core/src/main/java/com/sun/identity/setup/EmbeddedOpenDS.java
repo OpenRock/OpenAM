@@ -228,10 +228,11 @@ public class EmbeddedOpenDS {
         }
 
         // copy OpenDJ jar file
+        // TODO Make this Dynamic, so we can eliminate versions on Jars.
         String[] opendsJarFiles = {
-            "OpenDJ.jar",
-            "je.jar",
-            "mail.jar"
+            "OpenDJ-2012-20-02.jar", // Was OpenDJ.jar before Maven Support.
+            "je-4.0.92.jar",         // Was je.jar before Maven Support.
+            "mail-1.4.5.jar"         // Was mail.jar before Maven Support.
         };
 
         for (int i = 0 ; i < opendsJarFiles.length; i++) {
