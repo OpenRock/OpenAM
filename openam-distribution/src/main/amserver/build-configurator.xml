@@ -32,7 +32,7 @@
     Portions Copyrighted 2011 ForgeRock AS
 -->
 
-<project name="configurator" default="createZipFile" basedir=".">
+<project name="configurator" default="createZipFile" basedir="">
     <description>OpenAM: amConfigurator.zip Creation</description>
     <fail message="*** nightly build may be built from top level only ***">
       <condition>

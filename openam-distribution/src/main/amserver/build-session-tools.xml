@@ -28,7 +28,7 @@
 
 -->
 
-<project name="createsessiontools.zip" default="createZipFile" basedir=".">
+<project name="createsessiontools.zip" default="createZipFile" basedir="">
     <description>OpenSSO: amSessionTools.zip Creation</description>
     <fail message="*** nightly build may be built from top level only ***">
         <condition>
