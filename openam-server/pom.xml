@@ -123,7 +123,8 @@
                         WEB-INF/lib/jaxb-api-1.0.6.jar,
                         WEB-INF/lib/jaxb-impl-1.0.6.jar,
                         WEB-INF/lib/jaxb-libs-1.0.6.jar,
-                        WEB-INF/lib/jaxb-xjc-1.0.6.jar
+                        WEB-INF/lib/jaxb-xjc-1.0.6.jar,
+                        WEB-INF/lib/xmlParserAPIs-2.6.2.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>

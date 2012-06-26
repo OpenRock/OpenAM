@@ -420,12 +420,20 @@
                 <version>1.0</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>esapiport</artifactId>
+                <version>2009-26-07</version>
+            </dependency>
+
+            <!--
             <dependency>
                 <groupId>org.owasp.esapi</groupId>
                 <artifactId>esapi</artifactId>
                 <version>2.0.1</version>
-                <!-- Originally ? -->
             </dependency>
+            -->
 
             <dependency>
                 <groupId>org.kohsuke</groupId>

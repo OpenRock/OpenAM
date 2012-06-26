@@ -316,8 +316,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.owasp.esapi</groupId>
-            <artifactId>esapi</artifactId>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
         </dependency>
 
         <dependency>
