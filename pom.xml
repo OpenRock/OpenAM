@@ -524,10 +524,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.sleepycat</groupId>
-                <artifactId>je</artifactId>
-                <version>4.0.92</version>
-                <!-- Originally ? -->
+                <groupId>external</groupId>
+                <artifactId>sleepycat-je</artifactId>
+                <version>2011-04-07</version>
             </dependency>
 
             <dependency>

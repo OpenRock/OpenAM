@@ -436,7 +436,7 @@
 
         <!-- Build up web.xml -->
 
-        <!-- TODO NEED TO BE ADDRESSED Files do not exist yet....  -->
+        <!-- TODO NEED TO BE ADDRESSED Files do not exist yet....
 
         <java classname="com.sun.identity.setup.InsertContent"
               fork="true" failOnError="false" classpath="${build.class.path}">
@@ -453,6 +453,7 @@
             <arg value="&lt;!- - servlet mapping - -&gt;"/>
         </java>
 
+         -->
 
 
         <!--

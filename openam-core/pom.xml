@@ -386,8 +386,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sleepycat</groupId>
-            <artifactId>je</artifactId>
+            <groupId>external</groupId>
+            <artifactId>sleepycat-je</artifactId>
         </dependency>
 
         <dependency>
