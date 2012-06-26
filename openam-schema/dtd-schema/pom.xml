@@ -50,9 +50,6 @@
     <build>
         <plugins>
 
-            <!-- Generate Identity Services Source Files to prepare for Compilation -->
-            <!-- see http://docs.oracle.com/cd/E17802_01/webservices/webservices/docs/1.5/jaxrpc/jaxrpc-tools.html
-                 for Documentation on the wscompile tool. -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

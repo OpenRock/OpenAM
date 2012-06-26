@@ -56,6 +56,7 @@
         <module>saml2-schema</module>
         <module>wsfederation-schema</module>
         <module>liberty-schema</module>
+        <module>dtd-schema</module>
     </modules>
 
     <dependencies>
