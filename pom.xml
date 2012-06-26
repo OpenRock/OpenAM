@@ -113,6 +113,9 @@
         <!-- Tools Artifacts -->
         <module>openam-tools</module>
 
+        <!-- Java Client SDK Artifacts -->
+        <module>openam-clientsdk</module>
+
         <!-- Final Packaging Artifacts -->
         <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
 
