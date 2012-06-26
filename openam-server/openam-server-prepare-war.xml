@@ -209,7 +209,7 @@
         <copy todir="${openam.target}/config/auth/default_de" overwrite="false">
             <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
         </copy>
-        <copy todir="${openam.target}/config/authdefault_es" overwrite="false">
+        <copy todir="${openam.target}/config/auth/default_es" overwrite="false">
             <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
         </copy>
         <copy todir="${openam.target}/config/auth/default_fr" overwrite="false">
