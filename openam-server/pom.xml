@@ -62,6 +62,8 @@
                         <configuration>
                             <target>
 
+                                <property name="openam.version" value="${project.version}"/>
+
                                 <property name="build.class.path" refid="maven.compile.classpath"/>
                                 <property name="project.basedir" value="./"/>
 

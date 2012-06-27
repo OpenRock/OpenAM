@@ -31,9 +31,23 @@
     <description>OpenAM Server Prepare WAR ANT Script</description>
     <target name="openam-server-prepare-war">
 
+
+        <tstamp>
+            <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK"/>
+        </tstamp>
+        <property name="version.set" value="${openam.version}"/>
+
+        <filter token="DATESTAMP" value="${war.time.stamp}"/>
+        <filter token="VERSION" value="${version.set}"/>
+
+
         <mkdir dir="${project.build.directory}/classes"/>
 
         <mkdir dir="${project.build.directory}/openam"/>
+
+        <copy file="${project.basedir}/../version.template"
+              tofile="${openam.target}/version"
+              filtering="true"/>
 
         <mkdir dir="${openam.target}/WEB-INF/template/opendj"/>
         <copy todir="${openam.target}/WEB-INF/template/opendj" filtering="false">
