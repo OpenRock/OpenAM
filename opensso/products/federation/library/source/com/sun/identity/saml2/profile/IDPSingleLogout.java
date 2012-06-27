@@ -939,6 +939,8 @@ public class IDPSingleLogout {
             }
             String originatingRequestID = 
                 idpSession.getOriginatingLogoutRequestID();
+            String originatingLogoutSPEntityID = 
+                idpSession.getOriginatingLogoutSPEntityID();
             if (originatingRequestID == null) {
                 // this is IDP initiated SLO
                 if (idpSession.getLogoutAll() == true) {
@@ -987,7 +989,7 @@ public class IDPSingleLogout {
                             retStatus = sloManager.doIDPSingleLogout(set, uid, 
                                 request, response, false, true, 
                                 SingleLogoutManager.SAML2, realm, idpEntityID, 
-                                spEntityID, relayState, null, null, 
+                                originatingLogoutSPEntityID, relayState, null, null, 
                                 getLogoutStatus(logoutRes));
                         } catch (SAML2Exception ex) {
                             throw ex;
@@ -1005,8 +1007,6 @@ public class IDPSingleLogout {
                 debug.message("IDP initiated SLO Success");
                 return false;
             }
-            String originatingLogoutSPEntityID = 
-                idpSession.getOriginatingLogoutSPEntityID();
 
             SPSSODescriptorElement spsso = null;
             // get SPSSODescriptor
@@ -1115,7 +1115,7 @@ public class IDPSingleLogout {
 
                     LogoutUtil.sendSLOResponse(response, logoutRes,
                         location, relayState, realm, idpEntityID, 
-                        SAML2Constants.IDP_ROLE, spEntityID, binding);
+                        SAML2Constants.IDP_ROLE, originatingLogoutSPEntityID, binding);
 
                     return true;
                 } else {
