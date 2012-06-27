@@ -28,6 +28,13 @@
     *
     -->
 
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>forgerock-parent</artifactId>
+        <version>1.1.0-SNAPSHOT</version>
+    </parent>
+
     <!-- Component Definition -->
     <name>OpenAM</name>
     <groupId>org.forgerock</groupId>
@@ -37,7 +44,7 @@
 
     <description>OpenAM</description>
     <inceptionYear>2010</inceptionYear>
-    <!-- Need correct Year -->
+
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.org</url>
@@ -197,6 +204,9 @@
 
     <!-- Maven Repositories -->
     <repositories>
+
+
+
         <!-- ForgeRock Internal Project Repository -->
         <repository>
             <id>maven.forgerock.org</id>
@@ -244,6 +254,18 @@
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
+        </repository>
+
+        <repository>
+            <id>maven.forgerock.org-snapshots</id>
+            <name>maven.forgerock.org-snapshots</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>maven.forgerock.org-releases</id>
+            <name>maven.forgerock.org-releases</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
         </repository>
 
     </repositories>
