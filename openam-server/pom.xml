@@ -124,7 +124,11 @@
                         WEB-INF/lib/jaxb-impl-1.0.6.jar,
                         WEB-INF/lib/jaxb-libs-1.0.6.jar,
                         WEB-INF/lib/jaxb-xjc-1.0.6.jar,
-                        WEB-INF/lib/xmlParserAPIs-2.6.2.jar
+                        WEB-INF/lib/jdom-2.0.1.jar,
+                        WEB-INF/lib/jaxws-api-2.2.8.jar,
+                        jaxws-rt-2.2.7-promoted-b73.jar,
+                        WEB-INF/lib/xmlParserAPIs-2.6.2.jar,
+                        WEB-INF/lib/webservices-api-2.1-b16.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
