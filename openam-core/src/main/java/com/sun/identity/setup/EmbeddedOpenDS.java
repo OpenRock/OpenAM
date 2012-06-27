@@ -1483,7 +1483,7 @@ public class EmbeddedOpenDS {
 
         if (configLdif.exists() && configLdif.isDirectory()) {
             String[] configFile = configLdif.list(new FilenameFilter() {
-                @Override
+                //@Override -- Not Allowed Here.
                 public boolean accept(File dir, String name) {
                     return name.startsWith(OPENDS_CONFIG_LDIF);
                 }
