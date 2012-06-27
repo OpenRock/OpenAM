@@ -98,7 +98,7 @@ public class SSOTokenAuthN implements IAuthentication {
                 HttpServletRequestWrapperEx reqWrapper = new
                     HttpServletRequestWrapperEx((HttpServletRequest) request);
 
-                reqWrapper.setUserPrincipal(new SSOTokenPrincipal(token));
+                reqWrapper.setUserPrincipal(new SSOTokenPrincipal(token.toString()));    // Fix Me.
                 chain.doFilter(reqWrapper, response);
             } catch (SSOException e) {
                 redirect((HttpServletRequest)request,
