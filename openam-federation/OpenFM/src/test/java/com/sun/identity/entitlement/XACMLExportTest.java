@@ -38,7 +38,6 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.unittest.UnittestLog;
 
 import java.io.ByteArrayInputStream;
 import java.security.AccessController;

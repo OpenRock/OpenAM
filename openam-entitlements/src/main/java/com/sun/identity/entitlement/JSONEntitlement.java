@@ -27,7 +27,7 @@
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.rest.DecisionResource;
+//  import com.sun.identity.rest.DecisionResource;
 import com.sun.identity.shared.JSONUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +39,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONEntitlement {
+    public static final String JSON_DECISION_ARRAY_KEY = "results";
+
     private String resourceName;
     private Map<String, Set<String>> advices;
     private Map<String, Set<String>> attributes;
@@ -116,13 +118,13 @@ public class JSONEntitlement {
 
     public static List<JSONEntitlement> getEntitlements(JSONObject jo)
         throws JSONException {
-        if (!jo.has(DecisionResource.JSON_DECISION_ARRAY_KEY)) {
+        if (!jo.has(JSON_DECISION_ARRAY_KEY)) {
             return Collections.EMPTY_LIST;
         }
 
         List<JSONEntitlement> results = new ArrayList<JSONEntitlement>();
         JSONArray array = jo.getJSONArray(
-            DecisionResource.JSON_DECISION_ARRAY_KEY);
+            JSON_DECISION_ARRAY_KEY);
         for (int i = 0; i < array.length(); i++) {
             results.add(new JSONEntitlement(array.getJSONObject(i)));
         }

@@ -27,9 +27,6 @@
 
 package com.sun.identity.cli.entitlement;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-
 import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.CLIRequest;
@@ -45,17 +42,12 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 
-import com.sun.identity.security.AdminTokenAction;
-
 import com.sun.identity.sm.ServiceManager;
-
-import java.security.AccessController;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 

@@ -99,6 +99,15 @@
         <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
+        <!-- OpenAM Entitlement Module -->
+        <module>openam-entitlements</module>
+
+        <!-- OpenAM CoreToken Module -->
+        <module>openam-coretoken</module>
+
+        <!-- OpenAM REST - CORE Module -->
+        <module>openam-rest</module>
+
         <!-- OpenAM Schema Modules -->
         <module>openam-schema</module>
 

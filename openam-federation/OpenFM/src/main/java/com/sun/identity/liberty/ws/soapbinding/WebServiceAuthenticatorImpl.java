@@ -30,7 +30,6 @@
 package com.sun.identity.liberty.ws.soapbinding; 
 
 import java.security.AccessController;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServletRequest;
 import javax.security.auth.Subject;
@@ -51,16 +49,10 @@ import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.shared.DateUtils;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.liberty.ws.security.SecurityUtils;
 
 class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
     private static final String PRINCIPAL_PROP = "Principal";

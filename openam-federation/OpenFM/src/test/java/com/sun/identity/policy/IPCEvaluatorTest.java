@@ -29,7 +29,6 @@ package com.sun.identity.policy;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.internal.server.AuthSPrincipal;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
@@ -52,8 +51,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.unittest.UnittestLog;
 
 import java.security.AccessController;
-import java.security.Principal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

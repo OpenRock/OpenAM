@@ -26,7 +26,6 @@
  */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.unittest.UnittestLog;
 import java.util.HashSet;
 import java.util.Set;
 import org.testng.annotations.Test;

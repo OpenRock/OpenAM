@@ -52,7 +52,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Cookie;
 import org.json.JSONArray;
 import org.json.JSONObject;

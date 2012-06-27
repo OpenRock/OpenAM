@@ -27,7 +27,6 @@
 
 package com.sun.identity.entitlement.opensso;
 
-import com.sun.identity.entitlement.*;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -41,6 +40,7 @@ import javax.security.auth.Subject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import com.sun.identity.entitlement.*;
 
 /**
  *
