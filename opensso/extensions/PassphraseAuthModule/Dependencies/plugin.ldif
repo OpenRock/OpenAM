@@ -1,0 +1,6 @@
+dn: cn=referential integrity postoperation, cn=plugins, cn=config
+changetype: modify
+replace: nsslapd-pluginEnabled
+nsslapd-pluginEnabled: on
+
+

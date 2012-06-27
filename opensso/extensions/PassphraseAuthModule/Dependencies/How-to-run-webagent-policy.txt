@@ -1,0 +1,4 @@
+Reference: http://download.oracle.com/docs/cd/E19681-01/820-3885/gipwt/index.html
+
+
+ssoadm create-policies --realm / --xmlfile D:\Tools\ssoAdminTools\webagent-policy.xml --adminid amadmin --password-file D:\Tools\ssoAdminTools\agentadmin.txt

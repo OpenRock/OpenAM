@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN" "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+<ModuleProperties moduleName="PassphraseResetModule" version="1.0">
+	<Callbacks order="1" length="3" timeout="@INVALID_SESSION_TIMEOUT@" template="PPResetUserValidation.jsp" header="#REPLACE#">
+		<NameCallback>
+			<Prompt>User Name:</Prompt>
+		</NameCallback>
+		<ConfirmationCallback>
+			<OptionValues>
+				<OptionValue>
+					<Value>Next</Value>
+				</OptionValue>
+			</OptionValues>
+		</ConfirmationCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+	<Callbacks order="2" length="5" timeout="@INVALID_SESSION_TIMEOUT@" template="PPResetQuestion.jsp" header="#REPLACE#">
+		<PasswordCallback echoPassword="false">
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<ConfirmationCallback>
+			<OptionValues>
+				<OptionValue>
+					<Value>Submit</Value>
+				</OptionValue>
+			</OptionValues>
+		</ConfirmationCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+	<Callbacks order="3" length="1" timeout="@INVALID_SESSION_TIMEOUT@" template="PPResetSuccess.jsp" header="#REPLACE#">
+		<ConfirmationCallback>
+			<OptionValues>
+				<OptionValue>
+					<Value>Submit</Value>
+				</OptionValue>
+			</OptionValues>
+		</ConfirmationCallback>
+	</Callbacks>
+</ModuleProperties>

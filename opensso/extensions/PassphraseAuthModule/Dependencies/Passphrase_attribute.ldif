@@ -1,0 +1,28 @@
+dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributetypes: ( 2.16.840.1.113730.3.1.9990 NAME ( 'sso-passphrase' ) DESC 'PassPhrase service' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Sun Java System PassPhares Management')
+-
+add: objectClasses
+objectClasses: (  2.16.840.1.113730.3.2.9999 NAME 'sso-passphrase' DESC 'object containing PassPhraseservice information' SUP top AUXILIARY MAY ( uid $ sso-passphrase ) X-ORIGIN 'Sun Java System PassPhrase Management' )
+
+dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributetypes: ( 2.16.840.1.113730.3.1.9890 NAME ( 'iplanet-am-user-passphrase-reset-force-reset' ) DESC 'PassPhrase reset service' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Sun Java System PassPhares Management')
+-
+add: objectClasses
+objectClasses: (  2.16.840.1.113730.3.2.9899 NAME 'iplanet-am-user-passphrase-reset-force-reset' DESC 'object containing PassPhrase reset service information' SUP top AUXILIARY MAY ( uid $ iplanet-am-user-passphrase-reset-force-reset ) X-ORIGIN 'Sun Java System PassPhrase Management' )
+
+
+dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributetypes: ( 2.25.2399300480.2554.4577.44057.11372184859.2 NAME ( 'sso-bankingrecid' ) DESC 'Liferay Portal Screen Name' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Forgerock Custom ED Management')
+attributetypes: ( 2.25.2399300480.2554.4577.44057.11372184859.3 NAME ( 'fx-mnemonic' ) DESC 'ForexClear mnemonic attribute' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Forgerock Custom ED Management')
+attributetypes: ( 2.25.2399300480.2554.4577.44057.11372184859.4 NAME ( 'banking-cmm' ) DESC 'Clearing member mnemonics for LiquidityLink' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Forgerock Custom ED Management')
+attributetypes: ( 2.25.2399300480.2554.4577.44057.11372184859.5 NAME ( 'banking-mnemonic' ) DESC 'Sub-account mnemonics for LiquidityLink' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Forgerock Custom ED Management')
+attributetypes: ( 2.25.2399300480.2554.4577.44057.11372184859.6 NAME ( 'clearing-member-mnemonic' ) DESC 'Legal entity clearing mnemonic' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Forgerock Custom ED Management')
+-
+add: objectClasses
+objectClasses: (  2.25.2399300480.2554.4577.44057.11372184859.1 NAME 'Obj' DESC 'object containing related attribute information' SUP top AUXILIARY MAY ( uid $ sso-bankingrecid $ fx-mnemonic $ banking-cmm $ banking-mnemonic $ clearing-member-mnemonic ) X-ORIGIN 'Forgerock Custom ED Management' )

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN" "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="LDAP" version="1.0" >
+    <Callbacks length="2" order="1" timeout="@INVALID_SESSION_TIMEOUT@" header="">
+        <NameCallback>
+            <Prompt> User Name: </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> Password: </Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="@INVALID_SESSION_TIMEOUT@" template="AuthError.jsp" header="#REPLACE#">
+    	<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+    </Callbacks>
+</ModuleProperties>

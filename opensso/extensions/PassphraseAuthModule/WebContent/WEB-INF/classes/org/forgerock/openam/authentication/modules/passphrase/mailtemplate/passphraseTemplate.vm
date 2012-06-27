@@ -1,0 +1,37 @@
+<html>
+  <head>
+  	<style type = "text/css">
+		body {
+			font-family:Times New Roman;
+			font-size:17px;
+			list-style-type: none;
+		}
+		P {
+			margin-bottom: 3px;
+		}
+	</style>
+  </head>
+  <body>
+    <h3>Dear $DATA.USER_NAME </h3>
+    <p>
+	    A request to reset your  Web Portal passphrase has been received and processed.<br/>
+		Please see below a new temporary passphrase which has been created for you but will need to 
+		be changed to something you can remember when you sign on again.<br/>
+		<br/>
+		<b>New temporary Passphrase: </b>$DATA.PASSPHRASE<br/><br/>
+	    
+		Please note:<br/>
+		- &nbsp; When you sign on with this temporary passphrase the system will force you to choose a new one known only by you.<br/>
+		- &nbsp; Please ensure it contains at least <b>8 characters</b><br/>
+		- &nbsp; Your chosen passphrase alongside your password will be used to verify your access to the Portal in future<br/>
+	    
+		<br/><b>Issue Reporting</b><br/>
+		If you experience any issues with your logon credentials please report them to:<br/>
+		servicedesk@.com or 0207 426 7200<br/>
+		<br/>
+		Many Thanks
+		<br/><br/>
+		<b>Service Desk<br/>  <b/>
+    </p>
+  </body>
+</html>
