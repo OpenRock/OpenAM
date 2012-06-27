@@ -39,23 +39,11 @@
 
 <%
         request.setCharacterEncoding("UTF-8");
-        String locale = request.getParameter("locale");
-        Locale resLocale = null;
-        if ((locale != null) && (locale.length() > 0)) {
-            StringTokenizer st = new StringTokenizer(locale, "|");
-            int cnt = st.countTokens();
-            if (cnt == 1) {
-                resLocale = new Locale(st.nextToken());
-            } else if (cnt == 2) {
-                resLocale = new Locale(st.nextToken(), st.nextToken());
-            } else {
-                resLocale = new Locale(st.nextToken(), st.nextToken(),
-                        st.nextToken());
-            }
-        } else {
+        response.setContentType("text/html; charset=UTF-8");
+        Locale resLocale = request.getLocale();
+        if (resLocale == null) {
             resLocale = Locale.US;
         }
-       
         try {
             SSOTokenManager manager = SSOTokenManager.getInstance();
             SSOToken ssoToken = manager.createSSOToken(request);
@@ -71,21 +59,21 @@
             response.sendRedirect(redirectUrl);
             return;
         }
-
        
         InputStream is = null;
+        BufferedReader bos = null;
 
         try {
             boolean limitExceeded = false;
             StringBuffer buff = new StringBuffer();
             is = request.getInputStream();
-            BufferedReader bos = new BufferedReader(new InputStreamReader(is));
+            bos = new BufferedReader(new InputStreamReader(is));
             String line = bos.readLine();
             while (line != null) {
                 buff.append(line).append("\n");
-                line = bos.readLine();                
+                line = bos.readLine();
                 if (buff.length() > (1024 * 50)) {
-                    limitExceeded = true;                   
+                    limitExceeded = true;
                     break;
                 }
 
@@ -98,10 +86,10 @@
                         com.sun.identity.shared.debug.Debug.getInstance("workflowMessages");
                 rb = ResourceBundle.getBundle(RB_NAME, resLocale);
                 String data = com.sun.identity.shared.locale.Locale.getString(
-                        rb, "file.upload.size.limit.exceeded", debug);               
+                        rb, "file.upload.size.limit.exceeded", debug);
                 out.println("<div id=\"data\">" + "Error: " + data + "</div>");
             } else {               
-				// Parses a content-type String for the boundary.
+                // Parses a content-type String for the boundary.
                 String contentType = request.getContentType();
                 if (contentType == null) {
                     contentType = request.getHeader("Content-Type");
@@ -114,7 +102,6 @@
                     }
                 }
 
-
                 String data = buff.toString();
                 int idx = data.indexOf("filename=\"");
                 idx = data.indexOf("\n\n", idx);
@@ -122,11 +109,18 @@
                 idx = data.lastIndexOf("\n--" + boundary);
                 data = data.substring(0, idx);
                 data = data.replace("<", "&lt;");
-                data = data.replace(">", "&gt;");               
+                data = data.replace(">", "&gt;");
                 out.println("<div id=\"data\">" + data + "</div>");
             }
         } catch (IOException e) {
         } finally {
+            try {
+                if (bos != null) {
+                    bos.close();
+                }
+            } catch (IOException e) {
+                //ignore
+            }
             try {
                 if (is != null) {
                     is.close();
