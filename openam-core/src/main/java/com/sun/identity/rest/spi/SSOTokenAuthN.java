@@ -32,7 +32,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.rest.HttpServletRequestWrapperEx;
-import com.sun.identity.rest.SSOTokenPrincipal;
+import com.sun.identity.authentication.service.SSOTokenPrincipal;
 import com.sun.identity.rest.RestServiceManager;
 import java.io.IOException;
 import javax.servlet.FilterChain;
