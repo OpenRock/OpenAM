@@ -531,6 +531,29 @@ public class OATH extends AMLoginModule {
                 long lastLoginTime = Long.parseLong(
                         (String)(lastLoginTimeSet.iterator().next()));
                 
+                //Check TOTP values for validity
+                if (lastLoginTime < 0){
+                    debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "invalid login time value : ");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                }
+                
+                //must be greater than 0 or we get divide by 0, and cant be negetive
+                if (totpTimeStep <= 0){
+                    debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "invalid TOTP time step interval : ");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                }
+                                
+                if (totpStepsInWindow < 0){
+                    debug.error("OATH" + 
+                        ".checkOTP() : " + 
+                        "invalid TOTP steps in window value : ");
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                }
+                
                 //get Time Step
                 long localTime = time;
                 localTime /= totpTimeStep;
