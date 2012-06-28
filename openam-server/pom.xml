@@ -131,7 +131,6 @@
                         WEB-INF/lib/jaxws-api-2.2.8.jar,
                         WEB-INF/lib/jaxws-rt-2.2.7-promoted-b73.jar,
                         WEB-INF/lib/stax-api-1.0-2.jar,
-                        WEB-INF/lib/xmlParserAPIs-2.6.2.jar,
                         WEB-INF/lib/webservices-api-2.1-b16.jar
                     </packagingExcludes>
                     <archive>
