@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.plugins.ldapv3;
@@ -716,8 +717,8 @@ public class LDAPv3Repo extends IdRepo {
                     ldapServerPort = Integer.parseInt(origLdapHost.substring(index + 1));
                 } catch(NumberFormatException nfe) {
                     if (debug.warningEnabled()) {
-                        debug.warning("LDAPv3Repo:initConnectionPool : + origLdapHost" +
-                                      "incorrect port number, using default 389");
+                        debug.warning("LDAPv3Repo:initConnectionPool :" + origLdapHost +
+                                      " incorrect port number, using default 389");
                     }
                 }
             }
@@ -812,7 +813,7 @@ public class LDAPv3Repo extends IdRepo {
                 int resultCode = lex.getLDAPResultCode();
                 ldapConnError = Integer.toString(resultCode);
                 debug.error("LDAPv3Repo: initConnectionPool ConnectionPool failed: " +
-                            resultCode + "; to server ldapServerHost:" + ldapServerPort);
+                            resultCode + "; to server " + ldapServerHost + ":" + ldapServerPort);
                 connPool = null;
 
                 try {
