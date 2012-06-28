@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.M0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -39,7 +39,7 @@
     <description>OpenAM External Library Dependencies
     </description>
     <artifactId>openam-external-libraries</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+    <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -143,22 +143,22 @@
     	<dependency>
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-federation-library</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>OpenFM</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

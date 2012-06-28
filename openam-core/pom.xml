@@ -32,7 +32,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.M0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -40,7 +40,7 @@
     <description>OpenAM Core Components
     </description>
     <artifactId>openam-core</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+    <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -133,61 +133,61 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-entitlements</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-coretoken</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-rest</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>idsvcs-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>mib-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>xacml3-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>saml2-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>wsfederation-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>liberty-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
 
