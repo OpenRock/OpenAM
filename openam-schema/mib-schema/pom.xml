@@ -38,7 +38,7 @@
     <name>mib-schema</name>
     <description>OpenAM MIB Schema Components
     </description>
-    <artifactId>mib-schema</artifactId>
+    <artifactId>openam-mib-schema</artifactId>
     <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>

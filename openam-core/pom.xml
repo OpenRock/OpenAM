@@ -162,7 +162,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>mib-schema</artifactId>
+            <artifactId>openam-mib-schema</artifactId>
             <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
