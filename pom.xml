@@ -123,9 +123,6 @@
         <!-- OpenAM OAuth Token Service -->
         <module>openam-oauth</module>
 
-        <!-- OpenAM Console Module -->
-        <module>openam-console</module>
-
         <!-- OpenAM Server -->
         <module>openam-server</module>
 
