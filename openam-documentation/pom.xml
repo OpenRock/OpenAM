@@ -143,7 +143,7 @@
       <configuration>
        <transformationSets>
         <transformationSet>
-         <dir>../products</dir>
+         <dir>../</dir>
          <includes>
           <include>amserver/xml/log/AuthenticationLogMessageIDs.xml</include>
           <include>amserver/xml/log/CLILogMessageIDs.xml</include>
