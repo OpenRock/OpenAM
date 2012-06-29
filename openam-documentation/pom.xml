@@ -118,7 +118,7 @@
   <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
   <site-out>${basedir}/target/site</site-out>
   <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
-  <products-basedir>${basedir}/../products</products-basedir>
+  <products-basedir>${basedir}/..</products-basedir>
   <gaId>UA-23412190-7</gaId>
  </properties>
  <distributionManagement>
