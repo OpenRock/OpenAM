@@ -38,7 +38,7 @@
     <name>dtd-schema</name>
     <description>OpenAM Identity Services DTD Components
     </description>
-    <artifactId>dtd-schema</artifactId>
+    <artifactId>openam-dtd-schema</artifactId>
     <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>

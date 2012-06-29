@@ -265,7 +265,7 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>dtd-schema</artifactId>
+            <artifactId>openam-dtd-schema</artifactId>
             <version>10.1.M0-SNAPSHOT</version>
         </dependency>
 
