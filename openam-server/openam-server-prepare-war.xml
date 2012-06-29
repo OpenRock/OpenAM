@@ -154,13 +154,13 @@
         </copy>
         <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
             <fileset
-                    dir="${project.basedir}/../openam-schema/idsvcs-schema/src/main/resources/xml">
+                    dir="${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml">
                 <include name="*.wsdl"/>
             </fileset>
         </copy>
         <copy todir="${openam.target}/WEB-INF/wsdl" filtering="false">
             <fileset
-                    dir="${project.basedir}/../openam-schema/jaxrpc-schema/target/classes/jaxrpc">
+                    dir="${project.basedir}/../openam-schema/openam-jaxrpc-schema/target/classes/jaxrpc">
                 <include name="IdentityManagementServices.wsdl"/>
             </fileset>
         </copy>
