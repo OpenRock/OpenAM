@@ -168,7 +168,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>xacml3-schema</artifactId>
+            <artifactId>openam-xacml3-schema</artifactId>
             <version>10.1.M0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
