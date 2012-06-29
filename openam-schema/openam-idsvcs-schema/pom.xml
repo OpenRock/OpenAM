@@ -38,7 +38,7 @@
     <name>idsvcs-schema</name>
     <description>OpenAM Identity Services Schema Components
     </description>
-    <artifactId>idsvcs-schema</artifactId>
+    <artifactId>openam-idsvcs-schema</artifactId>
     <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
