@@ -147,7 +147,7 @@
 
       	<dependency>
 	   		<groupId>org.forgerock</groupId>
-        	<artifactId>wsfederation-schema</artifactId>
+        	<artifactId>openam-wsfederation-schema</artifactId>
               <version>10.1.M0-SNAPSHOT</version>
 		</dependency>
 

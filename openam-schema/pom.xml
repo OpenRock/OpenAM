@@ -49,14 +49,14 @@
 
     <!-- Child Modules -->
     <modules>
-        <module>mib-schema</module>
-        <module>idsvcs-schema</module>
-        <module>jaxrpc-schema</module>
-        <module>xacml3-schema</module>
-        <module>saml2-schema</module>
-        <module>wsfederation-schema</module>
-        <module>liberty-schema</module>
-        <module>dtd-schema</module>
+        <module>openam-mib-schema</module>
+        <module>openam-idsvcs-schema</module>
+        <module>openam-jaxrpc-schema</module>
+        <module>openam-xacml3-schema</module>
+        <module>openam-saml2-schema</module>
+        <module>openam-wsfederation-schema</module>
+        <module>openam-liberty-schema</module>
+        <module>openam-dtd-schema</module>
     </modules>
 
     <dependencies>
