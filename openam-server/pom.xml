@@ -247,12 +247,6 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-external-libraries</artifactId>
-            <version>10.1.M0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth</artifactId>
             <version>10.1.M0-SNAPSHOT</version>
         </dependency>

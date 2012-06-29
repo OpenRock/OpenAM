@@ -51,7 +51,7 @@
 
         <mkdir dir="${openam.target}/WEB-INF/template/opendj"/>
         <copy todir="${openam.target}/WEB-INF/template/opendj" filtering="false">
-            <fileset dir="${project.basedir}/../openam-external-libraries/binary">
+            <fileset dir="${project.basedir}/binary">
                 <include name="opendj.zip"/>
             </fileset>
         </copy>
