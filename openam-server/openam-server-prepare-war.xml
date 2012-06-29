@@ -371,7 +371,7 @@
                 <include name="license.txt"/>
             </fileset>
         </copy>
-        <copy todir="${project.build.directory}/classes" overwrite="false">
+        <copy todir="${project.build.directory}/classes" overwrite="false" filtering="true">
             <fileset dir="${project.basedir}/src/main/webapp/WEB-INF/template/sms">
                 <include name="*.*"/>
             </fileset>
@@ -446,33 +446,6 @@
                        match="(.+)"
                        replace="\1&#10;a144=Web Services Clients&#10;"/>
 
-        -->
-
-        <!-- Build up web.xml -->
-
-        <!-- TODO NEED TO BE ADDRESSED Files do not exist yet....
-
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="false" classpath="${build.class.path}">
-            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
-            <arg value="${library.xml.dir}/web.xml"/>
-            <arg value="${openam.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;!- - servlet declaration - -&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="false" classpath="${build.class.path}">
-            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
-            <arg value="${library.xml.dir}/web.xml"/>
-            <arg value="${openam.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;!- - servlet mapping - -&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="false" classpath="${build.class.path}">
-            <arg value="&lt;endpoint.+?/&gt;"/>
-            <arg value="${library.xml.dir}/jaxrpc-ri-runtime.xml"/>
-            <arg value="${openam.target}/WEB-INF/jaxrpc-ri-runtime.xml"/>
-            <arg value="&lt;/endpoints&gt;"/>
-        </java>
         -->
 
 
