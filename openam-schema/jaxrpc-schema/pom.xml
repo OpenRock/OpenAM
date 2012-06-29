@@ -39,7 +39,7 @@
     <name>jaxrpc-schema</name>
     <description>OpenAM JAXRPC Schema Components
     </description>
-    <artifactId>jaxrpc-schema</artifactId>
+    <artifactId>openam-jaxrpc-schema</artifactId>
     <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
