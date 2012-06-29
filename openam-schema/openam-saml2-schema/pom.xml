@@ -38,7 +38,7 @@
     <name>saml2-schema</name>
     <description>OpenAM Schemata Components 
     </description>
-    <artifactId>saml2-schema</artifactId>
+    <artifactId>openam-saml2-schema</artifactId>
     <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>

@@ -141,7 +141,7 @@
 
 		<dependency>
 			<groupId>org.forgerock</groupId>
-     		<artifactId>saml2-schema</artifactId>
+     		<artifactId>openam-saml2-schema</artifactId>
             <version>10.1.M0-SNAPSHOT</version>
       	</dependency>
 
