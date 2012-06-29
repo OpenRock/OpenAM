@@ -38,7 +38,7 @@
     <name>liberty-schema</name>
     <description>OpenAM Schemata Components 
     </description>
-    <artifactId>liberty-schema</artifactId>
+    <artifactId>openam-liberty-schema</artifactId>
     <version>10.1.M0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>

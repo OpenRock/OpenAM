@@ -153,7 +153,7 @@
 
    		<dependency>
 			<groupId>org.forgerock</groupId>
-			<artifactId>liberty-schema</artifactId>
+			<artifactId>openam-liberty-schema</artifactId>
             <version>10.1.M0-SNAPSHOT</version>
 		</dependency>
 
