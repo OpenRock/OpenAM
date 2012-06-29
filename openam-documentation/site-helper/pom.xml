@@ -54,7 +54,7 @@
             </goals>
             <configuration>
               <sources>
-                <source>../../products/amserver/source/com/sun/identity/cli/annotation</source>
+                <source>../../openam-core/src/main/java/com/sun/identity/cli/annotation</source>
               </sources>
             </configuration>
           </execution>
@@ -72,10 +72,10 @@
       </goals>
       <phase>compile</phase>
       <configuration>
-       <sourceDirectory>../../products/</sourceDirectory>
+       <sourceDirectory>../../</sourceDirectory>
        <includes>
-        <include>amserver/source/com/sun/identity/cli/definition/AccessManager.java</include>    
-        <include>federation/openfm/source/com/sun/identity/federation/cli/definition/FederationManager.java</include>    
+        <include>openam-core/src/main/java/com/sun/identity/cli/definition/AccessManager.java</include>
+        <include>openam-federation/OpenFM/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java</include>
        </includes>
        <processors>
         <processor>org.forgerock.openam.docs.ssoadm.SsoadmAP</processor>
