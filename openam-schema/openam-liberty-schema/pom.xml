@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>liberty-schema</name>
+    <name>openam-liberty-schema</name>
     <description>OpenAM Schemata Components 
     </description>
     <artifactId>openam-liberty-schema</artifactId>

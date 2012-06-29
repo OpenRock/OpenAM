@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>mib-schema</name>
+    <name>openam-mib-schema</name>
     <description>OpenAM MIB Schema Components
     </description>
     <artifactId>openam-mib-schema</artifactId>
