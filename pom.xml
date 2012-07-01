@@ -140,8 +140,8 @@
         <!-- Documentation -->
         <module>openam-documentation</module>
 
-        <!-- Final Packaging Artifacts -->
-        <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
+        <!-- Final Packaging Distribution Kit -->
+        <module>openam-distribution</module>
 
     </modules>
 

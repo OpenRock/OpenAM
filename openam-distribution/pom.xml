@@ -36,7 +36,7 @@
 
     <!-- Component Definition -->
     <name>openam-distribution</name>
-    <description>OpenAM Final Module to Build Distribution for subsequent delivery and deployment.
+    <description>OpenAM Final Module Distribution Kit.
     </description>
     <artifactId>openam-distribution</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
@@ -65,7 +65,7 @@
                             <stripVersion>false</stripVersion>
                             <copyPom>false</copyPom>
                             <type>jar</type>
-                            <outputDirectory>${basedir}/target/distribution</outputDirectory>
+                            <outputDirectory>${basedir}/target/distribution/lib</outputDirectory>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
@@ -78,7 +78,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>${project.build.finalName}</finalName>
+                    <finalName>openam-distribution-kit-${project.version}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <tarLongFileMode>gnu</tarLongFileMode>
                     <descriptors>
@@ -115,6 +115,7 @@
 	   		<groupId>org.forgerock</groupId>
         	<artifactId>openam-server</artifactId>
             <version>10.1-XPRESS-SNAPSHOT</version>
+            <type>war</type>
 		</dependency>
     
     </dependencies>

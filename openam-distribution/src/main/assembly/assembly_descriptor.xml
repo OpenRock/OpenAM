@@ -7,14 +7,13 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <fileSets>
-        <!-- Dependencies -->
-        <fileSet>
-            <directory>${basedir}/target/distribution</directory>
-            <outputDirectory>${basedir}/distribution</outputDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/lib</outputDirectory>
             <includes>
-                <include>**/**</include>
+                <include>org.forgerock:openam-server</include>
             </includes>
-        </fileSet>
-    </fileSets>
+        </dependencySet>
+    </dependencySets>
 </assembly>
+
