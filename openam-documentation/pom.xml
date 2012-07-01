@@ -233,42 +233,6 @@
                         </configuration>
                     </execution>
 
-
-                    <!--
-                   <execution>
-
-                    <id>generate-javadoc</id>
-                    <phase>generate-resources</phase>
-                    <inherited>true</inherited>
-                    <configuration>
-
-                        <target>
-
-
-                        <ant antfile="${products-basedir}/shared/build.xml">
-                       <target name="all" />
-                      </ant>
-                      <ant antfile="${products-basedir}/federation/library/build.xml">
-                       <target name="build" />
-                      </ant>
-                      <ant antfile="${products-basedir}/federation/openfm/build.xml">
-                       <target name="publicdoc" />
-                      </ant>
-
-
-
-
-                     </target>
-
-
-                    </configuration>
-                    <goals>
-                     <goal>run</goal>
-                    </goals>
-                   </execution>
-                    -->
-
-
                     <execution>
                         <id>unpack-javadoc</id>
                         <phase>site</phase>
@@ -277,7 +241,7 @@
                             <target>
                                 <mkdir dir="${site-out}/doc/public-api"/>
                                 <unjar
-                                        src="${products-basedir}/federation/OpenFM/target/openam-public-javadocs.jar"
+                                        src="../openam-federation/OpenFM/target/openam-public-javadocs.jar"
                                         dest="${site-out}/doc/public-api"/>
                             </target>
                         </configuration>
