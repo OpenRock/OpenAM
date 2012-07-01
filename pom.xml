@@ -1099,8 +1099,7 @@
                 <version>2.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <!-- All Reports -->
-                    <show>private</show>
+                    <show>public</show>
                     <charset>utf-8</charset>
                     <encoding>utf-8</encoding>
                     <source>${java.source.version}</source>
@@ -1133,9 +1132,7 @@
                 <artifactId>maven-source-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
-                    <!-- All Sources -->
                     <includePom>false</includePom>
-                    <!-- Do not include POMs in Source artifacts -->
                     <excludeResources>false</excludeResources>
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <useDefaultManifestFile>true</useDefaultManifestFile>
@@ -1165,7 +1162,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- Specified as false if a Project has no artifacts such as a parent pom. -->
                     <failOnError>false</failOnError>
                     <csvSummary>true</csvSummary>
                     <csvSummaryFile>OpenAM-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.csv
