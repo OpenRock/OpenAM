@@ -145,22 +145,24 @@
         <transformationSet>
          <dir>../</dir>
          <includes>
-          <include>amserver/xml/log/AuthenticationLogMessageIDs.xml</include>
-          <include>amserver/xml/log/CLILogMessageIDs.xml</include>
-          <include>amserver/xml/log/ConsoleLogMessageIDs.xml</include>
-          <include>amserver/xml/log/CoreTokenLogMessageIDs.xml</include>
-          <include>amserver/xml/log/EntitlementLogMessageIDs.xml</include>
-          <include>amserver/xml/log/LoggingLogMessageIDs.xml</include>
-          <include>amserver/xml/log/PolicyLogMessageIDs.xml</include>
-          <include>amserver/xml/log/SessionLogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/COTLogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/IDFFLogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/LibertyLogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/SAML2LogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/SAMLLogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/WebServicesSecurityLogMessageIDs.xml</include>
-          <include>federation/openfm/xml/log/WSFederationLogMessageIDs.xml</include>
-          <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/AuthenticationLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CLILogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ConsoleLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CoreTokenLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ntitlementLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/LoggingLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/PolicyLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/SessionLogMessageIDs.xml</include>
+
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/COTLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/IDFFLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/LibertyLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAML2LogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAMLLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WebServicesSecurityLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WSFederationLogMessageIDs.xml</include>
+
+         <!--  <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>  THIS FILE DOES NOT EXIST -->
          </includes>
          <stylesheet>src/main/xslt/logs.xsl</stylesheet>
          <outputProperties>
@@ -209,28 +211,46 @@
        </target>
       </configuration>
      </execution>
-     <execution>
-      <id>generate-javadoc</id>
-      <phase>generate-resources</phase>
-      <inherited>false</inherited>
-      <configuration>
-       <target>
-        <ant antfile="${products-basedir}/shared/build.xml">
-         <target name="all" />
-        </ant>
-        <ant antfile="${products-basedir}/federation/library/build.xml">
-         <target name="build" />
-        </ant>
-        <ant antfile="${products-basedir}/federation/openfm/build.xml">
-         <target name="publicdoc" />
-        </ant>
-       </target>
-      </configuration>
-      <goals>
-       <goal>run</goal>
-      </goals>
-     </execution>
-     <execution>
+
+
+        <!--
+       <execution>
+
+        <id>generate-javadoc</id>
+        <phase>generate-resources</phase>
+        <inherited>true</inherited>
+        <configuration>
+
+            <target>
+
+
+            <ant antfile="${products-basedir}/shared/build.xml">
+           <target name="all" />
+          </ant>
+          <ant antfile="${products-basedir}/federation/library/build.xml">
+           <target name="build" />
+          </ant>
+          <ant antfile="${products-basedir}/federation/openfm/build.xml">
+           <target name="publicdoc" />
+          </ant>
+
+
+
+
+         </target>
+
+
+        </configuration>
+        <goals>
+         <goal>run</goal>
+        </goals>
+       </execution>
+        -->
+
+
+
+
+        <execution>
       <id>unpack-javadoc</id>
       <phase>site</phase>
       <inherited>false</inherited>
@@ -238,7 +258,7 @@
        <target>
         <mkdir dir="${site-out}/doc/public-api" />
         <unjar
-         src="${products-basedir}/federation/openfm/built/dist/opensso-public-javadocs.jar"
+         src="${products-basedir}/federation/OpenFM/target/openam-public-javadocs.jar"
          dest="${site-out}/doc/public-api" />
        </target>
       </configuration>
@@ -246,21 +266,8 @@
        <goal>run</goal>
       </goals>
      </execution>
-     <execution>
-      <id>clean</id>
-      <phase>clean</phase>
-      <inherited>false</inherited>
-      <configuration>
-       <target>
-        <ant antfile="${products-basedir}/build.xml">
-         <target name="clean" />
-        </ant>
-       </target>
-      </configuration>
-      <goals>
-       <goal>run</goal>
-      </goals>
-     </execution>
+
+
     </executions>
    </plugin>
    <plugin>

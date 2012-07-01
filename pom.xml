@@ -29,17 +29,19 @@
     -->
 
     <!-- Parent Project -->
+    <!--
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>forgerock-parent</artifactId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
+    -->
 
     <!-- Component Definition -->
     <name>OpenAM</name>
     <groupId>org.forgerock</groupId>
     <artifactId>openam</artifactId>
-    <version>10.1.M0-SNAPSHOT</version>
+    <version>10.1-XPRESS-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -83,10 +85,18 @@
         <maven.build.timestamp.format>yyyy-MMM-dd HH:mm:ss</maven.build.timestamp.format>
         <!-- **************************************************************** -->
         <!-- Java Properties -->
-        <java.source.version>1.5</java.source.version>  <!-- Backed off from 1.6 -->
-        <java.target.version>1.5</java.target.version>  <!-- Backed off from 1.6 -->
+        <java.source.version>1.5</java.source.version>
+        <!-- Backed off from 1.6 -->
+        <java.target.version>1.5</java.target.version>
+        <!-- Backed off from 1.6 -->
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
+        <!-- JavaDoc Setting Properties -->
+        <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
+        <javadoc.excludePackageNames>javax.*:com.sun.web.ui.*:com.sun.xml.*:
+                org.apache.*:org.codehaus.*:org.glassfish.*:
+                com.*:org.*:net.*
+        </javadoc.excludePackageNames>
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Product Properties File Inclusion during Build -->
@@ -132,9 +142,9 @@
         <!-- Final Packaging Artifacts -->
         <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
 
-  </modules>
+    </modules>
 
-  <!-- Developers -->
+    <!-- Developers -->
     <developers>
 
         <developer>
@@ -208,9 +218,13 @@
         <!-- TODO Add OpenAM Additional Contributors -->
     </contributors>
 
+    <!-- Profiles -->
+    <profiles>
+        <!-- Place Default Profiles here to override plugins -->
+    </profiles>
+
     <!-- Maven Repositories -->
     <repositories>
-
 
 
         <!-- ForgeRock Internal Project Repository -->
@@ -220,10 +234,11 @@
             <url>http://maven.forgerock.org/repo/openam-dependencies</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
 
@@ -234,12 +249,13 @@
             <url>http://maven.forgerock.org/repo/openam-releases</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
         <repository>
             <id>forgerock-snapshots-repository</id>
             <name>ForgeRock Snapshot Repository</name>
@@ -247,15 +263,6 @@
             <releases>
                 <enabled>false</enabled>
             </releases>
-        </repository>
-
-        <repository>
-            <id>maven-central</id>
-            <url>http://maven.forgerock.org/repo/maven-central</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -263,15 +270,30 @@
         </repository>
 
         <repository>
-            <id>maven.forgerock.org-snapshots</id>
-            <name>maven.forgerock.org-snapshots</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <id>maven-central</id>
+            <url>http://maven.forgerock.org/repo/maven-central</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </repository>
 
         <repository>
-            <id>maven.forgerock.org-releases</id>
-            <name>maven.forgerock.org-releases</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
+            <id>maven.forgerock.org-snapshots</id>
+            <name>maven.forgerock.org-snapshots</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </repository>
 
     </repositories>
@@ -301,11 +323,11 @@
             <url>http://maven.forgerock.org/repo/maven-central</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>never</updatePolicy>
             </snapshots>
         </pluginRepository>
 
@@ -941,6 +963,29 @@
 
         <plugins>
 
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                <requireMavenVersion>3.0.3</requireMavenVersion>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+             -->
+
             <plugin>
                 <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
                 <artifactId>maven-svn-revision-number-plugin</artifactId>
@@ -960,6 +1005,7 @@
                 </configuration>
             </plugin>
 
+            <!-- Inject Specified Build Properties-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -1049,24 +1095,25 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
                     <!-- All Reports -->
                     <show>private</show>
-                    <quiet>false</quiet>
-                    <outputDirectory>${project.build.directory}/target/site/apidocs
+                    <charset>utf-8</charset>
+                    <encoding>utf-8</encoding>
+                    <source>${java.source.version}</source>
+                    <additionalJOption>${javadoc.options}</additionalJOption>
+                    <outputDirectory>${project.build.directory}/site/apidocs
                     </outputDirectory>
-                    <excludePackageNames>org.*:javax.*
+                    <detectLinks>true</detectLinks>
+                    <excludePackageNames>${javadoc.excludePackageNames}
                     </excludePackageNames>
                     <name>OpenAM-JAVADOC</name>
                     <description>OpenAM Java Documentation.
                     </description>
+                    <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
                     <bottom>
                         <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
                 </configuration>
@@ -1250,7 +1297,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.8</version>
+                    <version>2.8.1</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
@@ -1374,14 +1421,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.9.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>dashboard-maven-plugin</artifactId>
-                <version>1.0.0-beta-1</version>
-                <configuration>
-                    <generateGraphs>false</generateGraphs>
-                </configuration>
             </plugin>
         </plugins>
 

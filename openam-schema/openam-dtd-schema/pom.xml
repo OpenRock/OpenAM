@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>10.1.M0-SNAPSHOT</version>
+        <version>10.1-XPRESS-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -39,7 +39,7 @@
     <description>OpenAM Identity Services DTD Components
     </description>
     <artifactId>openam-dtd-schema</artifactId>
-    <version>10.1.M0-SNAPSHOT</version>
+    <version>10.1-XPRESS-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -78,6 +78,14 @@
                             <License></License>
                         </manifestEntries>
                     </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
 
