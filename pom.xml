@@ -29,13 +29,11 @@
     -->
 
     <!-- Parent Project -->
-    <!--
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>forgerock-parent</artifactId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
-    -->
 
     <!-- Component Definition -->
     <name>OpenAM</name>
@@ -138,6 +136,9 @@
 
         <!-- Java Client SDK Artifacts -->
         <module>openam-clientsdk</module>
+
+        <!-- Documentation -->
+        <module>openam-documentation</module>
 
         <!-- Final Packaging Artifacts -->
         <!-- Temporarily move this out of the way.... <module>openam-distribution</module> -->
@@ -1115,6 +1116,8 @@
                     <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
                     <bottom>
                         <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
+                    <header file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.header" />
+                    <footer file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.footer" />
                 </configuration>
                 <executions>
                     <execution>
