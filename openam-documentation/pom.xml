@@ -241,7 +241,7 @@
                             <target>
                                 <mkdir dir="${site-out}/doc/public-api"/>
                                 <unjar
-                                        src="../openam-federation/OpenFM/target/openam-public-javadocs.jar"
+                                        src="../openam-federation/OpenFM/target/OpenFM*javadoc.jar"
                                         dest="${site-out}/doc/public-api"/>
                             </target>
                         </configuration>
