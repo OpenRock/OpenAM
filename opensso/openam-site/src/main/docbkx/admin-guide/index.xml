@@ -72,5 +72,7 @@
  <xinclude:include href='chap-change-hosts.xml' />
  <xinclude:include href='chap-troubleshooting.xml' />
 
+ <xinclude:include href="glossary.xml" />
+
  <index />
 </book>
