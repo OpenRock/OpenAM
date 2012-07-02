@@ -26,4 +26,4 @@
  * Portions Copyrighted [2010] [ForgeRock AS]
  *
  */
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;

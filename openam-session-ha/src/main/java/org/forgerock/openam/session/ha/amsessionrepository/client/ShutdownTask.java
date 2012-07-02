@@ -23,11 +23,10 @@
  *
  */
 
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
-import com.sun.identity.ha.FAMRecord;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.resources.ReadResource;
+import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
@@ -36,36 +35,29 @@ import org.restlet.resource.ClientResource;
  *
  * @author steve
  */
-public class ReadTask extends AbstractTask {
-    private String primaryKey = null;
-    
-    public ReadTask(Client client,
-                    String resourceURL, 
-                    String username, 
-                    String password, 
-                    String recordToRead) {
+public class ShutdownTask extends AbstractTask {
+    public ShutdownTask(Client client,
+                        String resourceURL, 
+                        String username, 
+                        String password) {
         super(client, resourceURL, username, password);
-        this.primaryKey = recordToRead;
     }
     
     @Override
-    public AMRecord call() 
+    public AMRecord call()
     throws Exception {
         ChallengeResponse response = getAuth();
-        ClientResource resource = 
-                new ClientResource(resourceURL + ReadResource.URI + SLASH + primaryKey);
+        ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
         resource.setNext(client);
         resource.setChallengeResponse(response);
-        ReadResource readResource = resource.wrap(ReadResource.class);
-
-        AMRecord record = null;
+        ShutdownResource shutdownResource = resource.wrap(ShutdownResource.class);
         
         try {
-            record = readResource.read();
+            shutdownResource.shutdown();
         } catch (Exception ex) {
             if (resource.getStatus().getCode() != 401) {
                 if (debug.warningEnabled()) {
-                    debug.warning("Unable to read from amsessiondb", ex);
+                    debug.warning("Unable to call shutdown on amsessiondb", ex);
                 }
                 
                 throw ex;
@@ -76,44 +68,35 @@ public class ReadTask extends AbstractTask {
             resource.setChallengeResponse(response);
             
             try {
-                record = readResource.read();
+                shutdownResource.shutdown();
             } catch (Exception ex2) {
                 if (resource.getStatus().getCode() == 401) {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to read from amsessiondb; unauthorized", ex2);
+                        debug.warning("Unable to call shutdown on amsessiondb; unauthorized", ex2);
                     }
                     
                     throw new UnauthorizedException(ex2.getMessage());
                 } else {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to read from amsessiondb", ex2);
+                        debug.warning("Unable to call shutdown on amsessiondb", ex2);
                     }
                     throw ex2;
                 }
             }
         }
-        
-        if (record != null) {
-            record.setOperation(FAMRecord.READ);
 
-            if (debug.messageEnabled()) {
-                debug.message("Message read: " + record);
-            }
-        } else {
-            if (debug.warningEnabled()) {
-                debug.warning("amrecord is null");
-            }
+        if (debug.messageEnabled()) {
+            debug.message("Shutdown message sent");
         }
         
-        return record;
+        return null;
     }
     
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append(ReadTask.class).append(": pkey=").append(primaryKey);
+        output.append(ShutdownTask.class);
         
-        return output.toString();
+        return output.toString();        
     }
 }
-

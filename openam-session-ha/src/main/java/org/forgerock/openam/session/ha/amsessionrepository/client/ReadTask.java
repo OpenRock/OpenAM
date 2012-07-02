@@ -23,13 +23,11 @@
  *
  */
 
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import com.sun.identity.ha.FAMRecord;
-import java.util.Set;
-import java.util.Vector;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
+import org.forgerock.openam.amsessionstore.resources.ReadResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
@@ -38,20 +36,16 @@ import org.restlet.resource.ClientResource;
  *
  * @author steve
  */
-public class ReadWithSecKeyTask extends AbstractTask {
-    private String pKey = null;
-    private String sKey = null;
+public class ReadTask extends AbstractTask {
+    private String primaryKey = null;
     
-    public ReadWithSecKeyTask(Client client,
-                              String resourceURL, 
-                              String username, 
-                              String password, 
-                              String pKey, 
-                              String recordToRead) {
+    public ReadTask(Client client,
+                    String resourceURL, 
+                    String username, 
+                    String password, 
+                    String recordToRead) {
         super(client, resourceURL, username, password);
-        
-        this.pKey = pKey;
-        this.sKey = recordToRead;
+        this.primaryKey = recordToRead;
     }
     
     @Override
@@ -59,19 +53,19 @@ public class ReadWithSecKeyTask extends AbstractTask {
     throws Exception {
         ChallengeResponse response = getAuth();
         ClientResource resource = 
-                new ClientResource(resourceURL + ReadWithSecKeyResource.URI + SLASH + sKey);
+                new ClientResource(resourceURL + ReadResource.URI + SLASH + primaryKey);
         resource.setNext(client);
         resource.setChallengeResponse(response);
-        ReadWithSecKeyResource secReadResource = resource.wrap(ReadWithSecKeyResource.class);
+        ReadResource readResource = resource.wrap(ReadResource.class);
 
-        Set<String> records = null;
+        AMRecord record = null;
         
-        try { 
-            records = secReadResource.readWithSecKey();
+        try {
+            record = readResource.read();
         } catch (Exception ex) {
             if (resource.getStatus().getCode() != 401) {
                 if (debug.warningEnabled()) {
-                    debug.warning("Unable to read skey on amsessiondb", ex);
+                    debug.warning("Unable to read from amsessiondb", ex);
                 }
                 
                 throw ex;
@@ -82,38 +76,33 @@ public class ReadWithSecKeyTask extends AbstractTask {
             resource.setChallengeResponse(response);
             
             try {
-                records = secReadResource.readWithSecKey();
+                record = readResource.read();
             } catch (Exception ex2) {
                 if (resource.getStatus().getCode() == 401) {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to read skey on amsessiondb; unauthorized", ex2);
+                        debug.warning("Unable to read from amsessiondb; unauthorized", ex2);
                     }
                     
                     throw new UnauthorizedException(ex2.getMessage());
                 } else {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to read skey on amsessiondb", ex2);
+                        debug.warning("Unable to read from amsessiondb", ex2);
                     }
                     throw ex2;
                 }
             }
         }
         
-        AMRecord record = new AMRecord();
-        record.setOperation(FAMRecord.READ_WITH_SEC_KEY);
-        record.setPrimaryKey(pKey);
+        if (record != null) {
+            record.setOperation(FAMRecord.READ);
 
-        @SuppressWarnings("UseOfObsoleteCollectionType")
-        Vector<String> blobs = new Vector<String>();
-
-        for (String session : records) {
-            blobs.add(session);
-        }
-        
-        record.setRecords(blobs);
-
-        if (debug.messageEnabled()) {
-            debug.message("read with sec key: " + sKey + " found: " + blobs);
+            if (debug.messageEnabled()) {
+                debug.message("Message read: " + record);
+            }
+        } else {
+            if (debug.warningEnabled()) {
+                debug.warning("amrecord is null");
+            }
         }
         
         return record;
@@ -122,8 +111,9 @@ public class ReadWithSecKeyTask extends AbstractTask {
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append(ReadTask.class).append(": pkey=").append(sKey);
+        output.append(ReadTask.class).append(": pkey=").append(primaryKey);
         
         return output.toString();
-    }    
+    }
 }
+

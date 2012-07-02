@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import org.forgerock.openam.amsessionstore.common.AMRecord;
 import org.forgerock.openam.amsessionstore.resources.DeleteByDateResource;

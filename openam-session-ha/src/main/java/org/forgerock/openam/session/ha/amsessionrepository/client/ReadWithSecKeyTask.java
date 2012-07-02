@@ -23,10 +23,13 @@
  *
  */
 
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
+import com.sun.identity.ha.FAMRecord;
+import java.util.Set;
+import java.util.Vector;
 import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
+import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;
@@ -35,29 +38,40 @@ import org.restlet.resource.ClientResource;
  *
  * @author steve
  */
-public class ShutdownTask extends AbstractTask {
-    public ShutdownTask(Client client,
-                        String resourceURL, 
-                        String username, 
-                        String password) {
+public class ReadWithSecKeyTask extends AbstractTask {
+    private String pKey = null;
+    private String sKey = null;
+    
+    public ReadWithSecKeyTask(Client client,
+                              String resourceURL, 
+                              String username, 
+                              String password, 
+                              String pKey, 
+                              String recordToRead) {
         super(client, resourceURL, username, password);
+        
+        this.pKey = pKey;
+        this.sKey = recordToRead;
     }
     
     @Override
-    public AMRecord call()
+    public AMRecord call() 
     throws Exception {
         ChallengeResponse response = getAuth();
-        ClientResource resource = new ClientResource(resourceURL + ShutdownResource.URI);
+        ClientResource resource = 
+                new ClientResource(resourceURL + ReadWithSecKeyResource.URI + SLASH + sKey);
         resource.setNext(client);
         resource.setChallengeResponse(response);
-        ShutdownResource shutdownResource = resource.wrap(ShutdownResource.class);
+        ReadWithSecKeyResource secReadResource = resource.wrap(ReadWithSecKeyResource.class);
+
+        Set<String> records = null;
         
-        try {
-            shutdownResource.shutdown();
+        try { 
+            records = secReadResource.readWithSecKey();
         } catch (Exception ex) {
             if (resource.getStatus().getCode() != 401) {
                 if (debug.warningEnabled()) {
-                    debug.warning("Unable to call shutdown on amsessiondb", ex);
+                    debug.warning("Unable to read skey on amsessiondb", ex);
                 }
                 
                 throw ex;
@@ -68,35 +82,48 @@ public class ShutdownTask extends AbstractTask {
             resource.setChallengeResponse(response);
             
             try {
-                shutdownResource.shutdown();
+                records = secReadResource.readWithSecKey();
             } catch (Exception ex2) {
                 if (resource.getStatus().getCode() == 401) {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to call shutdown on amsessiondb; unauthorized", ex2);
+                        debug.warning("Unable to read skey on amsessiondb; unauthorized", ex2);
                     }
                     
                     throw new UnauthorizedException(ex2.getMessage());
                 } else {
                     if (debug.warningEnabled()) {
-                        debug.warning("Unable to call shutdown on amsessiondb", ex2);
+                        debug.warning("Unable to read skey on amsessiondb", ex2);
                     }
                     throw ex2;
                 }
             }
         }
+        
+        AMRecord record = new AMRecord();
+        record.setOperation(FAMRecord.READ_WITH_SEC_KEY);
+        record.setPrimaryKey(pKey);
 
-        if (debug.messageEnabled()) {
-            debug.message("Shutdown message sent");
+        @SuppressWarnings("UseOfObsoleteCollectionType")
+        Vector<String> blobs = new Vector<String>();
+
+        for (String session : records) {
+            blobs.add(session);
         }
         
-        return null;
+        record.setRecords(blobs);
+
+        if (debug.messageEnabled()) {
+            debug.message("read with sec key: " + sKey + " found: " + blobs);
+        }
+        
+        return record;
     }
     
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append(ShutdownTask.class);
+        output.append(ReadTask.class).append(": pkey=").append(sKey);
         
-        return output.toString();        
-    }
+        return output.toString();
+    }    
 }

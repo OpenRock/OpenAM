@@ -1,4 +1,4 @@
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

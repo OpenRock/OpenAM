@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.amsessionrepository.client;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.ha.FAMRecord;
