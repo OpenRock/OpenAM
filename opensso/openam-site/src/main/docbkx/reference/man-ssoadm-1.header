@@ -288,6 +288,10 @@
   <refsect2>
    <title>Service Management</title>
    <itemizedlist>
+    <para>To translate settings applied in OpenAM console to service attributes
+    for use with <command>ssoadm</command>, login to the OpenAM console
+    as as <literal>amadmin</literal> and access the services page, such as
+    <literal>http://openam.example.com:8080/openam/services.jsp</literal>.</para>
     <listitem><para><link linkend="ssoadm-add-attr-defs"><command>add-attr-defs</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-add-attrs"><command>add-attrs</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-add-plugin-interface"><command>add-plugin-interface</command></link></para></listitem>

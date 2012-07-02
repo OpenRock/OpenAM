@@ -154,6 +154,10 @@
      when you installed OpenAM, for example
      <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
      <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+     <para>To translate settings applied in OpenAM console to service attributes
+     for use with <command>ssoadm</command>, login to the OpenAM console
+     as <literal>amadmin</literal> and access the services page, such as
+     <literal>http://openam.example.com:8080/openam/services.jsp</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
