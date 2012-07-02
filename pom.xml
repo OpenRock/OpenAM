@@ -125,8 +125,8 @@
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
-        <!-- OpenAM Session Repository Module -->
-        <module>openam-session-repository</module>
+        <!-- OpenAM Session High-Availability FailOver Module -->
+        <module>openam-session-ha</module>
 
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>

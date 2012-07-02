@@ -35,10 +35,10 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Session Repository</name>
-    <description>OpenAM Session FailOver Component
+    <name>OpenAM Session High-Availability</name>
+    <description>OpenAM Session High-Availability FailOver Component
     </description>
-    <artifactId>openam-session-repository</artifactId>
+    <artifactId>openam-session-ha</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
@@ -87,10 +87,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Session Repository Component</Specification-Title>
+                            <Specification-Title>OpenAM Session High-Availability FailOver Component</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Session Repository Component</Implementation-Title>
+                            <Implementation-Title>OpenAM Session High-Availability FailOver Component</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -160,7 +160,26 @@
             <artifactId>openam-core</artifactId>
             <version>10.1-XPRESS-SNAPSHOT</version>
         </dependency>
-		
+
+        <!-- Session Repository Module Dependencies-->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+
+        <!-- Transport Layer Dependencies -->
+
+
+
+
     </dependencies>
     
 </project>
