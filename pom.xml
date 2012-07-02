@@ -91,9 +91,12 @@
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
-        <javadoc.excludePackageNames>javax.*:com.sun.web.ui.*:com.sun.xml.*:
-                org.apache.*:org.codehaus.*:org.glassfish.*:
-                com.*:org.*:net.*
+        <javadoc.excludePackageNames>java.*:javax.*:com.*:org.*:net.*:
+                com.sun.web.ui.*:
+                com.sun.xml.*:
+                org.apache.*:
+                org.codehaus.*:
+                org.glassfish.*
         </javadoc.excludePackageNames>
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1111,10 +1114,8 @@
                     <outputDirectory>${project.build.directory}/site/apidocs
                     </outputDirectory>
                     <detectLinks>true</detectLinks>
-                    <!--
                     <excludePackageNames>${javadoc.excludePackageNames}
                     </excludePackageNames>
-                    -->
                     <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
                     <name>OpenAM JavaDoc</name>
                     <description>OpenAM Java Documentation.
