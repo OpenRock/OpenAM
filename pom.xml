@@ -1111,12 +1111,14 @@
                     <outputDirectory>${project.build.directory}/site/apidocs
                     </outputDirectory>
                     <detectLinks>true</detectLinks>
+                    <!--
                     <excludePackageNames>${javadoc.excludePackageNames}
                     </excludePackageNames>
+                    -->
+                    <dependencySourceIncludes>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</dependencySourceIncludes>
                     <name>OpenAM JavaDoc</name>
                     <description>OpenAM Java Documentation.
                     </description>
-                    <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
                     <bottom>
                         <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
                     <header file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.header" />
