@@ -122,6 +122,9 @@
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
+        <!-- OpenAM Session Repository Module -->
+        <module>openam-session-repository</module>
+
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
 
