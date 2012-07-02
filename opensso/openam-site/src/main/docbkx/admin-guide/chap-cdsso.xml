@@ -60,7 +60,7 @@
  <mediaobject xml:id="figure-cdsso-jee-sequence">
   <alt>Java EE policy agent mechanism for CDSSO</alt>
   <imageobject>
-   <imagedata fileref="cdsso-jee-sequence.png" format="PNG"/>
+   <imagedata fileref="images/cdsso-jee-sequence.png" format="PNG"/>
   </imageobject>
   <textobject>
    <para>The sequence diagram illustrates the Java EE policy agent mechanism
@@ -75,7 +75,7 @@
  <mediaobject xml:id="figure-cdsso-web-sequence">
   <alt>Web policy agent mechanism for CDSSO</alt>
   <imageobject>
-   <imagedata fileref="cdsso-web-sequence.png" format="PNG"/>
+   <imagedata fileref="images/cdsso-web-sequence.png" format="PNG"/>
   </imageobject>
   <textobject>
    <para>The sequence diagram illustrates the web policy agent mechanism
