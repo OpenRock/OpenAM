@@ -1115,7 +1115,7 @@
                     <excludePackageNames>${javadoc.excludePackageNames}
                     </excludePackageNames>
                     -->
-                    <dependencySourceIncludes>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</dependencySourceIncludes>
+                    <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
                     <name>OpenAM JavaDoc</name>
                     <description>OpenAM Java Documentation.
                     </description>
