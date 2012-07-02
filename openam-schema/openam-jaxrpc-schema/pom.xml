@@ -36,7 +36,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-jaxrpc-schema</name>
+    <name>OpenAM JAXRPC Schema</name>
     <description>OpenAM JAXRPC Schema Components
     </description>
     <artifactId>openam-jaxrpc-schema</artifactId>

@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-shared</name>
+    <name>OpenAM Shared</name>
     <description>OpenAM Shared Components and Modules
     </description>
     <artifactId>openam-shared</artifactId>

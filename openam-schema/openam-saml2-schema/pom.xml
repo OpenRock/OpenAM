@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-saml2-schema</name>
+    <name>OpenAM SAML2 Schema</name>
     <description>OpenAM Schemata Components 
     </description>
     <artifactId>openam-saml2-schema</artifactId>

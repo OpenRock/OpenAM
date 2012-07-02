@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-xacml3-schema</name>
+    <name>OpenAM XACML3 Schema</name>
     <description>OpenAM XACML3 Schemata  
     </description>
     <artifactId>openam-xacml3-schema</artifactId>

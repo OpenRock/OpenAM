@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-coretoken</name>
+    <name>OpenAm Core Token</name>
     <description>OpenAM CoreToken Services
     </description>
     <artifactId>openam-coretoken</artifactId>

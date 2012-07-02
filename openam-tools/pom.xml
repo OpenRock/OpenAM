@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-tools</name>
+    <name>OpenAM Tools</name>
     <description>OpenAM Tool Components 
     </description>
     <artifactId>openam-tools</artifactId>

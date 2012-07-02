@@ -36,7 +36,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-installtools</name>
+    <name>OPenAM Istall Tools</name>
     <description>OpenAM Install Tool Components
     </description>
     <artifactId>openam-installtools</artifactId>

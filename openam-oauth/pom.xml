@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-oauth</name>
+    <name>OpenAM OAuth</name>
     <description>OpenAM OAuth Modules
     </description>
     <artifactId>openam-oauth</artifactId>

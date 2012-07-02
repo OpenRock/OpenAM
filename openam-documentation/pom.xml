@@ -40,7 +40,7 @@
     <artifactId>openam-documentation</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
 
-    <name>openam-documentation</name>
+    <name>OpenAM Documentation</name>
 
     <inceptionYear>2011</inceptionYear>
     <packaging>pom</packaging>
@@ -116,7 +116,7 @@
     <distributionManagement>
         <site>
             <id>forgerock.org</id>
-            <name>OpenAM Project</name>
+            <name>OpenAM</name>
             <url>${siteDistributionURL}</url>
         </site>
     </distributionManagement>
@@ -283,6 +283,6 @@
         </plugins>
     </build>
     <modules>
-        <module>site-helper</module>
+        <module>openam-site-helper</module>
     </modules>
 </project>

@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-federation</name>
+    <name>OpenAM Federation</name>
     <description>OpenAM Federation 
     </description>
     <artifactId>openam-federation</artifactId>

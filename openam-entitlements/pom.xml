@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-entitlements</name>
+    <name>OpenAM Entitlements</name>
     <description>OpenAM Entitlements
     </description>
     <artifactId>openam-entitlements</artifactId>

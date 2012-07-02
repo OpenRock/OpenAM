@@ -1113,7 +1113,7 @@
                     <detectLinks>true</detectLinks>
                     <excludePackageNames>${javadoc.excludePackageNames}
                     </excludePackageNames>
-                    <name>OpenAM-JAVADOC</name>
+                    <name>OpenAM JavaDoc</name>
                     <description>OpenAM Java Documentation.
                     </description>
                     <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>

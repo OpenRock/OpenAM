@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-session-repository</name>
+    <name>OpenAM Session Repository</name>
     <description>OpenAM Session FailOver Component
     </description>
     <artifactId>openam-session-repository</artifactId>

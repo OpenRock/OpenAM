@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-dtd-schema</name>
+    <name>OpenAM DTD Schema</name>
     <description>OpenAM Identity Services DTD Components
     </description>
     <artifactId>openam-dtd-schema</artifactId>

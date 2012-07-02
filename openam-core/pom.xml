@@ -36,7 +36,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-core</name>
+    <name>OpenAM Core</name>
     <description>OpenAM Core Components
     </description>
     <artifactId>openam-core</artifactId>

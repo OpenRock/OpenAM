@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-rest</name>
+    <name>OpenAM Rest</name>
     <description>OpenAM REST Services
     </description>
     <artifactId>openam-rest</artifactId>

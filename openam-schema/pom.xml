@@ -36,7 +36,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-schema</name>
+    <name>OpenAM Schemata</name>
     <description>OpenAM Schemata Components
     </description>
     <artifactId>openam-schema</artifactId>

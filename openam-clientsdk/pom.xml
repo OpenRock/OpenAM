@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-clientsdk</name>
+    <name>OpenAM Client SDK</name>
     <description>OpenAM Java Client SDK
     </description>
     <artifactId>openam-clientsdk</artifactId>

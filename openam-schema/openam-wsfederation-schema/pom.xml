@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>openam-wsfederation-schema</name>
+    <name>OpenAM WS Federation Schema</name>
     <description>OpenAM Schemata Components 
     </description>
     <artifactId>openam-wsfederation-schema</artifactId>
