@@ -102,6 +102,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Product Properties File Inclusion during Build -->
         <openam.properties>openam.properties</openam.properties>
+        <restlet.version>2.0.6</restlet.version>
     </properties>
 
     <!-- OpenAM Child Modules -->
@@ -978,7 +979,26 @@
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>1.9.7</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>2.0.8-FIX</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.simple</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.crypto</artifactId>
+                <version>2.0.8-FIX</version>
+            </dependency>
 
 
 
