@@ -23,6 +23,7 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
    $Id: session_timeout.jsp,v 1.1.1.1 2008/10/29 08:05:21 svbld Exp $
+   "Portions Copyrighted [2012] [Forgerock AS]"
 --%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

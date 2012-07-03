@@ -24,6 +24,8 @@
 
    $Id: PWResetQuestion.jsp,v 1.1.1.1 2008/10/29 08:04:58 svbld Exp $
 
+   "Portions Copyrighted [2012] [Forgerock AS]"
+
 --%>
 
 <%@include file="../ui/PWResetBase.jsp" %>

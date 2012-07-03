@@ -24,6 +24,7 @@
  *
  * $Id: auth.js,v 1.6 2008/06/25 05:44:32 qcheng Exp $
  *
+ *    "Portions Copyrighted [2012] [Forgerock AS]"
  */
 
 

@@ -24,6 +24,7 @@
  *
  * $Id: PPResetQuestionTiledView,v 1.4 2009/12/08 10:32:23 bhavnab Exp $
  *
+ *    "Portions Copyrighted [2012] [Forgerock AS]"
  */
 
 package org.forgerock.openam.authentication.modules.passphrase.ui;

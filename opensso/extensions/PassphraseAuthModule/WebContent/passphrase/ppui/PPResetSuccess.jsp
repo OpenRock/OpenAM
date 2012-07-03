@@ -23,6 +23,8 @@
    "Portions Copyrighted [year] [name of copyright owner]"
 
    $Id: PWResetSuccess.jsp,v 1.5 2008/08/28 06:41:11 mahesh_prasad_r Exp $
+   
+   "Portions Copyrighted [2012] [Forgerock AS]"
 --%>
 
 <%@include file="../ppui/PPResetBase.jsp"%>

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PPResetQuestionModel.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
+ *
+ *    "Portions Copyrighted [2012] [Forgerock AS]"
  */
 
 package org.forgerock.openam.authentication.modules.passphrase.ui.model;

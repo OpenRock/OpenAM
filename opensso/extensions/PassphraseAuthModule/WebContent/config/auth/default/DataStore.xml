@@ -24,7 +24,7 @@
     "Portions Copyrighted [year] [name of copyright owner]"
 
     $Id: DataStore.xml,v 1.1.1.1 2008/10/29 08:04:52 svbld Exp $
-
+    "Portions Copyrighted [2012] [Forgerock AS]"
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"

@@ -23,7 +23,8 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
    $Id: profileException.jsp,v 1.1.1.1 2008/10/29 08:05:21 svbld Exp $
-                                                                                
+
+   "Portions Copyrighted [2012] [Forgerock AS]"                                                                                
 --%>
 
 

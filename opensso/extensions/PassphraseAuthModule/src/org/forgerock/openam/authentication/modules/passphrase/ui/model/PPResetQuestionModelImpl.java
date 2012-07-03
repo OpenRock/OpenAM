@@ -24,6 +24,7 @@
  *
  * $Id: PPResetQuestionModelImpl.java,v 1.3 2009/11/18 20:52:18 qcheng Exp $
  *
+ *    "Portions Copyrighted [2012] [Forgerock AS]"
  */
 
 package org.forgerock.openam.authentication.modules.passphrase.ui.model;

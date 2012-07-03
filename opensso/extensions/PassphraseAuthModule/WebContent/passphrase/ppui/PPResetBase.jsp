@@ -24,6 +24,7 @@
 
    $Id: PWResetBase.jsp,v 1.6 2008/08/19 19:09:38 veiming Exp $
 
+   "Portions Copyrighted [2012] [Forgerock AS]"
 --%>
 
 <% 

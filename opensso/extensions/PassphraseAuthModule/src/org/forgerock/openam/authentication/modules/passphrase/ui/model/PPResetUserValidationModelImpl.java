@@ -24,6 +24,7 @@
  *
  * $Id: PWResetUserValidationModelImpl.java,v 1.3 2010/01/28 08:17:10 bina Exp $
  *
+ *    "Portions Copyrighted [2012] [Forgerock AS]"
  */
 
 package org.forgerock.openam.authentication.modules.passphrase.ui.model;

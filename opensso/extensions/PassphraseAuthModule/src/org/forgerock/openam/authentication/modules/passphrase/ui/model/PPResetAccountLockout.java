@@ -24,6 +24,7 @@
  *
  * $Id: PPResetAccountLockout.java,v 1.4 2009/03/06 22:37:07 hengming Exp $
  *
+ *    "Portions Copyrighted [2012] [Forgerock AS]"
  */
 
 package org.forgerock.openam.authentication.modules.passphrase.ui.model;

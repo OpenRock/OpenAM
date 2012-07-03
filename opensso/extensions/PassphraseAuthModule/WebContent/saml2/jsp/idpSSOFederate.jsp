@@ -23,6 +23,9 @@
    "Portions Copyrighted [year] [name of copyright owner]"
 
    $Id: idpSSOFederate.jsp,v 1.1.1.1.2.4 2010/03/02 08:05:10 qcheng Exp $
+
+   "Portions Copyrighted [2012] [Forgerock AS]"
+
 --%>
 
 <%@ page import="com.iplanet.am.util.Debug" %>

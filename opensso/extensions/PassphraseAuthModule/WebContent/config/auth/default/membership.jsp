@@ -23,6 +23,7 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
    $Id: membership.jsp,v 1.1.1.1.2.1 2008/12/18 22:44:58 gc111264 Exp $
+   "Portions Copyrighted [2012] [Forgerock AS]"
                                                                                 
 --%>
 

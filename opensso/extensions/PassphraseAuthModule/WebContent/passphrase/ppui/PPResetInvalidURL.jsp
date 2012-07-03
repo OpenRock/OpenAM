@@ -24,6 +24,8 @@
 
    $Id: PWResetInvalidURL.jsp,v 1.5 2008/08/28 06:41:11 mahesh_prasad_r Exp $
 
+
+   "Portions Copyrighted [2012] [Forgerock AS]"
 --%>
 
 <html>
