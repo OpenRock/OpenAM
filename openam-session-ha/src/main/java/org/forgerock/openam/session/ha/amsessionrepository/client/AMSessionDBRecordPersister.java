@@ -322,7 +322,6 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
      * For a set of operations turns an AMRecord into a FAMRecord
      * 
      * @param record The AMRecord to convert
-     * @param blobs The Vector of sessions
      * @return The FAMRecord object
      * @throws Exception If the incoming record is invalid
      */

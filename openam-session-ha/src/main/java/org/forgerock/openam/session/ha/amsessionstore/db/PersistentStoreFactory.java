@@ -50,7 +50,7 @@ public class PersistentStoreFactory {
     private static PersistentStore persistentStore = null; 
     private static String persistentStoreImpl = null; 
     private static final String DEFAULT_PERSISTER_VALUE = 
-        "org.forgerock.openam.amsessionstore.db.memory.MemoryPersistentStore";
+        "org.forgerock.openam.session.ha.amsessionstore.db.memory.MemoryPersistentStore";
     
     static {
         try {
