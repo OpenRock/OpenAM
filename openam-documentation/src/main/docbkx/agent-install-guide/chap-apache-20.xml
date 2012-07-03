@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-apache-20'
@@ -203,7 +203,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 20.4-b02-402, mixed mode)</screen>
     <para>Make sure OpenAM is running.</para>
    </step>
    <step>
-    <para>Run <command>agentadmin --install</command> to install the agent.</para>
+    <para>Run <command>./agentadmin --install</command> to install the agent.</para>
     <screen>$ cd /path/to/web_agents/apache_agent/bin/
 $ ./agentadmin --install
 ...
@@ -313,10 +313,10 @@ Install log file location:
   <command>agentadmin --custom-install</command>.</para>
   
   <para>When performing a scripted, silent installation, use
-  <command>agentadmin --install --saveResponse
+  <command>./agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
   to create a response file for scripted installation. Then install silently
-  using <command>agentadmin --install --useResponse
+  using <command>./agentadmin --install --useResponse
   <replaceable>response-file</replaceable></command>.</para>
  </section>
  
