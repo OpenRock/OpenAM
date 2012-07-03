@@ -1743,6 +1743,7 @@
       <literal>sunAMAuthHOTPasswordDelivery</literal></para>
      </listitem>
     </varlistentry>
+    <varlistentry>
     <term>Mobile Phone Number Attribute Names</term>
      <listitem>
       <para>Provides the attribute name used for the text message. The 
@@ -1778,7 +1779,6 @@
       <literal>sunAMAuthHOTPAutoClicking</literal></para>
      </listitem>
     </varlistentry>
-    <varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
      <listitem>
