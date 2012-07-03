@@ -1,7 +1,7 @@
 Add the following to the OpenAM web.xml in order to run the demo.
 The usernames and passwords must match a user in OpenAM.
 The demo will be available under openam/oauth2demo/
-
+ 
 
 
 <!-- Servlet to Restlet adapter declaration (Mandatory) -->
