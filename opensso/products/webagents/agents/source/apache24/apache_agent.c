@@ -846,148 +846,17 @@ static am_status_t set_method(void **args, am_web_req_method_t method) {
     const char *thisfunc = "set_method()";
     request_rec *r = NULL;
     am_status_t sts = AM_SUCCESS;
-
     if (args == NULL || (r = (request_rec *) args[0]) == NULL) {
-        am_web_log_error("%s: invalid argument passed.", thisfunc);
+        am_web_log_error("%s: invalid argument passed", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
-        switch (method) {
-            case AM_WEB_REQUEST_GET:
-                r->method_number = M_GET;
-                r->method = REQUEST_METHOD_GET;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_POST:
-                r->method_number = M_POST;
-                r->method = REQUEST_METHOD_POST;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_PUT:
-                r->method_number = M_PUT;
-                r->method = REQUEST_METHOD_PUT;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_DELETE:
-                r->method_number = M_DELETE;
-                r->method = REQUEST_METHOD_DELETE;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_OPTIONS:
-                r->method_number = M_OPTIONS;
-                r->method = REQUEST_METHOD_OPTIONS;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_CONNECT:
-                r->method_number = M_CONNECT;
-                r->method = REQUEST_METHOD_CONNECT;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_COPY:
-                r->method_number = M_COPY;
-                r->method = REQUEST_METHOD_COPY;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_INVALID:
-                r->method_number = M_INVALID;
-                r->method = REQUEST_METHOD_INVALID;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_LOCK:
-                r->method_number = M_LOCK;
-                r->method = REQUEST_METHOD_LOCK;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_UNLOCK:
-                r->method_number = M_UNLOCK;
-                r->method = REQUEST_METHOD_UNLOCK;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_MOVE:
-                r->method_number = M_MOVE;
-                r->method = REQUEST_METHOD_MOVE;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_PATCH:
-                r->method_number = M_PATCH;
-                r->method = REQUEST_METHOD_PATCH;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_PROPFIND:
-                r->method_number = M_PROPFIND;
-                r->method = REQUEST_METHOD_PROPFIND;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_PROPPATCH:
-                r->method_number = M_PROPPATCH;
-                r->method = REQUEST_METHOD_PROPPATCH;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_VERSION_CONTROL:
-                r->method_number = M_VERSION_CONTROL;
-                r->method = REQUEST_METHOD_VERSION_CONTROL;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_CHECKOUT:
-                r->method_number = M_CHECKOUT;
-                r->method = REQUEST_METHOD_CHECKOUT;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_UNCHECKOUT:
-                r->method_number = M_UNCHECKOUT;
-                r->method = REQUEST_METHOD_UNCHECKOUT;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_CHECKIN:
-                r->method_number = M_CHECKIN;
-                r->method = REQUEST_METHOD_CHECKIN;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_UPDATE:
-                r->method_number = M_UPDATE;
-                r->method = REQUEST_METHOD_UPDATE;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_LABEL:
-                r->method_number = M_LABEL;
-                r->method = REQUEST_METHOD_LABEL;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_REPORT:
-                r->method_number = M_REPORT;
-                r->method = REQUEST_METHOD_REPORT;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_MKWORKSPACE:
-                r->method_number = M_MKWORKSPACE;
-                r->method = REQUEST_METHOD_MKWORKSPACE;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_MKACTIVITY:
-                r->method_number = M_MKACTIVITY;
-                r->method = REQUEST_METHOD_MKACTIVITY;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_BASELINE_CONTROL:
-                r->method_number = M_BASELINE_CONTROL;
-                r->method = REQUEST_METHOD_BASELINE_CONTROL;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_MERGE:
-                r->method_number = M_MERGE;
-                r->method = REQUEST_METHOD_MERGE;
-                sts = AM_SUCCESS;
-                break;
-            case AM_WEB_REQUEST_HEAD:
-                r->method_number = M_GET;
-                r->method = REQUEST_METHOD_HEAD;
-                sts = AM_SUCCESS;
-                break;
-            default:
-                sts = AM_INVALID_ARGUMENT;
-                am_web_log_error("%s: invalid method [%s] passed.",
-                        thisfunc, am_web_method_num_to_str(method));
-                break;
-        }
+        r->method = am_web_method_num_to_str(method);
+        r->method_number = ap_method_number_of(r->method);
+        am_web_log_debug("%s: %s (%d)", thisfunc, r->method, r->method_number);
+        if (r->method_number == M_INVALID) {
+            sts = AM_INVALID_ARGUMENT;
+            am_web_log_error("%s: invalid method [%s] passed", thisfunc, r->method);
+        } else sts = AM_SUCCESS;
     }
     return sts;
 }
@@ -1012,202 +881,26 @@ static am_status_t set_user(void **args, const char *user) {
     return sts;
 }
 
-static int get_apache_method_num(am_web_req_method_t am_num) {
-    int apache_num = -1;
-    switch (am_num) {
-        case AM_WEB_REQUEST_GET:
-            apache_num = M_GET;
-            break;
-        case AM_WEB_REQUEST_POST:
-            apache_num = M_POST;
-            break;
-        case AM_WEB_REQUEST_PUT:
-            apache_num = M_PUT;
-            break;
-        case AM_WEB_REQUEST_DELETE:
-            apache_num = M_DELETE;
-            break;
-        case AM_WEB_REQUEST_TRACE:
-            apache_num = M_TRACE;
-            break;
-        case AM_WEB_REQUEST_OPTIONS:
-            apache_num = M_OPTIONS;
-            break;
-        case AM_WEB_REQUEST_CONNECT:
-            apache_num = M_CONNECT;
-            break;
-        case AM_WEB_REQUEST_COPY:
-            apache_num = M_COPY;
-            break;
-        case AM_WEB_REQUEST_INVALID:
-            apache_num = M_INVALID;
-            break;
-        case AM_WEB_REQUEST_LOCK:
-            apache_num = M_LOCK;
-            break;
-        case AM_WEB_REQUEST_UNLOCK:
-            apache_num = M_UNLOCK;
-            break;
-        case AM_WEB_REQUEST_MOVE:
-            apache_num = M_MOVE;
-            break;
-        case AM_WEB_REQUEST_MKCOL:
-            apache_num = M_MKCOL;
-            break;
-        case AM_WEB_REQUEST_PATCH:
-            apache_num = M_PATCH;
-            break;
-        case AM_WEB_REQUEST_PROPFIND:
-            apache_num = M_PROPFIND;
-            break;
-        case AM_WEB_REQUEST_PROPPATCH:
-            apache_num = M_PROPPATCH;
-            break;
-        case AM_WEB_REQUEST_VERSION_CONTROL:
-            apache_num = M_VERSION_CONTROL;
-            break;
-        case AM_WEB_REQUEST_CHECKOUT:
-            apache_num = M_CHECKOUT;
-            break;
-        case AM_WEB_REQUEST_UNCHECKOUT:
-            apache_num = M_UNCHECKOUT;
-            break;
-        case AM_WEB_REQUEST_CHECKIN:
-            apache_num = M_CHECKIN;
-            break;
-        case AM_WEB_REQUEST_UPDATE:
-            apache_num = M_UPDATE;
-            break;
-        case AM_WEB_REQUEST_LABEL:
-            apache_num = M_LABEL;
-            break;
-        case AM_WEB_REQUEST_REPORT:
-            apache_num = M_REPORT;
-            break;
-        case AM_WEB_REQUEST_MKWORKSPACE:
-            apache_num = M_MKWORKSPACE;
-            break;
-        case AM_WEB_REQUEST_MKACTIVITY:
-            apache_num = M_MKACTIVITY;
-            break;
-        case AM_WEB_REQUEST_BASELINE_CONTROL:
-            apache_num = M_BASELINE_CONTROL;
-            break;
-        case AM_WEB_REQUEST_MERGE:
-            apache_num = M_MERGE;
-            break;
-        case AM_WEB_REQUEST_HEAD:
-            apache_num = M_GET;
-            break;
-    }
-    return apache_num;
-}
-
 static am_web_req_method_t get_method_num(request_rec *r) {
     const char *thisfunc = "get_method_num()";
     am_web_req_method_t method_num = AM_WEB_REQUEST_UNKNOWN;
-    switch (r->method_number) {
-        case M_GET:
-            if (r->header_only > 0) {
-                method_num = AM_WEB_REQUEST_HEAD;
-            } else {
-                method_num = AM_WEB_REQUEST_GET;
-            }
-            break;
-        case M_POST:
-            method_num = AM_WEB_REQUEST_POST;
-            break;
-        case M_PUT:
-            method_num = AM_WEB_REQUEST_PUT;
-            break;
-        case M_DELETE:
-            method_num = AM_WEB_REQUEST_DELETE;
-            break;
-        case M_TRACE:
-            method_num = AM_WEB_REQUEST_TRACE;
-            break;
-        case M_OPTIONS:
-            method_num = AM_WEB_REQUEST_OPTIONS;
-            break;
-        case M_CONNECT:
-            method_num = AM_WEB_REQUEST_CONNECT;
-            break;
-        case M_COPY:
-            method_num = AM_WEB_REQUEST_COPY;
-            break;
-        case M_INVALID:
-            method_num = AM_WEB_REQUEST_INVALID;
-            break;
-        case M_LOCK:
-            method_num = AM_WEB_REQUEST_LOCK;
-            break;
-        case M_UNLOCK:
-            method_num = AM_WEB_REQUEST_UNLOCK;
-            break;
-        case M_MOVE:
-            method_num = AM_WEB_REQUEST_MOVE;
-            break;
-        case M_MKCOL:
-            method_num = AM_WEB_REQUEST_MKCOL;
-            break;
-        case M_PATCH:
-            method_num = AM_WEB_REQUEST_PATCH;
-            break;
-        case M_PROPFIND:
-            method_num = AM_WEB_REQUEST_PROPFIND;
-            break;
-        case M_PROPPATCH:
-            method_num = AM_WEB_REQUEST_PROPPATCH;
-            break;
-        case M_VERSION_CONTROL:
-            method_num = AM_WEB_REQUEST_VERSION_CONTROL;
-            break;
-        case M_CHECKOUT:
-            method_num = AM_WEB_REQUEST_CHECKOUT;
-            break;
-        case M_UNCHECKOUT:
-            method_num = AM_WEB_REQUEST_UNCHECKOUT;
-            break;
-        case M_CHECKIN:
-            method_num = AM_WEB_REQUEST_CHECKIN;
-            break;
-        case M_UPDATE:
-            method_num = AM_WEB_REQUEST_UPDATE;
-            break;
-        case M_LABEL:
-            method_num = AM_WEB_REQUEST_LABEL;
-            break;
-        case M_REPORT:
-            method_num = AM_WEB_REQUEST_REPORT;
-            break;
-        case M_MKWORKSPACE:
-            method_num = AM_WEB_REQUEST_MKWORKSPACE;
-            break;
-        case M_MKACTIVITY:
-            method_num = AM_WEB_REQUEST_MKACTIVITY;
-            break;
-        case M_BASELINE_CONTROL:
-            method_num = AM_WEB_REQUEST_BASELINE_CONTROL;
-            break;
-        case M_MERGE:
-            method_num = AM_WEB_REQUEST_MERGE;
-            break;
-        default:
-            method_num = AM_WEB_REQUEST_UNKNOWN;
-            break;
+    const char *mthd = ap_method_name_of(r->pool, r->method_number);
+    am_web_log_debug("%s: %s (%s, %d)", thisfunc, r->method, mthd, r->method_number);
+    if (r->method_number == M_GET && r->header_only > 0) {
+        method_num = AM_WEB_REQUEST_HEAD;
+    } else {
+        method_num = am_web_method_str_to_num(mthd);
     }
-    am_web_log_debug("%s: Method string is %s", thisfunc, r->method);
-    am_web_log_debug("%s: Apache method number corresponds to %s method",
+    am_web_log_debug("%s: number corresponds to %s method",
             thisfunc, am_web_method_num_to_str(method_num));
-
     // Check if method number and method string correspond
     if (method_num == AM_WEB_REQUEST_UNKNOWN) {
         // If method string is not null, set the correct method number
         if (r->method != NULL && *(r->method) != '\0') {
             method_num = am_web_method_str_to_num(r->method);
-            r->method_number = get_apache_method_num(method_num);
-            am_web_log_debug("%s: Set method number to correspond to %s method",
-                    thisfunc, r->method);
+            r->method_number = ap_method_number_of(r->method);
+            am_web_log_debug("%s: set method number to correspond to %s method (%d)",
+                    thisfunc, r->method, r->method_number);
         }
     } else if (strcasecmp(r->method, am_web_method_num_to_str(method_num))
             && (method_num != AM_WEB_REQUEST_INVALID)) {
@@ -1216,7 +909,7 @@ static am_web_req_method_t get_method_num(request_rec *r) {
         // the method string needs to be preserved in case Apache is
         // used as a proxy (in front of Exchange Server for instance)
         r->method = am_web_method_num_to_str(method_num);
-        am_web_log_debug("%s: Set method string to %s", thisfunc, r->method);
+        am_web_log_debug("%s: set method to %s", thisfunc, r->method);
     }
     return method_num;
 }
