@@ -27,10 +27,10 @@ package org.forgerock.openam.session.ha.amsessionstore.db;
 
 import java.util.logging.Level;
 import org.forgerock.i18n.LocalizableMessage;
-import org.forgerock.openam.amsessionstore.common.Constants;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.common.SystemProperties;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.common.SystemProperties;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.*;
 
 /**
  * Singleton used to fetch the shared instance of the persistent store.

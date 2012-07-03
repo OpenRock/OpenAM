@@ -27,7 +27,7 @@ package org.forgerock.openam.session.ha.amsessionstore.db;
 
 import java.util.Map;
 import java.util.Set;
-import org.forgerock.openam.amsessionstore.common.AMRecord;
+import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
 
 /**
  * This interface defines the functionality of the pluggable persistent stores
