@@ -977,6 +977,11 @@ static am_status_t set_method(void **args, am_web_req_method_t method) {
                 r->method = REQUEST_METHOD_MERGE;
                 sts = AM_SUCCESS;
                 break;
+            case AM_WEB_REQUEST_HEAD:
+                r->method_number = M_GET;
+                r->method = REQUEST_METHOD_HEAD;
+                sts = AM_SUCCESS;
+                break;
             default:
                 sts = AM_INVALID_ARGUMENT;
                 am_web_log_error("%s: invalid method [%s] passed.",
@@ -1091,6 +1096,9 @@ static int get_apache_method_num(am_web_req_method_t am_num) {
         case AM_WEB_REQUEST_MERGE:
             apache_num = M_MERGE;
             break;
+        case AM_WEB_REQUEST_HEAD:
+            apache_num = M_GET;
+            break;
     }
     return apache_num;
 }
@@ -1098,11 +1106,13 @@ static int get_apache_method_num(am_web_req_method_t am_num) {
 static am_web_req_method_t get_method_num(request_rec *r) {
     const char *thisfunc = "get_method_num()";
     am_web_req_method_t method_num = AM_WEB_REQUEST_UNKNOWN;
-    // get request method from method number first cuz it's
-    // faster. if not a recognized method, get it from the method string.
     switch (r->method_number) {
         case M_GET:
-            method_num = AM_WEB_REQUEST_GET;
+            if (r->header_only > 0) {
+                method_num = AM_WEB_REQUEST_HEAD;
+            } else {
+                method_num = AM_WEB_REQUEST_GET;
+            }
             break;
         case M_POST:
             method_num = AM_WEB_REQUEST_POST;
