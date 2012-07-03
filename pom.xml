@@ -91,18 +91,13 @@
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
-        <javadoc.excludePackageNames>java.*:javax.*:com.*:org.*:net.*:
-                com.sun.web.ui.*:
-                com.sun.xml.*:
-                org.apache.*:
-                org.codehaus.*:
-                org.glassfish.*
-        </javadoc.excludePackageNames>
+        <javadoc.excludePackageNames>java.*:javax.*:com.*:org.*:net.*:edu.*</javadoc.excludePackageNames>
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Product Properties File Inclusion during Build -->
         <openam.properties>openam.properties</openam.properties>
-        <restlet.version>2.0.6</restlet.version>
+        <!-- Version Properties -->
+        <restlet.version>2.0.14</restlet.version>
     </properties>
 
     <!-- OpenAM Child Modules -->
@@ -242,11 +237,11 @@
             <url>http://maven.forgerock.org/repo/openam-dependencies</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -273,7 +268,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -282,11 +277,11 @@
             <url>http://maven.forgerock.org/repo/maven-central</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -296,12 +291,18 @@
             <url>http://maven.forgerock.org/repo/snapshots</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
+        </repository>
+
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
         </repository>
 
     </repositories>
@@ -331,11 +332,11 @@
             <url>http://maven.forgerock.org/repo/maven-central</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </pluginRepository>
 
@@ -963,7 +964,7 @@
                 <version>2009-14-01</version>
             </dependency>
 
-            <!-- Session Repository Module Dependencies-->
+            <!-- Session HA Module Dependencies-->
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
@@ -982,7 +983,7 @@
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet</artifactId>
-                <version>2.0.8-FIX</version>
+                <version>${restlet.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.restlet.jse</groupId>
@@ -997,9 +998,14 @@
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.crypto</artifactId>
-                <version>2.0.8-FIX</version>
+                <version>${restlet.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.httpclient</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
 
 
         </dependencies>
@@ -1031,7 +1037,8 @@
                     </execution>
                 </executions>
             </plugin>
-             -->
+            -->
+
 
             <plugin>
                 <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>

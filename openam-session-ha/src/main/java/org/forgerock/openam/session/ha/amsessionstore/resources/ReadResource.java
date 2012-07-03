@@ -25,7 +25,7 @@
 
 package org.forgerock.openam.session.ha.amsessionstore.resources;
 
-import org.forgerock.openam.amsessionstore.common.AMRecord;
+import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
 import org.restlet.resource.Get;
 
 /**

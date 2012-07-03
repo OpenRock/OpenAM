@@ -31,13 +31,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.common.AMRecord;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.DBStatistics;
-import org.forgerock.openam.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.amsessionstore.db.PersistentStore;
-import org.forgerock.openam.amsessionstore.db.StoreException;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.db.DBStatistics;
+import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStore;
+import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Demonstration implementation of the PersistentStore interface

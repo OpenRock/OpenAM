@@ -26,13 +26,13 @@
 package org.forgerock.openam.session.ha.amsessionstore.impl;
 
 import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.AMSessionStoreServer;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
+import org.forgerock.openam.session.ha.amsessionstore.AMSessionStoreServer;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.resources.ShutdownResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * This class implements the shutdown REST call sent by OpenAM when it is 

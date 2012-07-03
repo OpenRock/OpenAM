@@ -23,18 +23,25 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
-
-import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
-import org.restlet.resource.Put;
+package org.forgerock.openam.session.ha.amsessionstore.db.client;
 
 /**
  *
  * @author steve
  */
-public interface WriteResource {
-    public final static String URI = "/write";
+public class UnauthorizedException extends Exception {
 
-    @Put
-    public void write(AMRecord record) throws Exception;
+    /**
+     * Creates a new instance of <code>UnauthorizedException</code> without detail message.
+     */
+    public UnauthorizedException() {
+    }
+
+    /**
+     * Constructs an instance of <code>UnauthorizedException</code> with the specified detail message.
+     * @param msg the detail message.
+     */
+    public UnauthorizedException(String msg) {
+        super(msg);
+    }
 }

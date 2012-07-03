@@ -25,14 +25,14 @@
 
 package org.forgerock.openam.session.ha.amsessionstore;
 
-import org.forgerock.openam.amsessionstore.common.Constants;
-import org.forgerock.openam.amsessionstore.common.SystemProperties;
-import org.forgerock.openam.amsessionstore.resources.ShutdownResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
+import org.forgerock.openam.session.ha.amsessionstore.common.SystemProperties;
+import org.forgerock.openam.session.ha.amsessionstore.resources.ShutdownResource;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Calls the shutdown method on the server

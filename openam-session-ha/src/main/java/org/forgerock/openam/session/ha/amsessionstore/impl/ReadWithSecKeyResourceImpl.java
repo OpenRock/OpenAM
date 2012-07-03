@@ -28,16 +28,16 @@ package org.forgerock.openam.session.ha.amsessionstore.impl;
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.Set;
 import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.amsessionstore.db.StoreException;
-import org.forgerock.openam.amsessionstore.resources.ReadWithSecKeyResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import org.forgerock.openam.session.ha.amsessionstore.resources.ReadWithSecKeyResource;
 import org.restlet.data.Status;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the read with sec key resource functionality

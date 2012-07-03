@@ -29,14 +29,14 @@ import org.restlet.resource.Get;
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.Map;
 import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.amsessionstore.resources.GetRecordCountResource;
-import org.forgerock.openam.amsessionstore.shared.Statistics;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.resources.GetRecordCountResource;
+import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the get record count functionality

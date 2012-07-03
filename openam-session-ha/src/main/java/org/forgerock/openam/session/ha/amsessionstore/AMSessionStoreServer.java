@@ -32,17 +32,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.common.Constants;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.common.SystemProperties;
-import org.forgerock.openam.amsessionstore.db.DBStatistics;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.common.SystemProperties;
+import org.forgerock.openam.session.ha.amsessionstore.db.DBStatistics;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import org.restlet.Component;
 import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.restlet.security.MapVerifier;
 import org.restlet.ext.crypto.DigestAuthenticator;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * This is the main class of the amsessiondb server. Starts the RESTlet server

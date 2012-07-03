@@ -24,8 +24,8 @@
  */
 package org.forgerock.openam.session.ha.amsessionstore.impl;
 
-import org.forgerock.openam.amsessionstore.resources.ConfigResource;
-import org.forgerock.openam.amsessionstore.common.Config;
+import org.forgerock.openam.session.ha.amsessionstore.resources.ConfigResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.Config;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 

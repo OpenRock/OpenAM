@@ -36,7 +36,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM Session High-Availability</name>
-    <description>OpenAM Session High-Availability FailOver Component
+    <description>OpenAM Session High-Availability Component
     </description>
     <artifactId>openam-session-ha</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
@@ -87,10 +87,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Session High-Availability FailOver Component</Specification-Title>
+                            <Specification-Title>OpenAM Session High-Availability Component</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Session High-Availability FailOver Component</Implementation-Title>
+                            <Implementation-Title>OpenAM Session High-Availability Component</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -183,6 +183,11 @@
         <dependency>
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet.ext.crypto</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.httpclient</artifactId>
         </dependency>
 
         <!-- Transport Layer Dependencies -->

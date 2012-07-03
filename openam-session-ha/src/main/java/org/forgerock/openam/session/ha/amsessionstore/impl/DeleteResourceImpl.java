@@ -27,17 +27,17 @@ package org.forgerock.openam.session.ha.amsessionstore.impl;
 
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.amsessionstore.db.StoreException;
-import org.forgerock.openam.amsessionstore.resources.DeleteResource;
-import org.forgerock.openam.amsessionstore.shared.Statistics;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import org.forgerock.openam.session.ha.amsessionstore.resources.DeleteResource;
+import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the delete resource functionality

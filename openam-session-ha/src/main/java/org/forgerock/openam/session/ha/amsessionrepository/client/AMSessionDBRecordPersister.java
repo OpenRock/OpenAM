@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import org.forgerock.openam.amsessionstore.common.AMRecord;
+import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
