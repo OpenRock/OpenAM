@@ -52,10 +52,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.forgerock.openam.amsessionstore.common.Constants;
-import org.forgerock.openam.amsessionstore.common.Log;
-import org.forgerock.openam.amsessionstore.db.StoreException;
-import org.forgerock.openam.amsessionstore.db.opendj.setup.SetupProgress;
+import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import org.forgerock.openam.session.ha.amsessionstore.db.opendj.setup.SetupProgress;
 import org.opends.messages.Message;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
@@ -76,7 +76,7 @@ import org.opends.server.types.RawAttribute;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
-import static org.forgerock.openam.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
 
 /**
  *

@@ -37,7 +37,7 @@ import org.forgerock.openam.session.ha.amsessionstore.db.DBStatistics;
 import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.amsessionstore.i18n.*;
 
 /**
  * Demonstration implementation of the PersistentStore interface

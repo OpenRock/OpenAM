@@ -28,7 +28,7 @@ package org.forgerock.openam.session.ha.amsessionstore.db.opendj.setup;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import org.forgerock.openam.amsessionstore.db.opendj.OpenDJConfig;
+import org.forgerock.openam.session.ha.amsessionstore.db.opendj.OpenDJConfig;
 
 /**
  *
