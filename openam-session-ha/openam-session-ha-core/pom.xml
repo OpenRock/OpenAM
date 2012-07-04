@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Session High-Availability</name>
+    <name>OpenAM Session High-Availability Core</name>
     <description>OpenAM Session High-Availability Component
     </description>
     <artifactId>openam-session-ha-core</artifactId>
