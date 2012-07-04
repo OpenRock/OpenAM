@@ -26,16 +26,13 @@
 #
 #
 
-# Portions Copyrighted 2011 ForgeRock AS
+# Portions Copyrighted 2011-2012 ForgeRock Inc
 
 USERX_ROOT = ../../..
 
 include $(USERX_ROOT)/arch/components.mk
 
 LIB_NAME := libamdomino
-ifeq ($(OS_ARCH), WINNT)
-LIB_NAME := amdomino
-endif
 
 
 EXPORTED_LIBS := $(LIB_NAME)$(SO_EXT)
@@ -46,7 +43,7 @@ DEPENDS := $(OBJS:.o=.d)
 
 ifeq ($(OS_ARCH), SunOS)
 
-CFLAGS += -xcg92 -xCC -Xt -xchip=ultra -KPIC $(PIC_FLAG) -DUNIX -D_REENTRANT -DUSE_THREADSAFE_INTERFACES
+CFLAGS += -mt -KPIC $(PIC_FLAG) -DUNIX -DSOLARIS -D_REENTRANT -DUSE_THREADSAFE_INTERFACES
 INCLUDE_FLAGS := -I$(DEST_INC_DIR)  -I$(DOMINO_INC_DIR)
 LDFLAGS += $(LD_COMMON_ORIGIN_FLAG) $(LD_ORIGIN_FLAG) -L$(DEST_LIB_DIR)
 SYSTEM_LIBS := -lpthread -ldl -lc -lm
@@ -54,7 +51,7 @@ LDFLAGS += -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR)
 $(STD_LIB)_LDLIBS := $(NSS_LIBS) $(NSPR_LIBS)
 LDLIBS += $(CXX_STD_LIBS) $(LD_SHARED_FLAG) -lc -lm
 LDLIBS += $(LDFLAGS) $(LIBXML_LIBS) $($(STD_LIB)_LDLIBS) $(SYSTEM_LIBS)
-LDLIBS += -Bstatic -lamsdk
+LDLIBS += -lamsdk $(DOMINO_LIB_DIR)/notes0.o $(DOMINO_LIB_DIR)/notesai0.o
 
 all: depends export_libs
 
@@ -64,8 +61,6 @@ $(EXPORTED_LIBS): $(OBJS) $(LIB_MAPFILE)
 endif
 
 ifeq ($(OS_ARCH), Linux)
-# Override optimization flag for IBM Lotus Domino -- on RH AS 2.1 -O2 results in a SEGV
-# at run time.
 ifeq ($(BUILD_DEBUG), optimize)
 DEBUG_FLAGS := -O3 -NDEBUG
 endif
@@ -76,7 +71,7 @@ SYSTEM_LIBS := -lpthread -ldl -lc -lm
 LDFLAGS += -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR)
 $(STD_LIB)_LDLIBS := $(NSS_LIBS) $(NSPR_LIBS)
 LDLIBS += $(LDFLAGS) $(LIBXML_LIBS) $($(STD_LIB)_LDLIBS) $(SYSTEM_LIBS)
-LDLIBS += -L../../am
+LDLIBS += -L../../am $(DOMINO_LIB_DIR)/notes0.o $(DOMINO_LIB_DIR)/notesai0.o
 LDLIBS += -Wl,-Bstatic -lamsdk -Wl,-Bdynamic
 
 
@@ -87,23 +82,6 @@ $(EXPORTED_LIBS): $(OBJS) $(LIB_MAPFILE)
 
 
 endif
-
-
-ifeq ($(OS_ARCH), WINNT)
-
-CFLAGS += -Zp -I$(DOMINO_INC_DIR) -I$(DEST_INC_DIR) -DW32 -DWIN32 -DXP_WIN32 -D_WINDOWS -D_REENTRANT -DUSE_THREADSAFE_INTERFACES -DAM_STATIC_LIB
-LDFLAGS += ../../../am/source/am_web.res -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) -L$(DOMINO_LIB_DIR)/mswin32
-LDFLAGS += $(LD_COMMON_ORIGIN_FLAG) $(LD_ORIGIN_FLAG) -L$(DEST_LIB_DIR)
-LDLIBS += -lamsdk_static -lnotes -ladvapi32 -lws2_32 -lnss3 -lssl3 -llibnspr4 -llibplc4 -llibxml2 -luser32
-
-all: depends export_libs
-
-$(EXPORTED_LIBS): $(OBJS)  $(LIB_MAPFILE)
-	$(MAKE_SHARED_LIB)
-	$(INCLUDE_MANIFEST)
-	$(INCLUDE_MANIFEST_LOCAL)
-
-endif 
 
 
 ### AIX
@@ -117,7 +95,7 @@ SYSTEM_LIBS := -lpthread -ldl -lc -lm -liconv
 LDFLAGS += -brtl -blibpath:/usr/lib:/lib:/usr/lib/mps -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) -L${DOMINO_LIB_DIR}
 LDLIBS +=  -L${DEST_LIB_DIR} -lamsdk
 LDLIBS += $(NSS_LIBS) $(NSPR_LIBS)
-LDLIBS += $(LIBXML_LIBS) -lnotes_r
+LDLIBS += $(LIBXML_LIBS) $(DOMINO_LIB_DIR)/notes0.o $(DOMINO_LIB_DIR)/notesai0.o
 LINKOPTS := -bE:libamdomino.exp -bnoentry -bquiet
 
 MAKE_SHARED_LIB := $(CC) -o libamdomino.a domino_agent.o $(LINKOPTS) ${LDFLAGS} $(LDLIBS) ${SYSTEM_LIBS}
@@ -131,11 +109,5 @@ endif
 
 clean: clean_objs clean_libs
 	$(RM) $(EXPORTED_LIBS) 
-ifeq ($(OS_ARCH),WINNT)
-	$(RM) $(EXPORTED_LIBS:.dll=.exp) $(EXPORTED_LIBS:.dll=.lib)
-	$(RM) *.pdb
-	$(RM) *.ilk
-	$(RM) *.manifest
-endif
 
 include $(USERX_ROOT)/arch/rules.mk

@@ -25,7 +25,11 @@
  * $Id: domino_agent.c,v 1.4 2010/03/10 05:08:11 dknab Exp $
  *
  *
- */ 
+ */
+
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -119,12 +123,12 @@ char SECURE_ONLY[] = ";secure";
 #if defined(_WINDOWS)
 __declspec(dllexport) unsigned int FilterInit(FilterInitData *);
 __declspec(dllexport) unsigned int HttpFilterProc(FilterContext *,
-						  unsigned int, void *);
+        unsigned int, void *);
 __declspec(dllexport) unsigned int TerminateFilter(unsigned int);
 #endif
 
 static am_status_t
-check_domino_access(void  **args, const char *userName, char **fullName);
+check_domino_access(void **args, const char *userName, char **fullName);
 
 typedef struct private_context {
     char *user;
@@ -138,165 +142,166 @@ void init_at_request();
 
 // maps domino request method number to string and
 // to am_web's request method number.
+
 static char *
 map_method(unsigned int methodNum, am_web_req_method_t *am_web_method_num) {
     char *method = "UNKNOWN";
     am_web_req_method_t am_num = AM_WEB_REQUEST_UNKNOWN;
 
     switch (methodNum) {
-    case kRequestNone:
-	method = "NONE";
-	am_num = AM_WEB_REQUEST_UNKNOWN;
-	break;
-    case kRequestHEAD:
-	method = "HEAD";
-	am_num = AM_WEB_REQUEST_HEAD;
-	break;
-    case kRequestGET:
-	method = "GET";
-	am_num = AM_WEB_REQUEST_GET;
-	break;
-    case kRequestPOST:
-	method = "POST";
-	am_num = AM_WEB_REQUEST_POST;
-	break;
-    case kRequestPUT:
-	method = "PUT";
-	am_num = AM_WEB_REQUEST_PUT;
-	break;
-    case kRequestDELETE:
-	method = "DELETE";
-	am_num = AM_WEB_REQUEST_DELETE;
-	break;
-    case kRequestTRACE:
-	method = "TRACE";
-	am_num = AM_WEB_REQUEST_TRACE;
-	break;
-    case kRequestCONNECT:
-	method = "CONNECT";
-	am_num = AM_WEB_REQUEST_UNKNOWN;
-	break;
-    case kRequestOPTIONS:
-	method = "OPTIONS";
-	am_num = AM_WEB_REQUEST_OPTIONS;
-	break;
-    case kRequestUNKNOWN:
-	method = "UNKNOWN";
-	am_num = AM_WEB_REQUEST_UNKNOWN;
-	break;
-    case kRequestBAD:
-	method = "BAD";
-	am_num = AM_WEB_REQUEST_UNKNOWN;
-	break;
-    default:
-	method = "UNKNOWN";
-	am_num = AM_WEB_REQUEST_UNKNOWN;
-	break;
+        case kRequestNone:
+            method = "NONE";
+            am_num = AM_WEB_REQUEST_UNKNOWN;
+            break;
+        case kRequestHEAD:
+            method = "HEAD";
+            am_num = AM_WEB_REQUEST_HEAD;
+            break;
+        case kRequestGET:
+            method = "GET";
+            am_num = AM_WEB_REQUEST_GET;
+            break;
+        case kRequestPOST:
+            method = "POST";
+            am_num = AM_WEB_REQUEST_POST;
+            break;
+        case kRequestPUT:
+            method = "PUT";
+            am_num = AM_WEB_REQUEST_PUT;
+            break;
+        case kRequestDELETE:
+            method = "DELETE";
+            am_num = AM_WEB_REQUEST_DELETE;
+            break;
+        case kRequestTRACE:
+            method = "TRACE";
+            am_num = AM_WEB_REQUEST_TRACE;
+            break;
+        case kRequestCONNECT:
+            method = "CONNECT";
+            am_num = AM_WEB_REQUEST_UNKNOWN;
+            break;
+        case kRequestOPTIONS:
+            method = "OPTIONS";
+            am_num = AM_WEB_REQUEST_OPTIONS;
+            break;
+        case kRequestUNKNOWN:
+            method = "UNKNOWN";
+            am_num = AM_WEB_REQUEST_UNKNOWN;
+            break;
+        case kRequestBAD:
+            method = "BAD";
+            am_num = AM_WEB_REQUEST_UNKNOWN;
+            break;
+        default:
+            method = "UNKNOWN";
+            am_num = AM_WEB_REQUEST_UNKNOWN;
+            break;
     }
     if (am_web_method_num)
-	*am_web_method_num = am_num;
+        *am_web_method_num = am_num;
     return method;
 }
 
 // map domino's request method number to string
+
 static char *
-method_num_to_str(unsigned int methodNum)
-{
+method_num_to_str(unsigned int methodNum) {
     return map_method(methodNum, NULL);
 }
 
 // map domino request method number to am_web's request number
+
 static am_web_req_method_t
-method_to_am_web_num(unsigned int methodNum)
-{
+method_to_am_web_num(unsigned int methodNum) {
     am_web_req_method_t method;
-    (void)map_method(methodNum, &method);
+    (void) map_method(methodNum, &method);
     return method;
 }
 
 // map method string to domino method number.
 // not currently used.
+
 static unsigned int
-method_str_to_num(const char *methodStr)
-{
+method_str_to_num(const char *methodStr) {
     unsigned int retVal = kRequestNone;
-    if(strcasecmp(methodStr, "HEAD") == 0)
-	retVal = kRequestHEAD;
-    else if(strcasecmp(methodStr, "GET") == 0)
-	retVal = kRequestGET;
-    else if(strcasecmp(methodStr, "POST") == 0)
-	retVal = kRequestPOST;
-    else if(strcasecmp(methodStr, "PUT") == 0)
-	retVal = kRequestPUT;
-    else if(strcasecmp(methodStr, "DELETE") == 0)
-	retVal = kRequestDELETE;
-    else if(strcasecmp(methodStr, "TRACE") == 0)
-	retVal = kRequestTRACE;
-    else if(strcasecmp(methodStr, "CONNECT") == 0)
-	retVal = kRequestCONNECT;
-    else if(strcasecmp(methodStr, "OPTIONS") == 0)
-	retVal = kRequestOPTIONS;
-    else if(strcasecmp(methodStr, "UNKNOWN") == 0)
-	retVal = kRequestUNKNOWN;
-    else if(strcasecmp(methodStr, "BAD") == 0)
-	retVal = kRequestBAD;
+    if (strcasecmp(methodStr, "HEAD") == 0)
+        retVal = kRequestHEAD;
+    else if (strcasecmp(methodStr, "GET") == 0)
+        retVal = kRequestGET;
+    else if (strcasecmp(methodStr, "POST") == 0)
+        retVal = kRequestPOST;
+    else if (strcasecmp(methodStr, "PUT") == 0)
+        retVal = kRequestPUT;
+    else if (strcasecmp(methodStr, "DELETE") == 0)
+        retVal = kRequestDELETE;
+    else if (strcasecmp(methodStr, "TRACE") == 0)
+        retVal = kRequestTRACE;
+    else if (strcasecmp(methodStr, "CONNECT") == 0)
+        retVal = kRequestCONNECT;
+    else if (strcasecmp(methodStr, "OPTIONS") == 0)
+        retVal = kRequestOPTIONS;
+    else if (strcasecmp(methodStr, "UNKNOWN") == 0)
+        retVal = kRequestUNKNOWN;
+    else if (strcasecmp(methodStr, "BAD") == 0)
+        retVal = kRequestBAD;
     return retVal;
 }
 
 // map domino error to am_status_t
+
 static am_status_t
-map_domino_error(unsigned int dominoErrID)
-{
+map_domino_error(unsigned int dominoErrID) {
     am_status_t status = AM_FAILURE;
-    switch(dominoErrID) {
-    case DSAPI_BUFFER_TOO_SMALL:
-	status = AM_BUFFER_TOO_SMALL;
-	break;
-    case DSAPI_INVALID_ARGUMENT:
-	status = AM_INVALID_ARGUMENT;
-	break;
-    case DSAPI_MEMORY_ERROR:
-	status = AM_NO_MEMORY;
-	break;
-    case DSAPI_INTERNAL_ERROR:
-	break;
-    case DSAPI_REQUEST_ALREADY_OWNED:
-	break;
-    case DSAPI_ERROR_MESSAGES:
-	break;
-    default:
-	break;
+    switch (dominoErrID) {
+        case DSAPI_BUFFER_TOO_SMALL:
+            status = AM_BUFFER_TOO_SMALL;
+            break;
+        case DSAPI_INVALID_ARGUMENT:
+            status = AM_INVALID_ARGUMENT;
+            break;
+        case DSAPI_MEMORY_ERROR:
+            status = AM_NO_MEMORY;
+            break;
+        case DSAPI_INTERNAL_ERROR:
+            break;
+        case DSAPI_REQUEST_ALREADY_OWNED:
+            break;
+        case DSAPI_ERROR_MESSAGES:
+            break;
+        default:
+            break;
     }
     return status;
 }
 
 // map domino error ID to the name as a string.
+
 static const char *
-domino_error_to_str(unsigned int dominoErrID)
-{
+domino_error_to_str(unsigned int dominoErrID) {
     char *errName = "UNKNOWN";
-    switch(dominoErrID) {
-    case DSAPI_BUFFER_TOO_SMALL:
-	errName = "DSAPI_BUFFER_TOO_SMALL";
-	break;
-    case DSAPI_INVALID_ARGUMENT:
-	errName = "DSAPI_INVALID_ARGUMENT";
-	break;
-    case DSAPI_MEMORY_ERROR:
-	errName = "DSAPI_MEMORY_ERROR";
-	break;
-    case DSAPI_INTERNAL_ERROR:
-	errName = "DSAPI_INTERNAL_ERROR";
-	break;
-    case DSAPI_REQUEST_ALREADY_OWNED:
-	errName = "DSAPI_REQUEST_ALREADY_OWNED";
-	break;
-    case DSAPI_ERROR_MESSAGES:
-	errName = "DSAPI_ERROR_MESSAGES";
-	break;
-    default:
-	errName = "UNKNOWN";
-	break;
+    switch (dominoErrID) {
+        case DSAPI_BUFFER_TOO_SMALL:
+            errName = "DSAPI_BUFFER_TOO_SMALL";
+            break;
+        case DSAPI_INVALID_ARGUMENT:
+            errName = "DSAPI_INVALID_ARGUMENT";
+            break;
+        case DSAPI_MEMORY_ERROR:
+            errName = "DSAPI_MEMORY_ERROR";
+            break;
+        case DSAPI_INTERNAL_ERROR:
+            errName = "DSAPI_INTERNAL_ERROR";
+            break;
+        case DSAPI_REQUEST_ALREADY_OWNED:
+            errName = "DSAPI_REQUEST_ALREADY_OWNED";
+            break;
+        case DSAPI_ERROR_MESSAGES:
+            errName = "DSAPI_ERROR_MESSAGES";
+            break;
+        default:
+            errName = "UNKNOWN";
+            break;
     }
     return errName;
 }
@@ -309,65 +314,66 @@ static const char *filterReturnCodeStr[] = {
     "kFilterError",
     "Unknown Code"
 };
+
 static const char *
 domino_return_code_to_str(unsigned int code) {
     const char *retVal = filterReturnCodeStr[4];
-    if(code < 4) {
-	retVal = filterReturnCodeStr[code];
+    if (code < 4) {
+        retVal = filterReturnCodeStr[code];
     }
     return retVal;
 }
 
 // map domino event type to the name as a string.
-char *getEventTypeStr(int eventType)
-{
+
+char *getEventTypeStr(int eventType) {
     char *retStr = "unknown event type";
-    switch(eventType) {
-    case kFilterRawRequest:
-	retStr =  "kFilterRawRequest";
-	break;
-    case kFilterAuthenticate:
-        retStr = "kFilterAuthenticate";
-	break;
-    case kFilterAuthorized:
-        retStr = "kFilterAuthorized";
-	break;
-    case kFilterResponse:
-        retStr = "kFilterResponse";
-	break;
-    // ones below are currently not used.
-    case kFilterParsedRequest:
-	retStr = "kFilterParsedRequest";
-	break;
-    case kFilterAuthUser:
-	retStr = "kFilterAuthUser";
-	break;
-    case kFilterUserNameList:
-	retStr = "kFilterUserNameList";
-	break;
-    case kFilterMapURL:
-	retStr = "kFilterMapURL";
-	break;
-    case kFilterRawWrite:
-	retStr = "kFilterRawWrite";
-	break;
-    case kFilterEndRequest:
-	retStr = "kFilterEndRequest";
-	break;
-    case kFilterStartRequest:
-	retStr = "kFilterStartRequest";
-	break;
-    case kFilterPostTranslate:
-	retStr = "kFilterPostTranslate";
-	break;
-    case kFilterProcessRequest:
-	retStr = "kFilterProcessRequest";
-	break;
-    case kFilterRewriteURL:
-	retStr = "kFilterRewriteURL";
-	break;
-    default:
-	break;
+    switch (eventType) {
+        case kFilterRawRequest:
+            retStr = "kFilterRawRequest";
+            break;
+        case kFilterAuthenticate:
+            retStr = "kFilterAuthenticate";
+            break;
+        case kFilterAuthorized:
+            retStr = "kFilterAuthorized";
+            break;
+        case kFilterResponse:
+            retStr = "kFilterResponse";
+            break;
+            // ones below are currently not used.
+        case kFilterParsedRequest:
+            retStr = "kFilterParsedRequest";
+            break;
+        case kFilterAuthUser:
+            retStr = "kFilterAuthUser";
+            break;
+        case kFilterUserNameList:
+            retStr = "kFilterUserNameList";
+            break;
+        case kFilterMapURL:
+            retStr = "kFilterMapURL";
+            break;
+        case kFilterRawWrite:
+            retStr = "kFilterRawWrite";
+            break;
+        case kFilterEndRequest:
+            retStr = "kFilterEndRequest";
+            break;
+        case kFilterStartRequest:
+            retStr = "kFilterStartRequest";
+            break;
+        case kFilterPostTranslate:
+            retStr = "kFilterPostTranslate";
+            break;
+        case kFilterProcessRequest:
+            retStr = "kFilterProcessRequest";
+            break;
+        case kFilterRewriteURL:
+            retStr = "kFilterRewriteURL";
+            break;
+        default:
+            break;
     }
     return retStr;
 }
@@ -387,8 +393,7 @@ char *getEventTypeStr(int eventType)
  *              The mapped error code, which makes sense to our APIs.
  */
 static am_status_t
-log_domino_error(const char *func, const char *dsapi_call, unsigned int errID)
-{
+log_domino_error(const char *func, const char *dsapi_call, unsigned int errID) {
     const char fmt[] = {"%s: Error while calling %s. Reason: %s[%d]."};
     const char *errName = domino_error_to_str(errID);
     am_web_log_error(fmt, func, dsapi_call, errName, errID);
@@ -397,8 +402,7 @@ log_domino_error(const char *func, const char *dsapi_call, unsigned int errID)
 
 static am_status_t
 allocateVariableInDominoContext(FilterContext *context, char *buf,
-                           size_t len, char **var)
-{
+        size_t len, char **var) {
     const char *thisfunc = "allocateVariableInDominoContext()";
     am_status_t sts = AM_SUCCESS;
     unsigned int errID = 0;
@@ -407,14 +411,14 @@ allocateVariableInDominoContext(FilterContext *context, char *buf,
         sts = AM_INVALID_ARGUMENT;
     }
     if (sts == AM_SUCCESS) {
-        *var = (char *)context->AllocMem(context, len+1, 0, &errID);
-        if(*var == NULL) {
+        *var = (char *) context->AllocMem(context, len + 1, 0, &errID);
+        if (*var == NULL) {
             am_web_log_error("%s: memory alloc of %d bytes failed: %s.",
-                          thisfunc, len, domino_error_to_str(errID));
+                    thisfunc, len, domino_error_to_str(errID));
             sts = map_domino_error(errID);
         } else {
             strcpy(*var, buf);
-        } 
+        }
     }
     return sts;
 }
@@ -432,30 +436,29 @@ allocateVariableInDominoContext(FilterContext *context, char *buf,
  */
 static am_status_t
 getServerVariable(FilterContext *context, const char *originalVarName,
-                  char **varValue, boolean_t isRequired,
-                  boolean_t addHTTPPrefix)
-{
+        char **varValue, boolean_t isRequired,
+        boolean_t addHTTPPrefix) {
     const char *thisfunc = "getServerVariable()";
     am_status_t sts = AM_SUCCESS;
     char* varName = NULL;
     char* buf = NULL;
     size_t buffer_size;
 
-    if(context == NULL || originalVarName == NULL || varValue == NULL) {
+    if (context == NULL || originalVarName == NULL || varValue == NULL) {
         am_web_log_debug("%s: Invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     }
     // Add HTTP in front of the header name if requested
     if (addHTTPPrefix == TRUE) {
-        varName = malloc(strlen("HTTP_") + 
-                             strlen(originalVarName) + 1);
+        varName = malloc(strlen("HTTP_") +
+                strlen(originalVarName) + 1);
         if (varName != NULL) {
-            strcpy(varName,"HTTP_");
-            strcat(varName,originalVarName);
-            strcat(varName,"\0");
+            strcpy(varName, "HTTP_");
+            strcat(varName, originalVarName);
+            strcat(varName, "\0");
         } else {
             am_web_log_error("%s: Not enough memory to allocate varName",
-                             thisfunc);
+                    thisfunc);
             sts = AM_NO_MEMORY;
         }
     } else {
@@ -470,35 +473,35 @@ getServerVariable(FilterContext *context, const char *originalVarName,
 
         while (1) {
             buf = realloc(buf, buffer_size);
-            if(buf == NULL){
+            if (buf == NULL) {
                 am_web_log_error("%s: Could not allocate %i bytes of memory "
-                                "for buffer_size",thisfunc, buffer_size);
+                        "for buffer_size", thisfunc, buffer_size);
                 sts = AM_NO_MEMORY;
                 break;
             } else {
                 memset(buf, 0, buffer_size);
                 // leave last byte for null terminating char.
-                if(!context->GetServerVariable(context, (char *)varName,
-                            (void *)buf, buffer_size-1, &errID)) {
+                if (!context->GetServerVariable(context, (char *) varName,
+                        (void *) buf, buffer_size - 1, &errID)) {
                     if (errID == DSAPI_INVALID_ARGUMENT) {
                         if (isRequired == B_TRUE) {
                             am_web_log_error("%s: Could not get a value for "
-                                             "header %s.", 
-                                              thisfunc, *varName);
+                                    "header %s.",
+                                    thisfunc, *varName);
                             sts = AM_FAILURE;
                         }
                     } else {
                         sts = log_domino_error(thisfunc,
-                         "context->GetServerVariable()", errID);
+                                "context->GetServerVariable()", errID);
                         sts = AM_FAILURE;
                     }
                     break;
                 } else {
-                    if (strlen(buf) > buffer_size-3) {
+                    if (strlen(buf) > buffer_size - 3) {
                         buffer_size = buffer_size + MAX_BUF_LEN;
-                        am_web_log_warning("%s: Current buffer size for %s " 
-                                    "is insufficient. Increasing to %i.",
-                                    thisfunc, varName, buffer_size);
+                        am_web_log_warning("%s: Current buffer size for %s "
+                                "is insufficient. Increasing to %i.",
+                                thisfunc, varName, buffer_size);
                     } else {
                         //am_web_log_info("%s: Max buffer size is %i, "
                         // "no buffer size increase required for %s (length=%i).",
@@ -514,19 +517,19 @@ getServerVariable(FilterContext *context, const char *originalVarName,
                 *varValue = NULL;
             } else {
                 size_t len = 0;
-                if(strchr(buf, ' ') != NULL) {
+                if (strchr(buf, ' ') != NULL) {
                     len = strlen(buf) + EXT_BUF_LEN;
                 } else {
                     len = strlen(buf) + 1;
                 }
                 sts = allocateVariableInDominoContext(context, buf,
-                                                      len, &(*varValue));
+                        len, &(*varValue));
             }
         }
         if (sts == AM_SUCCESS) {
             if (*varValue != NULL) {
                 am_web_log_debug("%s: %s = %s", thisfunc,
-                                  varName, *varValue);
+                        varName, *varValue);
             } else {
                 am_web_log_debug("%s: %s =", thisfunc, varName);
             }
@@ -536,7 +539,7 @@ getServerVariable(FilterContext *context, const char *originalVarName,
             buf = NULL;
         }
     }
-    if((addHTTPPrefix == TRUE) && (varName != NULL)) {
+    if ((addHTTPPrefix == TRUE) && (varName != NULL)) {
         free(varName);
         varName = NULL;
     }
@@ -558,8 +561,7 @@ getServerVariable(FilterContext *context, const char *originalVarName,
  * request_url - container for the constructed full request url
  */
 static am_status_t
-construct_request_url(FilterContext *context, char *rel_url, char **request_url)
-{
+construct_request_url(FilterContext *context, char *rel_url, char **request_url) {
     const char *thisfunc = "construct_request_url()";
     am_status_t sts = AM_SUCCESS;
     char https_hdr[MAX_VAR_LEN];
@@ -577,58 +579,58 @@ construct_request_url(FilterContext *context, char *rel_url, char **request_url)
 
     // Get HTTPS header, does not have to exist - protocol defaults to http
     if (!context->GetServerVariable(context, HTTPS_HEADER,
-                (void *)https_hdr, MAX_VAR_LEN-1, &errID) &&
-                errID != DSAPI_INVALID_ARGUMENT) {
+            (void *) https_hdr, MAX_VAR_LEN - 1, &errID) &&
+            errID != DSAPI_INVALID_ARGUMENT) {
         // error encountered other than variable not exist
         am_web_log_error("%s: Error when getting HTTPS header: %s.",
-                         thisfunc, domino_error_to_str(errID));
+                thisfunc, domino_error_to_str(errID));
         sts = map_domino_error(errID);
 
-    // Get the host from HOST header
+        // Get the host from HOST header
     } else if (!context->GetServerVariable(context, HOST,
-                    (void *)host, MAX_VAR_LEN-1, &errID) &&
-                    errID != DSAPI_INVALID_ARGUMENT) {
+            (void *) host, MAX_VAR_LEN - 1, &errID) &&
+            errID != DSAPI_INVALID_ARGUMENT) {
         // error encountered other than variable not exist
         am_web_log_error("%s: Error when getting HOST header: %s.",
-                         thisfunc, domino_error_to_str(errID));
+                thisfunc, domino_error_to_str(errID));
         sts = map_domino_error(errID);
 
-    // if HOST header is not there, get host from SERVER_NAME header.
-    // this must exist if we couldn't get host from the HOST header.
+        // if HOST header is not there, get host from SERVER_NAME header.
+        // this must exist if we couldn't get host from the HOST header.
     } else if (host[0] == '\0' &&
-               !context->GetServerVariable(context, SERVER_NAME,
-               (void *)host, MAX_VAR_LEN-1, &errID)) {
+            !context->GetServerVariable(context, SERVER_NAME,
+            (void *) host, MAX_VAR_LEN - 1, &errID)) {
         am_web_log_error("%s: Error when getting SERVER_NAME header: %s.",
-                            thisfunc, domino_error_to_str(errID));
+                thisfunc, domino_error_to_str(errID));
         if (errID == DSAPI_INVALID_ARGUMENT) {
             sts = AM_NOT_FOUND;
         } else {
             sts = map_domino_error(errID);
         }
 
-    // if SERVER_NAME header also missing, then return error.
+        // if SERVER_NAME header also missing, then return error.
     } else if (host[0] == '\0') {
         am_web_log_error("%s: Could not get host from HOST or "
-                         "SERVER_NAME header", thisfunc);
+                "SERVER_NAME header", thisfunc);
         sts = AM_NOT_FOUND;
 
-    // Get the port, must exist.
+        // Get the port, must exist.
     } else if (!context->GetServerVariable(context, PORT,
-               (void *)port, MAX_VAR_LEN-1, &errID)) {
+            (void *) port, MAX_VAR_LEN - 1, &errID)) {
         am_web_log_error("%s: Error when getting PORT header: %s.",
-                         thisfunc, domino_error_to_str(errID));
+                thisfunc, domino_error_to_str(errID));
         if (errID == DSAPI_INVALID_ARGUMENT) {
             sts = AM_NOT_FOUND;
         } else {
             sts = map_domino_error(errID);
         }
 
-    // Check if port value is valid.
+        // Check if port value is valid.
     } else if (sscanf(port, "%u", &port_num) != 1) {
         am_web_log_error("%s: Invalid port header value %s.", thisfunc, port);
         sts = AM_NOT_FOUND;
 
-    // Got everything OK, now construct the URL.
+        // Got everything OK, now construct the URL.
     } else {
         // set protocol to https if HTTPS header was ON, else default to http.
         if (!strcmp(https_hdr, "ON")) {
@@ -638,13 +640,13 @@ construct_request_url(FilterContext *context, char *rel_url, char **request_url)
         }
         // now allocate memory for our constructed url.
         request_url_len = strlen(protocol) + strlen(host) + strlen(port) +
-                          (rel_url == NULL ? 0 : strlen(rel_url)) +
-                          2;  /* colon + terminating null char */
+                (rel_url == NULL ? 0 : strlen(rel_url)) +
+                2; /* colon + terminating null char */
         *request_url = context->AllocMem(context, request_url_len, 0, &errID);
         if (*request_url == NULL) {
             am_web_log_error("%s: context->AllocMem(%d) failed with %s.",
-                             thisfunc, request_url_len,
-                             domino_error_to_str(errID));
+                    thisfunc, request_url_len,
+                    domino_error_to_str(errID));
             sts = map_domino_error(errID);
         } else {
             // everything OK - fill in URL.
@@ -661,7 +663,7 @@ construct_request_url(FilterContext *context, char *rel_url, char **request_url)
                     host, port_num,
                     leading_slash, rel_url);
             am_web_log_debug("%s: successfully constructed URL %s.",
-                              thisfunc, *request_url);
+                    thisfunc, *request_url);
             sts = AM_SUCCESS;
         }
     }
@@ -679,8 +681,7 @@ construct_request_url(FilterContext *context, char *rel_url, char **request_url)
  */
 static am_status_t
 get_request_url(FilterContext *context,
-        char **request_url, am_web_req_method_t *request_method)
-{
+        char **request_url, am_web_req_method_t *request_method) {
     const char *thisfunc = "get_request_url()";
     FilterRequest fRequest;
     unsigned int errID = 0;
@@ -693,32 +694,32 @@ get_request_url(FilterContext *context,
         am_web_log_error("%s: invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
 
-    // Get request info from context.
+        // Get request info from context.
     } else if (!context->GetRequest(context, &fRequest, &errID)) {
         sts = log_domino_error(thisfunc, "context->GetRequest()", errID);
 
-    // Check request method
+        // Check request method
     } else if (fRequest.method != kRequestGET &&
             fRequest.method != kRequestPOST) {
         am_web_log_error("%s: Unsupported request method: %s",
                 thisfunc, method_num_to_str(fRequest.method));
         sts = AM_FEATURE_UNSUPPORTED;
 
-    // now get or form URL from request
+        // now get or form URL from request
     } else {
         url = fRequest.URL;
         // check if URL is a full URL (begins with http[s]://).
         is_full_url = url != NULL && url[0] != '\0' &&
-                    (!strncasecmp(url, HTTP_STR, HTTP_STR_LEN) ||
-                    !strncasecmp(url, HTTPS_STR, HTTPS_STR_LEN));
+                (!strncasecmp(url, HTTP_STR, HTTP_STR_LEN) ||
+                !strncasecmp(url, HTTPS_STR, HTTPS_STR_LEN));
         // if URL is a full URL, we're done.
         if (is_full_url) {
             *request_url = context->AllocMem(
-                           context, strlen(url)+1, 0, &errID);
+                    context, strlen(url) + 1, 0, &errID);
             if (*request_url == NULL) {
                 am_web_log_error("%s: could not allocate memory for "
-                                 "full url [%s]. Error %s.",
-                                 thisfunc, url, domino_error_to_str(errID));
+                        "full url [%s]. Error %s.",
+                        thisfunc, url, domino_error_to_str(errID));
                 sts = map_domino_error(errID);
             } else {
                 strcpy(*request_url, url);
@@ -734,11 +735,11 @@ get_request_url(FilterContext *context,
             *request_method = method_to_am_web_num(fRequest.method);
             am_web_log_debug("%s: Request url = %s", thisfunc, *request_url);
             am_web_log_debug("%s: Request method = %s", thisfunc,
-                              method_num_to_str(fRequest.method));
+                    method_num_to_str(fRequest.method));
 
-        } else {        
+        } else {
             am_web_log_error("%s: Could not get request URL. Error %s",
-                          thisfunc, am_status_to_string(sts));
+                    thisfunc, am_status_to_string(sts));
         }
     }
     return sts;
@@ -766,31 +767,27 @@ add_header_in_response(void **args, const char *key, const char *value) {
     private_context_t *priv_ctx = NULL;
 
     if (key == NULL || value == NULL || args == NULL ||
-	(context = (FilterContext *)args[0]) == NULL) {
-	am_web_log_error("%s: invalid argument passed", thisfunc);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else if ((priv_ctx = (private_context_t *)context->privateContext)==NULL) {
-	am_web_log_error("%s: missing private context", thisfunc);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    // create map for response headers if it did not exist before.
+            (context = (FilterContext *) args[0]) == NULL) {
+        am_web_log_error("%s: invalid argument passed", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else if ((priv_ctx = (private_context_t *) context->privateContext) == NULL) {
+        am_web_log_error("%s: missing private context", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    }// create map for response headers if it did not exist before.
     else if (priv_ctx->response_headers_to_set == NULL &&
-	    (sts = am_map_create(
-			&priv_ctx->response_headers_to_set)) != AM_SUCCESS) {
-	    am_web_log_error("%s: am_map_create failed with error: %s",
-			     thisfunc, am_status_to_string(sts));
-    }
-    // insert header into map.
+            (sts = am_map_create(
+            &priv_ctx->response_headers_to_set)) != AM_SUCCESS) {
+        am_web_log_error("%s: am_map_create failed with error: %s",
+                thisfunc, am_status_to_string(sts));
+    }// insert header into map.
     else if ((sts = am_map_insert(priv_ctx->response_headers_to_set,
-				  key, value, B_FALSE)) != AM_SUCCESS) {
-	am_web_log_error("%s: am_map_insert failed with error: %s",
-			     thisfunc, am_status_to_string(sts));
-    }
-    else {
-	sts = AM_SUCCESS;
-	am_web_log_max_debug("%s: added response header %s:%s",
-			     thisfunc, key, value);
+            key, value, B_FALSE)) != AM_SUCCESS) {
+        am_web_log_error("%s: am_map_insert failed with error: %s",
+                thisfunc, am_status_to_string(sts));
+    } else {
+        sts = AM_SUCCESS;
+        am_web_log_max_debug("%s: added response header %s:%s",
+                thisfunc, key, value);
     }
     return sts;
 }
@@ -798,23 +795,23 @@ add_header_in_response(void **args, const char *key, const char *value) {
 static am_status_t
 get_post_data(void **args, char **data) {
     const char *thisfunc = "get_post_data()";
-    FilterContext *context = (FilterContext *)args[0];
+    FilterContext *context = (FilterContext *) args[0];
     unsigned int errID = 0;
     char *cLen = NULL;
     size_t len = 0;
     am_status_t sts = AM_SUCCESS;
 
-    sts = getServerVariable(context, HTTP_CONTENT_LENGTH, &cLen, 
-                                     B_TRUE, B_FALSE);
+    sts = getServerVariable(context, HTTP_CONTENT_LENGTH, &cLen,
+            B_TRUE, B_FALSE);
     if (sts != AM_SUCCESS) {
         am_web_log_error("%s: Could not get content length.", sts);
     } else if (sscanf(cLen, "%u", &len) != 1) {
         am_web_log_error("%s: invalid content length string: %s",
-                         thisfunc, cLen);
+                thisfunc, cLen);
         sts = AM_INVALID_ARGUMENT;
     } else if (!context->GetRequestContents(context, data, &errID)) {
         am_web_log_error("%s: Error getting request contents: %s.",
-                         thisfunc, domino_error_to_str(errID));
+                thisfunc, domino_error_to_str(errID));
         sts = map_domino_error(errID);
     } else if (*data == NULL || (*data)[0] == '\0') {
         am_web_log_debug("%s: No contents recieved.", thisfunc);
@@ -824,14 +821,13 @@ get_post_data(void **args, char **data) {
         // Note: hopefully data long enough for the null terminating char ?
         (*data)[len] = '\0';
         am_web_log_max_debug("%s: Contents received:\n %s",
-                             thisfunc, *data);
+                thisfunc, *data);
     }
     return sts;
 }
 
 static am_status_t
-set_user(void **args, const char *user)
-{
+set_user(void **args, const char *user) {
     const char *thisfunc = "set_user()";
     am_status_t sts = AM_SUCCESS;
     FilterContext *context = NULL;
@@ -840,25 +836,24 @@ set_user(void **args, const char *user)
 
     am_web_log_max_debug("%s: set_user entered.", thisfunc);
     // Check arguments
-    if (args == NULL || (context = (FilterContext *)args[0]) == NULL) {
+    if (args == NULL || (context = (FilterContext *) args[0]) == NULL) {
         am_web_log_error("%s: Error - context is NULL.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else if ((priv_ctx =
-        (private_context_t *)context->privateContext) == NULL)
-    {
+            (private_context_t *) context->privateContext) == NULL) {
         am_web_log_error("%s: Could not set user %s - request_info missing "
-                         "from request context.", thisfunc, user);
+                "from request context.", thisfunc, user);
         sts = AM_INVALID_ARGUMENT;
     } else if (user == NULL || user[0] == '\0') {
         // if user is null, set it in filterAuthenticate and let domino
         // decide whether or not to allow it.
         priv_ctx->user = "";
         am_web_log_warning("%s: Remote user is null. Setting user to empty "
-                           "string in private context.", thisfunc);
+                "string in private context.", thisfunc);
         sts = AM_SUCCESS;
-    // Find user in domino's database and get the full name
+        // Find user in domino's database and get the full name
     } else if ((sts = check_domino_access(args, user,
-                       (char **)&fullname)) != AM_SUCCESS) {
+            (char **) &fullname)) != AM_SUCCESS) {
         // On RH AS 2.1 with gcc 3.3.x optimized mode, calling a function here
         // that is non-trivial (like atoi or puts or printf), causes a segv.
         // So the following log is omitted to get around this weird prob,
@@ -870,7 +865,7 @@ set_user(void **args, const char *user)
             sts = AM_NOT_FOUND;
         }
         am_web_log_error("%s: Check domino access failed with %s.",
-                         thisfunc, am_status_to_string(sts));
+                thisfunc, am_status_to_string(sts));
     } else {
         // all OK - set user in the private context to be set later
         // in filterAuthenticate.
@@ -882,8 +877,7 @@ set_user(void **args, const char *user)
 }
 
 static am_status_t
-set_method(void **args, am_web_req_method_t method)
-{
+set_method(void **args, am_web_req_method_t method) {
     const char *thisfunc = "set_method()";
     FilterContext *context = NULL;
     FilterRawRequest *rawRequest = NULL;
@@ -891,50 +885,46 @@ set_method(void **args, am_web_req_method_t method)
     unsigned int errID;
 
     if (args == NULL ||
-	(context = args[0]) == NULL || (rawRequest = args[1]) == NULL) {
-	am_web_log_error("%s: one of input argument is NULL.", thisfunc);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else if (method != AM_WEB_REQUEST_GET && method != AM_WEB_REQUEST_POST) {
-	am_web_log_error("%s: invalid request method %s.",
-			 thisfunc, method);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else {
-	am_web_log_debug("%s: request method before set %s.",
-			 thisfunc,
-			 rawRequest->requestMethod==kRequestGET?
-			    "GET":"POST");
-	if (method == AM_WEB_REQUEST_GET)
-	    rawRequest->requestMethod = kRequestGET;
-	else
-	    rawRequest->requestMethod = kRequestPOST;
-	am_web_log_debug("%s: request method after set %s.",
-			 thisfunc,
-			 rawRequest->requestMethod==kRequestGET?
-			    "GET":"POST");
-	if (!rawRequest->SetHeader(context, "REQUEST_METHOD",
-				    method==AM_WEB_REQUEST_GET ? "GET": "POST",
-				    &errID)) {
-	    am_web_log_error("%s: Could not set request method header. "
-			     "Error %s.",
-			     thisfunc, errID);
-	    sts = map_domino_error(errID);
-	}
-	else {
-	    am_web_log_debug("%s: method changed.", thisfunc);
-	}
-	sts = AM_SUCCESS;
+            (context = args[0]) == NULL || (rawRequest = args[1]) == NULL) {
+        am_web_log_error("%s: one of input argument is NULL.", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else if (method != AM_WEB_REQUEST_GET && method != AM_WEB_REQUEST_POST) {
+        am_web_log_error("%s: invalid request method %s.",
+                thisfunc, method);
+        sts = AM_INVALID_ARGUMENT;
+    } else {
+        am_web_log_debug("%s: request method before set %s.",
+                thisfunc,
+                rawRequest->requestMethod == kRequestGET ?
+                "GET" : "POST");
+        if (method == AM_WEB_REQUEST_GET)
+            rawRequest->requestMethod = kRequestGET;
+        else
+            rawRequest->requestMethod = kRequestPOST;
+        am_web_log_debug("%s: request method after set %s.",
+                thisfunc,
+                rawRequest->requestMethod == kRequestGET ?
+                "GET" : "POST");
+        if (!rawRequest->SetHeader(context, "REQUEST_METHOD",
+                method == AM_WEB_REQUEST_GET ? "GET" : "POST",
+                &errID)) {
+            am_web_log_error("%s: Could not set request method header. "
+                    "Error %s.",
+                    thisfunc, errID);
+            sts = map_domino_error(errID);
+        } else {
+            am_web_log_debug("%s: method changed.", thisfunc);
+        }
+        sts = AM_SUCCESS;
     }
     return sts;
 }
 
 static am_status_t
-get_header_length(const char *key, const char *val, void **args)
-{
+get_header_length(const char *key, const char *val, void **args) {
     const char *thisfunc = "get_header_length()";
     am_status_t sts = AM_SUCCESS;
-    size_t totalLength = *(size_t *)args[0];
+    size_t totalLength = *(size_t *) args[0];
     size_t val_len = 0;
     size_t sep_len = strlen(HEADER_SEPARATOR);
 
@@ -944,15 +934,14 @@ get_header_length(const char *key, const char *val, void **args)
     } else {
         val_len = val == NULL ? 0 : strlen(val);
         totalLength = totalLength + strlen(key) + val_len + sep_len + 2; // colon + null term char
-        *(size_t *)args[0] = totalLength;
+        *(size_t *) args[0] = totalLength;
     }
-    
+
     return sts;
 }
 
 static am_status_t
-add_headers(const char *key, const char *val, void **args)
-{
+add_headers(const char *key, const char *val, void **args) {
     const char *thisfunc = "add_headers()";
     am_status_t sts = AM_SUCCESS;
     char *header_buf = NULL;
@@ -963,37 +952,35 @@ add_headers(const char *key, const char *val, void **args)
     size_t sep_len = strlen(HEADER_SEPARATOR);
 
     if (key == NULL || args == NULL || args[0] == NULL ||
-	args[1] == NULL || args[2] == NULL) {
-	am_web_log_error("%s: Invalid input argument.", thisfunc);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else {
-	am_web_log_max_debug("%s: Adding header:%s=[%s].",
-			     thisfunc, key, val);
-	header_buf = (char *)args[0];
-	max_len = *(size_t *)args[1];
-	n_written = *(size_t *)args[2];
-	val_len = val == NULL ? 0 : strlen(val);
+            args[1] == NULL || args[2] == NULL) {
+        am_web_log_error("%s: Invalid input argument.", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else {
+        am_web_log_max_debug("%s: Adding header:%s=[%s].",
+                thisfunc, key, val);
+        header_buf = (char *) args[0];
+        max_len = *(size_t *) args[1];
+        n_written = *(size_t *) args[2];
+        val_len = val == NULL ? 0 : strlen(val);
 
-	if (header_buf[0] != '\0')
-		add_len = sep_len;
-	add_len += strlen(key)+val_len+2; // colon + null term char
-	if (n_written + add_len > max_len) {
-	    am_web_log_warning("%s: Could not write response header %s: "
-			       "headerText buffer too small. ",
-			       thisfunc, key, val == NULL ? "NULL" : val);
-	    sts = AM_BUFFER_TOO_SMALL;
-	}
-	else {
-	    // Don't put seperator if it's the first header.
-	    if (header_buf[0] != '\0')
-		strcat(header_buf, HEADER_SEPARATOR);
-	    strcat(header_buf, key);
-	    strcat(header_buf, ":");
-	    strcat(header_buf, val);
-	    *(size_t *)args[2] = n_written + add_len;
-	    sts = AM_SUCCESS;
-	}
+        if (header_buf[0] != '\0')
+            add_len = sep_len;
+        add_len += strlen(key) + val_len + 2; // colon + null term char
+        if (n_written + add_len > max_len) {
+            am_web_log_warning("%s: Could not write response header %s: "
+                    "headerText buffer too small. ",
+                    thisfunc, key, val == NULL ? "NULL" : val);
+            sts = AM_BUFFER_TOO_SMALL;
+        } else {
+            // Don't put seperator if it's the first header.
+            if (header_buf[0] != '\0')
+                strcat(header_buf, HEADER_SEPARATOR);
+            strcat(header_buf, key);
+            strcat(header_buf, ":");
+            strcat(header_buf, val);
+            *(size_t *) args[2] = n_written + add_len;
+            sts = AM_SUCCESS;
+        }
     }
     return sts;
 }
@@ -1009,27 +996,26 @@ add_headers(const char *key, const char *val, void **args)
  */
 static am_status_t
 fill_header_text(char *headers_buf, size_t buf_size,
-                 unsigned int reason_code,
-                 const char *redirect_url,
-                 size_t content_len,
-                 private_context_t *priv_ctx,
-                 const char *data)
-{
+        unsigned int reason_code,
+        const char *redirect_url,
+        size_t content_len,
+        private_context_t *priv_ctx,
+        const char *data) {
     const char *thisfunc = "fill_header_text()";
     am_status_t sts = AM_SUCCESS;
     am_status_t tmp_sts = AM_SUCCESS;
     size_t max_len = buf_size - strlen(HEADER_TEXT_END) - 1; // null term. char.
     size_t n_written = 0;
     size_t add_len = 0;
-    void *args[] = { headers_buf, &max_len, &n_written };
+    void *args[] = {headers_buf, &max_len, &n_written};
 
     am_web_log_max_debug("%s: Entered.", thisfunc);
     // put header for redirect_url first if reason code is redirect.
     if (reason_code == HTTP_302_REDIRECT) {
-        add_len = strlen(LOCATION_HEADER) + strlen(redirect_url) + 1 ;
+        add_len = strlen(LOCATION_HEADER) + strlen(redirect_url) + 1;
         if (add_len > buf_size) {
             am_web_log_warning("%s: Buffer too small for header "
-                               "[Location:%s].", thisfunc, redirect_url);
+                    "[Location:%s].", thisfunc, redirect_url);
             sts = AM_BUFFER_TOO_SMALL;
         } else {
             strcat(headers_buf, LOCATION_HEADER);
@@ -1038,9 +1024,8 @@ fill_header_text(char *headers_buf, size_t buf_size,
         }
     } else {
         // else set content-type and content-length headers first
-        if ((data != NULL) && (strlen(data) > 5) && 
-             (strncasecmp(data, "<HTML>", 6) == 0))
-        {
+        if ((data != NULL) && (strlen(data) > 5) &&
+                (strncasecmp(data, "<HTML>", 6) == 0)) {
             sprintf(headers_buf, "%s%s%s%s%d%s",
                     CONTENT_TYPE_HEADER, CONTENT_TYPE_TEXT_HTML,
                     HEADER_SEPARATOR, CONTENT_LENGTH_HEADER, content_len,
@@ -1058,16 +1043,16 @@ fill_header_text(char *headers_buf, size_t buf_size,
     // errors setting these are logged as warning but ignored.
     if (priv_ctx == NULL) {
         am_web_log_warning("%s: private context is null. "
-                    "no response headers found and set.", thisfunc);
+                "no response headers found and set.", thisfunc);
     } else if (priv_ctx->response_headers_to_set != NULL) {
         am_web_log_max_debug("%s:Response headers present.", thisfunc);
         if (am_map_size(priv_ctx->response_headers_to_set) > 0) {
             tmp_sts = am_map_for_each(priv_ctx->response_headers_to_set,
-                                      add_headers, args);
+                    add_headers, args);
             if (tmp_sts != AM_SUCCESS) {
                 am_web_log_warning("%s: Error [%s] adding header from "
-                                   "private context.", thisfunc,
-                                   am_status_to_string(sts));
+                        "private context.", thisfunc,
+                        am_status_to_string(sts));
             }
         }
         am_map_destroy(priv_ctx->response_headers_to_set);
@@ -1078,7 +1063,6 @@ fill_header_text(char *headers_buf, size_t buf_size,
     strcat(headers_buf, HEADER_TEXT_END);
     return sts;
 }
-
 
 /**
  *  Render a response - ok, redirect, forbidden or internal error.
@@ -1106,8 +1090,7 @@ fill_header_text(char *headers_buf, size_t buf_size,
  */
 static am_status_t
 render_response(FilterContext *context, unsigned int response_code,
-		const char *data, unsigned int *retVal)
-{
+        const char *data, unsigned int *retVal) {
     const char *thisfunc = "render_response()";
     private_context_t *priv_ctx = NULL;
     am_status_t sts = AM_SUCCESS;
@@ -1119,7 +1102,7 @@ render_response(FilterContext *context, unsigned int response_code,
     const char *redirect_url = NULL;
 
     am_web_log_max_debug("%s: Entered.", thisfunc);
-    memset(headers_buf, 0, sizeof(headers_buf));
+    memset(headers_buf, 0, sizeof (headers_buf));
 
     if (context == NULL) {
         am_web_log_error("%s: one of input arguments is NULL", thisfunc);
@@ -1156,36 +1139,34 @@ render_response(FilterContext *context, unsigned int response_code,
         // - location headers from redirect urls.
         // - and set content type (always text/plain) and length.
         // Then destroy the headers map in the private context,
-        priv_ctx = (private_context_t *)context->privateContext;
+        priv_ctx = (private_context_t *) context->privateContext;
         content_len = content == NULL ? 0 : strlen(content);
-        sts = fill_header_text(headers_buf, sizeof(headers_buf),
-                               response_code, redirect_url,
-                               content_len, priv_ctx, data);
+        sts = fill_header_text(headers_buf, sizeof (headers_buf),
+                response_code, redirect_url,
+                content_len, priv_ctx, data);
         if (sts != AM_SUCCESS) {
             am_web_log_error("%s: Error forming response headers: %s",
-                             thisfunc, am_status_to_string(sts));
+                    thisfunc, am_status_to_string(sts));
         } else if (!context->ServerSupport(context, kWriteResponseHeaders,
-                                           &response, NULL, 0, &errID))
-        {
+                &response, NULL, 0, &errID)) {
             // now write the response headers
             am_web_log_error("%s: Could not render response %s",
-                             thisfunc, response.reasonText,
-                              domino_error_to_str(errID));
+                    thisfunc, response.reasonText,
+                    domino_error_to_str(errID));
             sts = map_domino_error(errID);
         } else if (content != NULL && *content != '\0' &&
-                  !context->WriteClient(context, (char *)content,
-                  content_len, 0, &errID))
-        {
+                !context->WriteClient(context, (char *) content,
+                content_len, 0, &errID)) {
             // write the content.
             am_web_log_error("%s: Could not write content [%s], error %s.",
-                             thisfunc, data, domino_error_to_str(errID));
+                    thisfunc, data, domino_error_to_str(errID));
             sts = map_domino_error(errID);
         } else {
             // done - log debug msg.
             am_web_log_debug("%s: Rendered response header [%s] "
-                             "and content [%s].",
-                             thisfunc, response.headerText,
-                             content == NULL ? "" : content);
+                    "and content [%s].",
+                    thisfunc, response.headerText,
+                    content == NULL ? "" : content);
             sts = AM_SUCCESS;
         }
     }
@@ -1196,72 +1177,66 @@ render_response(FilterContext *context, unsigned int response_code,
 }
 
 static am_status_t
-render_result(void **args, am_web_result_t result, char *data)
-{
+render_result(void **args, am_web_result_t result, char *data) {
     const char *thisfunc = "render_result()";
-    FilterContext *context = (FilterContext *)args[0];
+    FilterContext *context = (FilterContext *) args[0];
     am_status_t sts = AM_SUCCESS;
 
     am_web_log_debug("%s: rendering result %s, data [%s]",
-		     thisfunc, am_web_result_num_to_str(result),
-		     data == NULL ? "NULL" : data);
+            thisfunc, am_web_result_num_to_str(result),
+            data == NULL ? "NULL" : data);
     // Check arguments
     if (context == NULL) {
-	am_web_log_error("%s: No context passed in.", thisfunc);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else if (result == AM_WEB_RESULT_REDIRECT &&
-	     (data == NULL || data[0] == '\0')) {
-	am_web_log_error("%s: Result is redirect but redirect_url is %s.",
-			 thisfunc, data == NULL ? "NULL" : "empty");
-	sts = AM_INVALID_ARGUMENT;
-    }
-    // now take care of result.
+        am_web_log_error("%s: No context passed in.", thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else if (result == AM_WEB_RESULT_REDIRECT &&
+            (data == NULL || data[0] == '\0')) {
+        am_web_log_error("%s: Result is redirect but redirect_url is %s.",
+                thisfunc, data == NULL ? "NULL" : "empty");
+        sts = AM_INVALID_ARGUMENT;
+    }// now take care of result.
     else {
-	switch (result) {
-	case AM_WEB_RESULT_OK:
-	    sts = AM_SUCCESS;
-	    break;
-	case AM_WEB_RESULT_OK_DONE:
-	    sts = render_response(context, HTTP_200_OK, data, NULL);
-	    break;
-	case AM_WEB_RESULT_REDIRECT:
+        switch (result) {
+            case AM_WEB_RESULT_OK:
+                sts = AM_SUCCESS;
+                break;
+            case AM_WEB_RESULT_OK_DONE:
+                sts = render_response(context, HTTP_200_OK, data, NULL);
+                break;
+            case AM_WEB_RESULT_REDIRECT:
 
-	    sts = render_response(context, HTTP_302_REDIRECT, data, NULL);
-	    break;
-	case AM_WEB_RESULT_FORBIDDEN:
-	    sts = render_response(context, HTTP_403_FORBIDDEN, NULL, NULL);
-	    break;
-	case AM_WEB_RESULT_ERROR:
-	default:
-	    sts = render_response(context, HTTP_500_INT_ERROR, NULL, NULL);
-	    break;
-	}
+                sts = render_response(context, HTTP_302_REDIRECT, data, NULL);
+                break;
+            case AM_WEB_RESULT_FORBIDDEN:
+                sts = render_response(context, HTTP_403_FORBIDDEN, NULL, NULL);
+                break;
+            case AM_WEB_RESULT_ERROR:
+            default:
+                sts = render_response(context, HTTP_500_INT_ERROR, NULL, NULL);
+                break;
+        }
     }
     return sts;
 }
 
-
 static char *
 make_header(FilterContext *context, const char *key, const char *val,
-	    unsigned int *errID)
-{
+        unsigned int *errID) {
     const char *thisfunc = "make_header()";
     char *header = NULL;
     unsigned int len = 0;
 
     if (context == NULL || key == NULL || errID == NULL) {
-	am_web_log_error("%s: one of input arguments is null.", thisfunc);
-    }
-    else {
-	len = strlen(key) + 2;
-	if (val != NULL) {
-	    len += strlen(val); // for the : separator and null terminating char
-	}
-	header = context->AllocMem(context, len, 0, errID);
-	if (header != NULL) {
-	    sprintf(header, "%s:%s", key, val==NULL?"":val);
-	}
+        am_web_log_error("%s: one of input arguments is null.", thisfunc);
+    } else {
+        len = strlen(key) + 2;
+        if (val != NULL) {
+            len += strlen(val); // for the : separator and null terminating char
+        }
+        header = context->AllocMem(context, len, 0, errID);
+        if (header != NULL) {
+            sprintf(header, "%s:%s", key, val == NULL ? "" : val);
+        }
     }
     return header;
 }
@@ -1282,44 +1257,42 @@ set_header_in_request(void **args, const char *key, const char *val) {
 
     // Check arguments
     if (key == NULL || key[0] == '\0' || args == NULL ||
-        (context = (FilterContext *)args[0]) == NULL ||
-        (rawRequest = (FilterRawRequest *)args[1]) == NULL ||
-	(request_hdr_map = (am_map_t)args[2]) == NULL) {
-	if(key == NULL)
-	    am_web_log_error("%s: key is NULL.", thisfunc);
-	if(key[0] == '\0')
-	    am_web_log_error("%s: key[0] is NULL.", thisfunc);
-	if(args == NULL)
-	    am_web_log_error("%s: args is NULL.", thisfunc);
-	if(args[0] == NULL)
-	    am_web_log_error("%s: args[0] is NULL.", thisfunc);
-	if(args[1] == NULL)
-	    am_web_log_error("%s: args[1] is NULL.", thisfunc);
-	if(args[2] == NULL)
-	    am_web_log_error("%s: args[2] is NULL.", thisfunc);
-	am_web_log_error("%s: Error setting header in request. "
-		         "One or more input arguments is NULL or empty.",
-			 thisfunc);
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else {
-	// the last arg B_TRUE indicates to replace any existing key.
-	//Added by bn152013 for 6728280
-	if(val == '\0')
-		sts = am_map_insert(request_hdr_map, key, NULL, B_TRUE);
-	else
-		sts = am_map_insert(request_hdr_map, key, val, B_TRUE);
-	//End
+            (context = (FilterContext *) args[0]) == NULL ||
+            (rawRequest = (FilterRawRequest *) args[1]) == NULL ||
+            (request_hdr_map = (am_map_t) args[2]) == NULL) {
+        if (key == NULL)
+            am_web_log_error("%s: key is NULL.", thisfunc);
+        if (key[0] == '\0')
+            am_web_log_error("%s: key[0] is NULL.", thisfunc);
+        if (args == NULL)
+            am_web_log_error("%s: args is NULL.", thisfunc);
+        if (args[0] == NULL)
+            am_web_log_error("%s: args[0] is NULL.", thisfunc);
+        if (args[1] == NULL)
+            am_web_log_error("%s: args[1] is NULL.", thisfunc);
+        if (args[2] == NULL)
+            am_web_log_error("%s: args[2] is NULL.", thisfunc);
+        am_web_log_error("%s: Error setting header in request. "
+                "One or more input arguments is NULL or empty.",
+                thisfunc);
+        sts = AM_INVALID_ARGUMENT;
+    } else {
+        // the last arg B_TRUE indicates to replace any existing key.
+        //Added by bn152013 for 6728280
+        if (val == '\0')
+            sts = am_map_insert(request_hdr_map, key, NULL, B_TRUE);
+        else
+            sts = am_map_insert(request_hdr_map, key, val, B_TRUE);
+        //End
 
-	am_web_log_debug("%s: inserted request header %s:%s into map.",
-			 thisfunc, key, val==NULL?"NULL":val);
+        am_web_log_debug("%s: inserted request header %s:%s into map.",
+                thisfunc, key, val == NULL ? "NULL" : val);
     }
     return sts;
 }
 
 static am_status_t
-really_set_header_in_request(const char *key, const char *val, void **args)
-{
+really_set_header_in_request(const char *key, const char *val, void **args) {
     const char *thisfunc = "really_set_header_in_request()";
     am_status_t sts = AM_SUCCESS;
     FilterContext *context = NULL;
@@ -1328,22 +1301,22 @@ really_set_header_in_request(const char *key, const char *val, void **args)
     unsigned int errID;
 
     if (key == NULL || key[0] == '\0' || args == NULL ||
-            (context = (FilterContext *)args[0]) == NULL ||
-            (rawRequest = (FilterRawRequest *)args[1]) == NULL) {
+            (context = (FilterContext *) args[0]) == NULL ||
+            (rawRequest = (FilterRawRequest *) args[1]) == NULL) {
         am_web_log_error("%s: Error setting header in request. "
-                        "One or more input arguments is NULL or empty.",
-                        thisfunc);
+                "One or more input arguments is NULL or empty.",
+                thisfunc);
         sts = AM_INVALID_ARGUMENT;
     }
     if (sts == AM_SUCCESS) {
         if ((val == NULL) || strlen(val) == 0) {
             am_web_log_debug("%s: Header %s is empty and will not be set.",
-                             thisfunc, key);
+                    thisfunc, key);
         } else {
             if ((header = make_header(context, key, val, &errID)) == NULL) {
                 am_web_log_error("%s: Could not allocate memory for setting "
-                             "header %s:%s, error %s",
-                             thisfunc, key, val, domino_error_to_str(errID));
+                        "header %s:%s, error %s",
+                        thisfunc, key, val, domino_error_to_str(errID));
                 sts = map_domino_error(errID);
             } else if (!rawRequest->AddHeader(context, header, &errID)) {
                 am_web_log_error("%s: Error setting header [%s: %s], "
@@ -1367,6 +1340,7 @@ really_set_header_in_request(const char *key, const char *val, void **args)
 }
 
 // set all request headers that was saved in the request header map.
+
 static am_status_t
 set_all_request_headers(void **args) {
     const char *thisfunc = "set_all_request_headers()";
@@ -1375,29 +1349,28 @@ set_all_request_headers(void **args) {
     FilterRawRequest *rawRequest = NULL;
     am_map_t request_headers_map = NULL;
 
-    if ((context = (FilterContext *)args[0]) == NULL ||
-                   (rawRequest = (FilterRawRequest *)args[1]) == NULL ||
-                   (request_headers_map = (am_map_t)args[2]) == NULL) {
+    if ((context = (FilterContext *) args[0]) == NULL ||
+            (rawRequest = (FilterRawRequest *) args[1]) == NULL ||
+            (request_headers_map = (am_map_t) args[2]) == NULL) {
         am_web_log_error("%s: Error setting all request headers: "
-                         "One or more input arguments is NULL or empty.",
-                         thisfunc);
+                "One or more input arguments is NULL or empty.",
+                thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else if (am_map_size(request_headers_map) == 0) {
         am_web_log_debug("%s: No request headers to set.", thisfunc);
         sts = AM_SUCCESS;
     } else {
         sts = am_map_for_each(request_headers_map,
-                              really_set_header_in_request, args);
+                really_set_header_in_request, args);
         am_web_log_debug("%s: setting all request headers result: %s",
-                            thisfunc, am_status_to_string(sts));
+                thisfunc, am_status_to_string(sts));
     }
     return sts;
 }
 
 am_status_t validate_domino_sso(char *ssoOrgName, char *ssoCfgName, char *ltpaTokenValue,
-                                char *fullName)
-{
-    char *thisfunc="validate_domino_sso";
+        char *fullName) {
+    char *thisfunc = "validate_domino_sso";
     am_status_t retVal = AM_SUCCESS;
     char user[MAXUSERNAME];
     TIMEDATE retCreation;
@@ -1405,10 +1378,10 @@ am_status_t validate_domino_sso(char *ssoOrgName, char *ssoCfgName, char *ltpaTo
     STATUS error = NOERROR;
 
     error = SECTokenValidate(NULL, ssoOrgName, ssoCfgName, ltpaTokenValue,
-                      (char *)&user, &retCreation, &retExpiration,
-                      (DWORD)0, (void *)NULL);
-    if(error != NOERROR) {
-        switch(error) {
+            (char *) &user, &retCreation, &retExpiration,
+            (DWORD) 0, (void *) NULL);
+    if (error != NOERROR) {
+        switch (error) {
             case ERR_LTPA_TOKEN_EXPIRED:
                 retVal = AM_INVALID_SESSION;
                 break;
@@ -1418,52 +1391,51 @@ am_status_t validate_domino_sso(char *ssoOrgName, char *ssoCfgName, char *ltpaTo
             default:
                 retVal = AM_FAILURE;
         }
-    } else if (strcmp (user, fullName) != 0 ) {
+    } else if (strcmp(user, fullName) != 0) {
         am_web_log_debug("%s: User from LtpaToken (%s) doesn't correspond to "
-                         "authenticated user (%s)", thisfunc, user, fullName);
+                "authenticated user (%s)", thisfunc, user, fullName);
         retVal = AM_INVALID_SESSION;
     } else {
         am_web_log_debug("%s: Validation successful for user %s.",
-                          thisfunc, user);
+                thisfunc, user);
     }
     am_web_log_info("%s: Validation returns:%s.", thisfunc,
-                       am_status_to_string(retVal));
+            am_status_to_string(retVal));
     return retVal;
 }
 
 am_status_t extract_token(FilterContext *context, char *httpCookieValue,
-			  const char *token, char **value) {
+        const char *token, char **value) {
     am_status_t retVal = AM_SUCCESS;
     unsigned int errID = 0;
-    const char *thisfunc="extract_token";
-    if(context == NULL || httpCookieValue == NULL || token == NULL ||
-       value == NULL) {
-	am_web_log_error("%s: Invalid argument(s) to parameter.", thisfunc);
-	retVal = AM_FAILURE;
+    const char *thisfunc = "extract_token";
+    if (context == NULL || httpCookieValue == NULL || token == NULL ||
+            value == NULL) {
+        am_web_log_error("%s: Invalid argument(s) to parameter.", thisfunc);
+        retVal = AM_FAILURE;
     } else {
-	size_t len = strlen(httpCookieValue) + 1;
-	am_web_log_max_debug("%s: Extracting token: %s", thisfunc, token);
-	*value = (char *)context->AllocMem(context, len, 0, &errID);
-	if(*value != NULL) {
-	    char *tmpPtr = strstr(httpCookieValue, token);
-	    if(tmpPtr != NULL) {
-		strcpy(*value, tmpPtr);
-		tmpPtr = strchr(*value, ';');
-		if(tmpPtr != NULL) {
-		    tmpPtr[0] = '\0';
-		}
-		*value += strlen(token) + 1;
-		am_web_log_max_debug("%s: Extracted cookie value for %s=[%s]",
-				     thisfunc, token, *value);
-	    } else retVal = AM_NOT_FOUND;
-	} else retVal = AM_NO_MEMORY;
+        size_t len = strlen(httpCookieValue) + 1;
+        am_web_log_max_debug("%s: Extracting token: %s", thisfunc, token);
+        *value = (char *) context->AllocMem(context, len, 0, &errID);
+        if (*value != NULL) {
+            char *tmpPtr = strstr(httpCookieValue, token);
+            if (tmpPtr != NULL) {
+                strcpy(*value, tmpPtr);
+                tmpPtr = strchr(*value, ';');
+                if (tmpPtr != NULL) {
+                    tmpPtr[0] = '\0';
+                }
+                *value += strlen(token) + 1;
+                am_web_log_max_debug("%s: Extracted cookie value for %s=[%s]",
+                        thisfunc, token, *value);
+            } else retVal = AM_NOT_FOUND;
+        } else retVal = AM_NO_MEMORY;
     }
     return retVal;
 }
 
 static am_status_t
-set_cookie(FilterContext *context, void  **args, const char* tokenName, char* tokenValue)
-{
+set_cookie(FilterContext *context, void **args, const char* tokenName, char* tokenValue) {
     const char *thisfunc = "set_cookie()";
     am_status_t sts = AM_SUCCESS;
     unsigned int errID = 0;
@@ -1471,23 +1443,23 @@ set_cookie(FilterContext *context, void  **args, const char* tokenName, char* to
     sts = set_header_in_request(args, tokenName, tokenValue);
     if (sts != AM_SUCCESS) {
         am_web_log_error("%s: Failed to set header %s in the request.",
-                        thisfunc, tokenName);
+                thisfunc, tokenName);
     }
-    if(sts == AM_SUCCESS) {
+    if (sts == AM_SUCCESS) {
         char *value = NULL;
         size_t len = strlen(tokenName);
         len += strlen(tokenValue) + 100;
-        if((value = context->AllocMem(context,
-                              len, 0, &errID)) != NULL) {
+        if ((value = context->AllocMem(context,
+                len, 0, &errID)) != NULL) {
             size_t x = strlen(tokenValue);
             strcpy(value, tokenName);
             strcat(value, "=");
             strncat(value, tokenValue, x);
             sts = add_header_in_response(args, SET_COOKIE_HEADER_NAME,
-                                                 value);
+                    value);
             if (sts != AM_SUCCESS) {
                 am_web_log_error("%s: Failed to add %s cookie "
-                                 "in the response.", thisfunc, tokenName);
+                        "in the response.", thisfunc, tokenName);
             }
         } else {
             am_web_log_error("%s: Not enough memory to allocate value.");
@@ -1497,9 +1469,8 @@ set_cookie(FilterContext *context, void  **args, const char* tokenName, char* to
     return sts;
 }
 
-am_status_t create_domino_sso(FilterContext *context, void  **args, 
-                              char *pName, char *ssoOrgName, char *ssoCfgName)
-{
+am_status_t create_domino_sso(FilterContext *context, void **args,
+        char *pName, char *ssoOrgName, char *ssoCfgName) {
     am_status_t sts = AM_SUCCESS;
     MEMHANDLE mhToken;
     char *thisfunc = "create_domino_sso";
@@ -1509,44 +1480,44 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
     char *tokenName = NULL;
     char *tokenValue = NULL;
     char *pDomainList = NULL;
-    char *ltpaTokenValue =NULL;
+    char *ltpaTokenValue = NULL;
     WORD numDomains = 0;
     size_t valueLen = 0;
 
     const char *ltpaTokenName = NULL;
-    void* agent_config  = NULL;
+    void* agent_config = NULL;
 
     agent_config = am_web_get_agent_configuration();
     ltpaTokenName = am_web_domino_ltpa_token_name(agent_config);
 
     am_web_log_max_debug("%s: PNAME=%s SSOConfigName=%s",
-                         thisfunc, pName, ssoCfgName);
+            thisfunc, pName, ssoCfgName);
     if ((ssoOrgName != NULL) && (strlen(ssoOrgName) == 0)) {
         ssoOrgName = NULL;
     }
     // Generate the LtpaToken
-    if((error = SECTokenGenerate(NULL, ssoOrgName, ssoCfgName, pName, 0,
-                                 0, &mhToken,
-                                 (DWORD)0, (void *)NULL)) != NOERROR) {
+    if ((error = SECTokenGenerate(NULL, ssoOrgName, ssoCfgName, pName, 0,
+            0, &mhToken,
+            (DWORD) 0, (void *) NULL)) != NOERROR) {
         am_web_log_error("%s: SECTokenGenerate failed (ssoOrgName=%s, "
-                         "ssoCfgName=%s, pName=%s)",
-                         thisfunc, ssoOrgName, ssoCfgName, pName);
+                "ssoCfgName=%s, pName=%s)",
+                thisfunc, ssoOrgName, ssoCfgName, pName);
         sts = AM_FAILURE;
     }
     // Lock the token structure and its member data.
     if (sts == AM_SUCCESS) {
         am_web_log_max_debug("%s: SECTokenGenerate successful.", thisfunc);
-        pToken = (SSO_TOKEN*)OSMemoryLock(mhToken);
-        if(pToken == NULL) {
+        pToken = (SSO_TOKEN*) OSMemoryLock(mhToken);
+        if (pToken == NULL) {
             am_web_log_error("%s: SSO_TOKEN is NULL after "
-                             "dereferencing from MEMHANDLE.", thisfunc);
+                    "dereferencing from MEMHANDLE.", thisfunc);
             sts = AM_FAILURE;
         }
     }
     // Get the token name
-    if(sts == AM_SUCCESS) {
-        if(pToken->mhName != NULL) {
-            tokenName = (char *)OSMemoryLock(pToken->mhName);
+    if (sts == AM_SUCCESS) {
+        if (pToken->mhName != NULL) {
+            tokenName = (char *) OSMemoryLock(pToken->mhName);
             am_web_log_max_debug("%s: Token name returned by Domino server: %s", thisfunc, tokenName);
             OSMemoryUnlock(pToken->mhName);
         } else {
@@ -1555,11 +1526,11 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
         }
     }
     // Get the list of null-delimited DNS domains
-    if(sts == AM_SUCCESS) {
-        if(pToken->mhDomainList != NULL) {
-            pDomainList = (char*)OSMemoryLock(pToken->mhDomainList);
+    if (sts == AM_SUCCESS) {
+        if (pToken->mhDomainList != NULL) {
+            pDomainList = (char*) OSMemoryLock(pToken->mhDomainList);
             am_web_log_max_debug("%s: First domain of the list returned by Domino server: %s",
-                                  thisfunc, pDomainList);
+                    thisfunc, pDomainList);
             OSMemoryUnlock(pToken->mhDomainList);
         } else {
             am_web_log_error("%s: pToken->mhDomainList is NULL.", thisfunc);
@@ -1567,23 +1538,23 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
         }
     }
     // Get the total number of domains contained in the mhDomainList
-    if(sts == AM_SUCCESS) {
-        if(pToken->wNumDomains > 0) {
+    if (sts == AM_SUCCESS) {
+        if (pToken->wNumDomains > 0) {
             numDomains = pToken->wNumDomains;
             am_web_log_max_debug("%s: Number of domains returned by Domino server: %i",
-                                  thisfunc, numDomains);
+                    thisfunc, numDomains);
         } else {
             am_web_log_error("%s: pToken->wNumDomains is not a "
-                             "positive number.", thisfunc);
+                    "positive number.", thisfunc);
             sts = AM_FAILURE;
         }
     }
     // Get the token value
-    if(sts == AM_SUCCESS) {
-        if(pToken->mhData != NULL) {
-            tokenValue = (char*)OSMemoryLock(pToken->mhData);
+    if (sts == AM_SUCCESS) {
+        if (pToken->mhData != NULL) {
+            tokenValue = (char*) OSMemoryLock(pToken->mhData);
             am_web_log_max_debug("%s: Token value returned by Domino server: %s", thisfunc,
-                                 tokenValue);
+                    tokenValue);
             OSMemoryUnlock(pToken->mhData);
         } else {
             am_web_log_error("%s: pToken->mhData is NULL.", thisfunc);
@@ -1591,40 +1562,40 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
         }
     }
 
-    if(sts == AM_SUCCESS) {
+    if (sts == AM_SUCCESS) {
         char * pNullChar = NULL;
         char * pDomain = NULL;
-        int iDomain=0;
-        
-        if(strcmp(tokenName, ltpaTokenName) != 0) {
+        int iDomain = 0;
+
+        if (strcmp(tokenName, ltpaTokenName) != 0) {
             am_web_log_warning("%s: Domino server token name (%s) doesn't match "
-                               "token name configured in agent (%s). "
-                               "%s will be used to set the cookie.",
-                               thisfunc, tokenName, ltpaTokenName, 
-                               ltpaTokenName);
+                    "token name configured in agent (%s). "
+                    "%s will be used to set the cookie.",
+                    thisfunc, tokenName, ltpaTokenName,
+                    ltpaTokenName);
         }
         // Build and set the LtpaToken cookie in the all the domains 
         // listed in pDomainList
-        pNullChar = pDomainList-1;
+        pNullChar = pDomainList - 1;
         do {
             // Extract the null-delimited domains from the list
-            pDomain = pNullChar+1;
-            pNullChar=strchr(pNullChar+1,'\0');
+            pDomain = pNullChar + 1;
+            pNullChar = strchr(pNullChar + 1, '\0');
             if ((pNullChar == NULL) || (strlen(pDomain) < 2)) {
                 am_web_log_error("%s: Could not find %i domains in "
-                                 "the domain list.", thisfunc, numDomains);
+                        "the domain list.", thisfunc, numDomains);
                 sts = AM_FAILURE;
             }
             // Build and set the cookie in the domain
-            if(sts == AM_SUCCESS) {
-                valueLen = strlen(tokenValue) + sizeof(DOMAIN_STRING) +
-                           strlen(pDomain) + sizeof(PATH_STRING) +
-                           sizeof(SECURE_ONLY) + 1;
+            if (sts == AM_SUCCESS) {
+                valueLen = strlen(tokenValue) + sizeof (DOMAIN_STRING) +
+                        strlen(pDomain) + sizeof (PATH_STRING) +
+                        sizeof (SECURE_ONLY) + 1;
                 ltpaTokenValue = realloc(ltpaTokenValue, valueLen);
                 if (ltpaTokenValue == NULL) {
                     am_web_log_error("%s: Not enought memory to allocate "
-                                     "ltpaTokenValue at iteration %i.",
-                                     thisfunc, iDomain);
+                            "ltpaTokenValue at iteration %i.",
+                            thisfunc, iDomain);
                     sts = AM_NO_MEMORY;
                 } else {
                     memset(ltpaTokenValue, 0, valueLen);
@@ -1632,17 +1603,17 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
                     strcat(ltpaTokenValue, DOMAIN_STRING);
                     strcat(ltpaTokenValue, pDomain);
                     strcat(ltpaTokenValue, PATH_STRING);
-                    if(pToken->bSecureOnly) {
+                    if (pToken->bSecureOnly) {
                         strcat(ltpaTokenValue, SECURE_ONLY);
                     }
-                    am_web_log_debug("%s: Setting %s cookie in domain %s:", 
-                                     thisfunc, ltpaTokenName, pDomain);
-                    sts = set_cookie(context, args, ltpaTokenName, 
-                                     ltpaTokenValue);
+                    am_web_log_debug("%s: Setting %s cookie in domain %s:",
+                            thisfunc, ltpaTokenName, pDomain);
+                    sts = set_cookie(context, args, ltpaTokenName,
+                            ltpaTokenValue);
                     if (sts != AM_SUCCESS) {
                         am_web_log_error("%s: Failed to set %s cookie "
-                                         "in domain %s.", thisfunc, 
-                                         ltpaTokenName, pDomain);
+                                "in domain %s.", thisfunc,
+                                ltpaTokenName, pDomain);
                     }
                 }
             }
@@ -1650,7 +1621,7 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
         } while ((iDomain < numDomains) && (sts == AM_SUCCESS));
     }
     // Clean up
-    if(pToken != NULL) {
+    if (pToken != NULL) {
         OSMemoryUnlock(mhToken);
         SECTokenFree(&mhToken);
     }
@@ -1670,16 +1641,16 @@ am_status_t create_domino_sso(FilterContext *context, void  **args,
  * Return: AM_SUCCESS if operation was successful.
  */
 static am_status_t
-check_domino_access(void  **args, const char *userName, char **fullName) {
+check_domino_access(void **args, const char *userName, char **fullName) {
     const char *thisfunc = "check_domino_access()";
-    STATUS  error = NOERROR;
-    HANDLE  hLookup = NULLHANDLE;
-    WORD    Matches = 0;
-    char    *pLookup =  NULL;
-    char    *pName = NULL;
-    char    *pMatch = NULL;
-    WORD    ValueLength, DataType;
-    char    *ValuePtr = NULL;
+    STATUS error = NOERROR;
+    HANDLE hLookup = NULLHANDLE;
+    WORD Matches = 0;
+    char *pLookup = NULL;
+    char *pName = NULL;
+    char *pMatch = NULL;
+    WORD ValueLength, DataType;
+    char *ValuePtr = NULL;
     unsigned int errID;
     am_status_t sts = AM_SUCCESS;
     FilterContext *context = NULL;
@@ -1688,7 +1659,7 @@ check_domino_access(void  **args, const char *userName, char **fullName) {
     const char *ssoConfigName = NULL;
     const char *ssoOrgName = NULL;
     void* agent_config = NULL;
-    
+
 
     agent_config = am_web_get_agent_configuration();
     ltpaTokenName = am_web_domino_ltpa_token_name(agent_config);
@@ -1696,117 +1667,110 @@ check_domino_access(void  **args, const char *userName, char **fullName) {
     ssoOrgName = am_web_domino_ltpa_org_name(agent_config);
 
     // Check arguments
-    if (args == NULL || (context = (FilterContext *)args[0]) == NULL ||
-        userName == NULL || fullName == NULL) {
+    if (args == NULL || (context = (FilterContext *) args[0]) == NULL ||
+            userName == NULL || fullName == NULL) {
         am_web_log_error("%s: Error - context is NULL.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else if (am_web_is_domino_check_name_database(agent_config) == B_FALSE) {
         // Check if checkNameDatabase is false. If so, just use ruser as
         // the authenticated name.
         if ((*fullName = context->AllocMem(
-                            context, strlen(userName)+1, 0, &errID)) == NULL) {
+                context, strlen(userName) + 1, 0, &errID)) == NULL) {
             am_web_log_error("%s: could not allocate memory for [%s].",
-                             thisfunc, userName);
+                    thisfunc, userName);
             sts = map_domino_error(errID);
         } else {
             strcpy(*fullName, userName);
             am_web_log_max_debug("%s: Skipping name database lookup. "
-                                 "Setting full name to %s",
-                                 thisfunc, *fullName);
+                    "Setting full name to %s",
+                    thisfunc, *fullName);
             sts = AM_SUCCESS;
         }
     } else if (sts == AM_SUCCESS && (error = NAMELookup(NULL,
-                   0, 1, "$Users", 1, (char *)userName,
-                   2, "FullName\0ShortName", &hLookup)) != NOERROR) {
+            0, 1, "$Users", 1, (char *) userName,
+            2, "FullName\0ShortName", &hLookup)) != NOERROR) {
         am_web_log_error("%s: Call to NAMELookup failed with %d.",
-                         thisfunc, error);
+                thisfunc, error);
         sts = AM_NOT_FOUND;
     } else if (sts == AM_SUCCESS &&
-               (pLookup = (char *) OSLockObject(hLookup)) == NULL)
-    {
+            (pLookup = (char *) OSLockObject(hLookup)) == NULL) {
         am_web_log_error("%s: Call to OSLockObject returned NULL.", thisfunc);
         sts = AM_FAILURE;
-    } else if (sts == AM_SUCCESS && (pName = (char *)NAMELocateNextName(
-               pLookup, NULL, &Matches)) == NULL)
-    {
+    } else if (sts == AM_SUCCESS && (pName = (char *) NAMELocateNextName(
+            pLookup, NULL, &Matches)) == NULL) {
         am_web_log_error("%s: Call to NAMELocateNextName returned NULL.",
-                         thisfunc);
+                thisfunc);
         sts = AM_FAILURE;
     } else if (sts == AM_SUCCESS && Matches <= 0) {
         am_web_log_error("%s: Call to NAMELocateNextName returned no matches.",
-                         thisfunc);
+                thisfunc);
         sts = AM_FAILURE;
-    } else if (sts == AM_SUCCESS && (pMatch = (char *)NAMELocateNextMatch(
-                 pLookup, pName, NULL)) == NULL)
-    {
+    } else if (sts == AM_SUCCESS && (pMatch = (char *) NAMELocateNextMatch(
+            pLookup, pName, NULL)) == NULL) {
         am_web_log_error("%s: Call to NAMELocateNextMatch failed.", thisfunc);
         sts = AM_FAILURE;
-    } else if (sts == AM_SUCCESS && (ValuePtr = (char *)NAMELocateItem(pMatch, 0,
-                         &DataType, &ValueLength)) == NULL)
-    {
+    } else if (sts == AM_SUCCESS && (ValuePtr = (char *) NAMELocateItem(pMatch, 0,
+            &DataType, &ValueLength)) == NULL) {
         am_web_log_error("%s: Call to NAMELocateItem returned null.", thisfunc);
         sts = AM_FAILURE;
     } else if (sts == AM_SUCCESS && ValueLength <= 0) {
         am_web_log_error("%s: Call to NAMELocateItem returned <=0 length.",
-                         thisfunc);
+                thisfunc);
         sts = AM_FAILURE;
     } else if (sts == AM_SUCCESS && (*fullName = context->AllocMem(
-                       context, ValueLength + 1, 0, &errID)) == NULL)
-    {
+            context, ValueLength + 1, 0, &errID)) == NULL) {
         // now allocate memory for user's full name.
         am_web_log_error("%s: Could not allocate memory of length %d.",
-                         thisfunc, ValueLength+1);
+                thisfunc, ValueLength + 1);
         sts = map_domino_error(errID);
     } else if (sts == AM_SUCCESS && (error = NAMEGetTextItem(
-              pMatch, 0, 0, *fullName, ValueLength+1)) != NOERROR)
-    {
+            pMatch, 0, 0, *fullName, ValueLength + 1)) != NOERROR) {
         // Get user's full name.
         am_web_log_error("%s: NAMEGetTextItem (Get user's full name) "
-                         "failed with %d.", thisfunc, error);
+                "failed with %d.", thisfunc, error);
         sts = AM_FAILURE;
-    } else if(sts == AM_SUCCESS && (am_web_is_domino_ltpa_enable(agent_config) == B_TRUE))  {
+    } else if (sts == AM_SUCCESS && (am_web_is_domino_ltpa_enable(agent_config) == B_TRUE)) {
         // Get or create LTPA Token
         char httpCookieValue[MAX_VAR_LEN];
         boolean_t createSSOToken = B_FALSE;
         httpCookieValue[0] = '\0';
-        am_web_log_debug("%s: Domino full name obtained using remote user %s: %s", 
-                         thisfunc, userName, *fullName);
+        am_web_log_debug("%s: Domino full name obtained using remote user %s: %s",
+                thisfunc, userName, *fullName);
         am_web_log_max_debug("%s: Check if LTPAToken cookie is in the headers.",
-                             thisfunc);
+                thisfunc);
         context->GetServerVariable(context, HTTP_COOKIE,
-                (void *)httpCookieValue, MAX_VAR_LEN-1,
-                &errID);        
+                (void *) httpCookieValue, MAX_VAR_LEN - 1,
+                &errID);
         am_web_log_max_debug("%s: Cookie `Header value: Cookie=[%s]", thisfunc,
-                             httpCookieValue);
-        if(httpCookieValue[0] != '\0') {
+                httpCookieValue);
+        if (httpCookieValue[0] != '\0') {
             am_status_t lclStatus = AM_SUCCESS;
             char *ltpaTokenValue = NULL;
-            if((lclStatus = extract_token(context, httpCookieValue,
-                          ltpaTokenName,
-                          &ltpaTokenValue)) != AM_SUCCESS)
-            {
-                if(lclStatus == AM_NOT_FOUND) {
+            if ((lclStatus = extract_token(context, httpCookieValue,
+                    ltpaTokenName,
+                    &ltpaTokenValue)) != AM_SUCCESS) {
+                if (lclStatus == AM_NOT_FOUND) {
                     sts = AM_SUCCESS;
                     am_web_log_max_debug("%s: LTPAToken not found in the headers.",
-                             thisfunc);
+                            thisfunc);
                     createSSOToken = B_TRUE;
                 } else {
                     sts = lclStatus;
                     am_web_log_error("%s: Error while extracting LTPA token.",
-                                     thisfunc);
+                            thisfunc);
                 }
             } else {
                 am_web_log_max_debug("%s: Found LTPA Token:%s",
-                                      thisfunc, ltpaTokenValue);
-                lclStatus = validate_domino_sso((char *)ssoOrgName, (char *)ssoConfigName, ltpaTokenValue,
-                                                *fullName);
-                if(lclStatus == AM_INVALID_SESSION) {
+                        thisfunc, ltpaTokenValue);
+                lclStatus = validate_domino_sso((char *) ssoOrgName, (char *) ssoConfigName, ltpaTokenValue,
+                        *fullName);
+                if (lclStatus == AM_INVALID_SESSION) {
                     am_web_log_debug("%s: Outdated LTPA Token:%s.",
-                                     thisfunc, ltpaTokenValue);
+                            thisfunc, ltpaTokenValue);
                     createSSOToken = B_TRUE;
                 } else {
                     am_web_log_max_debug("%s: LTPA Token has been validated.",
-                                         thisfunc);
+                            thisfunc);
                     sts = lclStatus;
                 }
             }
@@ -1814,18 +1778,18 @@ check_domino_access(void  **args, const char *userName, char **fullName) {
             createSSOToken = B_TRUE;
         }
         // Create and set the LtapToken cookie(s)
-        if(sts == AM_SUCCESS && createSSOToken == B_TRUE) {
+        if (sts == AM_SUCCESS && createSSOToken == B_TRUE) {
             am_web_log_max_debug("%s: Creating LTPA Token.", thisfunc);
-            sts = create_domino_sso(context, args, *fullName, (char *)ssoOrgName, 
-                                    (char *)ssoConfigName);
+            sts = create_domino_sso(context, args, *fullName, (char *) ssoOrgName,
+                    (char *) ssoConfigName);
         }
-        if(sts != AM_SUCCESS) {
+        if (sts != AM_SUCCESS) {
             am_web_log_error("%s: Error while generating or validating token.",
-                             thisfunc);
+                    thisfunc);
         }
     }
     // clean up
-    if( pLookup && hLookup ) {
+    if (pLookup && hLookup) {
         OSUnlock(hLookup);
     }
     if (NULLHANDLE != hLookup) {
@@ -1836,8 +1800,7 @@ check_domino_access(void  **args, const char *userName, char **fullName) {
 }
 
 static private_context_t *
-create_private_context(FilterContext *context)
-{
+create_private_context(FilterContext *context) {
     const char *thisfunc = "create_private_context()";
     private_context_t *new_ctx = NULL;
     unsigned int errID;
@@ -1845,41 +1808,38 @@ create_private_context(FilterContext *context)
     am_web_log_max_debug("%s: creating new private context", thisfunc);
 
     if (context == NULL) {
-	am_web_log_error("%s: input argument context is NULL.", thisfunc);
-	new_ctx = NULL;
-    }
-    else if ((new_ctx = (private_context_t *)
-		context->AllocMem(context, sizeof(private_context_t),
-				  0, &errID)) == NULL) {
-	am_web_log_error("%s: context->AllocMem(%d) failed with %s.",
-			 thisfunc, sizeof(private_context_t),
-			 domino_error_to_str(errID));
-    }
-    else {
-	// success.
-	// the map for headers will be allocated the first time
-	// add_header_in_response is called.
+        am_web_log_error("%s: input argument context is NULL.", thisfunc);
+        new_ctx = NULL;
+    } else if ((new_ctx = (private_context_t *)
+            context->AllocMem(context, sizeof (private_context_t),
+            0, &errID)) == NULL) {
+        am_web_log_error("%s: context->AllocMem(%d) failed with %s.",
+                thisfunc, sizeof (private_context_t),
+                domino_error_to_str(errID));
+    } else {
+        // success.
+        // the map for headers will be allocated the first time
+        // add_header_in_response is called.
     }
     return new_ctx;
 }
 
 static am_status_t
-encode_space(char *pInfo)
-{
+encode_space(char *pInfo) {
 
     int pinfo_len = strlen(pInfo);
     char *space_ptr = NULL;
     char tmp_buf[MAX_VAR_LEN];
 
-    am_web_log_error("pinfo_len:[%d]",pinfo_len);
-    
-    
+    am_web_log_error("pinfo_len:[%d]", pinfo_len);
+
+
     memset(tmp_buf, 0, MAX_VAR_LEN);
-    if((space_ptr = strchr(pInfo, ' ')) != NULL) {
-	strncat(tmp_buf, pInfo, space_ptr-pInfo);
-	strcat(tmp_buf, "%20");
-	strcat(tmp_buf,space_ptr+1);
-	strcpy(pInfo, tmp_buf);
+    if ((space_ptr = strchr(pInfo, ' ')) != NULL) {
+        strncat(tmp_buf, pInfo, space_ptr - pInfo);
+        strcat(tmp_buf, "%20");
+        strcat(tmp_buf, space_ptr + 1);
+        strcpy(pInfo, tmp_buf);
     }
 
     return AM_SUCCESS;
@@ -1896,8 +1856,7 @@ encode_space(char *pInfo)
  */
 static am_status_t
 get_path_info(FilterContext *context,
-        char *request_url, char **path_info)
-{
+        char *request_url, char **path_info) {
     const char *thisfunc = "get_path_info()";
     am_status_t sts = AM_SUCCESS;
     char *original_path_info = NULL;
@@ -1913,8 +1872,8 @@ get_path_info(FilterContext *context,
     }
     // Get the path_info server variable
     if (sts == AM_SUCCESS) {
-        sts = getServerVariable(context, HTTP_PATH_INFO, 
-                                &original_path_info, B_FALSE, B_FALSE);
+        sts = getServerVariable(context, HTTP_PATH_INFO,
+                &original_path_info, B_FALSE, B_FALSE);
     }
     // Extract the path info from the request url.
     // In Domino server the path info is everything between
@@ -1933,9 +1892,9 @@ get_path_info(FilterContext *context,
                     len = strlen(pStart);
                 }
                 if (len > 0) {
-                    constructed_path_info = (char *) malloc(len+1);
+                    constructed_path_info = (char *) malloc(len + 1);
                     if (constructed_path_info != NULL) {
-                        memset(constructed_path_info, 0, len+1);
+                        memset(constructed_path_info, 0, len + 1);
                         strncpy(constructed_path_info, pStart, len);
                     } else {
                         am_web_log_error("%s: Unable to allocate memory for "
@@ -1944,18 +1903,18 @@ get_path_info(FilterContext *context,
                     }
                 } else {
                     am_web_log_error("%s: Could not get path info from "
-                                     "request url %s.",
-                                     thisfunc, request_url);
+                            "request url %s.",
+                            thisfunc, request_url);
                     sts = AM_FAILURE;
                 }
             } else {
                 am_web_log_error("%s: Request url %s is malformed ",
-                                 thisfunc, request_url);
+                        thisfunc, request_url);
                 sts = AM_FAILURE;
             }
         } else {
             am_web_log_error("%s: Request url %s is malformed ",
-                             thisfunc, request_url);
+                    thisfunc, request_url);
             sts = AM_FAILURE;
         }
     }
@@ -1963,12 +1922,12 @@ get_path_info(FilterContext *context,
     // be free.
     if ((sts == AM_SUCCESS) && (original_path_info != NULL)) {
         sts = allocateVariableInDominoContext(context, constructed_path_info,
-                                              strlen(constructed_path_info),
-                                              &(*path_info));
+                strlen(constructed_path_info),
+                &(*path_info));
         if (strcmp(original_path_info, constructed_path_info) != 0) {
             am_web_log_debug("%s: Path info changed to: %s",
-                                  thisfunc, constructed_path_info);
-        } 
+                    thisfunc, constructed_path_info);
+        }
     }
     if (constructed_path_info != NULL) {
         free(constructed_path_info);
@@ -2001,22 +1960,22 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     am_web_request_func_t req_funcs;
     am_web_result_t result = AM_WEB_RESULT_ERROR;
     am_map_t request_headers_map = NULL;
-    
 
-    memset(&params, 0, sizeof(params));
+
+    memset(&params, 0, sizeof (params));
 
     // check if agent is initialized.
     // if not initialized, then call agent init function
     // TODO: This needs to be synchronized as only one time agent
     // initialization needs to be done.
-    if(agentInitialized != B_TRUE){
+    if (agentInitialized != B_TRUE) {
         am_web_log_debug("%s: Will call init", thisfunc);
         init_at_request();
-        if(agentInitialized != B_TRUE){
+        if (agentInitialized != B_TRUE) {
             am_web_log_error("%s: Agent is still not intialized", thisfunc);
             //deny the access
             sts = AM_FAILURE;
-        }  else {
+        } else {
             am_web_log_debug("%s: Agent intialized", thisfunc);
         }
     }
@@ -2031,7 +1990,7 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     }
     // Check if there is an existing context
     if (sts == AM_SUCCESS) {
-        if ((priv_ctx = (private_context_t *)context->privateContext) != NULL) {
+        if ((priv_ctx = (private_context_t *) context->privateContext) != NULL) {
             am_web_log_error("%s: Unexpected private context found.", thisfunc);
             // don't set any headers from the unexpected private context.
             context->privateContext = NULL;
@@ -2040,13 +1999,11 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     }
     // Create private context for passing info between HttpFilterProc calls.
     if (sts == AM_SUCCESS) {
-         if ((context->privateContext = (void *)priv_ctx =
-                create_private_context(context)) == NULL)
-         {
-             am_web_log_error("%s: Failed to create request private context.",
-                              thisfunc);
-             sts = AM_FAILURE;
-         }
+        if ((context->privateContext = (priv_ctx = create_private_context(context))) == NULL) {
+            am_web_log_error("%s: Failed to create request private context.",
+                    thisfunc);
+            sts = AM_FAILURE;
+        }
     }
     // Get the URL and method (method will be either GET or POST)
     if (sts == AM_SUCCESS) {
@@ -2059,7 +2016,7 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     // Get cookie header val 
     if (sts == AM_SUCCESS) {
         sts = getServerVariable(context, HTTP_COOKIE, &cookie_header_val,
-                                B_FALSE, B_FALSE);
+                B_FALSE, B_FALSE);
     }
     // If there is a proxy in front of the agent, the user can set 
     // in AMAgent.properties the name of the headers that the proxy 
@@ -2072,7 +2029,7 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
         clientIP_hdr_name = am_web_get_client_ip_header_name(agent_config);
         if (clientIP_hdr_name != NULL) {
             sts = getServerVariable(context, clientIP_hdr_name,
-                                   &clientIP_hdr, B_FALSE, B_TRUE);
+                    &clientIP_hdr, B_FALSE, B_TRUE);
         }
     }
     // Get the client host name header set by the proxy, if there is one
@@ -2080,7 +2037,7 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
         clientHostname_hdr_name = am_web_get_client_hostname_header_name(agent_config);
         if (clientHostname_hdr_name != NULL) {
             sts = getServerVariable(context, clientHostname_hdr_name,
-                                   &clientHostname_hdr, B_FALSE, B_TRUE);
+                    &clientHostname_hdr, B_FALSE, B_TRUE);
         }
     }
     // If the client IP and host name headers contain more than one
@@ -2088,7 +2045,7 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
     if (sts == AM_SUCCESS) {
         if ((clientIP_hdr != NULL) || (clientHostname_hdr != NULL)) {
             sts = am_web_get_client_ip_host(clientIP_hdr, clientHostname_hdr,
-                                            &clientIP, &clientHostname);
+                    &clientIP, &clientHostname);
         }
     }
     // Set the IP address that will be used for the evaluation
@@ -2096,26 +2053,26 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
         if (clientIP != NULL) {
             // The ip address should be allocated from the Domino context
             // like it would have been using getServerVariable().
-            sts = allocateVariableInDominoContext(context, clientIP, 
-                                             strlen(clientIP), &requestIP);
+            sts = allocateVariableInDominoContext(context, clientIP,
+                    strlen(clientIP), &requestIP);
         } else {
             sts = getServerVariable(context, HTTP_REMOTE_ADDR,
-                                &requestIP, B_TRUE, B_FALSE);
+                    &requestIP, B_TRUE, B_FALSE);
         }
     }
     if (sts == AM_SUCCESS) {
         am_web_log_debug("%s: IP address used for request evaluation: %s",
-                         thisfunc, requestIP);
+                thisfunc, requestIP);
         sts = am_map_create(&request_headers_map);
     }
     if (sts == AM_SUCCESS) {
-        void *args[3] = { context, rawRequest, request_headers_map };
+        void *args[3] = {context, rawRequest, request_headers_map};
         // Get the query
         char *query = strchr(request_url, '?');
         if (query != NULL) {
             query++;
             am_web_log_debug("%s: QUERY = %s", thisfunc, query);
-        }        
+        }
         // Set request info needed for processing access check.
         req_params.url = request_url;
         req_params.query = query;
@@ -2142,16 +2099,16 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
         req_funcs.add_header_in_response.func = add_header_in_response;
         req_funcs.add_header_in_response.args = args;
         // Process request access check
-        result = am_web_process_request(&req_params, &req_funcs, 
-                                        &render_sts, agent_config);
+        result = am_web_process_request(&req_params, &req_funcs,
+                &render_sts, agent_config);
         if (render_sts != AM_SUCCESS) {
             retVal = kFilterError;
         } else {
-            switch(result) {
+            switch (result) {
                 case AM_WEB_RESULT_OK:
                     // see comments in set_header_in_request for why
                     // this is needed.
-                    (void)set_all_request_headers(args);
+                    (void) set_all_request_headers(args);
                     // done
                     retVal = kFilterHandledEvent;
                     break;
@@ -2175,11 +2132,11 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
         am_web_free_memory(clientHostname);
     }
     if (request_headers_map != NULL) {
-       am_map_destroy(request_headers_map);
+        am_map_destroy(request_headers_map);
     }
     // Handle error status
     if (sts != AM_SUCCESS) {
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+        (void) render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
     }
 
     return retVal;
@@ -2190,8 +2147,7 @@ filterRawRequest(FilterContext *context, FilterRawRequest *rawRequest) {
  * Set domino user to the user authenticated in filterRawRequest.
  */
 static unsigned int
-filterAuthenticate(FilterContext *context, FilterAuthenticate *fAuthN)
-{
+filterAuthenticate(FilterContext *context, FilterAuthenticate *fAuthN) {
     const char *thisfunc = "filterAuthenticate()";
     unsigned int retVal = kFilterError;
     private_context_t *priv_ctx = NULL;
@@ -2203,11 +2159,11 @@ filterAuthenticate(FilterContext *context, FilterAuthenticate *fAuthN)
             fAuthN->authType = kNotAuthentic;
             fAuthN->authName = "";
         }
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+        (void) render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
 
-    // Get the result and user that was authenticated in filterRawRequest
-    } else if ((priv_ctx = (private_context_t *)context->privateContext)==NULL ||
-               priv_ctx->result != AM_WEB_RESULT_OK) {
+        // Get the result and user that was authenticated in filterRawRequest
+    } else if ((priv_ctx = (private_context_t *) context->privateContext) == NULL ||
+            priv_ctx->result != AM_WEB_RESULT_OK) {
         // if we get to this function, result should've been ok,
         // and private context should not be null.
         // however, if it is for some reason, render internal error.
@@ -2215,22 +2171,22 @@ filterAuthenticate(FilterContext *context, FilterAuthenticate *fAuthN)
         // the url is not enforced. in that case let domino decide
         // whether or not to allow access.
         am_web_log_error("%s: Error encountered: private context is NULL or "
-               "result %s is not 200 OK.", thisfunc,
-               priv_ctx == NULL ? "" :
-               am_web_result_num_to_str(priv_ctx->result));
+                "result %s is not 200 OK.", thisfunc,
+                priv_ctx == NULL ? "" :
+                am_web_result_num_to_str(priv_ctx->result));
         fAuthN->authType = kNotAuthentic;
         fAuthN->authName = "";
-        (void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+        (void) render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
 
-    // everything OK
+        // everything OK
     } else {
         if (priv_ctx->user == NULL || priv_ctx->user[0] == '\0') {
             am_web_log_warning("%s: setting user to empty string in private context.",
-                      thisfunc);
+                    thisfunc);
             priv_ctx->user = "";
         }
         am_web_log_debug("%s: setting user to %s.",
-                  thisfunc, priv_ctx->user);
+                thisfunc, priv_ctx->user);
         fAuthN->authName = priv_ctx->user;
         fAuthN->authType = kAuthenticBasic;
         retVal = kFilterHandledEvent;
@@ -2238,42 +2194,38 @@ filterAuthenticate(FilterContext *context, FilterAuthenticate *fAuthN)
     return retVal;
 }
 
-
 /**
  * Gets called on kFilterAuthorize event.
  * Returns isAuthorized if user access was OK in filterRawRequest().
  */
 static unsigned int
-filterAuthorize(FilterContext *context, FilterAuthorize *fAuthZ)
-{
+filterAuthorize(FilterContext *context, FilterAuthorize *fAuthZ) {
     const char *thisfunc = "filterAuthorize()";
     unsigned int retVal = kFilterError;
     private_context_t *priv_ctx = NULL;
 
     // Check arguments
     if (context == NULL || fAuthZ == NULL) {
-	am_web_log_error("%s: One of input arguments is NULL.", thisfunc);
-	if (fAuthZ != NULL)
-	    fAuthZ->isAuthorized = 0;
-	(void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-    }
-    // Get the result from filterRawRequest
-    else if ((priv_ctx = (private_context_t *)context->privateContext)==NULL ||
-	      priv_ctx->result != AM_WEB_RESULT_OK) {
-	// if we get to this function, result should've been ok,
-	// but if it isn't for some reason, render internal error.
-	am_web_log_error("%s: Error encountered: result %s is not 200 OK, "
-			 "or private context is NULL.",
-			 thisfunc,
-			 priv_ctx == NULL ? "<no-result-found>" :
-			    am_web_result_num_to_str(priv_ctx->result));
-	fAuthZ->isAuthorized = 0;
-	(void)render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
-    }
-    else {
-	fAuthZ->isAuthorized = 1;
-	am_web_log_debug("%s: request authorized.", thisfunc);
-	retVal = kFilterHandledEvent;
+        am_web_log_error("%s: One of input arguments is NULL.", thisfunc);
+        if (fAuthZ != NULL)
+            fAuthZ->isAuthorized = 0;
+        (void) render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+    }// Get the result from filterRawRequest
+    else if ((priv_ctx = (private_context_t *) context->privateContext) == NULL ||
+            priv_ctx->result != AM_WEB_RESULT_OK) {
+        // if we get to this function, result should've been ok,
+        // but if it isn't for some reason, render internal error.
+        am_web_log_error("%s: Error encountered: result %s is not 200 OK, "
+                "or private context is NULL.",
+                thisfunc,
+                priv_ctx == NULL ? "<no-result-found>" :
+                am_web_result_num_to_str(priv_ctx->result));
+        fAuthZ->isAuthorized = 0;
+        (void) render_response(context, HTTP_500_INT_ERROR, NULL, &retVal);
+    } else {
+        fAuthZ->isAuthorized = 1;
+        am_web_log_debug("%s: request authorized.", thisfunc);
+        retVal = kFilterHandledEvent;
     }
 
     return retVal;
@@ -2289,13 +2241,12 @@ filterAuthorize(FilterContext *context, FilterAuthorize *fAuthZ)
  *               config and bootstrap files from file dsame.conf.
  *
  */
-static am_status_t get_properties_file_path()
-{
+static am_status_t get_properties_file_path() {
     FILE *fp;
     struct stat stat_buf;
     char *read_str;
     char *__return_str;
-    long  read_buf_sz = 0;
+    long read_buf_sz = 0;
     int continue_loop = 1;
     int err_id, read_len;
     am_status_t sts = AM_FAILURE;
@@ -2314,19 +2265,19 @@ static am_status_t get_properties_file_path()
         return (sts);
     }
 
-    read_str = (char *)malloc (read_buf_sz * sizeof(char));
+    read_str = (char *) malloc(read_buf_sz * sizeof (char));
     if (!read_str) {
         return (sts);
     }
 
-    while (continue_loop ) {
-        memset(read_str, 0 , read_buf_sz);
+    while (continue_loop) {
+        memset(read_str, 0, read_buf_sz);
         if (!fgets(read_str, read_buf_sz, fp)) {
             break;
         }
         if (strstr(read_str, AGENT_CONFIG_FILE)) {
             read_len = strlen(read_str) + 1;
-            __return_str = (char *)malloc(read_len * sizeof(char));
+            __return_str = (char *) malloc(read_len * sizeof (char));
             if (!__return_str) {
                 free(read_str);
                 return (sts);
@@ -2336,7 +2287,7 @@ static am_status_t get_properties_file_path()
             agent_config.properties_file = __return_str;
         } else if (strstr(read_str, AGENT_BOOTSTRAP_FILE)) {
             read_len = strlen(read_str) + 1;
-            __return_str = (char *)malloc(read_len * sizeof(char));
+            __return_str = (char *) malloc(read_len * sizeof (char));
             if (!__return_str) {
                 free(read_str);
                 if (!agent_config.properties_file) {
@@ -2364,101 +2315,96 @@ static am_status_t get_properties_file_path()
  * After response headers are set the headers map is destroyed.
  */
 static unsigned int
-filterResponse(FilterContext *context, FilterResponse *fResp)
-{
+filterResponse(FilterContext *context, FilterResponse *fResp) {
     const char *thisfunc = "filterResponse()";
     unsigned int retVal = kFilterHandledEvent;
     am_map_t headersMap = NULL;
     am_status_t sts = AM_SUCCESS;
     unsigned int max_buf_len = 0;
 
-    if (context == NULL || fResp == NULL ) {
-	am_web_log_error("%s: Invalid parameters passed.", thisfunc);
-	retVal = kFilterError;
-    }
-    else if (context->privateContext == NULL) {
-	am_web_log_warning("%s: No private context found.", thisfunc);
-	retVal = kFilterHandledEvent;
-    }
-    else {
-	private_context_t *
-	    priv_ctx = (private_context_t *)context->privateContext;
-	headersMap = priv_ctx->response_headers_to_set;
-	if (headersMap == NULL) {
-	    am_web_log_max_debug("%s: No headers handle found.", thisfunc);
-	    retVal = kFilterHandledEvent;
-	}
-	else if (am_map_size(headersMap) == 0) {
-	    am_web_log_max_debug("%s: No headers to be set.", thisfunc);
-	    retVal = kFilterHandledEvent;
-	}
-	else {
-	    // Calculate the length of the buffer required to store the headers
-	    void *args[] = { &max_buf_len };
-	    sts = am_map_for_each(headersMap, get_header_length, args);
-	    am_web_log_max_debug("%s: Header buffer length: %i",thisfunc, max_buf_len);
-	}
-	
-	if (max_buf_len > 0) {
-	    char* headers_buf = NULL;
-	    size_t max_len = 0;
-	    size_t n_written = 0;
-	    void *args[3];
-	    unsigned int errID;
+    if (context == NULL || fResp == NULL) {
+        am_web_log_error("%s: Invalid parameters passed.", thisfunc);
+        retVal = kFilterError;
+    } else if (context->privateContext == NULL) {
+        am_web_log_warning("%s: No private context found.", thisfunc);
+        retVal = kFilterHandledEvent;
+    } else {
+        private_context_t *
+                priv_ctx = (private_context_t *) context->privateContext;
+        headersMap = priv_ctx->response_headers_to_set;
+        if (headersMap == NULL) {
+            am_web_log_max_debug("%s: No headers handle found.", thisfunc);
+            retVal = kFilterHandledEvent;
+        } else if (am_map_size(headersMap) == 0) {
+            am_web_log_max_debug("%s: No headers to be set.", thisfunc);
+            retVal = kFilterHandledEvent;
+        } else {
+            // Calculate the length of the buffer required to store the headers
+            void *args[] = {&max_buf_len};
+            sts = am_map_for_each(headersMap, get_header_length, args);
+            am_web_log_max_debug("%s: Header buffer length: %i", thisfunc, max_buf_len);
+        }
 
-	    headers_buf = malloc(max_buf_len);
-	    if(headers_buf == NULL){
-	        am_web_log_error("%s: Could not allocate memory for headers_buf",thisfunc);
-	        retVal = kFilterError;
-	    } else {
-	        memset(headers_buf, 0, sizeof(headers_buf));
-	        max_len = sizeof(headers_buf) - strlen(HEADER_TEXT_END) - 1;
-	        args[0] = headers_buf;
-	        args[1] = &max_len;
-	        args[2] = &n_written;
+        if (max_buf_len > 0) {
+            char* headers_buf = NULL;
+            size_t max_len = 0;
+            size_t n_written = 0;
+            void *args[3];
+            unsigned int errID;
 
-	        // response->AddHeader and response->SetHeader will both replace
-	        // a header if one is already there, and this does not work for
-	        // headers like "Set-Cookie" which can have multiple entries.
-	        // The following was found to work around this "feature" -
-	        // put all headers into the buffer passed to AddHeader(),
-	        // each seperated by \r\n.
-	        // The following call fills a buffer with a list of header:value
-	        // pairs seperated by a \r\n.
-	        sts = am_map_for_each(headersMap, add_headers, args);
-	        if(sts != AM_SUCCESS) {
-	        am_web_log_error("%s: Error while "
-	                "iterating over the header values: %s",
-	                thisfunc, am_status_to_string(sts));
-	        } else {
-	            am_web_log_max_debug("%s: Successfully set all headers.",
-	                thisfunc);
-	        }
+            headers_buf = malloc(max_buf_len);
+            if (headers_buf == NULL) {
+                am_web_log_error("%s: Could not allocate memory for headers_buf", thisfunc);
+                retVal = kFilterError;
+            } else {
+                memset(headers_buf, 0, sizeof (headers_buf));
+                max_len = sizeof (headers_buf) - strlen(HEADER_TEXT_END) - 1;
+                args[0] = headers_buf;
+                args[1] = &max_len;
+                args[2] = &n_written;
 
-	        // Now call AddHeader with list of headers.
-	        if (fResp->AddHeader(context, headers_buf, &errID) == FALSE) {
-	        am_web_log_warning("%s: Error adding header %s: %s",
-	                thisfunc, headers_buf,
-	                domino_error_to_str(errID));
-	        } else {
-	            am_web_log_debug("%s: Headers set: %s", thisfunc, headers_buf);
-	        }
-	        
-	        if (headers_buf != NULL) {
-	            free(headers_buf);
-	            headers_buf = NULL;
-	        }
-	        // whether or not response headers were set successfully,
-	        // the filter is handled.
-	        retVal = kFilterHandledEvent;
-	    }
-	}
+                // response->AddHeader and response->SetHeader will both replace
+                // a header if one is already there, and this does not work for
+                // headers like "Set-Cookie" which can have multiple entries.
+                // The following was found to work around this "feature" -
+                // put all headers into the buffer passed to AddHeader(),
+                // each seperated by \r\n.
+                // The following call fills a buffer with a list of header:value
+                // pairs seperated by a \r\n.
+                sts = am_map_for_each(headersMap, add_headers, args);
+                if (sts != AM_SUCCESS) {
+                    am_web_log_error("%s: Error while "
+                            "iterating over the header values: %s",
+                            thisfunc, am_status_to_string(sts));
+                } else {
+                    am_web_log_max_debug("%s: Successfully set all headers.",
+                            thisfunc);
+                }
 
-	if (headersMap != NULL) {
-	    am_map_destroy(headersMap);
-	    priv_ctx->response_headers_to_set = NULL;
-	    am_web_log_debug("%s: Destroyed response headers map", thisfunc);
-	}
+                // Now call AddHeader with list of headers.
+                if (fResp->AddHeader(context, headers_buf, &errID) == FALSE) {
+                    am_web_log_warning("%s: Error adding header %s: %s",
+                            thisfunc, headers_buf,
+                            domino_error_to_str(errID));
+                } else {
+                    am_web_log_debug("%s: Headers set: %s", thisfunc, headers_buf);
+                }
+
+                if (headers_buf != NULL) {
+                    free(headers_buf);
+                    headers_buf = NULL;
+                }
+                // whether or not response headers were set successfully,
+                // the filter is handled.
+                retVal = kFilterHandledEvent;
+            }
+        }
+
+        if (headersMap != NULL) {
+            am_map_destroy(headersMap);
+            priv_ctx->response_headers_to_set = NULL;
+            am_web_log_debug("%s: Destroyed response headers map", thisfunc);
+        }
     }
     return retVal;
 }
@@ -2469,28 +2415,26 @@ init_agent() {
     am_status_t sts = AM_SUCCESS;
 
     //The following lines are added for the server restart bug
-    #if defined(WINNT)
-        LoadLibrary("libnspr4.dll");
-    #endif
+#if defined(WINNT)
+    LoadLibrary("libnspr4.dll");
+#endif
     //End of modifications for the server restart bug
 
 
-    if ((sts=get_properties_file_path()) != AM_SUCCESS) {
+    if ((sts = get_properties_file_path()) != AM_SUCCESS) {
         am_web_log_error(
-            "%s: getting agent's config/bootstrap files' paths failed!",
-            thisfunc);
-    } else if ((sts = am_web_init(agent_config.bootstrap_file, 
-                agent_config.properties_file)) != AM_SUCCESS) {
+                "%s: getting agent's config/bootstrap files' paths failed!",
+                thisfunc);
+    } else if ((sts = am_web_init(agent_config.bootstrap_file,
+            agent_config.properties_file)) != AM_SUCCESS) {
         am_web_log_error("%s: am_web_init failed with %s.",
-                    thisfunc, am_status_to_string(sts));
-    } 
-    if(sts == AM_SUCCESS) {
+                thisfunc, am_status_to_string(sts));
+    }
+    if (sts == AM_SUCCESS) {
         am_web_log_debug("%s: successfully initialized.", thisfunc);
     }
     return sts;
 }
-
-
 
 /**
  * This function is invoked to initialize the agent
@@ -2505,10 +2449,8 @@ void init_at_request() {
     }
 }
 
-
 unsigned int
-FilterInit(FilterInitData *initData)
-{
+FilterInit(FilterInitData *initData) {
     am_status_t sts = AM_FAILURE;
     unsigned int retVal = kFilterError;
 
@@ -2516,80 +2458,75 @@ FilterInit(FilterInitData *initData)
     initData->appFilterVersion = kInterfaceVersion;
 
     /* Modify the following code to set the flags you want */
-    initData->eventFlags = kFilterRawRequest|
-			   kFilterAuthenticate|
-			   kFilterAuthorized|
-			   kFilterResponse;
+    initData->eventFlags = kFilterRawRequest |
+            kFilterAuthenticate |
+            kFilterAuthorized |
+            kFilterResponse;
 
     /* Set a short description for your filter */
     strcpy(initData->filterDesc,
-	   "IS Authentication Filter for Lotus Domino Server R8");
+            "IS Authentication Filter for Lotus Domino Server R8");
 
     // initialize agent.
     sts = init_agent();
-    if (sts != AM_SUCCESS){
+    if (sts != AM_SUCCESS) {
         am_web_log_debug("FilterInit(): init_agent failed with error %s",
-			 am_status_to_string(sts));
-        retVal =  kFilterError;
+                am_status_to_string(sts));
+        retVal = kFilterError;
+    } else {
+        retVal = kFilterHandledEvent;
     }
-    else {
-	retVal = kFilterHandledEvent;
-    } 
 
     return retVal;
 }
 
-
 unsigned int
 HttpFilterProc(FilterContext *context, unsigned int eventType,
-	       void *pEventData)
-{
+        void *pEventData) {
     const char *thisfunc = "HttpFilterProc()";
     FilterReturnCode retVal = kFilterError;
 
     am_web_log_info("%s: Plugin called for event %s.",
-		    thisfunc, getEventTypeStr(eventType));
+            thisfunc, getEventTypeStr(eventType));
     if (context == NULL || pEventData == NULL) {
-	am_web_log_error("%s: One of input arguments is NULL.",
-			 thisfunc);
-	retVal = kFilterError;
-    }
-    else {
-	switch(eventType) {
-	case kFilterRawRequest:
-	    // where all of request access check takes place.
-	    retVal = filterRawRequest(context, (FilterRawRequest *)pEventData);
-	    break;
-	case kFilterAuthenticate:
-	    // returns authenticated user name and type to domino
-	    retVal = filterAuthenticate(context,
-					(FilterAuthenticate *)pEventData);
-	    break;
-	case kFilterAuthorized:
-	    // returns whether request is authorized to domino.
-	    retVal = filterAuthorize(context, (FilterAuthorize *)pEventData);
-	    break;
-	case kFilterResponse:
-	    // set response headers
-	    retVal = filterResponse(context, (FilterResponse *)pEventData);
-	    break;
-	default:
-	    am_web_log_error("%s: Unregistered event type invoked.", thisfunc);
-	    break;
-	}
+        am_web_log_error("%s: One of input arguments is NULL.",
+                thisfunc);
+        retVal = kFilterError;
+    } else {
+        switch (eventType) {
+            case kFilterRawRequest:
+                // where all of request access check takes place.
+                retVal = filterRawRequest(context, (FilterRawRequest *) pEventData);
+                break;
+            case kFilterAuthenticate:
+                // returns authenticated user name and type to domino
+                retVal = filterAuthenticate(context,
+                        (FilterAuthenticate *) pEventData);
+                break;
+            case kFilterAuthorized:
+                // returns whether request is authorized to domino.
+                retVal = filterAuthorize(context, (FilterAuthorize *) pEventData);
+                break;
+            case kFilterResponse:
+                // set response headers
+                retVal = filterResponse(context, (FilterResponse *) pEventData);
+                break;
+            default:
+                am_web_log_error("%s: Unregistered event type invoked.", thisfunc);
+                break;
+        }
     }
     am_web_log_info("%s: Plugin call ended for event %s, "
-		    "return val %s.", thisfunc, getEventTypeStr(eventType),
-		    domino_return_code_to_str(retVal));
+            "return val %s.", thisfunc, getEventTypeStr(eventType),
+            domino_return_code_to_str(retVal));
     return retVal;
 }
 
 unsigned int
-TerminateFilter(unsigned int reserved)
-{
-    if(agent_config.properties_file) {
-	free(agent_config.properties_file);
-	agent_config.properties_file = NULL;
+TerminateFilter(unsigned int reserved) {
+    if (agent_config.properties_file) {
+        free(agent_config.properties_file);
+        agent_config.properties_file = NULL;
     }
     if (agent_config.bootstrap_file) {
         free(agent_config.bootstrap_file);

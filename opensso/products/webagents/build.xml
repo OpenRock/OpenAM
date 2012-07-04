@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2011 ForgeRock AS
+    Portions Copyrighted 2010-2012 ForgeRock AS
 -->
 
 <project name="open-source-web-agents" default="usage">
@@ -175,7 +175,7 @@
                 </not>
                 <or>
                     <os name="linux" />
-                    <!--os name="sunos" arch="sparc" /-->
+                    <os name="sunos" arch="sparc"/>
                     <os name="aix"/>
                     <os family="windows"/>
                 </or>

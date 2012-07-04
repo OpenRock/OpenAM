@@ -43,10 +43,10 @@ AM_DOMINO_SRC = agents\source\domino\domino_agent.c
 
 DEP_INCPATH = \
 !IFDEF X64
-   /I"extlib\WINNT\libxml2_64\include" /I"extlib\WINNT\nspr_64\include" \
+   /I"extlib\WINNT\libxml2_64\include" /I"extlib\WINNT\nspr_64\include" /I"extlib\WINNT\domino_64\include" \
    /I"extlib\WINNT\nss_64\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include"
 !ELSE
-   /I"extlib\WINNT\libxml2\include" /I"extlib\WINNT\nspr\include" \
+   /I"extlib\WINNT\libxml2\include" /I"extlib\WINNT\nspr\include" /I"extlib\WINNT\domino\include" \
    /I"extlib\WINNT\nss\include" /I"extlib\WINNT\proxy40\include" /I"extlib\WINNT\sjsws\include"
 !ENDIF
 
@@ -54,10 +54,10 @@ DEP_LIBS = libxml2.lib nspr4.lib nss3.lib ssl3.lib plc4.lib kernel32.lib user32.
 
 DEP_LIBPATH = \
 !IFDEF X64
-  /LIBPATH:"extlib\WINNT\libxml2_64\lib" /LIBPATH:"extlib\WINNT\nspr_64\lib" \
+  /LIBPATH:"extlib\WINNT\libxml2_64\lib" /LIBPATH:"extlib\WINNT\nspr_64\lib" /LIBPATH:"extlib\WINNT\domino_64\lib" \
   /LIBPATH:"extlib\WINNT\nss_64\lib" /LIBPATH:"extlib\WINNT\proxy40_64\lib" /LIBPATH:"extlib\WINNT\sjsws_64\lib"
 !ELSE
-  /LIBPATH:"extlib\WINNT\libxml2\lib" /LIBPATH:"extlib\WINNT\nspr\lib" \
+  /LIBPATH:"extlib\WINNT\libxml2\lib" /LIBPATH:"extlib\WINNT\nspr\lib" /LIBPATH:"extlib\WINNT\domino\lib" \
   /LIBPATH:"extlib\WINNT\nss\lib" /LIBPATH:"extlib\WINNT\proxy40\lib" /LIBPATH:"extlib\WINNT\sjsws\lib"
 !ENDIF
 
