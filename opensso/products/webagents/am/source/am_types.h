@@ -35,26 +35,14 @@
 #define AM_TYPES_H
 
 #if (defined(WINNT) || defined(_AMD64_))
-#if	defined(AM_BUILDING_LIB)
-
-#if defined(_AMD64_)
-#define	AM_EXPORT	
+#if defined(AM_BUILDING_LIB)
+#define	AM_EXPORT __declspec(dllexport)
 #else
-#define	AM_EXPORT	__declspec(dllexport)
-#endif
-
+#if !defined(AM_STATIC_LIB)
+#define	AM_EXPORT __declspec(dllimport)
 #else
-#if	!defined(AM_STATIC_LIB)
-
-#if defined(_AMD64_)
-#define	AM_EXPORT	
-#else
-#define	AM_EXPORT	__declspec(dllimport)
-#endif
-
-#else
-#if	!defined(__cplusplus)
-#define	AM_EXPORT	extern
+#if !defined(__cplusplus)
+#define	AM_EXPORT extern
 #endif
 #endif
 #endif

@@ -29,22 +29,13 @@
 #ifndef AM_WEB_H
 #define AM_WEB_H
 
-#if     (defined(WINNT) || defined(_AMD64_)) && !(AM_STATIC_LIB)
-#if     defined(AM_BUILDING_LIB)
-
-#if defined(_AMD64_)
-#define AM_WEB_EXPORT 
+#if (defined(WINNT) || defined(_AMD64_))
+#if defined(AM_BUILDING_LIB)
+#define AM_WEB_EXPORT __declspec(dllexport)
 #else
-#define AM_WEB_EXPORT    __declspec(dllexport)
+#define AM_WEB_EXPORT __declspec(dllimport)
 #endif
-#else /* if defined(AM_BUILDING_LIB) */
-#if defined(_AMD64_)
-#define AM_WEB_EXPORT 
 #else
-#define AM_WEB_EXPORT    __declspec(dllimport)
-#endif
-#endif
-#else /* if defined(WINNT) */
 #define AM_WEB_EXPORT
 #endif
 
