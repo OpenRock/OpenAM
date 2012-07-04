@@ -26,4 +26,4 @@
  * Portions Copyrighted [2010] [ForgeRock AS]
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore.i18n;
+package org.forgerock.openam.session.ha.i18n;
