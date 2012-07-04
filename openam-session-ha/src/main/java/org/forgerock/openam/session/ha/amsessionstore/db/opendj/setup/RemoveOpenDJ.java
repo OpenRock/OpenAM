@@ -29,7 +29,7 @@ import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.db.opendj.EmbeddedOpenDJ;
 import org.forgerock.openam.session.ha.amsessionstore.db.opendj.OpenDJConfig;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  *

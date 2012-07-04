@@ -36,7 +36,7 @@ import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  * Implements the get record count functionality

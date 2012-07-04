@@ -32,7 +32,7 @@ import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.session.ha.amsessionstore.resources.ShutdownResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  * This class implements the shutdown REST call sent by OpenAM when it is 

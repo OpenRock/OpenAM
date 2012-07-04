@@ -76,7 +76,7 @@ import org.opends.server.types.RawAttribute;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  *

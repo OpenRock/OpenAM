@@ -42,7 +42,7 @@ import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.restlet.security.MapVerifier;
 import org.restlet.ext.crypto.DigestAuthenticator;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  * This is the main class of the amsessiondb server. Starts the RESTlet server

@@ -43,7 +43,7 @@ import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
-import static org.forgerock.openam.session.ha.amsessionstore.i18n.AmsessionstoreMessages.*;
+import static org.forgerock.openam.session.hai18n.AmsessionstoreMessages.*;
 
 /**
  * This class encapsulates a distinguished name and its attribute values.
