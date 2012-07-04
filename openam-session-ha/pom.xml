@@ -50,6 +50,7 @@
     <build>
         <plugins>
 
+            <!--
             <plugin>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>i18n-maven-plugin</artifactId>
@@ -62,14 +63,16 @@
                         </goals>
                         <configuration>
                             <messageFiles>
-                                <messageFile>org/forgerock/openam/session/ha/i18n/amsessionstore.properties</messageFile>
+                                <messageFile>org/forgerock/openam/session/ha/amsessionstore/i18n/amsessionstore.properties</messageFile>
                             </messageFiles>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <!-- Establish our generated-sources Directory for Compile Inclusion. -->
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -88,6 +91,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <plugin>
                 <inherited>true</inherited>
