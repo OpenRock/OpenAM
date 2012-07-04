@@ -40,7 +40,7 @@
     </description>
     <artifactId>openam-session-ha-core</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.com</url>
@@ -116,6 +116,12 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-locale</artifactId>
+            <version>10.1-XPRESS-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-common</artifactId>
             <version>10.1-XPRESS-SNAPSHOT</version>
         </dependency>
 
