@@ -73,12 +73,15 @@
             <post>commitopenam@forgerock.org</post>
         </mailingList>
     </mailingLists>
+
+    <!-- Source Control -->
     <scm>
-        <url>https://svn.forgerock.org/openam/trunk/opensso/</url>
-        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</developerConnection>
+        <url>https://svn.forgerock.org/openam/branches/maven_branch_01</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</developerConnection>
         <tag>HEAD</tag>
     </scm>
+
     <issueManagement>
         <system>Jira</system>
         <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
@@ -108,9 +111,11 @@
         <agentsDocTargetVersion>3</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
-        <site-out>${basedir}/target/site</site-out>
+
+        <site-out>${project.build.outputDirectory}/site</site-out>
+
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
-        <products-basedir>${basedir}/..</products-basedir>
+        <products-basedir>${basedir}</products-basedir>
         <gaId>UA-23412190-7</gaId>
     </properties>
     <distributionManagement>

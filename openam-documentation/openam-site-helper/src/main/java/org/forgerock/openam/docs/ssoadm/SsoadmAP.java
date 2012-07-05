@@ -125,7 +125,7 @@ public class SsoadmAP extends AbstractProcessor {
                 content.append(subCommand);
             }
             content.append(readFile("src/main/docbkx/reference/man-ssoadm-1.footer"));
-            writeFile("site-helper/target/generated-resources/man-ssoadm-1.xml", content.toString());
+            writeFile("target/generated-resources/man-ssoadm-1.xml", content.toString());
         }
         return true;
     }
