@@ -3323,7 +3323,7 @@ am_web_result_attr_map_set(
                     "%s: User attribute is %s.", thisfunc, keyRef.c_str());
 
                   // Clear the header
-                  std::string hdr_or_cookie_name_s(keyRef.c_str());
+                  /*std::string hdr_or_cookie_name_s(keyRef.c_str());
                   const char * hdr_or_cookie_name =
                                              hdr_or_cookie_name_s.c_str();
                   if (setFunc != NULL) {
@@ -3334,7 +3334,7 @@ am_web_result_attr_map_set(
                                             am_status_to_string(set_sts),
                                             hdr_or_cookie_name);
                      }
-                   }
+                   }*/
 
                    const KeyValueMap::mapped_type &valueRef =
                                                       iter_header->second;

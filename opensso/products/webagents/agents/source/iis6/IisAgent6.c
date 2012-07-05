@@ -1424,7 +1424,7 @@ void rem_attr_headers(char** rawHeaders, char* set_headers_list) {
         tmpHdr = (char*) calloc(1, strlen(rawCopy));
         for ((a = strtok_s(rawCopy, "\r\n", &ab)); a; (a = strtok_s(NULL, "\r\n", &ab))) {
             if (test_attr_exists(a, set_headers_list) == 0) {
-                sprintf(tmpHdr, "%s%s\n", tmpHdr, a);
+                sprintf(tmpHdr, "%s%s\r\n", tmpHdr, a);
             }
         }
         memset(*rawHeaders, 0, strlen(*rawHeaders));
