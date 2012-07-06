@@ -23,18 +23,19 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.ReplicationConfig;
+import java.util.Map;
 import org.restlet.resource.Get;
 
 /**
  *
  * @author steve
  */
-public interface ReplicationResource {
-    public static final String URI = "/replsetup";
+public interface GetRecordCountResource {
+    public static final String URI = "/getrecordcount";
+    public static final String UUID = "/{uuid}";
     
     @Get
-    public ReplicationConfig getConfig();  
+    public Map<String, Long> getRecordCount();
 }

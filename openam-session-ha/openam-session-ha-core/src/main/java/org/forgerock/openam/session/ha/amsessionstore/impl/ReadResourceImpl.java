@@ -37,7 +37,7 @@ import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.resources.ReadResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReadResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.Get;

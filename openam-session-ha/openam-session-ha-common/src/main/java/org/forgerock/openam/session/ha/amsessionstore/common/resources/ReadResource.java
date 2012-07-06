@@ -23,17 +23,20 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
+import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
 import org.restlet.resource.Get;
 
 /**
  *
  * @author steve
  */
-public interface ShutdownResource {
-    public static final String URI = "/shutdown";
+public interface ReadResource {
+    public static final String URI = "/read";
+    public static final String PKEY_PARAM = "pkey";
+    public static final String PKEY = "/{" + PKEY_PARAM + "}";
     
     @Get
-    public void shutdown();
+    public AMRecord read();
 }

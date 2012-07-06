@@ -23,18 +23,19 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
-import org.restlet.resource.Put;
+import org.restlet.resource.Delete;
 
 /**
  *
  * @author steve
  */
-public interface WriteResource {
-    public final static String URI = "/write";
-
-    @Put
-    public void write(AMRecord record) throws Exception;
+public interface DeleteResource {
+    public static final String URI = "/delete";
+    public static final String PKEY_PARAM = "pkey";
+    public static final String PKEY = "/{" + PKEY_PARAM + "}";
+    
+    @Delete
+    public void remove();
 }

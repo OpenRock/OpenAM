@@ -23,18 +23,17 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.Config;
+import java.util.Set;
 import org.restlet.resource.Get;
 
 /**
  *
  * @author steve
  */
-public interface ConfigResource {
-    public static final String URI = "/config";
-    
+public interface DBDumpResource {
+    public final static String URI = "/dbdump";
     @Get
-    public Config getConfig();
+    public Set<String> dbDump() throws Exception;
 }

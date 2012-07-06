@@ -23,20 +23,19 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
-import org.restlet.resource.Get;
+import org.restlet.resource.Delete;
 
 /**
  *
  * @author steve
  */
-public interface ReadResource {
-    public static final String URI = "/read";
-    public static final String PKEY_PARAM = "pkey";
-    public static final String PKEY = "/{" + PKEY_PARAM + "}";
+public interface DeleteByDateResource {
+    public static final String URI = "/deletebydate";
+    public static final String DATE_PARAM = "date";
+    public static final String DATE = "/{" + DATE_PARAM + "}";
     
-    @Get
-    public AMRecord read();
+    @Delete
+    public void remove();
 }

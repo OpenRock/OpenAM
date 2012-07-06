@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStore;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.resources.DBDumpResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.DBDumpResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 

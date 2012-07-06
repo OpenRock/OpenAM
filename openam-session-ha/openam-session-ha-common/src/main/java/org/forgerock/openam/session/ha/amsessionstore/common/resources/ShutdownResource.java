@@ -23,19 +23,17 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
 
 /**
  *
  * @author steve
  */
-public interface DeleteResource {
-    public static final String URI = "/delete";
-    public static final String PKEY_PARAM = "pkey";
-    public static final String PKEY = "/{" + PKEY_PARAM + "}";
+public interface ShutdownResource {
+    public static final String URI = "/shutdown";
     
-    @Delete
-    public void remove();
+    @Get
+    public void shutdown();
 }

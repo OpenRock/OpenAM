@@ -23,19 +23,18 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import java.util.Map;
-import org.restlet.resource.Get;
+import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
+import org.restlet.resource.Put;
 
 /**
  *
  * @author steve
  */
-public interface GetRecordCountResource {
-    public static final String URI = "/getrecordcount";
-    public static final String UUID = "/{uuid}";
-    
-    @Get
-    public Map<String, Long> getRecordCount();
+public interface WriteResource {
+    public final static String URI = "/write";
+
+    @Put
+    public void write(AMRecord record) throws Exception;
 }

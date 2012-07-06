@@ -31,7 +31,7 @@ import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.resources.DeleteResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.Delete;

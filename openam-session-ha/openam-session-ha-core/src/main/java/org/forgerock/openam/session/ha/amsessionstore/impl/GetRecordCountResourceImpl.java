@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.resources.GetRecordCountResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.GetRecordCountResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;

@@ -29,7 +29,7 @@ import com.sun.identity.ha.FAMRecord;
 import java.util.Set;
 import java.util.Vector;
 import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
-import org.forgerock.openam.session.ha.amsessionstore.resources.ReadWithSecKeyResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReadWithSecKeyResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;

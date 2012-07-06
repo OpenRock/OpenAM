@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.common.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.resources.WriteResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.WriteResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
 import org.restlet.resource.Put;

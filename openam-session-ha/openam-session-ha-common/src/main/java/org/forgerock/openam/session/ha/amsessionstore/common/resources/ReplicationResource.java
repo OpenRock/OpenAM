@@ -23,19 +23,18 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
-import org.restlet.resource.Delete;
+import org.forgerock.openam.session.ha.amsessionstore.common.ReplicationConfig;
+import org.restlet.resource.Get;
 
 /**
  *
  * @author steve
  */
-public interface DeleteByDateResource {
-    public static final String URI = "/deletebydate";
-    public static final String DATE_PARAM = "date";
-    public static final String DATE = "/{" + DATE_PARAM + "}";
+public interface ReplicationResource {
+    public static final String URI = "/replsetup";
     
-    @Delete
-    public void remove();
+    @Get
+    public ReplicationConfig getConfig();  
 }

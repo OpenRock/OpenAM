@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.resources;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
 
 import java.util.Set;
 import org.restlet.resource.Get;

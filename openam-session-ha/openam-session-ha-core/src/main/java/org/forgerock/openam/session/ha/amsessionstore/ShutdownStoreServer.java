@@ -27,7 +27,7 @@ package org.forgerock.openam.session.ha.amsessionstore;
 
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.SystemProperties;
-import org.forgerock.openam.session.ha.amsessionstore.resources.ShutdownResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.ShutdownResource;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;

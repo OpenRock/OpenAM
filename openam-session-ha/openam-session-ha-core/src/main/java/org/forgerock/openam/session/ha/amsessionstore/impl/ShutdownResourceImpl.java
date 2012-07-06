@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.AMSessionStoreServer;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.resources.ShutdownResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.ShutdownResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
