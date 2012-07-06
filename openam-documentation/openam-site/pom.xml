@@ -230,8 +230,8 @@
                             <target>
                                 <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
                                     <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header"/>
-                                    <fileset dir="${project.build.directory}/generated-resources/xml/xslt"
-                                             includes="**/*.xml" excludes="index.xml">
+                                    <fileset dir="${basedir}/src/main/xslt"
+                                             includes="**/*.xml">
 
                                     </fileset>
                                     <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer"/>
