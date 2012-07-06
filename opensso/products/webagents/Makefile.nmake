@@ -63,12 +63,8 @@ DEP_LIBPATH = \
 
 
 LDFLAGS = /NOLOGO /INCREMENTAL:NO /errorReport:none \
-   /MANIFEST:NO \
-!IFDEF DEBUG 
-   /DEBUG /LTCG /DYNAMICBASE /NXCOMPAT \
-!ELSE
-   /OPT:REF /OPT:ICF /LTCG /DYNAMICBASE /NXCOMPAT \
-!ENDIF
+   /MANIFEST:NO /LTCG /DYNAMICBASE /NXCOMPAT /DEBUG \
+   /OPT:REF /OPT:ICF \
 !IFDEF X64 
    /MACHINE:X64
 !ELSE
@@ -78,12 +74,7 @@ LDFLAGS = /NOLOGO /INCREMENTAL:NO /errorReport:none \
 
 CFLAGS = /O2 /Oi /GL /Gy /D _WINDLL /FD /D_CRT_SECURE_NO_WARNINGS \
    /D AM_BUILDING_LIB /wd4996 /wd4101 /wd4244 /D WINNT \
-   /EHsc /nologo /Zi /errorReport:none /Iam\source \
-!IFDEF DEBUG 
-   /MDd /Wall \
-!ELSE
-   /MD /W3 \
-!ENDIF
+   /EHsc /nologo /Zi /errorReport:none /Iam\source /MD /W3 \
 !IFDEF X64 
    /D _AMD64_ /c
 !ELSE
