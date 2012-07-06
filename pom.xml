@@ -224,6 +224,27 @@
     <!-- Profiles -->
     <profiles>
         <!-- Place Default Profiles here to override plugins -->
+
+        <profile>
+            <id>include-tools.jar</id>
+            <activation>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>1.5</version>
+                    <scope>system</scope>
+                    <optional>true</optional>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+
+
     </profiles>
 
     <!-- Maven Repositories -->
@@ -1015,31 +1036,6 @@
     <build>
 
         <plugins>
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <rule>
-                                <requireMavenVersion>3.0.3</requireMavenVersion>
-                                </rule>
-                                <rule>
-                                    <requireJavaVersion>1.6</requireJavaVersion>
-                                </rule>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-             -->
 
             <plugin>
                 <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
