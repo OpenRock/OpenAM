@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
-import org.forgerock.openam.session.ha.amsessionstore.common.SystemProperties;
+import org.forgerock.openam.session.ha.amsessionstore.common.config.SystemProperties;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**

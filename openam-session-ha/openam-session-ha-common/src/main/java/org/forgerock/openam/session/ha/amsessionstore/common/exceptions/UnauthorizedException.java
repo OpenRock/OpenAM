@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.db.client;
+package org.forgerock.openam.session.ha.amsessionstore.common.exceptions;
 
 /**
  *

@@ -23,7 +23,9 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.common;
+package org.forgerock.openam.session.ha.amsessionstore.common.config;
+
+import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 
 import java.io.Serializable;
 import java.util.Map;

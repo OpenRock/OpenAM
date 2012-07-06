@@ -23,9 +23,12 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.common;
+package org.forgerock.openam.session.ha.amsessionstore.common.config;
 
 import org.forgerock.i18n.LocalizableMessage;
+import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
+import org.forgerock.openam.session.ha.amsessionstore.common.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

@@ -26,7 +26,7 @@
 package org.forgerock.openam.session.ha.amsessionstore.shared;
 
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
-import org.forgerock.openam.session.ha.amsessionstore.common.SystemProperties;
+import org.forgerock.openam.session.ha.amsessionstore.common.config.SystemProperties;
 import java.io.Serializable;
 
 /**

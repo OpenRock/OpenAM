@@ -26,7 +26,7 @@
 package org.forgerock.openam.session.ha.amsessionstore.impl;
 
 import org.forgerock.openam.session.ha.amsessionstore.db.opendj.OpenDJConfig;
-import org.forgerock.openam.session.ha.amsessionstore.common.ReplicationConfig;
+import org.forgerock.openam.session.ha.amsessionstore.common.config.ReplicationConfig;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReplicationResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
