@@ -52,7 +52,7 @@
     <properties>
         <!-- Java Properties -->
         <openam.federation.java.source.version>1.5</openam.federation.java.source.version>
-        <openam.federation.java.target.version>1.4</openam.federation.java.target.version>
+        <openam.federation.java.target.version>1.5</openam.federation.java.target.version>
     </properties>
     <!-- Child Modules -->
     <modules>
