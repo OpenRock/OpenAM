@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import org.forgerock.openam.session.ha.amsessionstore.common.CaseInsensitiveHashMap;
+import org.forgerock.openam.session.ha.amsessionstore.common.model.CaseInsensitiveHashMap;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
 import org.opends.server.types.Attribute;
