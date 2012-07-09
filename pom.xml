@@ -236,7 +236,7 @@
                 <dependency>
                     <groupId>com.sun</groupId>
                     <artifactId>tools</artifactId>
-                    <version>1.5</version>
+                    <version>${java.target.version}</version>
                     <scope>system</scope>
                     <optional>true</optional>
                     <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
