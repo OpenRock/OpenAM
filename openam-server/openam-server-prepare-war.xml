@@ -122,6 +122,8 @@
             </fileset>
         </copy>
 
+        <!-- Moved to a WEB Resource in WAR Plugin
+
         <copy todir="${openam.target}/WEB-INF" filtering="false">
             <fileset
                     dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss">
@@ -135,6 +137,8 @@
                 <include name="amConsoleConfig.xml"/>
             </fileset>
         </copy>
+
+
 
         <copy todir="${openam.target}/WEB-INF/classes" filtering="false">
             <fileset
@@ -164,6 +168,8 @@
                 <include name="IdentityManagementServices.wsdl"/>
             </fileset>
         </copy>
+
+        -->
 
         <!-- Align in fedlet -->
         <mkdir dir="${openam.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
