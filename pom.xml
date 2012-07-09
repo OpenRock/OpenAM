@@ -227,32 +227,15 @@
 
         <profile>
             <id>default-profile</id>
+            <!-- This profile gets activated for WINDOWS and LINUX Systems -->
             <activation>
-                <activeByDefault>true</activeByDefault>
                 <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
+                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
                 </file>
             </activation>
             <properties>
-                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+                <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
             </properties>
-        </profile>
-
-        <profile>
-            <id>macosx-profile</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <file>
-                    <exists>${java.home}/../Classes/classes.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>include-tools-jar</id>
             <dependencies>
                 <dependency>
                     <groupId>com.sun</groupId>
@@ -264,8 +247,6 @@
                 </dependency>
             </dependencies>
         </profile>
-
-
 
     </profiles>
 
