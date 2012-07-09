@@ -71,7 +71,7 @@
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />
- <xinclude:include href='../../../../../openam-site-helper/target/generated-resources/chap-log-messages.xml' />
+ <xinclude:include href='../../../../../openam-site/target/generated-resources/chap-log-messages.xml' />
  <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />
