@@ -40,7 +40,7 @@
     <artifactId>openam-site</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
 
-    <name>OpenAM Documentation</name>
+    <name>OpenAM Site Documentation</name>
 
     <inceptionYear>2011</inceptionYear>
     <packaging>jar</packaging>
