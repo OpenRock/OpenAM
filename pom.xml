@@ -83,9 +83,9 @@
         <maven.build.timestamp.format>yyyy-MMM-dd HH:mm:ss</maven.build.timestamp.format>
         <!-- **************************************************************** -->
         <!-- Java Properties -->
-        <java.source.version>1.6</java.source.version>
+        <java.source.version>1.5</java.source.version>
         <!-- Backed off from 1.6 -->
-        <java.target.version>1.6</java.target.version>
+        <java.target.version>1.5</java.target.version>
         <!-- Backed off from 1.6 -->
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
