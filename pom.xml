@@ -223,15 +223,36 @@
 
     <!-- Profiles -->
     <profiles>
-        <!-- Place Default Profiles here to override plugins -->
+        <!-- Place Default Profiles here to override and determine Environment. -->
+
+        <profile>
+            <id>default-profile</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>macosx-profile</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <file>
+                    <exists>${java.home}/../Classes/classes.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+            </properties>
+        </profile>
 
         <profile>
             <id>include-tools-jar</id>
-            <activation>
-                <file>
-                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
-                </file>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.sun</groupId>
@@ -239,10 +260,11 @@
                     <version>${java.target.version}</version>
                     <scope>system</scope>
                     <optional>true</optional>
-                    <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+                    <systemPath>${toolsjar}</systemPath>
                 </dependency>
             </dependencies>
         </profile>
+
 
 
     </profiles>

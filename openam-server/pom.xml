@@ -64,12 +64,12 @@
 
                                 <property name="openam.version" value="${project.version}"/>
 
+                                <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP"/>
+
                                 <property name="build.class.path" refid="maven.compile.classpath"/>
                                 <property name="project.basedir" value="./"/>
 
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
-
-                                <property name="openam.target" value="${project.build.directory}/openam"/>
 
                                 <property name="amserver.target.resources.dir"
                                           value="${project.build.directory}/classes"/>
@@ -227,6 +227,17 @@
                                 <include>sun-jaxws.xml</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <!-- This pickup the remaining moved elements build from the "openam-server-prepare-war"
+                                 step from a Temp Area -->
+                            <directory>${project.build.directory}/openam_TEMP
+                            </directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath></targetPath>
                             <filtering>true</filtering>
                         </webResource>
 
