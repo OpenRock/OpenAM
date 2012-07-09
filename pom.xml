@@ -226,20 +226,20 @@
         <!-- Place Default Profiles here to override plugins -->
 
         <profile>
-            <id>include-tools.jar</id>
+            <id>include-tools-jar</id>
             <activation>
                 <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
+                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
                 </file>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.sun</groupId>
                     <artifactId>tools</artifactId>
-                    <version>${java.target.version}</version>
+                    <version>1.5</version>
                     <scope>system</scope>
                     <optional>true</optional>
-                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                    <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
                 </dependency>
             </dependencies>
         </profile>
