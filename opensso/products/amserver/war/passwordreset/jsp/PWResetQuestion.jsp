@@ -32,7 +32,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <%@include file="../ui/PWResetBase.jsp" %>
-    <%@page info="PWResetQuestion" language="java" %>
+    <%@page info="PWResetQuestion" language="java" pageEncoding="UTF-8" %>
     <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
     <jato:useViewBean className="com.sun.identity.password.ui.PWResetQuestionViewBean" fireChildDisplayEvents="true">
         <head>
