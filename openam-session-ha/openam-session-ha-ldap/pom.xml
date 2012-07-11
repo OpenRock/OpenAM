@@ -101,6 +101,12 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-core</artifactId>
+            <version>10.1-XPRESS-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
             <version>10.1-XPRESS-SNAPSHOT</version>
         </dependency>
