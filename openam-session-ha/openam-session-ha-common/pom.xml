@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam-session-ha</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -39,7 +39,7 @@
     <description>OpenAM Session High-Availability Component
     </description>
     <artifactId>openam-session-ha-common</artifactId>
-    <version>10.1-XPRESS-SNAPSHOT</version>
+    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-locale</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Session Repository Module Dependencies-->
