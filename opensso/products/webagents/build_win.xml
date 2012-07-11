@@ -95,15 +95,15 @@
     </condition>
 
     <condition property="winnt.lib.ext" value="_64" else="">
-        <os family="windows" arch="amd64"/>
+        <equals arg1="${build.type}" arg2="64"/>
     </condition>
 
     <condition property="winnt.ext" value="_64" else="">
-        <os family="windows" arch="amd64"/>
+        <equals arg1="${build.type}" arg2="64"/>
     </condition>
 
     <condition property="build.type.suffix" value="_64" else="">
-        <os family="windows" arch="amd64"/>
+        <equals arg1="${build.type}" arg2="64"/>
     </condition>
 
     <condition property="target.jdk.set" value="${target.jdk}">
@@ -344,8 +344,12 @@
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.dll"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.lib"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.dll"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nspr${winnt.lib.ext}/lib" includes="**/*.dll"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.chk"/>
             <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/libxml2${winnt.lib.ext}/lib" includes="**/*.dll"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nspr${winnt.lib.ext}/lib" includes="**/*.lib"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/nss${winnt.lib.ext}/lib" includes="**/*.lib"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/extlib/WINNT/libxml2${winnt.lib.ext}/lib" includes="**/*.lib"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
             <zipfileset dir="${webagents.basedir}/conf" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
             <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
