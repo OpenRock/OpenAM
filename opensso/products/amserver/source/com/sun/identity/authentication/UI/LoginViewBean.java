@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.UI;
@@ -1040,7 +1040,14 @@ public class LoginViewBean extends AuthViewBeanBase {
                     processLoginDisplay();
                 } else {
                     addLoginCallbackMessage(callbacks);
-                    AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    if (!LoginFail) {
+                        //if the login already failed, then LoginState is already
+                        //nullified, hence any attempt of calling this method
+                        //will result in failure. Also if the login failed,
+                        //the errormessage/code/template should be already set
+                        //so a proper error page is shown.
+                        AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    }
                 }
             } else {
                 if (loginDebug.messageEnabled()) {
@@ -1460,7 +1467,14 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                     
                     addLoginCallbackMessage(callbacks);
-                    AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    if (!LoginFail) {
+                        //if the login failed by now, then LoginState is already
+                        //nullified, hence any attempt of calling this method
+                        //will result in a NPE. Also if the login failed,
+                        //the errormessage/code/template should be already set
+                        //so a proper error page will be shown.
+                        AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    }
                 } else {
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message(
