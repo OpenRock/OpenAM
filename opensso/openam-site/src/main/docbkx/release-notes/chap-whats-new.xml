@@ -366,7 +366,7 @@
    <para>For cross domain single sign on and SAML 2.0 authentication, users
    were presented with a blank login page during authentication, in fact a
    page containing forms with hidden fields used to process authentication.
-   OpenAM now provides templates so you can show users something besides
+   OpenAM now provides templates so you can show users something other
    than blank pages, such as for example a page with an animated .gif progress
    bar (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-9"
    xlink:show="new">OPENAM-9</link>).</para>
