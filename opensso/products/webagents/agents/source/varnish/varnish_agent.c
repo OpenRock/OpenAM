@@ -83,12 +83,18 @@ static int iterate_func(void *v, const char *key, const char *value) {
 }
 
 static void fill_http(sess_record *sp, int done) {
+    int status;
     itd d;
     d.r = sp;
     d.hdr = (done == 1 ? HDR_OBJ : HDR_RESP);
     apr_table_do(iterate_func, &d, sp->response.headers_out, NULL);
-    if (done == 1 && sp->response.status != 0) {
-        http_PutStatus(sp->s->obj->http, sp->response.status);
+    if (done == 1 && (status = sp->response.status) != 0) {
+        if (status < 100 || status > 999) {
+            status = 503;
+        }
+        http_PutStatus(sp->s->obj->http, status);
+        http_PutResponse(sp->s->wrk, sp->s->fd,
+                sp->s->obj->http, http_StatusMessage(status));
     }
     if (done == 1 && sp->response.body != NULL && sp->response.body[0] != '\0') {
         VRT_synth_page(sp->s, 0, sp->response.body, vrt_magic_string_end);
@@ -287,6 +293,7 @@ static am_status_t render_result(void **args, am_web_result_t http_result, char 
                 break;
             case AM_WEB_RESULT_REDIRECT:
                 apr_table_add(rec->response.headers_out, "Location", data);
+                apr_table_addn(rec->response.headers_out, "Content-Type", "text/html");
                 ap_custom_response(rec, 302, apr_psprintf(rec->pool, "<head><title>Document Moved</title></head>\n"
                         "<body><h1>Object Moved</h1>This document may be found "
                         "<a HREF=\"%s\">here</a></body>", data));
@@ -607,7 +614,7 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
         }
         if ((req_params.client_ip == NULL) || (strlen(req_params.client_ip) == 0)
                 || (req_params.client_hostname == NULL) || (strlen(req_params.client_hostname) == 0)) {
-            am_web_log_error("%s: Could not get the remote host/ip (error: %d)", thisfunc, errno);
+            am_web_log_error("%s: Could not get the remote host/ip (error: %d)", thisfunc, err);
             status = AM_FAILURE;
         }
     }
