@@ -170,49 +170,45 @@ static am_status_t content_read(void **args, char **rbuf) {
     sess_record *r;
     char *ptr, *endp;
     unsigned long content_length;
-    am_status_t sts = AM_SUCCESS;
+    am_status_t sts = AM_FAILURE;
 
     int total_read = 0;
     int bytes_read;
-    int bytes_to_read;
 
     const int buf_length = 8192;
     char buf[buf_length];
 
     if (args == NULL || (r = args[0]) == NULL) {
-        am_web_log_error("%s: invalid arguments passed.", thisfunc);
+        am_web_log_error("%s: invalid arguments passed", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else if (ptr = VRT_GetHdr(r->s, HDR_REQ, cl)) {
         content_length = strtoul(ptr, &endp, 10);
-        ptr = 0;
-        while (content_length > 0) {
-            bytes_to_read = content_length > buf_length ? buf_length : content_length;
-            bytes_read = HTC_Read(r->s->htc, buf, bytes_to_read);
+        *rbuf = apr_pcalloc(r->pool, content_length + 1);
+        if (*rbuf == NULL) {
+            am_web_log_error("%s: memory failure", thisfunc);
+            return AM_FAILURE;
+        }
+        while (content_length) {
+            bytes_read = content_length > buf_length ? buf_length : content_length;
+            bytes_read = HTC_Read(r->s->htc, buf, bytes_read);
             if (bytes_read <= 0) {
                 sts = AM_FAILURE;
                 break;
             }
-            *rbuf = apr_pcalloc(r->pool, total_read + bytes_read);
-            if (*rbuf == 0) {
-                sts = AM_FAILURE;
-                break;
-            }
-            if (ptr) {
-                memcpy(*rbuf, ptr, total_read);
-            }
-            memcpy(*rbuf + total_read, buf, bytes_read);
-            total_read += bytes_read;
-            ptr = *rbuf;
             content_length -= bytes_read;
+            memcpy((*rbuf) + total_read, buf, bytes_read);
+            total_read += bytes_read;
         }
-    } else
-        sts = AM_FAILURE;
+        sts = AM_SUCCESS;
+    }
 
-    if (AM_SUCCESS == sts)
+    if (AM_SUCCESS == sts) {
         VRT_SetHdr(r->s, HDR_REQ, cl, NULL, vrt_magic_string_end);
+        (*rbuf)[total_read] = 0;
+        am_web_log_max_debug("%s:\n%s\n", thisfunc, *rbuf);
+    }
 
-    am_web_log_debug("%s: %d bytes read", thisfunc, total_read);
-    am_web_log_max_debug("\n%s\n", *rbuf);
+    am_web_log_debug("%s: %d bytes", thisfunc, total_read);
     return sts;
 }
 
