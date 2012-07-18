@@ -229,6 +229,8 @@
 ./WEB-INF/classes/amAuthNT_ko.properties
 ./WEB-INF/classes/amAuthNT_zh.properties
 ./WEB-INF/classes/amAuthNT_zh_TW.properties
+./WEB-INF/classes/amAuthOATH.properties
+./WEB-INF/classes/amAuthOATH.xml
 ./WEB-INF/classes/amAuthOAuth.properties
 ./WEB-INF/classes/amAuthOAuth.xml
 ./WEB-INF/classes/amAuthOAuth_en.properties
