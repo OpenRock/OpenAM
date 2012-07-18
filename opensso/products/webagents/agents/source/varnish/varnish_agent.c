@@ -72,6 +72,7 @@ typedef enum {
 static pthread_mutex_t s_module_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t init_mutex = PTHREAD_MUTEX_INITIALIZER;
 static boolean_t agentInitialized = B_FALSE;
+static boolean_t agentBootInitialized = B_FALSE;
 static apr_pool_t* s_module_pool = NULL;
 static apr_hash_t* s_module_storage = NULL;
 
@@ -473,42 +474,21 @@ static am_status_t check_for_post_data(void **args, const char *requestURL, char
 }
 
 void vmod_init(struct sess* s, const char *agent_bootstrap_file, const char *agent_config_file) {
-    am_status_t amstatus = AM_SUCCESS;
     apr_status_t status = apr_initialize();
-    if (APR_SUCCESS != status) {
-        LOG("am_vmod_init apr_initialize failed\n");
-        return;
-    }
-    status = apr_pool_create(&s_module_pool, NULL);
-    if (APR_SUCCESS != status) {
-        LOG("am_vmod_init apr_pool_create failed\n");
-        apr_terminate();
-        return;
-    }
-    s_module_storage = apr_hash_make(s_module_pool);
-    if (s_module_storage == NULL) {
-        LOG("am_vmod_init apr_hash_make failed\n");
-        apr_pool_destroy(s_module_pool);
-        apr_terminate();
-        return;
-    }
-
-    pthread_mutex_lock(&init_mutex);
-    if ((amstatus = am_web_init(agent_bootstrap_file, agent_config_file)) != AM_SUCCESS) {
-        LOG("am_vmod_init am_web_init failed: %s (%d)\n", am_status_to_string(amstatus), amstatus);
-        status = APR_EINIT;
-    }
-    if (APR_SUCCESS == status) {
-        if ((amstatus = am_agent_init(&agentInitialized)) != AM_SUCCESS) {
-            LOG("am_vmod_init am_agent_init failed: %s (%d)\n", am_status_to_string(amstatus), amstatus);
-            status = APR_EINIT;
+    if (status == APR_SUCCESS) {
+        status = apr_pool_create(&s_module_pool, NULL);
+        if (status == APR_SUCCESS) {
+            s_module_storage = apr_hash_make(s_module_pool);
+            if (s_module_storage != NULL) {
+                pthread_mutex_lock(&init_mutex);
+                if (am_web_init(agent_bootstrap_file, agent_config_file) != AM_SUCCESS) {
+                    agentBootInitialized = B_FALSE;
+                } else {
+                    agentBootInitialized = B_TRUE;
+                }
+                pthread_mutex_unlock(&init_mutex);
+            }
         }
-    }
-    pthread_mutex_unlock(&init_mutex);
-
-    if (APR_SUCCESS != status) {
-        apr_pool_destroy(s_module_pool);
-        apr_terminate();
     }
 }
 
@@ -557,7 +537,31 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     memset((void *) & req_params, 0, sizeof (req_params));
     memset((void *) & req_func, 0, sizeof (req_func));
 
-    if (agentInitialized != B_TRUE || (r = on_request_init(s)) == NULL) {
+    if ((r = on_request_init(s)) == NULL) {
+        LOG("vmod_authenticate() on_request_init failed\n");
+        am_web_log_error("%s: on_request_init failed", thisfunc);
+        send_deny(r);
+        return 0;
+    }
+
+    if (agentBootInitialized != B_TRUE) {
+        LOG("vmod_authenticate() am_web_init failed\n");
+        am_web_log_error("%s: am_web_init failed", thisfunc);
+        send_deny(r);
+        return 0;
+    }
+
+    if (agentInitialized != B_TRUE) {
+        pthread_mutex_lock(&init_mutex);
+        if (agentInitialized != B_TRUE) {
+            if ((status = am_agent_init(&agentInitialized)) != AM_SUCCESS) {
+                am_web_log_error("%s: am_agent_init failed: %s (%d)", thisfunc, am_status_to_string(status), status);
+            }
+        }
+        pthread_mutex_unlock(&init_mutex);
+    }
+
+    if (agentInitialized != B_TRUE) {
         send_deny(r);
         return 0;
     }
@@ -593,6 +597,7 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
             if (status == AM_SUCCESS && data != NULL && strlen(data) > 0) {
                 am_web_handle_notification(data, strlen(data), agent_config);
                 am_web_delete_agent_configuration(agent_config);
+                am_web_log_debug("%s: received notification message, sending HTTP-200 response", thisfunc);
                 send_ok(r);
                 return 0;
             } else {
@@ -664,12 +669,16 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
 
 void vmod_done(struct sess * s) {
     char thisfunc[] = "vmod_done()";
+    const char* ct = "\015Content-Type:";
     sess_record* r = get_sess_rec(s);
     if (r != NULL) {
         fill_http(r, 1);
     } else {
-        am_web_log_error("%s: invalid argument", thisfunc);
+        am_web_log_error("%s: sending HTTP-403 response", thisfunc);
         http_PutStatus(s->obj->http, 403);
+        http_PutResponse(s->wrk, s->fd, s->obj->http, http_StatusMessage(403));
+        VRT_synth_page(s, 0, "403 Forbidden", vrt_magic_string_end);
+        VRT_SetHdr(s, HDR_OBJ, ct, "text/plain", vrt_magic_string_end);
     }
     on_request_cleanup(s);
 }
