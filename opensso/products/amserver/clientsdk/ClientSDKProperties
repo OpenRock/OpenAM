@@ -9,3 +9,4 @@ amSecurity.properties
 amSSOProvider.properties
 amSession.properties
 amPolicy.properties
+EntitlementException.properties
