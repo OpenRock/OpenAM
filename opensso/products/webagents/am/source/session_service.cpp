@@ -25,6 +25,9 @@
  * $Id: session_service.cpp,v 1.5 2009/03/23 22:58:07 subbae Exp $
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 #include "am.h"
 #include "session_service.h"
 #include "xml_tree.h"
@@ -929,6 +932,12 @@ SessionService::addListener(const ServiceInfo& service,
                             sessionResponses[i].size());
                     XMLElement element = sessionTree.getRootElement();
                     std::string version;
+                    
+                    if (!element.isValid()) {
+                        Log::log(logModule, Log::LOG_ERROR,
+                            "SessionService::addListener() invalid response (%d): %s", i, sessionResponses[i].c_str());
+                        throw XMLTree::ParseException("Session Service returned an invalid ResponseSet");
+                    } 
                     
                     if (element.isNamed("SessionResponse") &&
                     element.getAttributeValue("vers", version) &&

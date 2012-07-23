@@ -25,7 +25,9 @@
  * $Id: service.cpp,v 1.34 2009/10/28 21:56:20 subbae Exp $
  *
  */
-
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 #include <climits>
 #include <ctime>
 #include <string>
@@ -433,34 +435,36 @@ Service::initialize() {
     string remoteLogName = svcParams.get(AM_AUDIT_SERVER_LOG_FILE_PROPERTY,
 					 "");
     LogService *newLogSvc =
-	   new LogService(mPolicyEntry->namingInfo.getLoggingSvcInfo(),
-			  mPolicyEntry->getSSOToken(),
-			  mPolicyEntry->cookies, remoteLogName,
-			  svcParams,
+            new LogService(mPolicyEntry->namingInfo.getLoggingSvcInfo(),
+            mPolicyEntry->getSSOToken(),
+            mPolicyEntry->cookies, remoteLogName,
+            svcParams,
                           svcParams.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY,""),
                           svcParams.get(AM_AUTH_CERT_ALIAS_PROPERTY,""),
-                          alwaysTrustServerCert);
+            alwaysTrustServerCert);
 
 
     Log::setRemoteInfo(newLogSvc);
-      // Start a thread pool to audit log 
-      if (auditLog == NULL) {
+    // Start a thread pool to audit log 
+    if (auditLog == NULL) {
         try {
             auditLog = new AuditLog(newLogSvc,
-                                    agentProfileService,
-                                    svcParams.getPositiveNumber(
-                                        AM_AUDIT_SERVER_LOG_INTERVAL_PROPERTY,
-                                        DEFAULT_AUDIT_LOG_POLLING_INTERVAL),
-                                       "Audit Log");
-        } catch(std::bad_alloc &bae) {
+                    agentProfileService,
+                    svcParams.getPositiveNumber(
+                    AM_AUDIT_SERVER_LOG_INTERVAL_PROPERTY,
+                    DEFAULT_AUDIT_LOG_POLLING_INTERVAL),
+                    "Audit Log");
+        } catch (std::bad_alloc &bae) {
             throw InternalException(func,
-                                    "Memory allocation failure while "
-                                    "creating Audit Log.",
-                                    AM_NO_MEMORY);
-        } catch(InternalException &ie) {
+                    "Memory allocation failure while "
+                    "creating Audit Log.",
+                    AM_NO_MEMORY);
+        } catch (InternalException &ie) {
             throw ie;
         }
-    }
+    } else {
+        auditLog->updateLogService(newLogSvc);
+    } 
 
     if (threadPoolAuditLogCreated == false) {
         if (tPoolAuditLog == NULL) {
@@ -1362,21 +1366,21 @@ Service::getPolicyResult(const char *userSSOToken,
 	uPolicyEntry->getAllPolicyDecisions(resName, results);
 	// If results not found,get the resource root
         if ((results.size() == 0)) {
-	    ResourceName resObj(resName);
+            ResourceName resObj(resName);
             std::string rootRes;
             if (resObj.getResourceRoot(rsrcTraits, rootRes)) {
 	        if (uPolicyEntry->getTree(rootRes,false) == NULL) {
-	            update_policy(ssoToken, resName, actionName, env, 
-                        uSessionInfo,
+                    update_policy(ssoToken, resName, actionName, env,
+                            uSessionInfo,
                         mFetchFromRootResource==true?SCOPE_SUBTREE:SCOPE_SELF,
-                        true, uPolicyEntry, attrList, properties);
+                            true, uPolicyEntry, attrList, properties);
                     Log::log(logID, Log::LOG_WARNING,
-	              "%s:Result size is %d,tree not present for %s", func,
+                            "%s:Result size is %d,tree not present for %s", func,
 	              results.size(),resName.c_str());
                     uPolicyEntry->getAllPolicyDecisions(resName, results);
-	        }
-	    }
-        }
+                }
+            }
+                }
 
         // For each policy decision, if it is stale,
         // get the new one.

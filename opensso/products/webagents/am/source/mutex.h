@@ -28,87 +28,103 @@
  *
  * Mutual exclusion synchronization object.
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef MUTEX_H
 #define MUTEX_H
 
-#if	defined(DEBUG)
-#include <cassert>
+#ifdef _MSC_VER
+#include <windows.h>
+#include <process.h>
+#else
+#include <pthread.h>
+#include <errno.h>
 #endif
 
-#include <prlock.h>
-
-#include "nspr_exception.h"
 #include "internal_macros.h"
 
 BEGIN_PRIVATE_NAMESPACE
 
+#ifdef _MSC_VER
+
 class Mutex {
+    CRITICAL_SECTION m;
+    Mutex(const Mutex&);
+    Mutex& operator=(const Mutex&);
 public:
-    //
-    // Creates a new mutex object.
-    //
-    // Throws:
-    //   NSPRException
-    //		if the underlying lock object cannot be created.
-    //
-    Mutex();
 
-    //
-    // Destroys the object.
-    //
-    ~Mutex();
+    Mutex() {
+        InitializeCriticalSection(&m);
+    }
 
-    //
-    // Locks the mutex object.  If the object is currently locked then,
-    // the caller will block until the lock becomes available.
-    //
-    // NOTE: These locks are not recursive.  If a thread holds a lock
-    // and attempts to lock the same lock again, the thread will deadlock.
-    //
-    void lock();
+    ~Mutex() {
+        DeleteCriticalSection(&m);
+    }
 
-    //
-    // Unlocks the mutex object.  The behavior is undefined if the
-    // current thread does not hold the lock.
-    //
-    void unlock();
+    bool lock() {
+        EnterCriticalSection(&m);
+        return true;
+    }
 
-private:
-    Mutex(const Mutex& rhs);	// not implemented
-    Mutex& operator=(const Mutex& rhs);	// not implemented
+    bool unlock() {
+        LeaveCriticalSection(&m);
+        return true;
+    }
 
-    PRLock *lockPtr;
+    bool trylock() {
+        return TryEnterCriticalSection(&m) != FALSE;
+    }
+
 };
 
-inline Mutex::Mutex()
-    : lockPtr(PR_NewLock())
-{
-    if (NULL == lockPtr) {
-	throw NSPRException("Mutex()", "PR_NewLock");
-    }
-}
-
-inline Mutex::~Mutex()
-{
-    PR_DestroyLock(lockPtr);
-}
-
-inline void Mutex::lock()
-{
-    PR_Lock(lockPtr);
-}
-
-inline void Mutex::unlock()
-{
-#if	defined(DEBUG)
-    assert(PR_SUCCESS == PR_Unlock(lockPtr));
 #else
-    PR_Unlock(lockPtr);
+
+class Mutex {
+    pthread_mutex_t m;
+    pthread_mutexattr_t ma;
+    Mutex(const Mutex&);
+    Mutex& operator=(const Mutex&);
+public:
+
+    Mutex() {
+        pthread_mutexattr_init(&ma);
+        pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_ERRORCHECK);
+        pthread_mutex_init(&m, &ma);
+    }
+
+    ~Mutex() {
+        pthread_mutexattr_destroy(&ma);
+        pthread_mutex_destroy(&m);
+    }
+
+    bool lock() {
+        int res;
+        res = pthread_mutex_lock(&m);
+        if (res == 0) return true;
+        return false;
+    }
+
+    bool unlock() {
+        int res;
+        res = pthread_mutex_unlock(&m);
+        if (res == 0) return true;
+        return false;
+    }
+
+    bool trylock() {
+        int res;
+        res = pthread_mutex_trylock(&m);
+        if (res && (res != EBUSY)) return false;
+        return !res;
+    }
+
+};
+
 #endif
-}
 
 END_PRIVATE_NAMESPACE
 
-#endif	/* not MUTEX_H */
+#endif

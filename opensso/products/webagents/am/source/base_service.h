@@ -31,6 +31,9 @@
  * with DSAME services.
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef BASE_SERVICE_H
 #define BASE_SERVICE_H
@@ -181,11 +184,6 @@ private:
 
     static Mutex classLock;
     static IdType globalRequestId;
-    static BodyChunk getPrefixChunk;
-    static BodyChunk postPrefixChunk;
-    static BodyChunk getSuffixChunk;
-    static BodyChunk postSuffixChunk;
-    static BodyChunk postFormSuffixChunk;
 
     Mutex objLock;
     IdType serviceRequestId;

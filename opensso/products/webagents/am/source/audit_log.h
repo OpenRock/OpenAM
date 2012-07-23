@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 #ifndef __AUDIT_LOG_H__
@@ -44,10 +44,10 @@
 #include "log_service.h"
 
 BEGIN_PRIVATE_NAMESPACE
-        
+
 using std::string;
 
-class AuditLog:public ThreadFunction {
+class AuditLog : public ThreadFunction {
 private:
     Log::ModuleId htcID;
     LogService *logService;
@@ -58,33 +58,32 @@ private:
     volatile bool stayAlive;
     mutable volatile bool doneExit;
     const char *message;
-    
+
 public:
+
     /* Throws NSPRException upon NSPR error */
     AuditLog(LogService *logServiceParam,
-             AgentProfileService *agentProfileServiceParam,
-             PRTime fetchInterval, 
-             const char *messStr)
-            : htcID(Log::addModule("Polling")),
-              logService(logServiceParam),
-              agentProfileService(agentProfileServiceParam),
-              sleepTime(fetchInterval),
-              lock(NULL), condVar(NULL), stayAlive(true),
-              doneExit(false), message(messStr) {
-        
+            AgentProfileService *agentProfileServiceParam,
+            PRTime fetchInterval, const char *messStr)
+    : htcID(Log::addModule("Polling")),
+    logService(logServiceParam),
+    agentProfileService(agentProfileServiceParam), sleepTime(fetchInterval),
+    lock(NULL), condVar(NULL), stayAlive(true), doneExit(false), message(messStr) {
+
         lock = PR_NewLock();
         if (lock == NULL) {
-            throw NSPRException("AuditLog::AuditLog", 
+            throw NSPRException("AuditLog::AuditLog",
                     "PR_NewLock", PR_GetError());
         } else {
             condVar = PR_NewCondVar(lock);
-            if(condVar == NULL) {
-                throw NSPRException("AuditLog::AuditLog", 
+            if (condVar == NULL) {
+                throw NSPRException("AuditLog::AuditLog",
                         "PR_NewLock",
                         PR_GetError());
             }
         }
     }
+
     ~AuditLog() {
         PR_DestroyCondVar(condVar);
         condVar = NULL;
@@ -92,17 +91,17 @@ public:
         lock = NULL;
         message = NULL;
     }
-    
+
     inline void stopFlushing() {
         stayAlive = false;
         PR_Lock(lock);
         PR_NotifyAllCondVar(condVar);
         PR_Unlock(lock);
     }
-       
+
     void operator()() const {
-        PRTime tps = PR_TicksPerSecond(), sleepCount = 0, rollover = 0;       
-        while(stayAlive) {           
+        PRTime tps = PR_TicksPerSecond(), sleepCount = 0, rollover = 0;
+        while (stayAlive) {
             /**
              * NSPR documentation suggests that we
              * don't give sleep timers that are more
@@ -116,38 +115,43 @@ public:
              * everytime bcoz, we can dynamically change
              * it if needed using the set timer
              */
-            sleepCount = sleepTime/300;
+            sleepCount = sleepTime / 300;
             rollover = sleepTime % 300;
-            
-            PR_Lock(lock);           
+
+            PR_Lock(lock);
             if (stayAlive)
-                for(PRTime counter = 0; counter < sleepCount; counter ++)
-                    if(stayAlive) PR_WaitCondVar(condVar, tps * 300 * 60);
-            
+                for (PRTime counter = 0; counter < sleepCount; counter++)
+                    if (stayAlive) PR_WaitCondVar(condVar, tps * 300 * 60);
+
             /* Wait for the reminder of the time */
-            if(stayAlive)
+            if (stayAlive)
                 PR_WaitCondVar(condVar, tps * rollover * 60);
-            
+
             PR_Unlock(lock);
-            
+
             if (stayAlive) {
 
                 if (agentProfileService->getAgentConfigInstance()->doRemoteLog == AM_TRUE) {
-                    Log::log(htcID, Log::LOG_INFO,
-                        "Starting %s. logService->flushBuffer()", message);
-
-                    logService->flushBuffer();                
-
-                    Log::log(htcID, Log::LOG_INFO,
-                        "Finished %s. logService->flushBuffer()", message);
+                    Log::log(htcID, Log::LOG_INFO, "Starting %s. logService->flushBuffer()", message);
+                    if (logService != NULL) {
+                        logService->flushBuffer();
+                    } else {
+                        Log::log(htcID, Log::LOG_ERROR, "LogService::flushBuffer() logService is NULL");
+                    }
+                    Log::log(htcID, Log::LOG_INFO, "Finished %s. logService->flushBuffer()", message);
                 }
             }
         }
         doneExit = true;
         return;
-    }       
+    }
+
+    void updateLogService(LogService *newLogService) {
+        LogService *oldRemoteLogInfo = logService;
+        logService = newLogService;
+    }
 };
 
 END_PRIVATE_NAMESPACE
-        
+
 #endif	// not AUDIT_LOG_H

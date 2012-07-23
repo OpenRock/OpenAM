@@ -30,6 +30,9 @@
  * Service interface class for the DSAME "Naming" service.
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef LOG_SERVICE_H
 #define LOG_SERVICE_H
@@ -43,43 +46,44 @@
 
 BEGIN_PRIVATE_NAMESPACE
 
-class LogService: public BaseService {
+class LogService : public BaseService {
 public:
     explicit LogService(const ServiceInfo &, const SSOToken &,
-			const Http::CookieList &, const std::string &,
-			const Properties &,
-                        const std::string &cert_passwd,
-                        const std::string &cert_nick_name,
-                        bool alwaysTrustServerCert);
+            const Http::CookieList &, const std::string &,
+            const Properties &,
+            const std::string &cert_passwd,
+            const std::string &cert_nick_name,
+            bool alwaysTrustServerCert);
 
     explicit LogService(const ServiceInfo &,
-                        const Properties &,
-                        const std::string &cert_passwd,
-                        const std::string &cert_nick_name,
-                        bool alwaysTrustServerCert,
-                        unsigned int bufferSize);
+            const Properties &,
+            const std::string &cert_passwd,
+            const std::string &cert_nick_name,
+            bool alwaysTrustServerCert,
+            unsigned int bufferSize);
+
     virtual ~LogService();
 
 
-    am_status_t logMessage(const std::string &message) throw();
+    am_status_t logMessage(const std::string &message) throw ();
 
     am_status_t logMessage(const ServiceInfo& service,
-			      const SSOToken& loggedBySSOToken,
-			      const Http::CookieList& cookieList,
-                              const std::string& message,
-                              const std::string& logname) throw();
+            const SSOToken& loggedBySSOToken,
+            const Http::CookieList& cookieList,
+            const std::string& message,
+            const std::string& logname) throw ();
 
     am_status_t sendLog(const std::string& logName,
-                        const LogRecord& record,
-                        const std::string& loggedByTokenID) throw();
+            const LogRecord& record,
+            const std::string& loggedByTokenID) throw ();
 
-    am_status_t flushBuffer() throw();
+    am_status_t flushBuffer() throw ();
 
 private:
 
     am_status_t addLogDetails(const std::string& logName,
-                       const LogRecord& record,
-                       const std::string& loggedByTokenID);
+            const LogRecord& record,
+            const std::string& loggedByTokenID);
 
     ServiceInfo serviceInfo;
     SSOToken loggedByToken;
@@ -93,28 +97,6 @@ private:
     unsigned int bufferCount;
     bool remoteBodyChunkListInitialized;
     Mutex mLock;
-
-    static const BodyChunk requestPrefixChunk;
-    static const BodyChunk logRequestPrefixChunk;
-    static const BodyChunk additionalRequestPrefixChunk;
-    static const BodyChunk logLogPrefixChunk;
-    static const BodyChunk logSidPrefixChunk;
-    static const BodyChunk logLogSuffixChunk;
-    static const BodyChunk logRecordPrefixChunk;
-    static const BodyChunk logRecordTypeChunk;
-    static const BodyChunk logRecordSuffixChunk;
-    static const BodyChunk logLevelPrefixChunk;
-    static const BodyChunk logLevelSuffixChunk;
-    static const BodyChunk logRecMsgPrefixChunk;
-    static const BodyChunk logRecMsgSuffixChunk;
-    static const BodyChunk logInfoMapPrefixChunk;
-    static const BodyChunk logInfoMapSuffixChunk;
-    static const BodyChunk logInfoKeyPrefixChunk;
-    static const BodyChunk logInfoKeySuffixChunk;
-    static const BodyChunk logInfoValuePrefixChunk;
-    static const BodyChunk logInfoValueSuffixChunk;
-    static const BodyChunk requestSuffixChunk;
-    static const BodyChunk requestSetSuffixChunk;
 
 };
 
