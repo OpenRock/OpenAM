@@ -478,4 +478,53 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
         // Redirect Error message - Unknown Client
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
     }
+
+    /*
+   If an authorization request fails validation due to a missing,
+   invalid, or mismatching redirection URI, the authorization server
+   SHOULD inform the resource owner of the error, and MUST NOT
+   automatically redirect the user-agent to the invalid redirection URI.
+    */
+    @Test
+    public void testInvalidRedirectURIInRequest() throws Exception {
+        Reference reference = new Reference("riap://component/test/oauth2/authorize");
+        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/a");
+        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+
+        ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
+        Request request = new Request(Method.GET, reference);
+        request.setChallengeResponse(cr);
+        Response response = new Response(request);
+
+        // handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+        Form fragment = response.getLocationRef().getQueryAsForm();
+
+        // assert
+        assertThat(fragment.getValuesMap().get(OAuth2.Params.ERROR).equalsIgnoreCase(OAuth2.Error.REDIRECT_URI_MISMATCH));
+
+        // Increase the scope
+        reference = new Reference("riap://component/test/oauth2/authorize");
+        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/a");
+        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        request = new Request(Method.GET, reference);
+        request.setChallengeResponse(cr);
+        response = new Response(request);
+
+        // handle
+        getClient().handle(request, response);
+
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+        fragment = response.getLocationRef().getQueryAsForm();
+
+        // assert
+        assertThat(fragment.getValuesMap().get(OAuth2.Params.ERROR).equalsIgnoreCase(OAuth2.Error.REDIRECT_URI_MISMATCH));
+    }
 }
