@@ -323,7 +323,7 @@
             <filterchain>
                 <replacetokens>
                     <token key="AGENT_VER" value="3.0-04"/>
-                    <token key="AGENT_ER_VER" value="ER 4"/>
+                    <token key="AGENT_ER_VER" value="ER 5"/>
                     <token key="AGENT_FVB_MARKER" value=""/>
                     <token key="SVN_REVISION" value="${svn.Revision}"/>
                     <token key="BUILD_DATE" value="${build.date}"/>
