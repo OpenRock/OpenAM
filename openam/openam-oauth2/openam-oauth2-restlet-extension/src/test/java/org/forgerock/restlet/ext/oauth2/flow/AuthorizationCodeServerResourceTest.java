@@ -416,24 +416,62 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
     }
 
-    /* TODO:
+    /*
     If an authorization request fails validation due to a missing,
     invalid, or mismatching redirection URI, the authorization server
     SHOULD inform the resource owner of the error, and MUST NOT
     automatically redirect the user-agent to the invalid redirection URI.
      */
+    @Test
+    public void testAuthorizationInvalidRedirectURIInRequestParameters() throws Exception {
+
+        BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
+        assertNotNull(auth2Proxy);
+
+        AuthorizationCodeRequest factory =
+                auth2Proxy.getAuthorizationCodeRequest().setClientId("cid").setRedirectUri(
+                        auth2Proxy.getRedirectionEndpoint().toString()).setState("random");
+        factory.getScope().add("read");
+        factory.getScope().add("write");
+
+        Request request = factory.buildRequest();
+        ChallengeResponse resource_owner =
+                new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
+        request.setChallengeResponse(resource_owner);
+        Response response = new Response(request);
+
+        // handle
+        getClient().handle(request, response);
+        assertTrue(response.getStatus().isSuccess());
+        assertTrue(response.getEntity() instanceof TemplateRepresentation);
+        assertTrue(MediaType.TEXT_HTML.equals(response.getEntity().getMediaType()));
+
+        request = new Request(Method.POST, auth2Proxy.getAuthorizationEndpoint());
+        request.setChallengeResponse(resource_owner);
+        response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.CODE);
+        parameters.add(OAuth2.Params.CLIENT_ID, auth2Proxy.getClientId());
+        parameters.add(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/a");
+        parameters.add(OAuth2.Params.STATE, "random");
+        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2.Custom.DECISION, OAuth2.Custom.ALLOW);
+        request.setEntity(parameters.getWebRepresentation());
+
+        // handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+        Form fragment = response.getLocationRef().getQueryAsForm();
+
+        // assert
+        assertThat(fragment.getValuesMap().get(OAuth2.Params.ERROR).equalsIgnoreCase(OAuth2.Error.REDIRECT_URI_MISMATCH));
+    }
 
     /* TODO:
     A public client that was not issued a client password MUST use the
     "client_id" request parameter to identify itself when sending requests
     to the token endpoint.
-    */
-
-    /* TODO:
-    The endpoint URI MAY include an "application/x-www-form-urlencoded"
-    formatted (per Appendix B) query component ([RFC3986] section 3.4),
-    which MUST be retained when adding additional query parameters.  The
-    endpoint URI MUST NOT include a fragment component.
     */
 
     @Test
@@ -595,6 +633,88 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         request.setEntity(parameters.getWebRepresentation());
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+    }
+
+    /*
+   If an authorization request fails validation due to a missing,
+   invalid, or mismatching redirection URI, the authorization server
+   SHOULD inform the resource owner of the error, and MUST NOT
+   automatically redirect the user-agent to the invalid redirection URI.
+    */
+    @Test
+    public void testTokenInvalidRedirectURIRequest() throws Exception {
+
+        BearerOAuth2Proxy auth2Proxy = BearerOAuth2Proxy.popOAuth2Proxy(component.getContext());
+        assertNotNull(auth2Proxy);
+
+        AuthorizationCodeRequest factory =
+                auth2Proxy.getAuthorizationCodeRequest().setClientId("cid").setRedirectUri(
+                        auth2Proxy.getRedirectionEndpoint().toString()).setState("random");
+        factory.getScope().add("read");
+        factory.getScope().add("write");
+
+        Request request = factory.buildRequest();
+        ChallengeResponse resource_owner =
+                new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
+        request.setChallengeResponse(resource_owner);
+        Response response = new Response(request);
+
+        // handle
+        getClient().handle(request, response);
+        assertTrue(response.getStatus().isSuccess());
+        assertTrue(response.getEntity() instanceof TemplateRepresentation);
+        assertTrue(MediaType.TEXT_HTML.equals(response.getEntity().getMediaType()));
+
+        request = new Request(Method.POST, auth2Proxy.getAuthorizationEndpoint());
+        request.setChallengeResponse(resource_owner);
+        response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.CODE);
+        parameters.add(OAuth2.Params.CLIENT_ID, auth2Proxy.getClientId());
+        parameters.add(OAuth2.Params.REDIRECT_URI, auth2Proxy.getRedirectionEndpoint().toString());
+        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2.Params.STATE, "random");
+        parameters.add(OAuth2.Custom.DECISION, OAuth2.Custom.ALLOW);
+        request.setEntity(parameters.getWebRepresentation());
+
+        // handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.REDIRECTION_FOUND);
+        Form fragment = response.getLocationRef().getQueryAsForm();
+
+        // assert
+        assertThat(fragment.getValuesMap())
+                .includes(MapAssert.entry(OAuth2.Params.STATE, "random")).is(
+                new Condition<Map<?, ?>>() {
+                    @Override
+                    public boolean matches(Map<?, ?> value) {
+                        return value.containsKey(OAuth2.Params.CODE);
+                    }
+                });
+
+        /*BearerToken token =
+                auth2Proxy.flowAuthorizationToken(fragment.getFirstValue(OAuth2.Params.CODE));
+        assertNotNull(token);*/
+
+        request = new Request(Method.GET, auth2Proxy.getTokenEndpoint());
+        request.setChallengeResponse(resource_owner);
+        response = new Response(request);
+
+        parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.AUTHORIZATION_CODE);
+        parameters.add(OAuth2.Params.CLIENT_ID, auth2Proxy.getClientId());
+        parameters.add(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/a");
+        parameters.add(OAuth2.Params.STATE, "random");
+        parameters.add(OAuth2.Custom.DECISION, OAuth2.Custom.ALLOW);
+        parameters.add(OAuth2.Params.CODE, fragment.getValuesMap().get(OAuth2.Params.CODE));
+        request.setEntity(parameters.getWebRepresentation());
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+        fragment = response.getLocationRef().getQueryAsForm();
+
+        // assert
+        assertThat(fragment.getValuesMap().get(OAuth2.Params.ERROR).equalsIgnoreCase(OAuth2.Error.REDIRECT_URI_MISMATCH));
     }
 
 }
