@@ -94,33 +94,33 @@ public class OAuth2DemoApplication extends Application {
                     + OAUTH2_ENDPOINT_AUTHORIZE);
         }
         String accessTokenEndpoint = SystemProperties.get(OAUTH2_ENDPOINT_ACCESS_TOKEN);
-        if (OAuth2Utils.isBlank(authorizeEndpoint)) {
+        if (OAuth2Utils.isBlank(accessTokenEndpoint)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_ENDPOINT_ACCESS_TOKEN);
         }
         String tokenInfoEndpoint = SystemProperties.get(OAUTH2_ENDPOINT_TOKENINFO);
-        if (OAuth2Utils.isBlank(authorizeEndpoint)) {
+        if (OAuth2Utils.isBlank(tokenInfoEndpoint)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_ENDPOINT_TOKENINFO);
         }
 
         String clientId = SystemProperties.get(OAUTH2_CLIENT_ID);
-        if (OAuth2Utils.isBlank(authorizeEndpoint)) {
+        if (OAuth2Utils.isBlank(clientId)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_CLIENT_ID);
         }
         String clientSecret = SystemProperties.get(OAUTH2_CLIENT_SECRET);
-        if (OAuth2Utils.isBlank(authorizeEndpoint)) {
+        if (OAuth2Utils.isBlank(clientSecret)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_CLIENT_SECRET);
         }
         String username = SystemProperties.get(OAUTH2_USERNAME);
-        if (OAuth2Utils.isBlank(authorizeEndpoint)) {
+        if (OAuth2Utils.isBlank(username)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_USERNAME);
         }
         String password = SystemProperties.get(OAUTH2_PASSWORD);
-        if (OAuth2Utils.isBlank(authorizeEndpoint)) {
+        if (OAuth2Utils.isBlank(password)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_PASSWORD);
         }
