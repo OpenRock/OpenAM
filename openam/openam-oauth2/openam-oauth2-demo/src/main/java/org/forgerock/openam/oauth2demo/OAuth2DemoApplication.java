@@ -79,6 +79,8 @@ public class OAuth2DemoApplication extends Application {
     public static final String OAUTH2_CLIENT_SECRET = "org.forgerock.openam.oauth2.client_secret";
     public static final String OAUTH2_USERNAME = "org.forgerock.openam.oauth2.username";
     public static final String OAUTH2_PASSWORD = "org.forgerock.openam.oauth2.password";
+    public static final String OAUTH2_ENDPOINT_REDIRECTION =
+            "org.forgerock.openam.oauth2.endpoint.redirection";
     /**
      * The Freemarker's configuration.
      */
@@ -92,6 +94,11 @@ public class OAuth2DemoApplication extends Application {
         if (OAuth2Utils.isBlank(authorizeEndpoint)) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
                     + OAUTH2_ENDPOINT_AUTHORIZE);
+        }
+        String redirectionEndpoint = SystemProperties.get(OAUTH2_ENDPOINT_REDIRECTION);
+        if (OAuth2Utils.isBlank(redirectionEndpoint)) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing required AMConfig:"
+                    + OAUTH2_ENDPOINT_REDIRECTION);
         }
         String accessTokenEndpoint = SystemProperties.get(OAUTH2_ENDPOINT_ACCESS_TOKEN);
         if (OAuth2Utils.isBlank(accessTokenEndpoint)) {
@@ -146,7 +153,7 @@ public class OAuth2DemoApplication extends Application {
         auth2Proxy.setChallengeResponse(new ChallengeResponse(ChallengeScheme.HTTP_BASIC, clientId,
                 clientSecret.toCharArray()));
         auth2Proxy.setClientCredentials(clientId, clientSecret);
-        auth2Proxy.setRedirectionEndpoint(new Reference(current.resolve("./redirect")));
+        auth2Proxy.setRedirectionEndpoint(new Reference(URI.create(redirectionEndpoint)));
         auth2Proxy.setResourceOwnerCredentials(username, password);
         auth2Proxy.setScope(OAuth2Utils.split(scope, ","));
 
