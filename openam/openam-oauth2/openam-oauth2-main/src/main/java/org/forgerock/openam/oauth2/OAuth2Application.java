@@ -120,8 +120,7 @@ public class OAuth2Application extends Application {
         Router root = new Router(childContext);
         //try {
             URI currentURI = getCurrentURI();
-            redirectURI = URI.create("http://jason.internal.forgerock.com:8080/openam/oauth2test/code-token.html");
-            //redirectURI = currentURI.resolve("../../oauth2demo/oauth2/redirect");
+            redirectURI = currentURI.resolve("../../../oauth2demo/oauth2/redirect");
             //redirectURI = new URI("http://jason.internal.foregerock.com:8080/openam-current/oauth2/redirect");
         //} catch (URISyntaxException ex) {
         //    Logger.getLogger(OAuth2Application.class.getName()).log(Level.SEVERE, null, ex);
