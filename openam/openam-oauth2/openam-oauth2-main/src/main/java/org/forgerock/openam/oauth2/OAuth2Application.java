@@ -120,8 +120,8 @@ public class OAuth2Application extends Application {
         Router root = new Router(childContext);
         //try {
             URI currentURI = getCurrentURI();
-
-            redirectURI = currentURI.resolve("../../../oauth2demo/oauth2/redirect");
+            redirectURI = URI.create("http://jason.internal.forgerock.com:8080/openam/oauth2test/code-token.html");
+            //redirectURI = currentURI.resolve("../../oauth2demo/oauth2/redirect");
             //redirectURI = new URI("http://jason.internal.foregerock.com:8080/openam-current/oauth2/redirect");
         //} catch (URISyntaxException ex) {
         //    Logger.getLogger(OAuth2Application.class.getName()).log(Level.SEVERE, null, ex);
@@ -285,7 +285,7 @@ public class OAuth2Application extends Application {
         public Set<URI> getRedirectionURIs() {
             Set<URI> cfg = new HashSet<URI>(1);
             cfg.add(URI.create("http://local.identitas.no:9085/openam/oauth2test/code-token.html"));
-            cfg.add(URI.create("http://jason.internal.forgerock.com:8080/oauth2demo/oauth2/redirect"));
+            cfg.add(URI.create("http://jason.internal.forgerock.com:8080/openam/oauth2test/code-token.html"));
             cfg.add(redirectURI);
             return Collections.unmodifiableSet(cfg);
         }
