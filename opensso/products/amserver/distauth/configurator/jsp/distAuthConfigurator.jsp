@@ -25,10 +25,11 @@
    $Id: distAuthConfigurator.jsp,v 1.9 2008/08/19 19:08:18 veiming Exp $
 
 --%>
-
 <%--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
+
 <html>
 <head>
 <title>Configure DistAuth</title>
@@ -226,7 +227,7 @@ java.util.Properties"
 %>
     <tr>
     <td colspan="2" align="left">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>
