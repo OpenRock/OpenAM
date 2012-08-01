@@ -27,11 +27,13 @@
 --%>
 <%--
    Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <%@page info="AuthException" language="java"%>
+    <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
     <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
     <jato:useViewBean className="com.sun.identity.authentication.distUI.AuthExceptionViewBean">
         <%@ page contentType="text/html" %>
