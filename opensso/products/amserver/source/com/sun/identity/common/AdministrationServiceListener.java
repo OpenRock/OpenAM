@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.common;
 
@@ -243,9 +244,7 @@ public class AdministrationServiceListener implements AMConstants, ServiceListen
             + "organizationConfigChanged : Config changed for Org="
             + orgName + "Service = "+serviceName+ " Change type = "+ type);
         }
-        if (type != ADDED) {
-            invalidCharCache.remove(orgName);
-            pluginNameCache.remove(orgName);
-        }
+        invalidCharCache.remove(orgName);
+        pluginNameCache.remove(orgName);
     }
 }

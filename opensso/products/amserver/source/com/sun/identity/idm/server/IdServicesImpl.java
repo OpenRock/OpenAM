@@ -27,7 +27,8 @@
 */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.server;
 
@@ -43,10 +44,18 @@ import javax.security.auth.callback.Callback;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 
+import com.iplanet.am.sdk.AMConstants;
+import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.am.sdk.AMObject;
+import com.iplanet.am.sdk.AMServiceUtils;
+import com.iplanet.am.sdk.AMUserPasswordValidation;
+import com.iplanet.am.util.Misc;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.AdministrationServiceListener;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.ShutdownListener;
@@ -75,12 +84,14 @@ import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.idm.plugins.internal.SpecialRepo;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -420,7 +431,32 @@ public class IdServicesImpl implements IdServices {
                IdRepoAttributeValidatorManager.getInstance().
                getIdRepoAttributeValidator(amOrgName);
            attrValidator.validateAttributes(attrMap, IdOperation.CREATE);
+       
+           // invalid chars validation 
+           AMUserPasswordValidation plugin = getUPValidationInstance(amOrgName);
+           if (plugin != null) {
+               Map envMap = new HashMap();
+               envMap.put(com.sun.identity.common.Constants.ORGANIZATION_NAME, amOrgName);
+               try {
+                   if (attrMap.containsKey("uid")) {
+                       String uid = (String)((Set)attrMap.get("uid")).iterator().next();
+                       if (uid != null) {
+                           plugin.validateUserID(uid, envMap);
+                       }
+                   }
+                   if (attrMap.containsKey("userpassword")) {
+                       String password = (String)((Set)attrMap.get("userpassword")).iterator().next();
+                       if (password != null) {
+                           plugin.validatePassword(password, envMap);
+                       }
+                   }
+               } catch (AMException e) {
+                   Object[] args = {e.getMessage()};
+                   throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "233", args);
+               }
+           }
        }
+       
        String amsdkdn = null;
        Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName,
            IdOperation.CREATE, type);
@@ -2791,5 +2827,112 @@ public class IdServicesImpl implements IdServices {
 
    public void reloadIdRepoServiceSchema() {
        idrepoCache.clearIdRepoPluginsCache();
+   }
+   
+   /**
+    * this method instantiates and returns plugin object
+    * 
+    * @param orgDN the organization dn
+    * @return plugin object
+    */
+   private AMUserPasswordValidation getUPValidationInstance(String orgDN) {
+       try {
+           SSOToken token = (SSOToken) AccessController
+                   .doPrivileged(AdminTokenAction.getInstance());
+           
+           String className = getOrgPluginClassName(token, orgDN);
+           if (className == null) {
+               // Org Config may not exist. Get default values
+               className = getPluginClassName(token);
+           }
+
+           if (debug.messageEnabled()) {
+               debug.message("UserPasswordValidation Class Name is : " +
+               className);
+           }
+           if ( (className == null) || (className.length() == 0)) {
+               return null;
+           }
+           
+           AMUserPasswordValidation userPasswordInstance =
+           (AMUserPasswordValidation)
+           (Class.forName(className).newInstance());
+           return userPasswordInstance;
+       } catch (ClassNotFoundException ce) {
+           if (debug.messageEnabled()) {
+               debug.message("Class not Found :", ce);
+           }
+           return null;
+       } catch (Exception e) {
+           if (debug.messageEnabled()) {
+               debug.message("Error: ", e);
+           }
+           return null;
+       }
+   }
+   
+   /**
+    * this method gets plugin classname from adminstration service for the org
+    * 
+    * @param token SSOToken
+    * @param orgDN the organization dn
+    * @return plugin classname from adminstration service for the org
+    */
+   private String getOrgPluginClassName(SSOToken token, String orgDN) {
+       try {
+           String cachedValue = AdministrationServiceListener.
+               getOrgPluginNameFromCache(orgDN);
+           if (cachedValue != null) {
+               return cachedValue;
+           }
+           Map config = null;
+           ServiceConfig sc = AMServiceUtils.getOrgConfig(token, orgDN,
+                   AMConstants.ADMINISTRATION_SERVICE);
+           if (sc != null) {
+               config = sc.getAttributes();
+           }
+           String className =
+           Misc.getServerMapAttr(config,
+           ISAuthConstants.USERID_PASSWORD_VALIDATION_CLASS);
+           if (debug.messageEnabled()) {
+               debug.message("Org Plugin Class:  " + className);
+           }
+           AdministrationServiceListener.setOrgPluginNameInCache(
+               orgDN, className);
+           return className;
+       } catch (Exception ee) {
+           debug.message("Error while getting UserPasswordValidationClass " ,ee );
+           return null;
+       }
+   }
+   
+   /**
+    * this method gets plugin classname from adminstration service
+    * 
+    * @param token SSOToken
+    * @return plugin classname from adminstration service
+    */
+   private String getPluginClassName(SSOToken token) {
+       try {
+           String cachedValue = AdministrationServiceListener.
+               getGlobalPluginNameFromCache();
+           if (cachedValue != null) {
+                  return cachedValue;
+           }
+           Map config = AMServiceUtils.getServiceConfig(token,
+                  AMConstants.ADMINISTRATION_SERVICE, SchemaType.ORGANIZATION);
+           String className =
+               CollectionHelper.getServerMapAttr(
+               config, ISAuthConstants.USERID_PASSWORD_VALIDATION_CLASS);
+           if (debug.messageEnabled()) {
+               debug.message("Plugin Class:  " + className);
+           }
+           AdministrationServiceListener.setGlobalPluginNameInCache(
+               className);
+           return className;
+       } catch (Exception ee) {
+           debug.message("Error while getting UserPasswordValidationClass " ,ee );
+           return null;
+       }
    }
 }
