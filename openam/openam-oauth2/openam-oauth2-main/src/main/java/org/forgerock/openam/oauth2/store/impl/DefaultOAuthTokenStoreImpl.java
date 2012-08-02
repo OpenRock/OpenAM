@@ -19,14 +19,22 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * "Portions Copyrighted [2012] [Forgerock Inc]"
  */
 
 package org.forgerock.openam.oauth2.store.impl;
 
+import java.security.AccessController;
 import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceAccessor;
@@ -38,6 +46,7 @@ import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;
 import org.forgerock.openam.oauth2.model.impl.RefreshTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.SessionClientImpl;
+import org.forgerock.openam.oauth2.utils.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
@@ -54,12 +63,9 @@ import org.restlet.data.Status;
  */
 public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
-    private static final long AUTHZ_CODE_LIFETIME = 1000 * 60 * 10;
-    // 10 minutes TODO: make configurable
-    private static final long REFRESH_TOKEN_LIFETIME = 1000 * 60 * 60 * 8;
-    // 8 hours TODO: make configurable
-    private static final long ACCESS_TOKEN_LIFETIME = 1000 * 60 * 10;
-    // 10 minutes TODO: make configurable
+    private long AUTHZ_CODE_LIFETIME = 1;
+    private long REFRESH_TOKEN_LIFETIME = 1;
+    private long ACCESS_TOKEN_LIFETIME = 1;
 
     // Removed: long requestTime
     // Removed: String clientID
@@ -75,6 +81,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public DefaultOAuthTokenStoreImpl() {
         try {
             repository = new CoreTokenService(new JMQTokenRepo());
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(null, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            AUTHZ_CODE_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME).iterator().next());
+            REFRESH_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME).iterator().next());
+            ACCESS_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME).iterator().next());
         } catch (Exception e) {
             // TODO: legacy code throws Exception, look to refactor
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),

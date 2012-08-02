@@ -204,7 +204,7 @@ public abstract class TokenImpl extends JsonValue implements Token {
 
     @Override
     public long getExpireTime() {
-        return (getAbsoluteExpiryTime() - System.currentTimeMillis()) / 1000;
+        return (getAbsoluteExpiryTime() - System.currentTimeMillis());
     }
 
     /**
