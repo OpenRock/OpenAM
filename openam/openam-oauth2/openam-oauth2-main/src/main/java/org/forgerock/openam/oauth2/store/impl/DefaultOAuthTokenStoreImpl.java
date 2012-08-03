@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
