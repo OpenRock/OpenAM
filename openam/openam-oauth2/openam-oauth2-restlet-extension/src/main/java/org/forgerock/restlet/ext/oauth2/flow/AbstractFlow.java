@@ -24,6 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,11 @@ import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
+import org.forgerock.openam.oauth2.utils.OAuth2Constants;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -68,6 +74,7 @@ public abstract class AbstractFlow extends ServerResource {
     protected OAuth2Client client = null;
     protected User resourceOwner = null;
     protected SessionClient sessionClient = null;
+    protected boolean issueRefreshToken = false;
 
     /**
      * If the {@link AbstractFlow#getCheckedScope} change the requested scope
@@ -114,6 +121,17 @@ public abstract class AbstractFlow extends ServerResource {
     protected void doInit() throws ResourceException {
         clientVerifier = OAuth2Utils.getClientVerifier(getContext());
         tokenStore = OAuth2Utils.getTokenStore(getContext());
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(null, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
+        } catch (Exception e) {
+            // TODO: legacy code throws Exception, look to refactor
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not get service settings", null);
+        }
     }
 
     /**

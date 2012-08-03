@@ -32,6 +32,8 @@ import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
+import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
+import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -256,6 +258,13 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                 sessionClient);
     }
 
+    protected RefreshToken createRefreshToken(AuthorizationCode code){
+        return getTokenStore().createRefreshToken(code.getScope(),
+                                                    OAuth2Utils.getContextRealm(getContext()),
+                                                    resourceOwner.getIdentifier(),
+                                                    sessionClient.getClientId());
+    }
+
     /**
      * This method is intended to be overridden by subclasses.
      * 
@@ -264,8 +273,17 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
      * @throws OAuthProblemException
      */
     protected AccessToken createAccessToken(AuthorizationCode code) {
-        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                code.getScope(), code);
+        if (issueRefreshToken){
+            //create refresh token
+            RefreshToken token = createRefreshToken(code);
+
+            //pass in refresh token as parent of Access Token
+            return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
+                    code.getScope(), token);
+        } else {
+            return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
+                    code.getScope(), code);
+        }
     }
 
     protected Form getFormPost(Representation entity) {
