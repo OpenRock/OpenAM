@@ -31,8 +31,9 @@ import java.util.Set;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
 import org.forgerock.restlet.ext.oauth2.model.Token;
+import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 
 /**
  * Created by IntelliJ IDEA. User: jonathan Date: 26/3/12 Time: 10:37 AM To
@@ -111,10 +112,8 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     }
 
     @Override
-    public RefreshTokenImpl getRefreshToken() {
-        // TODO implement or change interface
-        return null; // To change body of implemented methods use File |
-                     // Settings | File Templates.
+    public RefreshToken getRefreshToken() {
+        return (RefreshToken) this.get(OAuth2.Token.OAUTH_REFRESH_TOKEN).getObject();
     }
 
     @Override
@@ -123,7 +122,7 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
         tokenMap.put(OAuth2.Params.ACCESS_TOKEN, getToken());
         tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
         tokenMap.put(OAuth2.Params.EXPIRES_IN, getExpireTime() - System.currentTimeMillis());
-        // TODO implement or change interface
+        tokenMap.put(OAuth2.Params.REFRESH_TOKEN, getRefreshToken().getToken());
         return tokenMap;
     }
 
