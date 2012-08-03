@@ -335,7 +335,7 @@ static am_status_t check_for_post_data(EXTENSION_CONTROL_BLOCK *pECB,
         } else {
             am_web_log_error("%s: Found magic URI (%s) but entry is not in POST"
                            " hash table",thisfunc, post_data_query);
-            status = AM_FAILURE;
+            status = AM_SUCCESS;
        }
     }
     if (temp_uri != NULL) {
