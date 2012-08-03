@@ -902,10 +902,16 @@ AM_WEB_EXPORT am_status_t am_web_check_cookie_in_query(
 AM_WEB_EXPORT void am_web_free_memory(void *memory);
 
 /*
- * Method to retrieve the name of the OpenSSO server cookie.
+ * Method to retrieve the name of the OpenAM server cookie.
  */
 
 AM_WEB_EXPORT const char *am_web_get_cookie_name(void* agent_config);
+
+/*
+ * Method to retrieve the value of the OpenAM server cookie.
+ */
+
+AM_WEB_EXPORT am_status_t am_web_get_cookie_value(const char *separator, const char *cookie_name, const char *cookie_header_val, char **value);
 
 /*
  * Method to retrieve the name of the OpenSSO server notification Url.

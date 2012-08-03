@@ -4830,167 +4830,6 @@ remove_cookie(const char *cookie_name, char *cookie_header_val)
     return sts;
 }
 
-/**
- * Find a cookie name in a cookie header value, return pointers to the
- * cookie's name, value etc. in the cookie header value.
- * Netscape style cookies is assumed.
- *
- * Arguments:
- * cookie_name - the cookie name
- * cookie_header_val - the cookie value.
- * name_ptr - will contain a pointer in cookie_header_val where cookie_name
- *	      is found.
- * val_ptr - will contain a pointer in cookie_header_val where the cookie
- *           value is begins or NULL if no value was set.
- * val_len - will contain the value length, or 0 if no value was set.
- * next_cookie_ptr - will contain pointer to the next cookie, including the ';'
- *                   seperator befor the next cookie.
- *
- * Returns:
- * AM_SUCCESS - if cookie name is found.
- * AM_INVALID_ARGUMENT - if any argument is invalid.
- * AM_NOT_FOUND - if cookie name is not found.
- */
-static am_status_t
-find_cookie(const char *cookie_name,
-	    const char *cookie_header_val,
-	    char **name_ptr,
-	    char **val_ptr, size_t *val_len, char **next_cookie_ptr)
-{
-    const char *thisfunc = "find_cookie()";
-    am_status_t sts = AM_NOT_FOUND;
-    char *found = NULL;
-    char *value = NULL;
-    char c;
-    char *search_cookie = NULL;
-
-    if (cookie_name != NULL && cookie_name[0] != '\0') {
-        search_cookie = (char *)malloc(2+strlen(cookie_name));
-        if (search_cookie !=NULL) {
-            search_cookie = strcpy(search_cookie,cookie_name);
-            search_cookie = strcat(search_cookie,"=");
-        }
-    }
-
-    if (cookie_name == NULL ||
-	name_ptr == NULL || val_ptr == NULL || val_len == NULL) {
-	sts = AM_INVALID_ARGUMENT;
-    }
-    else if (cookie_name[0] == '\0' ||
-	     cookie_header_val == NULL || cookie_header_val[0] == '\0') {
-	sts = AM_NOT_FOUND;
-    } else if (search_cookie == NULL) {
-        sts = AM_NO_MEMORY;
-    }
-    // find cookie_name in header value first.
-    else if ((found = const_cast<char *>
-			(strstr(cookie_header_val, search_cookie))) == NULL) {
-	sts = AM_NOT_FOUND;
-    }
-    // if found, make sure it's not a substring of another cookie name i.e.
-    // must have a ';' before and '=' after.
-    else if (found != cookie_header_val &&
-		(c = *(found-1)) != ';' && !isspace(c)) {
-	sts = AM_NOT_FOUND;  // other chars besides ';' or space before name.
-    }
-    else if ((c = *(found + strlen(cookie_name))) != '=' &&
-		!isspace(c) && c != ';' && c != '\0') {
-	sts = AM_NOT_FOUND; // other chars besides space or '=' after name.
-    }
-    else if ((value = strchr(found, '=')) == NULL) {
-	sts = AM_NOT_FOUND;  // invalid syntax: no '=' anywhere after name.
-    }
-    // name really found.
-    else {
-	// set name.
-	*name_ptr = found;
-	// get value -
-	// skip white space after '=', stop at ';' or end of string.
-	value++;
-	while (isspace(*value))
-	    value++;
-	// value is null if we've reached the end
-	if (*value == ';' || *value == '\0') {
-	    *val_ptr = NULL;
-	    *val_len = 0;
-	    *next_cookie_ptr = NULL;
-	}
-	else {
-	    *val_ptr = value;
-	    found = strchr(value, ';');
-	    if (found == NULL) {
-		*val_len = strlen(value);  // no cookies following this one.
-		*next_cookie_ptr = NULL;
-	    }
-	    else {
-		*val_len = found - value;
-		*next_cookie_ptr = found;
-	    }
-	}
-	am_web_log_debug("%s: cookie found: header [%s] name [%s] val [%s] "
-			 "val_len [%d] next_cookie [%s]", thisfunc,
-			 cookie_header_val==NULL?"NULL":cookie_header_val,
-			 *name_ptr==NULL?"NULL":*name_ptr,
-			 *val_ptr==NULL?"NULL":*val_ptr,
-			 *val_len,
-			 *next_cookie_ptr==NULL?"NULL":*next_cookie_ptr);
-
-	sts = AM_SUCCESS;
-    }
-
-    if(search_cookie !=NULL) {
-        am_web_free_memory(search_cookie);
-    }
-    return sts;
-}
-
-
-/**
- * Get a cookie's value from the given cookie header.
- * Argument:
- * cookie_name - name of cookie to get
- * cookie_header_val - cookie header string
- * buf - will contain the cookie's value, or NULL if cookie was found but
- *       contained no (empty) value.
- *       If not null, the pointer must be freed by caller when done.
- * Returns:
- * AM_SUCCESS - on success.
- * AM_NOT_FOUND - if cookie was not found in cookie header.
- * AM_INVALID_ARGUMENT - if any arguments is invalid.
- */
-static am_status_t
-get_cookie_val(const char *cookie_name,
-	       const char *cookie_header_val,
-	       char **buf)
-{
-    am_status_t sts = AM_FAILURE;
-    char *name = NULL;
-    char *val = NULL;
-    size_t val_len = 0;
-    char *next_cookie = NULL;
-
-    sts = find_cookie(cookie_name, cookie_header_val,
-		      &name, &val, &val_len, &next_cookie);
-    if (sts == AM_SUCCESS) {
-	if (val == NULL) {  // cookie found but had no (empty) value.
-	    *buf = NULL;
-	    sts = AM_SUCCESS;
-	}
-	else {
-	    *buf = (char *)malloc(1+val_len);
-	    if (*buf == NULL) {
-		sts = AM_NO_MEMORY;
-	    }
-	    else {
-		strncpy(*buf, val, val_len);
-		(*buf)[val_len] = '\0';
-		sts = AM_SUCCESS;
-	    }
-	}
-    }
-    return sts;
-}
-
 static am_status_t
 process_notification(
     char *url,
@@ -5903,6 +5742,49 @@ process_access_redirect(char *url,
     return result;
 }
 
+static void trim(char *a) {
+    char *b = a;
+    while (isspace(*b)) ++b;
+    while (*b) *a++ = *b++;
+    *a = '\0';
+    while (isspace(*--a)) *a = '\0';
+}
+
+extern "C" AM_WEB_EXPORT am_status_t
+am_web_get_cookie_value(const char *separator, const char *cookie_name, const char *cookie_header_val, char **value) {
+    size_t value_len = 0;
+    int found = 0;
+    char *a, *b, *header_val = NULL;
+    if (cookie_name == NULL || cookie_name[0] == '\0') {
+        return AM_INVALID_ARGUMENT;
+    } else if (cookie_header_val == NULL || cookie_header_val[0] == '\0') {
+        return AM_NOT_FOUND;
+    } else *value = NULL;
+    header_val = strdup(cookie_header_val);
+    if (header_val) {
+        am_web_log_max_debug("am_web_get_cookie_value(): parsing cookie header: %s", cookie_header_val);
+        for ((a = strtok_r(header_val, separator, &b)); a; (a = strtok_r(NULL, separator, &b))) {
+            if (strcmp(separator, "=") == 0) {
+                trim(a);
+                if (!found && strcmp(a, cookie_name) == 0) found = 1;
+                else if (found && a[0] != '\0') {
+                    value_len = strlen(a);
+                    if ((*value = strdup(a)) == NULL) {
+                        found = 0;
+                    } else {
+                        (*value)[value_len] = '\0';
+                    }
+                }
+            } else {
+                if (strstr(a, cookie_name) == NULL) continue;
+                if ((found = am_web_get_cookie_value("=", cookie_name, a, value))) break;
+            }
+        }
+        free(header_val);
+    } else return AM_NO_MEMORY;
+    return found ? AM_SUCCESS : AM_NOT_FOUND;
+}
+
 /**
  * Get sso token from either cookie header or cdsso assertion.
  * Also gets the original method.
@@ -5925,7 +5807,7 @@ get_sso_token(am_web_request_params_t *req_params,
     am_web_req_method_t req_method = AM_WEB_REQUEST_UNKNOWN;
 
     // Get the sso token from cookie header
-    sts = get_cookie_val(am_web_get_cookie_name(agent_config),
+    sts = am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config),
                             req_params->cookie_header_val, sso_token);
     if (sts != AM_SUCCESS && sts != AM_NOT_FOUND) {
         am_web_log_error("%s: Error while getting sso token from "

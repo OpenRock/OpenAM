@@ -517,49 +517,10 @@ REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext, IHttpEven
     // Check for SSO Token in Http Cookie
     if (status == AM_SUCCESS) {
         if (pOphResources->cbCookies > 0) {
-            char *cookieValue = NULL;
-            int length = 0;
-            int i = 0;
-            const char *cookieName = am_web_get_cookie_name(agent_config);
             // Look for the iPlanetDirectoryPro cookie
-            if (cookieName != NULL) {
-                cookieValue = strstr((char *) (pOphResources->cookies), cookieName);
-                while (cookieValue) {
-                    char *marker = strstr(cookieValue + 1, cookieName);
-                    if (marker) {
-                        cookieValue = marker;
-                    } else {
-                        break;
-                    }
-                }
-                if (cookieValue != NULL) {
-                    cookieValue = strchr(cookieValue, '=');
-                }
-                if (cookieValue != NULL) {
-                    cookieValue = &cookieValue[1]; // 1 vs 0 skips over '='
-                    // find the end of the cookie
-                    length = 0;
-                    for (i = 0; (cookieValue[i] != ';') &&
-                            (cookieValue[i] != '\0'); i++) {
-                        length++;
-                    }
-                    if (length < URL_SIZE_MAX - 1) {
-                        if (length > 0) {
-                            dpro_cookie = (CHAR *) malloc(length + 1);
-                            if (dpro_cookie != NULL) {
-                                strncpy(dpro_cookie, cookieValue, length);
-                                dpro_cookie[length] = '\0';
-                                isLocalAlloc = TRUE;
-                                am_web_log_debug("%s: SSO token found in "
-                                        " cookie header.", thisfunc);
-                            } else {
-                                am_web_log_error("%s: Unable to allocate memory"
-                                        " for cookie, size = %u", thisfunc, length);
-                                status = AM_NO_MEMORY;
-                            }
-                        }
-                    }
-                }
+            if (am_web_get_cookie_value(";", am_web_get_cookie_name(agent_config), pOphResources->cookies, &dpro_cookie) == AM_SUCCESS) {
+                isLocalAlloc = TRUE;
+                am_web_log_debug("%s: SSO token found in cookie header.", thisfunc);
             }
         }
     }
