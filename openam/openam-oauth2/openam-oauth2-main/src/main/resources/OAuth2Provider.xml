@@ -30,7 +30,7 @@
     <Service name="OAuth2Provider" version="1.0">
         <Schema
                 serviceHierarchy="/DSAMEConfig/ForgerockOAuth2ProviderService"
-                i18nFileName="amOAuth2Provider"
+                i18nFileName="OAuth2Provider"
                 revisionNumber="1"
                 i18nKey="forgerock-oauth2-provider-description">
             <Organization>
@@ -64,6 +64,21 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a103">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+
                 <SubSchema name="serverconfig" inheritance="multiple">
 
                     <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
@@ -93,6 +108,20 @@
                                      i18nKey="a102">
                         <DefaultValues>
                             <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token"
+                                     type="single"
+                                     syntax="boolean"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a103">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
