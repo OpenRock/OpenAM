@@ -55,6 +55,7 @@
 #include <process.h>
 #include <windows.h>
 #include <winbase.h>
+#define	getpid	_getpid
 #else
 #include <unistd.h>
 #endif
@@ -396,15 +397,10 @@ static void * APR_THREAD_FUNC notification_listener(apr_thread_t *t, void *data)
     am_notification_list_item_t *table;
     pid_t pid = 0;
     int len, i;
-#ifdef _MSC_VER
-    pid = _getpid();
-#else
-    pid = getpid();
-#endif
     for (;;) {
         if (am_watchdog_interval <= 0)
             break;
-        if (agentInitialized == B_TRUE && pid > 0) {
+        if (agentInitialized == B_TRUE && (pid = getpid()) > 0) {
             if (get_global_lock(scfg->notification_lock) != 0) {
                 table = apr_shm_baseaddr_get(scfg->notification_cache);
                 for (i = 0; i < scfg->max_pid_count; i++) {
@@ -642,11 +638,7 @@ static void child_init_dsame(apr_pool_t *pool_ptr, server_rec *server_ptr) {
         return;
     }
 
-#ifdef _MSC_VER
-    register_process(_getpid(), server_ptr);
-#else
     register_process(getpid(), server_ptr);
-#endif
 
     /*all is set, setup notification thread watchdog interval and start listener thread*/
     am_watchdog_interval = 1; //1 sec

@@ -331,12 +331,10 @@ am_status_t LogService::addLogDetails(const std::string& logName,
     char *msg = NULL;
     bool lock_status = false;
 
-    Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::addLogDetails() about to acquire the lock");
-    if ((lock_status = mLock.trylock()) == false) {
-        Log::log(logModule, Log::LOG_ERROR, "LogService::addLogDetails() failed to acquire the lock (flushBuffer is running)");
+    if ((lock_status = mLock.lock()) == false) {
+        Log::log(logModule, Log::LOG_ERROR, "LogService::addLogDetails() failed to acquire the lock");
         return AM_SUCCESS;
     }
-    Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::addLogDetails() lock acquired");
 
     std::string message = record.getLogMessage();
     //The encoded log message needs to be in multiple of 4 bytes.
@@ -420,8 +418,6 @@ am_status_t LogService::addLogDetails(const std::string& logName,
         status = AM_NO_MEMORY;
     }
     lock_status = mLock.unlock();
-    Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::addLogDetails() lock released (%d)", (lock_status ? 1 : 0));
-
     return status;
 }
 
@@ -431,15 +427,12 @@ am_status_t LogService::flushBuffer() throw () {
     bool lock_status = false;
     BodyChunk requestSetSuffixChunk;
 
-    Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::flushBuffer() about to acquire the lock");
     if ((lock_status = mLock.trylock()) == false) {
         Log::log(logModule, Log::LOG_ERROR, "LogService::flushBuffer() failed to acquire the lock (sendLog/addLogDetails is running)");
-        return AM_FAILURE;
+        return AM_SUCCESS;
     }
-    Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::flushBuffer() lock acquired");
     if (bufferCount <= 0 || !remoteBodyChunkListInitialized) {
         lock_status = mLock.unlock();
-        Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::flushBuffer(a) lock released (%d)", (lock_status ? 1 : 0));
         return AM_SUCCESS;
     }
 
@@ -503,6 +496,5 @@ am_status_t LogService::flushBuffer() throw () {
         remoteRequest = NULL;
     }
     lock_status = mLock.unlock();
-    Log::log(logModule, Log::LOG_MAX_DEBUG, "LogService::flushBuffer(c) lock released (%d)", (lock_status ? 1 : 0));
     return status;
 }
