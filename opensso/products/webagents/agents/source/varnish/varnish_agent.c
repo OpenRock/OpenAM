@@ -237,7 +237,11 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
         am_web_log_error("%s: invalid argument passed", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
-        apr_table_add(r->response.headers_out, key, values);
+        if (values == NULL) {
+            apr_table_add(r->response.headers_out, "Set-Cookie", key);
+        } else {
+            apr_table_add(r->response.headers_out, key, values);
+        }
         sts = AM_SUCCESS;
     }
     return sts;
