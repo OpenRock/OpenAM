@@ -76,12 +76,18 @@ public class PasswordServerResource extends AbstractFlow {
                 getCheckedScope(scope_before, client.getClient().allowedGrantScopes(), client
                         .getClient().defaultGrantScopes());
 
-        AccessToken token = createAccessToken(checkedScope);
-        Map<String, Object> result = token.convertToMap();
+        AccessToken token = null;
+        Map<String, Object> result = null;
 
-        // TODO Conditional
-        RefreshToken refreshToken = createRefreshToken(checkedScope);
-        result.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
+        if (issueRefreshToken){
+            RefreshToken refreshToken = createRefreshToken(checkedScope);
+            token = createAccessToken(checkedScope, refreshToken);
+            result = token.convertToMap();
+            result.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
+        } else {
+            token = createAccessToken(checkedScope, null);
+            result = token.convertToMap();
+        }
 
         return new JacksonRepresentation<Map>(result);
     }
@@ -100,10 +106,16 @@ public class PasswordServerResource extends AbstractFlow {
      * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
      * 
      */
-    protected AccessToken createAccessToken(Set<String> checkedScope) {
-        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getContextRealm(getContext()),
-                resourceOwner.getIdentifier(), client.getClient().getClientId());
+    protected AccessToken createAccessToken(Set<String> checkedScope, RefreshToken token) {
+        if (token == null){
+            return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
+                    checkedScope, OAuth2Utils.getContextRealm(getContext()),
+                    resourceOwner.getIdentifier(), client.getClient().getClientId(), null);
+        } else {
+            return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
+                    checkedScope, OAuth2Utils.getContextRealm(getContext()),
+                    resourceOwner.getIdentifier(), client.getClient().getClientId(), token);
+        }
     }
 
     /**

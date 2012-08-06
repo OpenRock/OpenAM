@@ -81,6 +81,7 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     public AccessTokenImpl(String id, Set<String> scope, long expireTime, Token token) {
         super(id, token.getUserID(), token.getClient(), token.getRealm(), scope, expireTime);
         setType();
+        setParentToken(token.getToken());
     }
 
     /**
@@ -112,8 +113,10 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     }
 
     @Override
-    public RefreshToken getRefreshToken() {
-        return (RefreshToken) this.get(OAuth2.Token.OAUTH_REFRESH_TOKEN).getObject();
+    public String getRefreshToken() {
+        //return (RefreshToken) this.get(OAuth2.Token.OAUTH_REFRESH_TOKEN).getObject();
+        //refreshtoken is stored as parent token
+        return getParentToken();
     }
 
     @Override
@@ -121,8 +124,7 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(OAuth2.Params.ACCESS_TOKEN, getToken());
         tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
-        tokenMap.put(OAuth2.Params.EXPIRES_IN, getExpireTime() - System.currentTimeMillis());
-        tokenMap.put(OAuth2.Params.REFRESH_TOKEN, getRefreshToken().getToken());
+        tokenMap.put(OAuth2.Params.EXPIRES_IN, getExpireTime());
         return tokenMap;
     }
 

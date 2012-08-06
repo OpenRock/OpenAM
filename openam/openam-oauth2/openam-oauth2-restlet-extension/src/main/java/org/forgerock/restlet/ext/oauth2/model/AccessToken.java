@@ -50,7 +50,7 @@ public interface AccessToken extends Token {
      * @return null if there is no RefreshToken associated
      */
     @JsonSerialize
-    public RefreshToken getRefreshToken();
+    public String getRefreshToken();
 
     /**
      * Converts the token to Map

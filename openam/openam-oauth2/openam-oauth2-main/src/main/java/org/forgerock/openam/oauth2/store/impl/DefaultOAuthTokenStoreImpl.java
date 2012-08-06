@@ -223,7 +223,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+        long expireTime = ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, refreshToken);
         // TODO find out where the scope in the access token is checked against
@@ -314,16 +314,23 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
-            String uuid, String clientId) {
+            String uuid, String clientId, RefreshToken refreshToken) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
         long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+        AccessTokenImpl accessToken;
 
-        AccessTokenImpl accessToken =
-                new AccessTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm,
+        if (refreshToken != null){
+            accessToken =
+                new AccessTokenImpl(id, refreshToken.getToken(), uuid, new SessionClientImpl(clientId, null), realm,
                         scope, expireTime);
+        } else {
+            accessToken =
+                    new AccessTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm,
+                            scope, expireTime);
+        }
         // TODO should scope be checked against client settings?
 
         // Create in CTS
@@ -395,7 +402,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + REFRESH_TOKEN_LIFETIME;
+        long expireTime = REFRESH_TOKEN_LIFETIME;
 
         RefreshTokenImpl refreshToken =
                 new RefreshTokenImpl(id, null, uuid, null, realm, scope, expireTime);

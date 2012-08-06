@@ -195,7 +195,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                     "Authorization code has been user.");
         } else {
             // TODO Token expire check
-            if (code.getExpireTime() - System.currentTimeMillis() < 0 || code.isExpired()) {
+            if (code.isExpired()) {
                 // Throw expired code
                 throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
                         "Authorization code expired.");
@@ -208,6 +208,9 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             // Generate Token
             AccessToken token = createAccessToken(code);
             Map<String, Object> response = token.convertToMap();
+            if (issueRefreshToken){
+                response.put(OAuth2.Params.REFRESH_TOKEN, token.getRefreshToken());
+            }
             return new JacksonRepresentation<Map>(response);
         }
     }
@@ -259,6 +262,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
     }
 
     protected RefreshToken createRefreshToken(AuthorizationCode code){
+        resourceOwner = getAuthenticatedResourceOwner();
         return getTokenStore().createRefreshToken(code.getScope(),
                                                     OAuth2Utils.getContextRealm(getContext()),
                                                     resourceOwner.getIdentifier(),

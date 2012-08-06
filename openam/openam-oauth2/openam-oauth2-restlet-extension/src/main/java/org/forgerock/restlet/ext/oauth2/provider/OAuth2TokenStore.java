@@ -25,6 +25,7 @@ package org.forgerock.restlet.ext.oauth2.provider;
 
 import java.util.Set;
 
+import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.model.AccessToken;
 import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
@@ -157,10 +158,12 @@ public interface OAuth2TokenStore {
      *            the user identifier (resource owner)
      * @param clientId
      *            the client making the request
+     * @param refreshToken
+     *            the optional refresh token. null if there is no refresh token
      * @return a newly created and stored access token
      */
     AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
-            String uuid, String clientId);
+            String uuid, String clientId, RefreshToken refreshToken);
 
     /**
      * Creates and stores an access token using the client credential flow,
