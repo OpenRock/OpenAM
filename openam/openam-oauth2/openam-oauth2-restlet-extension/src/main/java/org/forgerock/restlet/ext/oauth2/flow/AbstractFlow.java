@@ -86,6 +86,19 @@ public abstract class AbstractFlow extends ServerResource {
 
     private OAuth2TokenStore tokenStore = null;
 
+    public AbstractFlow(){
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(null, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
+        } catch (Exception e) {
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not get service settings", null);
+        }
+    }
+
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
@@ -121,17 +134,6 @@ public abstract class AbstractFlow extends ServerResource {
     protected void doInit() throws ResourceException {
         clientVerifier = OAuth2Utils.getClientVerifier(getContext());
         tokenStore = OAuth2Utils.getTokenStore(getContext());
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(null, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
-        } catch (Exception e) {
-            // TODO: legacy code throws Exception, look to refactor
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not get service settings", null);
-        }
     }
 
     /**
