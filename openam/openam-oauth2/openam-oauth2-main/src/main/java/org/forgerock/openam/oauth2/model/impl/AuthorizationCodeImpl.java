@@ -80,6 +80,7 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
      * @param issued
      *            TODO Description
      */
+    @Override
     public void setIssued(boolean issued) {
         this.put(OAuth2.StoredToken.ISSUED, issued);
     }

@@ -42,6 +42,8 @@ public interface AuthorizationCode extends Token {
      */
     public boolean isTokenIssued();
 
+    public void setIssued(boolean issued);
+
     // public lifetime A maximum authorization code lifetime of 10 minutes is
     // RECOMMENDED
 }

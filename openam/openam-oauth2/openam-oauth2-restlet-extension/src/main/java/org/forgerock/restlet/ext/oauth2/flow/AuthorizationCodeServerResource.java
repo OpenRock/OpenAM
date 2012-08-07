@@ -190,13 +190,11 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code has been user.");
         } else if (code.isTokenIssued()) {
-            // TODO throw Exception
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code has been user.");
         } else {
-            // TODO Token expire check
             if (code.isExpired()) {
-                // Throw expired code
+                // TODO Used code 2 times needs to invalidate all tokens associated with this code
                 throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
                         "Authorization code expired.");
             }
@@ -207,6 +205,9 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
             // Generate Token
             AccessToken token = createAccessToken(code);
+
+            //set access token issued
+            code.setIssued(true);
             Map<String, Object> response = token.convertToMap();
             if (issueRefreshToken){
                 response.put(OAuth2.Params.REFRESH_TOKEN, token.getRefreshToken());
