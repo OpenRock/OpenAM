@@ -69,8 +69,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
                     "Token was issued to a different client");
         } else {
             // TODO validate the refresh token.
-            if (refreshToken.getExpireTime() - System.currentTimeMillis() < 0
-                    || refreshToken.isExpired()) {
+            if (refreshToken.isExpired()) {
                 throw OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
             }
 

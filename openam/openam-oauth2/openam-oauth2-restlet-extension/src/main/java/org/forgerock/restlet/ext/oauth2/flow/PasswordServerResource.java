@@ -50,6 +50,7 @@ public class PasswordServerResource extends AbstractFlow {
     public Representation represent(Representation entity) {
         Representation rep = null;
         client = getAuthenticatedClient();
+
         String username =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.USERNAME, String.class);
         String password =

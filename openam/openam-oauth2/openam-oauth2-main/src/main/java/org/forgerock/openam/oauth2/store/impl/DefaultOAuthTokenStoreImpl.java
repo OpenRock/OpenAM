@@ -46,10 +46,7 @@ import org.forgerock.openam.oauth2.model.impl.RefreshTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.SessionClientImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.AccessToken;
-import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.forgerock.restlet.ext.oauth2.model.*;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
 import org.restlet.data.Status;
 
@@ -61,6 +58,7 @@ import org.restlet.data.Status;
  */
 public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
+    //lifetimes are in seconds
     private long AUTHZ_CODE_LIFETIME = 1;
     private long REFRESH_TOKEN_LIFETIME = 1;
     private long ACCESS_TOKEN_LIFETIME = 1;
@@ -191,7 +189,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+        long expireTime = ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken = new AccessTokenImpl(id, scope, expireTime, code);
         // TODO decide where the scope in the access token is checked against
@@ -256,7 +254,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+        long expireTime = ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken =
                 new AccessTokenImpl(id, null, uuid, null, realm, scope, expireTime);
@@ -287,7 +285,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+        long expireTime = ACCESS_TOKEN_LIFETIME;
 
         AccessTokenImpl accessToken =
                 new AccessTokenImpl(id, null, uuid, client, realm, scope, expireTime);
@@ -319,7 +317,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         // TODO expiry time cascading config
-        long expireTime = System.currentTimeMillis() + ACCESS_TOKEN_LIFETIME;
+        long expireTime = ACCESS_TOKEN_LIFETIME;
         AccessTokenImpl accessToken;
 
         if (refreshToken != null){
@@ -405,7 +403,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         long expireTime = REFRESH_TOKEN_LIFETIME;
 
         RefreshTokenImpl refreshToken =
-                new RefreshTokenImpl(id, null, uuid, null, realm, scope, expireTime);
+                new RefreshTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm, scope, expireTime);
 
         // Create in CTS
         JsonResourceAccessor accessor =
@@ -448,7 +446,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         // Construct a RefreshToken object and return it
         // TODO use _id instead of id?
-        RefreshToken rt = new RefreshTokenImpl(id, response.get("value"));
+        RefreshToken rt = new RefreshTokenImpl(id, response);
         return rt;
     }
 

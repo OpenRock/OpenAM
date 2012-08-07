@@ -107,6 +107,7 @@ public abstract class TokenImpl extends JsonValue implements Token {
      *            the JSON object containing the values for this object
      */
     protected TokenImpl(String id, JsonValue value) {
+        //super(new HashMap<String, Object>());
         super(value);
         this.id = id;
     }
