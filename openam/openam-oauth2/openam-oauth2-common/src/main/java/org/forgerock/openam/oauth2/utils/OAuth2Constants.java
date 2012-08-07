@@ -30,6 +30,10 @@ package org.forgerock.openam.oauth2.utils;
  */
 public class OAuth2Constants {
 
+    /**
+     * Stores the constants for the OAuth2 Provider Service
+     * @author Jason Lemay
+     */
     public class OAuth2ProviderService{
         //service name and version
         public static final String NAME = "OAuth2Provider";

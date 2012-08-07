@@ -32,9 +32,9 @@ package org.forgerock.restlet.ext.oauth2.model;
 public interface RefreshToken extends Token {
 
     /**
-     * TODO Description.
+     * Get parent token
      * 
-     * @return TODO Description
+     * @return ID of parent token
      */
     public String getParentToken();
 }

@@ -33,29 +33,29 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.model.Token;
 
 /**
- * TODO Description.
+ * Implements a Refresh Token
  */
 public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
 
     private String parent;
 
     /**
-     * TODO Description.
+     * Creates a refresh token
      * 
      * @param id
-     *            TODO Description
+     *            ID of the token
      * @param parent
-     *            TODO Description
+     *            Parent ID of the refresh token
      * @param userID
-     *            TODO Description
+     *            UserID of the user creating the token
      * @param client
-     *            TODO Description
+     *            SessionClient of the client creating the token
      * @param realm
-     *            TODO Description
+     *            Realm the token is created in
      * @param scope
-     *            TODO Description
+     *            Scope of the token
      * @param expireTime
-     *            TODO Description
+     *            Time in seconds until the token expires
      */
     public RefreshTokenImpl(String id, String parent, String userID, SessionClient client,
             String realm, Set<String> scope, long expireTime) {
@@ -65,16 +65,16 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
     }
 
     /**
-     * TODO Description.
+     * Creates a refresh token
      * 
      * @param id
-     *            TODO Description
+     *            ID of the token
      * @param scope
-     *            TODO Description
+     *            Scope of the token
      * @param expireTime
-     *            TODO Description
+     *            Time in seconds until the token expires
      * @param token
-     *            TODO Description
+     *            Parent Token of the refresh token
      */
     public RefreshTokenImpl(String id, Set<String> scope, long expireTime, Token token) {
         super(id, token.getUserID(), token.getClient(), token.getRealm(), scope, expireTime);
@@ -82,12 +82,12 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
     }
 
     /**
-     * TODO Description.
+     * Creates a refresh token.
      * 
      * @param id
-     *            TODO Description
+     *            ID of the token
      * @param value
-     *            TODO Description
+     *            A JsonValue map to populate this token with.
      */
     public RefreshTokenImpl(String id, JsonValue value) {
         super(id, value);
@@ -95,10 +95,10 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
     }
 
     /**
-     * TODO Description.
+     * Set the parent token
      * 
      * @param parent
-     *            TODO Description
+     *            ID of the parent token
      */
     public void setParentToken(String parent) {
         this.put(OAuth2.StoredToken.PARENT, parent);
@@ -110,7 +110,7 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
     }
 
     /**
-     * TODO Description.
+     * Set the token type
      */
     protected void setType() {
         this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.REFRESH_TOKEN);

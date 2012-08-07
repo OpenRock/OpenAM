@@ -42,7 +42,7 @@ public interface Token {
     /**
      * Get the string representation of the identifier of this token
      * <p/>
-     * TODO Description
+     *
      * 
      * @return unique identifier of the represented token
      */
@@ -50,32 +50,36 @@ public interface Token {
     public String getToken();
 
     /**
-     * TODO Description.
+     * Get tokens UserID
      * 
      * @return
+     *          ID of user
      */
     @JsonIgnore
     public String getUserID();
 
     /**
-     * TODO Description.
+     * Get Tokens Realm
      * 
      * @return
+     *          the realm
      */
     public String getRealm();
 
     /**
-     * TODO Description.
+     * Get tokens client
      * 
      * @return
+     *          the SessionClient for the client
      */
     @JsonIgnore
     public SessionClient getClient();
 
     /**
-     * TODO Description.
+     * Gets the tokens scope
      * 
      * @return
+     *          Set of strings that are the tokens scope
      */
     @JsonIgnore
     public Set<String> getScope();
@@ -89,9 +93,11 @@ public interface Token {
     public long getExpireTime();
 
     /**
-     * TODO Description.
+     * Checks if token is expired
      * 
      * @return
+     *          true if expired
+     *          false if not expired
      */
     public boolean isExpired();
 }

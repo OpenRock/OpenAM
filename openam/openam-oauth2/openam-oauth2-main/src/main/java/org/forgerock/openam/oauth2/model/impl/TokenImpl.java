@@ -36,7 +36,7 @@ import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 import org.forgerock.restlet.ext.oauth2.model.Token;
 
 /**
- * TODO Description.
+ * Implements a Token
  */
 public abstract class TokenImpl extends JsonValue implements Token {
 
@@ -69,17 +69,6 @@ public abstract class TokenImpl extends JsonValue implements Token {
         setClient(client);
         setRealm(realm);
         setScope(scope);
-
-        // The expiresIn value is a count of the number of seconds that this
-        // token should be valid
-        // for.
-        // For storage purposes, the token should store the time when the token
-        // will expire, so that
-        // later retrieval
-        // will allow the expires_in value to be easily and accurately
-        // calculated. The expiresIn
-        // value should therefore
-        // be translated to a more absolute value.
         setAbsoluteExpiryTime(calculateAbsoluteExpiry(expiresIn));
     }
 
@@ -121,30 +110,30 @@ public abstract class TokenImpl extends JsonValue implements Token {
     }
 
     /**
-     * TODO Description.
+     * Sets the UserID of the token
      * 
      * @param userID
-     *            TODO Description
+     *            The UserID of the token
      */
     public void setUserID(String userID) {
         this.put(OAuth2.Params.USERNAME, userID);
     }
 
     /**
-     * TODO Description.
+     * Sets the Realm of the token
      * 
      * @param realm
-     *            TODO Description
+     *            The realm of the token
      */
     public void setRealm(String realm) {
         this.put(OAuth2.Params.REALM, realm == null ? "/" : new String(realm));
     }
 
     /**
-     * TODO Description.
+     * Sets the Client of the token
      * 
      * @param client
-     *            TODO Description
+     *            The client of the token
      */
     public void setClient(SessionClient client) {
         if (client != null) {
@@ -154,10 +143,10 @@ public abstract class TokenImpl extends JsonValue implements Token {
     }
 
     /**
-     * TODO Description.
+     * Sets the scope of the token
      * 
      * @param scope
-     *            TODO Description
+     *            The scope of the token
      */
     public void setScope(Set<String> scope) {
         if (scope == null) {
@@ -167,10 +156,10 @@ public abstract class TokenImpl extends JsonValue implements Token {
     }
 
     /**
-     * TODO Description.
+     * Sets the ExpiryTime of the token
      * 
      * @param expiryTime
-     *            TODO Description
+     *            The epoch in milliseconds when this token will expire
      */
     public void setAbsoluteExpiryTime(long expiryTime) {
         this.put(OAuth2.StoredToken.EXPIRY_TIME, expiryTime);

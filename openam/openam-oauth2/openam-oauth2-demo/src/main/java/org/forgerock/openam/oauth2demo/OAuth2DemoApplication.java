@@ -201,9 +201,9 @@ public class OAuth2DemoApplication extends Application {
     }
 
     /**
-     * TODO Description.
+     * Parses the current servlet request and creates a URI
      * 
-     * @return TODO Description
+     * @return URI representing the current servlet request
      */
     protected URI getCurrentURI() {
         Object o = getContext().getAttributes().get(OAuth2DemoApplication.class.getName());

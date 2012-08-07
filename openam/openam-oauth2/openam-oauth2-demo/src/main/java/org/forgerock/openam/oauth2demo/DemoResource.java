@@ -78,9 +78,9 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     private volatile boolean redirected = false;
 
     /**
-     * TODO Description.
+     * Parses the input request from the main demo interface and sends the necessary response
      * 
-     * @return TODO Description
+     * @return a template representation
      */
     @Get("html")
     public Representation getStatusInfo() {
@@ -176,9 +176,9 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     }
 
     /**
-     * TODO Description.
+     * Returns the servlet request
      * 
-     * @return TODO Description
+     * @return HttpServletRequest for current request
      */
     protected HttpServletRequest getHttpServletRequest() {
         if (null == servletRequest) {
@@ -188,13 +188,13 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
     }
 
     /**
-     * TODO Description.
+     * Gets the client resource
      * 
      * @param reference
-     *            TODO Description
+     *            URI to something
      * @param flow
-     *            TODO Description
-     * @return TODO Description
+     *            An OAuth2 flow
+     * @return The ClientResource containing the reference.
      */
     protected ClientResource getClientResource(Reference reference, OAuth2Proxy.Flow flow) {
         ClientResource clientResource = new ClientResource(getContext(), reference);

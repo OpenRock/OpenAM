@@ -30,7 +30,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 
 /**
- * TODO Description.
+ * Implements a Session Client
  */
 public class SessionClientImpl extends JsonValue implements SessionClient {
 
@@ -39,12 +39,12 @@ public class SessionClientImpl extends JsonValue implements SessionClient {
     private String redirectUri;
 
     /**
-     * TODO Description.
+     * Creates a session client
      * 
      * @param clientId
-     *            TODO Description
+     *            The ID of the client
      * @param redirectUri
-     *            TODO Description
+     *            The redirection URI of the client
      */
     public SessionClientImpl(String clientId, String redirectUri) {
         super(new HashMap<String, Object>());

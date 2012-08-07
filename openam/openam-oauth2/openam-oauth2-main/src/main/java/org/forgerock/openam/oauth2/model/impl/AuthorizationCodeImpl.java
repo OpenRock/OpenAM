@@ -32,27 +32,27 @@ import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
 import org.forgerock.restlet.ext.oauth2.model.SessionClient;
 
 /**
- * TODO Description.
+ * Implements an Authorization Code Token
  */
 public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCode {
 
     /**
-     * TODO Description.
+     * Creates an Authorization Code Token
      * 
      * @param id
-     *            TODO Description
+     *            ID of the token
      * @param userID
-     *            TODO Description
+     *            UserID of the user creating the token
      * @param client
-     *            TODO Description
+     *            SessionClient of the client creating the token
      * @param realm
-     *            TODO Description
+     *            Realm the token is created in
      * @param scope
-     *            TODO Description
+     *            Scope of the token
      * @param issued
-     *            TODO Description
+     *            Whether or not the access code has already been used to create an access token
      * @param expireTime
-     *            TODO Description
+     *            Time in seconds until the token expires
      */
     public AuthorizationCodeImpl(String id, String userID, SessionClient client, String realm,
             Set<String> scope, boolean issued, long expireTime) {
@@ -62,12 +62,12 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     }
 
     /**
-     * TODO Description.
+     * Creates an Authorization Code Token
      * 
      * @param id
-     *            TODO Description
+     *            ID of the token
      * @param value
-     *            TODO Description
+     *            A JsonValue map to populate this token with
      */
     public AuthorizationCodeImpl(String id, JsonValue value) {
         super(id, value);
@@ -75,10 +75,10 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     }
 
     /**
-     * TODO Description.
+     * Set the tokens issue state
      * 
      * @param issued
-     *            TODO Description
+     *            true or false whether the token has been used already
      */
     @Override
     public void setIssued(boolean issued) {
@@ -86,9 +86,9 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     }
 
     /**
-     * TODO Description.
+     * Check if token has been used to generate an access token
      * 
-     * @return TODO Description
+     * @return true or false whether the token has been used already
      */
     @Override
     public boolean isTokenIssued() {
@@ -96,7 +96,7 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     }
 
     /**
-     * TODO Description.
+     * Set the type of the token
      */
     protected void setType() {
         this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.CODE);
