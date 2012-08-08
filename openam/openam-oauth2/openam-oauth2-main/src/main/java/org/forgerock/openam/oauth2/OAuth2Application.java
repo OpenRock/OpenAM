@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * "Portions Copyrighted [2012] [Forgerock Inc]"
  */
 
 package org.forgerock.openam.oauth2;
@@ -38,15 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.oauth2.internal.ClientIdentityVerifier;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
+import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.oauth2.store.impl.DefaultOAuthTokenStoreImpl;
 import org.forgerock.restlet.ext.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
-import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.restlet.ext.oauth2.provider.ValidationServerResource;
+import org.forgerock.restlet.ext.oauth2.provider.*;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
@@ -120,7 +117,7 @@ public class OAuth2Application extends Application {
         Router root = new Router(childContext);
         //try {
             URI currentURI = getCurrentURI();
-            redirectURI = currentURI.resolve("../../../oauth2demo/oauth2/redirect");
+            redirectURI = currentURI.resolve("../../oauth2demo/oauth2/redirect");
             //redirectURI = new URI("http://jason.internal.foregerock.com:8080/openam-current/oauth2/redirect");
         //} catch (URISyntaxException ex) {
         //    Logger.getLogger(OAuth2Application.class.getName()).log(Level.SEVERE, null, ex);
@@ -142,15 +139,14 @@ public class OAuth2Application extends Application {
                         .supportPassword();
         authorizer.setNext(finder);
 
-        ChallengeAuthenticator filter =
-                new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
-        filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(), Arrays
-                .asList(redirectURI.toString())));
+        //ChallengeAuthenticator filter =
+        //        new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
+        //filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(), Arrays
+        //        .asList(redirectURI.toString())));
 
-        // ClientAuthenticationFilter filter = new
-        // ClientAuthenticationFilter(childContext);
+        ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
         // Try to authenticate the client The verifier MUST set
-        // filter.setVerifier(getClientVerifier());
+        filter.setVerifier(getClientVerifier());
         root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
 
         // Define Token Endpoint
@@ -175,7 +171,7 @@ public class OAuth2Application extends Application {
      * @return TODO Description
      */
     public ClientVerifier getClientVerifier() {
-        return new TestClientVerifier();
+        return new ClientVerifierImpl();
     }
 
     /**
@@ -285,6 +281,7 @@ public class OAuth2Application extends Application {
             Set<URI> cfg = new HashSet<URI>(1);
             cfg.add(URI.create("http://local.identitas.no:9085/openam/oauth2test/code-token.html"));
             cfg.add(URI.create("http://jason.internal.forgerock.com:8080/openam/oauth2test/code-token.html"));
+            cfg.add(URI.create("http://jason.internal.forgerock.com:8080/oauth2demo/oauth2/redirect"));
             cfg.add(redirectURI);
             return Collections.unmodifiableSet(cfg);
         }
