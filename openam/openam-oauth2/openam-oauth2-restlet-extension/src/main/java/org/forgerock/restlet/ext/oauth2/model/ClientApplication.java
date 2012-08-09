@@ -90,4 +90,18 @@ public interface ClientApplication {
      */
     public boolean isAutoGrant();
 
+    /**
+     * Contains a set of strings that are in the format of "locale"|"displayName"
+     * @return
+     *          a set of display names for various locales
+     */
+    public Set<String> getDisplayName();
+
+    /**
+     * Contains a set of strings that are in the format of "locale"|"displayDescription"
+     * @return
+     *          a set of display descriptions for various locales
+     */
+    public Set<String> getDisplayDescription();
+
 }

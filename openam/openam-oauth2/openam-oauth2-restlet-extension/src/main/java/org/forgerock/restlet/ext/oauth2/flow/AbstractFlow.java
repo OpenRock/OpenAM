@@ -409,6 +409,21 @@ public abstract class AbstractFlow extends ServerResource {
     protected Map<String, Object> getDataModel() {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
         data.put("target", getRequest().getResourceRef().toString());
+        Set<String> displayNames = client.getClient().getDisplayName();
+        Set<String> displayDescriptions = client.getClient().getDisplayDescription();
+        //String locale = getRequest().getLocale();
+        for (String name : displayNames){
+            //temporarily grab no locale
+            if (!name.contains("|")){
+                data.put("display_name", name);
+            }
+        }
+        for (String name : displayDescriptions){
+            //temporarily grab no locale
+            if (!name.contains("|")){
+                data.put("display_description", name);
+            }
+        }
         return data;
     }
 

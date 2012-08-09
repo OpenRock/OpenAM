@@ -118,5 +118,29 @@ public class ClientApplicationImpl implements ClientApplication{
         return false;
     }
 
+    @Override
+    public Set<String> getDisplayName(){
+        Set<String> displayName = null;
+        try {
+            displayName = id.getAttribute(NAME);
+        } catch (Exception e){
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+        return displayName;
+    }
+
+    @Override
+    public Set<String> getDisplayDescription(){
+        Set<String> displayDescription = null;
+        try {
+            displayDescription = id.getAttribute(DESCRIPTION);
+        } catch (Exception e){
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+        return displayDescription;
+    }
+
 
 }

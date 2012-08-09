@@ -15,8 +15,8 @@
         <section id="intro">
             <h2>Application requesting scope</h2>
 
-            <p>Client ClientId = ${clientId?if_exists} CB = ${clientDescription?if_exists} wants to get access to your
-                information.</p>
+            <p>Client ${display_name?if_exists}:</p>
+            <p>${display_description?if_exists} </p>
         </section>
     </div>
     <aside>

@@ -280,8 +280,6 @@ public class OAuth2Application extends Application {
         public Set<URI> getRedirectionURIs() {
             Set<URI> cfg = new HashSet<URI>(1);
             cfg.add(URI.create("http://local.identitas.no:9085/openam/oauth2test/code-token.html"));
-            cfg.add(URI.create("http://jason.internal.forgerock.com:8080/openam/oauth2test/code-token.html"));
-            cfg.add(URI.create("http://jason.internal.forgerock.com:8080/oauth2demo/oauth2/redirect"));
             cfg.add(redirectURI);
             return Collections.unmodifiableSet(cfg);
         }
@@ -314,6 +312,16 @@ public class OAuth2Application extends Application {
         @Override
         public boolean isAutoGrant() {
             return false;
+        }
+
+        @Override
+        public Set<String> getDisplayName(){
+            return null;
+        }
+
+        @Override
+        public Set<String> getDisplayDescription(){
+            return null;
         }
     }
 
