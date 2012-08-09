@@ -389,7 +389,7 @@ public class AbstractFlowTest {
         // Mock createAccessToken - Resource Owner Password
         when(
                 realm.getTokenStore().createAccessToken(eq(OAuth2.Bearer.BEARER), anySet(),
-                        anyString(), anyString(), anyString())).then(new Answer<AccessToken>() {
+                        anyString(), anyString(), any(SessionClient.class))).then(new Answer<AccessToken>() {
             @Override
             public AccessToken answer(InvocationOnMock invocation) throws Throwable {
                 AccessToken accessToken = mock(AccessToken.class);
