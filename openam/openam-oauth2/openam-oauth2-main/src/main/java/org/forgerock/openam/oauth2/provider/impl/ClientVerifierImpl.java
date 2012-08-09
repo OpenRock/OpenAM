@@ -42,10 +42,12 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Status;
 
 import java.security.AccessController;
+import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import com.sun.identity.shared.encode.Hash;
 
 public class ClientVerifierImpl implements ClientVerifier{
 
@@ -55,7 +57,9 @@ public class ClientVerifierImpl implements ClientVerifier{
     public ClientApplication verify(ChallengeResponse challengeResponse)
             throws OAuthProblemException{
         String client_id = challengeResponse.getIdentifier();
-        String client_secret = challengeResponse.getSecret().toString();
+        String client_secret = String.valueOf(challengeResponse.getSecret());
+        client_secret = Hash.hash(client_secret);
+        //String client_secret = String.valueOf(challengeResponse.getSecret());
         return verify(client_id, client_secret);
     }
 
@@ -66,7 +70,10 @@ public class ClientVerifierImpl implements ClientVerifier{
         try {
             AMIdentity id = getIdentity(client_id);
             Set<String> clientPassword = id.getAttribute(CLIENT_PASSWORD);
-            if (!clientPassword.iterator().next().equalsIgnoreCase(client_secret)){
+            //password is returned as {SHA-1}password
+            //remove {SHA-1}
+            String cleanpass = clientPassword.iterator().next().replaceAll("\\{SHA-1\\}", "");
+            if (!cleanpass.equalsIgnoreCase(client_secret)){
                  //wrong client secret
                 throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                         "Service unavailable", "Could not create underlying storage", null);
