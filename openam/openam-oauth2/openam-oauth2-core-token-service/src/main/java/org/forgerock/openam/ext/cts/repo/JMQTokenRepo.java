@@ -33,7 +33,7 @@ import org.forgerock.json.patch.JsonPatch;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2;
 
 import java.util.Date;
 import java.util.HashMap;

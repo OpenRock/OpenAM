@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 

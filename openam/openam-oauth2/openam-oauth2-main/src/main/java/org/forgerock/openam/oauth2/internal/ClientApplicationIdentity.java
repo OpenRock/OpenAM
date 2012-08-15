@@ -31,8 +31,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.model.ClientApplication;
 
 /**
  * A NAME does ...
@@ -94,5 +94,17 @@ public class ClientApplicationIdentity extends JsonValue implements ClientApplic
     @Override
     public boolean isAutoGrant() {
         return false;
+    }
+
+    @Override
+    public Set<String> getDisplayName(){
+        return Collections.unmodifiableSet(new HashSet<String>(get("displayName").required()
+                .asList(String.class)));
+    }
+
+    @Override
+    public Set<String> getDisplayDescription(){
+        return Collections.unmodifiableSet(new HashSet<String>(get("displayDescription").required()
+                .asList(String.class)));
     }
 }

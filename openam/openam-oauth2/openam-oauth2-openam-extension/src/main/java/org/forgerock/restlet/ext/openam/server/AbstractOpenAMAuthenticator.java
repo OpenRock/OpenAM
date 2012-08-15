@@ -26,6 +26,7 @@ package org.forgerock.restlet.ext.openam.server;
 
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -131,6 +132,10 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
 
     protected void redirect(Request request, Response response) {
         Reference amserver = new Reference(openamServer);
+        realm = OAuth2Utils.getRealm(request);
+        moduleName = OAuth2Utils.getModuleName(request);
+        serviceName = OAuth2Utils.getServiceName(request);
+
         if (null != realm) {
             amserver.addQueryParameter("realm", realm);
         }

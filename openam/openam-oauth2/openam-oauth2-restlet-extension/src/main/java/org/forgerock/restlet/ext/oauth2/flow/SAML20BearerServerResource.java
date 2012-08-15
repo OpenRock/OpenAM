@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2;
 
 /**
  * @author $author$

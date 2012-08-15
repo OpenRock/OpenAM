@@ -21,12 +21,14 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.provider;
+package org.forgerock.openam.oauth2.provider;
 
 import java.util.Collection;
 
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 
@@ -49,17 +51,30 @@ import org.restlet.data.ChallengeScheme;
  * @version $Revision$ $Date$
  */
 public interface ClientVerifier {
-
+    /**
+     * Authenticates the client
+     *
+     *
+     * @param request
+     *            the HTTP Request
+     * @param response
+     *            the HTTP Response
+     * @return Client if the credentials are correct
+     * @throws OAuthProblemException
+     *             when authentication failed
+     */
+    public ClientApplication verify(Request request, Response response)
+            throws OAuthProblemException;
     /**
      * Authenticates the client and use the
      * {@link org.restlet.engine.header.HeaderConstants#HEADER_AUTHORIZATION}
      * <p/>
-     * TODO Implement verify(Request request, Response response) instead
+     *
      * 
      * @param challengeResponse
      *            from the HTTP Request
      * @return Client if the credentials are correct
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      *             when authentication failed
      */
     public ClientApplication verify(ChallengeResponse challengeResponse)
@@ -67,8 +82,8 @@ public interface ClientVerifier {
 
     /**
      * Authenticates the client and use the
-     * {@link org.forgerock.restlet.ext.oauth2.OAuth2.Params#CLIENT_ID} and
-     * {@link org.forgerock.restlet.ext.oauth2.OAuth2.Params#CLIENT_SECRET} from
+     * {@link org.forgerock.openam.oauth2.OAuth2.Params#CLIENT_ID} and
+     * {@link org.forgerock.openam.oauth2.OAuth2.Params#CLIENT_SECRET} from
      * application/x-www-form-urlencoded Web From
      * 
      * @param client_id

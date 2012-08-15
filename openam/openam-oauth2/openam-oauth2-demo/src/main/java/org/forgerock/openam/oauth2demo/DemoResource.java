@@ -34,14 +34,14 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestCallbackHandler;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.data.Form;

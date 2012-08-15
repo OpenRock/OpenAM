@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.AccessToken;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.RefreshToken;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
@@ -102,7 +102,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
      * 
      * @param checkedScope
      * @return
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      */
     protected AccessToken createAccessToken(RefreshToken refreshToken, Set<String> checkedScope) {

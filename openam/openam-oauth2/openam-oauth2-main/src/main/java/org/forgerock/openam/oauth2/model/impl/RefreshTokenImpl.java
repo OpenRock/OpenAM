@@ -27,10 +27,10 @@ package org.forgerock.openam.oauth2.model.impl;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
-import org.forgerock.restlet.ext.oauth2.model.Token;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.model.RefreshToken;
+import org.forgerock.openam.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.model.Token;
 
 /**
  * Implements a Refresh Token

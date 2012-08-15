@@ -21,20 +21,53 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.model;
+package org.forgerock.openam.oauth2.provider;
+
+import org.restlet.Context;
+import org.restlet.Restlet;
 
 /**
  * @author $author$
  * @version $Revision$ $Date$
- * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-6">6.
- *      Refreshing an Access Token</a>
  */
-public interface RefreshToken extends Token {
+public interface OAuth2Provider {
 
     /**
-     * Get parent token
+     * Returns the context.
      * 
-     * @return ID of parent token
+     * @return The context.
      */
-    public String getParentToken();
+    public Context getContext();
+
+    /**
+     * Attach a new realm to the OAuth2Provider
+     * 
+     * @param realm
+     * @param next
+     * @return
+     */
+    public boolean attachRealm(String realm, Restlet next);
+
+    /**
+     * Detach the specified realm from the OAuth2Provider
+     * 
+     * @param realm
+     * @return
+     */
+    public Restlet detachRealm(String realm);
+
+    /**
+     * Attach the default realm to OAuth2Provider
+     * 
+     * @param next
+     * @return
+     */
+    public boolean attachDefaultRealm(Restlet next);
+
+    /**
+     * Detach the default realm from OAuth2Provider
+     * 
+     * @return
+     */
+    public Restlet detachDefaultRealm();
 }

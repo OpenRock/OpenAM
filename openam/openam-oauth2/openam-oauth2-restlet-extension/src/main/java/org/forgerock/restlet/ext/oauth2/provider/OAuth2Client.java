@@ -25,10 +25,10 @@ package org.forgerock.restlet.ext.oauth2.provider;
 
 import java.net.URI;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.model.SessionClient;
 import org.restlet.security.User;
 
 /**
@@ -53,7 +53,7 @@ public class OAuth2Client extends User {
      * session.
      * <p/>
      * Throws
-     * {@link org.forgerock.restlet.ext.oauth2.OAuthProblemException.OAuthError#REDIRECT_URI_MISMATCH}
+     * {@link org.forgerock.openam.oauth2.exceptions.OAuthProblemException.OAuthError#REDIRECT_URI_MISMATCH}
      * <p/>
      * The authorization server SHOULD require all clients to register their
      * redirection endpoint prior to utilizing the authorization endpoint
@@ -71,7 +71,7 @@ public class OAuth2Client extends User {
      * 
      * @param redirectionURI
      * @return
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      * @see <a
      *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-3.1.2.2">3.1.2.2.

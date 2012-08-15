@@ -28,7 +28,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2User;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;

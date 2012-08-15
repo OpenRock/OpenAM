@@ -24,34 +24,54 @@
 
 package org.forgerock.openam.oauth2.provider.impl;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.ext.cts.CoreTokenService;
-import org.forgerock.openam.ext.cts.repo.JMQTokenRepo;
+import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
-import org.forgerock.openam.oauth2.utils.OAuth2Constants;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
-import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Status;
+import org.restlet.Request;
+import org.restlet.Response;
 
 import java.security.AccessController;
-import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import com.sun.identity.shared.encode.Hash;
 
 public class ClientVerifierImpl implements ClientVerifier{
 
     private static final String CLIENT_PASSWORD = "userpassword";
+    private String realm = null;
+
+    @Override
+    public ClientApplication verify(Request request, Response response){
+
+        ClientApplication client = null;
+        realm = OAuth2Utils.getRealm(request);
+        if (request.getChallengeResponse() != null) {
+            client = verify(request.getChallengeResponse());
+        } else {
+            String client_secret =
+                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_SECRET,
+                            String.class);
+            String client_id =
+                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID,
+                            String.class);
+            if (client_secret != null){
+                client = verify(client_id, client_secret);
+            } else {
+                client = findClient(client_id);
+            }
+        }
+        return client;
+    }
 
     @Override
     public ClientApplication verify(ChallengeResponse challengeResponse)
@@ -59,7 +79,6 @@ public class ClientVerifierImpl implements ClientVerifier{
         String client_id = challengeResponse.getIdentifier();
         String client_secret = String.valueOf(challengeResponse.getSecret());
         client_secret = Hash.hash(client_secret);
-        //String client_secret = String.valueOf(challengeResponse.getSecret());
         return verify(client_id, client_secret);
     }
 
@@ -111,7 +130,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         AMIdentity theID = null;
 
         try {
-            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, null);
+            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
 
             IdSearchControl idsc = new IdSearchControl();
             idsc.setRecursive(true);
@@ -132,10 +151,16 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
 
             theID = results.iterator().next();
+
+            //if the client is deactivated return null
+            if (theID.isActive()){
+                return theID;
+            } else {
+                return null;
+            }
         } catch (Exception e){
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);
         }
-        return theID;
     }
 }

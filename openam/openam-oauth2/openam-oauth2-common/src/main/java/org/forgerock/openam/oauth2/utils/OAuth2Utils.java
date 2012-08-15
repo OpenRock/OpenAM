@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package org.forgerock.restlet.ext.oauth2;
+package org.forgerock.openam.oauth2.utils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -33,8 +33,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -378,6 +380,22 @@ public class OAuth2Utils {
             return (String) realm;
         }
         return getRequestParameter(request, OAuth2.Custom.REALM, String.class);
+    }
+
+    public static String getModuleName(Request request) {
+        Object module = request.getAttributes().get(OAuth2.Custom.MODULE);
+        if (module instanceof String) {
+            return (String) module;
+        }
+        return getRequestParameter(request, OAuth2.Custom.MODULE, String.class);
+    }
+
+    public static String getServiceName(Request request) {
+        Object service = request.getAttributes().get(OAuth2.Custom.SERVICE);
+        if (service instanceof String) {
+            return (String) service;
+        }
+        return getRequestParameter(request, OAuth2.Custom.SERVICE, String.class);
     }
 
     public static <T> T getRequestParameter(Request request, String parameterName, Class<T> clazz) {

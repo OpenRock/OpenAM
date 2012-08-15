@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
-import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2Provider;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.provider.OAuth2Provider;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.ClassDirectoryServerResource;
 import org.restlet.Context;
 import org.restlet.Restlet;

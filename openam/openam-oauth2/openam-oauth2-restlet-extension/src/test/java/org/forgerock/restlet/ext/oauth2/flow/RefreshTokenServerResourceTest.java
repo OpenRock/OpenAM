@@ -31,11 +31,11 @@ import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
+import org.forgerock.openam.oauth2.model.RefreshToken;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;

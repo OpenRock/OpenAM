@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.model;
+package org.forgerock.openam.oauth2.model;
 
 import java.util.Map;
 

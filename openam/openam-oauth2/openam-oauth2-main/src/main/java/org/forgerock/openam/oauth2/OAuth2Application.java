@@ -26,23 +26,18 @@ package org.forgerock.openam.oauth2;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.openam.oauth2.internal.ClientIdentityVerifier;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.oauth2.store.impl.DefaultOAuthTokenStoreImpl;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.restlet.ext.oauth2.provider.*;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
@@ -50,12 +45,12 @@ import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.routing.Router;
-import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
 
 /**
@@ -97,8 +92,8 @@ public class OAuth2Application extends Application {
 
     @Override
     public Restlet createInboundRoot() {
-        OAuth2RealmRouter root = new OAuth2RealmRouter(getContext());
-        root.attachDefaultRealm(activate());
+        Router root = new Router(getContext());
+        root.attach(activate());
 
         // Add TokenInfo Resource
         OAuth2Utils.setTokenStore(getTokenStore(), getContext());
@@ -170,7 +165,7 @@ public class OAuth2Application extends Application {
      * 
      * @return TODO Description
      */
-    public ClientVerifier getClientVerifier() {
+    public org.forgerock.openam.oauth2.provider.ClientVerifier getClientVerifier() {
         return new ClientVerifierImpl();
     }
 
@@ -188,7 +183,7 @@ public class OAuth2Application extends Application {
      * 
      * @return TODO Description
      */
-    public OAuth2TokenStore getTokenStore() {
+    public org.forgerock.openam.oauth2.provider.OAuth2TokenStore getTokenStore() {
         return new DefaultOAuthTokenStoreImpl();
     }
 
@@ -238,7 +233,12 @@ public class OAuth2Application extends Application {
     /**
      * A TestClientVerifier is only for testing.
      */
-    private class TestClientVerifier implements ClientVerifier {
+    private class TestClientVerifier implements org.forgerock.openam.oauth2.provider.ClientVerifier {
+
+        @Override
+        public ClientApplication verify(Request request, Response response ) {
+            return new TestClientApplication();
+        }
 
         @Override
         public ClientApplication verify(ChallengeResponse challengeResponse) {

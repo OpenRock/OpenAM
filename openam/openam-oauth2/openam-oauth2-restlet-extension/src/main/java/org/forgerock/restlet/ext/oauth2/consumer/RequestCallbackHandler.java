@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
 import java.util.Collection;
 import java.util.Set;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;

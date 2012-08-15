@@ -31,7 +31,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;

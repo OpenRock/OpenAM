@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;

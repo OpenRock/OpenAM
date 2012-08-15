@@ -27,7 +27,7 @@ package org.forgerock.openam.oauth2.model.impl;
 import java.util.HashMap;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.model.SessionClient;
 
 /**
  * Implements a Session Client

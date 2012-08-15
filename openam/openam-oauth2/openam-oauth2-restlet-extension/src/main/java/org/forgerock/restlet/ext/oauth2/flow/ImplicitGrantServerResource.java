@@ -27,12 +27,10 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.model.AccessToken;
 import org.restlet.data.Form;
-import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -136,7 +134,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
      * 
      * @param checkedScope
      * @return
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      */
     protected AccessToken createAccessToken(Set<String> checkedScope) {

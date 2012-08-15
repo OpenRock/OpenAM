@@ -29,8 +29,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;

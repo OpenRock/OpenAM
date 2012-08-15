@@ -21,16 +21,15 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.provider;
+package org.forgerock.openam.oauth2.provider;
 
 import java.util.Set;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.AccessToken;
-import org.forgerock.restlet.ext.oauth2.model.AuthorizationCode;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.AuthorizationCode;
+import org.forgerock.openam.oauth2.model.RefreshToken;
+import org.forgerock.openam.oauth2.model.SessionClient;
 
 /**
  * Interface to govern the high level store interactions, applying configuration
@@ -51,7 +50,7 @@ public interface OAuth2TokenStore {
      * @param uuid
      * @param client
      * @return Generated authorization code
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     AuthorizationCode createAuthorizationCode(Set<String> scopes, String realm, String uuid,
@@ -63,7 +62,7 @@ public interface OAuth2TokenStore {
      * @param id
      *            the id of the authorization code to find
      * @return an existing authorization code, or null if not found
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     AuthorizationCode readAuthorizationCode(String id) throws OAuthProblemException;
@@ -77,7 +76,7 @@ public interface OAuth2TokenStore {
      * 
      * @param id
      *            the id of the authorization code that should be deleted
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     void deleteAuthorizationCode(String id) throws OAuthProblemException;
@@ -192,7 +191,7 @@ public interface OAuth2TokenStore {
      * @param id
      *            the unique identifier of the token
      * @return the access token object, or null if it does not exist
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     AccessToken readAccessToken(String id) throws OAuthProblemException;
@@ -205,7 +204,7 @@ public interface OAuth2TokenStore {
      * 
      * @param id
      *            the id of the access token that should be deleted
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     void deleteAccessToken(String id) throws OAuthProblemException;
@@ -224,7 +223,7 @@ public interface OAuth2TokenStore {
      * @param clientId
      *            the client making the request
      * @return a newly created refresh token
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId)
@@ -236,7 +235,7 @@ public interface OAuth2TokenStore {
      * @param id
      *            the unique identifier of the token
      * @return the refresh token object, or null if it does not exist
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     RefreshToken readRefreshToken(String id) throws OAuthProblemException;
@@ -248,7 +247,7 @@ public interface OAuth2TokenStore {
      * 
      * @param id
      *            the id of the refresh token that should be deleted
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws OAuthProblemException
      * 
      */
     void deleteRefreshToken(String id) throws OAuthProblemException;

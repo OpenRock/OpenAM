@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package org.forgerock.restlet.ext.oauth2;
+package org.forgerock.openam.oauth2.exceptions;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
-import org.forgerock.restlet.ext.oauth2.flow.ErrorServerResource;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+//import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
+//import org.forgerock.restlet.ext.oauth2.flow.ErrorServerResource;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
@@ -265,14 +267,16 @@ public class OAuthProblemException extends ResourceException {
      * @throws ResourceException
      *             if the embedded request is null
      */
-    public Class<? extends AbstractFlow> pushException() throws ResourceException {
+    //public Class<? extends AbstractFlow> pushException() throws ResourceException {
+    public Object pushException() throws ResourceException {
         if (null != request) {
             request.getAttributes().put(OAuthProblemException.class.getName(), this);
         } else {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to push Exception",
                     this);
         }
-        return ErrorServerResource.class;
+        //return ErrorServerResource.class;
+        return null;
     }
 
     /**

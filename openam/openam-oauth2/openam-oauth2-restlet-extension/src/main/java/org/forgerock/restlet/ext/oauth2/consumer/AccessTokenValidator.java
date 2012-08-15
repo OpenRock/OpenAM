@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.consumer;
 
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 
 /**
  * An AccessTokenValidator does ...

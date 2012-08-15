@@ -21,14 +21,14 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.model;
+package org.forgerock.openam.oauth2.model;
 
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2;
 
 /**
  * @author $author$

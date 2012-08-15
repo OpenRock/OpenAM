@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package org.forgerock.restlet.ext.oauth2;
+package org.forgerock.openam.oauth2;
 
 /**
  * TODO Finish this class with all constants TODO refactor to clean up what is
@@ -624,6 +624,8 @@ public class OAuth2 {
         public static final String DISPLAY = "display";
 
         public static final String REALM = "realm";
+        public static final String MODULE = "module";
+        public static final String SERVICE = "service";
 
         public static final String AUDIENCE = "audience";
         public static final String USER_ID = "user_id";

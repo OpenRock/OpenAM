@@ -21,53 +21,18 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.provider;
+package org.forgerock.openam.oauth2.model;
 
-import org.restlet.Context;
-import org.restlet.Restlet;
+import java.io.Serializable;
+
 
 /**
  * @author $author$
  * @version $Revision$ $Date$
  */
-public interface OAuth2Provider {
+public interface SessionClient extends Serializable {
 
-    /**
-     * Returns the context.
-     * 
-     * @return The context.
-     */
-    public Context getContext();
+    public String getClientId();
 
-    /**
-     * Attach a new realm to the OAuth2Provider
-     * 
-     * @param realm
-     * @param next
-     * @return
-     */
-    public boolean attachRealm(String realm, Restlet next);
-
-    /**
-     * Detach the specified realm from the OAuth2Provider
-     * 
-     * @param realm
-     * @return
-     */
-    public Restlet detachRealm(String realm);
-
-    /**
-     * Attach the default realm to OAuth2Provider
-     * 
-     * @param next
-     * @return
-     */
-    public boolean attachDefaultRealm(Restlet next);
-
-    /**
-     * Detach the default realm from OAuth2Provider
-     * 
-     * @return
-     */
-    public Restlet detachDefaultRealm();
+    public String getRedirectUri();
 }

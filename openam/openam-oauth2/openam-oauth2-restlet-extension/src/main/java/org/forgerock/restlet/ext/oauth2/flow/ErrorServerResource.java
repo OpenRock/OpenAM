@@ -24,8 +24,8 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;

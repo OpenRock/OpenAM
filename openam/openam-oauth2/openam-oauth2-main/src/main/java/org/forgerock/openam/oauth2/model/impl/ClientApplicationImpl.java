@@ -25,9 +25,9 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import com.sun.identity.idm.AMIdentity;
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.restlet.data.Status;
 
 import java.net.URI;

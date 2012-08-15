@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.model;
+package org.forgerock.openam.oauth2.model;
 
 import java.net.URI;
 import java.util.Set;
@@ -81,7 +81,7 @@ public interface ClientApplication {
      * <p/>
      * If "auto_grant" is true then the server does not require the Resource
      * Owner's approval unless the request has the
-     * {@link org.forgerock.restlet.ext.oauth2.OAuth2.Custom#APPROVAL_PROMPT}
+     * {@link org.forgerock.openam.oauth2.OAuth2.Custom#APPROVAL_PROMPT}
      * property and the value is null.
      * <p/>
      * This function is not part of the OAuth2 specification

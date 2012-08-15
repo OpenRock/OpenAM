@@ -21,29 +21,20 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.model;
+package org.forgerock.openam.oauth2.model;
 
 /**
  * @author $author$
  * @version $Revision$ $Date$
+ * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-6">6.
+ *      Refreshing an Access Token</a>
  */
-public interface AuthorizationCode extends Token {
+public interface RefreshToken extends Token {
 
     /**
-     * Checks if this code was used to issue a token or not
-     * <p/>
-     * If an authorization code is used more than once, the authorization server
-     * MUST deny the request and SHOULD revoke (when possible) all tokens
-     * previously issued based on that authorization code. The authorization
-     * code is bound to the client identifier and redirection URI.
+     * Get parent token
      * 
-     * @return false if the code was not used to issue a access_token otherwise
-     *         true
+     * @return ID of parent token
      */
-    public boolean isTokenIssued();
-
-    public void setIssued(boolean issued);
-
-    // public lifetime A maximum authorization code lifetime of 10 minutes is
-    // RECOMMENDED
+    public String getParentToken();
 }

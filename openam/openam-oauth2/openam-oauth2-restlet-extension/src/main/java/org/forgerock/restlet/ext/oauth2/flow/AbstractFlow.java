@@ -30,16 +30,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
-import org.forgerock.restlet.ext.oauth2.model.SessionClient;
-import org.forgerock.restlet.ext.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
-import org.forgerock.openam.oauth2.utils.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceConfig;
@@ -366,7 +366,7 @@ public abstract class AbstractFlow extends ServerResource {
             String client_id =
                     OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CLIENT_ID,
                             String.class);
-            ClientApplication client = getClientVerifier().findClient(client_id);
+            ClientApplication client = getClientVerifier().verify(getRequest(), getResponse());
             if (null != client) {
                 return new OAuth2Client(client);
             } else {

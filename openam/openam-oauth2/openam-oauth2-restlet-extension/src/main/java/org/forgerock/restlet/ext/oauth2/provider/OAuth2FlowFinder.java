@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
 import org.forgerock.restlet.ext.oauth2.flow.AuthorizationCodeServerResource;
 import org.forgerock.restlet.ext.oauth2.flow.ClientCredentialsServerResource;
@@ -130,24 +130,36 @@ public class OAuth2FlowFinder extends Finder {
                 targetClass = flowServerResources.get(type);
                 if (targetClass == null) {
                     if (OAuth2.EndpointType.AUTHORIZATION_ENDPOINT.equals(endpointType)) {
-                        targetClass =
+                        /*targetClass =
                                 OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
                                         request, "Type is not supported: " + type).pushException();
+                        */
+                        OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
+                                request, "Type is not supported: " + type);
                     } else {
-                        targetClass =
+                        /*targetClass =
                                 OAuthProblemException.OAuthError.UNSUPPORTED_GRANT_TYPE.handle(
                                         request, "Type is not supported: " + type).pushException();
+                        */
+                        OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
+                                request, "Type is not supported: " + type);
                     }
                 }
             } else {
+                /*
                 targetClass =
                         OAuthProblemException.OAuthError.NOT_FOUND.handle(request,
                                 "Type is not set").pushException();
+                */
+                OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
+                        request, "Type is not supported: " + type);
             }
         } else {
+            /*
             targetClass =
                     OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "Type is not set")
                             .pushException();
+            */
         }
         return targetClass;
     }

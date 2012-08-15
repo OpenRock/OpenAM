@@ -27,11 +27,11 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.AccessToken;
-import org.forgerock.restlet.ext.oauth2.model.RefreshToken;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.RefreshToken;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
@@ -104,7 +104,7 @@ public class PasswordServerResource extends AbstractFlow {
      * 
      * @param checkedScope
      * @return
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      */
     protected AccessToken createAccessToken(Set<String> checkedScope, RefreshToken token) {
@@ -124,7 +124,7 @@ public class PasswordServerResource extends AbstractFlow {
      * 
      * @param checkedScope
      * @return
-     * @throws org.forgerock.restlet.ext.oauth2.OAuthProblemException
+     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      */
     protected RefreshToken createRefreshToken(Set<String> checkedScope) {

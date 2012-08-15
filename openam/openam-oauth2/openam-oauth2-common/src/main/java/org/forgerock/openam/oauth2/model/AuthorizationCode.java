@@ -21,18 +21,29 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.restlet.ext.oauth2.model;
-
-import java.io.Serializable;
-
+package org.forgerock.openam.oauth2.model;
 
 /**
  * @author $author$
  * @version $Revision$ $Date$
  */
-public interface SessionClient extends Serializable {
+public interface AuthorizationCode extends Token {
 
-    public String getClientId();
+    /**
+     * Checks if this code was used to issue a token or not
+     * <p/>
+     * If an authorization code is used more than once, the authorization server
+     * MUST deny the request and SHOULD revoke (when possible) all tokens
+     * previously issued based on that authorization code. The authorization
+     * code is bound to the client identifier and redirection URI.
+     * 
+     * @return false if the code was not used to issue a access_token otherwise
+     *         true
+     */
+    public boolean isTokenIssued();
 
-    public String getRedirectUri();
+    public void setIssued(boolean issued);
+
+    // public lifetime A maximum authorization code lifetime of 10 minutes is
+    // RECOMMENDED
 }

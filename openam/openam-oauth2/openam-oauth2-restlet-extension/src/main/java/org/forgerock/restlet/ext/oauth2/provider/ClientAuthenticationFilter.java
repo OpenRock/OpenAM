@@ -26,10 +26,11 @@ package org.forgerock.restlet.ext.oauth2.provider;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.ClientApplication;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -86,16 +87,8 @@ public class ClientAuthenticationFilter extends Authenticator {
                     OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID, String.class);
             ClientApplication client;
             try {
-                if (request.getChallengeResponse() != null) {
-                    client = getVerifier().verify(request.getChallengeResponse());
-                    request.getClientInfo().setUser(new OAuth2Client(client));
-                } else {
-                    String client_secret =
-                            OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_SECRET,
-                                    String.class);
-                    client = getVerifier().verify(client_id, client_secret);
-                    request.getClientInfo().setUser(new OAuth2Client(client));
-                }
+                client = getVerifier().verify(request, response);
+                request.getClientInfo().setUser(new OAuth2Client(client));
             } catch (OAuthProblemException e) {
                 if (null != client_id) {
                     Collection<ChallengeScheme> scheme =

@@ -31,8 +31,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.AuthorizationCodeRequest;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.AuthorizationTokenRequest;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.ClientCredentialsRequest;

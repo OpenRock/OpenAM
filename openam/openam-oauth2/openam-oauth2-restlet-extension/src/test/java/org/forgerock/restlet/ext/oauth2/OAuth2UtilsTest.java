@@ -29,6 +29,8 @@ import static org.testng.Assert.assertNotNull;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;

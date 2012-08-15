@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.forgerock.restlet.ext.oauth2.OAuth2;
-import org.forgerock.restlet.ext.oauth2.OAuth2Utils;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;

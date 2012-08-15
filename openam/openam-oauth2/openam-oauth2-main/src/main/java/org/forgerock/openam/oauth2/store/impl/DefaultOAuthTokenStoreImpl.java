@@ -44,10 +44,9 @@ import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;
 import org.forgerock.openam.oauth2.model.impl.RefreshTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.SessionClientImpl;
-import org.forgerock.openam.oauth2.utils.OAuth2Constants;
-import org.forgerock.restlet.ext.oauth2.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.model.*;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.restlet.data.Status;
 
 /**
@@ -92,8 +91,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid,
-            SessionClient client) {
+    public org.forgerock.openam.oauth2.model.AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid,
+            org.forgerock.openam.oauth2.model.SessionClient client) {
 
         String id = UUID.randomUUID().toString();
         long expiresIn = AUTHZ_CODE_LIFETIME;
@@ -122,7 +121,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AuthorizationCode readAuthorizationCode(String id) {
+    public org.forgerock.openam.oauth2.model.AuthorizationCode readAuthorizationCode(String id) {
         JsonValue response = null;
 
         // Read from CTS
@@ -143,7 +142,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         // Construct an AuthorizationCode object and return it
         // TODO use _id instead of id?
-        AuthorizationCode ac = new AuthorizationCodeImpl(id, response);
+        org.forgerock.openam.oauth2.model.AuthorizationCode ac = new AuthorizationCodeImpl(id, response);
         return ac;
     }
 
@@ -183,8 +182,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scope,
-            AuthorizationCode code) {
+    public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope,
+            org.forgerock.openam.oauth2.model.AuthorizationCode code) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -215,8 +214,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scope,
-            RefreshToken refreshToken) {
+    public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope,
+            org.forgerock.openam.oauth2.model.RefreshToken refreshToken) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -248,7 +247,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
+    public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid) {
         JsonValue response = null;
 
@@ -279,8 +278,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
-            String uuid, SessionClient client) {
+    public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
+            String uuid, org.forgerock.openam.oauth2.model.SessionClient client) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -311,8 +310,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
-            String uuid, String clientId, RefreshToken refreshToken) {
+    public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
+            String uuid, String clientId, org.forgerock.openam.oauth2.model.RefreshToken refreshToken) {
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -351,7 +350,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public AccessToken readAccessToken(String id) {
+    public org.forgerock.openam.oauth2.model.AccessToken readAccessToken(String id) {
         JsonValue response = null;
 
         // Create in CTS
@@ -371,7 +370,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         // TODO use _id rather than id
-        AccessToken accessToken = new AccessTokenImpl(id, response);
+        org.forgerock.openam.oauth2.model.AccessToken accessToken = new AccessTokenImpl(id, response);
         return accessToken;
     }
 
@@ -394,7 +393,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid,
+    public org.forgerock.openam.oauth2.model.RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid,
             String clientId) {
         JsonValue response = null;
 
@@ -425,7 +424,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     }
 
     @Override
-    public RefreshToken readRefreshToken(String id) {
+    public org.forgerock.openam.oauth2.model.RefreshToken readRefreshToken(String id) {
         JsonValue response = null;
 
         // Read from CTS
@@ -446,7 +445,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         // Construct a RefreshToken object and return it
         // TODO use _id instead of id?
-        RefreshToken rt = new RefreshTokenImpl(id, response);
+        org.forgerock.openam.oauth2.model.RefreshToken rt = new RefreshTokenImpl(id, response);
         return rt;
     }
 

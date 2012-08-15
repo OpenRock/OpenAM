@@ -22,7 +22,7 @@
  * "Portions Copyrighted [2012] [Forgerock Inc]"
  */
 
-package org.forgerock.openam.oauth2.utils;
+package org.forgerock.openam.oauth2;
 
 /**
  * Stores the constants nessesary for the OAuth2 implementation
