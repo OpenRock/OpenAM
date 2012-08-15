@@ -99,9 +99,11 @@ public interface OAuth2TokenStore {
      * @param code
      *            the authorization code that will be the parent of this access
      *            token
+     * @param realm
+     *            the realm of this token
      * @return a newly created and stored access token
      */
-    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, AuthorizationCode code);
+    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, AuthorizationCode code, String realm);
 
     /**
      * Creates and stores an access token using a refresh token (refresh token
@@ -115,10 +117,12 @@ public interface OAuth2TokenStore {
      *            to or a subset of authz code scopes
      * @param refreshToken
      *            the refresh token that will be the parent of this access token
+     * @param realm
+     *            the realm of this token
      * @return a newly created and stored access token
      */
     AccessToken createAccessToken(String accessTokenType, Set<String> scopes,
-            RefreshToken refreshToken);
+            RefreshToken refreshToken, String realm);
 
     /**
      * Creates and stores an access token using the implicit flow where no

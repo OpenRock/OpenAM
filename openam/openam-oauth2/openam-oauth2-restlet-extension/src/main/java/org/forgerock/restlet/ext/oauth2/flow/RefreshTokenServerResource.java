@@ -107,7 +107,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
      */
     protected AccessToken createAccessToken(RefreshToken refreshToken, Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, refreshToken);
+                checkedScope, refreshToken, OAuth2Utils.getRealm(getRequest()));
     }
 
 }

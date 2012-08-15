@@ -110,11 +110,11 @@ public class PasswordServerResource extends AbstractFlow {
     protected AccessToken createAccessToken(Set<String> checkedScope, RefreshToken token) {
         if (token == null){
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    checkedScope, OAuth2Utils.getContextRealm(getContext()),
+                    checkedScope, OAuth2Utils.getRealm(getRequest()),
                     resourceOwner.getIdentifier(), client.getClient().getClientId(), null);
         } else {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    checkedScope, OAuth2Utils.getContextRealm(getContext()),
+                    checkedScope, OAuth2Utils.getRealm(getRequest()),
                     resourceOwner.getIdentifier(), client.getClient().getClientId(), token);
         }
     }
@@ -129,7 +129,7 @@ public class PasswordServerResource extends AbstractFlow {
      */
     protected RefreshToken createRefreshToken(Set<String> checkedScope) {
         return getTokenStore().createRefreshToken(checkedScope,
-                OAuth2Utils.getContextRealm(getContext()), resourceOwner.getIdentifier(),
+                OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(),
                 client.getClient().getClientId());
     }
 }

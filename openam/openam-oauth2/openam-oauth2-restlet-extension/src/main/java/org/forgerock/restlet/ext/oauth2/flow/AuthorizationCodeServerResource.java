@@ -257,14 +257,14 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
      */
     protected AuthorizationCode createAuthorizationCode(Set<String> checkedScope) {
         return getTokenStore().createAuthorizationCode(checkedScope,
-                OAuth2Utils.getContextRealm(getContext()), resourceOwner.getIdentifier(),
+                OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(),
                 sessionClient);
     }
 
     protected RefreshToken createRefreshToken(AuthorizationCode code){
         resourceOwner = getAuthenticatedResourceOwner();
         return getTokenStore().createRefreshToken(code.getScope(),
-                                                    OAuth2Utils.getContextRealm(getContext()),
+                                                    OAuth2Utils.getRealm(getRequest()),
                                                     resourceOwner.getIdentifier(),
                                                     sessionClient.getClientId());
     }
@@ -283,10 +283,10 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
             //pass in refresh token as parent of Access Token
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    code.getScope(), token);
+                    code.getScope(), token, OAuth2Utils.getRealm(getRequest()));
         } else {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    code.getScope(), code);
+                    code.getScope(), code, OAuth2Utils.getRealm(getRequest()));
         }
     }
 
