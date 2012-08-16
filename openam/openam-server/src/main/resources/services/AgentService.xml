@@ -63,6 +63,32 @@
                             <Value>Confidential</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="com.forgerock.openam.oauth2provider.tokenType"
+                                     type="single_choice"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a709">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a710">Bearer</ChoiceValue>
+                            <ChoiceValue i18nKey="a711">MAC</ChoiceValue>
+                            <ChoiceValue i18nKey="a712">SAML 2.0</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>Bearer</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="com.forgerock.openam.oauth2provider.autoGrant"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a713">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="com.forgerock.openam.oauth2provider.redirectionURIs"
                                      type="list"
                                      syntax="string"
@@ -75,6 +101,13 @@
                                      type="list"
                                      syntax="string"
                                      i18nKey="a705">
+                        <DefaultValues>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="com.forgerock.openam.oauth2provider.defaultScopes"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a708">
                         <DefaultValues>
                         </DefaultValues>
                     </AttributeSchema>

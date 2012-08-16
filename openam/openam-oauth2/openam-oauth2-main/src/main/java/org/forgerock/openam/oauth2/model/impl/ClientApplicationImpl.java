@@ -39,8 +39,11 @@ public class ClientApplicationImpl implements ClientApplication{
     private static final String CLIENT_TYPE = "com.forgerock.openam.oauth2provider.clientType";
     private static final String REDIRECTION_URIS = "com.forgerock.openam.oauth2provider.redirectionURIs";
     private static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
+    private static final String DEFAULT_SCOPES = "com.forgerock.openam.oauth2provider.defaultScopes";
     private static final String NAME = "com.forgerock.openam.oauth2provider.name";
     private static final String DESCRIPTION = "com.forgerock.openam.oauth2provider.description";
+    private static final String AUTO_GRANT = "com.forgerock.openam.oauth2provider.autoGrant";
+    private static final String TOKEN_TYPE = "com.forgerock.openam.oauth2provider.tokenType";
 
     AMIdentity id = null;
 
@@ -88,7 +91,14 @@ public class ClientApplicationImpl implements ClientApplication{
 
     @Override
     public String getAccessTokenType(){
-        return OAuth2.Bearer.BEARER;
+        Set<String> tokenTypesSet = null;
+        try {
+            tokenTypesSet = id.getAttribute(TOKEN_TYPE);
+        } catch (Exception e){
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+        return tokenTypesSet.iterator().next();
     }
 
     @Override
@@ -110,12 +120,28 @@ public class ClientApplicationImpl implements ClientApplication{
 
     @Override
     public Set<String> defaultGrantScopes(){
-        return null;
+        Set<String> scopes = null;
+        try {
+            scopes = id.getAttribute(DEFAULT_SCOPES);
+        } catch (Exception e){
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+        return scopes;
     }
 
     @Override
     public boolean isAutoGrant(){
-        return false;
+        Set<String> autoGrantSet = null;
+        boolean grant = false;
+        try {
+            autoGrantSet = id.getAttribute(AUTO_GRANT);
+            grant = Boolean.parseBoolean(autoGrantSet.iterator().next());
+        } catch (Exception e){
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+        return grant;
     }
 
     @Override
