@@ -80,7 +80,7 @@ public class PasswordServerResource extends AbstractFlow {
         AccessToken token = null;
         Map<String, Object> result = null;
 
-        if (issueRefreshToken){
+        if (checkIfRefreshTokenIsRequired(getRequest())){
             RefreshToken refreshToken = createRefreshToken(checkedScope);
             token = createAccessToken(checkedScope, refreshToken);
             result = token.convertToMap();

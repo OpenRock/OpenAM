@@ -84,6 +84,10 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
     }
     public void getSettings(String realm){
+        if (realm == null){
+            //default realm
+            realm = "/";
+        }
         try {
             SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);

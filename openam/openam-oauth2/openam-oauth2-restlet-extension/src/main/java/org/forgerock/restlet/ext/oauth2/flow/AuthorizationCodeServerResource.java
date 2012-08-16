@@ -208,7 +208,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             //set access token issued
             code.setIssued(true);
             Map<String, Object> response = token.convertToMap();
-            if (issueRefreshToken){
+            if (checkIfRefreshTokenIsRequired(getRequest())){
                 response.put(OAuth2.Params.REFRESH_TOKEN, token.getRefreshToken());
             }
             return new JacksonRepresentation<Map>(response);
@@ -277,7 +277,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
      * @throws OAuthProblemException
      */
     protected AccessToken createAccessToken(AuthorizationCode code) {
-        if (issueRefreshToken){
+        if (checkIfRefreshTokenIsRequired(getRequest())){
             //create refresh token
             RefreshToken token = createRefreshToken(code);
 

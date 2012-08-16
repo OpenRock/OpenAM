@@ -84,18 +84,20 @@ public abstract class AbstractFlow extends ServerResource {
     private OAuth2TokenStore tokenStore = null;
 
     public AbstractFlow(){
+    }
+    protected boolean checkIfRefreshTokenIsRequired(Request request){
         try {
             SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(OAuth2Utils.getRealm(getRequest()), null);
+            ServiceConfig scm = mgr.getOrganizationConfig(OAuth2Utils.getRealm(request), null);
             Map<String, Set<String>> attrs = scm.getAttributes();
             issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
         } catch (Exception e) {
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not get service settings", null);
+                "Service unavailable", "Could not get service settings", null);
         }
+        return issueRefreshToken;
     }
-
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
