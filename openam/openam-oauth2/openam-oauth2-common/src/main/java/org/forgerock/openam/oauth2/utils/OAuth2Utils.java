@@ -398,6 +398,14 @@ public class OAuth2Utils {
         return getRequestParameter(request, OAuth2.Custom.SERVICE, String.class);
     }
 
+    public static String getLocale(Request request) {
+        Object locale = request.getAttributes().get(OAuth2.Custom.LOCALE);
+        if (locale instanceof String) {
+            return (String) locale;
+        }
+        return getRequestParameter(request, OAuth2.Custom.LOCALE, String.class);
+    }
+
     public static <T> T getRequestParameter(Request request, String parameterName, Class<T> clazz) {
         Object value = getRequestParameters(request).get(parameterName);
         if (null != value && clazz.isAssignableFrom(value.getClass())) {

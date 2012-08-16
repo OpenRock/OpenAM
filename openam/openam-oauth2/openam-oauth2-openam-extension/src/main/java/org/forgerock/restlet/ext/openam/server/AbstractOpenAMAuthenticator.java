@@ -24,6 +24,7 @@
 
 package org.forgerock.restlet.ext.openam.server;
 
+import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -54,6 +55,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     private String serviceName = null;
     private String moduleName = null;
     private String realm = null;
+    private String locale = null;
 
     /**
      * {@inheritDoc}
@@ -135,17 +137,21 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
         realm = OAuth2Utils.getRealm(request);
         moduleName = OAuth2Utils.getModuleName(request);
         serviceName = OAuth2Utils.getServiceName(request);
+        locale = OAuth2Utils.getLocale(request);
 
         if (null != realm) {
-            amserver.addQueryParameter("realm", realm);
+            amserver.addQueryParameter(OAuth2.Custom.REALM, realm);
+        }
+        if (null != locale){
+            amserver.addQueryParameter(OAuth2.Custom.LOCALE, locale);
         }
         if (null != moduleName) {
-            amserver.addQueryParameter("module", moduleName);
+            amserver.addQueryParameter(OAuth2.Custom.MODULE, moduleName);
         } else if (null != serviceName) {
-            amserver.addQueryParameter("service", serviceName);
+            amserver.addQueryParameter(OAuth2.Custom.SERVICE, serviceName);
         }
 
-        amserver.addQueryParameter("goto", request.getResourceRef().toString());
+        amserver.addQueryParameter(OAuth2.Custom.GOTO, request.getResourceRef().toString());
 
         Redirector redirector =
                 new Redirector(getContext(), amserver.toString(), Redirector.MODE_CLIENT_FOUND);

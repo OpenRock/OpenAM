@@ -25,10 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import java.security.AccessController;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -411,19 +408,72 @@ public abstract class AbstractFlow extends ServerResource {
         data.put("target", getRequest().getResourceRef().toString());
         Set<String> displayNames = client.getClient().getDisplayName();
         Set<String> displayDescriptions = client.getClient().getDisplayDescription();
-        //String locale = getRequest().getLocale();
-        for (String name : displayNames){
-            //temporarily grab no locale
-            if (!name.contains("|")){
-                data.put("display_name", name);
+        Set<String> scopes = client.getClient().allowedGrantScopes();
+        String locale = OAuth2Utils.getLocale(getRequest());
+        String displayName = "";
+        String displayDescription = "";
+        List<String> displayScope = new ArrayList<String>();
+        if (locale != null){
+            //get the localized display name
+            for (String name : displayNames){
+                int firstDelimiter = name.indexOf("|");
+                if (firstDelimiter == -1){
+                    //no localization
+                    continue;
+                }
+                if (name.substring(0, firstDelimiter).equalsIgnoreCase(locale)){
+                    displayName = displayName + " " + name.substring(firstDelimiter+1,name.length());
+                }
+            }
+            //get the localized display description
+            for (String name : displayDescriptions){
+                int firstDelimiter = name.indexOf("|");
+                if (firstDelimiter == -1){
+                    //no localization
+                    continue;
+                }
+                if (name.substring(0, firstDelimiter).equalsIgnoreCase(locale)){
+                    displayDescription = displayDescription + " " + name.substring(firstDelimiter+1,name.length());
+                }
+            }
+            //get the localized scopes
+            for (String scope : scopes){
+                int firstDelimiter = scope.indexOf("|");
+                int secondDelimiter = scope.indexOf("|", firstDelimiter+1);
+                if (secondDelimiter == -1){
+                    //doesn't have 2 delimiters
+                    continue;
+                }
+                if (scope.substring(firstDelimiter+1,secondDelimiter).equals(locale)){
+                    displayScope.add(scope.substring(secondDelimiter+1,scope.length()));
+                }
+            }
+        } else {
+            //get the default display name (no localization)
+            for (String name : displayNames){
+                if (name.indexOf("|") == -1){
+                    displayName = displayName + " " + name;
+                }
+            }
+            //get the default display description (no localization)
+            for (String name : displayDescriptions){
+                if (name.indexOf("|") == -1){
+                    displayDescription = displayDescription + " " + name;
+                }
+            }
+            //get the default scopes
+            for (String scope : scopes){
+                int firstDelimiter = scope.indexOf("|");
+                int secondDelimiter = scope.indexOf("|", firstDelimiter+1);
+                if (secondDelimiter == -1){
+                    //doesn't have 2 delimiters (no localization)
+                    displayScope.add(scope.substring(firstDelimiter+1,scope.length()));
+                }
             }
         }
-        for (String name : displayDescriptions){
-            //temporarily grab no locale
-            if (!name.contains("|")){
-                data.put("display_description", name);
-            }
-        }
+        data.put("display_name", displayName);
+        data.put("display_description", displayDescription);
+        data.put("display_scope", displayScope);
         return data;
     }
 

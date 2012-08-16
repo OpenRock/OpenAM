@@ -15,15 +15,15 @@
         <section id="intro">
             <h2>Application requesting scope</h2>
 
-            <p>Client ${display_name?if_exists}:</p>
+            <p>${display_name?if_exists}:</p>
             <p>${display_description?if_exists} </p>
         </section>
     </div>
     <aside>
         <form action="${target!'.'}" method="post">
             <h4>The following private info is requested</h4>
-        <#if requestingScopes??>
-            <#list requestingScopes as r><input type="checkbox" name="scope" value="${r}" checked/>
+        <#if display_scope??>
+            <#list display_scope as r><input type="checkbox" name="scope" value="${r}" checked/>
                 <b>${r}</b><br/>
             </#list>
         </#if>
