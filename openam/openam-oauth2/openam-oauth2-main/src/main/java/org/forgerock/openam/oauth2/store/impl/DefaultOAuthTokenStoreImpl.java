@@ -47,6 +47,7 @@ import org.forgerock.openam.oauth2.model.impl.SessionClientImpl;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Status;
 
 /**
@@ -76,24 +77,30 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public DefaultOAuthTokenStoreImpl() {
         try {
             repository = new CoreTokenService(new JMQTokenRepo());
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(null, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            AUTHZ_CODE_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME).iterator().next());
-            REFRESH_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME).iterator().next());
-            ACCESS_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME).iterator().next());
         } catch (Exception e) {
             // TODO: legacy code throws Exception, look to refactor
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);
         }
     }
-
+    public void getSettings(String realm){
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            AUTHZ_CODE_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME).iterator().next());
+            REFRESH_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME).iterator().next());
+            ACCESS_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME).iterator().next());
+        } catch (Exception e) {
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                "Service unavailable", "Could not create underlying storage", null);
+        }
+    }
     @Override
     public org.forgerock.openam.oauth2.model.AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid,
             org.forgerock.openam.oauth2.model.SessionClient client) {
-
+        getSettings(realm);
         String id = UUID.randomUUID().toString();
         long expiresIn = AUTHZ_CODE_LIFETIME;
 
@@ -122,6 +129,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public org.forgerock.openam.oauth2.model.AuthorizationCode readAuthorizationCode(String id) {
+
         JsonValue response = null;
 
         // Read from CTS
@@ -183,7 +191,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope,
-            org.forgerock.openam.oauth2.model.AuthorizationCode code) {
+            org.forgerock.openam.oauth2.model.AuthorizationCode code, String realm) {
+        getSettings(realm);
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -215,7 +224,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     @Override
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope,
-            org.forgerock.openam.oauth2.model.RefreshToken refreshToken) {
+            org.forgerock.openam.oauth2.model.RefreshToken refreshToken, String realm) {
+        getSettings(realm);
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -249,6 +259,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid) {
+        getSettings(realm);
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -280,6 +291,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid, org.forgerock.openam.oauth2.model.SessionClient client) {
+        getSettings(realm);
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -312,6 +324,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid, String clientId, org.forgerock.openam.oauth2.model.RefreshToken refreshToken) {
+        getSettings(realm);
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -395,6 +408,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid,
             String clientId) {
+        getSettings(realm);
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();

@@ -87,7 +87,7 @@ public abstract class AbstractFlow extends ServerResource {
         try {
             SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(null, null);
+            ServiceConfig scm = mgr.getOrganizationConfig(OAuth2Utils.getRealm(getRequest()), null);
             Map<String, Set<String>> attrs = scm.getAttributes();
             issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
         } catch (Exception e) {
