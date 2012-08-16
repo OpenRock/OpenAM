@@ -93,7 +93,7 @@ public class OAuth2Application extends Application {
     @Override
     public Restlet createInboundRoot() {
         Router root = new Router(getContext());
-        root.attach(activate());
+        root.attachDefault(activate());
 
         // Add TokenInfo Resource
         OAuth2Utils.setTokenStore(getTokenStore(), getContext());

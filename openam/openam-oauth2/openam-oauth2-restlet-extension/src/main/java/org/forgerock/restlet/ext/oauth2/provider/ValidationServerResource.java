@@ -140,11 +140,9 @@ public class ValidationServerResource extends ServerResource implements
                         error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                         getLogger().warning("Should response and refresh the token");
                     }
-
-                    response.put(OAuth2.Custom.AUDIENCE, t.getClient().getClientId());
-                    response.put(OAuth2.Custom.USER_ID, t.getUserID());
-                    response.put(OAuth2.Params.SCOPE, t.getScope());
-                    response.put(OAuth2.Token.OAUTH_EXPIRES_IN, t.getExpireTime());
+                    if (error == null) {
+                        response.putAll(t.convertToMap());
+                    }
 
                 }
             }
