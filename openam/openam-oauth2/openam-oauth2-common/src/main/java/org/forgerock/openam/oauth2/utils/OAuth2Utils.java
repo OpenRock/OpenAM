@@ -236,17 +236,6 @@ public class OAuth2Utils {
     }
 
     /**
-     * Returns the value of the "realm" parameter.
-     * 
-     * @param context
-     *            The context where to find the parameter.
-     * @return The value of the "realm" parameter.
-     */
-    public static String getContextRealm(Context context) {
-        return context.getParameters().getFirstValue(OAuth2.Custom.REALM, false);
-    }
-
-    /**
      * Returns the value of the "ClientVerifier" parameter.
      * 
      * @param context
@@ -415,10 +404,9 @@ public class OAuth2Utils {
     }
 
     /**
-     * It copies the given parameters only once!!! TODO Copy all parameters in a
+     * It copies the given parameters only once!!!
      * way the CallResolver can use it and the FreeMarker can list and add all
-     * into the generated form TODO do not overwrite realm if
-     * /openam/{realm}/oauth2/
+     * into the generated form
      * 
      * @param request
      *            incoming request object
@@ -431,12 +419,6 @@ public class OAuth2Utils {
             if (null != parameters) {
                 // Copy the parameter for CallResolver
                 request.getAttributes().putAll(parameters);
-                /*
-                 * for (String parameterName : OAuth2.params) { String value =
-                 * parameters.getFirstValue(parameterName); if
-                 * (OAuth2Utils.isNotBlank(value)) {
-                 * request.getAttributes().put(parameterName, value); } }
-                 */
             }
             // Avoid reprocess the request next time.
             request.getAttributes().put(OAuth2.Params.class.getName(), parameters);

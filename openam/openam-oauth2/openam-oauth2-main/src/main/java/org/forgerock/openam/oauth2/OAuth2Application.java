@@ -110,13 +110,6 @@ public class OAuth2Application extends Application {
     public Restlet activate() {
         Context childContext = getContext().createChildContext();
         Router root = new Router(childContext);
-        //try {
-            URI currentURI = getCurrentURI();
-            redirectURI = currentURI.resolve("../../oauth2demo/oauth2/redirect");
-            //redirectURI = new URI("http://jason.internal.foregerock.com:8080/openam-current/oauth2/redirect");
-        //} catch (URISyntaxException ex) {
-        //    Logger.getLogger(OAuth2Application.class.getName()).log(Level.SEVERE, null, ex);
-        //}
         
         OpenAMParameters parameters = new OpenAMParameters();
         OpenAMServletAuthenticator authenticator =
@@ -133,11 +126,6 @@ public class OAuth2Application extends Application {
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
         authorizer.setNext(finder);
-
-        //ChallengeAuthenticator filter =
-        //        new ChallengeAuthenticator(childContext, ChallengeScheme.HTTP_BASIC, "/");
-        //filter.setVerifier(new ClientIdentityVerifier(new OpenAMParameters(), Arrays
-        //        .asList(redirectURI.toString())));
 
         ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
         // Try to authenticate the client The verifier MUST set
@@ -161,27 +149,30 @@ public class OAuth2Application extends Application {
     }
 
     /**
-     * TODO Description.
+     * Creates a new client verifier
      * 
-     * @return TODO Description
+     * @return ClientVerifierImpl
+     *              A client verifier
      */
     public org.forgerock.openam.oauth2.provider.ClientVerifier getClientVerifier() {
         return new ClientVerifierImpl();
     }
 
     /**
-     * TODO Description.
+     * Creates a new user verifier
      * 
-     * @return TODO Description
+     * @return UserIdentityVerifier
+     *              A new UserVerifier
      */
     public Verifier getUserVerifier() {
         return new UserIdentityVerifier(new OpenAMParameters());
     }
 
     /**
-     * TODO Description.
+     * Gets the current token store or creates a new one if it doesn't exist
      * 
-     * @return TODO Description
+     * @return OAuthTokenStore
+     *              A new token store.
      */
     public org.forgerock.openam.oauth2.provider.OAuth2TokenStore getTokenStore() {
         return new DefaultOAuthTokenStoreImpl();
