@@ -558,7 +558,12 @@ public abstract class AbstractFlow extends ServerResource {
             //maximum scope can be in the form of <scope>|<locale>|<description>
             Set<String> cleanScopes = new TreeSet<String>();
             for (String s : maximumScope){
-                cleanScopes.add(s.substring(0,s.indexOf('|')));
+                int index = s.indexOf('|');
+                if (index == -1){
+                    cleanScopes.add(s);
+                    continue;
+                }
+                cleanScopes.add(s.substring(0,index));
             }
             if (intersect.retainAll(cleanScopes)) {
                 // TODO Log not allowed scope was requested and was modified
