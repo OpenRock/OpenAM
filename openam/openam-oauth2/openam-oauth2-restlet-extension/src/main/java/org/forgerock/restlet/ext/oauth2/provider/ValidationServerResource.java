@@ -141,6 +141,7 @@ public class ValidationServerResource extends ServerResource implements
                         getLogger().warning("Should response and refresh the token");
                     }
                     if (error == null) {
+                        authenticated = true;
                         response.putAll(t.convertToMap());
                     }
 
