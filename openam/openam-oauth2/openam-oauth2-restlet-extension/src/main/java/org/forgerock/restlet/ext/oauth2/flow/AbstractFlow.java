@@ -555,7 +555,12 @@ public abstract class AbstractFlow extends ServerResource {
             Set<String> intersect =
                     new TreeSet<String>(OAuth2Utils.split(requestedScope, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            if (intersect.retainAll(maximumScope)) {
+            //maximum scope can be in the form of <scope>|<locale>|<description>
+            Set<String> cleanScopes = new TreeSet<String>();
+            for (String s : maximumScope){
+                cleanScopes.add(s.substring(0,s.indexOf('|')));
+            }
+            if (intersect.retainAll(cleanScopes)) {
                 // TODO Log not allowed scope was requested and was modified
                 scopeChanged = true;
                 return intersect;
