@@ -208,7 +208,7 @@ public class AbstractFlowTest {
         // Mock createAccessToken - Authorization Code
         when(
                 realm.getTokenStore().createAccessToken(eq(OAuth2.Bearer.BEARER), anySet(),
-                        any(AuthorizationCode.class))).then(new Answer<AccessToken>() {
+                        any(AuthorizationCode.class), any(String.class))).then(new Answer<AccessToken>() {
             @Override
             public AccessToken answer(InvocationOnMock invocation) throws Throwable {
                 AuthorizationCode authorizationCode =
@@ -289,7 +289,7 @@ public class AbstractFlowTest {
         // Mock createAccessToken - Refresh Token
         when(
                 realm.getTokenStore().createAccessToken(eq(OAuth2.Bearer.BEARER), anySet(),
-                        any(RefreshToken.class))).then(new Answer<AccessToken>() {
+                        any(RefreshToken.class), any(String.class))).then(new Answer<AccessToken>() {
             @Override
             public AccessToken answer(InvocationOnMock invocation) throws Throwable {
                 RefreshToken refreshToken = (RefreshToken) invocation.getArguments()[2];
