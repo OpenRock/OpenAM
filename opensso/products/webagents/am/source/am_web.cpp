@@ -3916,7 +3916,7 @@ static char *prtime_to_string(char *buffer,
     PR_Unlock((*agentConfigPtr)->lock);
 
     PR_ExplodeTime(timestamp, PR_LocalTimeParameters, &exploded_time);
-    n_written = snprintf(buffer, buffer_len, "%d-%02d-%02d%02d:%02d:%02d.%03d",
+    n_written = snprintf(buffer, buffer_len, "%d-%02d-%02d.%02d-%02d-%02d.%03d",
                          exploded_time.tm_year, exploded_time.tm_month+1,
 			 exploded_time.tm_mday, exploded_time.tm_hour,
 			 exploded_time.tm_min, exploded_time.tm_sec,
@@ -5753,7 +5753,7 @@ static void trim(char *a) {
 extern "C" AM_WEB_EXPORT am_status_t
 am_web_get_cookie_value(const char *separator, const char *cookie_name, const char *cookie_header_val, char **value) {
     size_t value_len = 0;
-    int found = 0;
+    am_status_t found = AM_NOT_FOUND;
     char *a, *b, *header_val = NULL;
     if (cookie_name == NULL || cookie_name[0] == '\0') {
         return AM_INVALID_ARGUMENT;
@@ -5766,23 +5766,23 @@ am_web_get_cookie_value(const char *separator, const char *cookie_name, const ch
         for ((a = strtok_r(header_val, separator, &b)); a; (a = strtok_r(NULL, separator, &b))) {
             if (strcmp(separator, "=") == 0) {
                 trim(a);
-                if (!found && strcmp(a, cookie_name) == 0) found = 1;
-                else if (found && a[0] != '\0') {
+                if (found != AM_SUCCESS && strcmp(a, cookie_name) == 0) found = AM_SUCCESS;
+                else if (found == AM_SUCCESS && a[0] != '\0') {
                     value_len = strlen(a);
                     if ((*value = strdup(a)) == NULL) {
-                        found = 0;
+                        found = AM_NOT_FOUND;
                     } else {
                         (*value)[value_len] = '\0';
                     }
                 }
             } else {
                 if (strstr(a, cookie_name) == NULL) continue;
-                if ((found = am_web_get_cookie_value("=", cookie_name, a, value))) break;
+                if ((found = am_web_get_cookie_value("=", cookie_name, a, value)) == AM_SUCCESS) break;
             }
         }
         free(header_val);
     } else return AM_NO_MEMORY;
-    return found ? AM_SUCCESS : AM_NOT_FOUND;
+    return found;
 }
 
 /**
