@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <stdarg.h>
 
 #include <vrt.h>
 #include <bin/varnishd/cache.h>
@@ -76,10 +77,54 @@ static boolean_t agentBootInitialized = B_FALSE;
 static apr_pool_t* s_module_pool = NULL;
 static apr_hash_t* s_module_storage = NULL;
 
+static am_status_t set_cookie(const char *header, void **args);
+static am_status_t set_header_in_request(void **args, const char *key, const char *value);
+static const char* get_req_header(sess_record* r, const char* key);
+
+static void am_varnish_mod_header(const struct sess *sp, enum gethdr_e where, int unset, const char *hdr,
+        const char *p, ...) {
+    struct http *hp;
+    va_list ap;
+    char *b;
+    switch (where) {
+        case HDR_REQ:
+            hp = sp->http;
+            break;
+        case HDR_RESP:
+            hp = sp->wrk->resp;
+            break;
+        case HDR_OBJ:
+            hp = sp->obj->http;
+            break;
+        case HDR_BEREQ:
+            hp = sp->wrk->bereq;
+            break;
+        case HDR_BERESP:
+            hp = sp->wrk->beresp;
+            break;
+        default:
+            am_web_log_error("am_varnish_mod_header(): invalid gethdr_e value");
+            return;
+    }
+    va_start(ap, p);
+    if (p == NULL) {
+        http_Unset(hp, hdr);
+    } else {
+        b = VRT_String(hp->ws, hdr + 1, p, ap);
+        if (b == NULL) {
+            am_web_log_error("am_varnish_mod_header(): error allocating memory for %s header", hdr + 1);
+        } else {
+            if (unset) http_Unset(hp, hdr);
+            http_SetHeader(sp->wrk, sp->fd, hp, b);
+        }
+    }
+    va_end(ap);
+}
+
 static int iterate_func(void *v, const char *key, const char *value) {
     itd *d = (itd *) v;
     if (key == NULL || value == NULL || value[0] == '\0') return 1;
-    VRT_SetHdr(d->r->s, d->hdr, apr_psprintf(d->r->pool, "%c%s:", (int) strlen(key) + 1, key), value, vrt_magic_string_end);
+    am_varnish_mod_header(d->r->s, d->hdr, 0, apr_psprintf(d->r->pool, "%c%s:", (int) strlen(key) + 1, key), value, vrt_magic_string_end);
     return 1;
 }
 
@@ -181,7 +226,7 @@ static am_status_t content_read(void **args, char **rbuf) {
     if (args == NULL || (r = args[0]) == NULL) {
         am_web_log_error("%s: invalid arguments passed", thisfunc);
         sts = AM_INVALID_ARGUMENT;
-    } else if (ptr = VRT_GetHdr(r->s, HDR_REQ, cl)) {
+    } else if ((ptr = VRT_GetHdr(r->s, HDR_REQ, cl))) {
         content_length = strtoul(ptr, &endp, 10);
         *rbuf = apr_pcalloc(r->pool, content_length + 1);
         if (*rbuf == NULL) {
@@ -212,17 +257,37 @@ static am_status_t content_read(void **args, char **rbuf) {
     return sts;
 }
 
+static am_status_t set_cookie(const char *header, void **args) {
+    am_status_t ret = AM_INVALID_ARGUMENT;
+    char *currentCookies;
+    if (header != NULL && args != NULL) {
+        sess_record *r = (sess_record *) args[0];
+        if (r == NULL) {
+            am_web_log_error("set_cookie(): invalid request structure");
+        } else {
+            apr_table_add(r->response.headers_out, "Set-Cookie", header);
+            if ((currentCookies = (char *) get_req_header(r, "Cookie")) == NULL) {
+                set_header_in_request(args, "Cookie", header);
+            } else {
+                set_header_in_request(args, "Cookie", (apr_pstrcat(r->pool, header, ";", currentCookies, NULL)));
+            }
+            ret = AM_SUCCESS;
+        }
+    }
+    return ret;
+}
+
 static am_status_t set_header_in_request(void **args, const char *key, const char *value) {
     sess_record * rec = (sess_record*) args[0];
-    sess* sp = rec->s;
     const char *thisfunc = "set_header_in_request()";
     am_status_t sts = AM_SUCCESS;
     if (rec == NULL || key == NULL) {
         am_web_log_error("%s: invalid argument passed.", thisfunc);
         sts = AM_INVALID_ARGUMENT;
     } else {
+        am_varnish_mod_header(rec->s, HDR_REQ, 1, apr_psprintf(rec->pool, "%c%s:", (int) strlen(key) + 1, key), 0);
         if (value != NULL && *value != '\0') {
-            VRT_SetHdr(sp, HDR_REQ, apr_psprintf(rec->pool, "%c%s:", (int) strlen(key) + 1, key), value, vrt_magic_string_end);
+            am_varnish_mod_header(rec->s, HDR_REQ, 1, apr_psprintf(rec->pool, "%c%s:", (int) strlen(key) + 1, key), value, vrt_magic_string_end);
         }
         sts = AM_SUCCESS;
     }
@@ -238,11 +303,11 @@ static am_status_t add_header_in_response(void **args, const char *key, const ch
         sts = AM_INVALID_ARGUMENT;
     } else {
         if (values == NULL) {
-            apr_table_add(r->response.headers_out, "Set-Cookie", key);
+            sts = set_cookie(key, args);
         } else {
             apr_table_add(r->response.headers_out, key, values);
+            sts = AM_SUCCESS;
         }
-        sts = AM_SUCCESS;
     }
     return sts;
 }
