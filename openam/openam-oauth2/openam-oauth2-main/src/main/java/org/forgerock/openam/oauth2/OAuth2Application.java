@@ -93,11 +93,18 @@ public class OAuth2Application extends Application {
     @Override
     public Restlet createInboundRoot() {
         Router root = new Router(getContext());
+
+        //default route goes to the flows
         root.attachDefault(activate());
 
         // Add TokenInfo Resource
         OAuth2Utils.setTokenStore(getTokenStore(), getContext());
+
+        //go to token info endpoint
         root.attach(OAuth2Utils.getTokenInfoPath(getContext()), ValidationServerResource.class);
+
+        //go to register client endpoint
+        root.attach("/register_client", RegisterClient.class);
 
         return root;
     }

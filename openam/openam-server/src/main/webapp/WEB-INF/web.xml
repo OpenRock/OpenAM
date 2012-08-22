@@ -1120,6 +1120,16 @@
 	        </init-param>
 	    </servlet>
 
+	    <servlet>
+	      <servlet-name>OAuth2RegisterClient</servlet-name>
+	      <jsp-file>/oauth2/registerClient.jsp</jsp-file>
+	    </servlet>
+	    
+	    <servlet-mapping>
+	      <servlet-name>OAuth2RegisterClient</servlet-name>
+	      <url-pattern>/oauth2/registerClient.jsp</url-pattern>
+	    </servlet-mapping>
+
 	<!-- servlet declaration -->
 
 	    <servlet-mapping>
