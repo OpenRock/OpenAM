@@ -258,13 +258,6 @@ Function AgentConfigure(WshShell, FSO, responseFile, objWebRoot, dict1)
 
    WScript.Sleep(100)
 
-   WScript.Echo dict1("131")
-   'Add the config file into the product registry
-   regKey = "HKLM\Software\Sun Microsystems\OpenSSO IIS7 Agent\"
-   WshShell.RegWrite regKey + newIdentifier + "\" ,1,"REG_SZ"
-   WshShell.RegWrite regKey + newIdentifier + "\Path", newConfigDir,"REG_SZ"
-   WshShell.RegWrite regKey + newIdentifier + "\Version","3.0","REG_SZ"
-
    Call ConfigureDll()
    WSCript.Echo dict1("133")
 End Function
@@ -373,13 +366,6 @@ Function AgentUnConfigure(WshShell, FSO, dict1)
       WScript.Echo dict1("135")
       WScript.Echo newConfigDir
       FSO.DeleteFolder(newConfigDir)
-
-      'Remove the entry from the Windows Product Registry
-      WSCript.Echo dict1("136")
-      regKey = "HKLM\Software\Sun Microsystems\OpenSSO IIS7 Agent\"
-      WshShell.RegDelete regKey + newIdentifier + "\Version"
-      WshShell.RegDelete regKey + newIdentifier + "\Path"
-      WshShell.RegDelete regKey + newIdentifier + "\"
 
       Call UnconfigureDll()
 
