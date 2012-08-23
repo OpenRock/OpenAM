@@ -29,6 +29,7 @@
 CC = cl
 LINK = link
 RC = rc
+MC = mc
 
 AM_WIN32_SRC = am\source\action_decision.cpp am\source\agent_config_cache.cpp am\source\agent_configuration.cpp am\source\agent_profile_service.cpp am\source\am_auth.cpp am\source\am_log.cpp am\source\am_main.cpp am\source\am_map.cpp am\source\am_policy.cpp am\source\am_properties.cpp am\source\am_resource.cpp am\source\am_sso.cpp am\source\am_string_set.cpp am\source\am_utils.cpp am\source\am_web.cpp am\source\auth_context.cpp am\source\auth_svc.cpp am\source\base_service.cpp am\source\connection.cpp am\source\fqdn_handler.cpp am\source\http.cpp am\source\key_value_map.cpp am\source\log.cpp am\source\log_record.cpp am\source\log_service.cpp am\source\naming_service.cpp am\source\p_cache.cpp am\source\pnotify_handler.cpp am\source\policy_decision.cpp am\source\policy_engine.cpp am\source\policy_entry.cpp am\source\policy_service.cpp am\source\properties.cpp am\source\ref_cnt_ptr.cpp am\source\server_info.cpp am\source\service.cpp am\source\service_info.cpp am\source\session_info.cpp am\source\session_service.cpp am\source\sso_entry.cpp am\source\sso_token.cpp am\source\sso_token_service.cpp am\source\string_util.cpp am\source\thread_pool.cpp am\source\tree.cpp am\source\url.cpp am\source\utils.cpp am\source\xml_attribute.cpp am\source\xml_element.cpp am\source\xml_tree.cpp  am\source\sdk.cpp
 
@@ -99,9 +100,8 @@ cryptutil.obj	: am\source\crypt_util.c
 AM_WIN32_OBJECTS = $(AM_WIN32_SRC:.cpp=.obj)
 
 amsdk.dll : crypt_util.obj notenforcedip.obj $(AM_WIN32_OBJECTS)
-	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /DEF:"am\source\amsdk.def" \
-		   /PDB:"am\source\amsdk.pdb" \
-		   /DLL /OUT:"am\source\amsdk.dll" am\source\crypt_util.obj am\source\notenforcedip.obj $(AM_WIN32_OBJECTS) $(DEP_LIBS) wininet.lib Ws2_32.lib
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /PDB:"am\source\amsdk.pdb" \
+	/DLL /OUT:"am\source\amsdk.dll" am\source\crypt_util.obj am\source\notenforcedip.obj $(AM_WIN32_OBJECTS) $(DEP_LIBS) Ws2_32.lib
 
 cryptit : cryptutil.obj
 	$(LINK) $(LDFLAGS) /SUBSYSTEM:CONSOLE /OUT:"am\source\cryptit.exe" am\source\cryptutil.obj 
@@ -124,13 +124,16 @@ iis6i : ii6.obj
 
 
 iis7.obj : $(AM_IIS7_SRC)
-	$(CC) /I"C:\Program Files\Microsoft SDKs\Windows\v7.1\Include" $(CFLAGS) $(DEP_INCPATH) /DWIN32 /Iagents\source\iis7 /Foagents\source\iis7\ $(AM_IIS7_SRC)
+        $(MC) -A -b -c -h agents\source\iis7\ -r agents\source\iis7\ agents\source\iis7\agent_ev.mc
+	$(CC) /I"C:\Program Files\Microsoft SDKs\Windows\v7.1\Include" $(CFLAGS) $(DEP_INCPATH) /D WIN32 /Iagents\source\iis7 /Foagents\source\iis7\ $(AM_IIS7_SRC)
 
 iis7i	: iis7.obj
-	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /DEF:"agents\source\iis7\Iis7Agent.def" \
-		/PDB:"agents\source\iis7\amiis7module.pdb" \
-		/DLL /OUT:"agents\source\iis7\amiis7module.dll" agents\source\iis7\agent_main.obj agents\source\iis7\agent_module.obj \
-                agents\source\iis7\Iis7Agent.obj $(DEP_LIBS) am\source\amsdk.lib advapi32.lib
+	$(RC) /nologo /fo agents\source\iis7\agent_ev.res agents\source\iis7\agent_ev.rc
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /EXPORT:RegisterModule \
+	/PDB:"agents\source\iis7\amiis7module.pdb" \
+	/DLL /OUT:"agents\source\iis7\amiis7module.dll" agents\source\iis7\agent_main.obj agents\source\iis7\agent_module.obj \
+        agents\source\iis7\Iis7Agent.obj agents\source\iis7\agent_ev.res $(DEP_LIBS) am\source\amsdk.lib crypt32.lib advapi32.lib shlwapi.lib
+
 #
 # IIS6 and IIS7 Agent end
 #
