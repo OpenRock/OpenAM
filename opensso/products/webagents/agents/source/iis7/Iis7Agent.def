@@ -1,5 +1,0 @@
-LIBRARY	"Iis7Agent"
-
-EXPORTS
-    RegisterModule
-    ProcessRequest

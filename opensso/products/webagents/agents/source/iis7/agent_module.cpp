@@ -26,51 +26,20 @@
  *
  *
  */
-
-#include <stdio.h> 
-#include "precomp.h"
-#include "Iis7Agent.h"
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 #include "agent_module.h"
-
-/*
- * This is the function invoked by IIS during the first event
- * in the request processing pipeline. Here, we implement the 
- * agent functionality.
- * */
-REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnBeginRequest(IN IHttpContext* pHttpContext, 
-            IN OUT IHttpEventProvider * pProvider)
-{
-    REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
-    status = ProcessRequest(pHttpContext, pProvider);
-    return status;
-
-}
-
-/*
- * This function is invoked when IIS establishes the identity of the user
- * */
-REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnAuthenticateRequest(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
-    REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
-    return status;
-
-}
-
 
 /*
  * Invoked when IIS verifies user authorization
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnAuthorizeRequest(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnAuthorizeRequest(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
 
 /*
@@ -78,12 +47,10 @@ CAgentModule::OnAuthorizeRequest(IN IHttpContext* pHttpContext,
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnResolveRequestCache(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnResolveRequestCache(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
 
 /*
@@ -91,113 +58,75 @@ CAgentModule::OnResolveRequestCache(IN IHttpContext* pHttpContext,
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnAcquireRequestState(IN IHttpContext* pHttpContext, 
-        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnAcquireRequestState(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     HRESULT hr = S_OK;
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
 
 /*
  * Invoked when IIS maps request to an event handler.
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnMapRequestHandler(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnMapRequestHandler(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
 
 /*
  * Invoked before IIS executes a request handler.
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnPreExecuteRequestHandler(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnPreExecuteRequestHandler(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
 
 /*
  * Invoked when IIS executes a request handler.
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnExecuteRequestHandler(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnExecuteRequestHandler(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
 
 /*
  * Invoked when the current state is released.
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnReleaseRequestState(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnReleaseRequestState(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
-
 
 /*
  * Invoked when IIS stores the request in the cache.
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnUpdateRequestCache(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnUpdateRequestCache(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
-
 
 /*
  * Invoked when IIS prepares to log the current request.
  *
  * */
 REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnLogRequest(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
+CAgentModule::OnLogRequest(IN IHttpContext* pHttpContext,
+        IN OUT IHttpEventProvider * pProvider) {
     REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
     return status;
-
 }
-
-
-/*
- * This is the function invoked by IIS during the last event
- * in the request processing pipeline. 
- *
- * */
-REQUEST_NOTIFICATION_STATUS
-CAgentModule::OnEndRequest(IN IHttpContext* pHttpContext, 
-                        IN OUT IHttpEventProvider * pProvider)
-{
-    REQUEST_NOTIFICATION_STATUS status = RQ_NOTIFICATION_CONTINUE;
-    return status;
-
-}
-

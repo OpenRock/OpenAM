@@ -26,6 +26,9 @@
  *
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef __IIS7AGENT_H__
 #define __IIS7AGENT_H__
@@ -37,8 +40,6 @@
 #include <string>
 #include "am_web.h"
 
-using namespace std;
-
 #define TCP_PORT_ASCII_SIZE_MAX 5
 #define URL_SIZE_MAX (20*1024)
 
@@ -48,27 +49,17 @@ typedef struct OphResources {
     am_policy_result_t result;
 } tOphResources;
 
-typedef struct AgentConfig {
-    BOOL bAgentInitSuccess; // For disabling IIS if init fails.
-} tAgentConfig;
-
 BOOL RegisterAgentModule();
-REQUEST_NOTIFICATION_STATUS ProcessRequest(IHttpContext* pHttpContext, 
-                                    IHttpEventProvider* pProvider);
 
-am_status_t get_request_url(IHttpContext* pHttpContext, string& requestURL,
-                            string& origRequestURL, string& pathInfo,
-                            void* agent_config);
+am_status_t get_request_url(IHttpContext* pHttpContext, std::string& requestURL,
+        std::string& origRequestURL, std::string& pathInfo, void* agent_config);
 
-am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName, 
-                        PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired); 
+am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
+        PCSTR* pVarVal, DWORD* pVarValSize, BOOL isRequired);
 
 BOOL loadAgentPropertyFile(IHttpContext* pHttpContext);
 
-BOOL iisaPropertiesFilePathGet(CHAR** propertiesFileFullPath, 
-                string instanceId, BOOL isBootStrapFile);
-
-void GetEntity(IHttpContext* pHttpContext, string& data);
+void GetEntity(IHttpContext* pHttpContext, std::string& data);
 
 static am_status_t set_cookie(const char *header, void **args);
 
@@ -82,46 +73,30 @@ static am_status_t set_cookie_in_response(const char *header, void **args);
 
 static am_status_t set_header_attr_as_cookie(const char *header, void **args);
 
-static am_status_t get_cookie_sync(const char *cookieName, char** dpro_cookie, 
-                                                    void **args);
+static am_status_t get_cookie_sync(const char *cookieName, char** dpro_cookie, void **args);
 
 am_status_t set_request_headers(IHttpContext *pHttpContext, void** args);
 
-REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext, 
-                const char *redirect_url, const char *set_cookies_list);
+REQUEST_NOTIFICATION_STATUS redirect_to_request_url(IHttpContext* pHttpContext,
+        const char *redirect_url, const char *set_cookies_list);
 
-static am_status_t do_redirect(IHttpContext* pHttpContext, am_status_t status, 
-        am_policy_result_t *policy_result, const char *original_url, 
+static am_status_t do_redirect(IHttpContext* pHttpContext, am_status_t status,
+        am_policy_result_t *policy_result, const char *original_url,
         const char *method, void** args, void* agent_config);
 
 am_status_t remove_key_in_headers(char* key, char** httpHeaders);
 
-am_status_t set_headers_in_context(IHttpContext *pHttpContext, 
-                        string headersList, BOOL isRequest);
+am_status_t set_headers_in_context(IHttpContext *pHttpContext,
+        std::string headersList, BOOL isRequest);
 
-void ConstructReqCookieValue(string& completeString,string value);
+void ConstructReqCookieValue(std::string& completeString, std::string value);
 
 void do_deny(IHttpContext* pHttpContext);
-
-void logPrimitive(CHAR *message);
 
 void OphResourcesFree(tOphResources* pOphResources);
 
 void TerminateAgent();
 
 void init_at_request();
-
-// Agent error codes to return to IIS on failure via SetLastError() 
-// See WINERROR.H for format.
-
-// Error | Customer code flag
-#define IISA_ERROR_BASE (3 << 30 | 1 << 29)
-
-#define IISA_ERROR_GET_EXTENSION_VERSION    (IISA_ERROR_BASE | 1 << 15)
-
-#define IISA_ERROR_PROPERTIES_FILE_PATH_GET (IISA_ERROR_GET_EXTENSION_VERSION | 1)
-#define IISA_ERROR_INIT_POLICY              (IISA_ERROR_GET_EXTENSION_VERSION | 2)
-#define IISA_ERROR_SEE_DEBUG_LOG            (IISA_ERROR_GET_EXTENSION_VERSION | 3)
-
 
 #endif

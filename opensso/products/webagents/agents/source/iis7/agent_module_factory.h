@@ -26,42 +26,41 @@
  *
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef __AGENT_MODULE_FACTORY_H__
 #define __AGENT_MODULE_FACTORY_H__
 
-#include <stdio.h>
-#include "Iis7Agent.h"
+#include "agent_module.h"
 
-// This class creats instances of CAgentModule for each request.
-class CAgentModuleFactory : public IHttpModuleFactory
-{
+// This class creates instances of CAgentModule for each request.
+
+class CAgentModuleFactory : public IHttpModuleFactory {
 public:
-    virtual HRESULT GetHttpModule(OUT CHttpModule **ppModule, IN IModuleAllocator *)
-    {
-        HRESULT  hr = S_OK;
+
+    virtual HRESULT GetHttpModule(OUT CHttpModule **ppModule, IN IModuleAllocator *) {
+        HRESULT hr = S_OK;
         CAgentModule * pModule = NULL;
 
-	    if ( ppModule == NULL )
-        {
-            hr = HRESULT_FROM_WIN32( ERROR_INVALID_PARAMETER );
+        if (ppModule == NULL) {
+            hr = HRESULT_FROM_WIN32(ERROR_INVALID_PARAMETER);
             goto Finished;
         }
 
         pModule = new CAgentModule();
-        if ( pModule == NULL )
-        {
-            hr = HRESULT_FROM_WIN32( ERROR_NOT_ENOUGH_MEMORY );
+        if (pModule == NULL) {
+            hr = HRESULT_FROM_WIN32(ERROR_NOT_ENOUGH_MEMORY);
             goto Finished;
         }
 
         *ppModule = pModule;
         pModule = NULL;
-            
-    Finished:
 
-        if ( pModule != NULL )
-        {
+Finished:
+
+        if (pModule != NULL) {
             delete pModule;
             pModule = NULL;
         }
@@ -69,8 +68,7 @@ public:
         return hr;
     }
 
-    virtual void Terminate()
-    {
+    virtual void Terminate() {
         TerminateAgent();
         delete this;
     }
