@@ -818,7 +818,7 @@ VOID WINAPI execute_orig_request(EXTENSION_CONTROL_BLOCK *pECB,
 
         if ( execUrlStatus.dwWin32Error != ERROR_SUCCESS )
         {
-            am_web_log_error( szWin32Error,
+            _snprintf( szWin32Error,
                        16,
                        "ErrorCode=%d, ",
                        execUrlStatus.dwWin32Error );
@@ -1417,17 +1417,47 @@ int test_attr_exists(char *key, char* set_headers_list) {
     return 0;
 }
 
+int vasprintf(char **buffer, const char *fmt, va_list argv) {
+    int size = _vsnprintf(*buffer = NULL, 0, fmt, argv);
+    if ((size > 0) && ((*buffer = malloc(size + 1)) != NULL)) {
+        return vsprintf(*buffer, fmt, argv);
+    }
+    return size;
+}
+
+int am_sprintf(char **buffer, const char *fmt, ...) {
+    int size;
+    char *tmp = NULL;
+    va_list ap;
+    va_start(ap, fmt);
+    tmp = *buffer;
+    size = vasprintf(buffer, fmt, ap);
+    free(tmp);
+    va_end(ap);
+    return size;
+}
+
 void rem_attr_headers(char** rawHeaders, char* set_headers_list) {
-    char *a, *ab, *rawCopy, *tmpHdr;
+    int hlen = 0, nlen = 0;
+    char *a, *ab, *rawCopy = NULL, *tmpHdr = NULL;
     if (*rawHeaders != NULL && set_headers_list != NULL) {
         rawCopy = strdup(*rawHeaders);
-        tmpHdr = (char*) calloc(1, strlen(rawCopy));
+        hlen = strlen(*rawHeaders);
         for ((a = strtok_s(rawCopy, "\r\n", &ab)); a; (a = strtok_s(NULL, "\r\n", &ab))) {
             if (test_attr_exists(a, set_headers_list) == 0) {
-                sprintf(tmpHdr, "%s%s\r\n", tmpHdr, a);
+                if (tmpHdr == NULL) {
+                    nlen = am_sprintf(&tmpHdr, "%s\r\n", a);
+                } else {
+                    nlen = am_sprintf(&tmpHdr, "%s%s\r\n", tmpHdr, a);
+                }
             }
         }
-        memset(*rawHeaders, 0, strlen(*rawHeaders));
+        if (nlen > hlen) {
+            *rawHeaders = (char *) realloc(*rawHeaders, nlen + 1);
+            memset(*rawHeaders, 0, nlen);
+        } else {
+            memset(*rawHeaders, 0, hlen);
+        }
         strcpy(*rawHeaders, tmpHdr);
         free(rawCopy);
         free(tmpHdr);
