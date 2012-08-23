@@ -394,51 +394,47 @@ void mbyte_to_wchar(const char * orig_str,char *dest_str,int dest_len)
  * any code in here that could cause problems if called twice.
  */
 
-static am_bool_t is_server_alive(const Utils::url_info_t *info_ptr, 
-                                 void* agent_config)
-{
+static am_bool_t is_server_alive(const Utils::url_info_t *info_ptr,
+        void* agent_config) {
     AgentConfigurationRefCntPtr* agentConfigPtr =
-        (AgentConfigurationRefCntPtr*) agent_config;
+            (AgentConfigurationRefCntPtr*) agent_config;
 
 
     am_bool_t status = AM_FALSE;
-    char	buffer[PR_NETDB_BUF_SIZE];
-    PRNetAddr	address;
-    PRHostEnt	hostEntry;
-    PRIntn	hostIndex;
-    PRStatus	prStatus;
+    char buffer[PR_NETDB_BUF_SIZE];
+    PRNetAddr address;
+    PRHostEnt hostEntry;
+    PRIntn hostIndex;
+    PRStatus prStatus;
     PRFileDesc *tcpSocket;
     unsigned timeout = 0;
-    
-    prStatus = PR_GetHostByName(info_ptr->host, buffer, sizeof(buffer),
-				&hostEntry);
-    if (PR_SUCCESS == prStatus) {
-	hostIndex = PR_EnumerateHostEnt(0, &hostEntry, info_ptr->port,
-					&address);
-	if (hostIndex >= 0) {
-		timeout = (unsigned) ((*agentConfigPtr)->connection_timeout);
 
-		if (((PRFileDesc *) NULL) != tcpSocket) {
-		Log::log(boot_info.log_module, Log::LOG_DEBUG,
-			"is_server_alive(): Connection timeout set to %i", timeout);
-	    }
-		tcpSocket = PR_NewTCPSocket();
-	    if (((PRFileDesc *) NULL) != tcpSocket) {
-		prStatus = PR_Connect(tcpSocket, &address,
-				      PR_SecondsToInterval(timeout));
-		if (PR_SUCCESS == prStatus) {
-		    status = AM_TRUE;
-		}
-	    	PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
-	    	prStatus = PR_Close(tcpSocket);
-	    	if (prStatus != PR_SUCCESS) {
-		    PRErrorCode error = PR_GetError();
-		    Log::log(boot_info.log_module, Log::LOG_ERROR,
-			     "is_server_alive(): NSPR Error while calling "
-			     "PR_Close(): %d.", error);
-	        }
-	    }
-	}
+    prStatus = PR_GetHostByName(info_ptr->host, buffer, sizeof (buffer),
+            &hostEntry);
+    if (PR_SUCCESS == prStatus) {
+        hostIndex = PR_EnumerateHostEnt(0, &hostEntry, info_ptr->port,
+                &address);
+        if (hostIndex >= 0) {
+            timeout = (unsigned) ((*agentConfigPtr)->connection_timeout);
+            Log::log(boot_info.log_module, Log::LOG_DEBUG,
+                    "is_server_alive(): Connection timeout set to %i", timeout);
+            tcpSocket = PR_NewTCPSocket();
+            if (((PRFileDesc *) NULL) != tcpSocket) {
+                prStatus = PR_Connect(tcpSocket, &address,
+                        PR_SecondsToInterval(timeout));
+                if (PR_SUCCESS == prStatus) {
+                    status = AM_TRUE;
+                }
+                PR_Shutdown(tcpSocket, PR_SHUTDOWN_BOTH);
+                prStatus = PR_Close(tcpSocket);
+                if (prStatus != PR_SUCCESS) {
+                    PRErrorCode error = PR_GetError();
+                    Log::log(boot_info.log_module, Log::LOG_ERROR,
+                            "is_server_alive(): NSPR Error while calling "
+                            "PR_Close(): %d.", error);
+                }
+            }
+        }
     }
 
     return status;
@@ -5817,6 +5813,8 @@ get_sso_token(am_web_request_params_t *req_params,
              (*sso_token == NULL || (*sso_token)[0] == '\0')) {
         sts = AM_NOT_FOUND;
     }
+    am_web_log_debug("%s: sso token %s, status - %s", thisfunc, *sso_token, am_status_to_string(sts));
+
     // If SSO token is not found and CDSSO mode is enabled
     // check for the request method.
     // If the method is POST, 
@@ -6605,6 +6603,34 @@ am_web_is_cache_control_enabled(void* agent_config) {
         status = B_TRUE;
     }
     return status;
+}
+
+extern "C" AM_WEB_EXPORT boolean_t
+am_web_is_iis_logonuser_enabled(void* agent_config) {
+    boolean_t status = B_FALSE;
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    if ((*agentConfigPtr)->iis_logonuser_enabled == 1) {
+        status = B_TRUE;
+    }
+    return status;
+}
+
+extern "C" AM_WEB_EXPORT boolean_t
+am_web_is_password_header_enabled(void* agent_config) {
+    boolean_t status = B_FALSE;
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    if ((*agentConfigPtr)->password_header_enabled == 1) {
+        status = B_TRUE;
+    }
+    return status;
+}
+
+extern "C" AM_WEB_EXPORT const char *am_web_get_password_encryption_key(void* agent_config) {
+    AgentConfigurationRefCntPtr* agentConfigPtr =
+            (AgentConfigurationRefCntPtr*) agent_config;
+    return (*agentConfigPtr)->password_encr_key;
 }
 
 extern "C" AM_WEB_EXPORT am_status_t

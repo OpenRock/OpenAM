@@ -44,18 +44,15 @@
 #include "internal_macros.h"
 #include "am_notify.h"
 #include "version.h"
+#include "mutex.h"
 
 
 using std::string;
 
-//
-// XXX - This code should have some locking added to it.
-//
 namespace {
     bool initialized;
+    smi::Mutex initLock;
 }
-
-
 
 BEGIN_PRIVATE_NAMESPACE
 DEFINE_BASE_INIT;
@@ -101,64 +98,54 @@ void log_version_info() {
 /**
  * Throws: InternalException upon error
  */
-void PRIVATE_NAMESPACE_NAME::base_init(const Properties &propertiesRef, boolean_t initializeLog)
-{
+void PRIVATE_NAMESPACE_NAME::base_init(const Properties &propertiesRef, boolean_t initializeLog) {
     am_status_t status = AM_SUCCESS;
 
-    if (! initialized) {
-	PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
+    ScopeLock myLock(initLock);
+    if (!initialized) {
+        PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
+        try {
 
-	try {
+            // NOTE - The dependency here is
+            // - connection::initialize depends on Log::initialize
+            //   for the local log.
+            // - remote log depends on XMLTree::initialize and
+            //   connection::initialize and Log::initialize for local log
+            // Ideally dependencies are taken care of in the classes
+            // themselves.
 
-	    // NOTE - The dependency here is
-	    // - connection::initialize depends on Log::initialize
-	    //   for the local log.
-	    // - remote log depends on XMLTree::initialize and
-	    //   connection::initialize and Log::initialize for local log
-	    // Ideally dependencies are taken care of in the classes
- 	    // themselves.
+            if (initializeLog) {
+                Log::initialize(propertiesRef);
+                log_version_info();
+            }
 
-	    if (initializeLog) {
-	    	Log::initialize(propertiesRef);
-	    	log_version_info();
-		}
+            XMLTree::initialize();
 
-	    XMLTree::initialize();
+            if (AM_SUCCESS == status) {
+                status = Connection::initialize(propertiesRef);
+            }
+            if (AM_SUCCESS == status) {
+                Log::initializeRemoteLog(propertiesRef);
+                initialized = true;
+            }
 
-	    if (AM_SUCCESS == status) {
-		status = Connection::initialize(propertiesRef);
-	    }
-	    if (AM_SUCCESS == status) {
-	        Log::initializeRemoteLog(propertiesRef);
-		initialized = true;
-	    }
-
-	} catch (const NSPRException& exc) {
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, exc);
-	    status = AM_NSPR_ERROR;
-	} catch (const std::bad_alloc& exc) {
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, exc);
-	    status = AM_NO_MEMORY;
-	} catch (const std::exception& exc) {
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
-                     "Unknown exception during base_init: %s",
-		     exc.what());
-	    Log::log(Log::ALL_MODULES, Log::LOG_ERROR, exc);
-	    status = AM_FAILURE;
-	}
-
-#if	defined(USE_STATIC_NSPR)
-	if (AM_SUCCESS != status) {
-	    PR_Cleanup();
-	}
-#endif
+        } catch (const NSPRException& exc) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, exc);
+            status = AM_NSPR_ERROR;
+        } catch (const std::bad_alloc& exc) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, exc);
+            status = AM_NO_MEMORY;
+        } catch (const std::exception& exc) {
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                    "Unknown exception during base_init: %s",
+                    exc.what());
+            Log::log(Log::ALL_MODULES, Log::LOG_ERROR, exc);
+            status = AM_FAILURE;
+        }
     }
-    if(status != AM_SUCCESS) {
-      throw InternalException("init()",
-			      "Error while performing common initialization.",
-			      status);
+    if (status != AM_SUCCESS) {
+        throw InternalException("base_init()", "Error while performing common initialization.", status);
     }
-    return;
 }
 
 extern "C"
@@ -173,9 +160,9 @@ am_status_t am_cleanup(void) {
     Log::ModuleId logID = Log::addModule("am_cleanup()");
     am_status_t status = AM_SUCCESS;
 
+    ScopeLock myLock(initLock);
     if (initialized) {
         initialized = false;
-
         try {
             /**
              * Call private interfaces to cleanup
@@ -197,8 +184,7 @@ am_status_t am_cleanup(void) {
             Log::log(logID, Log::LOG_ERROR, exc);
             status = AM_FAILURE;
         } catch (...) {
-            Log::log(logID, Log::LOG_ERROR,
-                    "am_cleanup(): Unknown exception encountered");
+            Log::log(logID, Log::LOG_ERROR, "am_cleanup(): Unknown exception encountered");
             status = AM_FAILURE;
         }
         Log::shutdown();

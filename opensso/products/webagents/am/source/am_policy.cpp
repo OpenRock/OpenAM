@@ -101,11 +101,6 @@ am_policy_init(am_properties_t policy_config_params) {
                          "Unknown exception encountered.");
             }
 
-#if	defined(USE_STATIC_NSPR)
-	    if (AM_SUCCESS != status) {
-		PR_Cleanup();
-	    }
-#endif
 	} else {
 	    Log::log(logID, Log::LOG_DEBUG,
 		     "am_policy_init(): "

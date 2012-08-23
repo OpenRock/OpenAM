@@ -45,7 +45,7 @@ SSOEntry::SSOEntry(const SSOToken &ssoTok,
 }
 
 SSOEntry::~SSOEntry() {
-    ScopeLock myLock();
+    ScopeLock myLock(lock);
     std::list<Tree *>::iterator iter = forest.begin();
     while (iter != forest.end()) {
 	Tree *tree = *iter;

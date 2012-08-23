@@ -540,6 +540,26 @@ am_status_t AgentConfiguration::populateAgentProperties()
         am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->cache_control_header_enable ? "TRUE" : "FALSE"));
     }
 
+    if (AM_SUCCESS == status) {
+        parameter = "com.sun.identity.agents.config.iis.password.header";
+        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->password_header_enabled));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->password_header_enabled ? "TRUE" : "FALSE"));
+    }
+
+    if (AM_SUCCESS == status) {
+        parameter = "com.sun.identity.agents.config.iis.logonuser";
+        am_properties_get_boolean_with_default(this->properties, parameter, B_FALSE,
+                reinterpret_cast<int *> (&this->iis_logonuser_enabled));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, (this->iis_logonuser_enabled ? "TRUE" : "FALSE"));
+    }
+
+    if (AM_SUCCESS == status) {
+        parameter = "com.sun.identity.agents.config.replaypasswd.key";
+        am_properties_get_with_default(this->properties, parameter, NULL, &(this->password_encr_key));
+        am_web_log_max_debug("Property [%s] value set to [%s]", parameter, this->password_encr_key);
+    }
+    
     /* Get url string comparision case sensitivity values. */
     if (AM_SUCCESS == status) {
         status = am_properties_get_boolean_with_default(this->properties,

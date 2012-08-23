@@ -46,7 +46,7 @@ PolicyEntry::PolicyEntry(const SSOToken &ssoTok,
 }
 
 PolicyEntry::~PolicyEntry() {
-    ScopeLock myLock();
+    ScopeLock myLock(lock);
     std::list<Tree *>::iterator iter = forest.begin();
     while (iter != forest.end()) {
 	Tree *tree = *iter;

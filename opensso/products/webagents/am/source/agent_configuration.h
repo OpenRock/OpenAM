@@ -202,6 +202,9 @@ public:
     PRBool cdsso_disable_redirect_on_post;	// disable extra-302-redirect on (after) LARES post
     PRBool cache_control_header_enable;	// enable cache-control/pragma/expires = no-cache headers for unauthenticated sessions
     am_status_t error;
+    int password_header_enabled;
+    int iis_logonuser_enabled;
+    const char *password_encr_key;
     
     smap_t cond_login_url;
     
@@ -306,6 +309,9 @@ public:
         this->cdsso_disable_redirect_on_post = AM_FALSE;
         this->dummyPostPrefixUri = NULL;
         this->error = AM_SUCCESS;
+        this->password_header_enabled = 0;
+        this->iis_logonuser_enabled = 0;
+        this->password_encr_key = NULL;
 
     }
     

@@ -179,6 +179,9 @@ SUNW_1.0 {
 		am_string_set_destroy;
 
                 am_web_is_cache_control_enabled;
+                am_web_is_iis_logonuser_enabled;
+                am_web_is_password_header_enabled;
+                am_web_get_password_encryption_key;
 
 	local:
 		*;
