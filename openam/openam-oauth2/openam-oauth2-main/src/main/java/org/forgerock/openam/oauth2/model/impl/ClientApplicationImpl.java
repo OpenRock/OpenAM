@@ -28,6 +28,7 @@ import com.sun.identity.idm.AMIdentity;
 import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
+import org.restlet.Request;
 import org.restlet.data.Status;
 
 import java.net.URI;
@@ -67,8 +68,8 @@ public class ClientApplicationImpl implements ClientApplication{
                 clientType = ClientType.PUBLIC;
             }
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get client type from repository");
         }
         return clientType;
     }
@@ -83,8 +84,8 @@ public class ClientApplicationImpl implements ClientApplication{
                 redirectionURIs.add(URI.create(uri));
             }
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get redirection URLs from repository");
         }
         return redirectionURIs;
     }
@@ -95,8 +96,8 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             tokenTypesSet = id.getAttribute(TOKEN_TYPE);
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get access token type from repository");
         }
         return tokenTypesSet.iterator().next();
     }
@@ -112,8 +113,8 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             scopes = id.getAttribute(SCOPES);
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get allowed grant scopes from repository");
         }
         return scopes;
     }
@@ -124,8 +125,8 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             scopes = id.getAttribute(DEFAULT_SCOPES);
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get default grant scopes from repository");
         }
         return scopes;
     }
@@ -138,8 +139,8 @@ public class ClientApplicationImpl implements ClientApplication{
             autoGrantSet = id.getAttribute(AUTO_GRANT);
             grant = Boolean.parseBoolean(autoGrantSet.iterator().next());
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get auto grant status from repository");
         }
         return grant;
     }
@@ -150,8 +151,8 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             displayName = id.getAttribute(NAME);
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get display name from repository");
         }
         return displayName;
     }
@@ -162,8 +163,8 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             displayDescription = id.getAttribute(DESCRIPTION);
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get display description from repository");
         }
         return displayDescription;
     }
