@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet</artifactId>
-                <version>2.0.8-FIX</version>
+                <version>${restlet.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.restlet.jse</groupId>
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.crypto</artifactId>
-                <version>2.0.8-FIX</version>
+                <version>${restlet.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-net</groupId>
@@ -134,7 +134,7 @@
         <opendj.stable.version>2.4.4</opendj.stable.version>
         <opendj.version>${opendj.stable.version}-SNAPSHOT</opendj.version>
         <orientdb.version>1.0rc1-SNAPSHOT</orientdb.version>
-        <restlet.version>2.0.6</restlet.version>
+        <restlet.version>2.0.15</restlet.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

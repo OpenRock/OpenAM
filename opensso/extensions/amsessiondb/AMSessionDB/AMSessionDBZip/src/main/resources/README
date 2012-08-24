@@ -4,7 +4,7 @@ README file for amsessiondb
 
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
- Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
 
  The contents of this file are subject to the terms
  of the Common Development and Distribution License
@@ -29,27 +29,55 @@ README file for amsessiondb
 1. Overview
 
 amsessiondb is designed as a drop in replacement for the existing OpenAM session
-failover system that uses MQ and Berkley DB.
+failover system that uses MQ and Berkeley DB.
 
 2. Installation
 
 Copy the following files into your OpenAM webapp WEB-INF/lib directory and
 restart the container.
 
-* AMSessionRepository-0.1-SNAPSHOT.jar
-* AMSessionStoreCommon-0.1-SNAPSHOT.jar
-* org.restlet.lib.org.json-2.0.jar
+* AMSessionRepository-0.2-SNAPSHOT.jar
+* AMSessionStoreCommon-0.2-SNAPSHOT.jar
 * commons-net-2.2.jar                    
 * jackson-core-asl-1.4.3.jar             
 * jackson-mapper-asl-1.4.3.jar           
 * org.osgi.core-4.0.0.jar                
-* org.restlet-2.0.6.jar                  
-* org.restlet.ext.jackson-2.0.6.jar      
-* org.restlet.ext.json-2.0.6.jar
+* org.restlet-2.0.15.jar               
+* org.restlet.ext.crypto-2.0.15.jar   
+* org.restlet.ext.jackson-2.0.15.jar      
 
 3. Configuration
 
-3.1. OpenAM Configuration 
+3.1. amsessiondb setup
+
+When extracting the amsessiondb zip file, the bin/setup.sh script must be run. 
+Review the file config/amsessiondb.properties before running the setup.sh script. 
+This properties file controls the port and suffix used during the installation 
+and importantly the password used to protect the amsessiondb store.
+
+3.1.1. Secondary instance setup
+
+Before installing a secondary instance you must edit the amsessiondb.properties file
+and update the following property to point to your first instance.
+
+amsessiondb.exising.server.url=http://server1.internal.forgerock.com:8182/amsessiondb
+
+NB: The JAVA_HOME environmental variable must be set correct for the amsessiondb
+scripts to operate correctly. 
+
+3.2. OpenAM Configuration 
+
+3.2.1. OpenAM Advanced Property Configuration
+
+To enable the amsessiondb client in OpenAM you must set the following advanced 
+property in the console under Configuration > Servers and Sites.
+
+com.sun.identity.ha.famrecordpersister = 
+    org.forgerock.openam.amsessionrepository.client.AMSessionDBRecordPersister
+
+NB: Ignore the warning about "Unidentified property"
+
+3.2.2. OpenAM Session Service Configuration
 
 For OpenAM session failover to be configured, OpenAM must be running in a site
 configuration. Please site this article to assist in configuring sites:
@@ -60,14 +88,14 @@ When configuring the session service in OpenAM; the same procedure should be
 followed only with these configuration changes to the secondary session 
 configuration instance.
 
-* Session Store User : admin
+* Session Store User : amsessiondb
 * Session Store Password : <password>
 * Session Store Password (confirm) : <password>
 * Maximum Wait Time : 5000
 * Database Url : http://localhost:8182/amsessiondb
 * Session Failover Enabled : (True) Enabled
 
-3.2 amsessiondb configuration.
+3.3 amsessiondb configuration.
 
 amsessiondb is configured using the configuration files in the config directory:
 

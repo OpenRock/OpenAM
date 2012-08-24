@@ -2,7 +2,7 @@
 
 : DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 :
-: Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+: Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
 :
 : The contents of this file are subject to the terms
 : of the Common Development and Distribution License
@@ -44,5 +44,5 @@ set CONFIG_DIR=%AMSESSION_DB%/../config
 set LIB_DIR=%AMSESSION_DB%/../lib
 set DEBUG_OPT="-agentlib:jdwp=transport=dt_socket,address=9000,server=y,suspend=n"
 
-java -Djava.util.logging.config.file="%CONFIG_DIR%/amsessiondblog.properties" -cp %LIB_DIR%/AMSessionStore-0.2-SNAPSHOT.jar;%LIB_DIR%/AMSessionStoreCommon-0.2-SNAPSHOT.jar;%LIB_DIR%/org.restlet-2.0.6.jar;%LIB_DIR%/org.restlet.ext.crypto-2.0.6.jar;%LIB_DIR%/commons-net-2.2.jar;%LIB_DIR%/jackson-core-asl-1.4.3.jar;%LIB_DIR%/jackson-mapper-asl-1.4.3.jar;%LIB_DIR%/org.osgi.core-4.0.0.jar;%LIB_DIR%/org.restlet.ext.jackson-2.0.6.jar;%LIB_DIR%/org.restlet.ext.json-2.0.6.jar;%LIB_DIR%/org.restlet.lib.org.json-2.0.jar;%LIB_DIR%/opendj-server-2.4.4-SNAPSHOT.jar;%LIB_DIR%/mail.jar;%LIB_DIR%/je.jar;%LIB_DIR%/activation.jar;%LIB_DIR%/i18n-core-1.3.0-SNAPSHOT.jar;../config %DEBUG_OPT% org.forgerock.openam.amsessionstore.db.opendj.setup.SetupOpenDJ
+java -Djava.util.logging.config.file="%CONFIG_DIR%/amsessiondblog.properties" -cp %LIB_DIR%/AMSessionStore-0.2-SNAPSHOT.jar;%LIB_DIR%/AMSessionStoreCommon-0.2-SNAPSHOT.jar;%LIB_DIR%/org.restlet-2.0.15.jar;%LIB_DIR%/org.restlet.ext.crypto-2.0.15.jar;%LIB_DIR%/commons-net-2.2.jar;%LIB_DIR%/jackson-core-asl-1.4.3.jar;%LIB_DIR%/jackson-mapper-asl-1.4.3.jar;%LIB_DIR%/org.osgi.core-4.0.0.jar;%LIB_DIR%/org.restlet.ext.jackson-2.0.15.jar;%LIB_DIR%/opendj-server-2.4.4-SNAPSHOT.jar;%LIB_DIR%/mail.jar;%LIB_DIR%/je.jar;%LIB_DIR%/activation.jar;%LIB_DIR%/i18n-core-1.3.0-SNAPSHOT.jar;../config %DEBUG_OPT% org.forgerock.openam.amsessionstore.db.opendj.setup.SetupOpenDJ
 
