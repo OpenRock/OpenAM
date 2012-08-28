@@ -89,28 +89,25 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- OpenAM -->
-        <dependency>
-            <groupId>com.forgerock.openam</groupId>
-            <artifactId>amserver</artifactId>
-            <version>${openam.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+	
+	<dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-oauth2-restlet-extension</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        
+	<!-- OpenAM -->        
+	<dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.forgerock.openam</groupId>
-            <artifactId>sharedlib</artifactId>
-            <version>${openam.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.forgerock.openam</groupId>
-            <artifactId>clientsdk</artifactId>
-            <version>${openam.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
