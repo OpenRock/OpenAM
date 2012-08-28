@@ -51,6 +51,12 @@
             <param-name>org.restlet.application</param-name>
             <param-value>org.forgerock.openam.oauth2demo.OAuth2DemoApplication</param-value>
         </init-param>
+
+        <!-- List of supported client protocols (Optional - Only in mode 3) -->
+        <init-param>
+            <param-name>org.restlet.clients</param-name>
+            <param-value>HTTP RIAP CLAP FILE</param-value>
+        </init-param>
     </servlet>
 
     <!-- servlet declaration -->
