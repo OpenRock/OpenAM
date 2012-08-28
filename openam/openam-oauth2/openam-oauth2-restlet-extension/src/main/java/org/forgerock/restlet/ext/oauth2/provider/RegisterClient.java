@@ -90,6 +90,7 @@ public class RegisterClient extends ServerResource {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "A required request parameter was not sent");
         }
+        //TODO Need to sanitize the user input.
         Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
 
         Set<String> temp = new HashSet<String>();
