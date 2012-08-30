@@ -5748,9 +5748,9 @@ static void trim(char *a) {
 
 extern "C" AM_WEB_EXPORT am_status_t
 am_web_get_cookie_value(const char *separator, const char *cookie_name, const char *cookie_header_val, char **value) {
-    size_t value_len = 0;
+    size_t value_len = 0, ec = 0;
     am_status_t found = AM_NOT_FOUND;
-    char *a, *b, *header_val = NULL;
+    char *a, *b, *header_val = NULL, *c = NULL;
     if (cookie_name == NULL || cookie_name[0] == '\0') {
         return AM_INVALID_ARGUMENT;
     } else if (cookie_header_val == NULL || cookie_header_val[0] == '\0') {
@@ -5758,9 +5758,9 @@ am_web_get_cookie_value(const char *separator, const char *cookie_name, const ch
     } else *value = NULL;
     header_val = strdup(cookie_header_val);
     if (header_val) {
-        am_web_log_max_debug("am_web_get_cookie_value(): parsing cookie header: %s", cookie_header_val);
+        am_web_log_max_debug("am_web_get_cookie_value(%s) parsing cookie header: %s", separator, cookie_header_val);
         for ((a = strtok_r(header_val, separator, &b)); a; (a = strtok_r(NULL, separator, &b))) {
-            if (strcmp(separator, "=") == 0) {
+            if (strcmp(separator, "=") == 0 || strcmp(separator, "~") == 0) {
                 trim(a);
                 if (found != AM_SUCCESS && strcmp(a, cookie_name) == 0) found = AM_SUCCESS;
                 else if (found == AM_SUCCESS && a[0] != '\0') {
@@ -5773,7 +5773,16 @@ am_web_get_cookie_value(const char *separator, const char *cookie_name, const ch
                 }
             } else {
                 if (strstr(a, cookie_name) == NULL) continue;
-                if ((found = am_web_get_cookie_value("=", cookie_name, a, value)) == AM_SUCCESS) break;
+                for (ec = 0, c = a; *c != '\0'; ++c) {
+                    if (*c == '=') ++ec;
+                }
+                if (ec > 1) {
+                    c = strchr(a, '=');
+                    *c = '~';
+                    if ((found = am_web_get_cookie_value("~", cookie_name, a, value)) == AM_SUCCESS) break;
+                } else {
+                    if ((found = am_web_get_cookie_value("=", cookie_name, a, value)) == AM_SUCCESS) break;
+                }
             }
         }
         free(header_val);
