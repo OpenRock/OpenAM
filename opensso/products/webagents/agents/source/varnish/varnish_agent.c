@@ -29,6 +29,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 #include <vrt.h>
 #include <bin/varnishd/cache.h>
@@ -546,7 +547,9 @@ void vmod_init(struct sess* s, const char *agent_bootstrap_file, const char *age
             s_module_storage = apr_hash_make(s_module_pool);
             if (s_module_storage != NULL) {
                 pthread_mutex_lock(&init_mutex);
-                if (am_web_init(agent_bootstrap_file, agent_config_file) != AM_SUCCESS) {
+                if (agent_bootstrap_file == NULL || agent_config_file == NULL ||
+                        access(agent_bootstrap_file, R_OK) != 0 || access(agent_config_file, R_OK) != 0 ||
+                        am_web_init(agent_bootstrap_file, agent_config_file) != AM_SUCCESS) {
                     agentBootInitialized = B_FALSE;
                 } else {
                     agentBootInitialized = B_TRUE;
