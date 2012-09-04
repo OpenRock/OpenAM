@@ -24,16 +24,14 @@
 
 package org.forgerock.openam.oauth2.model.impl;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.SessionClient;
 import org.forgerock.openam.oauth2.model.Token;
+import org.restlet.Request;
 
 /**
  * Implements a Token
@@ -116,7 +114,9 @@ public abstract class TokenImpl extends JsonValue implements Token {
      *            The UserID of the token
      */
     public void setUserID(String userID) {
-        this.put(OAuth2.Params.USERNAME, userID);
+        Set<String> s = new HashSet<String>();
+        s.add(userID);
+        this.put(OAuth2.Params.USERNAME, s);
     }
 
     /**
@@ -126,7 +126,9 @@ public abstract class TokenImpl extends JsonValue implements Token {
      *            The realm of the token
      */
     public void setRealm(String realm) {
-        this.put(OAuth2.Params.REALM, realm == null ? "/" : new String(realm));
+        Set<String> s = new HashSet<String>();
+        s.add(realm == null ? "/" : new String(realm));
+        this.put(OAuth2.Params.REALM, s);
     }
 
     /**
@@ -137,8 +139,12 @@ public abstract class TokenImpl extends JsonValue implements Token {
      */
     public void setClient(SessionClient client) {
         if (client != null) {
-            this.put(OAuth2.Params.CLIENT_ID, client.getClientId());
-            this.put(OAuth2.Params.REDIRECT_URI, client.getRedirectUri());
+            Set<String> s = new HashSet<String>();
+            s.add(client.getClientId());
+            this.put(OAuth2.Params.CLIENT_ID, s);
+            s = new HashSet<String>();
+            s.add(client.getRedirectUri());
+            this.put(OAuth2.Params.REDIRECT_URI, s);
         }
     }
 
@@ -162,7 +168,9 @@ public abstract class TokenImpl extends JsonValue implements Token {
      *            The epoch in milliseconds when this token will expire
      */
     public void setAbsoluteExpiryTime(long expiryTime) {
-        this.put(OAuth2.StoredToken.EXPIRY_TIME, expiryTime);
+        Set<String> s = new HashSet<String>();
+        s.add(String.valueOf(expiryTime));
+        this.put(OAuth2.StoredToken.EXPIRY_TIME, s);
     }
 
     @Override
@@ -172,18 +180,37 @@ public abstract class TokenImpl extends JsonValue implements Token {
 
     @Override
     public String getUserID() {
-        return this.get(OAuth2.Params.USERNAME).asString();
+        String username = null;
+        Set username_set = (Set) get(OAuth2.Params.USERNAME).getObject();
+        if (username_set != null){
+            username = username_set.iterator().next().toString();
+        }
+        return username;
     }
 
     @Override
     public String getRealm() {
-        return this.get(OAuth2.Params.REALM).asString();
+        String realm = null;
+        Set realm_set = (Set) get(OAuth2.Params.REALM).getObject();
+        if (realm_set != null){
+            realm = realm_set.iterator().next().toString();
+        }
+        return realm;
     }
 
     @Override
     public SessionClient getClient() {
-        return new SessionClientImpl(this.get(OAuth2.Params.CLIENT_ID).asString(), this.get(
-                OAuth2.Params.REDIRECT_URI).asString());
+        Set client_id_set = (Set) get(OAuth2.Params.CLIENT_ID).getObject();
+        Set redirect_uri_set = (Set) get(OAuth2.Params.REDIRECT_URI).getObject();
+        String client_id = null;
+        String redirect_url = null;
+        if (client_id_set != null){
+            client_id = (client_id_set).iterator().next().toString();
+        }
+        if (redirect_uri_set != null){
+            redirect_url = (redirect_uri_set).iterator().next().toString();
+        }
+        return new SessionClientImpl(client_id, redirect_url);
     }
 
     @Override
@@ -203,7 +230,12 @@ public abstract class TokenImpl extends JsonValue implements Token {
      * @return time of expiry expressed as milliseconds since the epoch.
      */
     public long getAbsoluteExpiryTime() {
-        return get(OAuth2.StoredToken.EXPIRY_TIME).required().asLong();
+        Set expiry_set = (Set) get(OAuth2.StoredToken.EXPIRY_TIME).getObject();
+        if (expiry_set != null){
+            return Long.parseLong(expiry_set.iterator().next().toString());
+        }
+        throw OAuthProblemException.OAuthError.INVALID_TOKEN.handle(Request.getCurrent(),
+                "Token has no expire time. Invalid Token");
     }
 
     @Override
@@ -217,7 +249,12 @@ public abstract class TokenImpl extends JsonValue implements Token {
      * @return the OAuth2 token type.
      */
     public String getType() {
-        return this.get(OAuth2.Params.TOKEN_TYPE).asString();
+        String token_type = null;
+        Set token_type_set = (Set) get(OAuth2.Params.TOKEN_TYPE).getObject();
+        if (token_type_set != null){
+            token_type = token_type_set.iterator().next().toString();
+        }
+        return token_type;
     }
 
 }

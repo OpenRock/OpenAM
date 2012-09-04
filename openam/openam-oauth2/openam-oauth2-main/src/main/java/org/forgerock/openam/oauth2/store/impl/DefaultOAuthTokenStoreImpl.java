@@ -25,6 +25,7 @@
 package org.forgerock.openam.oauth2.store.impl;
 
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import org.forgerock.json.resource.JsonResourceContext;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.JMQTokenRepo;
+import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;
 import org.forgerock.openam.oauth2.model.impl.RefreshTokenImpl;
@@ -76,7 +78,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     public DefaultOAuthTokenStoreImpl() {
         try {
-            repository = new CoreTokenService(new JMQTokenRepo());
+            repository = new CoreTokenService(new OpenDJTokenRepo());
         } catch (Exception e) {
             // TODO: legacy code throws Exception, look to refactor
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),

@@ -24,6 +24,7 @@
 
 package org.forgerock.openam.oauth2.model.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
@@ -101,19 +102,28 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
      *            ID of the parent token
      */
     public void setParentToken(String parent) {
-        this.put(OAuth2.StoredToken.PARENT, parent);
+        Set<String> s = new HashSet<String>();
+        s.add(parent);
+        this.put(OAuth2.StoredToken.PARENT, s);
     }
 
     @Override
     public String getParentToken() {
-        return this.get(OAuth2.StoredToken.PARENT).asString();
+        String parent = null;
+        Set parent_set = (Set) get(OAuth2.StoredToken.PARENT).getObject();
+        if (parent_set != null){
+            parent = parent_set.iterator().next().toString();
+        }
+        return parent;
     }
 
     /**
      * Set the token type
      */
     protected void setType() {
-        this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.REFRESH_TOKEN);
+        Set<String> s = new HashSet<String>();
+        s.add(OAuth2.Params.REFRESH_TOKEN);
+        this.put(OAuth2.StoredToken.TYPE, s);
     }
 
 }

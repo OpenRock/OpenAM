@@ -206,7 +206,6 @@ public class ValidationServerResource extends ServerResource implements
         } catch (OAuthProblemException e) {
             throw e;
         } catch (ResourceException e) {
-            // TODO fetch the exception
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(null, e.getMessage());
         }
     }

@@ -24,12 +24,15 @@
 
 package org.forgerock.openam.oauth2.model.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AuthorizationCode;
 import org.forgerock.openam.oauth2.model.SessionClient;
+import org.restlet.Request;
 
 /**
  * Implements an Authorization Code Token
@@ -82,7 +85,9 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
      */
     @Override
     public void setIssued(boolean issued) {
-        this.put(OAuth2.StoredToken.ISSUED, issued);
+        Set<String> s = new HashSet<String>();
+        s.add(String.valueOf(issued));
+        this.put(OAuth2.StoredToken.ISSUED, s);
     }
 
     /**
@@ -92,14 +97,21 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
      */
     @Override
     public boolean isTokenIssued() {
-        return this.get(OAuth2.StoredToken.ISSUED).asBoolean();
+        Set issued_set = (Set) get(OAuth2.StoredToken.ISSUED).getObject();
+        if (issued_set != null){
+            return Boolean.parseBoolean(issued_set.iterator().next().toString());
+        }
+        throw OAuthProblemException.OAuthError.INVALID_TOKEN.handle(Request.getCurrent(),
+                "Access Code has no issued state. Invalid Token");
     }
 
     /**
      * Set the type of the token
      */
     protected void setType() {
-        this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.CODE);
+        Set<String> s = new HashSet<String>();
+        s.add(String.valueOf(OAuth2.Params.CODE));
+        this.put(OAuth2.StoredToken.TYPE, s);
     }
 
 }

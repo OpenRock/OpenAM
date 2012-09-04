@@ -25,6 +25,7 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,12 +100,19 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
      *            The parent token
      */
     public void setParentToken(String parent) {
-        this.put(OAuth2.StoredToken.PARENT, parent);
+        Set<String> s = new HashSet<String>();
+        s.add(parent);
+        this.put(OAuth2.StoredToken.PARENT, s);
     }
 
     @Override
     public String getParentToken() {
-        return this.get(OAuth2.StoredToken.PARENT).asString();
+        String parent = null;
+        Set parent_set = (Set) get(OAuth2.StoredToken.PARENT).getObject();
+        if (parent_set != null){
+            parent = parent_set.iterator().next().toString();
+        }
+        return parent;
     }
 
     @Override
@@ -126,7 +134,9 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
      * Sets the type of the token
      */
     protected void setType() {
-        this.put(OAuth2.StoredToken.TYPE, OAuth2.Params.ACCESS_TOKEN);
+        Set<String> s = new HashSet<String>();
+        s.add(OAuth2.Params.ACCESS_TOKEN);
+        this.put(OAuth2.StoredToken.TYPE, s);
     }
 
 }

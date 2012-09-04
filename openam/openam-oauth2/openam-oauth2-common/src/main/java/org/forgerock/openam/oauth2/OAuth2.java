@@ -88,6 +88,8 @@ public class OAuth2 {
          */
         public static final String CLIENT_ID = "client_id";
 
+        public static final String ID = "id";
+
         /**
          * Parameter usage location: token request
          */
