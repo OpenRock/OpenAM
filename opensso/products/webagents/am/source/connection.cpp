@@ -202,7 +202,6 @@ am_status_t Connection::initialize_in_child_process(const Properties& properties
 
     SSL_InheritMPServerSIDCache(NULL);
     
-#if NSS_VMAJOR >= 3 && NSS_VMINOR >= 12 && NSS_VPATCH >= 9
     if (SECFailure == (secStatus = SECMOD_RestartModules(PR_FALSE))) {
         errcode = PORT_GetError();
         if (errcode != SEC_ERROR_NOT_INITIALIZED) {
@@ -212,7 +211,6 @@ am_status_t Connection::initialize_in_child_process(const Properties& properties
             status = AM_NSPR_ERROR;
         }
     }
-#endif
 
     std::string certDir = properties.get(AM_COMMON_SSL_CERT_DIR_PROPERTY, "");
     std::string dbPrefix = properties.get(AM_COMMON_CERT_DB_PREFIX_PROPERTY, "");
@@ -244,6 +242,17 @@ am_status_t Connection::initialize_in_child_process(const Properties& properties
     if (SECSuccess == secStatus) {
         secStatus = NSS_SetDomesticPolicy();
     }
+    
+    if (SECSuccess == secStatus) {
+        PK11_SetPasswordFunc(getPasswordFromArg);
+    }
+    if (secStatus != SECSuccess) {
+        Log::log(Log::ALL_MODULES, Log::LOG_ERROR,
+                "Connection::initialize_in_child_process() unable to initialize SSL "
+                "libraries: %d", PR_GetError());
+        status = AM_NSPR_ERROR;
+    }
+    
     return status;
 }
 

@@ -128,10 +128,10 @@ endif
 
 ifeq ($(OS_ARCH), SunOS)
 LDFLAGS += -L$(DEST_LIB_DIR)
-LDLIBS += $(LD_SHARED_FLAG) $(CXX_STD_LIBS) -lc -lm
-endif
-
+LDLIBS += $(LD_SHARED_FLAG) $(CXX_STD_LIBS) -lamsdk
+else
 LDLIBS += -Bstatic -lamsdk
+endif
 
 $(APACHE2_LIB_NAME).o: apache_agent.c
 	$(COMPILE.c) $(APACHE2_CFLAGS) $< $(OUTPUT_OPTION)

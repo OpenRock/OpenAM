@@ -156,6 +156,8 @@ static void init_dsame(server_rec *server_ptr, pool *pool_ptr)
 {
     void *lib_handle;
     int  requestResult = HTTP_FORBIDDEN;
+    void *data;
+    const char *data_key = "init_dsame";
 #if defined(APACHE2)
     int ret = OK;
 #endif
@@ -167,6 +169,12 @@ static void init_dsame(server_rec *server_ptr, pool *pool_ptr)
     LoadLibrary("libamapc2.dll");
 #endif
 #endif
+    
+    apr_pool_userdata_get(&data, data_key, server_ptr->process->pool);
+    if (!data) {
+        apr_pool_userdata_set((const void *) 1, data_key, apr_pool_cleanup_null, server_ptr->process->pool);
+        return OK;
+    }
 
 #if defined(LINUX) && defined(APACHE2)
     lib_handle = dlopen("libamapc2.so", RTLD_LAZY);
