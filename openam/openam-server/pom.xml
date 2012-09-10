@@ -241,7 +241,16 @@
                             <targetPath></targetPath>
                             <filtering>false</filtering>
                         </webResource>
-
+                        <webResource>
+                            <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
+                            </directory>
+                            <includes>
+                                <!-- The xx-...ldif Files get moved into Place when installing OpenDJ. -->
+                                <include>99-oauth2attributes.ldif</include>
+                            </includes>
+                            <targetPath>WEB-INF/template/ldif/oauth2</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
                     </webResources>
                 </configuration>
 
@@ -499,6 +508,12 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth2-main</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-oauth2-rest</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 

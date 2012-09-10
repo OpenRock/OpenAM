@@ -1,0 +1,8 @@
+dn: dc=internal,dc=opensso,dc=java,dc=net
+objectClass: domain
+objectClass: top
+dc: internal
+
+dn: ou=oauth2tokens,dc=internal,dc=opensso,dc=java,dc=net
+ou: oauth2tokens
+objectClass: organizationalUnit
