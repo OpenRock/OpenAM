@@ -93,20 +93,23 @@
 
         <!-- OpenAM -->
         <dependency>
-            <groupId>com.forgerock.openam</groupId>
-            <artifactId>amserver</artifactId>
-            <version>${openam.version}</version>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.forgerock.openam</groupId>
-            <artifactId>sharedlib</artifactId>
-            <version>${openam.version}</version>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.forgerock.openam</groupId>
-            <artifactId>clientsdk</artifactId>
-            <version>${openam.version}</version>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-common</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-core</artifactId>
+        </dependency>
+
 
 
         <!-- Restlet -->

@@ -261,14 +261,21 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE);
         }
 
-        String filter = request.get("filter").required().asString();
+        Map<String, Object> filters = (Map<String, Object>)request.get("params").required().asMap().get("filter");
         Set<Map<String, Set<String>>> tokens = new HashSet<Map<String, Set<String>>>();
         try {
+            StringBuilder filter = new StringBuilder();
+            for(String key: filters.keySet()){
+                filter.append("(").append(key).append(Constants.EQUALS)
+                      .append(filters.get(key).toString()).append(")").append(" ").append("&").append(" ");
+            }
+            //remove last ampersand
+            filter.delete(filter.length()-3, filter.length());
             StringBuilder baseDN = new StringBuilder();
             baseDN.append(BASE_DN).append(Constants.COMMA).append(ROOT_DN);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                    0, 0, false, filter, returnAttrs);
+                    0, 0, false, filter.toString(), returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {

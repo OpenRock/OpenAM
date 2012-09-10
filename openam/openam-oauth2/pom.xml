@@ -45,6 +45,7 @@
         <module>openam-oauth2-main</module>
         <module>openam-oauth2-demo</module>
         <module>openam-oauth2-common</module>
+        <module>openam-oauth2-rest</module>
     </modules>
 
 
@@ -57,6 +58,8 @@
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
+        <commons.json-resource-servlet.version>2.0.0-SNAPSHOT</commons.json-resource-servlet.version>
+        <commons.json-resource-c.version>2.0.0-SNAPSHOT</commons.json-resource-c.version>
 	<openam.version>10.0.0</openam.version>
     </properties>
 
@@ -110,6 +113,21 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-patch</artifactId>
             <version>${commons.json-patch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource-servlet</artifactId>
+            <version>${commons.json-resource-servlet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource</artifactId>
+            <version>${commons.json-resource-c.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-fluent</artifactId>
+            <version>${commons.json-fluent.version}</version>
         </dependency>
         <!-- Restlet -->
         <dependency>
