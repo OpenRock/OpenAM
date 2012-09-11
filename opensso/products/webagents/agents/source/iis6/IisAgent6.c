@@ -2432,6 +2432,7 @@ void logPrimitive(CHAR *message)
 BOOL WINAPI TerminateExtension(DWORD dwFlags)
 {
     am_status_t status = am_web_cleanup();
+    status = am_shutdown_nss();
     DeleteCriticalSection(&initLock);
     return TRUE;
 }
@@ -2455,4 +2456,16 @@ char* string_case_insensitive_search(char *HTTPHeaders, char *KeY)
         }
     }
     return NULL;
+}
+
+BOOL WINAPI DllMain(IN HINSTANCE hinstDll, IN DWORD fdwReason, IN LPVOID lpvContext OPTIONAL) {
+    switch (fdwReason) {
+        case DLL_PROCESS_ATTACH:
+        {
+            DisableThreadLibraryCalls(hinstDll);
+            LoadLibrary("nspr4.dll");
+        }
+            break;
+    }
+    return TRUE;
 }

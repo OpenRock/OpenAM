@@ -118,7 +118,7 @@ ii6.obj : $(AM_IIS6_SRC)
 	$(CC) $(CFLAGS) $(DEP_INCPATH) /DXP_WIN32 /DWINNT /Iagents\source\iis6 /Foagents\source\iis6\ $(AM_IIS6_SRC)
 
 iis6i : ii6.obj
-	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /DEF:"agents\source\iis6\IisAgent6.def" \
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /EXPORT:GetExtensionVersion /EXPORT:HttpExtensionProc /EXPORT:TerminateExtension \
 		/PDB:"agents\source\iis6\amiis6.pdb" \
 		/DLL /OUT:"agents\source\iis6\amiis6.dll" agents\source\iis6\IisAgent6.obj $(DEP_LIBS) am\source\amsdk.lib advapi32.lib
 
