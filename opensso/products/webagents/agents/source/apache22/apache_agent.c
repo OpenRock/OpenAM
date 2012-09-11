@@ -1322,12 +1322,10 @@ static apr_status_t cleanup_dsame(void *data) {
 }
 
 static apr_status_t shutdownNSS(void *data) {
-#ifndef _MSC_VER
     am_status_t status = am_shutdown_nss();
     if (status != AM_SUCCESS) {
         am_web_log_error("shutdownNSS(): Failed to shutdown NSS.");
     }
-#endif
     return OK;
 }
 

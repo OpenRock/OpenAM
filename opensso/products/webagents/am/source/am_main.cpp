@@ -45,6 +45,7 @@
 #include "am_notify.h"
 #include "version.h"
 #include "mutex.h"
+#include <nss.h>
 
 
 using std::string;
@@ -151,7 +152,7 @@ void PRIVATE_NAMESPACE_NAME::base_init(const Properties &propertiesRef, boolean_
 extern "C"
 am_status_t am_shutdown_nss(void)
 {
-    am_status_t status = Connection::shutdown();
+    am_status_t status = NSS_IsInitialized() ? Connection::shutdown() : AM_SUCCESS;
     return status;
 }
 
@@ -192,6 +193,7 @@ am_status_t am_cleanup(void) {
     return status;
 }
 
+extern "C"
 void get_status_info(am_status_t status, const char ** name, const char ** msg)
 {
     switch (status) {
