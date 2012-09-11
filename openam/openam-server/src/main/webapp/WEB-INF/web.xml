@@ -1116,11 +1116,26 @@
         <url-pattern>/oauth2/*</url-pattern>
     </servlet-mapping>
 
+<<<<<<< .working
+
+=======
+    <servlet>
+    <servlet-name>FRRest</servlet-name>
+    <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+
+    <!-- Your application class name (Optional - For mode 3) -->
+    <init-param>
+        <param-name>connection-factory-class</param-name>
+        <param-value>org.forgerock.openam.forgerockrest.IdentityDispatcher</param-value>
+    </init-param>
+    </servlet>
     <servlet-mapping>
-        <servlet-name>OAuth2Rest</servlet-name>
-        <url-pattern>/rest/oauth2/*</url-pattern>
+        <servlet-name>FRRest</servlet-name>
+        <url-pattern>/jsonresource/*</url-pattern>
     </servlet-mapping>
 
+
+>>>>>>> .merge-right.r3194
     <mime-mapping>
         <extension>ico</extension>
         <mime-type>image/x-icon</mime-type>
