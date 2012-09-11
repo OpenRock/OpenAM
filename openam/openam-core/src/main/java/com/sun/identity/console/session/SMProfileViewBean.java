@@ -28,6 +28,7 @@
 
 package com.sun.identity.console.session;
 
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
@@ -35,14 +36,18 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
 import com.sun.identity.console.base.AMConsoleConfig;
+import com.sun.identity.console.base.AMViewConfig;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.components.view.html.SerializedField;
+import com.sun.identity.console.realm.HasEntitiesTabs;
 import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.web.ui.model.CCActionTableModel;
+import com.sun.web.ui.model.CCNavNodeInterface;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
@@ -52,6 +57,8 @@ import com.sun.web.ui.view.html.CCStaticTextField;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
+import com.sun.web.ui.view.tabs.CCTabs;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,7 +69,9 @@ import javax.servlet.http.HttpServletRequest;
 
 public class SMProfileViewBean
     extends SMViewBeanBase
+    implements HasEntitiesTabs
 {
+
     public static final String DEFAULT_DISPLAY_URL =
         "/console/session/SMProfile.jsp";
 
@@ -86,19 +95,18 @@ public class SMProfileViewBean
     private static final String TBL_DATA_MAX_IDLE_TIME = "tblDataMaxIdleTime";
     private static final String TBL_DATA_SESSION_ID = "sessionId";
 
-    private static final String PAGETITLE = "pgtitle";
     public static final String CHILD_SERVER_NAME_HREF = "serverNameHref";
     public static final String CHILD_SERVER_NAME_MENU = "serverNameMenu";
     private static final String LOGOUT_URL = "logoutUrl";
     private static final String SERVER_NAME = "SERVER_NAME";
 
-    private CCActionTableModel tblModel = null;
+    protected CCActionTableModel tblModel = null;
     private CCPageTitleModel ptModel;
     protected int curPage = 0;
     private boolean validSession = true;
 
     /**
-     * Creates a session view bean.
+     * Creates a default named session view bean.
      */
     public SMProfileViewBean() {
         super("SMProfile");
@@ -107,6 +115,19 @@ public class SMProfileViewBean
         ptModel = new CCPageTitleModel(
             getClass().getClassLoader().getResourceAsStream(
                 "com/sun/identity/console/simplePageTitle.xml"));
+        registerChildren();
+    }
+
+    /**
+     * Creates a session view bean by name.
+     */
+    public SMProfileViewBean(String name) {
+        super(name);
+        setDefaultDisplayURL(DEFAULT_DISPLAY_URL);
+        createTableModel();
+        ptModel = new CCPageTitleModel(
+                getClass().getClassLoader().getResourceAsStream(
+                        "com/sun/identity/console/simplePageTitle.xml"));
         registerChildren();
     }
 
@@ -149,7 +170,7 @@ public class SMProfileViewBean
         } else if (name.equals(CHILD_SERVER_NAME_HREF)) {
             view = new CCHref(this, name, null);
         } else {
-            view = super.createChild(name);
+                 view = super.createChild(name);
         }
 
         return view;
@@ -204,8 +225,45 @@ public class SMProfileViewBean
                 populateTableModel(Collections.EMPTY_LIST);
             }
             setPageSessionAttribute(SERVER_NAME, value);
+            // Set our Sub-Tabs
+            addSessionsTab(model,1);
+            // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
+            // Both the SFO is Enabled and Repository Type has been Specified for view of HA Tabs.
+            if ( (!SystemPropertiesManager.get(AMSessionRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
+                 (SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
+            {
+                removeSessionsTab();
+            }
         }
-    }   
+    }
+
+    // Assign the Session SubTabs
+    protected void addSessionsTab(SMProfileModel model, int selectedNode) {
+        AMViewConfig config = AMViewConfig.getInstance();
+        config.addSessionTabs(tabModel, model);
+        registerChild(TAB_COMMON, CCTabs.class);
+        tabModel.setSelectedNode(selectedNode);
+    }
+
+    // Remove all Session Tabs, since HA not available, disable associated Tabs.
+    protected void removeSessionsTab() {
+        if (tabModel != null) {
+            tabModel.clear();
+            // removeSessionsTab(551); Current Sessions, Leave!
+            removeSessionsTab(552);
+            removeSessionsTab(553);
+        }
+    }
+
+    private void removeSessionsTab(int tabNodeId) {
+            CCNavNodeInterface tabNode = tabModel.getNodeById(tabNodeId);
+            if (tabNode != null)
+            {
+                tabNode.setVisible(false);
+                tabNode.setAcceptsChildren(false);
+                tabNode.getParent().removeChild(tabNode);
+            }
+    }
 
     /**
      * Returns model for this view bean.
@@ -365,4 +423,6 @@ public class SMProfileViewBean
         }
         return display;
     }
+
+
 }

@@ -27,7 +27,7 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
 import org.forgerock.openam.ext.cts.model.TokenDataEntry;
 import org.forgerock.openam.oauth2.OAuth2;
-import org.forgerock.openam.session.ha.amsessionstore.db.opendj.EmbeddedSearchResultIterator;
+import org.forgerock.openam.session.ha.amsessionstore.store.opendj.EmbeddedSearchResultIterator;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
 import org.opends.server.protocols.internal.InternalClientConnection;

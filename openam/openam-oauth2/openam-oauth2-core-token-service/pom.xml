@@ -43,7 +43,13 @@
         
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-restlet-extension</artifactId>
+            <artifactId>openam-shared</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-oauth2-common</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
@@ -64,6 +70,10 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-patch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
             <artifactId>org.forgerock.json.resource</artifactId>
         </dependency>
         <dependency>
@@ -77,7 +87,6 @@
             <artifactId>openam-session-ha-common</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-core</artifactId>

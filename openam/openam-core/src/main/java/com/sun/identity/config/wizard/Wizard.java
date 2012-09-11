@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -42,9 +42,11 @@ import com.sun.identity.setup.SetupConstants;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+
+import com.sun.identity.shared.Constants;
 import org.apache.click.control.ActionLink;
 
-public class Wizard extends AjaxPage {
+public class Wizard extends AjaxPage implements Constants {
 
     public int startingTab = 1;
 
@@ -61,7 +63,10 @@ public class Wizard extends AjaxPage {
     
     public static String defaultUserName = "cn=Directory Manager";
     public static String defaultPassword = "";
-    public static String defaultRootSuffix = "dc=opensso,dc=java,dc=net";
+    public static String defaultRootSuffix = DEFAULT_ROOT_SUFFIX;
+    public static String defaultSessionRootDN = DEFAULT_SESSION_HA_ROOT_DN;
+    public static String defaultSessionStoreType = DEFAULT_SESSION_HA_STORE_TYPE;
+
     public String defaultPort = Integer.toString(
         AMSetupServlet.getUnusedPort(hostName, 50389, 1000));
     public String defaultAdminPort = Integer.toString(
@@ -165,6 +170,12 @@ public class Wizard extends AjaxPage {
 
         tmp = getAttribute("rootSuffix", defaultRootSuffix);
         request.addParameter(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, tmp);
+
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, defaultSessionRootDN);
+        request.addParameter(SetupConstants.CONFIG_VAR_SESSION_ROOT_DN, tmp);
+
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, defaultSessionStoreType);
+        request.addParameter(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, tmp);
        
         if (!isEmbedded) {
             tmp = getAttribute("configStoreHost", hostName);

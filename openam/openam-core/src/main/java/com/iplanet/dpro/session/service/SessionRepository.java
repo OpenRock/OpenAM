@@ -30,35 +30,43 @@ package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
 
+import java.lang.reflect.Method;
+
 /**
  * <code>SessionRepository</code> represents the session
  * repository , default repository 
- * is <code>JMQSessionRepository</code>
- * @see com.iplanet.dpro.session.JMQSessionRepository
+ * is <code>OpenDJPersistentStore</code>.
  */
 
 public class SessionRepository {
 
-    private static final String DEFAULT_REPOSITORY_CLASS = 
-        "com.iplanet.dpro.session.JMQSessionRepository";
-
-    private static final String REPOSITORY_CLASS_PROPERTY = 
-        "com.sun.am.session.SessionRepositoryImpl";
+    private static final String  OPENDJ_REPOSITORY_CLASS =
+            "org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore";
 
     private static final String REPOSITORY_CLASS = SystemProperties.get(
-            REPOSITORY_CLASS_PROPERTY, DEFAULT_REPOSITORY_CLASS);
+            AMSessionRepository.REPOSITORY_CLASS_PROPERTY, OPENDJ_REPOSITORY_CLASS);
 
     private static AMSessionRepository sessionRepository = null;
 
     /**
-     * @return the instance of AMSessionRepository
+     * Private, do not allow instantiation.
+     */
+    private SessionRepository() {
+    }
+
+    /**
+     * Common Get Instance method to obtain access to
+     * Service Methods.
+     *
+     * @return AMSessionRepository Singleton Instance.
      * @throws Exception
      */
     public static synchronized AMSessionRepository getInstance()
             throws Exception {
         if (sessionRepository == null) {
-            sessionRepository = (AMSessionRepository) Class.forName(
-                    REPOSITORY_CLASS).newInstance();
+            Class c = Class.forName(REPOSITORY_CLASS);
+            Method factoryMethod = c.getDeclaredMethod("getInstance");
+            sessionRepository  = (AMSessionRepository) factoryMethod.invoke(null, null);
         }
         return sessionRepository;
     }

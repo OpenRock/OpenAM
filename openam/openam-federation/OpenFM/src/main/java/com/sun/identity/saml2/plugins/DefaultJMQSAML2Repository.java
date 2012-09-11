@@ -29,11 +29,9 @@
 package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 
-import com.sun.identity.common.TaskRunnable;
 import com.iplanet.dpro.session.SessionException;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
@@ -45,14 +43,12 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.jms.IllegalStateException;
-import com.sun.identity.ha.FAMRecord;
+import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
-import com.sun.identity.ha.jmqdb.FAMRecordJMQPersister;
 import com.sun.identity.ha.FAMPersisterManager;
 import com.sun.identity.saml2.common.SAML2Utils;
 
@@ -238,7 +234,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
                 SAML2, FAMRecord.READ, samlKey, 0, null, 0, null, null);
            
             FAMRecord retRec = pSession.send(famRec);
-            byte[] blob = retRec.getBlob();  
+            byte[] blob = retRec.getSerializedInternalSessionBlob();
             Object retObj = SessionUtils.decode(blob);
             return retObj;
         } catch (IllegalStateException e) {
@@ -329,7 +325,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
 
     /**
      * Deletes expired SAML2 object from the repository
-     * @exception When Unable to delete the expired SAML2 object
+     * @exception Exception When Unable to delete the expired SAML2 object
      */
     public void deleteExpired()  {
         if (!isDatabaseUp) {

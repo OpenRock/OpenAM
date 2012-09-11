@@ -218,6 +218,11 @@ public interface AMAdminConstants {
     int SUBJECTS_NODE_ID = 17;
 
     /**
+     * Sessions Node Identifier.
+     */
+     int SESSIONS_NODE_ID = 5;
+
+    /**
      * Last tab visited before opening a profile object.
      */
     String PREVIOUS_ORGANIZATION = "PreviousOrganization";
@@ -356,6 +361,11 @@ public interface AMAdminConstants {
     String PLATFORM_SERVICE = "iPlanetAMPlatformService";
 
     /**
+     * Session Service.
+     */
+    String SESSION_SERVICE = "iPlanetAMSessionService";
+
+    /**
      * Read permission.
      */
     String PERMISSION_READ = "READ";
@@ -399,4 +409,5 @@ public interface AMAdminConstants {
      */
     String AGENT_REPOSITORY_LOCATION_ATTR =
             "com.sun.identity.agents.config.repository.location";
+
 }

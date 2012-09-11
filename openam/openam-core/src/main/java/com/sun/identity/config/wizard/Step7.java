@@ -66,6 +66,23 @@ public class Step7 extends AjaxPage {
             getLocalizedString("no.label"));
         tmp = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         add("rootSuffix", tmp);
+        tmp = getAttribute("sessionRootDN", Wizard.defaultSessionRootDN);
+        add("sessionRootDN", tmp);
+
+        // Provide Localized Setting for Session Failover Type.
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                Wizard.defaultSessionStoreType);
+        if (tmp.equalsIgnoreCase("None")) {
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                    getLocalizedString("session.store.type.none"));
+        } else if (tmp.equalsIgnoreCase("OpenDJ")) {
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                    getLocalizedString("session.store.type.opendj"));
+        } else {
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,tmp);
+        }
+
+        // Provide Port Settings
         tmp = getAttribute("configStorePort", getAvailablePort(50389));
         add("configStorePort", tmp);
         tmp = getAttribute("configStoreAdminPort", getAvailablePort(4444));
@@ -75,6 +92,7 @@ public class Step7 extends AjaxPage {
         tmp = getAttribute("configStoreLoginId", Wizard.defaultUserName);
         add("configStoreLoginId", tmp);
 
+        // Provide User Store Properties.
         tmp = getAttribute(SetupConstants.DS_EMB_REPL_FLAG, "");
         if (!tmp.equals(SetupConstants.DS_EMP_REPL_FLAG_VAL)) {
             // User Config Store Properties

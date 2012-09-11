@@ -43,7 +43,7 @@ import com.sun.identity.authentication.internal.AuthContext;
 import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.authentication.internal.server.SMSAuthModule;
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.common.DebugPropertiesObserver;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.shared.debug.Debug;
@@ -164,7 +164,7 @@ public class Bootstrap {
     /**
      * Returns System Property with an URL.
      *
-     * @param bootstrapInfo an URL that contains information on how to
+     * @param bootstrapData an URL that contains information on how to
      *        fetch the server configuration properties.
      * @param reinit <code>true</code> to re initialize the system.
      * @throws Exception if properties cannot be loaded.

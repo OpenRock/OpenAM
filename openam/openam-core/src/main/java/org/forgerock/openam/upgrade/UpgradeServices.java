@@ -51,15 +51,16 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchemaModifications;
-import java.io.BufferedReader;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,6 +73,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.forgerock.openam.upgrade.helpers.AuthenticationModuleServiceResourceResolutionHelper;
 import org.w3c.dom.Document;
 
 /**
@@ -339,7 +342,8 @@ public class UpgradeServices {
             String strXML = null;
             
             try {
-                strXML = getResourceContent(serviceFileName);
+                strXML =
+                AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(),serviceFileName);
             } catch (IOException ioe) {
                 debug.error("unable to load services file: " + serviceFileName, ioe);
                 throw new UpgradeException(ioe);
@@ -348,6 +352,12 @@ public class UpgradeServices {
             // This string 'content' is to avoid plain text password
             // in the files copied to the config/xml directory.
             String content = strXML;
+            if ( (strXML == null) || (strXML.length() <= 0) )
+            {
+                String errorMessage = "Unable to load services file: " + serviceFileName;
+                debug.error(errorMessage);
+                throw new UpgradeException(errorMessage);
+            }
             
             if (tagswap) {
                 content = StringUtils.strReplaceAll(content,
@@ -555,33 +565,8 @@ public class UpgradeServices {
         return doc;
     }
     
-    protected String getResourceContent(String resName) 
-    throws IOException {
-        BufferedReader rawReader = null;
-        String content = null;
 
-        try {
-            rawReader = new BufferedReader(new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(resName)));
-            StringBuilder buff = new StringBuilder();
-            String line = null;
 
-            while ((line = rawReader.readLine()) != null) {
-                buff.append(line).append("\n");
-            }
-
-            rawReader.close();
-            rawReader = null;
-            content = buff.toString();
-        } finally {
-            if (rawReader != null) {
-                rawReader.close();
-            }
-        }
-        
-        return content;
-    }
-    
     private String generateBackupPassword() {
         PasswordGenerator passwordGenerator = new RandomPasswordGenerator();
         String password = null;

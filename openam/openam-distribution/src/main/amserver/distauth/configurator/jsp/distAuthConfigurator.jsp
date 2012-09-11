@@ -27,7 +27,8 @@
 --%>
 
 <%--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 <html>
 <head>
@@ -216,7 +217,7 @@ java.util.Properties"
 <h3>Configuring DistAuth Application</h3>
 
 <form action="distAuthConfigurator.jsp" method="POST">
-    Please provide the OpenSSO Server Information.
+    Please provide the OpenAM Server Information.
     <p>&nbsp;</p>    
 
     <table border=0 cellpadding=5 cellspacing=0>
@@ -226,7 +227,7 @@ java.util.Properties"
 %>
     <tr>
     <td colspan="2" align="left">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>

@@ -109,12 +109,38 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock</groupId>
+                                    <artifactId>openam-jaxrpc-schema</artifactId>
+                                    <version>10.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+                                    <includes>jaxrpc/IdentityManagementServices.wsdl</includes>
+                                </artifactItem>
+                            </artifactItems>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>
-                        WEB-INF/lib/j2ee-2007-18-10.jar,
-                        WEB-INF/lib/el-api-2.2.jar,
-                        WEB-INF/lib/servlet-api.jar,
+                        WEB-INF/lib/ant-contrib-1.0b3.jar,
                         WEB-INF/lib/jersey-core-1.1.5.2.jar,
                         WEB-INF/lib/jaxb-api-1.0.6.jar,
                         WEB-INF/lib/jaxb-impl-1.0.6.jar,
@@ -139,6 +165,36 @@
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
                     </archive>
+                    <nonFilteredFileExtensions>
+                        <!-- Exclude any binary files based upon File Types. -->
+                        <nonFilteredFileExtension>bin</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bkf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bmp</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bz2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>deb</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dmg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ear</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>lz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rpm</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
+                    </nonFilteredFileExtensions>
                     <webResources>
                         <webResource>
                             <directory>${basedir}/src/main/webapp</directory>
@@ -211,8 +267,9 @@
                             <targetPath>WEB-INF/wsdl</targetPath>
                             <filtering>false</filtering>
                         </webResource>
+
                         <webResource>
-                            <directory>${project.basedir}/../openam-schema/openam-jaxrpc-schema/target/classes/jaxrpc
+                            <directory>${project.build.directory}/unpacked/jaxrpc
                             </directory>
                             <includes>
                                 <include>IdentityManagementServices.wsdl</include>
@@ -220,6 +277,7 @@
                             <targetPath>WEB-INF/wsdl</targetPath>
                             <filtering>true</filtering>
                         </webResource>
+
                         <webResource>
                             <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
                             </directory>
@@ -242,6 +300,17 @@
                             <filtering>false</filtering>
                         </webResource>
                         <webResource>
+                            <directory>${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif
+                            </directory>
+                            <includes>
+                                <!-- The xx-...ldif Files get moved into Place when installing OpenDJ. -->
+                                <include>98-amsessiondb.ldif</include>
+                            </includes>
+                            <targetPath>WEB-INF/template/ldif/sfha</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+
+                        <webResource>
                             <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
                             </directory>
                             <includes>
@@ -251,6 +320,7 @@
                             <targetPath>WEB-INF/template/ldif/oauth2</targetPath>
                             <filtering>false</filtering>
                         </webResource>
+
                     </webResources>
                 </configuration>
 
@@ -268,7 +338,7 @@
 
         <resources>
             <resource>
-                <filtering>false</filtering>
+                <filtering>true</filtering>
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*</include>
@@ -290,7 +360,7 @@
 
         <testResources>
             <testResource>
-                <filtering>false</filtering>
+                <filtering>true</filtering>
                 <directory>src/test/resources</directory>
                 <includes>
                     <include>**/*</include>
@@ -354,19 +424,19 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
+            <artifactId>openam-jaxrpc-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-saml2-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-ldap</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-mq</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
@@ -463,6 +533,12 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
+            <artifactId>openam-auth-oauth2</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
             <artifactId>openam-auth-radius</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
@@ -485,8 +561,7 @@
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
-		<!-- Oauth2 dependencies -->
-
+        <!-- Oauth2 dependencies -->
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
@@ -521,6 +596,24 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.19</version>
+        </dependency>
+        <!-- XML -->
+        <!-- Xerces-J Required for fedlet -->
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
         </dependency>
 
     </dependencies>

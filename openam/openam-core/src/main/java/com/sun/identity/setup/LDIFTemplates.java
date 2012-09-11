@@ -53,18 +53,19 @@ public class LDIFTemplates {
 	    templates.add("opendj/opendj_user_schema.ldif");
 	    templates.add("opendj/opendj_embinit.ldif");
 	    templates.add("opendj/opendj_userinit.ldif");
-        templates.add("opendj/opendj_user_index.ldif");
-        templates.add("opendj/opendj_plugin.ldif");
-        templates.add("opendj/opendj_remove_user_schema.ldif");
-        templates.add("sunds/sunds_config_schema.ldif");
-        templates.add("sunds/sunds_config_index.ldif");
-        templates.add("sunds/sunds_user_index.ldif");
-        templates.add("sunds/sunds_user_schema.ldif");
-        templates.add("sunds/sunds_plugin.ldif");
-        templates.add("sunds/sunds_userinit.ldif");
-        templates.add("sunds/amsdk_plugin/amsdk_init_template.ldif");
-        templates.add("sunds/amsdk_plugin/amsdk_sunone_schema2.ldif");
-        templates.add("tivoli/tivoli_user_schema.ldif");
+	    templates.add("opendj/opendj_user_index.ldif");
+	    templates.add("opendj/opendj_plugin.ldif");
+	    templates.add("opendj/opendj_remove_user_schema.ldif");
+	    templates.add("sunds/sunds_config_schema.ldif");
+	    templates.add("sunds/sunds_config_index.ldif");
+	    templates.add("sunds/sunds_user_index.ldif");
+	    templates.add("sunds/sunds_user_schema.ldif");
+	    templates.add("sunds/sunds_plugin.ldif");
+	    templates.add("sunds/sunds_userinit.ldif");
+	    templates.add("sunds/amsdk_plugin/amsdk_init_template.ldif");
+	    templates.add("sunds/amsdk_plugin/amsdk_sunone_schema2.ldif");
+	    templates.add("tivoli/tivoli_user_schema.ldif");
+        templates.add("sfha/amsessiondb_container.ldif");
         templates.add("oauth2/oauth2_container.ldif");
     }
 

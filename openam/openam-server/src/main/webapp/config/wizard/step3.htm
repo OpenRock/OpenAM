@@ -9,6 +9,9 @@
     function configStoreBaseDNValidated( response ) {
         storeBaseDNValidated('$type', response );
     }
+    function configStoreSessionDNValidated( response ) {
+        storeSessionDNValidated('$type', response );
+    }
     function configStoreLoginIdValidated( response ) {
         storeLoginIdValidated( '$type', response );
     }
@@ -116,9 +119,30 @@
     function validateRootSuffix() {
         $('nextTabButton').disabled = true;
         ie7fix++;
-	field = "rootSuffix";
+	    field = "rootSuffix";
         var callUrl = "$context$path?actionLink=validateRootSuffix&ie7fix=" +
             ie7fix + "&rootSuffix=" +  escape($(field).value);
+        setTimeout("enableNextButton()", 500);
+        AjaxUtils.call(callUrl, fieldValidated);
+    }
+
+    function setSessionStoreType() {
+        $('nextTabButton').disabled = true;
+        field = "sessionStoreType";
+        var call = "$context$path?actionLink=setSessionStoreType";
+        var sessionStoreTypeVal = "&sessionStoreType=" + escape($(field).value);
+        ie7fix++;
+        call = call + "&ie7fix=" + ie7fix;
+        setTimeout("enableNextButton()", 500);
+        AjaxUtils.call(call+sessionStoreTypeVal, fieldValidated);
+    }
+
+    function validateSessionRootDN() {
+        $('nextTabButton').disabled = true;
+        ie7fix++;
+        field = "sessionRootDN";
+        var callUrl = "$context$path?actionLink=validateSessionRootDN&ie7fix=" +
+                ie7fix + "&sessionRootDN=" +  escape($(field).value);
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, fieldValidated);
     }
@@ -128,7 +152,7 @@
         var image = okImage;   
 
         if (resp.code == "100") {
-            // url was a valid OpenSSO server
+            // url was a valid OpenAM server
             validServerURL = true;  
 
             document.getElementById("existingPort").disabled = true;
@@ -286,7 +310,7 @@
         } else {
             document.getElementById("configStoreSSL").disabled = false;
             document.getElementById("configStoreHost").disabled = false;
-	    remoteDSHost = document.getElementById("configStoreHost").value;
+	        remoteDSHost = document.getElementById("configStoreHost").value;
             document.getElementById("configStoreHost").value = remoteDSHost;
             document.getElementById("adminport").style.display = "none";
             document.getElementById("jmxport").style.display = "none";
@@ -329,11 +353,14 @@
                 !isFieldOK('configStoreAdminPort') ||
                 !isFieldOK('configStoreJmxPort') ||
                 !isEncryptionKeyOk() ||
-                !isFieldOK('rootSuffix');
+                !isFieldOK('rootSuffix') ||
+                !isFieldOK('sessionRootDN') ||
+                !isFieldOK('sessionStoreType');
         } else {
             var allFieldsValid = isFieldOK('configStoreHost') &&
                 isFieldOK('configStorePort') && isEncryptionKeyOk() &&
-                isFieldOK('rootSuffix') && isFieldOK('configStoreLoginId') &&
+                isFieldOK('rootSuffix') && isFieldOK('sessionRootDN') && isFieldOK('sessionStoreType') &&
+                isFieldOK('configStoreLoginId') &&
                 isFieldOK('configStorePassword') &&
                 (document.getElementById('configStorePassword').value != '');
             if (allFieldsValid) {
@@ -395,7 +422,7 @@
         <div class="headerBox">
             $page.getLocalizedString("step3.sub.title")
         </div>
-        <div class="bodyBox" style="height:290px;">	
+        <div class="bodyBox" style="height:340px;">
              <span>  
              <!-- New Instances -->
              <div id="newInstanceOptions">            
@@ -418,7 +445,7 @@
                 </table>
             
                 <!-- Embedded Store -->
-                <table class="temp">                    
+                <table class="temp">
                     <tr id="ssl">
                         <td><label for="configStoreSSL"><em>*&nbsp;</em>
                             $page.getLocalizedString("ssl.label")</label></td>
@@ -441,7 +468,7 @@
                         </td>
                     </tr>  
                     <tr>
-			<td><label for="configStorePort"><em>*&nbsp;</em>
+			            <td><label for="configStorePort"><em>*&nbsp;</em>
                             $page.getLocalizedString("port.label")</label></td>
                         <td>
                             <input id="configStorePort" name="configStorePort" 
@@ -452,7 +479,7 @@
                             <span id="configStorePortStatus"></span></td>
                     </tr>
                     <tr id="adminport">
-			<td><label for="configStoreAdminPort"><em>*&nbsp;</em>
+			            <td><label for="configStoreAdminPort"><em>*&nbsp;</em>
                             $page.getLocalizedString("admin.port.label")</label></td>
                         <td>
                             <input id="configStoreAdminPort" name="configStoreAdminPort"
@@ -463,7 +490,7 @@
                             <span id="configStoreAdminPortStatus"></span></td>
                     </tr>
                     <tr id="jmxport">
-			<td><label for="configStoreJmxPort"><em>*&nbsp;</em>
+			            <td><label for="configStoreJmxPort"><em>*&nbsp;</em>
                             $page.getLocalizedString("jmx.port.label")</label></td>
                         <td>
                             <input id="configStoreJmxPort" name="configStoreJmxPort"
@@ -496,7 +523,34 @@
                             <span id="rootSuffixStatus"></span>                       
                         </td>
                     </tr>
-
+                    <!-- TODO Refactor this Field, to a simple CheckBox/Radio Button for Yes or No. -->
+                    <tr>
+                        <td><label for="sessionStoreType"><em>&nbsp;&nbsp;</em>
+                            $page.getLocalizedString("session.store.type.label")</label></td>
+                        <td>
+                            <select name="sessionStoreType" id="sessionStoreType" size="1"
+                                    onkeyup="APP.callDelayed(this, setSessionStoreType)"
+                                    onchange="APP.callDelayed(this, setSessionStoreType)">
+                                <option value="NONE">$page.getLocalizedString("session.store.type.none")</option>
+                                <option value="OpenDJ">$page.getLocalizedString("session.store.type.opendj")</option>
+                                <option value="PlugIn">$page.getLocalizedString("session.store.type.plugin")</option>
+                            </select>
+                            <span id="sessionStoreTypeStatus"></span>
+                        </td>
+                    </tr>
+                    <!-- TODO Pull this Field, as it will be Dynamically Generated -->
+                    <tr>
+                        <td><label for="sessionRootDN"><em>&nbsp;&nbsp;</em>
+                            $page.getLocalizedString("session.root.dn.label")</label></td>
+                        <td>
+                            <input id="sessionRootDN" name="sessionRootDN"
+                                   type="text" class="text" style="width:240px"
+                                   value="$sessionRootDN"
+                                   onkeyup="APP.callDelayed(this, validateSessionRootDN)"
+                                   onchange="APP.callDelayed(this, validateSessionRootDN)"/>
+                            <span id="sessionRootDNStatus"></span>
+                        </td>
+                    </tr>
                     <tr id="login">
                         <td><label for="configStoreLoginId"><em>*&nbsp;</em>
                             $page.getLocalizedString("login.id.label")</label></td>
@@ -653,7 +707,8 @@
                                    onchange="APP.callDelayed(this, validatePort)"/>
                             <span id="existingStorePortStatus"></span>
                         </td>
-                    </tr>                
+                    </tr>
+
                 </table>     
             </div>                
             </span>

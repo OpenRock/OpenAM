@@ -21,7 +21,7 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.ha.FAMPersisterManager;
-import com.sun.identity.ha.FAMRecord;
+import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
@@ -236,9 +236,9 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
             if (null == retRec) {
                 throw new JsonResourceException(JsonResourceException.NOT_FOUND, "Object not found with id: " + primaryKey);
             }
-            byte[] blob = retRec.getBlob();
+            byte[] blob = retRec.getSerializedInternalSessionBlob();
             Object retObj = SessionUtils.decode(blob);
-            Map tokenObj = (Map) retObj; // TODO: check cast
+            Map tokenObj = (Map) retObj; // TODO: check cast  // Jeff: This is InternalSession or Binary Data !
 
             JsonValue retValue = new JsonValue(tokenObj);
             retValue.put("_id", primaryKey);

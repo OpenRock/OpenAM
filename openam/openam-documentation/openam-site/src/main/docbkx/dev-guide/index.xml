@@ -49,7 +49,7 @@
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
-  <pubdate>Last updated: <?dbtimestamp format="B d, Y"?></pubdate>
+  <pubdate>Publication date: <?dbtimestamp format="B d, Y"?></pubdate>
  </info>
 
  <toc />
@@ -76,6 +76,7 @@
  <xinclude:include href='chap-samlv2.xml' />
  <xinclude:include href='chap-ws-federation.xml' />
   -->
+ <xinclude:include href="chap-sae.xml" />
  <!-- Nothing to do but configure an OAuth auth module per client
  <xinclude:include href='chap-oauth.xml' />
  -->

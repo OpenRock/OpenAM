@@ -1,7 +1,7 @@
 <%--
    DO  NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-   Copyright © 2011-2012 ForgeRock Inc. All rights reserved.
+   Copyright ï¿½ 2011-2012 ForgeRock Inc. All rights reserved.
   
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -152,7 +152,7 @@
                     <p>Copyright &copy; 2010 ForgeRock AS,<br />Philip Pedersens vei 1,<br />1366 Lysaker,<br />Norway.<br />All rights reserved.</p>
                 </div>
                 <div class="grid_6 suffix_3">
-                    <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
+                    <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenAM/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
                 </div>
             </div>
         </div>

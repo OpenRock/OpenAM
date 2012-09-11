@@ -25,6 +25,10 @@
    $Id: configure.jsp,v 1.8 2009/07/22 00:39:12 sean_brydon Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <html>
 <head>
@@ -260,7 +264,7 @@
 <form action="configure.jsp" method="GET">
     This sample will create and load metadata for a hosted Identity Provider and a remote Service Provider, it will also setup circle of trust for the two providers.
     <p>&nbsp;</p>    
-    Please provide the remote Service Provider (must also be an OpenSSO instance) information: <p>
+    Please provide the remote Service Provider (must also be an OpenAM instance) information: <p>
 
     <table border=0 cellpadding=5 cellspacing=0>
 
@@ -269,7 +273,7 @@
 %>
     <tr>
     <td colspan="2" align="center">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>

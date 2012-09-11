@@ -36,14 +36,18 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,6 +66,9 @@ import javax.servlet.http.HttpServletRequest;
 public class SMProfileModelImpl extends AMModelBase
     implements SMProfileModel
 {
+    private static SSOToken adminSSOToken =
+            (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+
     private final static String SERVER_LIST = 
         "iplanet-am-platform-server-list";
 
@@ -91,7 +98,6 @@ public class SMProfileModelImpl extends AMModelBase
     public void setProfileServerName(String value) {
         serverName = value;
     }
-
 
     /**
      * Initializes sessions list.
@@ -392,4 +398,5 @@ public class SMProfileModelImpl extends AMModelBase
         }
         return map;
     }
+
 }

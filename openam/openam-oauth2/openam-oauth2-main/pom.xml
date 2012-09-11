@@ -107,13 +107,16 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-rest</artifactId>
+            <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-common</artifactId>
+            <artifactId>openam-coretoken</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-rest</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-core</artifactId>
@@ -130,6 +133,10 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.easytesting</groupId>
@@ -143,7 +150,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
-	
+
     </dependencies>
     <profiles>
         <profile>

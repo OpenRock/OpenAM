@@ -299,16 +299,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.el</groupId>
-            <artifactId>el-ri</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>external</groupId>
             <artifactId>esapiport</artifactId>
         </dependency>
@@ -316,16 +306,6 @@
         <dependency>
             <groupId>org.kohsuke</groupId>
             <artifactId>geoip</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.gmbal</groupId>
-            <artifactId>gmbal-api-only</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
-            <artifactId>grizzly-framework</artifactId>
         </dependency>
 
         <dependency>
@@ -414,6 +394,16 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
@@ -421,11 +411,6 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.external</groupId>
-            <artifactId>management-api</artifactId>
         </dependency>
 
         <dependency>
@@ -449,13 +434,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.relaxng</groupId>
+            <groupId>relaxngDatatype</groupId>
             <artifactId>relaxngDatatype</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>rome</groupId>
-            <artifactId>rome</artifactId>
         </dependency>
 
         <dependency>
@@ -499,7 +479,7 @@
         </dependency>
 
         <dependency>
-            <groupId>xerces</groupId>
+            <groupId>xerces-J</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
 
@@ -530,14 +510,6 @@
         </dependency>
         <dependency>
             <groupId>external</groupId>
-            <artifactId>i18n-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>j2ee</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
             <artifactId>jdmkrt</artifactId>
         </dependency>
         <dependency>
@@ -557,7 +529,7 @@
             <artifactId>OpenDJ</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
+            <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
         <dependency>

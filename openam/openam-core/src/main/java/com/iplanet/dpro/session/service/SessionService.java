@@ -80,6 +80,7 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
@@ -124,7 +125,6 @@ import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -140,6 +140,8 @@ public class SessionService {
     static private ThreadPool threadPool = null;
 
     static SSOTokenManager ssoManager = null;
+
+    private static AMSessionRepository amSessionRepository = null;
 
     public static Debug sessionDebug = null;
 
@@ -222,10 +224,7 @@ public class SessionService {
     private static final String TOP_LEVEL_ADMIN_ROLE = 
         "Top-level Admin Role";
 
-    private static final String IS_SFO_ENABLED = 
-        "iplanet-am-session-sfo-enabled";
-    
-    private static final String SESSION_STORE_USERNAME = 
+    private static final String SESSION_STORE_USERNAME =
         "iplanet-am-session-store-username";
 
     private static final String SESSION_STORE_PASSWORD = 
@@ -285,6 +284,7 @@ public class SessionService {
         int poolSize = DEFAULT_POOL_SIZE;
         int threshold = DEFAULT_THRESHOLD;
 
+        // Notification Thread Pool Size
         String size = SystemProperties.get(
             Constants.NOTIFICATION_THREADPOOL_SIZE);
         if (size != null) {
@@ -297,6 +297,7 @@ public class SessionService {
             }
         }
 
+        // Notification Thread Pool Threshold
         String thres = SystemProperties.get(
             Constants.NOTIFICATION_THREADPOOL_THRESHOLD);
         if (thres != null) {
@@ -309,6 +310,18 @@ public class SessionService {
             }
         }
 
+        // *******************************************************************
+        // Bootstrap AMSessionRepository Implementation if one was specified.
+        if (amSessionRepository == null)
+        {
+                // Instantiate our Session Repository Implementation.
+                // Allows Static Elements to Initialize.
+                amSessionRepository = getRepository();
+                sessionDebug.message("amSessionRepository Implementation: "+
+                    ((amSessionRepository == null) ? "None" : amSessionRepository.getClass().getSimpleName()));
+        }
+
+        // Establish Shutdown Manager.
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
         if (shutdownMan.acquireValidLock()) {
             try {
@@ -1177,23 +1190,23 @@ public class SessionService {
     /**
      * Add a listener to a Internal Session.
      * 
-     * @param session
+     * @param session - InternalSession Object
      * @param url
      * @param sid
      *            sid to be used with notification (master or restricted)
      */
-    private void addInternalSessionListener(InternalSession sess, String url,
+    private void addInternalSessionListener(InternalSession session, String url,
             SessionID sid) {
 
-        if (sess != null) {
-            if (!sid.equals(sess.getID())
-                    && sess.getRestrictionForToken(sid) == null) {
+        if (session != null) {
+            if (!sid.equals(session.getID())
+                    && session.getRestrictionForToken(sid) == null) {
                 throw new IllegalArgumentException("Session id mismatch");
             }
 
-            Map urls = sess.getSessionEventURLs();
+            Map urls = session.getSessionEventURLs();
             urls.put(url, sid);
-            sess.updateForFailover();
+            session.updateForFailover();
         }
     }
 
@@ -2054,14 +2067,19 @@ public class SessionService {
      * 
      * @return reference to session repository
      */
-    protected AMSessionRepository getRepository() {
+    protected static AMSessionRepository getRepository() {
 
         if (!getUseInternalRequestRouting()) {
+            sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
             return null;
         }
+
         if (sessionRepository == null) {
             try {
                 sessionRepository = SessionRepository.getInstance();
+                String message =
+                        "Obtained Session Repository Implementation: "+sessionRepository.getClass().getSimpleName();
+                sessionDebug.message(message);
             } catch (Exception e) {
                 sessionDebug
                         .error("Failed to initialize session repository", e);
@@ -2172,7 +2190,7 @@ public class SessionService {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                         CollectionHelper.getMapAttr(
-                        sessionAttrs, IS_SFO_ENABLED, "false")
+                        sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
                         ).booleanValue();
                 
                 if(sfoEnabled) {
@@ -3124,7 +3142,7 @@ public class SessionService {
      * 
      * @param owner
      *            server instance URL
-     * @param sid
+     * @param masterSid
      *            SessionID
      * @param restriction
      *            restriction
@@ -3187,10 +3205,8 @@ public class SessionService {
 
     /**
      * This method is the "server side" of the getRestrictedTokenIdRemotely()
-     * 
-     * @param owner
-     *            server instance URL
-     * @param sid
+     *
+     * @param masterSid
      *            SessionID
      * @param restriction
      *            restriction
@@ -3211,8 +3227,8 @@ public class SessionService {
      * This method is used to update the HttpSession when InternalSession
      * property changes.
      * 
-     * @param sid
-     *            SessionID
+     * @param session
+     *            Session Object
      */
     void saveForFailover(InternalSession session) {
 
