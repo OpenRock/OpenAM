@@ -57,6 +57,11 @@
             </fileset>
         </copy>
 
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/oauth2"/>
+        <copy file="${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources/oauth2_container.ldif.template"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/oauth2/oauth2_container.ldif"
+              filtering="false"/>
+
         <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
         <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/amsessiondb_container.ldif.template"
               tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/amsessiondb_container.ldif"

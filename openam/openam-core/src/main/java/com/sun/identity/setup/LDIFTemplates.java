@@ -67,6 +67,7 @@ public class LDIFTemplates {
 	    templates.add("tivoli/tivoli_user_schema.ldif");
         templates.add("sfha/amsessiondb_container.ldif");
         templates.add("sfha/opendj_amsessiondb_index.ldif");
+        templates.add("oauth2/oauth2_container.ldif");
     }
 
     private LDIFTemplates() {

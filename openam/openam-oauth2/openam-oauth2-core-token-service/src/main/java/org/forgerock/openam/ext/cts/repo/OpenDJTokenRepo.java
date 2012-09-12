@@ -19,6 +19,7 @@ package org.forgerock.openam.ext.cts.repo;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
@@ -65,10 +66,25 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
      */
     private static InternalClientConnection icConn;
     private Thread storeThread;
+    /**
+     * Define Session DN Constants
+     */
+    static final String SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX =
+            "iplanet-am-config-root-suffix";
 
-    //TODO make configurable
-    private static final String BASE_DN = "ou=oauth2tokens";
-    private static final String ROOT_DN = "dc=internal,dc=opensso,dc=java,dc=net";
+    static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX =
+            "iplanet-am-session-sfo-store-root-suffix";
+
+    private static final String SM_CONFIG_ROOT_SUFFIX =
+            SystemPropertiesManager.get(SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX, Constants.DEFAULT_ROOT_SUFFIX);
+
+    private static final String OAUTH2_ROOT_SUFFIX = Constants.DEFAULT_OAUTH2_ROOT_SUFFIX;
+
+    private static final String OAUTH2_BASE_DN =
+            OAUTH2_ROOT_SUFFIX +
+                    Constants.COMMA + SM_CONFIG_ROOT_SUFFIX;
+
+    private static final String OAUTH2_TOKEN_STORE = "ou=oauth2tokens" + Constants.COMMA + OAUTH2_BASE_DN;
 
     //TODO Store this somewhere
     static final String TOKEN_FILTER = "(objectclass=*)";
@@ -94,7 +110,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             icConn = InternalClientConnection.getRootConnection();
             // TODO -- Fix Make ths Dynamic.
             InternalSearchOperation results =
-                    icConn.processSearch("dc=internal,dc=openam,dc=java,dc=net", SearchScope.BASE_OBJECT, "*");
+                    icConn.processSearch(OAUTH2_ROOT_SUFFIX+Constants.COMMA+SM_CONFIG_ROOT_SUFFIX, SearchScope.BASE_OBJECT, "*");
             debug.message("Search for base container yielded Result Code: " + results.getResultCode().toString() + "]");
             isDatabaseUp = true;
         } catch (DirectoryException directoryException) {
@@ -130,8 +146,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
         StringBuilder dn = new StringBuilder();
         dn.append(OAuth2.Params.ID).append(Constants.EQUALS).append(token.getDN());
-        dn.append(Constants.COMMA).append(BASE_DN);
-        dn.append(Constants.COMMA).append(ROOT_DN);
+        dn.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
         AddOperation ao = icConn.processAdd(dn.toString(), attrList);
         ResultCode resultCode = ao.getResultCode();
 
@@ -161,8 +176,8 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         StringBuilder baseDN = new StringBuilder();
         try {
             baseDN.append(OAuth2.Params.ID).append(Constants.EQUALS);
-            baseDN.append(dn).append(Constants.COMMA).append(BASE_DN);
-            baseDN.append(Constants.COMMA).append(ROOT_DN);
+            baseDN.append(dn);
+            baseDN.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, TOKEN_FILTER, returnAttrs);
@@ -219,8 +234,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         String id = request.get("id").required().asString();
         StringBuilder dn = new StringBuilder();
         dn.append(OAuth2.Params.ID).append(Constants.EQUALS).append(id);
-        dn.append(Constants.COMMA).append(BASE_DN);
-        dn.append(Constants.COMMA).append(ROOT_DN);
+        dn.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
         DeleteOperation dop = icConn.processDelete(dn.toString());
         ResultCode resultCode = dop.getResultCode();
 
@@ -272,7 +286,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             //remove last ampersand
             filter.delete(filter.length()-3, filter.length());
             StringBuilder baseDN = new StringBuilder();
-            baseDN.append(BASE_DN).append(Constants.COMMA).append(ROOT_DN);
+            baseDN.append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, filter.toString(), returnAttrs);
@@ -320,7 +334,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(EXPDATE_FILTER_PRE).append(System.currentTimeMillis()).append(EXPDATE_FILTER_POST);
-            baseDN.append(BASE_DN).append(Constants.COMMA).append(ROOT_DN);
+            baseDN.append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, filter.toString(), returnAttrs);
@@ -360,8 +374,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
     private void delete(String id) throws JsonResourceException {
         StringBuilder dn = new StringBuilder();
         dn.append(OAuth2.Params.ID).append(Constants.EQUALS).append(id);
-        dn.append(Constants.COMMA).append(BASE_DN);
-        dn.append(Constants.COMMA).append(ROOT_DN);
+        dn.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
         DeleteOperation dop = icConn.processDelete(dn.toString());
         ResultCode resultCode = dop.getResultCode();
 

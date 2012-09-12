@@ -1,8 +1,9 @@
-dn: dc=internal,dc=opensso,dc=java,dc=net
-objectClass: domain
+dn: o=openam-oauth2,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organization
 objectClass: top
-dc: internal
+o: OpenAM-OAuth2-Tokens
 
-dn: ou=oauth2tokens,dc=internal,dc=opensso,dc=java,dc=net
+dn: ou=oauth2tokens,o=openam-oauth2,@SM_CONFIG_ROOT_SUFFIX@
 ou: oauth2tokens
 objectClass: organizationalUnit
+

@@ -99,8 +99,8 @@ public class EmbeddedOpenDS {
      * List of Schema to be copied and applied during installation.
      */
     private static final String[] additionalSchemaToBeApplied = {
-            "webapps/openam/WEB-INF/template/ldif/sfha/98-amsessiondb.ldif",
-            "webapps/openam/WEB-INF/template/ldif/oauth2/99-oauth2attributes.ldif"
+            "/WEB-INF/template/ldif/sfha/98-amsessiondb.ldif",
+            "/WEB-INF/template/ldif/oauth2/99-oauth2attributes.ldif"
     };
 
     /**
@@ -315,7 +315,7 @@ public class EmbeddedOpenDS {
 
         // ****************************************************
         // Copy in additional Schemata Definitions.
-        copyFiles(additionalSchemaToBeApplied, odsRoot + "/config/schema/");
+        copyFiles(additionalSchemaToBeApplied, odsRoot + "/config/schema/", servletCtx);
 
         // remove zip
         File toDelete = new File(odsRoot + "/opendj.zip");
@@ -364,7 +364,7 @@ public class EmbeddedOpenDS {
      * @param targetDirectory
      * @throws IOException
      */
-    protected static void copyFiles(String[] sourceFiles, String targetDirectory) throws IOException {
+    protected static void copyFiles(String[] sourceFiles, String targetDirectory , ServletContext servletCtx) throws IOException {
         if ((targetDirectory == null) || (!new File(targetDirectory).exists())) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("Invalid Target Directory Destination: "
                     + targetDirectory + ", Ignoring.");
@@ -373,7 +373,7 @@ public class EmbeddedOpenDS {
         // ****************************************************
         // Copy in additional Schemata Definitions.
         for (String additionalSchemaSourceFileName : sourceFiles) {
-            File additionalSchemaSourceFile = new File(additionalSchemaSourceFileName);
+            File additionalSchemaSourceFile = new File(servletCtx.getRealPath(additionalSchemaSourceFileName));
             if (!additionalSchemaSourceFile.canRead()) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to Read Schema File:["
                         + additionalSchemaSourceFile.getAbsolutePath() + "], Ignoring!");
