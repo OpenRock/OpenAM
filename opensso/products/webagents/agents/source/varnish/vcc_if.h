@@ -29,6 +29,7 @@ struct vmod_priv;
 
 void vmod_init(struct sess *, const char *, const char *);
 void vmod_cleanup(struct sess *);
+void vmod_request_cleanup(struct sess *);
 unsigned vmod_authenticate(struct sess *, const char *, const char *, const char *, int, const char *, struct sockaddr_storage *);
 void vmod_done(struct sess *);
 void vmod_ok(struct sess *);

@@ -198,7 +198,7 @@ sess_record* on_request_init(const sess* s) {
     return rec;
 }
 
-static void on_request_cleanup(const sess* s) {
+void vmod_request_cleanup(const sess* s) {
     apr_pool_t* pool = NULL;
     pthread_mutex_lock(&s_module_mutex);
     pool = (apr_pool_t*) apr_hash_get(s_module_storage, &s, sizeof (s));
@@ -748,7 +748,7 @@ void vmod_done(struct sess * s) {
         VRT_synth_page(s, 0, "403 Forbidden", vrt_magic_string_end);
         VRT_SetHdr(s, HDR_OBJ, ct, "text/plain", vrt_magic_string_end);
     }
-    on_request_cleanup(s);
+    vmod_request_cleanup(s);
 }
 
 void vmod_ok(struct sess * s) {
@@ -756,5 +756,5 @@ void vmod_ok(struct sess * s) {
     if (r != NULL) {
         fill_http(r, 0);
     }
-    on_request_cleanup(s);
+    vmod_request_cleanup(s);
 }
