@@ -98,8 +98,8 @@ OBJS := action_decision.o \
 	xml_attribute.o \
 	xml_element.o \
 	xml_tree.o \
-	sdk.o \
-	notenforcedip.o
+	notenforcedip.o \
+	naming_valid.o
 
 DEPENDS := $(OBJS:.o=.d)
 
@@ -161,7 +161,7 @@ INCLUDE_FLAGS := -I$(REAL_SRC_DIR) -I$(NSPR_INC_DIR) -I$(NSS_INC_DIR) -I$(LIBXML
 LDFLAGS += -L$(NSS_LIB_DIR) -L$(NSPR_LIB_DIR) \
 	-L$(LIBXML_LIB_DIR)
 
-$(STD_LIB)_LDLIBS := $(NSS_DYNAMIC_LIBS) $(NSPR_LIBS)
+$(STD_LIB)_LDLIBS := -lrt $(NSS_DYNAMIC_LIBS) $(NSPR_LIBS)
 
 
 $(TEST_LIB)_LDLIBS := $($(STD_LIB)_LDLIBS)

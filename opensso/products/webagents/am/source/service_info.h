@@ -31,6 +31,9 @@
  * AM service.
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef SERVICE_INFO_H
 #define SERVICE_INFO_H
@@ -81,6 +84,10 @@ public:
     const_reverse_iterator rend() const { return serverList.rend(); }
 
     std::size_t getNumberOfServers() const { return serverList.size(); }
+    
+    void clear() {
+        serverList.clear();
+    }
 
 private:
     void parseServerList(const char *serverList);

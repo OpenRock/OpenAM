@@ -25,6 +25,9 @@
  * $Id: thread_pool.cpp,v 1.4 2008/06/25 08:14:39 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 #include "thread_pool.h"
 
 USING_PRIVATE_NAMESPACE
@@ -189,9 +192,6 @@ ThreadPool::dispatch(ThreadFunction *fObj) {
 	}
 
 	if(retVal) {
-	    Log::log(logID, Log::LOG_DEBUG,
-		     "ThreadPool::dispatch(): Calling PR_Lock() after "
-		     "this line %s:%d.", __FILE__, __LINE__);
 	    PR_Lock(lock);
 	    workQueue.push_back(fObj);
 	    PR_NotifyCondVar(condVar);

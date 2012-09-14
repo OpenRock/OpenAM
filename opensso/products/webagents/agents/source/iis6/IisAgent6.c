@@ -35,7 +35,17 @@
 #include <stdarg.h>
 #include "am_web.h"
 #include <nspr.h>
+#include <shlwapi.h>
 #include "IisAgent6.h"
+
+char agentInstPath[MAX_PATH];
+char agentDllPath[MAX_PATH];
+boolean_t agentInitialized = B_FALSE;
+BOOL readAgentConfigFile = FALSE;
+CRITICAL_SECTION initLock;
+
+#define BOOTSTRAP_FILE          "\\config\\OpenSSOAgentBootstrap.properties"
+#define CONFIG_FILE             "\\config\\OpenSSOAgentConfiguration.properties"
 
 const char REDIRECT_TEMPLATE[] = {
     "Location: %s\r\n"
@@ -120,11 +130,6 @@ const CHAR refererServlet[]     = "refererservlet";
 // Responses the agent uses to requests.
 typedef enum {aaDeny, aaAllow, aaLogin} tAgentAction;
 
-tAgentConfig agentConfig;
-
-BOOL readAgentConfigFile = FALSE;
-CRITICAL_SECTION initLock;
-
 typedef struct OphResources {
     CHAR* cookies;      // cookies in the request
     DWORD cbCookies;
@@ -142,106 +147,32 @@ BOOL WINAPI GetExtensionVersion(HSE_VERSION_INFO * pVer) {
     return TRUE;
 }
 
-BOOL loadAgentPropertyFile(EXTENSION_CONTROL_BLOCK *pECB)
-{
-    BOOL  gotInstanceId = FALSE;
-    CHAR  *instanceId =  NULL;
-    DWORD instanceIdSize = 0;
-    CHAR* propertiesFileFullPath  = NULL;
-    am_status_t status = AM_SUCCESS;
-    am_status_t polsPolicyStatus = AM_SUCCESS;
-    BOOL         statusContinue      = FALSE;
-    CHAR         debugMsg[2048]   = "";
-    CHAR* agent_bootstrap_file  = NULL;
-    CHAR* agent_config_file = NULL;    
-    boolean_t agentInitialized = B_FALSE;
-
-    // Init to NULL values until we read properties file.
-    agentConfig.bAgentInitSuccess = FALSE; // assume Failure until success
-
-    if ( pECB->GetServerVariable(pECB->ConnID, "INSTANCE_ID", NULL,
-                                 &instanceIdSize) == FALSE ) {
-       instanceId = malloc(instanceIdSize);
-       if (instanceId != NULL) {
-           gotInstanceId = pECB->GetServerVariable(pECB->ConnID,
-                                   "INSTANCE_ID",
-                               instanceId,
-                               &instanceIdSize);
-           if ((gotInstanceId == FALSE) || (instanceIdSize <= 0)) {
-               sprintf(debugMsg,
-                       "%d: Invalid Instance Id received",
-                       instanceIdSize);
-           status = AM_FAILURE;
-           }
-       } else {
-            sprintf(debugMsg,
-                    "%d: Invalid Instance Id received",
-                    instanceIdSize);
-            status = AM_NO_MEMORY;
-       }
+void init_at_request() {
+    am_status_t status;
+    status = am_agent_init(&agentInitialized);
+    if (status != AM_SUCCESS) {
+        am_web_log_error("%s: am_agent_init() returned failure: %s", agentDescription, am_status_to_string(status));
     }
+}
 
-    if (status == AM_SUCCESS) {
-       if (iisaPropertiesFilePathGet(&agent_bootstrap_file, instanceId, TRUE)
-                                     == FALSE){ 
-            sprintf(debugMsg,"%s: iisaPropertiesFilePathGet() failed.", 
-                    agentDescription);
-            logPrimitive(debugMsg);
-            free(agent_bootstrap_file);
-            agent_bootstrap_file = NULL;
-            SetLastError(IISA_ERROR_PROPERTIES_FILE_PATH_GET);
-            return FALSE;
+BOOL loadAgentPropertyFile(EXTENSION_CONTROL_BLOCK *ecb) {
+    am_status_t status = AM_SUCCESS;
+    char error_msg[2048];
+    char agent_bootstrap_file[MAX_PATH];
+    char agent_config_file[MAX_PATH];
+    char *instance_id = NULL;
+    if (get_header_value(ecb, "INSTANCE_ID", &instance_id, TRUE, FALSE) == AM_SUCCESS) {
+        sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%s%s", agentInstPath, instance_id, BOOTSTRAP_FILE);
+        sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%s%s", agentInstPath, instance_id, CONFIG_FILE);
+        free(instance_id);
+        if (AM_SUCCESS == (status = am_web_init(agent_bootstrap_file, agent_config_file))) {
+            return TRUE;
         }
     }
-
-
-    if (iisaPropertiesFilePathGet(&agent_config_file, instanceId, FALSE)
-                                     == FALSE) {
-           sprintf(debugMsg, "%s: iisaPropertiesFilePathGet() returned failure",
-                   agentDescription);
-            logPrimitive(debugMsg);
-            free(agent_config_file);
-            agent_config_file = NULL;
-           SetLastError(IISA_ERROR_PROPERTIES_FILE_PATH_GET);
-           return FALSE;
-       }
-
-       // Initialize the OpenSSO Policy API
-        polsPolicyStatus = am_web_init(agent_bootstrap_file, agent_config_file);
-        free(agent_bootstrap_file);
-        agent_bootstrap_file = NULL;
-        free(agent_config_file);
-        agent_config_file = NULL;
-
-       if (AM_SUCCESS != polsPolicyStatus) {
-         // Use logPrimitive() AND am_web_log_error() here since a policy_init()
-         //   failure could mean am_web_log_error() isn't initialized.
-         sprintf(debugMsg,
-                 "%s: Initialization of the agent failed: status = %s (%d)",
-                 agentDescription, am_status_to_string(polsPolicyStatus),
-         polsPolicyStatus);
-         logPrimitive(debugMsg);
-         SetLastError(IISA_ERROR_INIT_POLICY);
-         return FALSE;
-       }
-
-    status = am_agent_init(&agentInitialized);
-       if (AM_SUCCESS != polsPolicyStatus) {
-         sprintf(debugMsg, "%s: Initialization of the agent(am_agent_init) failed: status = %s (%d)",
-                 agentDescription, am_status_to_string(polsPolicyStatus),
-         polsPolicyStatus);
-         logPrimitive(debugMsg);
-         SetLastError(IISA_ERROR_INIT_POLICY);
-         return FALSE;
-       }
-
-    if (instanceId != NULL) {
-       free(instanceId);
-    }
-
-    // Record success initializing agent.
-    agentConfig.bAgentInitSuccess = TRUE;
-    return TRUE;
+    sprintf_s(error_msg, sizeof (error_msg), "%s (%s): initialization of the agent failed: status = %s (%d)",
+            agentDescription, instance_id, am_status_to_string(status), status);
+    log_primitive(error_msg);
+    return FALSE;
 }
 
 // Method to register POST data in agent cache
@@ -505,12 +436,7 @@ DWORD send_post_data(EXTENSION_CONTROL_BLOCK *pECB, char *page,
  * The value is assigned in header_value.
  * This value must be freed by the caller.
  */
-am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB,
-                             const char *original_header_name,
-                             char **header_value,
-                             BOOL isRequired,
-                             BOOL addHTTPPrefix)
-{
+am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB, const char *original_header_name, char **header_value, BOOL isRequired, BOOL addHTTPPrefix) {
     const char *thisfunc = "get_header_value()";
     am_status_t status = AM_SUCCESS;
     DWORD header_size = 0;
@@ -523,15 +449,15 @@ am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB,
     }
     // Add HTTP in front of the header name if requested
     if (addHTTPPrefix == TRUE) {
-        header_name = malloc(strlen("HTTP_") + 
-                             strlen(original_header_name) + 1);
+        header_name = malloc(strlen("HTTP_") +
+                strlen(original_header_name) + 1);
         if (header_name != NULL) {
-            strcpy(header_name,"HTTP_");
-            strcat(header_name,original_header_name);
-            strcat(header_name,"\0");
+            strcpy(header_name, "HTTP_");
+            strcat(header_name, original_header_name);
+            strcat(header_name, "\0");
         } else {
             am_web_log_error("%s: Not enough memory to allocate header_name",
-                             thisfunc);
+                    thisfunc);
             status = AM_NO_MEMORY;
         }
     } else {
@@ -539,40 +465,32 @@ am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB,
     }
     // Get the header value
     if (status == AM_SUCCESS) {
-        if (pECB->GetServerVariable(pECB->ConnID, header_name,
-                                    NULL, &header_size) == FALSE)
-        {
-            *header_value = malloc(header_size);
+        if (pECB->GetServerVariable(pECB->ConnID, header_name, NULL, &header_size) == FALSE) {
+            *header_value = malloc(header_size + 1);
             if (*header_value != NULL) {
-                got_header = pECB->GetServerVariable(pECB->ConnID, header_name,
-                                                     *header_value, &header_size);
+                got_header = pECB->GetServerVariable(pECB->ConnID, header_name, *header_value, &header_size);
                 if (got_header == TRUE) {
-                    // header_size includes the null-terminating byte
-                    // so the size needs to be > 1 to not be empty
                     if ((*header_value != NULL) && (header_size > 1)) {
-                        am_web_log_debug("%s: %s = %s",
-                                         thisfunc, header_name, *header_value);
+                        (*header_value)[header_size] = 0;
+                        am_web_log_debug("%s: %s = %s", thisfunc, header_name, *header_value);
                     } else {
+                        free(*header_value);
                         *header_value = NULL;
                         if (isRequired == TRUE) {
-                            am_web_log_error("%s: Could not get a value for "
-                                             "header %s.", 
-                                             thisfunc, header_name);
+                            am_web_log_error("%s: Could not get a value for header %s.", thisfunc, header_name);
                             status = AM_FAILURE;
                         } else {
-                            am_web_log_debug("%s: %s = ", thisfunc,
-                                             header_name);
+                            am_web_log_debug("%s: %s = ", thisfunc, header_name);
                         }
                     }
                 } else {
+                    free(*header_value);
                     *header_value = NULL;
                     if (isRequired == TRUE) {
-                        am_web_log_error("%s: Header %s not found.", thisfunc,
-                                         header_name);
+                        am_web_log_error("%s: Header %s not found.", thisfunc, header_name);
                         status = AM_FAILURE;
                     } else {
-                        am_web_log_debug("%s: %s: not found.", thisfunc,
-                                         header_name);
+                        am_web_log_debug("%s: %s: not found.", thisfunc, header_name);
                     }
                 }
             } else {
@@ -581,7 +499,7 @@ am_status_t get_header_value(EXTENSION_CONTROL_BLOCK *pECB,
             }
         }
     }
-    if((addHTTPPrefix == TRUE) && (header_name != NULL)) {
+    if ((addHTTPPrefix == TRUE) && (header_name != NULL)) {
         free(header_name);
         header_name = NULL;
     }
@@ -1837,16 +1755,31 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     char* logout_url = NULL;
     am_status_t cdStatus = AM_FAILURE; 
 
-    // Load Agent Propeties file only once
+    // Load Agent Properties file only once
     if (readAgentConfigFile == FALSE) {
         EnterCriticalSection(&initLock);
         if (readAgentConfigFile == FALSE) {
             if (loadAgentPropertyFile(pECB) == FALSE) {
                 LeaveCriticalSection(&initLock);
-                am_web_log_error("%s: Agent init failed.", thisfunc);
                 return do_deny(pECB);
             }
             readAgentConfigFile = TRUE;
+        }
+        LeaveCriticalSection(&initLock);
+    }
+
+    // Initialize agent
+    if (agentInitialized != B_TRUE) {
+        EnterCriticalSection(&initLock);
+        if (agentInitialized != B_TRUE) {
+            am_web_log_debug("%s: will call am_agent_init()", thisfunc);
+            init_at_request();
+            if (agentInitialized != B_TRUE) {
+                am_web_log_error("%s: agent initialization failed.", thisfunc);
+                return do_deny(pECB);
+            } else {
+                am_web_log_debug("%s: agent initialized", thisfunc);
+            }
         }
         LeaveCriticalSection(&initLock);
     }
@@ -2320,100 +2253,9 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
 }
 
 
-BOOL iisaPropertiesFilePathGet(CHAR** propertiesFileFullPath, char* instanceId,
-        BOOL isBootStrapFile)
-{
-    // Max WINAPI path
-    const DWORD dwPropertiesFileFullPathSize = MAX_PATH + 1;
-    CHAR  szPropertiesFileName[512]          = "";
-    CHAR agentApplicationSubKey[1000]        = "";
-    const CHAR agentDirectoryKeyName[]       = "Path";
-    DWORD dwPropertiesFileFullPathLen        = dwPropertiesFileFullPathSize;
-    HKEY hKey                                = NULL;
-    LONG lRet                                = ERROR_SUCCESS;
-    CHAR debugMsg[2048]                      = "";
-
-    if(isBootStrapFile) {
-        strcpy(szPropertiesFileName,"OpenSSOAgentBootstrap.properties");
-    }
-    else {
-        strcpy(szPropertiesFileName,"OpenSSOAgentConfiguration.properties");
-    }
-
-    strcpy(agentApplicationSubKey,
-        "Software\\Sun Microsystems\\OpenSSO IIS6 Agent\\Identifier_");
-    if (instanceId != NULL) {
-       strcat(agentApplicationSubKey,instanceId);
-    }
-    ///////////////////////////////////////////////////////////////////
-    //  get the location of the properties file from the registry
-    lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, agentApplicationSubKey,
-                        0, KEY_READ, &hKey);
-    if(lRet != ERROR_SUCCESS) {
-        sprintf(debugMsg,
-                "%s(%d) Opening registry key %s%s failed with error code %d",
-                __FILE__, __LINE__, "HKEY_LOCAL_MACHINE\\",
-                agentApplicationSubKey, lRet);
-        logPrimitive(debugMsg);
-        return FALSE;
-    }
-
-    // free'd by caller, even when there's an error.
-    *propertiesFileFullPath = (CHAR*) malloc(dwPropertiesFileFullPathLen);
-    if (*propertiesFileFullPath == NULL) {
-        sprintf(debugMsg,
-              "%s(%d) Insufficient memory for propertiesFileFullPath %d bytes",
-             __FILE__, __LINE__, dwPropertiesFileFullPathLen);
-        logPrimitive(debugMsg);
-        return FALSE;
-    }
-    lRet = RegQueryValueEx(hKey, agentDirectoryKeyName, NULL, NULL,
-                           *propertiesFileFullPath,
-                           &dwPropertiesFileFullPathLen);
-    if (lRet != ERROR_SUCCESS || *propertiesFileFullPath == NULL ||
-        (*propertiesFileFullPath)[0] == '\0') {
-        sprintf(debugMsg,
-          "%s(%d) Reading registry value %s\\%s\\%s failed with error code %d",
-          __FILE__, __LINE__,
-          "HKEY_LOCAL_MACHINE\\", agentApplicationSubKey,
-          agentDirectoryKeyName, lRet);
-        logPrimitive(debugMsg);
-        return FALSE;
-    }
-    if (*propertiesFileFullPath &&
-        (**propertiesFileFullPath == '\0')) {
-        sprintf(debugMsg,
-                "%s(%d) Properties file directory path is NULL.",
-                __FILE__, __LINE__);
-        logPrimitive(debugMsg);
-        return FALSE;
-    }
-    if (*(*propertiesFileFullPath + dwPropertiesFileFullPathLen - 1) !=
-        '\0') {
-        sprintf(debugMsg,
-             "%s(%d) Properties file directory path missing NULL termination.",
-             __FILE__, __LINE__);
-        logPrimitive(debugMsg);
-        return FALSE;
-    }
-    // closes system registry
-    RegCloseKey(hKey);
-    if ((strlen(*propertiesFileFullPath) + 2 /* size of \\ */ +
-         strlen(szPropertiesFileName) + 1) > dwPropertiesFileFullPathSize) {
-        sprintf(debugMsg,
-              "%s(%d) Properties file directory path exceeds Max WINAPI path.",
-              __FILE__, __LINE__);
-        logPrimitive(debugMsg);
-        return FALSE;
-    }
-    strcat(*propertiesFileFullPath, "\\");
-    strcat(*propertiesFileFullPath, szPropertiesFileName);
-    return TRUE;
-}
-
 // Primitive error logger here that works before before policy_error() is
 // initialized.
-void logPrimitive(CHAR *message)
+void log_primitive(CHAR *message)
 {
     HANDLE hes        = NULL;
     const CHAR* rsz[] = {message};
@@ -2462,8 +2304,22 @@ BOOL WINAPI DllMain(IN HINSTANCE hinstDll, IN DWORD fdwReason, IN LPVOID lpvCont
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH:
         {
+            static char location[MAX_PATH];
+            size_t len;
             DisableThreadLibraryCalls(hinstDll);
+            if (!GetModuleFileNameA(hinstDll, location, sizeof (location))) return FALSE;
+            strcpy(agentDllPath, location);
+            if (!PathRemoveFileSpecA(location)) return FALSE;
+            if (!PathRemoveFileSpecA(location)) return FALSE;
+            len = strlen(location);
+            if (len > 0 && strncmp(location, "\\\\?\\", 4) == 0) {
+                memmove(location, location + 4, len - 4);
+                location[len - 4] = '\0';
+            }
+            strcat(location, "\\Identifier_");
+            strcpy(agentInstPath, location);
             LoadLibrary("nspr4.dll");
+            LoadLibrary("amsdk.dll");
         }
             break;
     }

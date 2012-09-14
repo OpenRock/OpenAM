@@ -46,6 +46,9 @@
 #include "xml_tree.h"
 #include <cstring>
 
+#define AM_NAMING_LOCK ".am_naming_lock"
+extern "C" char *read_naming_value(const char *key);
+
 USING_PRIVATE_NAMESPACE
 
         namespace {
@@ -131,7 +134,8 @@ BaseService::BaseService(const std::string& name,
         const Properties& props,
         const std::string &cert_passwd,
         const std::string &cert_nick_name,
-        bool trustServerCert)
+        bool trustServerCert,
+        bool namingRequestParam)
 : logModule(Log::addModule(name)), objLock(), serviceRequestId(0),
 certDBPasswd((cert_passwd.size() > 0) ?
 cert_passwd : props.get(AM_COMMON_CERT_DB_PASSWORD_PROPERTY, "")),
@@ -142,7 +146,8 @@ alwaysTrustServerCert(trustServerCert),
 proxyHost(props.get(AM_COMMON_FORWARD_PROXY_HOST, "")),
 proxyPort(atoi(props.get(AM_COMMON_FORWARD_PROXY_PORT, "0").c_str())),
 proxyUser(props.get(AM_COMMON_FORWARD_PROXY_USER, "")),
-proxyPassword(props.get(AM_COMMON_FORWARD_PROXY_PASSWORD, "")) {
+proxyPassword(props.get(AM_COMMON_FORWARD_PROXY_PASSWORD, "")),
+namingRequest(namingRequestParam) {
     useProxy = proxyHost.size() > 0 ? true : false;
     useProxyAuth = proxyUser.size() > 0 ? true : false;
 }
@@ -289,19 +294,34 @@ BaseService::doRequest(const ServiceInfo& service,
     if (sizeof (contentLine) > contentLineLen) {
         BodyChunk contentLineChunk(contentLine, contentLineLen);
         ServiceInfo::const_iterator iter;
-
-        for (iter = service.begin(); iter != service.end(); ++iter) {
-            ServerInfo svrInfo = ServerInfo((const ServerInfo&) (*iter));
-            if (!svrInfo.isHealthy(poll_primary_server)) {
-                Log::log(logModule, Log::LOG_WARNING,
-                        "BaseService::doRequest(): "
-                        "Server is unavailable: %s.",
-                        svrInfo.getURL().c_str());
-                continue;
+        ServiceInfo svc(service);
+        if (namingRequest) {
+            svc.clear();
+            char *nurl = read_naming_value(AM_NAMING_LOCK);
+            if (nurl != NULL) {
+                ServerInfo si(nurl);
+                svc.addServer(si);
+                Log::log(logModule, Log::LOG_ALWAYS, "BaseService::doRequest(): naming request to %s", nurl);
+                free(nurl);
             } else {
+                Log::log(logModule, Log::LOG_ALWAYS, "BaseService::doRequest(): failed to get valid naming url");
+            }
+        }
+        
+        for (iter = svc.begin(); iter != svc.end(); ++iter) {
+            ServerInfo svrInfo = ServerInfo((const ServerInfo&) (*iter));
+            if (!namingRequest) {
+                if (!svrInfo.isHealthy(poll_primary_server)) {
+                    Log::log(logModule, Log::LOG_WARNING,
+                            "BaseService::doRequest(): "
+                            "Server is unavailable: %s.",
+                            svrInfo.getURL().c_str());
+                    continue;
+                } else {
                 Log::log(logModule, Log::LOG_DEBUG,
-                        "BaseService::doRequest(): Using server: %s.",
-                        iter->getURL().c_str());
+                            "BaseService::doRequest(): Using server: %s.",
+                            iter->getURL().c_str());
+                }
             }
 
             Http::HeaderList headerList, proxyHeaderList;

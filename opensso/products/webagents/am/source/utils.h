@@ -24,7 +24,11 @@
  *
  * $Id: utils.h,v 1.7 2008/08/26 00:18:37 subbae Exp $
  *
- */ 
+ */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
+
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
@@ -156,7 +160,10 @@ typedef struct boot_info_t {
     const char *shared_agent_profile_name;
     const char *realm_name;
     unsigned long ext_url_validation_disable;
-    unsigned long ext_url_validation_timeout;
+    unsigned long ext_url_validation_poll;
+    unsigned long ext_url_validation_scan;
+    unsigned long connect_timeout;
+    unsigned long receive_timeout;
 } boot_info_t;
 
 void parseIPAddresses(const std::string &property,

@@ -30,6 +30,9 @@
  * Access Management SDK.
  *
  */
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #ifndef AM_TYPES_H
 #define AM_TYPES_H
@@ -76,6 +79,17 @@ typedef enum {
     B_TRUE
 } booleant;
 #endif
+
+#define AM_NAMING_LOCK ".am_naming_lock"
+
+typedef struct {
+    unsigned long poll_valid; //timer run-interval in sec
+    unsigned long poll_scan; //value re-scan interval in sec
+    int url_size;
+    char **url_list;
+    void (*log)(const char *, ...);
+    int (*validate)(const char *, const char **, int *httpcode);
+} naming_validator_t;
 
 typedef enum {
     AM_FALSE = 0,

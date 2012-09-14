@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010 - 2012 ForgeRock AS
  */
 
 /*
@@ -479,9 +479,6 @@ am_status_t AgentProfileService::getAgentAttributes(
 {
     am_status_t status = AM_FAILURE;
     Http::Response response;
-//    const char *parameter = NULL;
-//    const char *repositoryLocation = NULL;
-//    am_status_t getStatus;
     std::string certName;
     std::string::size_type pos;
 
@@ -499,8 +496,12 @@ am_status_t AgentProfileService::getAgentAttributes(
     urlParams.append("&admin=" );
     urlParams.append(encodedAgentToken);
 
-    setRestSvcInfo(mRestURL);
-
+    try {
+        setRestSvcInfo(mRestURL);
+    } catch (InternalException &iex) {
+        status = AM_FAILURE;
+    }
+    
     status =  doHttpGet(mRestSvcInfo, urlParams, Http::CookieList(),
                         response, READ_INIT_BUF_LEN,
                         certName);

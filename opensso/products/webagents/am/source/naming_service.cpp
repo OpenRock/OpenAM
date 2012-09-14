@@ -25,6 +25,9 @@
  * $Id: naming_service.cpp,v 1.12 2008/08/25 21:00:23 madan_ranganath Exp $
  *
  */ 
+/*
+ * Portions Copyrighted 2012 ForgeRock AS
+ */
 
 #include <prlock.h>
 #include <prnetdb.h>
@@ -33,6 +36,8 @@
 #include <prprf.h>
 #include "naming_service.h"
 #include "xml_tree.h"
+
+extern "C" unsigned long am_web_naming_validation_status();
 
 USING_PRIVATE_NAMESPACE
 
@@ -96,14 +101,14 @@ const std::string NamingService::invalidSessionMsgPrefix("SessionID ---");
 const std::string NamingService::invalidSessionMsgSuffix("---is Invalid");
 
 NamingService::NamingService(const Properties& props,
-                const std::string &cert_passwd,
-                const std::string &cert_nick_name,
-                bool trustServerCert)
-    : BaseService("NamingService", props, cert_passwd, cert_nick_name, 
-		trustServerCert),
-      namingURL(props.get(AM_COMMON_NAMING_URL_PROPERTY)),
-      ignorePreferredNamingURL(props.getBool(AM_COMMON_IGNORE_PREFERRED_NAMING_URL_PROPERTY, true))
-{
+        const std::string &cert_passwd,
+        const std::string &cert_nick_name,
+        bool trustServerCert)
+: BaseService("NamingService", props, cert_passwd, cert_nick_name,
+trustServerCert,
+(am_web_naming_validation_status() == 2 ? false : true)),
+namingURL(props.get(AM_COMMON_NAMING_URL_PROPERTY)),
+ignorePreferredNamingURL(props.getBool(AM_COMMON_IGNORE_PREFERRED_NAMING_URL_PROPERTY, true)) {
 }
 
 NamingService::~NamingService()

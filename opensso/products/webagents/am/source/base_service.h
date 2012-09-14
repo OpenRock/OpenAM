@@ -107,11 +107,12 @@ protected:
 	char *extraData;
     };
 
-    BaseService(const std::string& name, 
-                const Properties& props,
-                const std::string &cert_passwd,
-		const std::string &cert_nick_name,
-		bool alwaysTrustServerCert);
+    BaseService(const std::string& name,
+            const Properties& props,
+            const std::string &cert_passwd,
+            const std::string &cert_nick_name,
+            bool alwaysTrustServerCert,
+            bool namingRequestParam = false);
     virtual ~BaseService() = 0;
 
     am_status_t doHttpGet(const ServiceInfo& service,
@@ -191,6 +192,8 @@ private:
     std::string certNickName;
     std::string poll_primary_server;
     bool alwaysTrustServerCert;
+    
+    bool namingRequest;
 
     /* proxy parameters */
     bool useProxy;

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010 - 2012 ForgeRock AS
  */
 
 
@@ -127,9 +127,6 @@ public:
     const char *url_redirect_param;
     const char *user_id_param;
     const char *authLogType_param;
-#if defined(WINNT)
-    HINSTANCE hInst;
-#endif
     const char *locale;
     const char *unauthenticated_user;
     PRBool anon_remote_user_enable;
@@ -245,9 +242,6 @@ public:
         this->url_redirect_param= NULL;
         this->user_id_param = NULL;
         this->authLogType_param = NULL;
-#if defined(WINNT)
-        this->hInst = NULL;
-#endif
         this->locale = NULL;
         this->unauthenticated_user = NULL;
         this->anon_remote_user_enable = AM_FALSE;

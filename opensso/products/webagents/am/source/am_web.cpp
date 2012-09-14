@@ -27,7 +27,7 @@
  */
 
 /*
- * "Portions Copyrighted [2010] [ForgeRock AS]"
+ * Portions Copyrighted 2010 - 2012 ForgeRock AS
  */
 
 #include <ctype.h>
@@ -115,8 +115,8 @@ typedef unsigned __int32 uint32_t;
 #include <arpa/inet.h>
 #endif
 
-#include "sdk.hpp"
 #include "agent_configuration.h"
+#include "naming_valid.h"
 
 USING_PRIVATE_NAMESPACE
 
@@ -200,11 +200,34 @@ static Utils::boot_info_t boot_info = {
 
 AgentProfileService* agentProfileService;
 
-/**
- *                    -------- helper functions --------
- */
+naming_validator_t* nvld = NULL;
 
-static void release_ip_list(char **list, unsigned int listsize) {
+#ifdef _MSC_VER
+HANDLE nv_thr;
+#else
+pthread_t nv_thr;
+#endif
+
+extern "C" void get_status_info(am_status_t status, const char ** name, const char ** msg);
+extern "C" void *naming_validator(void *arg);
+extern "C" void stop_naming_validator();
+
+int naming_validate_helper(const char *url, const char **msg, int *hs) {
+    const char *name;
+    am_status_t status = AM_FAILURE;
+    const Properties& propPtr = *reinterpret_cast<Properties *> (boot_info.properties);
+    if (boot_info.ext_url_validation_disable == 1) {
+        NamingValidateHttp v(url, propPtr);
+        status = v.validate_url(hs);
+    } else {
+        NamingValidateHttpLogin v(url, propPtr);
+        status = v.validate_url(hs);
+    }
+    get_status_info(status, &name, msg);
+    return (AM_SUCCESS == status && Http::OK == *hs ? 0 : status);
+} 
+
+static void release_char_list(char **list, unsigned int listsize) {
     unsigned int i;
     if (list != NULL) {
         for (i = 0; i < listsize; i++) {
@@ -226,7 +249,7 @@ static boolean_t notenforced_ip_cidr_match(const char *ip, std::set<std::string>
             als++;
         }
         int r = ip_match(ip, (const char **) al, list->size(), am_web_log_info);
-        release_ip_list(al, list->size());
+        release_char_list(al, list->size());
         return r > 0 ? B_TRUE : B_FALSE;
     }
     return B_FALSE;
@@ -669,15 +692,36 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
     if (AM_SUCCESS == status) {
         function_name = "am_properties_get";
         parameter = "com.forgerock.agents.ext.url.validation.disable";
-        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 0,
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 2,
             &boot_ptr->ext_url_validation_disable);
     }
     
     if (AM_SUCCESS == status) {
         function_name = "am_properties_get";
-        parameter = "com.forgerock.agents.ext.url.validation.timeout";
-        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 2,
-            &boot_ptr->ext_url_validation_timeout);
+        parameter = "com.forgerock.agents.ext.url.validation.poll.interval";
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 60,
+            &boot_ptr->ext_url_validation_poll);
+    }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = "com.forgerock.agents.ext.url.validation.scan.interval";
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 3,
+            &boot_ptr->ext_url_validation_scan);
+    }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = AM_COMMON_CONNECT_TIMEOUT_PROPERTY;
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 2000,
+            &boot_ptr->connect_timeout);
+    }
+    
+    if (AM_SUCCESS == status) {
+        function_name = "am_properties_get";
+        parameter = AM_COMMON_RECEIVE_TIMEOUT_PROPERTY;
+        status = am_properties_get_unsigned_with_default(boot_ptr->properties, parameter, 2000,
+            &boot_ptr->receive_timeout);
     }
 
     // Get the naming URL.
@@ -686,44 +730,6 @@ load_bootstrap_properties(Utils::boot_info_t *boot_ptr,
 	parameter = AM_COMMON_NAMING_URL_PROPERTY;
 	status = am_properties_get(boot_ptr->properties, parameter,
 				   &property_str);
-        
-        /* Extended url validation, 
-         * including naming url, 
-         * agent name, password and 
-         * ability to do a successful login to OpenAM
-         */
-        int vrv = 0;
-        std::list<std::string> nurl;
-        std::string prpty(property_str);
-        sdk::utils::stringtokenize(prpty, " ", &nurl);
-        for (std::list<std::string>::const_iterator ur = nurl.begin(); ur != nurl.end(); ++ur) {
-            std::string const& str = *ur;
-            am_web_log_always("Validating naming URL [%s]...", str.c_str());
-            sdk::utils::url u(str);
-            am_web_log_always("URL values:\n protocol: %s\n host: %s\n port %d\n path: %s\n query: %s\n URL: %s", 
-                    u.protocol().c_str(),
-                    u.host().c_str(),
-                    u.port(),
-                    u.path().c_str(),
-                    u.query().c_str(),
-                    u.URL().c_str());
-            if (boot_ptr->ext_url_validation_disable == 1) {
-                am_web_log_always("URL [%s] validation disabled", str.c_str());
-            } else {
-                if (u.host().empty()) {
-                    status = AM_FAILURE;
-                    am_web_log_error("URL [%s] validation failed. Host name is not resolvable", str.c_str());
-                    break;
-                } else if ((vrv = sdk::utils::validate_agent_credentials(&u, boot_ptr->shared_agent_profile_name, decrypt_passwd, boot_ptr->realm_name, NULL, NULL, 1, boot_ptr->ext_url_validation_timeout)) != 1) {
-                    status = AM_FAILURE;
-                    am_web_log_error("URL [%s] validation failed with error [%d]", str.c_str(), vrv);
-                    break;
-                } else {
-                    am_web_log_always("URL [%s] validation succeeded", str.c_str());
-                }
-            }
-        }
-        
 	if (AM_SUCCESS == status) {
 	    status = Utils::parse_url_list(property_str, ' ',
 				    &boot_ptr->naming_url_list, AM_TRUE);
@@ -867,7 +873,7 @@ am_agent_init(boolean_t* pAgentInitialized)
             status = AM_FAILURE;
         }
     }
-
+    
     if (AM_SUCCESS == status) {
 
         am_resource_traits_t rsrcTraits;
@@ -907,7 +913,7 @@ am_agent_init(boolean_t* pAgentInitialized)
             }
         }
     }
-
+    
     if (AM_SUCCESS == status) {
         *pAgentInitialized = B_TRUE;
     } else {
@@ -916,6 +922,11 @@ am_agent_init(boolean_t* pAgentInitialized)
         }
     }
     return status;
+}
+
+extern "C" unsigned long
+am_web_naming_validation_status() {
+    return boot_info.ext_url_validation_disable;
 }
 
 /**
@@ -960,6 +971,43 @@ am_web_init(const char *agent_bootstrap_file,
                 // initialize NSS/NSPR here
                 status = Connection::initialize(propPtr);
             }
+
+            if (boot_info.ext_url_validation_disable == 2) {
+                am_web_log_always("naming_validator(): validation disabled");
+            }
+            if (AM_SUCCESS == status && nvld == NULL && boot_info.ext_url_validation_disable != 2) {
+                unsigned long ct = boot_info.connect_timeout;
+                unsigned long rt = boot_info.receive_timeout;
+                if (ct == 0 || ct > 2000 || rt == 0 || rt > 2000) {
+                    am_web_log_always("naming_validator(): network connect.timeout and receive.timeout values are not set"
+                            " or are set to more than 2 sec. timeout");
+                }
+                nvld = (naming_validator_t *) malloc(sizeof (naming_validator_t));
+                if (nvld == NULL) return AM_NO_MEMORY;
+                nvld->validate = naming_validate_helper;
+                nvld->log = am_web_log_always;
+                nvld->url_size = (int) boot_info.naming_url_list.size;
+                /* poll values in sec */
+                nvld->poll_valid = boot_info.ext_url_validation_poll;
+                nvld->poll_scan = boot_info.ext_url_validation_scan;
+                if (boot_info.naming_url_list.size > 0) {
+                    nvld->url_list = (char **) malloc(boot_info.naming_url_list.size * sizeof (char *));
+                    if (nvld->url_list == NULL) {
+                        free(nvld);
+                        nvld = NULL;
+                        return AM_NO_MEMORY;
+                    }
+                    for (int i = 0; i < boot_info.naming_url_list.size; i++) {
+                        nvld->url_list[i] = strdup(boot_info.naming_url_list.list[i].url);
+                    }
+                }
+#ifdef _MSC_VER
+                nv_thr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) naming_validator, nvld, 0, NULL);
+                SleepEx((nvld->poll_scan + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
+#else
+                pthread_create(&nv_thr, NULL, naming_validator, nvld);
+#endif
+            }
         }
     }
     return status;
@@ -969,24 +1017,29 @@ am_web_init(const char *agent_bootstrap_file,
  * Performs cleanup.
  */
 extern "C" AM_WEB_EXPORT am_status_t
-am_web_cleanup()
-{
+am_web_cleanup() {
     const char *thisfunc = "am_web_cleanup()";
     am_status_t status = AM_FAILURE;
 
     if (initialized) {
-	am_web_log_debug("%s: cleanup sequence initiated.", thisfunc);
+        am_web_log_debug("%s: cleanup sequence initiated.", thisfunc);
 
-	    const Properties& propPtr = 
-            *reinterpret_cast<Properties *>(boot_info.properties);
-	    agentProfileService->agentLogout(propPtr); 
-	    am_web_log_debug("%s: Agent logout done.", thisfunc);
+        const Properties& propPtr =
+                *reinterpret_cast<Properties *> (boot_info.properties);
+        agentProfileService->agentLogout(propPtr);
+        am_web_log_debug("%s: Agent logout done.", thisfunc);
 
-	status = am_cleanup();
-
-	initialized = AM_FALSE;
+        if (nvld != NULL) {
+            stop_naming_validator();
+            release_char_list(nvld->url_list, nvld->url_size);
+            free(nvld);
+            am_web_log_debug("%s: Naming Validator stopped.", thisfunc);
+        }
+        
+        status = am_cleanup();
+        initialized = AM_FALSE;
     } else {
-	status = AM_SUCCESS;
+        status = AM_SUCCESS;
     }
     return status;
 }
@@ -1359,6 +1412,24 @@ am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_
     return status;
 }
 
+std::string cookie_timestamp(const char *sec) {
+    long sec_ = strtol(sec, NULL, 10);
+    if (errno != ERANGE || errno != EINVAL || sec_ != LONG_MAX || sec_ != LONG_MIN) {
+        char time_string[50];
+        struct tm *now;
+        time_t rawtime;
+        if (sec_ == 0) {
+            return std::string("Thu, 01-Jan-1970 00:00:01 GMT");
+        }
+        time(&rawtime);
+        rawtime += sec_;
+        now = gmtime(&rawtime);
+        strftime(time_string, sizeof (time_string), "%a, %d-%b-%Y %H:%M:%S GMT", now);
+        return std::string(time_string);
+    }
+    return std::string();
+}
+
 /*
  * Creates a Set-Cookie HTTP Response header from cookie_info_t structure
  * The string returned should be freed when not needed anymore.
@@ -1393,7 +1464,7 @@ buildSetCookieHeader(Utils::cookie_info_t *cookie)
         if (NULL != max_age && '\0' != max_age[0]) {
             resetCookieVal.append(";Max-Age=");
             resetCookieVal.append(max_age);
-            expires = sdk::utils::timestamp(max_age);
+            expires = cookie_timestamp(max_age);
             if (!expires.empty()) {
                 resetCookieVal.append(";Expires=");
                 resetCookieVal.append(expires);
