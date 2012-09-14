@@ -270,13 +270,43 @@
   the properties are set in OpenAM.</para>
 
   <variablelist>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.cache_control_header.enable</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to enable use of
+     Cache-Control headers that prevent proxies from caching resources accessed
+     by unauthenticated users. Default: <literal>false</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.cdsso.disable.redirect.on_post</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to disable the HTTP
+     302 redirect after the LARES POST. By default, the policy agent does an
+     HTTP redirect after processing the LARES POST message. Default:
+     <literal>false</literal>.</para>
+     <para>This property applies only to Apache HTTPD 2.2 and 2.4, Lotus Domino,
+     and Varnish Cache policy agents. Other policy agents do not redirect
+     after processing the LARES POST message.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.forgerock.agents.conditional.login.url</literal></term>
     <listitem>
-     <para>This takes the incoming request URL to match, a comma, and then a
-      comma-separated list of URLs to which to redirect incoming users.</para>
+     <para>To conditionally redirect users based on the incoming request URL,
+     set this property. The values take the incoming request URL to match, a
+     <literal>|</literal> separator, and a comma-separated list of URLs to
+     which to redirect incoming users.</para>
+
+     <para>Example: <literal>com.forgerock.agents.conditional.login.url[0]=
+     login.example.com|http://openam1.example.com/openam/UI/Login,
+     http://openam2.example.com/openam/UI/Login</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term><literal>com.forgerock.agents.config.notenforced.ip.handler</literal></term>
     <listitem>
@@ -320,6 +350,29 @@
      </variablelist>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.config.pdpuri.prefix</literal></term>
+    <listitem>
+     <para>If you run multiple web servers with policy agents behind a load
+     balancer that directs traffic based on the request URI, and you need to
+     preserve POST data, then set this property.</para>
+
+     <para>By default, policy agents use a dummy URL for POST data preservation,
+     <literal>http://<replaceable>agent.host</replaceable>:<replaceable>port</replaceable>/dummypost/sunpostpreserve</literal>,
+     to handle POST data across redirects to and from OpenAM. When you set this
+     property, the policy agent prefixes the property value to the dummy URL
+     path. In other words, when you set
+     <literal>com.forgerock.agents.config.pdpuri.prefix = app1</literal>,
+     the policy agent uses the dummy URL,
+     <literal>http://<replaceable>agent.host</replaceable>:<replaceable>port</replaceable>/app1/dummypost/sunpostpreserve</literal>.</para>
+
+     <para>Next, use the prefix you set when you define load balancer URI
+     rules. This ensures that clients end up being redirected to the policy
+     agent that preserved the POST data.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.access.denied.url</literal></term>
     <listitem>
@@ -1491,6 +1544,16 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Notification URL.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.cookie.httponly</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to mark
+     <literal>iPlanetDirectoryPro</literal> cookies as HTTPOnly, preventing
+     scripts and third-party programs from accessing the cookies.</para>
+    </listitem>
+   </varlistentry>
+
   </variablelist>
  </section>
 </appendix>

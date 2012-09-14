@@ -74,23 +74,35 @@
     xlink:show="new">OPENAM-1195</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agents now let you preserve POST data when working with
+    <para>Web policy policy agents now let you enable and disable Cache-Control
+    headers for unauthenticated sessions (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1087"
+    xlink:show="new">OPENAM-1087</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now let you preserve POST data when working with
     URI-based load balancing (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"
-   xlink:show="new">OPENAM-980</link>).</para>
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"
+    xlink:show="new">OPENAM-980</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agents can now conditionally redirect users based on the
+    <para>Web policy agents now let you configure whether to do an HTTP 302
+    redirect after processing the LARES POST (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-936"
+    xlink:show="new">OPENAM-936</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents can now conditionally redirect users based on the
     incoming request URL (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
-   xlink:show="new">OPENAM-849</link>).</para>
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
+    xlink:show="new">OPENAM-849</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agents can now mark persistent cookies as HTTPOnly, to prevent
-    scripts and third-party programs from accessing the cookies
+    <para>Web policy agents can now mark persistent cookies as HTTPOnly, to
+    prevent scripts and third-party programs from accessing the cookies
     (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-804"
-   xlink:show="new">OPENAM-804</link>).</para>
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-804"
+    xlink:show="new">OPENAM-804</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agent file names now include the version number

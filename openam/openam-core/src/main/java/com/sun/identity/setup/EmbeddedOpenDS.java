@@ -364,7 +364,8 @@ public class EmbeddedOpenDS {
      * @param targetDirectory
      * @throws IOException
      */
-    protected static void copyFiles(String[] sourceFiles, String targetDirectory , ServletContext servletCtx) throws IOException {
+    protected static void copyFiles(String[] sourceFiles, String targetDirectory,
+                                    ServletContext servletCtx) throws IOException {
         if ((targetDirectory == null) || (!new File(targetDirectory).exists())) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("Invalid Target Directory Destination: "
                     + targetDirectory + ", Ignoring.");

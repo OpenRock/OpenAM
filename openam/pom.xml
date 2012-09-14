@@ -6,7 +6,7 @@
     <!--
     * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
     *
-    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
     *
     * The contents of this file are subject to the terms
     * of the Common Development and Distribution License
@@ -116,7 +116,6 @@
 
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
-        <javadoc.excludePackageNames>java.*:javax.*:com.*:org.*:net.*:edu.*</javadoc.excludePackageNames>
 
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -160,6 +159,7 @@
     </profiles>
 
     <!-- OpenAM Child Modules -->
+    <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
 
         <!-- OpenAM Shared - Common Module -->
@@ -167,6 +167,12 @@
 
         <!-- OpenAM Entitlement Module -->
         <module>openam-entitlements</module>
+
+        <!-- OpenAM Authentication Modules -->
+        <module>openam-authentication</module>
+
+        <!-- OpenAM Schema Modules -->
+        <module>openam-schema</module>
 
         <!-- OpenAM CoreToken Module -->
         <module>openam-coretoken</module>
@@ -494,8 +500,8 @@
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_merge/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_merge/</developerConnection>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
     </scm>
 
     <!-- Dependency Management -->
@@ -856,13 +862,6 @@
                 <version>1.1.5.2</version>
             </dependency>
 
-            <dependency>
-                <groupId>ognl</groupId>
-                <artifactId>ognl</artifactId>
-                <version>2.6.9</version>
-                <!-- Originally ? -->
-            </dependency>
-
             <!-- TODO opendj-ldap-sdk-3.0.0-M2 -->
 
             <!-- TODO publicsuffix -->
@@ -892,12 +891,6 @@
                 <artifactId>testng</artifactId>
                 <version>6.5.2</version>
                 <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
-                <version>1.7</version>
             </dependency>
 
             <dependency>
@@ -1313,32 +1306,33 @@
                 <version>2.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <show>public</show>
                     <charset>utf-8</charset>
                     <encoding>utf-8</encoding>
                     <source>${java.source.version}</source>
                     <additionalJOption>${javadoc.options}</additionalJOption>
-                    <outputDirectory>${project.build.directory}/site/apidocs
-                    </outputDirectory>
                     <detectLinks>true</detectLinks>
-                    <excludePackageNames>${javadoc.excludePackageNames}
-                    </excludePackageNames>
-                    <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
-                    <name>OpenAM JavaDoc</name>
-                    <description>OpenAM Java Documentation.
-                    </description>
                     <bottom>
-                        <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
-                    <header file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.header"/>
-                    <footer file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.footer"/>
+                        <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
+                    </bottom>
                 </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadoc</id>
                         <phase>site</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>aggregate-jar</goal>
                         </goals>
+                        <configuration>
+                            <doctitle>OpenAM ${project.version} Public API JavaDoc</doctitle>
+                            <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
+                            <finalName>openam-${project.version}-public</finalName>
+                            <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
+                            <docletArtifact>
+                                <groupId>org.forgerock</groupId>
+                                <artifactId>openam-shared</artifactId>
+                                <version>10.1.0-SNAPSHOT</version>
+                            </docletArtifact>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
