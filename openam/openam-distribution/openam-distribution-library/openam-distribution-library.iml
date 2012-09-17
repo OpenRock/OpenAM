@@ -9,19 +9,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="openam-idsvcs-schema" />
-    <orderEntry type="module" module-name="openam-jaxrpc-schema" />
-    <orderEntry type="module" module-name="openam-auth-ldap" />
-    <orderEntry type="module" module-name="openam-auth-adaptive" />
-    <orderEntry type="module" module-name="openam-auth-application" />
-    <orderEntry type="module" module-name="openam-auth-cert" />
-    <orderEntry type="module" module-name="openam-auth-hotp" />
-    <orderEntry type="module" module-name="openam-auth-httpbasic" />
-    <orderEntry type="module" module-name="openam-auth-msisdn" />
-    <orderEntry type="module" module-name="openam-auth-oath" />
-    <orderEntry type="module" module-name="openam-auth-oauth2" />
-    <orderEntry type="module" module-name="openam-auth-securid" />
-    <orderEntry type="module" module-name="openam-auth-windowsdesktopsso" />
     <orderEntry type="module" module-name="openam-distribution-amadmsetup" />
     <orderEntry type="module" module-name="openam-core" />
     <orderEntry type="module" module-name="openam-shared" />
@@ -31,7 +18,7 @@
     <orderEntry type="module" module-name="openam-coretoken" />
     <orderEntry type="module" module-name="openam-rest" />
     <orderEntry type="library" name="Maven: javax.ws.rs:jsr311-api:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-idsvcs-schema:10.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="openam-idsvcs-schema" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.parsers:jaxp-api:1.4.2" level="project" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:1.0.6" level="project" />
@@ -48,10 +35,10 @@
     <orderEntry type="library" name="Maven: external:webservices-api:2009-14-01" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:mail:1.4.5" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-mib-schema:10.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="openam-mib-schema" />
     <orderEntry type="library" name="Maven: external:jdmktk:2007-01-10" level="project" />
     <orderEntry type="library" name="Maven: external:jdmkrt:2007-01-10" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-xacml3-schema:10.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="openam-xacml3-schema" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-xjc:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: com.iplanet.jato:jato:2005-05-04" level="project" />
     <orderEntry type="library" name="Maven: com.sun.web.ui:cc:2008-08-08" level="project" />
@@ -82,7 +69,6 @@
     <orderEntry type="library" name="Maven: commons-digester:commons-digester:2.1" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging-api:1.1" level="project" />
     <orderEntry type="library" name="Maven: external:esapiport:2009-26-07" level="project" />
-    <orderEntry type="library" name="Maven: org.kohsuke:geoip:1.2.5" level="project" />
     <orderEntry type="library" name="Maven: com.sun.messaging.mq:imq:4.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.mq:imq:4.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.jdom:jdom:2.0.1" level="project" />
@@ -135,9 +121,9 @@
     <orderEntry type="library" name="Maven: external:webservices-rt:2009-29-07" level="project" />
     <orderEntry type="module" module-name="openam-installtools" />
     <orderEntry type="module" module-name="openam-federation-library" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-saml2-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-wsfederation-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-liberty-schema:10.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="openam-saml2-schema" />
+    <orderEntry type="module" module-name="openam-wsfederation-schema" />
+    <orderEntry type="module" module-name="openam-liberty-schema" />
     <orderEntry type="module" module-name="OpenFM" />
     <orderEntry type="module" module-name="openam-session-ha-core" />
     <orderEntry type="module" module-name="openam-session-ha-locale" />
@@ -158,27 +144,28 @@
     <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.james:apache-mime4j:0.6" level="project" />
     <orderEntry type="module" module-name="openam-oauth" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-dtd-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-jaxrpc-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-ad:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-ldap:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-anonymous:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-adaptive:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-application:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-cert:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-datastore:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-hotp:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-httpbasic:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-jdbc:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-membership:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-msisdn:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-nt:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-oath:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-oauth2:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-radius:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-safeword:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-securid:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-windowsdesktopsso:10.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="openam-dtd-schema" />
+    <orderEntry type="module" module-name="openam-jaxrpc-schema" />
+    <orderEntry type="module" module-name="openam-auth-ad" />
+    <orderEntry type="module" module-name="openam-auth-ldap" />
+    <orderEntry type="module" module-name="openam-auth-anonymous" />
+    <orderEntry type="module" module-name="openam-auth-adaptive" />
+    <orderEntry type="library" name="Maven: org.kohsuke:geoip:1.2.5" level="project" />
+    <orderEntry type="module" module-name="openam-auth-application" />
+    <orderEntry type="module" module-name="openam-auth-cert" />
+    <orderEntry type="module" module-name="openam-auth-datastore" />
+    <orderEntry type="module" module-name="openam-auth-hotp" />
+    <orderEntry type="module" module-name="openam-auth-httpbasic" />
+    <orderEntry type="module" module-name="openam-auth-jdbc" />
+    <orderEntry type="module" module-name="openam-auth-membership" />
+    <orderEntry type="module" module-name="openam-auth-msisdn" />
+    <orderEntry type="module" module-name="openam-auth-nt" />
+    <orderEntry type="module" module-name="openam-auth-oath" />
+    <orderEntry type="module" module-name="openam-auth-oauth2" />
+    <orderEntry type="module" module-name="openam-auth-radius" />
+    <orderEntry type="module" module-name="openam-auth-safeword" />
+    <orderEntry type="module" module-name="openam-auth-securid" />
+    <orderEntry type="module" module-name="openam-auth-windowsdesktopsso" />
     <orderEntry type="library" name="Maven: org.freemarker:freemarker:2.3.19" level="project" />
   </component>
 </module>
