@@ -87,6 +87,7 @@ public class OAuth2 {
          * Parameter usage location: authorization request, token request
          */
         public static final String CLIENT_ID = "client_id";
+        public static final String CLIENTID = "clientid";
 
         public static final String ID = "id";
 
@@ -104,6 +105,8 @@ public class OAuth2 {
          * Parameter usage location: authorization request, token request
          */
         public static final String REDIRECT_URI = "redirect_uri";
+        public static final String REDIRECTURI = "redirecturi";
+
 
         /**
          * Parameter usage location: authorization request, authorization
@@ -168,6 +171,7 @@ public class OAuth2 {
          * Parameter usage location: token request, token response
          */
         public static final String REFRESH_TOKEN = "refresh_token";
+        public static final String REFRESHTOKEN = "refreshtoken";
 
         /**
          * Parameter usage location: token request
@@ -185,6 +189,7 @@ public class OAuth2 {
 
     public class StoredToken {
         public static final String EXPIRY_TIME = "expiry_time";
+        public static final String EXPIRYTIME = "expirytime";
         public static final String ISSUED = "issued";
         public static final String PARENT = "parent";
         public static final String TYPE = "type";

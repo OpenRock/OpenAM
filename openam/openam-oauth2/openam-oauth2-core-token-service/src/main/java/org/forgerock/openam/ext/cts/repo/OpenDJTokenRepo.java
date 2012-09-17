@@ -92,8 +92,26 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
     static final String EXPDATE_FILTER_POST = ")";
 
     private static LinkedHashSet<String> returnAttrs;
+    private static LinkedHashSet<String> returnAttrs_DN_ONLY;
 
     static {
+
+        returnAttrs_DN_ONLY = new LinkedHashSet<String>();
+        returnAttrs_DN_ONLY.add("dn");
+
+        returnAttrs = new LinkedHashSet<String>();
+        returnAttrs.add("dn");
+        returnAttrs.add(OAuth2.StoredToken.EXPIRYTIME);
+        returnAttrs.add(OAuth2.Params.SCOPE);
+        returnAttrs.add(OAuth2.StoredToken.PARENT);
+        returnAttrs.add(OAuth2.Params.USERNAME);
+        returnAttrs.add(OAuth2.Params.REDIRECTURI);
+        returnAttrs.add(OAuth2.Params.REFRESHTOKEN);
+        returnAttrs.add(OAuth2.StoredToken.ISSUED);
+        returnAttrs.add(OAuth2.StoredToken.TYPE);
+        returnAttrs.add(OAuth2.Params.REALM);
+        returnAttrs.add(OAuth2.Params.ID);
+        returnAttrs.add(OAuth2.Params.CLIENTID);
 
         RUNPERIOD = (CLEANUPPERIOD <= HEALTHCHECKPERIOD) ? CLEANUPPERIOD : HEALTHCHECKPERIOD;
         CLEANUPVALUE = CLEANUPPERIOD;
@@ -108,11 +126,18 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
         try {
             icConn = InternalClientConnection.getRootConnection();
-            // TODO -- Fix Make ths Dynamic.
-            InternalSearchOperation results =
-                    icConn.processSearch(OAUTH2_ROOT_SUFFIX+Constants.COMMA+SM_CONFIG_ROOT_SUFFIX, SearchScope.BASE_OBJECT, "*");
-            debug.message("Search for base container yielded Result Code: " + results.getResultCode().toString() + "]");
+            InternalSearchOperation iso = icConn.processSearch(OAUTH2_BASE_DN,
+                    SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
+                    0, 0, false, Constants.FAMRECORD_FILTER, returnAttrs_DN_ONLY);
             isDatabaseUp = true;
+
+            if (iso.getResultCode() == ResultCode.SUCCESS) {
+                //TODO LOG
+            } else if (iso.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
+                //TODO LOG
+            } else {
+                //TODO LOG
+            }
         } catch (DirectoryException directoryException) {
             debug.warning("Unable to obtain the Internal Root Container for Token Persistence!",
                     directoryException);
