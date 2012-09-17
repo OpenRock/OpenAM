@@ -29,15 +29,13 @@ import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class TokensResource implements CollectionResourceProvider {
 
     private JsonResource repository;
 
-    private static final String REFRESH_TOKEN = "( type=refresh_token )";
+    private static final String REFRESH_TOKEN = "(type=refresh_token)";
 
     public TokensResource() {
         try {

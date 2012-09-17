@@ -23,7 +23,6 @@ import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.CollectionResourceProvider;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
-import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 
@@ -66,16 +65,17 @@ public class TokenResource implements CollectionResourceProvider {
     public void deleteInstance(Context context, DeleteRequest deleteRequest, ResultHandler<Resource> handler){
         try{
             JsonValue query = new JsonValue(null);
-            JsonValue response;
-            Resource resource;
+            JsonValue response = null;
+            Resource resource = null;
             JsonResourceAccessor accessor =
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                response = accessor.delete("id", "1");
+                //TODO what is the significance of revision
+                response = accessor.delete(deleteRequest.getResourceId(), "1");
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't delete token in CTS", null, e);
             }
-            resource = new Resource("id", "1", response);
+            resource = new Resource(deleteRequest.getResourceId(), "1", response);
             handler.handleResult(resource);
         } catch (ResourceException e){
             handler.handleError(e);
