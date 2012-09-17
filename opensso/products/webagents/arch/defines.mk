@@ -59,7 +59,7 @@ RELEASE_TYPE = ER
 
 # For ER set AGENT_ER_VER (ex: AGENT_ER_VER := ER 1)
 ifeq ($(RELEASE_TYPE), ER)
-AGENT_ER_VER := ER 5
+AGENT_ER_VER := ER 6
 AGENT_ER_TEXT := Exception Release: $(AGENT_ER_VER)
 ADD_README := YES
 else
