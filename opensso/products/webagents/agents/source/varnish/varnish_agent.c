@@ -677,18 +677,22 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
     if (status == AM_SUCCESS) {
         int err = getnameinfo((struct sockaddr*) cip, addr_len, client_ip, sizeof (client_ip), 0, 0, NI_NUMERICHOST);
         if (err == 0) {
-            am_web_log_debug("%s: client ip: %s", thisfunc, client_ip);
+            am_web_log_debug("%s: client host ip: %s", thisfunc, client_ip);
             req_params.client_ip = client_ip;
         }
-        err = getnameinfo((struct sockaddr*) cip, addr_len, client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
-        if (err == 0) {
-            am_web_log_debug("%s: client host: %s", thisfunc, client_host);
-            req_params.client_hostname = client_host;
-        }
-        if ((req_params.client_ip == NULL) || (strlen(req_params.client_ip) == 0)
-                || (req_params.client_hostname == NULL) || (strlen(req_params.client_hostname) == 0)) {
-            am_web_log_error("%s: Could not get the remote host/ip (error: %d)", thisfunc, err);
+        if ((req_params.client_ip == NULL) || (strlen(req_params.client_ip) == 0)) {
+            am_web_log_error("%s: Could not get the remote host ip (error: %d)", thisfunc, err);
             status = AM_FAILURE;
+        }
+        if (status == AM_SUCCESS) {
+            err = getnameinfo((struct sockaddr*) cip, addr_len, client_host, sizeof (client_host), NULL, 0, NI_NAMEREQD);
+            if (err == 0) {
+                am_web_log_debug("%s: client host name: %s", thisfunc, client_host);
+                req_params.client_hostname = client_host;
+            }
+            if ((req_params.client_hostname == NULL) || (strlen(req_params.client_hostname) == 0)) {
+                am_web_log_warning("%s: Could not get the remote host name (error: %d)", thisfunc, err);
+            }
         }
     }
 
