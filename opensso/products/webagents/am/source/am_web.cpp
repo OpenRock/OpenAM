@@ -5809,12 +5809,20 @@ process_access_redirect(char *url,
     return result;
 }
 
-static void trim(char *a) {
+static void trim(char *a, char w) {
     char *b = a;
-    while (isspace(*b)) ++b;
+    if (w == 0) {
+        while (isspace(*b)) ++b;
+    } else {
+        while (*b == w) ++b;
+    }
     while (*b) *a++ = *b++;
     *a = '\0';
-    while (isspace(*--a)) *a = '\0';
+    if (w == 0) {
+        while (isspace(*--a)) *a = '\0';
+    } else {
+        while ((*--a) == w) *a = '\0';
+    }
 }
 
 extern "C" AM_WEB_EXPORT am_status_t
@@ -5832,7 +5840,8 @@ am_web_get_cookie_value(const char *separator, const char *cookie_name, const ch
         am_web_log_max_debug("am_web_get_cookie_value(%s) parsing cookie header: %s", separator, cookie_header_val);
         for ((a = strtok_r(header_val, separator, &b)); a; (a = strtok_r(NULL, separator, &b))) {
             if (strcmp(separator, "=") == 0 || strcmp(separator, "~") == 0) {
-                trim(a);
+                /* trim any leading/trailing whitespace */
+                trim(a, 0);
                 if (found != AM_SUCCESS && strcmp(a, cookie_name) == 0) found = AM_SUCCESS;
                 else if (found == AM_SUCCESS && a[0] != '\0') {
                     value_len = strlen(a);
@@ -5840,6 +5849,8 @@ am_web_get_cookie_value(const char *separator, const char *cookie_name, const ch
                         found = AM_NOT_FOUND;
                     } else {
                         (*value)[value_len] = '\0';
+                        /* trim any leading/trailing double-quotes */
+                        trim(*value, '"');
                     }
                 }
             } else {
