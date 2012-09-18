@@ -78,6 +78,16 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="forgerock-oauth2-provider-scope-implementation-class"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a104">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
 
                 <SubSchema name="serverconfig" inheritance="multiple">
 
@@ -122,6 +132,16 @@
                         </BooleanValues>
                         <DefaultValues>
                             <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-scope-implementation-class"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a104">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

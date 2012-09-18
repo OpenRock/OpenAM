@@ -24,6 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.provider;
 
+import java.security.AccessController;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +32,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -53,6 +59,7 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.forgerock.openam.oauth2.provider.Scope;
 
 /**
  * A ValidationServerResource does ...
@@ -118,7 +125,7 @@ public class ValidationServerResource extends ServerResource implements
 
         OAuthProblemException error = null;
         Map<String, Object> response = new HashMap<String, Object>();
-        boolean authenticated = false;
+        Scope scopeClass = null;
 
         try {
             Form call = getQuery();
@@ -134,28 +141,40 @@ public class ValidationServerResource extends ServerResource implements
                 if (t == null) {
                     error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                 } else {
+                    String pluginClass = getPluginClass(t.getRealm());
+                    //instantiate plugin class
+                    scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+
+                    //call plugin class init
+                    scopeClass.init();
                     getLogger().fine("In Validator resource - got token = " + t);
 
                     if (t.isExpired()) {
                         error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                         getLogger().warning("Should response and refresh the token");
                     }
+                    //call plugin class.process
+                    Map <String, Object> returnMap = scopeClass.process(t, error);
                     if (error == null) {
-                        authenticated = true;
                         response.putAll(t.convertToMap());
+                        response.putAll(returnMap);
                     }
 
                 }
+
             }
         } catch (OAuthProblemException e) {
             error = e;
+        } catch (Exception e){
+            error = OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
+                    "Missing scope plugin class");
         }
 
         if (error != null) {
             response.putAll(error.getErrorMessage());
-        } else {
-            response.put("authenticated", authenticated);
         }
+        //call plugin class destroy for cleanup
+        scopeClass.destroy();
 
         // Sets the no-store Cache-Control header
         getResponse().getCacheDirectives().add(CacheDirective.noCache());
@@ -208,6 +227,22 @@ public class ValidationServerResource extends ServerResource implements
         } catch (ResourceException e) {
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(null, e.getMessage());
         }
+    }
+
+    private String getPluginClass(String realm) throws OAuthProblemException {
+        String pluginClass = null;
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
+        } catch (Exception e) {
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+
+        return pluginClass;
     }
 
 }
