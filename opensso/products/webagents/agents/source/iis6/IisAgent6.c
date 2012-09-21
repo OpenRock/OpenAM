@@ -1739,10 +1739,8 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     CHAR* response = NULL;
     BOOL fCookie = FALSE;
     DWORD cbCookiesLength = 0;
-    CHAR* cookieValue = NULL;
     CHAR* post_page = NULL;
-    int length = 0;
-    int i = 0;
+    //int i = 0;
     BOOL isLocalAlloc = FALSE;
     BOOL redirectRequest = FALSE;
     const char *clientIP_hdr_name = NULL;
@@ -1753,7 +1751,7 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
     char *clientHostname = NULL;
     void *agent_config=NULL;
     char* logout_url = NULL;
-    am_status_t cdStatus = AM_FAILURE; 
+    am_status_t cdStatus = AM_FAILURE;
 
     // Load Agent Properties file only once
     if (readAgentConfigFile == FALSE) {
@@ -1844,43 +1842,11 @@ DWORD WINAPI HttpExtensionProc(EXTENSION_CONTROL_BLOCK *pECB)
                 
                 // Look for the iPlanetDirectoryPro cookie
                 if (cookieName != NULL) {
-                    cookieValue = strstr(pOphResources->cookies, cookieName);
-                    while (cookieValue) {
-                        char *marker = strstr(cookieValue+1, cookieName);
-                        if (marker) {
-                            cookieValue = marker;
-                        } else {
-                            break;
-                        }
+                    if ((status_tmp = am_web_get_cookie_value(";", cookieName, 
+                            pOphResources->cookies, &dpro_cookie)) == AM_SUCCESS) {
+                        isLocalAlloc = TRUE;
                     }
-                    if (cookieValue != NULL && (cookieValue = strchr(cookieValue ,'=')) != NULL) {
-                        cookieValue = &cookieValue[1]; // 1 vs 0 skips over '='
-                        // find the end of the cookie
-                        length = 0;
-                        for (i=0;(cookieValue[i] != ';') &&
-                              (cookieValue[i] != '\0'); i++) {
-                            length++;
-                        }
-                        cookieValue[length]='\0';
-                        if (length < URL_SIZE_MAX-1) {
-                            if (length > 0) {
-                                dpro_cookie = malloc(length+1);
-                                if (dpro_cookie != NULL) {
-                                    strncpy(dpro_cookie, cookieValue, length);
-                                    dpro_cookie[length] = '\0';
-                                    isLocalAlloc = TRUE;
-                                    am_web_log_debug("%s: SSO token found in "
-                                          " cookie header.",
-                                           thisfunc);
-                                } else {
-                                    am_web_log_error("%s: Unable to allocate "
-                                            "memory for cookie, size = %u",
-                                            thisfunc, length);
-                                    status = AM_NO_MEMORY;
-                                }
-                            }
-                        }
-                    }
+                    am_web_log_debug("%s: sso token %s, status - %s", thisfunc, dpro_cookie, am_status_to_string(status_tmp));
                 }
             }
         }

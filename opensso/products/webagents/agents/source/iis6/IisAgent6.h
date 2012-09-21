@@ -31,8 +31,6 @@
 #include <windows.h>
 #include <httpext.h>
 
-#define URL_SIZE_MAX (20*1024)
-
 //   Size from minimum maximum of cookies per host in section 5.3 of:
 //   http://www.ietf.org/rfc/rfc2965.txt
 #define COOKIES_SIZE_MAX (20*4096)
