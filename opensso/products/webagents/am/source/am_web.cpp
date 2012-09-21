@@ -976,6 +976,7 @@ am_web_init(const char *agent_bootstrap_file,
                 am_web_log_always("naming_validator(): validation disabled");
             }
             if (AM_SUCCESS == status && nvld == NULL && boot_info.ext_url_validation_disable != 2) {
+                char fn[64];
                 unsigned long ct = boot_info.connect_timeout;
                 unsigned long rt = boot_info.receive_timeout;
                 if (ct == 0 || ct > 2000 || rt == 0 || rt > 2000) {
@@ -1005,6 +1006,8 @@ am_web_init(const char *agent_bootstrap_file,
                 nv_thr = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) naming_validator, nvld, 0, NULL);
                 SleepEx((nvld->poll_scan + 2) * 1000, FALSE); //allow naming_validator boot-up to finish
 #else
+                sprintf(fn, "/tmp/%s", AM_NAMING_LOCK);
+                unlink(fn);
                 pthread_create(&nv_thr, NULL, naming_validator, nvld);
 #endif
             }
@@ -1414,7 +1417,7 @@ am_web_get_token_from_assertion(char * enc_assertion, char **token, void* agent_
 
 std::string cookie_timestamp(const char *sec) {
     long sec_ = strtol(sec, NULL, 10);
-    if (errno != ERANGE || errno != EINVAL || sec_ != LONG_MAX || sec_ != LONG_MIN) {
+    if (errno != ERANGE || errno != EINVAL) {
         char time_string[50];
         struct tm *now;
         time_t rawtime;

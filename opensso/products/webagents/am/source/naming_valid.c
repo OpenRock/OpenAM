@@ -400,18 +400,6 @@ void write_naming_value(const char *key, const char *value) {
         CloseHandle(fd);
     }
 #else
-#if !S_IRUSR && S_IREAD
-#define S_IRUSR S_IREAD
-#endif
-#if !S_IRUSR
-#define S_IRUSR 00400
-#endif
-#if !S_IWUSR && S_IWRITE
-#define S_IWUSR S_IWRITE
-#endif
-#if !S_IWUSR
-#define S_IWUSR 00200
-#endif
     int fd;
     struct flock fl;
     memset(&fl, 0, sizeof (fl));
@@ -420,7 +408,7 @@ void write_naming_value(const char *key, const char *value) {
     fl.l_start = 0;
     fl.l_len = 0;
     sprintf(fn, "/tmp/%s", key);
-    if ((fd = open(fn, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) != -1) {
+    if ((fd = open(fn, O_WRONLY | O_CREAT | O_TRUNC, 0644)) != -1) {
         if (fcntl(fd, F_SETLKW, &fl) != -1) {
             lseek(fd, (off_t) 0, SEEK_SET);
             if (value == NULL) {
