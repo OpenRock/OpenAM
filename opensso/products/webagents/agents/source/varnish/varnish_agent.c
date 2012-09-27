@@ -607,14 +607,12 @@ unsigned vmod_authenticate(struct sess *s, const char *req_method, const char *p
 
     if ((r = on_request_init(s)) == NULL) {
         LOG("vmod_authenticate() on_request_init failed\n");
-        am_web_log_error("%s: on_request_init failed", thisfunc);
         send_deny(r);
         return 0;
     }
 
     if (agentBootInitialized != B_TRUE) {
         LOG("vmod_authenticate() am_web_init failed\n");
-        am_web_log_error("%s: am_web_init failed", thisfunc);
         send_deny(r);
         return 0;
     }
