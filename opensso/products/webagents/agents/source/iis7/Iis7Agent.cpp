@@ -1003,6 +1003,35 @@ REQUEST_NOTIFICATION_STATUS CAgentModule::OnBeginRequest(IN IHttpContext* pHttpC
     return retStatus;
 }
 
+char *read_registry_value(DWORD siteid) {
+    HKEY key;
+    char *bytes = NULL;
+    const char *path = "Path";
+    char keypath[MAX_PATH];
+    DWORD status, size, bsize = MAX_PATH + 1;
+    sprintf_s(keypath, sizeof (keypath), "SOFTWARE\\Sun Microsystems\\OpenSSO IIS7 Agent\\Identifier_%lu", siteid);
+    if ((status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, (LPCSTR) keypath, 0, KEY_READ | KEY_WOW64_64KEY, &key)) == ERROR_SUCCESS) {
+        if ((bytes = (char *) malloc(bsize)) != NULL) {
+            size = bsize;
+            status = RegQueryValueExA(key, path, NULL, NULL, (LPBYTE) bytes, &size);
+            while (status == ERROR_MORE_DATA) {
+                bsize += 1024;
+                bytes = (char *) realloc(bytes, bsize);
+                size = bsize;
+                status = RegQueryValueExA(key, path, NULL, NULL, (LPBYTE) bytes, &size);
+            }
+            if (status == ERROR_SUCCESS) {
+                bytes[size] = 0;
+            } else if (bytes) {
+                free(bytes);
+                bytes = NULL;
+            }
+        }
+        RegCloseKey(key);
+    }
+    return bytes;
+}
+
 /*
  * This function loads the bootstrap and the configuration files and 
  * invokes am_web_init.
@@ -1012,11 +1041,20 @@ BOOL loadAgentPropertyFile(IHttpContext* pHttpContext) {
     am_status_t polsPolicyStatus = AM_SUCCESS;
     char agent_bootstrap_file[MAX_PATH];
     char agent_config_file[MAX_PATH];
-
+    char *reg_path = NULL;
     IHttpSite *pHttpSite = pHttpContext->GetSite();
     if (NULL != pHttpSite) {
-        sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%d%s", agentInstPath, pHttpSite->GetSiteId(), BOOTSTRAP_FILE);
-        sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%d%s", agentInstPath, pHttpSite->GetSiteId(), CONFIG_FILE);
+        reg_path = read_registry_value(pHttpSite->GetSiteId());
+        if (reg_path == NULL) {
+            sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%lu%s", agentInstPath, pHttpSite->GetSiteId(), BOOTSTRAP_FILE);
+            sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%lu%s", agentInstPath, pHttpSite->GetSiteId(), CONFIG_FILE);
+        } else {
+            if (strstr(reg_path, "config") != NULL) PathRemoveFileSpecA(reg_path);
+            event_log(EVENTLOG_INFORMATION_TYPE, "%s: agent instance configuration read from registry:\n%s", agentDescription, reg_path);
+            sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%s", reg_path, BOOTSTRAP_FILE);
+            sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%s", reg_path, CONFIG_FILE);
+            free(reg_path);
+        }
         event_log(EVENTLOG_INFORMATION_TYPE, "%s: agent instance configuration files:\n%s,\n%s", agentDescription, agent_bootstrap_file, agent_config_file);
     } else {
         event_log(EVENTLOG_ERROR_TYPE, "%s: error locating agent instance configuration files", agentDescription);

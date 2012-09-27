@@ -155,23 +155,65 @@ void init_at_request() {
     }
 }
 
+char *read_registry_value(const char *siteid) {
+    HKEY key;
+    char *bytes = NULL;
+    const char *path = "Path";
+    char keypath[MAX_PATH];
+    DWORD status, size, bsize = MAX_PATH + 1;
+    sprintf_s(keypath, sizeof (keypath), "SOFTWARE\\Sun Microsystems\\OpenSSO IIS6 Agent\\Identifier_%s", siteid);
+    if ((status = RegOpenKeyExA(HKEY_LOCAL_MACHINE, (LPCSTR) keypath, 0, KEY_READ | KEY_WOW64_64KEY, &key)) == ERROR_SUCCESS) {
+        if ((bytes = (char *) malloc(bsize)) != NULL) {
+            size = bsize;
+            status = RegQueryValueExA(key, path, NULL, NULL, (LPBYTE) bytes, &size);
+            while (status == ERROR_MORE_DATA) {
+                bsize += 1024;
+                bytes = (char *) realloc(bytes, bsize);
+                size = bsize;
+                status = RegQueryValueExA(key, path, NULL, NULL, (LPBYTE) bytes, &size);
+            }
+            if (status == ERROR_SUCCESS) {
+                bytes[size] = 0;
+            } else if (bytes) {
+                free(bytes);
+                bytes = NULL;
+            }
+        }
+        RegCloseKey(key);
+    }
+    return bytes;
+}
+
 BOOL loadAgentPropertyFile(EXTENSION_CONTROL_BLOCK *ecb) {
     am_status_t status = AM_SUCCESS;
     char error_msg[2048];
     char agent_bootstrap_file[MAX_PATH];
     char agent_config_file[MAX_PATH];
     char *instance_id = NULL;
+    char *reg_path = NULL;
     if (get_header_value(ecb, "INSTANCE_ID", &instance_id, TRUE, FALSE) == AM_SUCCESS) {
-        sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%s%s", agentInstPath, instance_id, BOOTSTRAP_FILE);
-        sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%s%s", agentInstPath, instance_id, CONFIG_FILE);
+        reg_path = read_registry_value(instance_id);
+        if (reg_path == NULL) {
+            sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%s%s", agentInstPath, instance_id, BOOTSTRAP_FILE);
+            sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%s%s", agentInstPath, instance_id, CONFIG_FILE);
+        } else {
+            if (strstr(reg_path, "config") != NULL) PathRemoveFileSpecA(reg_path);
+            sprintf_s(error_msg, sizeof (error_msg), "%s: agent instance configuration read from registry:\n%s\n", agentDescription, reg_path);
+            OutputDebugStringA(error_msg);
+            sprintf_s(agent_bootstrap_file, sizeof (agent_bootstrap_file), "%s%s", reg_path, BOOTSTRAP_FILE);
+            sprintf_s(agent_config_file, sizeof (agent_config_file), "%s%s", reg_path, CONFIG_FILE);
+            free(reg_path);
+        }
         free(instance_id);
         if (AM_SUCCESS == (status = am_web_init(agent_bootstrap_file, agent_config_file))) {
+            sprintf_s(error_msg, sizeof (error_msg), "%s: agent instance configuration files:\n%s,\n%s", agentDescription, agent_bootstrap_file, agent_config_file);
+            OutputDebugStringA(error_msg);
             return TRUE;
         }
     }
-    sprintf_s(error_msg, sizeof (error_msg), "%s (%s): initialization of the agent failed: status = %s (%d)",
+    sprintf_s(error_msg, sizeof (error_msg), "%s (%s): initialization of the agent failed: status = %s (%d)\n",
             agentDescription, instance_id, am_status_to_string(status), status);
-    log_primitive(error_msg);
+    OutputDebugStringA(error_msg);
     return FALSE;
 }
 
@@ -2227,14 +2269,14 @@ void log_primitive(CHAR *message)
     const CHAR* rsz[] = {message};
 
     if (message == NULL) {
-    return;
+        return;
     }
 
     hes = RegisterEventSource(0, agentDescription);
     if (hes) {
     ReportEvent(hes, EVENTLOG_ERROR_TYPE, 0, 0, 0, 1, 0, rsz, 0);
-    DeregisterEventSource(hes);
-    }
+        DeregisterEventSource(hes);
+    } 
 }
 
 BOOL WINAPI TerminateExtension(DWORD dwFlags)
