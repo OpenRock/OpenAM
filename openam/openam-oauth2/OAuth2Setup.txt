@@ -1,13 +1,7 @@
-Steps 1-3 Setup OpenDJ attributes and DN to store tokens.
-1. Open the openDJ control panel <openam_folder>/opends/bin/control_panel
-2. Click Import ldif.
-3. Import both ldifs under openam-oauth2-core-token-service/resources. Make sure append is checked in the import screen.
-
-Steps 4-6 Setup OpenAM
-4. Click Access Control->Top Level Realm. Click Services. Add an OAuth2 Provider service.
+1. Click Access Control->Top Level Realm. Click Services. Add an OAuth2 Provider service.
 	a. The token life times can be whatever you want. I suggest something reasonable 60 seconds or so.
 	b. Issue refresh tokens wont effect the working in anyway except for you will or wont get a refresh token.
-5. Click Policies. Add a new policy.
+2. Click Policies. Add a new policy.
 	a. Name can be whatever
 	b. Add a New rule
 		i. Click URL Policy Agent.
@@ -23,7 +17,7 @@ Steps 4-6 Setup OpenAM
 		iv. exclusive can be left unchecked.
 		v. Click finish.
 	d. Click OK.
-6. Click Agents->OAuth2.0 Client
+3. Click Agents->OAuth2.0 Client
  	a. Add a new agent
 	b. Click the new agent
 	c. Fill in the new agents settings using the help text as a guide.
