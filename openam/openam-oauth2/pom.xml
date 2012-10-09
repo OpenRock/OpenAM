@@ -112,11 +112,12 @@
             </dependency>
 
             <!-- Commons -->
-            <dependency>
+            <!--<dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>org.forgerock.json.resource</artifactId>
                 <version>${commons.json-resource.version}</version>
             </dependency>
+            -->
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>org.forgerock.restlet.ext.openam</artifactId>

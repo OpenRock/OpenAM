@@ -146,7 +146,6 @@ public class ValidationServerResource extends ServerResource implements
                     scopeClass = (Scope) Class.forName(pluginClass).newInstance();
 
                     //call plugin class init
-                    scopeClass.init();
                     getLogger().fine("In Validator resource - got token = " + t);
 
                     if (t.isExpired()) {
@@ -154,7 +153,7 @@ public class ValidationServerResource extends ServerResource implements
                         getLogger().warning("Should response and refresh the token");
                     }
                     //call plugin class.process
-                    Map <String, Object> returnMap = scopeClass.process(t, error);
+                    Map <String, Object> returnMap = scopeClass.retrieveTokenInfoEndPoint(t);
                     if (error == null) {
                         response.putAll(t.convertToMap());
                         response.putAll(returnMap);

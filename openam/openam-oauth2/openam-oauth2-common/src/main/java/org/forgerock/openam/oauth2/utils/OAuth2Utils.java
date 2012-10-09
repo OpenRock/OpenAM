@@ -528,6 +528,27 @@ public class OAuth2Utils {
         }
     }
 
+
+    /**
+     * Scopes retrieved from the stored client can be in the form <scope>|<locale>|<description>. This method
+     * parses out the actual scope value
+     * @param maximumScope The allowed scopes for the client
+     * @return A set of strings containing the scope value only
+     */
+    public static Set<String> parseScope(Set<String> maximumScope){
+        Set<String> cleanScopes = new TreeSet<String>();
+        for (String s : maximumScope){
+            int index = s.indexOf('|');
+            if (index == -1){
+                cleanScopes.add(s);
+                continue;
+            }
+            cleanScopes.add(s.substring(0,index));
+        }
+
+        return cleanScopes;
+    }
+
     /**
      * Constructor.
      */

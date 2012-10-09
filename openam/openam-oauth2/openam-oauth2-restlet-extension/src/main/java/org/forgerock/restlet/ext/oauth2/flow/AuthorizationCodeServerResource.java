@@ -24,10 +24,18 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.security.AccessController;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
@@ -35,6 +43,7 @@ import org.forgerock.openam.oauth2.model.AuthorizationCode;
 import org.forgerock.openam.oauth2.model.RefreshToken;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
+import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -91,12 +100,11 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             String scope_before =
                     OAuth2Utils
                             .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
-            // Validate the granted scope
-            Set<String> checkedScope =
-                    getCheckedScope(scope_before, client.getClient().allowedGrantScopes(), client
-                            .getClient().defaultGrantScopes());
 
-            return getPage("authorize.ftl", getDataModel());
+            // Validate the granted scope
+            Set<String> checkedScope = executeAuthorizationPageScopePlugin(scope_before);
+
+            return getPage("authorize.ftl", getDataModel(checkedScope));
         } else {
             decisionIsAllow = true;
             return authorization(getRequest().getEntity());
@@ -139,9 +147,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                     OAuth2Utils
                             .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
             // Validate the granted scope
-            Set<String> checkedScope =
-                    getCheckedScope(scope_after, client.getClient().allowedGrantScopes(), client
-                            .getClient().defaultGrantScopes());
+            Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
 
             // Generate Token resourceOwner, sessionClient, checkedScope,
             // customParameters
@@ -189,11 +195,11 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code has been user.");
         } else if (code.isTokenIssued()) {
+            // TODO Used code 2 times needs to invalidate all tokens associated with this code
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code has been user.");
         } else {
             if (code.isExpired()) {
-                // TODO Used code 2 times needs to invalidate all tokens associated with this code
                 throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
                         "Authorization code expired.");
             }

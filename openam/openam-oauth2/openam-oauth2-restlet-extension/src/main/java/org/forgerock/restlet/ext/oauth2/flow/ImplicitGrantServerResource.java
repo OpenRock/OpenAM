@@ -63,65 +63,49 @@ public class ImplicitGrantServerResource extends AbstractFlow {
     public Representation represent() {
         resourceOwner = getAuthenticatedResourceOwner();
 
-        String approval_prompt =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT,
-                        String.class);
+        // Validate the client
+        client = validateRemoteClient();
+        // Validate Redirect URI throw exception
+        sessionClient =
+                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
+                        OAuth2.Params.REDIRECT_URI, String.class));
 
-        if (true) {
-            /*
-             * APPROVAL_PROMPT = false AND CLIENT.AUTO_GRANT
-             */
+        // The target contains the state
+        String state =
+                OAuth2Utils
+                        .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
 
-            // Validate the client
-            client = validateRemoteClient();
-            // Validate Redirect URI throw exception
-            sessionClient =
-                    client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                            OAuth2.Params.REDIRECT_URI, String.class));
+        // Get the requested scope
+        String scope_before =
+                OAuth2Utils
+                        .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+        // Validate the granted scope
+        Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
-            // The target contains the state
-            String state =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
+        AccessToken token = createAccessToken(checkedScope);
+        Form tokenForm = tokenToForm(token.convertToMap());
 
-            // Get the requested scope
-            String scope_before =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
-            // Validate the granted scope
-            Set<String> checkedScope =
-                    getCheckedScope(scope_before, client.getClient().allowedGrantScopes(), client
-                            .getClient().defaultGrantScopes());
-
-            AccessToken token = createAccessToken(checkedScope);
-            Form tokenForm = tokenToForm(token.convertToMap());
-
-            /*
-             * scope OPTIONAL, if identical to the scope requested by the
-             * client, otherwise REQUIRED. The scope of the access token as
-             * described by Section 3.3.
-             */
-            if (isScopeChanged()) {
-                tokenForm.add(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
-                        .getScopeDelimiter(getContext())));
-            }
-            if (null != state) {
-                tokenForm.add(OAuth2.Params.STATE, state);
-            }
-
-            Reference redirectReference = new Reference(sessionClient.getRedirectUri());
-            redirectReference.setFragment(tokenForm.getQueryString());
-
-            Redirector dispatcher =
-                    new Redirector(getContext(), redirectReference.toString(),
-                            Redirector.MODE_CLIENT_FOUND);
-            dispatcher.handle(getRequest(), getResponse());
-            return getResponseEntity();
-
-        } else {
-            // Build approval page data
-            return getPage("authorize.ftl", getDataModel());
+        /*
+         * scope OPTIONAL, if identical to the scope requested by the
+         * client, otherwise REQUIRED. The scope of the access token as
+         * described by Section 3.3.
+         */
+        if (isScopeChanged()) {
+            tokenForm.add(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
+                    .getScopeDelimiter(getContext())));
         }
+        if (null != state) {
+            tokenForm.add(OAuth2.Params.STATE, state);
+        }
+
+        Reference redirectReference = new Reference(sessionClient.getRedirectUri());
+        redirectReference.setFragment(tokenForm.getQueryString());
+
+        Redirector dispatcher =
+                new Redirector(getContext(), redirectReference.toString(),
+                        Redirector.MODE_CLIENT_FOUND);
+        dispatcher.handle(getRequest(), getResponse());
+        return getResponseEntity();
     }
 
     @Override

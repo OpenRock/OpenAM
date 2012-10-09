@@ -28,6 +28,7 @@ import java.security.AccessController;
 import java.util.*;
 
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
@@ -405,78 +406,91 @@ public abstract class AbstractFlow extends ServerResource {
                 "The authorization server can not authenticate the client.");
     }
 
-    protected Map<String, Object> getDataModel() {
+    protected Map<String, Object> getDataModel(Set<String> scopes) {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
         data.put("target", getRequest().getResourceRef().toString());
         Set<String> displayNames = client.getClient().getDisplayName();
         Set<String> displayDescriptions = client.getClient().getDisplayDescription();
-        Set<String> scopes = client.getClient().allowedGrantScopes();
+        Set<String> allScopes = client.getClient().allowedGrantScopes();
         String locale = OAuth2Utils.getLocale(getRequest());
         String displayName = "";
         String displayDescription = "";
         List<String> displayScope = new ArrayList<String>();
-        if (locale != null){
-            //get the localized display name
-            for (String name : displayNames){
-                int firstDelimiter = name.indexOf("|");
-                if (firstDelimiter == -1){
-                    //no localization
-                    continue;
-                }
-                if (name.substring(0, firstDelimiter).equalsIgnoreCase(locale)){
-                    displayName = displayName + " " + name.substring(firstDelimiter+1,name.length());
-                }
-            }
-            //get the localized display description
-            for (String name : displayDescriptions){
-                int firstDelimiter = name.indexOf("|");
-                if (firstDelimiter == -1){
-                    //no localization
-                    continue;
-                }
-                if (name.substring(0, firstDelimiter).equalsIgnoreCase(locale)){
-                    displayDescription = displayDescription + " " + name.substring(firstDelimiter+1,name.length());
-                }
-            }
-            //get the localized scopes
-            for (String scope : scopes){
-                int firstDelimiter = scope.indexOf("|");
-                int secondDelimiter = scope.indexOf("|", firstDelimiter+1);
-                if (secondDelimiter == -1){
-                    //doesn't have 2 delimiters
-                    continue;
-                }
-                if (scope.substring(firstDelimiter+1,secondDelimiter).equals(locale)){
-                    displayScope.add(scope.substring(secondDelimiter+1,scope.length()));
-                }
-            }
-        } else {
-            //get the default display name (no localization)
-            for (String name : displayNames){
-                if (name.indexOf("|") == -1){
-                    displayName = displayName + " " + name;
-                }
-            }
-            //get the default display description (no localization)
-            for (String name : displayDescriptions){
-                if (name.indexOf("|") == -1){
-                    displayDescription = displayDescription + " " + name;
-                }
-            }
-            //get the default scopes
-            for (String scope : scopes){
-                int firstDelimiter = scope.indexOf("|");
-                int secondDelimiter = scope.indexOf("|", firstDelimiter+1);
-                if (secondDelimiter == -1){
-                    //doesn't have 2 delimiters (no localization)
-                    displayScope.add(scope.substring(firstDelimiter+1,scope.length()));
-                }
-            }
-        }
+
+        //get the localized display name
+        displayName = getDisplayParameter(locale, displayNames);
+        displayDescription = getDisplayParameter(locale, displayDescriptions);
+
+        //get the scope descriptions
+        displayScope = getScopeDescriptionsForLocale(scopes, allScopes, locale);
+
         data.put("display_name", displayName);
         data.put("display_description", displayDescription);
         data.put("display_scope", displayScope);
         return data;
+    }
+
+    private String getDisplayParameter(String locale, Set<String> displayNames){
+        Set<String> names = new HashSet<String>();
+        String defaultName = null;
+        final String DELIMITER = "|";
+        for (String name : displayNames){
+            if (name.contains(DELIMITER)){
+                int locationOfDelimiter = name.indexOf(DELIMITER);
+                if (name.substring(locationOfDelimiter).equalsIgnoreCase(locale)){
+                    return name.substring(locationOfDelimiter+1, name.length());
+                }
+            } else {
+                defaultName = name;
+            }
+        }
+
+        if (locale == null){
+            return defaultName;
+        }
+        return null;
+    }
+
+    private List<String> getScopeDescriptionsForLocale(Set<String> scopes,
+                                                       Set<String>scopesWithDescriptions,
+                                                       String locale){
+        final String DELIMITER = "|";
+        List<String> list = new LinkedList<String>();
+        for (String scope: scopes){
+            for (String scopeDescription : scopesWithDescriptions){
+                String[] parts = scopeDescription.split(DELIMITER);
+                if (parts != null && parts[0].equalsIgnoreCase(scope)){
+                    //no description or locale
+                    if (parts.length == 1){
+                        continue;
+                    } else if (parts.length == 2){
+                        //no locale add description
+                        list.add(parts[1]);
+                    } else if (parts.length == 3){
+                        //locale and description
+                        if (parts[2].equalsIgnoreCase(locale)){
+                            list.add(parts[3]);
+                        } else {
+                            //not the right locale
+                            continue;
+                        }
+
+                    } else {
+                        // TODO LOG Scope was input in client settings wrong
+                        continue;
+                    }
+
+                }
+
+            }
+
+        }
+        return list;
+    }
+
+    private String getFirstItemInDelimitedString(String string, String DELIMITER){
+        String[] items = string.split(DELIMITER);
+        return items[0];
     }
 
     protected void validateMethod() throws OAuthProblemException {
@@ -555,17 +569,9 @@ public abstract class AbstractFlow extends ServerResource {
             Set<String> intersect =
                     new TreeSet<String>(OAuth2Utils.split(requestedScope, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            //maximum scope can be in the form of <scope>|<locale>|<description>
-            Set<String> cleanScopes = new TreeSet<String>();
-            for (String s : maximumScope){
-                int index = s.indexOf('|');
-                if (index == -1){
-                    cleanScopes.add(s);
-                    continue;
-                }
-                cleanScopes.add(s.substring(0,index));
-            }
-            if (intersect.retainAll(cleanScopes)) {
+            Set<String> scopes = null;
+            scopes = OAuth2Utils.parseScope(maximumScope);
+            if (intersect.retainAll(scopes)) {
                 // TODO Log not allowed scope was requested and was modified
                 scopeChanged = true;
                 return intersect;
@@ -583,6 +589,99 @@ public abstract class AbstractFlow extends ServerResource {
     }
 
     protected void validateNotAllowedParameters() throws OAuthProblemException {
+    }
+
+    protected String getScopePluginClass(String realm) throws OAuthProblemException {
+        String pluginClass = null;
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
+        } catch (Exception e) {
+            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+                    "Service unavailable", "Could not create underlying storage", null);
+        }
+
+        return pluginClass;
+    }
+
+    protected Set<String> executeAccessTokenScopePlugin(String scopeRequest){
+        Set<String> checkedScope = null;
+        Set<String> requestedScopeSet = null;
+        String pluginClass = null;
+        Scope scopeClass = null;
+        try {
+            requestedScopeSet =
+                    new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
+                            .getScopeDelimiter(getContext())));
+            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
+            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+        } catch (Exception e){
+            //TODO LOG exception
+            checkedScope = null;
+            scopeClass = null;
+        }
+        // Validate the granted scope
+        if (scopeClass != null && pluginClass != null){
+            checkedScope = scopeClass.scopeRequestedForAccessToken(requestedScopeSet,
+                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()));
+        }
+
+        return checkedScope;
+    }
+
+    protected Set<String> executeRefreshTokenScopePlugin(String scopeRequest, Set<String> maxScope){
+        Set<String> checkedScope = null;
+        Set<String> requestedScopeSet = null;
+        String pluginClass = null;
+        Scope scopeClass = null;
+        try {
+            requestedScopeSet =
+                    new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
+                            .getScopeDelimiter(getContext())));
+            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
+            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+        } catch (Exception e){
+            //TODO LOG exception
+            checkedScope = null;
+            scopeClass = null;
+        }
+        // Validate the granted scope
+        if (scopeClass != null && pluginClass != null){
+            checkedScope = scopeClass.scopeRequestedForRefreshToken(requestedScopeSet,
+                    maxScope,
+                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()));
+        }
+
+        return checkedScope;
+    }
+
+    protected Set<String> executeAuthorizationPageScopePlugin(String scopeRequest){
+        Set<String> checkedScope = null;
+        Set<String> requestedScopeSet = null;
+        String pluginClass = null;
+        Scope scopeClass = null;
+        try {
+            requestedScopeSet =
+                    new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
+                            .getScopeDelimiter(getContext())));
+            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
+            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+        } catch (Exception e){
+            //TODO LOG exception
+            checkedScope = null;
+            scopeClass = null;
+        }
+
+        // Validate the granted scope
+        if (scopeClass != null && pluginClass != null){
+            checkedScope = scopeClass.scopeToPresentOnAuthorizationPage(requestedScopeSet,
+                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()));
+        }
+
+        return checkedScope;
     }
 
 }

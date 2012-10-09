@@ -73,9 +73,7 @@ public class PasswordServerResource extends AbstractFlow {
         String scope_before =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
         // Validate the granted scope
-        Set<String> checkedScope =
-                getCheckedScope(scope_before, client.getClient().allowedGrantScopes(), client
-                        .getClient().defaultGrantScopes());
+        Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
         AccessToken token = null;
         Map<String, Object> result = null;

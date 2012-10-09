@@ -68,7 +68,6 @@ public class RefreshTokenServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Token was issued to a different client");
         } else {
-            // TODO validate the refresh token.
             if (refreshToken.isExpired()) {
                 throw OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
             }
@@ -80,10 +79,9 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
             // Get the granted scope
             Set<String> granted_after = new TreeSet<String>(refreshToken.getScope());
-            granted_after.retainAll(client.getClient().allowedGrantScopes());
 
             // Validate the granted scope
-            Set<String> checkedScope = getCheckedScope(scope_before, granted_after, granted_after);
+            Set<String> checkedScope = executeRefreshTokenScopePlugin(scope_before, granted_after);
 
             // Generate Token
             AccessToken token = createAccessToken(refreshToken, checkedScope);

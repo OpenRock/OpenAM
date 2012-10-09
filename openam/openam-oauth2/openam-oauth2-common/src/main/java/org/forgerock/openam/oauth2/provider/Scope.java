@@ -24,31 +24,47 @@
 
 package org.forgerock.openam.oauth2.provider;
 
-
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
 
 import java.util.Map;
+import java.util.Set;
 
+/**
+ * This interface needs to be implemented to take advantage of OAuth2's scope feature.
+ * Each method of Scope is called with a new instance of the Scope implementation class. Any data that needs to
+ * persist between scope method calls should be declared static.
+ */
 public interface Scope {
 
+    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes);
+
     /**
-     * Init is called before any token processing is done. This method should be used to initialize any
-     * data the class requires.
+     * ScopeRequestedForAccessToken is called when a token is created and the token scope is requested.
+     * @param requestedScope The set of scopes requested
+     * @param availableScopes The set of scopes available for the client requesting the access token
+     * @return The set of scopes to grant the token
      */
-    public void init();
+    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes);
+
+    /**
+     * ScopeRequestedForRefreshToken is called when the client tries to refresh an Access Token. The scope returned MUST
+     * not contain a scope not originally grated to the original Access Token.
+     * @param requestedScope The set of scopes requested
+     * @param availableScopes The set of scopes given to the original Access Token
+     * @param allScopes All the available scopes for the client
+     * @return The set of scopes to grant the new Access Token
+     */
+    public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScope,
+                                                     Set<String> availableScopes,
+                                                     Set<String> allScopes);
 
     /**
      * This method is called after the token is processed and before it is returned to the user as authenticated. This
      * method should be used to implement your scope tasks.
      * @param token An AccessToken that contains all the information about the token
-     * @param error This value will be null unless the token is expired. If the token being expired is of no interest to
-     *              you set this to null.
-     * @return returns a map of data to be added to the token json object that will be returned to the client.
-     *          This map should contain a field called "authenticated" with a value of true or false depending on if the
-     *          token has passed your policies.
+     * @return returns a map of data to be added to the token json object that will be returned to the client
      */
-    public Map<String, Object> process(AccessToken token, OAuthProblemException error);
+    public Map<String, Object> retrieveTokenInfoEndPoint(AccessToken token);
 
     /**
      * This method is called just before the tokeninfo endpoint is returns the tokeninfo.
