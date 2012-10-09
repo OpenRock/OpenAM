@@ -1091,26 +1091,14 @@
 
     <filter>
         <filter-name>AuthenticationFilter</filter-name>
-        <filter-class>org.forgerock.openam.oauth2.rest.AuthenticationFilter</filter-class>
+        <filter-class>org.forgerock.openam.oauth2.rest.RestAuthentication</filter-class>
     </filter>
-    <!--
-    <filter>
-        <filter-name>RestHandlerFilter</filter-name>
-        <filter-class>
-            com.filters.Filter2
-        </filter-class>
-    </filter>
-    -->
+
     <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
         <url-pattern>/frrest/oauth2/*</url-pattern>
     </filter-mapping>
-    <!--
-    <filter-mapping>
-        <filter-name>RestHandlerFilter</filter-name>
-        <url-pattern>/frrest/oauth2/*</url-pattern>
-    </filter-mapping>
-    -->
+
     <servlet>
         <servlet-name>OAuth2Rest</servlet-name>
         <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>

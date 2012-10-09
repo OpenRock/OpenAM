@@ -48,7 +48,8 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionInstance(Context context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
+    public void actionInstance(Context context, String resourceId, ActionRequest request,
+                        ResultHandler<JsonValue> handler){
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
         handler.handleError(e);
@@ -62,7 +63,8 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void deleteInstance(Context context, DeleteRequest deleteRequest, ResultHandler<Resource> handler){
+    public void deleteInstance(Context context, String resourceId, DeleteRequest request,
+                        ResultHandler<Resource> handler){
         try{
             JsonValue query = new JsonValue(null);
             JsonValue response = null;
@@ -71,11 +73,11 @@ public class TokenResource implements CollectionResourceProvider {
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
                 //TODO what is the significance of revision
-                response = accessor.delete(deleteRequest.getResourceId(), "1");
+                response = accessor.delete(request.getResourceName(), "1");
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't delete token in CTS", null, e);
             }
-            resource = new Resource(deleteRequest.getResourceId(), "1", response);
+            resource = new Resource(request.getResourceName(), "1", response);
             handler.handleResult(resource);
         } catch (ResourceException e){
             handler.handleError(e);
@@ -83,7 +85,8 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void patchInstance(Context context, PatchRequest patchRequest, ResultHandler<Resource> handler){
+    public void patchInstance(Context context, String resourceId, PatchRequest request,
+                              ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Path is not supported for resource instances");
         handler.handleError(e);
@@ -97,14 +100,16 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void readInstance(Context context, ReadRequest readRequest, ResultHandler<Resource> handler){
+    public void readInstance(Context context, String resourceId, ReadRequest request,
+                      ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Read is not supported for resource instances");
         handler.handleError(e);
     }
 
     @Override
-    public void updateInstance(Context context, UpdateRequest updateRequest, ResultHandler<Resource> handler){
+    public void updateInstance(Context context, String resourceId, UpdateRequest request,
+                               ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Update is not supported for resource instances");
         handler.handleError(e);

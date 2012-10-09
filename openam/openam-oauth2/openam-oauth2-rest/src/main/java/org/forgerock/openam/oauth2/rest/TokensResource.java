@@ -54,7 +54,8 @@ public class TokensResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionInstance(Context context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
+    public void actionInstance(Context context, String resourceId, ActionRequest request,
+                               ResultHandler<JsonValue> handler){
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
         handler.handleError(e);
@@ -68,14 +69,16 @@ public class TokensResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void deleteInstance(Context context, DeleteRequest deleteRequest, ResultHandler<Resource> handler){
+    public void deleteInstance(Context context, String resourceId, DeleteRequest request,
+                               ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Delete is not supported for resource instances");
         handler.handleError(e);
     }
 
     @Override
-    public void patchInstance(Context context, PatchRequest patchRequest, ResultHandler<Resource> handler){
+    public void patchInstance(Context context, String resourceId, PatchRequest request,
+                              ResultHandler<Resource> handler){
         System.out.println("TEST");
         final ResourceException e =
                 new NotSupportedException("Patch is not supported for resource instances");
@@ -90,7 +93,7 @@ public class TokensResource implements CollectionResourceProvider {
             JsonResourceAccessor accessor =
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                response = accessor.query("XX", null);
+                response = accessor.query("1", null);
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't query CTS", null, e);
             }
@@ -102,7 +105,8 @@ public class TokensResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void readInstance(Context context, ReadRequest readRequest, ResultHandler<Resource> handler){
+    public void readInstance(Context context, String resourceId, ReadRequest request,
+                             ResultHandler<Resource> handler){
         try{
             JsonValue response;
             Resource resource;
@@ -110,11 +114,13 @@ public class TokensResource implements CollectionResourceProvider {
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
                 Map query = new HashMap<String,String>();
-                if (readRequest.getResourceId().equalsIgnoreCase(OAuth2.Params.REFRESH_TOKEN)){
+                if (request.getResourceName() == null){
+                    query.put(OAuth2.StoredToken.TYPE, "*");
+                } else if (request.getResourceName().equalsIgnoreCase(OAuth2.Params.REFRESH_TOKEN)){
                     query.put(OAuth2.StoredToken.TYPE, OAuth2.Params.REFRESH_TOKEN);
-                } else if (readRequest.getResourceId().equalsIgnoreCase(OAuth2.Params.ACCESS_TOKEN)){
+                } else if (request.getResourceName().equalsIgnoreCase(OAuth2.Params.ACCESS_TOKEN)){
                     query.put(OAuth2.StoredToken.TYPE, OAuth2.Params.ACCESS_TOKEN);
-                } else if (readRequest.getResourceId().equalsIgnoreCase(OAuth2.Params.CODE)) {
+                } else if (request.getResourceName().equalsIgnoreCase(OAuth2.Params.CODE)) {
                     query.put(OAuth2.StoredToken.TYPE, OAuth2.Params.CODE);
                 } else {
                     query.put(OAuth2.StoredToken.TYPE, "*");
@@ -133,7 +139,8 @@ public class TokensResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void updateInstance(Context context, UpdateRequest updateRequest, ResultHandler<Resource> handler){
+    public void updateInstance(Context context, String resourceId, UpdateRequest request,
+                               ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Update is not supported for resource instances");
         handler.handleError(e);

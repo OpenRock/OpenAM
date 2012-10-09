@@ -16,24 +16,13 @@
  */
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.json.resource.Context.newRootContext;
-
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.logging.Logger;
+import static org.forgerock.json.resource.provider.RoutingMode.EQUALS;
 import javax.servlet.ServletException;
 
-
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Connections;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.RequestHandler;
 import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
 
 
 public class RestTokenDispathcer {
@@ -44,11 +33,10 @@ public class RestTokenDispathcer {
 
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
-            final UriTemplateRoutingStrategy routes = new UriTemplateRoutingStrategy();
-            routes.register("/tokens", new TokensResource());
-            routes.register("/token", new TokenResource());
-            final RequestHandler handler = new Router(routes);
-            final ConnectionFactory factory = Connections.newInternalConnectionFactory(handler);
+            final Router router = new Router();
+            router.addRoute(EQUALS, "/tokens", new TokensResource());
+            router.addRoute(EQUALS, "/token", new TokenResource());
+            final ConnectionFactory factory = Connections.newInternalConnectionFactory(router);
             return factory;
         } catch (final Exception e) {
             throw new ServletException(e);

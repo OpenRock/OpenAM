@@ -21,24 +21,24 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.oauth2.OAuth2;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AuthenticationFilter implements Filter {
+public class RestAuthentication implements Filter {
 
-    FilterConfig filterConfig = null;
-
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException{
-        this.filterConfig = filterConfig;
+
     }
 
-    public void doFilter ( ServletRequest request, ServletResponse response, FilterChain chain )
-            throws IOException, ServletException{
-        boolean authorized = false;
+    @Override
+    public void doFilter ( ServletRequest request, ServletResponse response, FilterChain chain ) throws IOException, ServletException{
         HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
 
         try {
             request.setCharacterEncoding("UTF-8");
@@ -50,26 +50,16 @@ public class AuthenticationFilter implements Filter {
                     "id=amadmin,ou=user," + SMSEntry.getRootSuffix())
                     ) {
                 //Is an admin continue
-                authorized = true;
+                chain.doFilter(request, response);
             } else {
-                authorized = false;
+                res.sendError(401, "Not Authorized");
             }
         } catch (SSOException e) {
-            authorized = false;
+            res.sendError(401, "Not Authorized");
         }
-
-        if (authorized){
-            chain.doFilter(request, response);
-            return;
-        } else {
-            filterConfig.getServletContext().getRequestDispatcher("/UI/Login?goto="+req.getRequestURL().toString()).
-                    forward(request, response);
-
-            return;
-        }
-
     }
 
+    @Override
     public void destroy(){
 
     }

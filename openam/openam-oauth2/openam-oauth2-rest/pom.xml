@@ -93,10 +93,12 @@
        <module>json-resource</module>
        <module>json-resource-servlet</module>
         -->
+        <!--
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>org.forgerock.json.resource</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-patch</artifactId>
