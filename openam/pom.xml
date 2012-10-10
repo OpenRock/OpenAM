@@ -56,7 +56,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM</name>
+    <name>OpenAM Project</name>
     <groupId>org.forgerock</groupId>
     <artifactId>openam</artifactId>
     <version>10.1.0-SNAPSHOT</version>
@@ -127,6 +127,8 @@
         <restlet.version>2.1-RC4</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
 
+        <!--  Project web site -->
+        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
     </properties>
 
     <!-- Profiles -->
@@ -181,6 +183,7 @@
         <module>openam-rest</module>
 
         <!-- OpenAM Forgerock REST - CORE Module -->
+        <!-- Commenting out until it gets stable -->
         <!-- <module>openam-forgerock-rest</module> -->
 
         <!-- OpenAM Core Module -->
@@ -496,6 +499,11 @@
             <name>maven.forgerock.org-snapshots</name>
             <url>http://maven.forgerock.org/repo/openam-snapshots</url>
         </snapshotRepository>
+        <site>
+            <id>forgerock.org</id>
+            <name>OpenAM Project</name>
+            <url>${siteDistributionURL}</url>
+        </site>
     </distributionManagement>
 
     <!-- Source Control -->
@@ -1326,6 +1334,9 @@
                             <doctitle>OpenAM ${project.version} Public API JavaDoc</doctitle>
                             <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
                             <finalName>openam-${project.version}-public</finalName>
+                            <subpackages>
+                                com.iplanet.am.sdk:com.sun.identity.saml2:com.iplanet.am.sdk:com.iplanet.sso:com.sun.identity.log:com.sun.identity.policy:com.sun.identity.authentication:com.sun.identity.idm:com.sun.identity.sm:com.sun.identity.federation:com.sun.identity.liberty.ws:com.sun.identity.plugin:com.sun.identity.saml:com.sun.identity.saml2:com.sun.identity.sae:com.sun.identity.wsfederation:com.sun.identity.xacml:com.sun.liberty:com.sun.identity.wss.provider:com.sun.identity.wss.security:com.sun.identity.wss.sts:org.forgerock.openam
+                            </subpackages>
                             <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
                             <docletArtifact>
                                 <groupId>org.forgerock</groupId>
@@ -1434,6 +1445,29 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.forgerock.maven.plugins</groupId>
+                <artifactId>linktester-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <includes>
+                        <include>**/index.xml</include>
+                    </includes>
+                    <validating>true</validating>
+                    <xIncludeAware>true</xIncludeAware>
+                    <failOnError>false</failOnError>
+                    <outputFile>${project.build.directory}/linktester.err</outputFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>site</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -1634,6 +1668,24 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.9.1</version>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.4</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
         </plugins>
 
     </reporting>
