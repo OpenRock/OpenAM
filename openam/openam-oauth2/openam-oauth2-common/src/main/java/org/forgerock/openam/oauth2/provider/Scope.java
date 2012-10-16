@@ -66,9 +66,4 @@ public interface Scope {
      */
     public Map<String, Object> retrieveTokenInfoEndPoint(AccessToken token);
 
-    /**
-     * This method is called just before the tokeninfo endpoint is returns the tokeninfo.
-     * Use this method to cleanup any variables left over in this class
-     */
-    public void destroy();
 }

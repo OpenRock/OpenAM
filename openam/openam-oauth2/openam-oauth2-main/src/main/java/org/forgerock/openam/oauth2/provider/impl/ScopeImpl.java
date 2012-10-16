@@ -60,9 +60,4 @@ public class ScopeImpl implements Scope {
         return map;
     }
 
-    @Override
-    public void destroy(){
-
-    }
-
 }

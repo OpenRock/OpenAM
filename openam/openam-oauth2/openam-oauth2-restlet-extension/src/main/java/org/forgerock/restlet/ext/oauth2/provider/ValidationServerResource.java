@@ -172,8 +172,6 @@ public class ValidationServerResource extends ServerResource implements
         if (error != null) {
             response.putAll(error.getErrorMessage());
         }
-        //call plugin class destroy for cleanup
-        scopeClass.destroy();
 
         // Sets the no-store Cache-Control header
         getResponse().getCacheDirectives().add(CacheDirective.noCache());

@@ -148,6 +148,7 @@ public class OAuth2Utils {
     public static final String TOKENINFO = "tokeninfo";
     public static final String SCOPE_DELIMITER_CONFIG = "scope_delimiter";
     public static final String SCOPE_DELIMITER = " ";
+    public static final String SCOPE_LOCALE_DELIMITER = "|";
 
     /**
      * Returns the value of the "access_token_path" parameter.
@@ -538,7 +539,7 @@ public class OAuth2Utils {
     public static Set<String> parseScope(Set<String> maximumScope){
         Set<String> cleanScopes = new TreeSet<String>();
         for (String s : maximumScope){
-            int index = s.indexOf('|');
+            int index = s.indexOf(SCOPE_LOCALE_DELIMITER);
             if (index == -1){
                 cleanScopes.add(s);
                 continue;
