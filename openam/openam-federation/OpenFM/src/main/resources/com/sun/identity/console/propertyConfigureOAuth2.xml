@@ -1,0 +1,61 @@
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="question" defaultValue="blank.header">
+        <property required="true">
+            <label name="lblRealm" defaultValue="create.fedlet.label.realm" labelFor="tfRealm" />
+            <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+        </property>
+    </section>
+    <section name="question" defaultValue="configure.oauth2.section.serv">
+        <property required="true">
+            <label name="lblServiceRefreshLifetime" defaultValue="configure.oauth2.label.service.refreshLifetime" labelFor="choiceRefreshLifetime" />
+            <cc name="choiceRefreshLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoiceRefreshLifetime" defaultValue="configure.oauth2.label.service.refreshLifetime.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceCodeLifetime" defaultValue="configure.oauth2.label.service.codeLifetime" labelFor="choiceCodeLifetime" />
+            <cc name="choiceCodeLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoiceCodeLifetime" defaultValue="configure.oauth2.label.service.codeLifetime.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceTokenLifetime" defaultValue="configure.oauth2.label.service.tokenLifetime" labelFor="choiceTokenLifetime" />
+            <cc name="choiceTokenLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoiceTokenLifetime" defaultValue="configure.oauth2.label.service.tokenLifetime.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceRefreshToken" defaultValue="configure.oauth2.label.service.refreshToken" labelFor="choiceRefreshToken" />
+            <cc name="choiceRefreshToken" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+            <fieldhelp name="helpChoiceRefreshToken" defaultValue="configure.oauth2.label.service.refreshToken.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl" labelFor="choiceScopeImpl" />
+            <cc name="choiceScopeImpl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl.help" />
+        </property>
+    </section>
+
+    <section name="question" defaultValue="configure.oauth2.section.policy">
+        <property required="true">
+            <label name="lblPolicyName" defaultValue="configure.oauth2.label.policy.policyName" labelFor="choicePolicyName" />
+            <cc name="choicePolicyName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicyName" defaultValue="configure.oauth2.label.policy.policyName.help" />
+        </property>
+        <property required="true">
+            <label name="lblPolicyRuleName" defaultValue="configure.oauth2.label.policy.policyRuleName" labelFor="choicePolicyRuleName" />
+            <cc name="choicePolicyRuleName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicyRuleName" defaultValue="configure.oauth2.label.policy.policyRuleName.help" />
+        </property>
+        <property required="true">
+            <label name="lblPolicySubjectName" defaultValue="configure.oauth2.label.policy.policySubjectName" labelFor="choicePolicySubjectName" />
+            <cc name="choicePolicySubjectName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicySubjectName" defaultValue="configure.oauth2.label.policy.policySubjectName.help" />
+        </property>
+    </section>
+
+    <section name="question2" defaultValue="configure.oauth2.section.registerClient">
+    <property>
+        <fieldhelp name="helpQuestion2" defaultValue="configure.oauth2.section.registerClient.help" />
+    </property>
+    </section>
+</propertysheet>
