@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2012 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2010-2012 ForgeRock Inc. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -26,9 +26,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.forgerock.openam</groupId>
+    <groupId>org.forgerock.openam</groupId>
     <artifactId>mavenquickstart</artifactId>
-    <version>954</version>
+    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>OpenAM - Auth-module quickstart</name>
     

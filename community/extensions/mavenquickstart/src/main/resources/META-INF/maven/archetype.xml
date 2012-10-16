@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2010-2012 ForgeRock Inc. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -32,8 +32,8 @@
         <source>src/main/java/MyPrincipal.java</source>
     </sources>
     <resources>
-        <resource>src/resources/amAuthMyModule.properties</resource>
-        <resource>src/resources/amAuthMyModule.xml</resource>
-        <resource>src/resources/MyModule.xml</resource>
+        <resource>src/main/resources/amAuthMyModule.properties</resource>
+        <resource>src/main/resources/amAuthMyModule.xml</resource>
+        <resource>src/main/resources/MyModule.xml</resource>
     </resources>
 </archetype>
