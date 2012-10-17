@@ -78,18 +78,41 @@
 
 <script language="javascript">
 
-var msgCreating = "<p><img src=\"../console/images/processing.gif\" width=\"66\" height\"66\"/></p><cc:text name="txtConfiguring" defaultValue="creating.fedlet.waiting" bundleID="amConsole" escape="false" />";
-var ttlCreated = "<h3><cc:text name="txtTtlCreated" defaultValue="fedlet.created.title" escape="false" bundleID="amConsole" /></h3>";
+var msgCreating = "<p><img src=\"../console/images/processing.gif\" width=\"66\" height\"66\"/></p><cc:text name="txtConfiguring" defaultValue="configuring.oauth2.waiting" bundleID="amConsole" escape="false" />";
+var ttlCreated = "<h3><cc:text name="txtTtlCreated" defaultValue="oauth2.configured.title" escape="false" bundleID="amConsole" /></h3>";
 var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/Home\');return false;\" /></div></p>";
 var closeBtn = "<p>&nbsp;</p><p><div class=\"TtlBtnDiv\"><input name=\"btnClose\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtCloseBtn" defaultValue="ajax.close.button" bundleID="amConsole" />\" onClick=\"focusMain();return false;\" /></div></p>";
 
-var frm = document.forms['CreateFedlet'];
-var btn1 = frm.elements['CreateFedlet.button1'];
+var frm = document.forms['ConfigureOAuth2'];
+var btn1 = frm.elements['ConfigureOAuth2.button1'];
 btn1.onclick = submitPage;
-var btn2 = frm.elements['CreateFedlet.button2'];
+var btn2 = frm.elements['ConfigureOAuth2.button2'];
 btn2.onclick = cancelOp;
 var ajaxObj = getXmlHttpRequestObject();
 var userLocale = "<%= viewBean.getUserLocale().toString() %>";
+
+function getData(){
+    var realm = frm.elements['ConfigureOAuth2.tfRealm'].value;
+    var rtl = frm.elements['ConfigureOAuth2.choiceRefreshLifetime'].value;
+    var acl = frm.elements['ConfigureOAuth2.choiceCodeLifetime'].value;
+    var atl = frm.elements['ConfigureOAuth2.choiceTokenLifetime'].value;
+    var irt = frm.elements['ConfigureOAuth2.choiceRefreshToken'].value;
+    var sic = frm.elements['ConfigureOAuth2.choiceScopeImpl'].value;
+    var pn = frm.elements['ConfigureOAuth2.choicePolicyName'].value;
+    var rn = frm.elements['ConfigureOAuth2.choicePolicyRuleName'].value;
+    var sn = frm.elements['ConfigureOAuth2.choicePolicySubjectName'].value;
+    var policyURL = frm.elements['ConfigureOAuth2.choicePolicyURL'].value;
+    return "&realm=" + escapeEx(realm) +
+            "&rtl=" + escapeEx(rtl) +
+            "&acl=" + escapeEx(acl) +
+            "&atl=" + escapeEx(atl) +
+            "&irt=" + escapeEx(irt) +
+            "&sic=" + escapeEx(sic) +
+            "&pn=" + escapeEx(pn) +
+            "&rn=" + escapeEx(rn) +
+            "&sn=" + escapeEx(sn) +
+            "&policyURL=" + escapeEx(policyURL);
+}
 
 function submitPage() {
     document.getElementById('dlg').style.top = '300px';
@@ -98,9 +121,24 @@ function submitPage() {
             msgCreating + '</center>';
     var url = "../console/ajax/AjaxProxy.jsp";
     var params = 'locale=' + userLocale +
-            '&class=com.sun.identity.workflow.CreateFedlet' + getData();
+            '&class=com.sun.identity.workflow.ConfigureOAuth2' + getData();
     ajaxPost(ajaxObj, url, params, configured);
     return false;
+}
+
+function configured() {
+    if (ajaxObj.readyState == 4) {
+        var result = hexToString(ajaxObj.responseText);
+        var status = result.substring(0, result.indexOf('|'));
+        var result = result.substring(result.indexOf('|') +1);
+        var msg = '<center><p>' + result + '</p></center>';
+        if (status == 0) {
+            msg = '<center>' + ttlCreated + msg + msgCreated + '</center>';
+        } else {
+            msg = msg + '<center>' +  closeBtn + '</center>';
+        }
+        document.getElementById('dlg').innerHTML = msg;
+    }
 }
 
 </script>
