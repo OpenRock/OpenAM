@@ -85,6 +85,11 @@ public class ConfigureOAuth2 extends Task {
             String subjectName = getString(params, SN);
             String policyURL = getString(params, POLICY_URL);
 
+            //add asterisk to cover the url having parameters
+            if (!policyURL.endsWith("*")){
+                policyURL.concat("*");
+            }
+
             //build the policy
             Policy policy = null;
             try {
