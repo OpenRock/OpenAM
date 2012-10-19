@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolverException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
@@ -102,7 +103,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(final Context context, final ActionRequest request,
+    public void actionInstance(final Context context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource Realms");
@@ -124,7 +125,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final Context context, final DeleteRequest request,
+    public void deleteInstance(final Context context, final String resourceId, final DeleteRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e =
                 new NotSupportedException("Delete is not supported for resource Realms");
@@ -135,7 +136,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(final Context context, final PatchRequest request,
+    public void patchInstance(final Context context, final String resourceId, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported for resource Realms");
         handler.handleError(e);
@@ -151,7 +152,7 @@ public final class RealmResource implements CollectionResourceProvider {
         for (Object theRealm : subRealms ) {
             String realm = (String) theRealm;
             JsonValue val = new JsonValue(realm);
-            Resource resource = new Resource("0","0",val)  ;
+            Resource resource = new Resource("0","0",val);
             handler.handleResource(resource);
         }
         handler.handleResult(new QueryResult());
@@ -161,29 +162,30 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final Context context, final ReadRequest request,
-                             final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
-
+    public void readInstance(final Context context, final String resourceId,
+                             final ReadRequest request, final ResultHandler<Resource> handler) {
+        JsonValue val = null;
         for (Object theRealm : subRealms ) {
             String realm = (String) theRealm;
-            JsonValue val = new JsonValue(realm);
-            Resource resource = new Resource("0","0",val)  ;
-            handler.handleResource(resource);
+            if(realm.equalsIgnoreCase(resourceId)){
+                val = new JsonValue(realm);
+            }
         }
-        handler.handleResult(new QueryResult());
+        if(val != null){
+            Resource resource = new Resource("0","0",val);
+            handler.handleResult(resource);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final Context context, final UpdateRequest request,
-                               final ResultHandler<Resource> handler) {
+    public void updateInstance(final Context context,final String resourceId,
+                               final UpdateRequest request, final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Update operations are not supported for resource Realms");
         handler.handleError(e);
     }
-
     /*
      * Add the ID and revision to the JSON content so that they are included
      * with subsequent responses. We shouldn't really update the passed in
@@ -193,7 +195,7 @@ public final class RealmResource implements CollectionResourceProvider {
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {
-            content.asMap().put("_id", resource.getId());
+            content.asMap().put("_id",resource.getResourceName());
             content.asMap().put("_rev", resource.getRevision());
         } catch (final JsonValueException e) {
             throw new BadRequestException(

@@ -36,7 +36,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.RequestHandler;
 import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
+import static org.forgerock.json.resource.provider.RoutingMode.EQUALS;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
@@ -58,7 +58,7 @@ public final class RealmDispatcher  {
 
     }
 
-    static private void initRealmEndpoints(OrganizationConfigManager ocm, UriTemplateRoutingStrategy routes) {
+    static private void initRealmEndpoints(OrganizationConfigManager ocm, Router router) {
 
         try {
             SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
@@ -66,27 +66,29 @@ public final class RealmDispatcher  {
             String rName = ocm.getOrganizationName();
             if (rName.length() > 1) rName = rName + "/";
 
-            routes.register(rName + "users", new IdentityResource("user", rName));                // Just a simply READ to make sure dispatching works
-            routes.register(rName + "agents", new IdentityResource("agent", rName));              // Just a simply READ to make sure dispatching works
-            routes.register(rName + "groups", new IdentityResource("group", rName));              // Just a simply READ to make sure dispatching works
-            Set subOrgs = ocm.getSubOrganizationNames();
-            routes.register(rName + "realms", new RealmResource(subOrgs));
 
+            router.addRoute(EQUALS, "/users", new IdentityResource("user", rName));// Just a simply READ to make sure dispatching works
+            router.addRoute(EQUALS, "/agents", new IdentityResource("agent", rName));// Just a simply READ to make sure dispatching works
+            router.addRoute(EQUALS, "/groups", new IdentityResource("group", rName));// Just a simply READ to make sure dispatching works
+
+            Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
+            router.addRoute(EQUALS, "/realms", new RealmResource(subOrgs));
+            //Recursively calls on each realm registring users agents groups for each subrealm
             for (Object theRealm : subOrgs) {
                 String realm = rName + (String) theRealm;
-                initRealmEndpoints(new OrganizationConfigManager(adminToken, realm), routes);
+                initRealmEndpoints(new OrganizationConfigManager(adminToken, realm), router);
             }
         } catch (Exception e) {
 
         }
     }
 
-    static public void initDispatcher(UriTemplateRoutingStrategy routes) {
+    static public void initDispatcher(Router router) {
         try {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
-        OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken,"/");
-        initRealmEndpoints(ocm, routes);
+            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                    AdminTokenAction. getInstance());
+            OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken,"/");
+            initRealmEndpoints(ocm, router);
         } catch (Exception e) {
 
         }

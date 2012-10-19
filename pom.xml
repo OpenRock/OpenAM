@@ -57,7 +57,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM Project</name>
-    <groupId>org.forgerock</groupId>
+    <groupId>org.forgerock.openam</groupId>
     <artifactId>openam</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -183,14 +183,13 @@
         <module>openam-rest</module>
 
         <!-- OpenAM Forgerock REST - CORE Module -->
-        <!-- Commenting out until it gets stable -->
-        <!-- <module>openam-forgerock-rest</module> -->
+        <module>openam-forgerock-rest</module>
 
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
         <!-- OpenAM Common Test Suite -->
-        <!-- module>openam-test</module -->
+        <module>openam-test</module>
 
         <!-- OpenAM Session High-Availability FailOver Module -->
         <module>openam-session-ha</module>
@@ -905,7 +904,7 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
-                <scope>provided</scope> 
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet.jsp</groupId>
@@ -943,12 +942,12 @@
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.1</version>
-                 <exclusions>
-                     <exclusion>
-                         <groupId>xml-apis</groupId>
-                         <artifactId>xml-apis</artifactId>
-                     </exclusion>
-                 </exclusions>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1339,7 +1338,7 @@
                             </subpackages>
                             <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
                             <docletArtifact>
-                                <groupId>org.forgerock</groupId>
+                                <groupId>org.forgerock.openam</groupId>
                                 <artifactId>openam-shared</artifactId>
                                 <version>10.1.0-SNAPSHOT</version>
                             </docletArtifact>

@@ -34,7 +34,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.RequestHandler;
 import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
+
 
 
 
@@ -48,7 +48,7 @@ public final class TestDispatcher  {
 
     }
 
-    static public void initDispatcher(UriTemplateRoutingStrategy routes) {
-       // routes.register("/test",new TestResource());                // Just a simply READ to make sure dispatching works
+    static public void initDispatcher(Router router) {
+        //router.addRoute(EQUALS, "/test", new TestResource());// Just a simply READ to make sure dispatching works
     }
 }

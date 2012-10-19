@@ -45,7 +45,7 @@ import org.forgerock.json.resource.provider.CollectionResourceProvider;
 import org.forgerock.json.resource.provider.SingletonResourceProvider;
 import org.forgerock.json.resource.provider.RequestHandler;
 import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
+
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
@@ -80,7 +80,7 @@ public final class TestResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
 
-    public void actionInstance(final Context context, final ActionRequest request,
+    public void actionInstance(final Context context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
@@ -102,7 +102,7 @@ public final class TestResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
 
-    public void deleteInstance(final Context context, final DeleteRequest request,
+    public void deleteInstance(final Context context, final String resourceId, final DeleteRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
@@ -113,7 +113,7 @@ public final class TestResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
 
-    public void patchInstance(final Context context, final PatchRequest request,
+    public void patchInstance(final Context context, final String resourceId, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported");
         handler.handleError(e);
@@ -136,7 +136,7 @@ public final class TestResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
 
-    public void readInstance(final Context context, final ReadRequest request,
+    public void readInstance(final Context context, final String resourceId, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
         JsonValue val = context.toJsonValue();
         Resource resource = new Resource("0","0",val);
@@ -147,7 +147,7 @@ public final class TestResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
 
-    public void updateInstance(final Context context, final UpdateRequest request,
+    public void updateInstance(final Context context, final String resourceId, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Update operations are not supported");
         handler.handleError(e);
@@ -162,7 +162,7 @@ public final class TestResource implements CollectionResourceProvider {
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {
-            content.asMap().put("_id", resource.getId());
+            content.asMap().put("_id", resource.getResourceName());
             content.asMap().put("_rev", resource.getRevision());
         } catch (final JsonValueException e) {
             throw new BadRequestException(

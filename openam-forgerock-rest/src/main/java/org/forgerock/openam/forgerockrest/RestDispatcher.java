@@ -36,7 +36,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.RequestHandler;
 import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
+import static org.forgerock.json.resource.provider.RoutingMode.EQUALS;
 import org.forgerock.json.resource.provider.SingletonResourceProvider;
 
 
@@ -58,16 +58,16 @@ public final class RestDispatcher  {
         return instance;
     }
 
-    private void callConfigClass(String className,UriTemplateRoutingStrategy routes) {
-            // Check for configured connection factory class first.
+    private void callConfigClass(String className, Router router) {
+        // Check for configured connection factory class first.
         if (className != null) {
             final ClassLoader cl = this.getClass().getClassLoader();
             try {
                 final Class<?> cls = Class.forName(className, true, cl);
                 // Try method which accepts ServletConfig.
-                final Method factoryMethod = cls.getMethod("initDispatcher", UriTemplateRoutingStrategy.class);
+                final Method factoryMethod = cls.getMethod("initDispatcher", Router.class);
 
-                factoryMethod.invoke(null, routes);
+                factoryMethod.invoke(null, router);
                 return ;
             } catch (final Exception e) {
             }
@@ -81,19 +81,18 @@ public final class RestDispatcher  {
      * */
 
     public ConnectionFactory buildConnectionFactory(ServletConfig config) throws ResourceException {
-        final UriTemplateRoutingStrategy routes = new UriTemplateRoutingStrategy();
-
+        final Router router = new Router();
         String roots = config.getInitParameter("rootContexts");
-        routes.register("/test",new TestResource());                // Just a simply READ to make sure dispatching works
+        router.addRoute(EQUALS, "/test", new TestResource());// Just a simply READ to make sure dispatching works
+
         if (roots != null)  {
             String[] initClasses = config.getInitParameter("rootContexts").split(","); // not really much to do
 
             for (String ctx : initClasses)  {
-                callConfigClass(ctx.trim(),routes);
+                callConfigClass(ctx.trim(),router);
             }
         }
-        handler = new Router(routes);
-        factory = Connections.newInternalConnectionFactory(handler);
+        factory = Connections.newInternalConnectionFactory(router);
         return factory;
     }
 
@@ -107,7 +106,7 @@ public final class RestDispatcher  {
 
     private static void initSampleResources(ConnectionFactory factory) throws ResourceException {
 
-// Populate with some test users and groups.
+        // Populate with some test users and groups.
         final Connection connection = factory.getConnection();
 
         final JsonValue user1 = new JsonValue(new LinkedHashMap<String, Object>());

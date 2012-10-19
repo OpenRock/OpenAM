@@ -16,7 +16,9 @@
 package org.forgerock.openam.forgerockrest;
 
 import java.lang.Exception;
+import java.lang.Object;
 import java.lang.String;
+import java.lang.System;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +26,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.Iterator;
+
+
+import java.lang.reflect.Method;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
@@ -55,6 +61,8 @@ import java.security.AccessController;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idsvcs.DeleteResponse;
+import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.idsvcs.Token;
 
@@ -123,7 +131,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(final Context context, final ActionRequest request,
+    public void actionInstance(final Context context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
@@ -132,42 +140,70 @@ public final class IdentityResource implements CollectionResourceProvider {
 
     /**
      * {@inheritDoc}
+     *
      */
-    @Override
+
+    public void printJValMap(Map<String, Object> JVMap){
+        for (Map.Entry<String, Object> entry : JVMap.entrySet()){
+            System.out.println("Key is:   [" + entry.getKey() + "]");
+            System.out.println("Value is: ["+ entry.getValue() + "]");
+        }
+    }
+
+    @Override  //public CreateResponse create(IdentityDetails identity, Token admin)
     public void createInstance(final Context context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
-        final JsonValue value = request.getContent();
-        final String id = request.getResourceId();
-        final String rev = "0";
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
+        Token admin = new Token();
+        admin.setId(adminToken.getTokenID().toString());
+
+        final JsonValue jVal = request.getContent();
+        final String id = request.getResourceName();
+
+
+        List<Attribute> identityAttrList = new ArrayList();
+        identityAttrList.addAll(iDSvcsAttrList);
+        Map<String, Object> holdJVal = new LinkedHashMap<String, Object>();
+
+        holdJVal = jVal.asMap();
+        printJValMap(holdJVal);  //Print the Map for now...
+
+        for (Map.Entry<String, Object> entry : holdJVal.entrySet()){
+            String t = entry.getValue().toString();
+            String[] test =  {t};
+            identityAttrList.add(new Attribute(entry.getKey().toString(),test));
+        }
+
+        Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
+
         try {
-            final Resource resource;
-            while (true) {
-                final String eid =
-                        id != null ? id : String.valueOf(nextResourceId.getAndIncrement());
-                final Resource tmp = new Resource(eid, rev, value);
-                synchronized (writeLock) {
-                    final Resource existingResource = resources.put(eid, tmp);
-                    if (existingResource != null) {
-                        if (id != null) {
-                            // Already exists - put the existing resource back.
-                            resources.put(id, existingResource);
-                            throw new ConflictException("The resource with ID '" + id
-                                    + "' could not be created because "
-                                    + "there is already another resource with the same ID");
-                        } else {
-                            // Retry with next available resource ID.
-                        }
-                    } else {
-                        // Add succeeded.
-                        addIdAndRevision(tmp);
-                        resource = tmp;
-                        break;
-                    }
-                }
+            if (jVal == null) {
+                throw new NotFoundException("The resource with ID '" + id
+                        + " can not be created!");
             }
+            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+            IdentityDetails identity = new IdentityDetails();
+
+            //identity.setName(jVal.get("name").toString());
+            identity.setName("test");
+            String hold = "user";
+            identity.setType(hold);
+            identity.setRealm(realm);
+            //identity.setAttributes(identityAttrList);
+            identity.setAttributes(attr);
+            IdentityServicesImpl idsvc = new IdentityServicesImpl();
+
+            Method methods[] = identity.getClass().getDeclaredMethods();
+
+            //identity.setAttributes(identityAttrList);
+            CreateResponse success = idsvc.create(identity, admin);
+
+
+            Resource resource = new Resource("0", "0", jVal);
             handler.handleResult(resource);
         } catch (final ResourceException e) {
             handler.handleError(e);
+        } catch (final Exception e) {
         }
     }
 
@@ -175,28 +211,33 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final Context context, final DeleteRequest request,
+    public void deleteInstance(final Context context, final String resourceId, final DeleteRequest request,
                                final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
-        final String rev = request.getRevision();
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
+        Token admin = new Token();
+        admin.setId(adminToken.getTokenID().toString());
+
         try {
-            final Resource resource;
-            synchronized (writeLock) {
-                resource = resources.remove(id);
-                if (resource == null) {
-                    throw new NotFoundException("The resource with ID '" + id
-                            + " could not be deleted because it does not exist");
-                } else if (rev != null && !resource.getRevision().equals(rev)) {
-                    // Mismatch - put the resource back.
-                    resources.put(id, resource);
-                    throw new ConflictException("The resource with ID '" + id
-                            + "' could not be deleted because "
-                            + "it does not have the required version");
-                }
+            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+            IdentityServicesImpl idsvc = new IdentityServicesImpl();
+            IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin); //read to see if it's there
+
+            if (dtls == null) {
+                throw new NotFoundException("The resource with ID '" + resourceId
+                        + " could not be read because it does not exist");
             }
+
+            //DeleteResponse success = idsvc.delete(dtls, admin); //delete now that dtls isn't null
+            Object success = idsvc.delete(dtls,admin);
+            String name = success.getClass().getName();
+            //result.put("Delete", success.toString());
+            result.put("Delete", "OK");
+            Resource resource = new Resource("0", "0", result);
             handler.handleResult(resource);
+
         } catch (final ResourceException e) {
             handler.handleError(e);
+        } catch (final Exception e) {
         }
     }
 
@@ -204,7 +245,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(final Context context, final PatchRequest request,
+    public void patchInstance(final Context context, final String resourceId, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported");
         handler.handleError(e);
@@ -242,24 +283,22 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final Context context, final ReadRequest request,
+    public void readInstance(final Context context, final String resourceId, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
 
         try {
-            String component = request.getComponent();
+
             JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
 
-
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            IdentityDetails dtls = idsvc.read(id, iDSvcsAttrList, admin);
+            IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);
 
             if (dtls == null) {
-                throw new NotFoundException("The resource with ID '" + id
+                throw new NotFoundException("The resource with ID '" + resourceId
                         + " could not be read because it does not exist");
             }
             result.put("name", dtls.getName());
@@ -269,8 +308,8 @@ public final class IdentityResource implements CollectionResourceProvider {
             for (Attribute aix : attrs) {
                 result.put(aix.getName(), aix.getValues());
             }
-            Resource resource = new Resource("0", "0", result);
 
+            Resource resource = new Resource("0", "0", result);
             handler.handleResult(resource);
         } catch (final ResourceException e) {
             handler.handleError(e);
@@ -282,32 +321,18 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final Context context, final UpdateRequest request,
+    public void updateInstance(final Context context, final String resourceId, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
+        final String id = request.getResourceName();
         final String rev = request.getRevision();
-        try {
+       /* try {
             final Resource resource;
-            synchronized (writeLock) {
-                final Resource existingResource = resources.get(id);
-                if (existingResource == null) {
-                    throw new NotFoundException("The resource with ID '" + id
-                            + " could not be updated because it does not exist");
-                } else if (rev != null && !existingResource.getRevision().equals(rev)) {
-                    throw new ConflictException("The resource with ID '" + id
-                            + "' could not be updated because "
-                            + "it does not have the required version");
-                } else {
-                    final String newRev = getNextRevision(existingResource.getRevision());
-                    resource = new Resource(id, newRev, request.getNewContent());
-                    addIdAndRevision(resource);
-                    resources.put(id, resource);
-                }
+
             }
             handler.handleResult(resource);
         } catch (final ResourceException e) {
             handler.handleError(e);
-        }
+        } */
     }
 
     /*
@@ -319,7 +344,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {
-            content.asMap().put("_id", resource.getId());
+            content.asMap().put("_id",resource.getResourceName());
             content.asMap().put("_rev", resource.getRevision());
         } catch (final JsonValueException e) {
             throw new BadRequestException(
