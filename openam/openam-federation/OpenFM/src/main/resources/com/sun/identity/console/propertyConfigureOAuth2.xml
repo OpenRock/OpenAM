@@ -10,17 +10,23 @@
     <section name="question" defaultValue="configure.oauth2.section.serv">
         <property required="true">
             <label name="lblServiceRefreshLifetime" defaultValue="configure.oauth2.label.service.refreshLifetime" labelFor="choiceRefreshLifetime" />
-            <cc name="choiceRefreshLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="choiceRefreshLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="60" />
+            </cc>
             <fieldhelp name="helpChoiceRefreshLifetime" defaultValue="configure.oauth2.label.service.refreshLifetime.help" />
         </property>
         <property required="true">
             <label name="lblServiceCodeLifetime" defaultValue="configure.oauth2.label.service.codeLifetime" labelFor="choiceCodeLifetime" />
-            <cc name="choiceCodeLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="choiceCodeLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="60" />
+            </cc>
             <fieldhelp name="helpChoiceCodeLifetime" defaultValue="configure.oauth2.label.service.codeLifetime.help" />
         </property>
         <property required="true">
             <label name="lblServiceTokenLifetime" defaultValue="configure.oauth2.label.service.tokenLifetime" labelFor="choiceTokenLifetime" />
-            <cc name="choiceTokenLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="choiceTokenLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="60" />
+            </cc>
             <fieldhelp name="helpChoiceTokenLifetime" defaultValue="configure.oauth2.label.service.tokenLifetime.help" />
         </property>
         <property required="true">
@@ -30,7 +36,9 @@
         </property>
         <property required="true">
             <label name="lblServiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl" labelFor="choiceScopeImpl" />
-            <cc name="choiceScopeImpl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="choiceScopeImpl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="org.forgerock.openam.oauth2.provider.impl.ScopeImpl" />
+            </cc>
             <fieldhelp name="helpChoiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl.help" />
         </property>
     </section>
