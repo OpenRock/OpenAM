@@ -87,7 +87,7 @@ public class ConfigureOAuth2 extends Task {
 
             //add asterisk to cover the url having parameters
             if (!policyURL.endsWith("*")){
-                policyURL.concat("*");
+                policyURL = policyURL.concat("*");
             }
 
             //build the policy
@@ -99,10 +99,10 @@ public class ConfigureOAuth2 extends Task {
             }
             Map<String,Set<String>> actions = new HashMap<String,Set<String>>();
             temp = new HashSet<String>();
-            temp.add("true");
+            temp.add("allow");
             actions.put("POST", temp);
             temp = new HashSet<String>();
-            temp.add("true");
+            temp.add("allow");
             actions.put("GET", temp);
 
             Rule policyURLRule = null;
