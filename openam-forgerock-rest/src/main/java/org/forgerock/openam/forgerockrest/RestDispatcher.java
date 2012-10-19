@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.resource.Context.newRootContext;
+//import static org.forgerock.json.resource.Context;
 
 import java.lang.String;
 import java.util.Arrays;
@@ -30,14 +30,14 @@ import java.lang.reflect.Method;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.Connections;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.RequestHandler;
-import org.forgerock.json.resource.provider.Router;
-import static org.forgerock.json.resource.provider.RoutingMode.EQUALS;
-import org.forgerock.json.resource.provider.SingletonResourceProvider;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Router;
+import static org.forgerock.json.resource.RoutingMode.EQUALS;
+import org.forgerock.json.resource.SingletonResourceProvider;
 
 
 
@@ -92,7 +92,7 @@ public final class RestDispatcher  {
                 callConfigClass(ctx.trim(),router);
             }
         }
-        factory = Connections.newInternalConnectionFactory(router);
+        factory = Resources.newInternalConnectionFactory(router);
         return factory;
     }
 
@@ -104,7 +104,7 @@ public final class RestDispatcher  {
         }
     }
 
-    private static void initSampleResources(ConnectionFactory factory) throws ResourceException {
+   /* private static void initSampleResources(ConnectionFactory factory) throws ResourceException {
 
         // Populate with some test users and groups.
         final Connection connection = factory.getConnection();
@@ -121,7 +121,7 @@ public final class RestDispatcher  {
 
         for (final JsonValue user : Arrays.asList(user1, user2)) {
             final CreateRequest request = Requests.newCreateRequest("/users", user);
-            connection.create(newRootContext(), request);
+            connection.create(new RootContext(), request);
         }
 
         final JsonValue group1 = new JsonValue(new LinkedHashMap<String, Object>());
@@ -134,8 +134,9 @@ public final class RestDispatcher  {
 
         for (final JsonValue user : Arrays.asList(group1, group2)) {
             final CreateRequest request = Requests.newCreateRequest("/groups", user);
-            connection.create(newRootContext(), request);
+            connection.create(new RootContext(), request);
         }
         connection.close();
-    }
+
+    }  */
 }

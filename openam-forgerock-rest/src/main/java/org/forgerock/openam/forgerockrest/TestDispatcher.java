@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.resource.Context.newRootContext;
+//import static org.forgerock.json.resource.Context.newRootContext;
 
 import java.lang.String;
 import java.util.Arrays;
@@ -28,12 +28,11 @@ import javax.servlet.ServletContext;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.Connections;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.RequestHandler;
-import org.forgerock.json.resource.provider.Router;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Router;
 
 
 
