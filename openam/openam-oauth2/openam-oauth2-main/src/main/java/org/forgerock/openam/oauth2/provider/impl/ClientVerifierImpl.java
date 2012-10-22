@@ -52,7 +52,9 @@ public class ClientVerifierImpl implements ClientVerifier{
 
     @Override
     public ClientApplication verify(Request request, Response response){
-
+        if (OAuth2Utils.debug.messageEnabled()){
+            OAuth2Utils.debug.message("ClientVerifierImpl::Verifying client application");
+        }
         ClientApplication client = null;
         realm = OAuth2Utils.getRealm(request);
         if (request.getChallengeResponse() != null) {
@@ -65,7 +67,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                     OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID,
                             String.class);
             if (client_secret != null){
-                client = verify(client_id, client_secret);
+                client = verify(client_id, Hash.hash(client_secret));
             } else {
                 client = findClient(client_id);
             }
@@ -92,15 +94,16 @@ public class ClientVerifierImpl implements ClientVerifier{
             //password is returned as {SHA-1}password
             //remove {SHA-1}
             String cleanpass = clientPassword.iterator().next().replaceAll("\\{SHA-1\\}", "");
-            if (!cleanpass.equalsIgnoreCase(client_secret)){
+            if (!cleanpass.equals(client_secret)){
                  //wrong client secret
-                throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                        "Service unavailable", "Could not create underlying storage", null);
+                OAuth2Utils.debug.error("ClientVerifierImpl::Unable to verify client password: " +
+                    cleanpass);
+                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
             }
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            OAuth2Utils.debug.error("Unable to verify client", e);
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
         }
         return user;
     }
@@ -145,8 +148,8 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
 
             if (results == null || results.size() != 1) {
-                throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                        "Service unavailable", "Could not create underlying storage", null);
+                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
+                                                                                 "Not able to get client from OpenAM");
 
             }
 
@@ -159,8 +162,8 @@ public class ClientVerifierImpl implements ClientVerifier{
                 return null;
             }
         } catch (Exception e){
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+            OAuth2Utils.debug.error("Unable to get client AMIdentity: ", e);
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
         }
     }
 }

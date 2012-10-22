@@ -94,6 +94,7 @@ public abstract class AbstractFlow extends ServerResource {
             Map<String, Set<String>> attrs = scm.getAttributes();
             issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
         } catch (Exception e) {
+            OAuth2Utils.debug.error("Could not get service settings", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                 "Service unavailable", "Could not get service settings", null);
         }
@@ -101,6 +102,7 @@ public abstract class AbstractFlow extends ServerResource {
     }
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {
+            OAuth2Utils.debug.error("AbstractFlow::ClientVerifier is not initialised");
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                     "ClientVerifier is not initialised");
         }
@@ -109,8 +111,9 @@ public abstract class AbstractFlow extends ServerResource {
 
     public OAuth2TokenStore getTokenStore() throws OAuthProblemException {
         if (null == tokenStore) {
+            OAuth2Utils.debug.error("AbstractFlow::Token store is not initialised");
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
-                    "ClientVerifier is not initialised");
+                    "Toekn store is not initialised");
         }
         return tokenStore;
     }
@@ -328,6 +331,7 @@ public abstract class AbstractFlow extends ServerResource {
         if (null != r) {
             return r;
         }
+        OAuth2Utils.debug.error("AbstractFlow::Server can not serve the content of authorization page");
         throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                 "Server can not serve the content of authorization page");
     }
@@ -374,6 +378,7 @@ public abstract class AbstractFlow extends ServerResource {
                  * unauthorized_client The client is not authorized to request
                  * an authorization code using this method.
                  */
+                OAuth2Utils.debug.error("AbstractFlow::Unauthorized client accessing authorize endpoint");
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest());
             }
         }
@@ -391,6 +396,7 @@ public abstract class AbstractFlow extends ServerResource {
                 && getRequest().getClientInfo().isAuthenticated()) {
             return getRequest().getClientInfo().getUser();
         }
+        OAuth2Utils.debug.error("The authorization server can not authenticate the resource owner.");
         throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                 "The authorization server can not authenticate the resource owner.");
     }
@@ -402,6 +408,7 @@ public abstract class AbstractFlow extends ServerResource {
                 return (OAuth2Client) getRequest().getClientInfo().getUser();
             }
         }
+        OAuth2Utils.debug.error("The authorization server can not authenticate the client.");
         throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                 "The authorization server can not authenticate the client.");
     }
@@ -476,7 +483,7 @@ public abstract class AbstractFlow extends ServerResource {
                         }
 
                     } else {
-                        // TODO LOG Scope was input in client settings wrong
+                        OAuth2Utils.debug.warning("Scope was input into the client settings in the wrong format");
                         continue;
                     }
 
@@ -486,11 +493,6 @@ public abstract class AbstractFlow extends ServerResource {
 
         }
         return list;
-    }
-
-    private String getFirstItemInDelimitedString(String string, String DELIMITER){
-        String[] items = string.split(DELIMITER);
-        return items[0];
     }
 
     protected void validateMethod() throws OAuthProblemException {
@@ -524,6 +526,7 @@ public abstract class AbstractFlow extends ServerResource {
             if (!(null == getRequest().getEntity() || getRequest().getEntity() instanceof EmptyRepresentation)
                     && !MediaType.APPLICATION_WWW_FORM.equals(getRequest().getEntity()
                             .getMediaType())) {
+                OAuth2Utils.debug.error("AbstractFlow::Invalid Content Type for authorization endpoint");
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                         "Invalid Content Type");
             }
@@ -532,6 +535,7 @@ public abstract class AbstractFlow extends ServerResource {
             if (!(null == getRequest().getEntity() || getRequest().getEntity() instanceof EmptyRepresentation)
                     && !MediaType.APPLICATION_WWW_FORM.equals(getRequest().getEntity()
                             .getMediaType())) {
+                OAuth2Utils.debug.error("AbstractFlow::Invalid Content Type for token endpoint");
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                         "Invalid Content Type");
             }
@@ -555,6 +559,7 @@ public abstract class AbstractFlow extends ServerResource {
                 }
             }
             if (null != sb) {
+                OAuth2Utils.debug.error("AbstractFlow::Invlaid parameters in request: " + sb.toString());
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), sb
                         .toString());
             }
@@ -572,10 +577,11 @@ public abstract class AbstractFlow extends ServerResource {
             Set<String> scopes = null;
             scopes = OAuth2Utils.parseScope(maximumScope);
             if (intersect.retainAll(scopes)) {
-                // TODO Log not allowed scope was requested and was modified
+                OAuth2Utils.debug.warning("AbstractFlow::Scope is different then requested");
                 scopeChanged = true;
                 return intersect;
             } else {
+                scopeChanged = false;
                 return intersect;
             }
         }
@@ -600,6 +606,7 @@ public abstract class AbstractFlow extends ServerResource {
             Map<String, Set<String>> attrs = scm.getAttributes();
             pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
         } catch (Exception e) {
+            OAuth2Utils.debug.error("AbstractFlow::Unable to get scope plugin class", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);
         }
@@ -619,7 +626,7 @@ public abstract class AbstractFlow extends ServerResource {
             pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
             scopeClass = (Scope) Class.forName(pluginClass).newInstance();
         } catch (Exception e){
-            //TODO LOG exception
+            OAuth2Utils.debug.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
             scopeClass = null;
         }
@@ -644,7 +651,7 @@ public abstract class AbstractFlow extends ServerResource {
             pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
             scopeClass = (Scope) Class.forName(pluginClass).newInstance();
         } catch (Exception e){
-            //TODO LOG exception
+            OAuth2Utils.debug.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
             scopeClass = null;
         }
@@ -670,7 +677,7 @@ public abstract class AbstractFlow extends ServerResource {
             pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
             scopeClass = (Scope) Class.forName(pluginClass).newInstance();
         } catch (Exception e){
-            //TODO LOG exception
+            OAuth2Utils.debug.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
             scopeClass = null;
         }

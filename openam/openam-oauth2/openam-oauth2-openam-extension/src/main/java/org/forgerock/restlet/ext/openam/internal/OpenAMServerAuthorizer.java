@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.forgerock.restlet.ext.openam.server.AbstractOpenAMAuthorizer;
 import org.restlet.Request;
@@ -76,9 +77,11 @@ public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
         try {
             pe = new PolicyEvaluator(WEB_AGENT_SERVICE);
         } catch (SSOException e) {
+            OAuth2Utils.debug.error("Error creating policy evaluator: " + e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getL10NMessage(Locale
                     .getDefault()), e);
         } catch (PolicyException e) {
+            OAuth2Utils.debug.error("Error creating policy evaluator: " + e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e
                     .getCompleteL10NMessage(Locale.getDefault()), e);
         }

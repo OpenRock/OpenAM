@@ -39,7 +39,6 @@ import java.util.*;
 
 public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource {
 
-
     final static Debug debug = Debug.getInstance("CTS");
 
     private static boolean isDatabaseUp = true;
@@ -58,8 +57,6 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
     // This period is actual one that is used by the thread, smallest value of cleanUpPeriod and healthCheckPeriod
     private static long RUNPERIOD = 1 * 60 * 1000; // 1 min in milliseconds
-
-    private String CTS = "CTS";
 
     /**
      * Internal LDAP Connection.
@@ -134,21 +131,15 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             if (iso.getResultCode() == ResultCode.SUCCESS) {
                 //TODO LOG
             } else if (iso.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
-                //TODO LOG
+                debug.warning("Unable to obtain the Internal Root Container for Token Persistence!");
             } else {
-                //TODO LOG
+                debug.warning("Unable to obtain the Internal Root Container for Token Persistence!");
             }
         } catch (DirectoryException directoryException) {
             debug.warning("Unable to obtain the Internal Root Container for Token Persistence!",
                     directoryException);
             // TODO -- Abort further setup.
         }
-
-
-        // Start our AM Repository Store Thread.
-        //storeThread = new Thread(this);
-        //storeThread.setName(CTS);
-        //storeThread.start();
 
         SystemTimer.getTimer().schedule(this, new Date((System.currentTimeMillis() / 1000) * 1000));
 
@@ -176,12 +167,16 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         ResultCode resultCode = ao.getResultCode();
 
         if (resultCode == ResultCode.SUCCESS) {
-            //TODO LOG created
+            if (debug.messageEnabled()){
+                debug.message("Token created: " + request.get("values").toString());
+            }
             request.get("value").put(OAuth2.Params.ID, token.getDN());
             return new JsonValue(request.get("values"));
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
+            debug.warning("Token already exists");
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         } else {
+            debug.warning("Unable to create token");
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
     }
@@ -220,17 +215,25 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                             EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
 
                     addUnderScoresToParams(results);
-
+                    if (debug.messageEnabled()){
+                        debug.message("Token read: " + results.toString());
+                    }
                     return new JsonValue(results);
                 } else {
+                    debug.warning("Token not found");
                     throw new JsonResourceException(JsonResourceException.NOT_FOUND, "Object not found with id: " + dn);
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
+                debug.warning("Token not found: " +
+                        resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
+                debug.error("Token not found: " +
+                        resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             }
         } catch (DirectoryException dex) {
+            debug.error("Directory Exception when reading", dex);
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, dex);
         }
     }
@@ -264,7 +267,8 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         ResultCode resultCode = dop.getResultCode();
 
         if (resultCode != ResultCode.SUCCESS) {
-            //TODO LOG FAILED
+            debug.error("Unable to read token: " +
+                    resultCode.getResultCodeName().toString());
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
 
@@ -292,6 +296,8 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
     /**
      * Queries the OpenDJ store given a set of filters
      * @param request request contains a filter value which has a valid LDAP filter command
+     *                The filter values key is a Map<String, String> where the key is the key to filter
+     *                on and the value is the value to filter for.
      * @return returns a Set of tokens that match the filter.
      * @throws JsonResourceException
      */
@@ -310,6 +316,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             }
             //remove last ampersand
             filter.delete(filter.length()-3, filter.length());
+
             StringBuilder baseDN = new StringBuilder();
             baseDN.append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
@@ -331,14 +338,23 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
                     }
                 }
+                if (debug.messageEnabled()){
+                    debug.message("Token query performed");
+                }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
+                debug.warning("Query produced no results: " +
+                        resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
+                debug.warning("Query failed: " +
+                        resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             }
         } catch (DirectoryException dex) {
+            debug.error("Reading from the directory failed", dex);
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, dex);
         } catch (Exception ex) {
+            debug.error("An error occured while reading from the directory", ex);
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, ex);
         }
 
@@ -385,13 +401,19 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                     }
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
+                debug.warning("No expired object found to delete: " +
+                        resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
+                debug.warning("Deleting expired tokens failed: " +
+                        resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             }
         } catch (DirectoryException dex) {
+            debug.error("An error occured while trying to delete expired tokens", dex);
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, dex);
         } catch (Exception ex) {
+            debug.error("An error occured while trying to delete expired tokens", ex);
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, ex);
         }
     }
@@ -404,6 +426,8 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         ResultCode resultCode = dop.getResultCode();
 
         if (resultCode != ResultCode.SUCCESS) {
+            debug.error("An error occured while trying to delete a token: " +
+                    resultCode.getResultCodeName().toString());
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
     }

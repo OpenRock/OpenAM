@@ -125,14 +125,19 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
                 return identity.isActive();
             }
         } catch (SSOException e) {
+            OAuth2Utils.debug.error("Error authenticating user against OpenAM: ", e );
             redirect(request, response);
         } catch (IdRepoException e) {
+            OAuth2Utils.debug.error("Error authenticating user against OpenAM: ", e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
         }
         return false;
     }
 
     protected void redirect(Request request, Response response) {
+        if (OAuth2Utils.debug.messageEnabled()){
+            OAuth2Utils.debug.message("Redirecting to OpenAM login page");
+        }
         Reference amserver = new Reference(openamServer);
         realm = OAuth2Utils.getRealm(request);
         moduleName = OAuth2Utils.getModuleName(request);

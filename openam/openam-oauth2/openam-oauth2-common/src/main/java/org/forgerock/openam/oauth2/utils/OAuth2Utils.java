@@ -48,11 +48,14 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Utilities related to OAuth2.
  */
 public class OAuth2Utils {
+
+    public static Debug debug = Debug.getInstance("OAuth2Provider");
 
     public static enum ParameterLocation {
         HTTP_QUERY, HTTP_HEADER, HTTP_FRAGMENT, HTTP_BODY;

@@ -98,7 +98,7 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                 }
 
             } catch (OAuthProblemException e) {
-                // TODO add logging
+                OAuth2Utils.debug.error("Unable to verify token", e);
                 throw e;
             }
             return result;

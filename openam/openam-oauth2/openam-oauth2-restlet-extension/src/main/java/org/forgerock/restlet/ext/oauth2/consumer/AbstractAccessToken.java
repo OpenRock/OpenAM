@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Parameter;
 import org.restlet.util.Series;
@@ -66,7 +67,7 @@ public abstract class AbstractAccessToken implements Serializable {
         validated = false;
         access_token = token.getFirstValue(OAuth2.Token.OAUTH_ACCESS_TOKEN);
         if (OAuth2Utils.isBlank(access_token)) {
-            // TODO Exception Invalid token
+            throw OAuthProblemException.OAuthError.INVALID_TOKEN.handle(null, "Invalid access token");
         }
         String o = token.getFirstValue(OAuth2.Token.OAUTH_EXPIRES_IN);
         if (o instanceof String) {
@@ -87,7 +88,7 @@ public abstract class AbstractAccessToken implements Serializable {
         if (o instanceof String) {
             access_token = (String) o;
         } else {
-            // TODO Exception Invalid token
+            throw OAuthProblemException.OAuthError.INVALID_TOKEN.handle(null, "Invalid access token");
         }
         o = token.get(OAuth2.Token.OAUTH_EXPIRES_IN);
         if (o instanceof String) {

@@ -34,7 +34,6 @@ import org.forgerock.openam.oauth2.model.SessionClient;
  */
 public class SessionClientImpl extends JsonValue implements SessionClient {
 
-    // TODO clean up cases in interface
     private String clientId;
     private String redirectUri;
 

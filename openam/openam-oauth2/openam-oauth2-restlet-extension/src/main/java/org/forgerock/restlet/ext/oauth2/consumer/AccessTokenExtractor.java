@@ -220,6 +220,7 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
         if (null != token) {
             OAuthProblemException exception = extractException(token);
             if (exception != null) {
+                OAuth2Utils.debug.error("Unable to extract token from request", exception);
                 throw exception;
             }
         }

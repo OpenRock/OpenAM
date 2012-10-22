@@ -26,6 +26,7 @@ package org.forgerock.restlet.ext.openam.server;
 
 import java.util.Locale;
 
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -83,9 +84,11 @@ public abstract class AbstractOpenAMAuthorizer extends Authorizer {
                 OpenAMUser user = (OpenAMUser) request.getClientInfo().getUser();
                 return getPolicyDecision(user, request, response);
             } catch (SSOException e) {
+                OAuth2Utils.debug.error("Error authorizing user: ", e );
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getL10NMessage(Locale
                         .getDefault()), e);
             } catch (PolicyException e) {
+                OAuth2Utils.debug.error("Error authorizing user: ", e );
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e
                         .getCompleteL10NMessage(Locale.getDefault()), e);
             }

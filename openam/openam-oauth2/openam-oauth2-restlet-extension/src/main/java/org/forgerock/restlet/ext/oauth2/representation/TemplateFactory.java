@@ -36,8 +36,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
- * TODO Redesign it to be more flexible
- * 
+ *
  * @see <a
  *      href="http://freemarker.sourceforge.net/docs/pgui_config_templateloading.html">Template
  *      loading</a>

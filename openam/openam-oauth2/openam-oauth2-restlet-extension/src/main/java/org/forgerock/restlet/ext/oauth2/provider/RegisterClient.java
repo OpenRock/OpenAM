@@ -24,21 +24,27 @@
 
 package org.forgerock.restlet.ext.oauth2.provider;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
+import org.restlet.ext.servlet.internal.ServletCall;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.restlet.Request;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.util.*;
 
@@ -83,6 +89,22 @@ public class RegisterClient extends ServerResource {
      *      org.restlet.Response)
      */
     protected void doInit() throws ResourceException {
+
+        //authenticate the user
+        try {
+            Request request = getRequest();
+            SSOTokenManager manager = SSOTokenManager.getInstance();
+            SSOToken ssoToken = manager.createSSOToken(request.getCookies().getValues("iPlantDirectoryPro"));
+            manager.validateToken(ssoToken);
+
+            if (!ssoToken.getPrincipal().getName().equalsIgnoreCase(
+                    "id=amadmin,ou=user," + SMSEntry.getRootSuffix())
+                    ) {
+                getResponse().setStatus(Status.valueOf(401));
+            }
+        } catch (SSOException e) {
+            getResponse().setStatus(Status.valueOf(401));
+        }
         Form form = new Form(getRequestEntity());
         Map <String, String> parameters = form.getValuesMap();
         if (parameters.isEmpty()){

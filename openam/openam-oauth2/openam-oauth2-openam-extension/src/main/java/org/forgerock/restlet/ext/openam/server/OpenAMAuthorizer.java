@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -76,9 +77,11 @@ public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
         try {
             pe = PolicyEvaluatorFactory.getInstance().getPolicyEvaluator(WEB_AGENT_SERVICE);
         } catch (SSOException e) {
+            OAuth2Utils.debug.error("Error getting policy for authorizer: ", e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getL10NMessage(Locale
                     .getDefault()), e);
         } catch (PolicyException e) {
+            OAuth2Utils.debug.error("Error getting policy for authorizer: ", e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e
                     .getCompleteL10NMessage(Locale.getDefault()), e);
         }

@@ -161,10 +161,15 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             if (OAuth2Utils.isNotBlank(state)) {
                 location.addQueryParameter(OAuth2.Params.STATE, state);
             }
+            if (isScopeChanged()) {
+                location.addQueryParameter(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
+                        .getScopeDelimiter(getContext())));
+            }
             Redirector cb =
                     new Redirector(getContext(), location.toString(), Redirector.MODE_CLIENT_FOUND);
             cb.handle(getRequest(), getResponse());
         } else {
+            OAuth2Utils.debug.warning("AuthorizationCodeServerResource::Resource Owner did not authorize the request");
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                     "Resource Owner did not authorize the request");
         }
@@ -192,14 +197,17 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         AuthorizationCode code = getTokenStore().readAuthorizationCode(code_p);
 
         if (null == code) {
+            OAuth2Utils.debug.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "Authorization code has been user.");
+                    "Authorization code doesn't exist.");
         } else if (code.isTokenIssued()) {
             // TODO Used code 2 times needs to invalidate all tokens associated with this code
+            OAuth2Utils.debug.error("AuthorizationCodeServerResource::Authorization code has been used");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "Authorization code has been user.");
+                    "Authorization code has been used.");
         } else {
             if (code.isExpired()) {
+                OAuth2Utils.debug.error("AuthorizationCodeServerResource::Authorization code expired.");
                 throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
                         "Authorization code expired.");
             }
@@ -230,6 +238,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             if (OAuth2.Custom.ALLOW.equalsIgnoreCase(decision)) {
                 decisionIsAllow = true;
             } else {
+                OAuth2Utils.debug.error("AuthorizationCodeServerResource::Resource Owner did not authorize the request");
                 throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                         "Resource Owner did not authorize the request");
             }

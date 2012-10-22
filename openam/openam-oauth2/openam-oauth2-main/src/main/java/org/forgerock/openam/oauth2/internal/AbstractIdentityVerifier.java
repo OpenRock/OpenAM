@@ -32,6 +32,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -55,7 +57,6 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     private String realm;
     private AuthContext.IndexType authIndexType;
     private String authIndexValue = null;
-    private Logger logger;
 
     /**
      * Constructor.
@@ -69,7 +70,6 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
         authIndexType = AuthContext.IndexType.MODULE_INSTANCE;
         authIndexValue = parameters.getLoginIndexName();
         realm = parameters.getOrgName();
-        logger = Context.getCurrentLogger();
     }
 
     @Override
@@ -172,9 +172,8 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                 lc.submitRequirements(callbacks);
             }
 
-            if (logger.isLoggable(Level.FINE)) {
-                logger.log(Level.FINE,
-                        "IdentityServicesImpl:authenticate returning an InvalidCredentials"
+            if (OAuth2Utils.debug.messageEnabled()) {
+                OAuth2Utils.debug.message("IdentityServicesImpl:authenticate returning an InvalidCredentials"
                                 + " exception for invalid passwords.");
             }
 
@@ -184,7 +183,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                     // package up the token for transport..
                     ret = createUser(lc);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "IdentityServicesImpl:authContext: "
+                    OAuth2Utils.debug.error( "IdentityServicesImpl:authContext: "
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
@@ -192,7 +191,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                 }
             }
         } catch (AuthLoginException le) {
-            logger.log(Level.SEVERE, "IdentityServicesImpl:authContext AuthException", le);
+            OAuth2Utils.debug.error("IdentityServicesImpl:authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         }
         return ret;

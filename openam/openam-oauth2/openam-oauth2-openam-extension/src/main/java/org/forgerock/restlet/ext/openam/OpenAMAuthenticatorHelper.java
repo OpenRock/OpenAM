@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -83,9 +84,11 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
                 credentials.write(retrieveSSOToken(challenge));
                 cw.append(Base64.encode(credentials.toCharArray(), "ISO-8859-1", false));
             }
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e){
+            OAuth2Utils.debug.error("Unsupported encoding, unable to encode credentials", e);
             throw new RuntimeException("Unsupported encoding, unable to encode credentials");
         } catch (IOException e) {
+            OAuth2Utils.debug.error("Unexpected exception, unable to encode credentials", e);
             throw new RuntimeException("Unexpected exception, unable to encode credentials", e);
         }
     }
@@ -113,12 +116,12 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
                             param = null;
                         }
                     } catch (Exception e) {
-                        Context.getCurrentLogger().log(Level.WARNING,
+                        OAuth2Utils.debug.error(
                                 "Unable to parse the challenge request header parameter", e);
                     }
                 }
             } catch (Exception e) {
-                Context.getCurrentLogger().log(Level.WARNING,
+                OAuth2Utils.debug.error(
                         "Unable to parse the challenge request header parameter", e);
             }
         }
@@ -130,13 +133,13 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
         try {
             byte[] credentialsEncoded = Base64.decode(challenge.getRawValue());
             if (credentialsEncoded == null) {
-                getLogger().info("Cannot decode token: " + challenge.getRawValue());
+                OAuth2Utils.debug.warning("Cannot decode token: " + challenge.getRawValue());
             }
             saveSSOToken(challenge, new String(credentialsEncoded, "ISO-8859-1"));
         } catch (UnsupportedEncodingException e) {
-            getLogger().log(Level.INFO, "Unsupported OpenAM encoding error", e);
+            OAuth2Utils.debug.error("Unsupported OpenAM encoding error", e);
         } catch (IllegalArgumentException e) {
-            getLogger().log(Level.INFO, "Unable to decode the OpenAM token", e);
+            OAuth2Utils.debug.error("Unable to decode the OpenAM token", e);
         }
     }
 

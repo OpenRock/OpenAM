@@ -62,9 +62,11 @@ public class PasswordServerResource extends AbstractFlow {
                     .verify(username, password.toCharArray())) {
                 resourceOwner = new User(username, password.toCharArray());
             } else {
+                OAuth2Utils.debug.error("Unable to verify user: " + username + "password: " + password);
                 throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest());
             }
         } else {
+            OAuth2Utils.debug.error("SecretVerifier is not set in the Context");
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                     "SecretVerifier is not set in the Context");
         }

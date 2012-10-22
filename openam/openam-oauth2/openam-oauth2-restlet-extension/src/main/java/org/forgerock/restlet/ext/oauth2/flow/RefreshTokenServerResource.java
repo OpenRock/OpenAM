@@ -61,14 +61,16 @@ public class RefreshTokenServerResource extends AbstractFlow {
         RefreshToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
 
         if (null == refreshToken) {
+            OAuth2Utils.debug.error("Refresh token does not exist for id: " + refresh_token );
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "RefreshToken does not exist");
         } else if (!refreshToken.getClient().getClientId().equals(client.getClient().getClientId())) {
-            // TODO throw Exception
+            OAuth2Utils.debug.error("Refresh Token was issued to a different client id: " + refreshToken.getClient().getClientId() );
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Token was issued to a different client");
         } else {
             if (refreshToken.isExpired()) {
+                OAuth2Utils.debug.warning("Refresh Token is expired for id: " + refresh_token);
                 throw OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
             }
 

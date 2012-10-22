@@ -110,7 +110,7 @@ public class OAuth2Application extends Application {
     }
 
     /**
-     * TODO Description.
+     * Setups OAuth2 paths and handlers
      * 
      * @return TODO Description
      */
@@ -183,49 +183,6 @@ public class OAuth2Application extends Application {
      */
     public org.forgerock.openam.oauth2.provider.OAuth2TokenStore getTokenStore() {
         return new DefaultOAuthTokenStoreImpl();
-    }
-
-    // TEST
-
-    /**
-     * Gets the current URI form the Request.
-     * 
-     * @return application URI
-     */
-    protected URI getCurrentURI() {
-        Object o = getContext().getAttributes().get(OAuth2Application.class.getName());
-        URI root = null;
-
-        if (o instanceof String) {
-            String path = (String) o;
-            root = URI.create(path.endsWith("/") ? path : path + "/");
-        } else {
-            Request request = Request.getCurrent();
-            if (null != request) {
-                HttpServletRequest servletRequest = ServletUtils.getRequest(request);
-                String scheme = servletRequest.getScheme(); // http
-                String serverName = servletRequest.getServerName(); // localhost
-                int serverPort = servletRequest.getServerPort(); // 8080
-                String contextPath = servletRequest.getContextPath(); // /openam
-                String servletPath = servletRequest.getServletPath(); // /oauth2demo
-                // String pathInfo = servletRequest.getPathInfo(); //
-                // /static/index.html
-                // String queryString = servletRequest.getQueryString(); //
-                // d=789
-
-                try {
-                    root =
-                            new URI(scheme, null, serverName, serverPort, contextPath + servletPath
-                                    + "/", null, null);
-                } catch (URISyntaxException e) {
-                    // Should not happen
-                }
-            }
-        }
-        if (null == root) {
-            throw new RuntimeException("OAuth2DemoApplication can not detect current context");
-        }
-        return root;
     }
 
     /**
