@@ -154,6 +154,8 @@ public final class IdentityResource implements CollectionResourceProvider {
     @Override  //public CreateResponse create(IdentityDetails identity, Token admin)
     public void createInstance(final ServerContext context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
+        //check params for null vals
+
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
@@ -161,21 +163,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         final JsonValue jVal = request.getContent();
         final String id = request.getResourceName();
 
-
         List<Attribute> identityAttrList = new ArrayList();
         identityAttrList.addAll(iDSvcsAttrList);
-        Map<String, Object> holdJVal = new LinkedHashMap<String, Object>();
-
-        holdJVal = jVal.asMap();
-        printJValMap(holdJVal);  //Print the Map for now...
-
-        for (Map.Entry<String, Object> entry : holdJVal.entrySet()){
-            String t = entry.getValue().toString();
-            String[] test =  {t};
-            identityAttrList.add(new Attribute(entry.getKey().toString(),test));
-        }
-
-        Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
 
         try {
             if (jVal == null) {
@@ -184,18 +173,36 @@ public final class IdentityResource implements CollectionResourceProvider {
             }
             JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
             IdentityDetails identity = new IdentityDetails();
-
-            //identity.setName(jVal.get("name").toString());
-            identity.setName("test");
             String hold = "user";
             identity.setType(hold);
             identity.setRealm(realm);
-            //identity.setAttributes(identityAttrList);
-            identity.setAttributes(attr);
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
+            identity.setName(id);
+
+            Map<String, Object> holdJVal = jVal.asMap();
+            printJValMap(holdJVal);  //Print the Map for now...
+
+            identity.setName((String)holdJVal.get("name"));
 
             Method methods[] = identity.getClass().getDeclaredMethods();
+            try {
+                for (Map.Entry<String, Object> entry : holdJVal.entrySet()) {
+                    Object t = entry.getValue();
+                    if (t instanceof String) {
+                        String[] tArray = {(String) t};
+                        identityAttrList.add(new Attribute((String) entry.getKey(), tArray));
+                    } else {
+                        String[] tArray = (String[])t;
+                        identityAttrList.add(new Attribute((String) entry.getKey(), tArray));
+                    }
+                }
+            } catch (Exception e) {
+                throw new Exception("Identity Atrribute List blew Chunks!");
+            }
 
+            Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
+
+            identity.setAttributes(attr);
+            IdentityServicesImpl idsvc = new IdentityServicesImpl();
             //identity.setAttributes(identityAttrList);
             CreateResponse success = idsvc.create(identity, admin);
 
@@ -324,13 +331,14 @@ public final class IdentityResource implements CollectionResourceProvider {
     @Override
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
+
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
 
         final String id = request.getResourceName();
         final String rev = request.getRevision();
-        //final JsonValue jVal = request.getContent();
+
 
         /*try {
             IdentityServicesImpl idsvc = new IdentityServicesImpl();

@@ -59,8 +59,7 @@ public final class RealmDispatcher  {
     static private void initRealmEndpoints(OrganizationConfigManager ocm, Router router) {
 
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
+            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             String rName = ocm.getOrganizationName();
             if (rName.length() > 1) rName = rName + "/";
 
