@@ -64,6 +64,9 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.CreateResponse;
+import com.sun.identity.idsvcs.NeedMoreCredentials;
+import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.idsvcs.Token;
 
@@ -150,37 +153,21 @@ public final class IdentityResource implements CollectionResourceProvider {
             System.out.println("Value is: ["+ entry.getValue() + "]");
         }
     }
+    //identityDetailsToJsonValue
+    private IdentityDetails jsonValueToIdentityDetails(JsonValue jVal){
 
-    @Override  //public CreateResponse create(IdentityDetails identity, Token admin)
-    public void createInstance(final ServerContext context, final CreateRequest request,
-                               final ResultHandler<Resource> handler) {
-        //check params for null vals
-
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
-        Token admin = new Token();
-        admin.setId(adminToken.getTokenID().toString());
-
-        final JsonValue jVal = request.getContent();
-        final String id = request.getResourceName();
-
+        IdentityDetails identity = new IdentityDetails();
         List<Attribute> identityAttrList = new ArrayList();
         identityAttrList.addAll(iDSvcsAttrList);
 
-        try {
-            if (jVal == null) {
-                throw new NotFoundException("The resource with ID '" + id
-                        + " can not be created!");
-            }
-            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-            IdentityDetails identity = new IdentityDetails();
-            String hold = "user";
-            identity.setType(hold);
-            identity.setRealm(realm);
+        try{
+            identity.setType(iDSvcsAttrList.get(0).getValues()[0]); //set type ex. user
+            identity.setRealm(realm); //set realm
 
             Map<String, Object> holdJVal = jVal.asMap();
             printJValMap(holdJVal);  //Print the Map for now...
 
-            identity.setName((String)holdJVal.get("name"));
+            identity.setName((String)holdJVal.get("name"));  //set name from JsonValue object
 
             Method methods[] = identity.getClass().getDeclaredMethods();
             try {
@@ -195,18 +182,38 @@ public final class IdentityResource implements CollectionResourceProvider {
                     }
                 }
             } catch (Exception e) {
-                throw new NotFoundException("Identity Atrribute List blew Chunks!");
+                throw new NotFoundException("Cannnot Create IdentityAttributeList!");
             }
 
             Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
 
             identity.setAttributes(attr);
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
+        } catch (final Exception e) {
+            //deal with better exceptions
+        }
+        return identity;
 
+    }
+
+    @Override  //public CreateResponse create(IdentityDetails identity, Token admin)
+    public void createInstance(final ServerContext context, final CreateRequest request,
+                               final ResultHandler<Resource> handler) {
+        //check params for null vals
+
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
+        Token admin = new Token();
+        admin.setId(adminToken.getTokenID().toString());
+
+        final JsonValue jVal = request.getContent();
+        final String id = request.getResourceName();
+
+        try {
+            IdentityServicesImpl idsvc = new IdentityServicesImpl();
+            IdentityDetails identity = jsonValueToIdentityDetails(jVal);
             try {
                 CreateResponse success = idsvc.create(identity, admin);
             } catch (Exception e) {
-                throw new NotFoundException("Identity Atrribute List blew Chunks!");
+                throw new NotFoundException("Cannot create idenity" + identity.getName());
             }
 
             IdentityDetails dtls = idsvc.read(identity.getName(),iDSvcsAttrList, admin);
@@ -300,6 +307,11 @@ public final class IdentityResource implements CollectionResourceProvider {
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
 
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                AdminTokenAction. getInstance());
+        Token admin = new Token();
+        admin.setId(adminToken.getTokenID().toString());
+
         try {
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);
@@ -351,20 +363,45 @@ public final class IdentityResource implements CollectionResourceProvider {
         admin.setId(adminToken.getTokenID().toString());
 
         final String id = request.getResourceName();
+        final JsonValue jVal = request.getNewContent();
         final String rev = request.getRevision();
 
-
-        /*try {
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);//Retrieve details about user to be updated
-
-
+        Map<String, Object> holdJVal = jVal.asMap();
+        printJValMap(holdJVal);
+        //IdentityDetails jsonValueToIdentityDetails(JsonValue jVal);
+        IdentityDetails dtls = null;
+        IdentityServicesImpl idsvc = null;
+        try {
+            idsvc = new IdentityServicesImpl();
+            dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);//Retrieve details about user to be updated
+            if(dtls != null){
+                //Continue modifying the identity
 
             }
-            handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            handler.handleError(e);
-        } */
+        } catch(final ObjectNotFound o){
+            //create object because it does not exist
+            //public CreateResponse create(IdentityDetails identity, Token admin)
+            try{
+                dtls = jsonValueToIdentityDetails(jVal);
+                try {
+                    CreateResponse success = idsvc.create(dtls, admin);
+                } catch (Exception e) {
+                    throw new NotFoundException("Cannot create idenity" + dtls.getName());
+                }
+                IdentityDetails checkIdent = idsvc.read(dtls.getName(),iDSvcsAttrList, admin);
+                Resource resource = new Resource("0", "0", identityDetailsToJsonValue(checkIdent));
+                handler.handleResult(resource);
+            } catch (final ResourceException e) {
+                handler.handleError(e);
+            }catch (final NeedMoreCredentials ex){
+                //do something useful
+            } catch(final ObjectNotFound notFound){
+                //""
+            } catch(final Exception exception){
+                //do somethint
+            }
+        }catch (final Exception e) {
+        }
     }
 
     /*

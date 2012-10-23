@@ -1013,14 +1013,14 @@ public class IdentityServicesImpl
         try {
             AMIdentity amIdentity = getAMIdentity(admin, identityType, name,
                                                   repoRealm);
-            if (isSpecialUser(amIdentity)) {
-                throw new AccessDenied(
-                    "Cannot retrieve attributes for this user.");
-            }
-
             if (!identityExists(amIdentity)) {
                 debug.error("IdentityServicesImpl:read identity not found");
                 throw new ObjectNotFound(name);
+            }
+
+            if (isSpecialUser(amIdentity)) {
+                throw new AccessDenied(
+                    "Cannot retrieve attributes for this user.");
             }
 
             rv = convertToIdentityDetails(amIdentity, attrsToGet);
