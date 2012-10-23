@@ -633,7 +633,8 @@ public abstract class AbstractFlow extends ServerResource {
         // Validate the granted scope
         if (scopeClass != null && pluginClass != null){
             checkedScope = scopeClass.scopeRequestedForAccessToken(requestedScopeSet,
-                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()));
+                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()),
+                    OAuth2Utils.parseScope(client.getClient().defaultGrantScopes()));
         }
 
         return checkedScope;
@@ -659,7 +660,8 @@ public abstract class AbstractFlow extends ServerResource {
         if (scopeClass != null && pluginClass != null){
             checkedScope = scopeClass.scopeRequestedForRefreshToken(requestedScopeSet,
                     maxScope,
-                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()));
+                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()),
+                    OAuth2Utils.parseScope(client.getClient().defaultGrantScopes()));
         }
 
         return checkedScope;
@@ -685,7 +687,8 @@ public abstract class AbstractFlow extends ServerResource {
         // Validate the granted scope
         if (scopeClass != null && pluginClass != null){
             checkedScope = scopeClass.scopeToPresentOnAuthorizationPage(requestedScopeSet,
-                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()));
+                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()),
+                    OAuth2Utils.parseScope(client.getClient().defaultGrantScopes()));
         }
 
         return checkedScope;

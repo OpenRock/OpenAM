@@ -11,10 +11,10 @@ import java.util.Set;
 public class ScopeImpl implements Scope {
 
     @Override
-    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes){
+    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
         if (requestedScope == null){
-            return null;
+            return defaultScopes;
         }
 
         Set<String> scopes = new HashSet<String>(availableScopes);
@@ -23,10 +23,10 @@ public class ScopeImpl implements Scope {
     }
 
     @Override
-    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes){
+    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
         if (requestedScope == null){
-            return null;
+            return defaultScopes;
         }
 
         Set<String> scopes = new HashSet<String>(availableScopes);
@@ -37,10 +37,11 @@ public class ScopeImpl implements Scope {
     @Override
     public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScope,
                                                      Set<String> availableScopes,
-                                                     Set<String> allScopes){
+                                                     Set<String> allScopes,
+                                                     Set<String> defaultScopes){
 
         if (requestedScope == null){
-            return null;
+            return defaultScopes;
         }
 
         Set<String> scopes = new HashSet<String>(availableScopes);

@@ -35,28 +35,37 @@ import java.util.Set;
  * persist between scope method calls should be declared static.
  */
 public interface Scope {
-
-    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes);
+    /**
+     * scopeToPresentOnAuthorizationPage is called to decide what scopes will appear on the authorization page.
+     * @param requestedScopes The set of scopes requested
+     * @param availableScopes The set of scopes available for the client requesting the access token
+     * @param defaultScopes The set of scopes set in the client registration as default
+     * @return The set of scopes to grant the token
+     */
+    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScopes, Set<String> availableScopes, Set<String> defaultScopes);
 
     /**
      * ScopeRequestedForAccessToken is called when a token is created and the token scope is requested.
-     * @param requestedScope The set of scopes requested
+     * @param requestedScopes The set of scopes requested
      * @param availableScopes The set of scopes available for the client requesting the access token
+     * @param defaultScopes The set of scopes set in the client registration as default
      * @return The set of scopes to grant the token
      */
-    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes);
+    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScopes, Set<String> availableScopes, Set<String> defaultScopes);
 
     /**
      * ScopeRequestedForRefreshToken is called when the client tries to refresh an Access Token. The scope returned MUST
      * not contain a scope not originally grated to the original Access Token.
-     * @param requestedScope The set of scopes requested
+     * @param requestedScopes The set of scopes requested
      * @param availableScopes The set of scopes given to the original Access Token
      * @param allScopes All the available scopes for the client
+     * @param defaultScopes The set of scopes set in the client registration as default
      * @return The set of scopes to grant the new Access Token
      */
-    public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScope,
+    public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScopes,
                                                      Set<String> availableScopes,
-                                                     Set<String> allScopes);
+                                                     Set<String> allScopes,
+                                                     Set<String> defaultScopes);
 
     /**
      * This method is called after the token is processed and before it is returned to the user as authenticated. This
