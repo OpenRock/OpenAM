@@ -112,18 +112,6 @@
         </dependency>
 
 
-        <!-- OpenAM Shared -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-        <!-- OpenAM core -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
 
             <!-- OpenAM Shared -->
             <dependency>

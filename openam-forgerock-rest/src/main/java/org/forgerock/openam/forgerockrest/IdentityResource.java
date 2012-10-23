@@ -307,11 +307,6 @@ public final class IdentityResource implements CollectionResourceProvider {
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
 
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
-        Token admin = new Token();
-        admin.setId(adminToken.getTokenID().toString());
-
         try {
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);
