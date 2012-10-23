@@ -176,7 +176,6 @@ public final class IdentityResource implements CollectionResourceProvider {
             String hold = "user";
             identity.setType(hold);
             identity.setRealm(realm);
-            identity.setName(id);
 
             Map<String, Object> holdJVal = jVal.asMap();
             printJValMap(holdJVal);  //Print the Map for now...
@@ -196,18 +195,22 @@ public final class IdentityResource implements CollectionResourceProvider {
                     }
                 }
             } catch (Exception e) {
-                throw new Exception("Identity Atrribute List blew Chunks!");
+                throw new NotFoundException("Identity Atrribute List blew Chunks!");
             }
 
             Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
 
             identity.setAttributes(attr);
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            //identity.setAttributes(identityAttrList);
-            CreateResponse success = idsvc.create(identity, admin);
 
+            try {
+                CreateResponse success = idsvc.create(identity, admin);
+            } catch (Exception e) {
+                throw new NotFoundException("Identity Atrribute List blew Chunks!");
+            }
 
-            Resource resource = new Resource("0", "0", jVal);
+            IdentityDetails dtls = idsvc.read(identity.getName(),iDSvcsAttrList, admin);
+            Resource resource = new Resource("0", "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
         } catch (final ResourceException e) {
             handler.handleError(e);
@@ -293,15 +296,11 @@ public final class IdentityResource implements CollectionResourceProvider {
     @Override
     public void readInstance(final ServerContext context, final String resourceId, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
 
         try {
-
-            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);
 
@@ -309,15 +308,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new NotFoundException("The resource with ID '" + resourceId
                         + " could not be read because it does not exist");
             }
-            result.put("name", dtls.getName());
-            result.put("realm", dtls.getRealm());
-            Attribute[] attrs = dtls.getAttributes();
 
-            for (Attribute aix : attrs) {
-                result.put(aix.getName(), aix.getValues());
-            }
-
-            Resource resource = new Resource("0", "0", result);
+            Resource resource = new Resource("0", "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
         } catch (final ResourceException e) {
             handler.handleError(e);
@@ -325,6 +317,28 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
+    /**
+     * Returns a JsonValue containing appropriate identity details
+     *
+     * @param details
+     *            The IdentityDetails of a Resource
+     * @return The JsonValue Object
+     */
+    private JsonValue identityDetailsToJsonValue(IdentityDetails details){
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+        try{
+            result.put("name", details.getName());
+            result.put("realm", details.getRealm());
+            Attribute[] attrs = details.getAttributes();
+
+            for (Attribute aix : attrs) {
+                result.put(aix.getName(), aix.getValues());
+            }
+            return result;
+        }catch(final Exception e){
+            throw new JsonValueException(result);
+        }
+    }
     /**
      * {@inheritDoc}
      */
