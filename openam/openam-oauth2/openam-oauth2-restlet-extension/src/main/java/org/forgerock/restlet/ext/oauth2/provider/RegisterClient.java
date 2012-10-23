@@ -89,9 +89,8 @@ public class RegisterClient extends ServerResource {
 
         //authenticate the user
         try {
-            Request request = getRequest();
             SSOTokenManager manager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = manager.createSSOToken(request.getCookies().getValues("iPlantDirectoryPro"));
+            SSOToken ssoToken = manager.createSSOToken(getRequest().getCookies().getValues("iPlantDirectoryPro"));
             manager.validateToken(ssoToken);
 
             if (!ssoToken.getPrincipal().getName().equalsIgnoreCase(
