@@ -18,14 +18,20 @@ package org.forgerock.openam.oauth2.rest;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
-import org.forgerock.json.resource.exception.NotSupportedException;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.CollectionResourceProvider;
+
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
+import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TokenResource implements CollectionResourceProvider {
 
@@ -41,30 +47,30 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(Context context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
+    public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
         handler.handleError(e);
     }
 
     @Override
-    public void actionInstance(Context context, String resourceId, ActionRequest request,
-                        ResultHandler<JsonValue> handler){
+    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
+                               ResultHandler<JsonValue> handler){
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
         handler.handleError(e);
     }
 
     @Override
-    public void createInstance(Context context, CreateRequest createRequest, ResultHandler<Resource> handler){
+    public void createInstance(ServerContext context, CreateRequest createRequest, ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Create is not supported for resource instances");
         handler.handleError(e);
     }
 
     @Override
-    public void deleteInstance(Context context, String resourceId, DeleteRequest request,
-                        ResultHandler<Resource> handler){
+    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
+                               ResultHandler<Resource> handler){
         try{
             JsonValue query = new JsonValue(null);
             JsonValue response = null;
@@ -72,8 +78,7 @@ public class TokenResource implements CollectionResourceProvider {
             JsonResourceAccessor accessor =
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                //TODO what is the significance of revision
-                response = accessor.delete(request.getResourceName(), "1");
+                response = accessor.delete(resourceId, "1");
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't delete token in CTS", null, e);
             }
@@ -85,34 +90,83 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void patchInstance(Context context, String resourceId, PatchRequest request,
+    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
                               ResultHandler<Resource> handler){
         final ResourceException e =
-                new NotSupportedException("Path is not supported for resource instances");
+                new NotSupportedException("Patch is not supported for resource instances");
         handler.handleError(e);
     }
 
     @Override
-    public void queryCollection(Context context, QueryRequest queryRequest, QueryResultHandler handler){
-        final ResourceException e =
-                new NotSupportedException("Query is not supported for resource instances");
-        handler.handleError(e);
+    public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler){
+        try{
+            JsonValue response;
+            Resource resource;
+            JsonResourceAccessor accessor =
+                    new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+            try {
+                Map query = new HashMap<String,String>();
+                String id = queryRequest.getQueryId();
+                if (id.equalsIgnoreCase(OAuth2.Params.REFRESH_TOKEN)){
+                    query.put(OAuth2.StoredToken.TYPE, id);
+                } else if (id.equalsIgnoreCase(OAuth2.Params.ACCESS_TOKEN)){
+                    query.put(OAuth2.StoredToken.TYPE, id);
+                } else if (id.equalsIgnoreCase(OAuth2.Params.CODE)){
+                    query.put(OAuth2.StoredToken.TYPE, id);
+                } else {
+                    query = null;
+                }
+                JsonValue queryFilter = new JsonValue(new HashMap<String, HashMap<String, String>>());
+                if (query != null){
+                    queryFilter.put("filter", query);
+                }
+                response = accessor.query("1", queryFilter);
+            } catch (JsonResourceException e) {
+                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't query CTS", null, e);
+            }
+            resource = new Resource("result", "1", response);
+            JsonValue value = resource.getContent();
+            Set<HashMap<String,Set<String>>> list = (Set<HashMap<String,Set<String>>>) value.getObject();
+            Resource res = null;
+            JsonValue val = null;
+            for (HashMap<String,Set<String>> entry : list){
+                val = new JsonValue(entry);
+                res = new Resource("result", "1", val);
+                handler.handleResource(res);
+            }
+            handler.handleResult(new QueryResult());
+        } catch (ResourceException e){
+            handler.handleError(e);
+        }
     }
 
     @Override
-    public void readInstance(Context context, String resourceId, ReadRequest request,
-                      ResultHandler<Resource> handler){
-        final ResourceException e =
-                new NotSupportedException("Read is not supported for resource instances");
-        handler.handleError(e);
+    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
+                             ResultHandler<Resource> handler){
+        try{
+            JsonValue response;
+            Resource resource;
+            JsonResourceAccessor accessor =
+                    new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+            try {
+                response = accessor.read(resourceId);
+            } catch (JsonResourceException e) {
+                throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
+            }
+            resource = new Resource(OAuth2.Params.ID, "1", response);
+            handler.handleResult(resource);
+        } catch (ResourceException e){
+            handler.handleError(e);
+        }
     }
 
     @Override
-    public void updateInstance(Context context, String resourceId, UpdateRequest request,
+    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> handler){
         final ResourceException e =
                 new NotSupportedException("Update is not supported for resource instances");
         handler.handleError(e);
     }
+
 
 }

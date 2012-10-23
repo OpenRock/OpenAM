@@ -310,18 +310,22 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         Set<Map<String, Set<String>>> tokens = new HashSet<Map<String, Set<String>>>();
         try {
             StringBuilder filter = new StringBuilder();
-            for(String key: filters.keySet()){
-                filter.append("(").append(key).append(Constants.EQUALS)
-                      .append(filters.get(key).toString()).append(")").append(" ").append("&").append(" ");
+            if (filters == null){
+                filter = null;
+            } else {
+                filter = new StringBuilder();
+                for(String key: filters.keySet()){
+                    filter.append("(").append(key).append(Constants.EQUALS)
+                          .append(filters.get(key).toString()).append(")").append(" ").append("&").append(" ");
+                }
+                //remove last ampersand
+                filter.delete(filter.length()-3, filter.length());
             }
-            //remove last ampersand
-            filter.delete(filter.length()-3, filter.length());
-
             StringBuilder baseDN = new StringBuilder();
             baseDN.append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                    0, 0, false, filter.toString(), returnAttrs);
+                    0, 0, false, (filter == null) ? "(objectClass=*)" : filter.toString(), returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {
