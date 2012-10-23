@@ -208,7 +208,12 @@ public abstract class TokenImpl extends JsonValue implements Token {
             client_id = (client_id_set).iterator().next().toString();
         }
         if (redirect_uri_set != null){
-            redirect_url = (redirect_uri_set).iterator().next().toString();
+            Object redirect = redirect_uri_set.iterator().next();
+            if (redirect != null) {
+                redirect_url = redirect.toString();
+            } else {
+                redirect_url = null;
+            }
         }
         return new SessionClientImpl(client_id, redirect_url);
     }
