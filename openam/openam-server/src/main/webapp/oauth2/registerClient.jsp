@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Client Registration</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script src="../js/jquery.js"></script>
 	<script>
         $(document).ready(function () {
             //add buttons
