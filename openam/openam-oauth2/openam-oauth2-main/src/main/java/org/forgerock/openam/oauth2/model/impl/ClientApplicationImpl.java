@@ -25,6 +25,7 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import com.sun.identity.idm.AMIdentity;
+import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -93,6 +94,7 @@ public class ClientApplicationImpl implements ClientApplication{
 
     @Override
     public String getAccessTokenType(){
+        /*
         Set<String> tokenTypesSet = null;
         try {
             tokenTypesSet = id.getAttribute(TOKEN_TYPE);
@@ -102,6 +104,8 @@ public class ClientApplicationImpl implements ClientApplication{
                     "Unable to get access token type from repository");
         }
         return tokenTypesSet.iterator().next();
+        */
+        return OAuth2.Bearer.BEARER;
     }
 
     @Override
