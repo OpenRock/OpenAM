@@ -16,13 +16,14 @@
  */
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.json.resource.provider.RoutingMode.EQUALS;
+import static org.forgerock.json.resource.RoutingMode.EQUALS;
+import static org.forgerock.json.resource.RoutingMode.EQUALS;
 import javax.servlet.ServletException;
 
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.Connections;
-import org.forgerock.json.resource.provider.RequestHandler;
-import org.forgerock.json.resource.provider.Router;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.Router;
 
 
 public class RestTokenDispathcer {
@@ -34,9 +35,9 @@ public class RestTokenDispathcer {
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
             final Router router = new Router();
-            router.addRoute(EQUALS, "/tokens", new TokensResource());
             router.addRoute(EQUALS, "/token", new TokenResource());
-            final ConnectionFactory factory = Connections.newInternalConnectionFactory(router);
+            router.addRoute(EQUALS, "/client", new ClientResource());
+            final ConnectionFactory factory = Resources.newInternalConnectionFactory(router);
             return factory;
         } catch (final Exception e) {
             throw new ServletException(e);
