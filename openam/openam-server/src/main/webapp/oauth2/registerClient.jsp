@@ -150,9 +150,11 @@
 						 <input type="text" name="display_name" id ="display_name" value=""/><input type="button" name="add_display_name" id="add_display_name" value="Add"/><br><br>
 		Display Description(s):<br><select id="display_descriptions" multiple="single" name="display_descriptions"></select><input type="button" name="remove_display_description" id="remove_display_description" value="Remove"/><br>
 						 		<input type="text" name="display_description" id ="display_description" value=""/><input type="button" name="add_dispaly_description" id="add_dispaly_description" value="Add"/><br><br>
+		<!--
 		Token Validation Type:<br><input type="radio" name="token_type" value="Bearer" checked />Bearer<br>
 							   <input type="radio" name="token_type" value="MAC"/>MAC<br>
 							   <input type="radio" name="token_type" value="SAML 2.0"/>SAML 2.0<br><br>
+        -->
 		<input type="Submit" name="save" id="submit"/>
 
         <!--used to transferdata -->

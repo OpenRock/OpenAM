@@ -61,7 +61,7 @@ public class RegisterClient extends ServerResource {
     static final String DEFAULT_SCOPES = "default_scopes";
     static final String DISPLAY_NAMES = "display_names";
     static final String DISPLAY_DESCRIPTIONS = "display_descriptions";
-    static final String TOKEN_TYPE = "token_type";
+    //static final String TOKEN_TYPE = "token_type";
 
     static final String CLIENT_PASSWORD_ = "userpassword";
     static final String CLIENT_TYPE_ = "com.forgerock.openam.oauth2provider.clientType";
@@ -70,7 +70,7 @@ public class RegisterClient extends ServerResource {
     static final String DEFAULT_SCOPES_ = "com.forgerock.openam.oauth2provider.defaultScopes";
     static final String DISPLAY_NAMES_ = "com.forgerock.openam.oauth2provider.name";
     static final String DISPLAY_DESCRIPTIONS_ = "com.forgerock.openam.oauth2provider.description";
-    static final String TOKEN_TYPE_ = "com.forgerock.openam.oauth2provider.tokenType";
+    //static final String TOKEN_TYPE_ = "com.forgerock.openam.oauth2provider.tokenType";
 
     public RegisterClient() {
         this.registerClientRef = null;
@@ -116,13 +116,14 @@ public class RegisterClient extends ServerResource {
         Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
 
         Set<String> temp = new HashSet<String>();
-        String value = parameters.get(TOKEN_TYPE);
-        if (value == null){
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "A required request parameter was not sent");
-        }
-        temp.add(value);
-        attributes.put(TOKEN_TYPE_, temp);
+        String value;
+        //value = parameters.get(TOKEN_TYPE);
+        //if (value == null){
+        //    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+        //            "A required request parameter was not sent");
+        //}
+        //temp.add(value);
+        //attributes.put(TOKEN_TYPE_, temp);
 
         temp = new HashSet<String>();
         value = parameters.get(CLIENT_PASSWORD);

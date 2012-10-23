@@ -63,6 +63,7 @@
                             <Value>Confidential</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!--
                     <AttributeSchema name="com.forgerock.openam.oauth2provider.tokenType"
                                      type="single_choice"
                                      syntax="string"
@@ -89,6 +90,7 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    -->
                     <AttributeSchema name="com.forgerock.openam.oauth2provider.redirectionURIs"
                                      type="list"
                                      syntax="string"
