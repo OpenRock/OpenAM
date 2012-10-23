@@ -25,13 +25,10 @@
 package org.forgerock.openam.oauth2;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
@@ -49,7 +46,6 @@ import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.routing.Router;
 import org.restlet.security.Verifier;
 

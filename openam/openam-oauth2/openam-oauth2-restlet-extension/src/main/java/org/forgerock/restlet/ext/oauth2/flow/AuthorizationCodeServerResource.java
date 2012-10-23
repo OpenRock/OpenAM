@@ -19,23 +19,15 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.security.AccessController;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.oauth2.OAuth2;
-import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
@@ -43,7 +35,6 @@ import org.forgerock.openam.oauth2.model.AuthorizationCode;
 import org.forgerock.openam.oauth2.model.RefreshToken;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
-import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;

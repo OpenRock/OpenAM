@@ -21,7 +21,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.sm.SMSEntry;
-import org.forgerock.openam.oauth2.OAuth2;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

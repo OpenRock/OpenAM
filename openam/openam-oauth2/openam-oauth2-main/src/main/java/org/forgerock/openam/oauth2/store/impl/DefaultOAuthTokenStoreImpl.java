@@ -25,7 +25,6 @@
 package org.forgerock.openam.oauth2.store.impl;
 
 import java.security.AccessController;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +39,6 @@ import org.forgerock.json.resource.JsonResourceAccessor;
 import org.forgerock.json.resource.JsonResourceContext;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
-import org.forgerock.openam.ext.cts.repo.JMQTokenRepo;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;

@@ -17,11 +17,9 @@
 package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.json.resource.RoutingMode.EQUALS;
-import static org.forgerock.json.resource.RoutingMode.EQUALS;
 import javax.servlet.ServletException;
 
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 
