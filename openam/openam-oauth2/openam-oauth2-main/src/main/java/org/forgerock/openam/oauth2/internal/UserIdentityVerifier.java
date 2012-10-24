@@ -24,11 +24,28 @@
 
 package org.forgerock.openam.oauth2.internal;
 
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.idm.IdRepo;
+import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.Status;
+import org.restlet.engine.adapter.HttpRequest;
+import org.restlet.ext.servlet.internal.ServletCall;
+import org.restlet.resource.ResourceException;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 /**
  * A UserIdentityVerifier does ...
@@ -52,5 +69,86 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     protected OpenAMUser createUser(AuthContext authContext) throws Exception {
         SSOToken token = authContext.getSSOToken();
         return new OpenAMUser(token.getProperty("UserId"), token);
+    }
+
+    /**
+     * Returns the user identifier.
+     *
+     * @param request
+     *            The request to inspect.
+     * @param response
+     *            The response to inspect.
+     * @return The user identifier.
+     */
+    protected String getIdentifier(Request request, Response response) {
+        if (null != request.getChallengeResponse()){
+            return request.getChallengeResponse().getIdentifier();
+        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2.Params.USERNAME, String.class)){
+            return OAuth2Utils.getRequestParameter(request, OAuth2.Params.USERNAME, String.class);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the secret provided by the user.
+     *
+     * @param request
+     *            The request to inspect.
+     * @param response
+     *            The response to inspect.
+     * @return The secret provided by the user.
+     */
+    protected char[] getSecret(Request request, Response response) {
+        if (null != request.getChallengeResponse()){
+            return request.getChallengeResponse().getSecret();
+        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2.Params.PASSWORD, String.class)){
+            return OAuth2Utils.getRequestParameter(request, OAuth2.Params.PASSWORD, String.class).toCharArray();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int verify(Request request, Response response) {
+        int result = RESULT_INVALID;
+        String identifier = getIdentifier(request, response);
+        char[] secret = getSecret(request, response);
+        if (null == identifier || null == secret) {
+            result = RESULT_MISSING;
+        } else {
+            // result = verify(identifier, secret);
+            OpenAMUser user = authenticate(request, identifier, secret);
+            if (null != user) {
+                result = RESULT_VALID;
+                request.getClientInfo().setUser(user);
+            }
+        }
+
+        return result;
+    }
+
+    public OpenAMUser authenticate(Request request, String username, char[] password) {
+        HttpServletRequest httpRequest = ((ServletCall)((HttpRequest) request).getHttpCall()).getRequest();
+
+        SSOToken token = null;
+        try {
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            token = mgr.createSSOToken(httpRequest);
+        } catch (Exception e){
+            OAuth2Utils.debug.error("UserIdentityVerifier:: No SSO Token in request", e);
+        }
+        if (token == null){
+            return super.authenticate(username, password);
+        } else {
+            try {
+                return new OpenAMUser(token.getProperty("UserId"), token);
+            } catch (Exception e){
+                OAuth2Utils.debug.error("UserIdentityVerifier:: Unable to create OpenAMUser", e);
+            }
+        }
+        return null;
     }
 }

@@ -59,7 +59,7 @@ public class PasswordServerResource extends AbstractFlow {
         // Authenticate ResourceOwner
         if (getContext().getDefaultVerifier() instanceof SecretVerifier) {
             if (Verifier.RESULT_VALID == ((SecretVerifier) getContext().getDefaultVerifier())
-                    .verify(username, password.toCharArray())) {
+                    .verify(getRequest(), getResponse())) {
                 resourceOwner = new User(username, password.toCharArray());
             } else {
                 OAuth2Utils.debug.error("Unable to verify user: " + username + "password: " + password);
