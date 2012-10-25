@@ -37,6 +37,10 @@
     <artifactId>openam-oauth2-core-token-service</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <name>OpenAM OAuth2 Core Token Service</name>
+    <properties>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+    </properties>
 
 
     <dependencies>
