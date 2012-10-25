@@ -169,7 +169,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
             }
 
             if (OAuth2Utils.debug.messageEnabled()) {
-                OAuth2Utils.debug.message("IdentityServicesImpl:authenticate returning an InvalidCredentials"
+                OAuth2Utils.debug.message("AbstractIdentityVerifier::authenticate returning an InvalidCredentials"
                                 + " exception for invalid passwords.");
             }
 
@@ -179,7 +179,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                     // package up the token for transport..
                     ret = createUser(lc);
                 } catch (Exception e) {
-                    OAuth2Utils.debug.error( "IdentityServicesImpl:authContext: "
+                    OAuth2Utils.debug.error( "AbstractIdentityVerifier::authContext: "
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
@@ -187,7 +187,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                 }
             }
         } catch (AuthLoginException le) {
-            OAuth2Utils.debug.error("IdentityServicesImpl:authContext AuthException", le);
+            OAuth2Utils.debug.error("AbstractIdentityVerifier::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         }
         return ret;

@@ -77,11 +77,11 @@ public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
         try {
             pe = new PolicyEvaluator(WEB_AGENT_SERVICE);
         } catch (SSOException e) {
-            OAuth2Utils.debug.error("Error creating policy evaluator: " + e );
+            OAuth2Utils.debug.error("OpenAMServerAuthorizer::Error creating policy evaluator: " + e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getL10NMessage(Locale
                     .getDefault()), e);
         } catch (PolicyException e) {
-            OAuth2Utils.debug.error("Error creating policy evaluator: " + e );
+            OAuth2Utils.debug.error("OpenAMServerAuthorizer::Error creating policy evaluator: " + e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e
                     .getCompleteL10NMessage(Locale.getDefault()), e);
         }

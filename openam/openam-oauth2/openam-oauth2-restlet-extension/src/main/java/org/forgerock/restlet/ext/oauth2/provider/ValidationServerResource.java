@@ -156,12 +156,12 @@ public class ValidationServerResource extends ServerResource implements
                     }
                     //call plugin class init
                     if (OAuth2Utils.debug.messageEnabled()){
-                        OAuth2Utils.debug.message("In Validator resource - got token = " + t);
+                        OAuth2Utils.debug.message("ValidationServerResource::In Validator resource - got token = " + t);
                     }
 
                     if (t.isExpired()) {
                         error = OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
-                        getLogger().warning("Should response and refresh the token");
+                        OAuth2Utils.debug.error("ValidationServerResource::Should response and refresh the token");
                     }
 
                     if (error == null) {

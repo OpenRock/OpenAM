@@ -114,7 +114,7 @@ public class OAuth2FlowFinder extends Finder {
                 result = (AbstractFlow) targetClass.newInstance();
                 result.setEndpointType(endpointType);
             } catch (Exception e) {
-                OAuth2Utils.debug.warning("Exception while instantiating the target server resource.", e);
+                OAuth2Utils.debug.warning("OAuth2FlowFinder::Exception while instantiating the target server resource.", e);
                 OAuthProblemException.OAuthError.SERVER_ERROR.handle(request, e.getMessage())
                         .pushException();
                 result = new ErrorServerResource();

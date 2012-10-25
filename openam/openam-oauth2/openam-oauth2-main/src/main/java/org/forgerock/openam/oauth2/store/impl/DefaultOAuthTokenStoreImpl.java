@@ -97,7 +97,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             REFRESH_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME).iterator().next());
             ACCESS_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME).iterator().next());
         } catch (Exception e) {
-            OAuth2Utils.debug.error("Unable to read service settings", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to read service settings", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null,
                     "Unable to read service settings");
         }
@@ -106,7 +106,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.AuthorizationCode createAuthorizationCode(Set<String> scope, String realm, String uuid,
             org.forgerock.openam.oauth2.model.SessionClient client) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Creating Authorization code");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
         }
         getSettings(realm);
         String id = UUID.randomUUID().toString();
@@ -122,13 +122,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, code);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create authorization code", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create authorization code");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
@@ -139,7 +139,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.AuthorizationCode readAuthorizationCode(String id) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Reading Authorization code: " + id);
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Reading Authorization code: " + id);
         }
         JsonValue response = null;
 
@@ -149,13 +149,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to read authorization code", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create authorization code");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
@@ -167,7 +167,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public void deleteAuthorizationCode(String id) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Deleting Authorization code: " + id);
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Deleting Authorization code: " + id);
         }
         JsonValue response = null;
 
@@ -177,13 +177,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to delete authorization code", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to delete authorization code", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create authorization code");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token using CTS", null);
         }
@@ -195,7 +195,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to delete authorization code", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to delete authorization code", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
         }
@@ -205,7 +205,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope,
             org.forgerock.openam.oauth2.model.AuthorizationCode code, String realm) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Creating access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
         getSettings(realm);
         JsonValue response = null;
@@ -221,13 +221,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create access token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -239,7 +239,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope,
             org.forgerock.openam.oauth2.model.RefreshToken refreshToken, String realm) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Creating access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
         getSettings(realm);
         JsonValue response = null;
@@ -255,13 +255,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create access token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -273,7 +273,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Creating access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
         getSettings(realm);
         JsonValue response = null;
@@ -290,13 +290,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create access token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -308,7 +308,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid, org.forgerock.openam.oauth2.model.SessionClient client) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Creating access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
         getSettings(realm);
         JsonValue response = null;
@@ -325,13 +325,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create access token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -343,7 +343,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.AccessToken createAccessToken(String accessTokenType, Set<String> scope, String realm,
             String uuid, String clientId, org.forgerock.openam.oauth2.model.RefreshToken refreshToken) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Creating access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
         getSettings(realm);
         JsonValue response = null;
@@ -368,13 +368,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create access token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -385,7 +385,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.AccessToken readAccessToken(String id) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Reading access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Reading access token");
         }
         JsonValue response = null;
 
@@ -395,13 +395,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to read access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to read access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to read access token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to read access token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not read token in CTS", null);
         }
@@ -413,7 +413,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public void deleteAccessToken(String id) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Deleting access token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Deleting access token");
         }
         JsonValue response = null;
 
@@ -423,7 +423,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to delete access token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to delete access token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
         }
@@ -433,7 +433,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     public org.forgerock.openam.oauth2.model.RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid,
             String clientId) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Create refresh token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Create refresh token");
         }
         getSettings(realm);
         JsonValue response = null;
@@ -450,13 +450,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, refreshToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to create refresh token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to create refresh token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -467,7 +467,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     @Override
     public org.forgerock.openam.oauth2.model.RefreshToken readRefreshToken(String id) {
         if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Read refresh token");
+            OAuth2Utils.debug.message("DefaultOAuthTokenStoreImpl::Read refresh token");
         }
         JsonValue response = null;
 
@@ -477,13 +477,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to read refresh token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.debug.error("Unable to read refresh token");
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token");
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
@@ -502,7 +502,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
-            OAuth2Utils.debug.error("Unable to delete refresh token", e);
+            OAuth2Utils.debug.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
         }

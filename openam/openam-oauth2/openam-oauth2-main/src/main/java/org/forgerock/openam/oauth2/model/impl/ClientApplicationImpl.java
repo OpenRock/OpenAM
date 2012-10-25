@@ -68,7 +68,7 @@ public class ClientApplicationImpl implements ClientApplication{
                 clientType = ClientType.PUBLIC;
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get client type from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get client type from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get client type from repository");
         }
@@ -85,7 +85,7 @@ public class ClientApplicationImpl implements ClientApplication{
                 redirectionURIs.add(URI.create(uri));
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get redirection URLs from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get redirection URLs from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get redirection URLs from repository");
         }
@@ -119,7 +119,7 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             scopes = id.getAttribute(SCOPES);
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get allowed grant scopes from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get allowed grant scopes from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get allowed grant scopes from repository");
         }
@@ -132,7 +132,7 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             scopes = id.getAttribute(DEFAULT_SCOPES);
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get defualt grant scopes from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get defualt grant scopes from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get default grant scopes from repository");
         }
@@ -147,7 +147,7 @@ public class ClientApplicationImpl implements ClientApplication{
             autoGrantSet = id.getAttribute(AUTO_GRANT);
             grant = Boolean.parseBoolean(autoGrantSet.iterator().next());
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get auto grant status from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get auto grant status from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get auto grant status from repository");
         }
@@ -160,7 +160,7 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             displayName = id.getAttribute(NAME);
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get display name from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get display name from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get display name from repository");
         }
@@ -173,7 +173,7 @@ public class ClientApplicationImpl implements ClientApplication{
         try {
             displayDescription = id.getAttribute(DESCRIPTION);
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get display decription from repository", e);
+            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get display decription from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get display description from repository");
         }

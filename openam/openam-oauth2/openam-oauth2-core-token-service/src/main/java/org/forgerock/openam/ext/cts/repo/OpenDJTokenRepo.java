@@ -131,12 +131,12 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             if (iso.getResultCode() == ResultCode.SUCCESS) {
                 //TODO LOG
             } else if (iso.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
-                debug.warning("Unable to obtain the Internal Root Container for Token Persistence!");
+                debug.warning("OpenDJTokenRepo::Unable to obtain the Internal Root Container for Token Persistence!");
             } else {
-                debug.warning("Unable to obtain the Internal Root Container for Token Persistence!");
+                debug.warning("OpenDJTokenRepo::Unable to obtain the Internal Root Container for Token Persistence!");
             }
         } catch (DirectoryException directoryException) {
-            debug.warning("Unable to obtain the Internal Root Container for Token Persistence!",
+            debug.warning("OpenDJTokenRepo::Unable to obtain the Internal Root Container for Token Persistence!",
                     directoryException);
             // TODO -- Abort further setup.
         }
@@ -168,15 +168,15 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
         if (resultCode == ResultCode.SUCCESS) {
             if (debug.messageEnabled()){
-                debug.message("Token created: " + request.get("values").toString());
+                debug.message("OpenDJTokenRepo::Token created: " + request.get("values").toString());
             }
             request.get("value").put(OAuth2.Params.ID, token.getDN());
             return new JsonValue(request.get("values"));
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
-            debug.warning("Token already exists");
+            debug.warning("OpenDJTokenRepo::Token already exists");
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         } else {
-            debug.warning("Unable to create token");
+            debug.warning("OpenDJTokenRepo::Unable to create token");
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
     }
@@ -216,24 +216,24 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
                     addUnderScoresToParams(results);
                     if (debug.messageEnabled()){
-                        debug.message("Token read: " + results.toString());
+                        debug.message("OpenDJTokenRepo::Token read: " + results.toString());
                     }
                     return new JsonValue(results);
                 } else {
-                    debug.warning("Token not found");
+                    debug.warning("OpenDJTokenRepo::Token not found");
                     throw new JsonResourceException(JsonResourceException.NOT_FOUND, "Object not found with id: " + dn);
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                debug.warning("Token not found: " +
+                debug.warning("OpenDJTokenRepo::Token not found: " +
                         resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
-                debug.error("Token not found: " +
+                debug.error("OpenDJTokenRepo::Token not found: " +
                         resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             }
         } catch (DirectoryException dex) {
-            debug.error("Directory Exception when reading", dex);
+            debug.error("OpenDJTokenRepo::Directory Exception when reading", dex);
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, dex);
         }
     }
@@ -267,7 +267,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         ResultCode resultCode = dop.getResultCode();
 
         if (resultCode != ResultCode.SUCCESS) {
-            debug.error("Unable to read token: " +
+            debug.error("OpenDJTokenRepo::Unable to read token: " +
                     resultCode.getResultCodeName().toString());
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
@@ -343,22 +343,22 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                     }
                 }
                 if (debug.messageEnabled()){
-                    debug.message("Token query performed");
+                    debug.message("OpenDJTokenRepo::Token query performed");
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                debug.warning("Query produced no results: " +
+                debug.warning("OpenDJTokenRepo::Query produced no results: " +
                         resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
-                debug.warning("Query failed: " +
+                debug.warning("OpenDJTokenRepo::Query failed: " +
                         resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             }
         } catch (DirectoryException dex) {
-            debug.error("Reading from the directory failed", dex);
+            debug.error("OpenDJTokenRepo::Reading from the directory failed", dex);
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, dex);
         } catch (Exception ex) {
-            debug.error("An error occured while reading from the directory", ex);
+            debug.error("OpenDJTokenRepo::An error occured while reading from the directory", ex);
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, ex);
         }
 
@@ -405,19 +405,19 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                     }
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                debug.warning("No expired object found to delete: " +
+                debug.warning("OpenDJTokenRepo::No expired object found to delete: " +
                         resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
-                debug.warning("Deleting expired tokens failed: " +
+                debug.warning("OpenDJTokenRepo::Deleting expired tokens failed: " +
                         resultCode.getResultCodeName().toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             }
         } catch (DirectoryException dex) {
-            debug.error("An error occured while trying to delete expired tokens", dex);
+            debug.error("OpenDJTokenRepo::An error occured while trying to delete expired tokens", dex);
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, dex);
         } catch (Exception ex) {
-            debug.error("An error occured while trying to delete expired tokens", ex);
+            debug.error("OpenDJTokenRepo::An error occured while trying to delete expired tokens", ex);
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, ex);
         }
     }
@@ -430,7 +430,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         ResultCode resultCode = dop.getResultCode();
 
         if (resultCode != ResultCode.SUCCESS) {
-            debug.error("An error occured while trying to delete a token: " +
+            debug.error("OpenDJTokenRepo::An error occured while trying to delete a token: " +
                     resultCode.getResultCodeName().toString());
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
@@ -539,7 +539,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                 //logDBStatus();
             }
         } catch (Exception e) {
-            debug.error("OpenDJTokenRepo: Exception during run.", e);
+            debug.error("OpenDJTokenRepo::Exception during run.", e);
         }
     }
 

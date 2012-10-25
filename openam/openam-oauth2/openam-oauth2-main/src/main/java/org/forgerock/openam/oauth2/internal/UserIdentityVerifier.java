@@ -25,8 +25,6 @@
 package org.forgerock.openam.oauth2.internal;
 
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.idm.IdRepo;
 import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
@@ -36,16 +34,10 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Status;
-import org.restlet.engine.adapter.HttpRequest;
-import org.restlet.ext.servlet.internal.ServletCall;
-import org.restlet.resource.ResourceException;
+import org.restlet.ext.servlet.ServletUtils;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
+
 
 /**
  * A UserIdentityVerifier does ...
@@ -131,7 +123,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     }
 
     public OpenAMUser authenticate(Request request, String username, char[] password) {
-        HttpServletRequest httpRequest = ((ServletCall)((HttpRequest) request).getHttpCall()).getRequest();
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
 
         SSOToken token = null;
         try {

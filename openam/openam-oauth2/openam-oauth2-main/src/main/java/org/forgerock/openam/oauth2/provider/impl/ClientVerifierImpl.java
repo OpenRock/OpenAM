@@ -55,7 +55,6 @@ import javax.security.auth.callback.PasswordCallback;
 
 public class ClientVerifierImpl implements ClientVerifier{
 
-    private static final String CLIENT_PASSWORD = "userpassword";
     private String realm = null;
 
     @Override
@@ -103,7 +102,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
             user = new ClientApplicationImpl(ret);
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to verify client", e);
+            OAuth2Utils.debug.error("ClientVerifierImpl::Unable to verify client", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
         }
         return user;
@@ -139,16 +138,16 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
 
             if (OAuth2Utils.debug.messageEnabled()) {
-                OAuth2Utils.debug.message("ClientVerifierImpl:authenticate returning an InvalidCredentials"
+                OAuth2Utils.debug.message("ClientVerifierImpl::authenticate returning an InvalidCredentials"
                         + " exception for invalid passwords.");
             }
 
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
                 try {
-                    ret = new AMIdentity(lc.getSSOToken());
+                    ret = IdUtils.getIdentity(lc.getSSOToken());
                 } catch (Exception e) {
-                    OAuth2Utils.debug.error( "ClientVerifierImpl:authContext: "
+                    OAuth2Utils.debug.error( "ClientVerifierImpl::authContext: "
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
@@ -156,7 +155,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                 }
             }
         } catch (AuthLoginException le) {
-            OAuth2Utils.debug.error("ClientVerifierImpl:authContext AuthException", le);
+            OAuth2Utils.debug.error("ClientVerifierImpl::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         }
         return ret;
@@ -173,7 +172,6 @@ public class ClientVerifierImpl implements ClientVerifier{
         ClientApplication user = null;
         try {
             AMIdentity id = getIdentity(client_id);
-            Set<String> clientPassword = id.getAttribute(CLIENT_PASSWORD);
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
             return user;
@@ -215,7 +213,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                 return null;
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("Unable to get client AMIdentity: ", e);
+            OAuth2Utils.debug.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
         }
     }
