@@ -372,7 +372,12 @@ public class OAuth2Utils {
         if (realm instanceof String) {
             return (String) realm;
         }
-        return getRequestParameter(request, OAuth2.Custom.REALM, String.class);
+        String ret = getRequestParameter(request, OAuth2.Custom.REALM, String.class);
+        if (ret == null){
+            return "/";
+        } else {
+            return ret;
+        }
     }
 
     public static String getModuleName(Request request) {

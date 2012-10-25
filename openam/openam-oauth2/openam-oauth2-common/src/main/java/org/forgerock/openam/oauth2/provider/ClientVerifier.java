@@ -29,7 +29,6 @@ import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 
 /**
@@ -65,35 +64,6 @@ public interface ClientVerifier {
      */
     public ClientApplication verify(Request request, Response response)
             throws OAuthProblemException;
-    /**
-     * Authenticates the client and use the
-     * {@link org.restlet.engine.header.HeaderConstants#HEADER_AUTHORIZATION}
-     * <p/>
-     *
-     * 
-     * @param challengeResponse
-     *            from the HTTP Request
-     * @return Client if the credentials are correct
-     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     *             when authentication failed
-     */
-    public ClientApplication verify(ChallengeResponse challengeResponse)
-            throws OAuthProblemException;
-
-    /**
-     * Authenticates the client and use the
-     * {@link org.forgerock.openam.oauth2.OAuth2.Params#CLIENT_ID} and
-     * {@link org.forgerock.openam.oauth2.OAuth2.Params#CLIENT_SECRET} from
-     * application/x-www-form-urlencoded Web From
-     * 
-     * @param client_id
-     * @param client_secret
-     * @return Client if the credentials are correct
-     * @throws OAuthProblemException
-     *             when authentication failed
-     */
-    public ClientApplication verify(String client_id, String client_secret)
-            throws OAuthProblemException;
 
     /**
      * Get the configured HTTP Authentication scheme for the given
@@ -110,12 +80,4 @@ public interface ClientVerifier {
      */
     public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String client_id);
 
-    /**
-     * Find the client by {@code client_id}
-     * 
-     * @param client_id
-     *            client_id from the request
-     * @return null if there is no client with the given identifier.
-     */
-    public ClientApplication findClient(String client_id);
 }

@@ -25,6 +25,8 @@
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.openam.oauth2.OAuth2;
@@ -39,10 +41,17 @@ import org.restlet.Request;
 import org.restlet.Response;
 
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import com.sun.identity.shared.encode.Hash;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 
 public class ClientVerifierImpl implements ClientVerifier{
 
@@ -66,7 +75,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                     OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID,
                             String.class);
             if (client_secret != null){
-                client = verify(client_id, Hash.hash(client_secret));
+                client = verify(client_id, client_secret);
             } else {
                 client = findClient(client_id);
             }
@@ -74,8 +83,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         return client;
     }
 
-    @Override
-    public ClientApplication verify(ChallengeResponse challengeResponse)
+    private ClientApplication verify(ChallengeResponse challengeResponse)
             throws OAuthProblemException{
         String client_id = challengeResponse.getIdentifier();
         String client_secret = String.valueOf(challengeResponse.getSecret());
@@ -83,28 +91,75 @@ public class ClientVerifierImpl implements ClientVerifier{
         return verify(client_id, client_secret);
     }
 
-    @Override
-    public ClientApplication verify(String client_id, String client_secret)
+    private ClientApplication verify(String client_id, String client_secret)
             throws OAuthProblemException{
         ClientApplication user = null;
         try {
-            AMIdentity id = getIdentity(client_id);
-            Set<String> clientPassword = id.getAttribute(CLIENT_PASSWORD);
-            //password is returned as {SHA-1}password
-            //remove {SHA-1}
-            String cleanpass = clientPassword.iterator().next().replaceAll("\\{SHA-1\\}", "");
-            if (!cleanpass.equals(client_secret)){
-                 //wrong client secret
+            AMIdentity ret = authenticate(client_id, client_secret.toCharArray());
+            if (ret == null){
                 OAuth2Utils.debug.error("ClientVerifierImpl::Unable to verify client password: " +
-                    cleanpass);
+                    client_secret);
                 throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
             }
-            user = new ClientApplicationImpl(id);
+            user = new ClientApplicationImpl(ret);
         } catch (Exception e){
             OAuth2Utils.debug.error("Unable to verify client", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
         }
         return user;
+    }
+
+    private AMIdentity authenticate(String username, char[] password) {
+
+        AMIdentity ret = null;
+        try {
+            AuthContext lc = new AuthContext(realm);
+            lc.login();
+            while (lc.hasMoreRequirements()) {
+                Callback[] callbacks = lc.getRequirements();
+                ArrayList missing = new ArrayList();
+                // loop through the requires setting the needs..
+                for (int i = 0; i < callbacks.length; i++) {
+                    if (callbacks[i] instanceof NameCallback) {
+                        NameCallback nc = (NameCallback) callbacks[i];
+                        nc.setName(username);
+                    } else if (callbacks[i] instanceof PasswordCallback) {
+                        PasswordCallback pc = (PasswordCallback) callbacks[i];
+                        pc.setPassword(password);
+                    } else {
+                        missing.add(callbacks[i]);
+                    }
+                }
+                // there's missing requirements not filled by this
+                if (missing.size() > 0) {
+                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                            "Missing requirements");
+                }
+                lc.submitRequirements(callbacks);
+            }
+
+            if (OAuth2Utils.debug.messageEnabled()) {
+                OAuth2Utils.debug.message("ClientVerifierImpl:authenticate returning an InvalidCredentials"
+                        + " exception for invalid passwords.");
+            }
+
+            // validate the password..
+            if (lc.getStatus() == AuthContext.Status.SUCCESS) {
+                try {
+                    ret = new AMIdentity(lc.getSSOToken());
+                } catch (Exception e) {
+                    OAuth2Utils.debug.error( "ClientVerifierImpl:authContext: "
+                            + "Unable to get SSOToken", e);
+                    // we're going to throw a generic error
+                    // because the system is likely down..
+                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+                }
+            }
+        } catch (AuthLoginException le) {
+            OAuth2Utils.debug.error("ClientVerifierImpl:authContext AuthException", le);
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
+        }
+        return ret;
     }
 
     @Override
@@ -113,8 +168,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         return null;
     }
 
-    @Override
-    public ClientApplication findClient(String client_id){
+    private ClientApplication findClient(String client_id){
 
         ClientApplication user = null;
         try {

@@ -192,23 +192,8 @@ public class OAuth2Application extends Application {
         }
 
         @Override
-        public ClientApplication verify(ChallengeResponse challengeResponse) {
-            return new TestClientApplication();
-        }
-
-        @Override
-        public ClientApplication verify(String clientId, String clientSecret) {
-            return new TestClientApplication();
-        }
-
-        @Override
         public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String clientId) {
             return null;
-        }
-
-        @Override
-        public ClientApplication findClient(String clientId) {
-            return new TestClientApplication();
         }
     }
 

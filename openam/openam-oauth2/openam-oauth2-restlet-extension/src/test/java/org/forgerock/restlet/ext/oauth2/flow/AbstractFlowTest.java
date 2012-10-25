@@ -139,9 +139,9 @@ public class AbstractFlowTest {
         redirectionURIs.add(URI.create("http://localhost:8080/oauth2/cb"));
         when(client.getRedirectionURIs()).thenReturn(redirectionURIs);
 
-        when(realm.getClientVerifier().verify(anyString(), anyString())).thenReturn(client);
-        when(realm.getClientVerifier().verify(any(ChallengeResponse.class))).thenReturn(client);
-        when(realm.getClientVerifier().findClient(matches("cid"))).thenReturn(client);
+        //when(realm.getClientVerifier().verify(anyString(), anyString())).thenReturn(client);
+        //when(realm.getClientVerifier().verify(any(ChallengeResponse.class))).thenReturn(client);
+        //when(realm.getClientVerifier().findClient(matches("cid"))).thenReturn(client);
 
         // Mock Token Store
 
