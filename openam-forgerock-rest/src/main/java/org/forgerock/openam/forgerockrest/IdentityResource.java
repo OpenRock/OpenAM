@@ -362,7 +362,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         Map<String, Object> holdJVal = jVal.asMap();
         printJValMap(holdJVal);
-        //IdentityDetails jsonValueToIdentityDetails(JsonValue jVal);
+
         IdentityDetails dtls = null;
         IdentityServicesImpl idsvc = null;
         try {

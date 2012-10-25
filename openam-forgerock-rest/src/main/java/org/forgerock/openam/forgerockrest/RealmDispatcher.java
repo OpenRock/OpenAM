@@ -64,9 +64,9 @@ public final class RealmDispatcher  {
             if (rName.length() > 1) rName = rName + "/";
 
 
-            router.addRoute(EQUALS, "/users", new IdentityResource("user", rName));// Just a simply READ to make sure dispatching works
-            router.addRoute(EQUALS, "/agents", new IdentityResource("agent", rName));// Just a simply READ to make sure dispatching works
-            router.addRoute(EQUALS, "/groups", new IdentityResource("group", rName));// Just a simply READ to make sure dispatching works
+            router.addRoute(EQUALS, rName + "users", new IdentityResource("user", rName));// Just a simply READ to make sure dispatching works
+            router.addRoute(EQUALS, rName + "agents", new IdentityResource("agent", rName));// Just a simply READ to make sure dispatching works
+            router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));// Just a simply READ to make sure dispatching works
 
             Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
             router.addRoute(EQUALS, "/realms", new RealmResource(subOrgs));

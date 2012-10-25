@@ -83,7 +83,6 @@ public final class RestDispatcher  {
     public ConnectionFactory buildConnectionFactory(ServletConfig config) throws ResourceException {
         final Router router = new Router();
         String roots = config.getInitParameter("rootContexts");
-        router.addRoute(EQUALS, "/test", new TestResource());// Just a simply READ to make sure dispatching works
 
         if (roots != null)  {
             String[] initClasses = config.getInitParameter("rootContexts").split(","); // not really much to do
