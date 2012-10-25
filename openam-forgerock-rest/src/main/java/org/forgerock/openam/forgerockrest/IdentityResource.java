@@ -67,6 +67,7 @@ import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
+import com.sun.identity.idsvcs.UpdateResponse;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.idsvcs.Token;
 
@@ -146,56 +147,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      *
      */
-
-    public void printJValMap(Map<String, Object> JVMap){
-        for (Map.Entry<String, Object> entry : JVMap.entrySet()){
-            System.out.println("Key is:   [" + entry.getKey() + "]");
-            System.out.println("Value is: ["+ entry.getValue() + "]");
-        }
-    }
-    //identityDetailsToJsonValue
-    private IdentityDetails jsonValueToIdentityDetails(JsonValue jVal){
-
-        IdentityDetails identity = new IdentityDetails();
-        List<Attribute> identityAttrList = new ArrayList();
-        identityAttrList.addAll(iDSvcsAttrList);
-
-        try{
-            identity.setType(iDSvcsAttrList.get(0).getValues()[0]); //set type ex. user
-            identity.setRealm(realm); //set realm
-
-            Map<String, Object> holdJVal = jVal.asMap();
-            printJValMap(holdJVal);  //Print the Map for now...
-
-            identity.setName((String)holdJVal.get("name"));  //set name from JsonValue object
-
-            Method methods[] = identity.getClass().getDeclaredMethods();
-            try {
-                for (Map.Entry<String, Object> entry : holdJVal.entrySet()) {
-                    Object t = entry.getValue();
-                    if (t instanceof String) {
-                        String[] tArray = {(String) t};
-                        identityAttrList.add(new Attribute((String) entry.getKey(), tArray));
-                    } else {
-                        String[] tArray = (String[])t;
-                        identityAttrList.add(new Attribute((String) entry.getKey(), tArray));
-                    }
-                }
-            } catch (Exception e) {
-                throw new NotFoundException("Cannnot Create IdentityAttributeList!");
-            }
-
-            Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
-
-            identity.setAttributes(attr);
-        } catch (final Exception e) {
-            //deal with better exceptions
-        }
-        return identity;
-
-    }
-
-    @Override  //public CreateResponse create(IdentityDetails identity, Token admin)
+    @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
         //check params for null vals
@@ -234,31 +186,97 @@ public final class IdentityResource implements CollectionResourceProvider {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
+        IdentityDetails dtls = null;
+        IdentityServicesImpl idsvc = null;
 
         try {
             JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin); //read to see if it's there
+            idsvc = new IdentityServicesImpl();
+            dtls = idsvc.read(resourceId, iDSvcsAttrList, admin); //read to see if it's there
 
-            if (dtls == null) {
-                throw new NotFoundException("The resource with ID '" + resourceId
-                        + " could not be read because it does not exist");
-            }
-
-            //DeleteResponse success = idsvc.delete(dtls, admin); //delete now that dtls isn't null
-            Object success = idsvc.delete(dtls,admin);
-            String name = success.getClass().getName();
-            //result.put("Delete", success.toString());
+            DeleteResponse success = idsvc.delete(dtls, admin); //delete now that dtls isn't null
             result.put("Delete", "OK");
             Resource resource = new Resource("0", "0", result);
             handler.handleResult(resource);
-
-        } catch (final ResourceException e) {
-            handler.handleError(e);
-        } catch (final Exception e) {
+        }catch (final NeedMoreCredentials ex){
+            //do something useful
+        } catch(final ObjectNotFound notFound){
+            //
+        } catch(final Exception exception){
+            //do something useful
         }
     }
 
+    /**
+     * Returns a JsonValue containing appropriate identity details
+     *
+     * @param details
+     *            The IdentityDetails of a Resource
+     * @return The JsonValue Object
+     */
+    private JsonValue identityDetailsToJsonValue(IdentityDetails details){
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+        try{
+            result.put("name", details.getName());
+            result.put("realm", details.getRealm());
+            Attribute[] attrs = details.getAttributes();
+
+            for (Attribute aix : attrs) {
+                result.put(aix.getName(), aix.getValues());
+            }
+            return result;
+        }catch(final Exception e){
+            throw new JsonValueException(result);
+        }
+    }
+
+    /**
+     * Returns an IdenityDetails from a JsonValue
+     *
+     * @param jVal
+     *            The JsonValue Object to be converted
+     * @return The IdentityDetails object
+     */
+    private IdentityDetails jsonValueToIdentityDetails(JsonValue jVal){
+
+        IdentityDetails identity = new IdentityDetails();
+        List<Attribute> identityAttrList = new ArrayList();
+        identityAttrList.addAll(iDSvcsAttrList);
+
+        try{
+            identity.setType(iDSvcsAttrList.get(0).getValues()[0]); //set type ex. user
+            identity.setRealm(realm); //set realm
+
+            Map<String, Object> holdJVal = jVal.asMap();
+            printJValMap(holdJVal);  //Print the Map for now...
+
+            identity.setName((String)holdJVal.get("name"));  //set name from JsonValue object
+
+            Method methods[] = identity.getClass().getDeclaredMethods();
+            try {
+                for (Map.Entry<String, Object> entry : holdJVal.entrySet()) {
+                    Object t = entry.getValue();
+                    if (t instanceof String) {
+                        String[] tArray = {(String) t};
+                        identityAttrList.add(new Attribute((String) entry.getKey(), tArray));
+                    } else {
+                        ArrayList<String> tList = (ArrayList<String>)t;
+                        String [] tArray = tList.toArray(new String[tList.size()]);
+                        identityAttrList.add(new Attribute((String) entry.getKey(), tArray));
+                    }
+                }
+            } catch (Exception e) {
+                throw new NotFoundException("Cannnot Create IdentityAttributeList!");
+            }
+
+            Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
+
+            identity.setAttributes(attr);
+        } catch (final Exception e) {
+            //deal with better exceptions
+        }
+        return identity;
+    }
     /**
      * {@inheritDoc}
      */
@@ -267,6 +285,13 @@ public final class IdentityResource implements CollectionResourceProvider {
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported");
         handler.handleError(e);
+    }
+
+    public void printJValMap(Map<String, Object> JVMap){
+        for (Map.Entry<String, Object> entry : JVMap.entrySet()){
+            System.out.println("Key is:   [" + entry.getKey() + "]");
+            System.out.println("Value is: ["+ entry.getValue() + "]");
+        }
     }
 
     /**
@@ -306,46 +331,20 @@ public final class IdentityResource implements CollectionResourceProvider {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
-
+        IdentityServicesImpl idsvc = null;
+        IdentityDetails dtls = null;
         try {
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            IdentityDetails dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);
-
-            if (dtls == null) {
-                throw new NotFoundException("The resource with ID '" + resourceId
-                        + " could not be read because it does not exist");
-            }
-
+            idsvc = new IdentityServicesImpl();
+            dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);
             Resource resource = new Resource("0", "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            handler.handleError(e);
-        } catch (final Exception e) {
+        }catch(final ObjectNotFound o){
+            //
+        }catch (final Exception e) {
+            //
         }
     }
 
-    /**
-     * Returns a JsonValue containing appropriate identity details
-     *
-     * @param details
-     *            The IdentityDetails of a Resource
-     * @return The JsonValue Object
-     */
-    private JsonValue identityDetailsToJsonValue(IdentityDetails details){
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        try{
-            result.put("name", details.getName());
-            result.put("realm", details.getRealm());
-            Attribute[] attrs = details.getAttributes();
-
-            for (Attribute aix : attrs) {
-                result.put(aix.getName(), aix.getValues());
-            }
-            return result;
-        }catch(final Exception e){
-            throw new JsonValueException(result);
-        }
-    }
     /**
      * {@inheritDoc}
      */
@@ -369,10 +368,11 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             idsvc = new IdentityServicesImpl();
             dtls = idsvc.read(resourceId, iDSvcsAttrList, admin);//Retrieve details about user to be updated
-            if(dtls != null){
-                //Continue modifying the identity
-
-            }
+            //Continue modifying the identity
+            UpdateResponse message = idsvc.update(jsonValueToIdentityDetails(jVal), admin);
+            IdentityDetails checkIdent = idsvc.read(dtls.getName(),iDSvcsAttrList, admin);
+            Resource resource = new Resource("0", "0", identityDetailsToJsonValue(checkIdent));
+            handler.handleResult(resource);
         } catch(final ObjectNotFound o){
             //create object because it does not exist
             //public CreateResponse create(IdentityDetails identity, Token admin)
@@ -391,11 +391,12 @@ public final class IdentityResource implements CollectionResourceProvider {
             }catch (final NeedMoreCredentials ex){
                 //do something useful
             } catch(final ObjectNotFound notFound){
-                //""
+                //do something useful
             } catch(final Exception exception){
-                //do somethint
+                //do something useful
             }
         }catch (final Exception e) {
+            //deal with exceptions
         }
     }
 
