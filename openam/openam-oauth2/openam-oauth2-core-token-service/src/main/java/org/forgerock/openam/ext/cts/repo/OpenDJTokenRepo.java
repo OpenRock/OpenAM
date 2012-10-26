@@ -38,6 +38,8 @@ import org.opends.server.types.*;
 import java.util.*;
 
 public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource {
+    private static final String FAMRECORD_FILTER = "("+Constants.OBJECTCLASS+Constants.EQUALS+Constants.ASTERISK+")";
+
 
     final static Debug debug = Debug.getInstance("CTS");
 
@@ -125,7 +127,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             icConn = InternalClientConnection.getRootConnection();
             InternalSearchOperation iso = icConn.processSearch(OAUTH2_BASE_DN,
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                    0, 0, false, Constants.FAMRECORD_FILTER, returnAttrs_DN_ONLY);
+                    0, 0, false, FAMRECORD_FILTER, returnAttrs_DN_ONLY);
             isDatabaseUp = true;
 
             if (iso.getResultCode() == ResultCode.SUCCESS) {

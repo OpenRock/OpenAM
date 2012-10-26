@@ -16,9 +16,9 @@
  */
 package org.forgerock.openam.ext.cts.model;
 
+import com.sun.identity.shared.Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.OAuth2;
-import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 
