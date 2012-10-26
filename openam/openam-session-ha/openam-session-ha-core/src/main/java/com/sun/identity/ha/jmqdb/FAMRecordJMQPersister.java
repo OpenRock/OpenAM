@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.ha.jmqdb;
@@ -123,9 +123,9 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
 
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
         if (shutdownMan.acquireValidLock()) {
-            tConn = tFactory.createTopicConnection();
-            tSession = tConn.createTopicSession(false, flag);
             try {
+                tConn = tFactory.createTopicConnection();
+                tSession = tConn.createTopicSession(false, flag);
                 shutdownMan.addShutdownListener(
                     new ShutdownListener() {
                         public void shutdown() {
@@ -198,7 +198,7 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
                 thisURI);
                    
         // Initialize all message queues/topics
-        serverList = SessionService.getSessionRepositoryURL();
+        serverList = SessionService.getSessionExternalRepositoryURL();
         userName =   SessionService.getSessionStoreUserName();
         password =   SessionService.getSessionStorePassword();
         readTimeOut = SessionService.getConnectionMaxWaitTime();
@@ -212,9 +212,9 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
 
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
         if (shutdownMan.acquireValidLock()) {
-            tConn = tFactory.createTopicConnection();
-            tSession = tConn.createTopicSession(false, flag);
             try {
+                tConn = tFactory.createTopicConnection();
+                tSession = tConn.createTopicSession(false, flag);
                 shutdownMan.addShutdownListener(
                     new ShutdownListener() {
                         public void shutdown() {

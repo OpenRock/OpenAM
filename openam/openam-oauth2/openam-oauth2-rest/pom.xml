@@ -30,12 +30,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.forgerock</groupId>
+    <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-oauth2-rest</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -75,12 +75,12 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-core-token-service</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>

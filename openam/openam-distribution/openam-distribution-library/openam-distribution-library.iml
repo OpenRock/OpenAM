@@ -127,22 +127,6 @@
     <orderEntry type="module" module-name="OpenFM" />
     <orderEntry type="module" module-name="openam-session-ha-core" />
     <orderEntry type="module" module-name="openam-session-ha-locale" />
-    <orderEntry type="library" name="Maven: commons-net:commons-net:3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.jackson:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.simple:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.simpleframework:simple:4.1.21" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.ssl:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.jsslutils:jsslutils:1.0.5" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.crypto:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.httpclient:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.1.1" level="project" />
-    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.james:apache-mime4j:0.6" level="project" />
     <orderEntry type="module" module-name="openam-oauth" />
     <orderEntry type="module" module-name="openam-dtd-schema" />
     <orderEntry type="module" module-name="openam-jaxrpc-schema" />

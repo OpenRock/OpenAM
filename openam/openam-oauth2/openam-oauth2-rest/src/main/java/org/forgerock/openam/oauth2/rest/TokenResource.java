@@ -22,6 +22,7 @@ import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.openam.oauth2.OAuth2;
