@@ -24,14 +24,24 @@
 
 package org.forgerock.openam.oauth2.provider.impl;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.*;
+import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.security.AccessController;
+import java.util.*;
 
+/**
+ * This is the default scope implementation class. This class by default
+ * follows the OAuth2 specs rules regarding how scope should be assigned.
+ * The only exceptions is in the retrieveTokenInfoEndPoint method end point
+ * the scopes are assumed to be OpenAM user attributes, which will be returned
+ * upon the completion of the retrieveTokenInfoEndPoint method
+ */
 public class ScopeImpl implements Scope {
 
     @Override
@@ -76,13 +86,67 @@ public class ScopeImpl implements Scope {
     @Override
     public Map<String, Object> retrieveTokenInfoEndPoint(AccessToken token){
         Map<String, Object> map = new HashMap<String, Object>();
-        Set<String> s = token.getScope();
+        Set<String> scopes = token.getScope();
+        String resourceOwner = token.getUserID();
 
-        if (s != null){
-            map.put("scope", s.toString());
+        if (resourceOwner != null){
+            AMIdentity id = getIdentity(resourceOwner);
+            for (String scope : scopes){
+                try {
+                    map.put(scope, id.getAttribute(scope));
+                } catch (Exception e){
+                    OAuth2Utils.debug.error("Unable to get attribute", e);
+                }
+            }
         }
 
         return map;
+    }
+
+    /**
+     * Gets the AMIdentity of user uname.
+     *
+     * @param uName username of the identity to get
+     * @return
+     * @throws OAuthProblemException
+     */
+    private AMIdentity getIdentity(String uName) throws OAuthProblemException {
+        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        AMIdentity theID = null;
+
+        try {
+            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
+
+            IdSearchControl idsc = new IdSearchControl();
+            idsc.setRecursive(true);
+            idsc.setAllReturnAttributes(true);
+            // search for the identity
+            Set<AMIdentity> results = Collections.EMPTY_SET;
+            idsc.setMaxResults(0);
+            IdSearchResults searchResults =
+                    amIdRepo.searchIdentities(IdType.AGENT, uName, idsc);
+            if (searchResults != null) {
+                results = searchResults.getSearchResults();
+            }
+
+            if (results == null || results.size() != 1) {
+                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
+                        "Not able to get client from OpenAM");
+
+            }
+
+            theID = results.iterator().next();
+
+            //if the client is deactivated return null
+            if (theID.isActive()){
+                return theID;
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            OAuth2Utils.debug.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+        }
     }
 
 }
