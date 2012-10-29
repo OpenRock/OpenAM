@@ -90,7 +90,7 @@ public class ScopeImpl implements Scope {
         String resourceOwner = token.getUserID();
 
         if (resourceOwner != null){
-            AMIdentity id = getIdentity(resourceOwner);
+            AMIdentity id = getIdentity(resourceOwner, token.getRealm());
             for (String scope : scopes){
                 try {
                     map.put(scope, id.getAttribute(scope));
@@ -110,7 +110,7 @@ public class ScopeImpl implements Scope {
      * @return
      * @throws OAuthProblemException
      */
-    private AMIdentity getIdentity(String uName) throws OAuthProblemException {
+    private AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentity theID = null;
 
