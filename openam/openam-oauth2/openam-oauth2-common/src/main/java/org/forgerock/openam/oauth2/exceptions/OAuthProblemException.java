@@ -46,6 +46,10 @@ public class OAuthProblemException extends ResourceException {
     private static final long serialVersionUID = 1934721539808864898L;
 
     public enum OAuthError {
+        METHOD_NOT_ALLOWED(
+                OAuth2.Error.METHOD_NOT_ALLOWED,
+                "The Method is not allowed.",
+                "", 405),
         INVALID_REQUEST(
                 OAuth2.Error.INVALID_REQUEST,
                 "The request is missing a required parameter, includes an invalid parameter value, or is otherwise malformed.",

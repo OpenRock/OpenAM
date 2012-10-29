@@ -500,7 +500,7 @@ public abstract class AbstractFlow extends ServerResource {
         case AUTHORIZATION_ENDPOINT: {
             if (!(Method.POST.equals(getRequest().getMethod()) || Method.GET.equals(getRequest()
                     .getMethod()))) {
-                throw OAuthProblemException.OAuthError.INVALID_REQUEST
+                throw OAuthProblemException.OAuthError.METHOD_NOT_ALLOWED
                         .handle(getRequest(), "Required Method: GET or POST found: "
                                 + getRequest().getMethod().getName());
             }
@@ -509,7 +509,7 @@ public abstract class AbstractFlow extends ServerResource {
 
         case TOKEN_ENDPOINT: {
             if (!Method.POST.equals(getRequest().getMethod())) {
-                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                throw OAuthProblemException.OAuthError.METHOD_NOT_ALLOWED.handle(getRequest(),
                         "Required Method: POST found: " + getRequest().getMethod().getName());
             }
             break;

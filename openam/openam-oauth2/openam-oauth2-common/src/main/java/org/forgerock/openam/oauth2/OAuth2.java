@@ -450,6 +450,11 @@ public class OAuth2 {
         public static final String INVALID_REQUEST = "invalid_request";
 
         /**
+         * The request is using the incorrect method.
+         */
+        public static final String METHOD_NOT_ALLOWED = "method_not_allowed";
+
+        /**
          * The client is not authorized to request an access token using this
          * method.
          */
