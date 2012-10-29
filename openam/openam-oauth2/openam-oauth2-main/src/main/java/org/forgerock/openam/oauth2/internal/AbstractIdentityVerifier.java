@@ -168,11 +168,6 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                 lc.submitRequirements(callbacks);
             }
 
-            if (OAuth2Utils.debug.messageEnabled()) {
-                OAuth2Utils.debug.message("AbstractIdentityVerifier::authenticate returning an InvalidCredentials"
-                                + " exception for invalid passwords.");
-            }
-
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
                 try {
