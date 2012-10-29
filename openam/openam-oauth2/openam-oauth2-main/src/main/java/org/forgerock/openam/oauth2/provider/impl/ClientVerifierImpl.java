@@ -86,7 +86,6 @@ public class ClientVerifierImpl implements ClientVerifier{
             throws OAuthProblemException{
         String client_id = challengeResponse.getIdentifier();
         String client_secret = String.valueOf(challengeResponse.getSecret());
-        client_secret = Hash.hash(client_secret);
         return verify(client_id, client_secret);
     }
 
