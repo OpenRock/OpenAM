@@ -271,7 +271,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         resourceOwner = getAuthenticatedResourceOwner();
         return getTokenStore().createRefreshToken(code.getScope(),
                                                     OAuth2Utils.getRealm(getRequest()),
-                                                    resourceOwner.getIdentifier(),
+                                                    code.getUserID(),
                                                     sessionClient.getClientId());
     }
 
