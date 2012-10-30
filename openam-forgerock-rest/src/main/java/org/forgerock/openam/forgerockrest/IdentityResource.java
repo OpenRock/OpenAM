@@ -67,7 +67,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     private String realm = null;
     private String userType = null;
 
-    //private IdentityServicesFactory idsvcs = IdentityServicesFactory.getInstance();
+    //private IdentityServicesFactory idsvc = IdentityServicesFactory.getInstance();
 
     /**
      * Creates a backend
