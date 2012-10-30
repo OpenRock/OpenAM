@@ -64,9 +64,9 @@ public final class RealmDispatcher  {
             if (rName.length() > 1) rName = rName + "/";
 
 
-            router.addRoute(EQUALS, rName + "users", new IdentityResource("user", rName));// Just a simply READ to make sure dispatching works
-            router.addRoute(EQUALS, rName + "agents", new IdentityResource("agent", rName));// Just a simply READ to make sure dispatching works
-            router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));// Just a simply READ to make sure dispatching works
+            router.addRoute(EQUALS, rName + "users", new IdentityResource("user", rName));
+            router.addRoute(EQUALS, rName + "agents", new IdentityResource("agent", rName));
+            router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));
 
             Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
             router.addRoute(EQUALS, "/realms", new RealmResource(subOrgs));
@@ -83,7 +83,7 @@ public final class RealmDispatcher  {
     static public void initDispatcher(Router router) {
         try {
             SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction. getInstance());
+                    AdminTokenAction.getInstance());
             OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken,"/");
             initRealmEndpoints(ocm, router);
         } catch (Exception e) {

@@ -17,27 +17,19 @@ package org.forgerock.openam.forgerockrest;
 
 //import static org.forgerock.json.resource.Context;
 
+import com.sun.identity.shared.debug.Debug;
+
 import java.lang.String;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import java.lang.reflect.Method;
 
-
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
-import static org.forgerock.json.resource.RoutingMode.EQUALS;
-import org.forgerock.json.resource.SingletonResourceProvider;
+
 
 
 
@@ -45,6 +37,8 @@ import org.forgerock.json.resource.SingletonResourceProvider;
  * A simple {@code Map} based collection resource provider.
  */
 public final class RestDispatcher  {
+
+    public static Debug debug = Debug.getInstance("forgerockrest");
 
     private static RestDispatcher instance = null;
     private RequestHandler handler = null;
