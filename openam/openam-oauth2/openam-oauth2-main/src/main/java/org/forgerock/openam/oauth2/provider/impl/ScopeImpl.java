@@ -90,12 +90,22 @@ public class ScopeImpl implements Scope {
         String resourceOwner = token.getUserID();
 
         if (resourceOwner != null){
-            AMIdentity id = getIdentity(resourceOwner, token.getRealm());
-            for (String scope : scopes){
-                try {
-                    map.put(scope, id.getAttribute(scope));
-                } catch (Exception e){
-                    OAuth2Utils.debug.error("Unable to get attribute", e);
+            AMIdentity id = null;
+            try {
+            id = getIdentity(resourceOwner, token.getRealm());
+            } catch (Exception e){
+                OAuth2Utils.debug.error("Unable to get user identity", e);
+            }
+            if (id != null){
+                for (String scope : scopes){
+                    try {
+                        Set<String> mail = id.getAttribute(scope);
+                        if (mail != null || !mail.isEmpty()){
+                            map.put(scope, mail.iterator().next());
+                        }
+                    } catch (Exception e){
+                        OAuth2Utils.debug.error("Unable to get attribute", e);
+                    }
                 }
             }
         }
@@ -124,7 +134,7 @@ public class ScopeImpl implements Scope {
             Set<AMIdentity> results = Collections.EMPTY_SET;
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.AGENT, uName, idsc);
+                    amIdRepo.searchIdentities(IdType.USER, uName, idsc);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
