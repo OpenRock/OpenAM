@@ -81,7 +81,7 @@ public class OAuthProblemException extends ResourceException {
                 "The request requires higher privileges than provided by the access token.", "",
                 403),
         EXPIRED_TOKEN(OAuth2.Error.EXPIRED_TOKEN,
-                "The request requires higher privileges than provided by the access token.", "",
+                "The request contains a token no longer valid.", "",
                 401),
         INVALID_CLIENT(
                 OAuth2.Error.INVALID_CLIENT,
