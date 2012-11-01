@@ -25,7 +25,9 @@
  * $Id: AssertionTest.java,v 1.2 2008/06/25 05:48:24 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.saml.assertion;
 
 import com.sun.identity.shared.xml.XMLUtils;
@@ -34,7 +36,6 @@ import com.sun.identity.shared.test.UnitTestBase;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -59,9 +60,7 @@ public class AssertionTest extends UnitTestBase {
     {
         entering("createAssertion", null);
         try {
-            DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
-            fac.setNamespaceAware(true);
-            DocumentBuilder _documentBuilder = fac.newDocumentBuilder();
+            DocumentBuilder _documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             InputSource is = new InputSource(new FileReader(assertionFile));
             Document doc = _documentBuilder.parse(is);
             Element element = doc.getDocumentElement();

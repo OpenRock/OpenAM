@@ -25,7 +25,9 @@
  * $Id: WSSUsernameTokenAuthenticator.java,v 1.5 2008/10/07 17:32:31 huacui Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.agents.filter;
 
 import java.io.StringReader;
@@ -37,7 +39,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.InputSource;
 
@@ -53,6 +54,7 @@ import com.sun.identity.agents.common.ISSOTokenValidator;
 import com.sun.identity.agents.common.SSOValidationResult;
 import com.sun.identity.agents.util.TransportToken;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.shared.xml.XMLUtils;
 /**
  * @author 
  *
@@ -76,12 +78,9 @@ public class WSSUsernameTokenAuthenticator implements IWebServiceAuthenticator {
         SSOToken result = null;
         
         try {            
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            
             WSSUserNameTokenContentHandler handler = 
                 new WSSUserNameTokenContentHandler();
-            SAXParser parser = spf.newSAXParser();            
+            SAXParser parser = XMLUtils.getSafeSAXParser(false);
             StringReader reader = new StringReader(requestMessage);
             InputSource inputSource = new InputSource(reader);            
             parser.parse(inputSource, handler);

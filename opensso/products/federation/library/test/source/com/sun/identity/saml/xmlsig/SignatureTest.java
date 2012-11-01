@@ -25,7 +25,9 @@
  * $Id: SignatureTest.java,v 1.2 2008/06/25 05:48:25 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.saml.xmlsig;
 
 import com.sun.identity.saml.assertion.Assertion;
@@ -44,7 +46,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -67,9 +68,7 @@ public class SignatureTest extends UnitTestBase {
         entering("createSignature", null);
         try {
             //build xml block 
-            DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
-            fac.setNamespaceAware(true);
-            DocumentBuilder _documentBuilder = fac.newDocumentBuilder();
+            DocumentBuilder _documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             
             //Read xml file 
             InputSource is = new InputSource(new FileReader(assertFile));
@@ -97,9 +96,7 @@ public class SignatureTest extends UnitTestBase {
     {   
         entering("verifySignature", null);
         try {
-            DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
-            fac.setNamespaceAware(true);
-            DocumentBuilder _documentBuilder = fac.newDocumentBuilder(); 
+            DocumentBuilder _documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             InputSource is = new InputSource(new FileReader(signatureFile));
             Document doc = _documentBuilder.parse(is);
             Element element = doc.getDocumentElement();

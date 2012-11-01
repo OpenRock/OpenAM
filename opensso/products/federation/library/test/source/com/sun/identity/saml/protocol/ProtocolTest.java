@@ -45,8 +45,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.Date;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
