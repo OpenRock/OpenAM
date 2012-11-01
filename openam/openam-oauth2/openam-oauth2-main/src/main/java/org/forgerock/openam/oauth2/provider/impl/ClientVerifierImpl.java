@@ -59,6 +59,9 @@ public class ClientVerifierImpl implements ClientVerifier{
 
     @Override
     public ClientApplication verify(Request request, Response response){
+        String client_id = null;
+        String client_secret = null;
+
         if (OAuth2Utils.debug.messageEnabled()){
             OAuth2Utils.debug.message("ClientVerifierImpl::Verifying client application");
         }
@@ -67,16 +70,25 @@ public class ClientVerifierImpl implements ClientVerifier{
         if (request.getChallengeResponse() != null) {
             client = verify(request.getChallengeResponse());
         } else {
-            String client_secret =
+            client_secret =
                     OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_SECRET,
                             String.class);
-            String client_id =
+            client_id =
                     OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID,
                             String.class);
             if (client_secret != null){
                 client = verify(client_id, client_secret);
             } else {
                 client = findClient(client_id);
+            }
+        }
+        if (OAuth2Utils.logStatus) {
+            if (client == null){
+                String[] obs = {"FAILED_AUTHENTICATE_CLIENT", client_id};
+                OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, OAuth2Utils.getSSOToken(request));
+            } else {
+                String[] obs2 = {"AUTHENTICATED_CLIENT", client.getClientId()};
+                OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs2, OAuth2Utils.getSSOToken(request));
             }
         }
         return client;

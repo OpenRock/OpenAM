@@ -18,6 +18,7 @@ package org.forgerock.openam.ext.cts.repo;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
+import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -28,12 +29,14 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
 import org.forgerock.openam.ext.cts.model.TokenDataEntry;
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.session.ha.amsessionstore.store.opendj.EmbeddedSearchResultIterator;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
 import org.opends.server.protocols.internal.InternalClientConnection;
 import org.opends.server.protocols.internal.InternalSearchOperation;
 import org.opends.server.types.*;
+import org.restlet.Request;
 
 import java.util.*;
 
@@ -172,12 +175,20 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
             if (debug.messageEnabled()){
                 debug.message("OpenDJTokenRepo::Token created: " + request.get("values").toString());
             }
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"CREATED_TOKEN", request.toString()};
+                OAuth2Utils.logAccessMessage("CREATED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+            }
             request.get("value").put(OAuth2.Params.ID, token.getDN());
             return new JsonValue(request.get("values"));
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
             debug.warning("OpenDJTokenRepo::Token already exists");
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         } else {
+            if (OAuth2Utils.logStatus) {
+                String[] obs = { "FAILED_CREATE_TOKEN", request.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_CREATE_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+            }
             debug.warning("OpenDJTokenRepo::Unable to create token");
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
         }
@@ -271,7 +282,15 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         if (resultCode != ResultCode.SUCCESS) {
             debug.error("OpenDJTokenRepo::Unable to read token: " +
                     resultCode.getResultCodeName().toString());
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_TOKEN", request.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+            }
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
+        }
+        if (OAuth2Utils.logStatus) {
+            String[] obs = { "DELETED_TOKEN", request.toString()};
+            OAuth2Utils.logAccessMessage("DELETED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
         }
 
         return new JsonValue(null);
@@ -434,7 +453,15 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         if (resultCode != ResultCode.SUCCESS) {
             debug.error("OpenDJTokenRepo::An error occured while trying to delete a token: " +
                     resultCode.getResultCodeName().toString());
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_TOKEN", id};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+            }
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
+        }
+        if (OAuth2Utils.logStatus) {
+            String[] obs = { "DELETED_TOKEN", id};
+            OAuth2Utils.logAccessMessage("DELETED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
         }
     }
 

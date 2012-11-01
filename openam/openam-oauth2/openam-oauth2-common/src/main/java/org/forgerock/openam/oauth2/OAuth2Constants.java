@@ -47,4 +47,10 @@ public class OAuth2Constants {
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
     }
 
+    /**
+     * Logger file names
+     */
+    public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
+    public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
+
 }

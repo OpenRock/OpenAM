@@ -25,6 +25,7 @@
 package org.forgerock.openam.oauth2.utils;
 
 import java.io.IOException;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -32,8 +33,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.delegation.DelegationManager;
+import com.sun.identity.idm.*;
+import com.sun.identity.log.LogRecord;
+import com.sun.identity.log.Logger;
+import com.sun.identity.log.messageid.LogMessageProvider;
+import com.sun.identity.log.messageid.MessageProviderFactory;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.HttpServletRequestWrapper;
+import com.sun.identity.shared.Constants;
+import com.sun.xml.ws.transport.http.servlet.ServletUtil;
 import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -45,10 +62,13 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.engine.util.ChildContext;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
 import com.sun.identity.shared.debug.Debug;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Utilities related to OAuth2.
@@ -56,6 +76,96 @@ import com.sun.identity.shared.debug.Debug;
 public class OAuth2Utils {
 
     public static Debug debug = Debug.getInstance("OAuth2Provider");
+
+    private static LogMessageProvider msgProvider;
+    private static Logger accessLogger;
+    private static Logger errorLogger;
+    public static boolean logStatus = false;
+
+    static {
+        String status = SystemProperties.get(Constants.AM_LOGSTATUS);
+        logStatus = ((status != null) && status.equalsIgnoreCase("ACTIVE"));
+
+        if (logStatus) {
+            accessLogger = (Logger)Logger.getLogger(OAuth2Constants.ACCESS_LOG_NAME);
+            errorLogger = (Logger)Logger.getLogger(OAuth2Constants.ERROR_LOG_NAME);
+        }
+    }
+
+    /**
+     * Logs an access message
+     * @param msgIdName name of message id
+     * @param data array of data to be logged
+     * @param token session token of the user who did the operation
+     * that triggered this logging
+     */
+    public static void logAccessMessage(
+            String msgIdName,
+            String data[],
+            SSOToken token
+    ) {
+        try {
+            if (msgProvider == null) {
+                msgProvider = MessageProviderFactory.getProvider("OAuth2Provider");
+            }
+        } catch (IOException e) {
+            debug.error("OAuth2Utils.logAccessMessage()", e);
+            debug.error("OAuth2Utils.logAccessMessage():"
+                    + "disabling logging");
+            logStatus = false;
+        }
+        if ((accessLogger != null) && (msgProvider != null)) {
+            LogRecord lr = msgProvider.createLogRecord(msgIdName, data, token);
+            if (lr != null) {
+                SSOToken ssoToken = (SSOToken)AccessController.doPrivileged(
+                        AdminTokenAction.getInstance());
+                    accessLogger.log(lr, ssoToken);
+            }
+        }
+    }
+
+    /**
+     * Logs an error message
+     * @param msgIdName name of message id
+     * @param data array of data to be logged
+     * @param token session token of the user who did the operation
+     * that triggered this logging
+     */
+    public static void logErrorMessage(
+            String msgIdName,
+            String data[],
+            SSOToken token
+    ) {
+        try {
+            if (msgProvider == null) {
+                msgProvider = MessageProviderFactory.getProvider("OAuth2Provider");
+            }
+        } catch (IOException e) {
+            debug.error("OAuth2Utils.logErrorMessage()", e);
+            debug.error("OAuth2Utils.logAccessMessage():"
+                    + "disabling logging");
+            logStatus = false;
+        }
+        if ((errorLogger != null) && (msgProvider != null)) {
+            LogRecord lr = msgProvider.createLogRecord(msgIdName, data, token);
+            if (lr != null) {
+                SSOToken ssoToken = (SSOToken)AccessController.doPrivileged(
+                        AdminTokenAction.getInstance());
+                errorLogger.log(lr, ssoToken);
+            }
+        }
+    }
+
+    public static SSOToken getSSOToken(Request request){
+        try {
+            HttpServletRequest req = ServletUtils.getRequest(request);
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            return mgr.createSSOToken(req);
+        } catch (Exception e){
+            OAuth2Utils.debug.error("OAuth2Utils::Unable to get sso token: ", e);
+        }
+        return null;
+    }
 
     public static enum ParameterLocation {
         HTTP_QUERY, HTTP_HEADER, HTTP_FRAGMENT, HTTP_BODY;

@@ -27,6 +27,8 @@ import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.restlet.*;
 
 import java.security.AccessController;
 import java.util.*;
@@ -73,11 +75,19 @@ public class ClientResource  implements CollectionResourceProvider {
             responseVal.put("success", "true");
         } catch(Exception e){
             responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+            }
             handler.handleError(new InternalServerErrorException("Unable to create client"));
         }
         response = new JsonValue(responseVal);
 
         Resource resource = new Resource("results", "1", response);
+        if (OAuth2Utils.logStatus) {
+            String[] obs = {"CREATED_CLIENT", responseVal.toString()};
+            OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, null);
+        }
         handler.handleResult(resource);
     }
 
@@ -94,11 +104,19 @@ public class ClientResource  implements CollectionResourceProvider {
             responseVal.put("success", "true");
         } catch(Exception e){
             responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
             handler.handleError(new InternalServerErrorException("Unable to create client"));
         }
         response = new JsonValue(responseVal);
 
         Resource resource = new Resource("results", "1", response);
+        if (OAuth2Utils.logStatus) {
+            String[] obs = {"DELETED_CLIENT", response.toString()};
+            OAuth2Utils.logAccessMessage("DELETED_CLIENT", obs, null);
+        }
         handler.handleResult(resource);
     }
 
