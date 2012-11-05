@@ -94,6 +94,14 @@
             </exclusions>
             <!--scope>provided</scope-->
         </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.freemarker</groupId>
