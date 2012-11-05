@@ -33,23 +33,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.logging.Level;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.delegation.DelegationManager;
-import com.sun.identity.idm.*;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.shared.Constants;
-import com.sun.xml.ws.transport.http.servlet.ServletUtil;
-import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
@@ -436,7 +429,7 @@ public class OAuth2Utils {
      *            The context where to set the parameter.
      */
     public static void setContextRealm(String value, Context context) {
-        context.getParameters().set(OAuth2.Custom.REALM, value);
+        context.getParameters().set(OAuth2Constants.Custom.REALM, value);
     }
 
     /**
@@ -478,11 +471,11 @@ public class OAuth2Utils {
      * @return
      */
     public static String getRealm(Request request) {
-        Object realm = request.getAttributes().get(OAuth2.Custom.REALM);
+        Object realm = request.getAttributes().get(OAuth2Constants.Custom.REALM);
         if (realm instanceof String) {
             return (String) realm;
         }
-        String ret = getRequestParameter(request, OAuth2.Custom.REALM, String.class);
+        String ret = getRequestParameter(request, OAuth2Constants.Custom.REALM, String.class);
         if (ret == null){
             return "/";
         } else {
@@ -491,27 +484,27 @@ public class OAuth2Utils {
     }
 
     public static String getModuleName(Request request) {
-        Object module = request.getAttributes().get(OAuth2.Custom.MODULE);
+        Object module = request.getAttributes().get(OAuth2Constants.Custom.MODULE);
         if (module instanceof String) {
             return (String) module;
         }
-        return getRequestParameter(request, OAuth2.Custom.MODULE, String.class);
+        return getRequestParameter(request, OAuth2Constants.Custom.MODULE, String.class);
     }
 
     public static String getServiceName(Request request) {
-        Object service = request.getAttributes().get(OAuth2.Custom.SERVICE);
+        Object service = request.getAttributes().get(OAuth2Constants.Custom.SERVICE);
         if (service instanceof String) {
             return (String) service;
         }
-        return getRequestParameter(request, OAuth2.Custom.SERVICE, String.class);
+        return getRequestParameter(request, OAuth2Constants.Custom.SERVICE, String.class);
     }
 
     public static String getLocale(Request request) {
-        Object locale = request.getAttributes().get(OAuth2.Custom.LOCALE);
+        Object locale = request.getAttributes().get(OAuth2Constants.Custom.LOCALE);
         if (locale instanceof String) {
             return (String) locale;
         }
-        return getRequestParameter(request, OAuth2.Custom.LOCALE, String.class);
+        return getRequestParameter(request, OAuth2Constants.Custom.LOCALE, String.class);
     }
 
     public static <T> T getRequestParameter(Request request, String parameterName, Class<T> clazz) {
@@ -533,14 +526,14 @@ public class OAuth2Utils {
      */
     public static Map<String, Object> getRequestParameters(Request request) {
         Map<String, String> parameters = null;
-        if (request.getAttributes().get(OAuth2.Params.class.getName()) instanceof Map == false) {
+        if (request.getAttributes().get(OAuth2Constants.Params.class.getName()) instanceof Map == false) {
             parameters = getParameters(request);
             if (null != parameters) {
                 // Copy the parameter for CallResolver
                 request.getAttributes().putAll(parameters);
             }
             // Avoid reprocess the request next time.
-            request.getAttributes().put(OAuth2.Params.class.getName(), parameters);
+            request.getAttributes().put(OAuth2Constants.Params.class.getName(), parameters);
         }
         return request.getAttributes();
     }

@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.restlet.Request;
@@ -53,8 +53,8 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.CLIENT_CREDENTIALS);
-        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS);
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -65,11 +65,11 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN);
             }
         });
     }
@@ -93,8 +93,8 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.CLIENT_CREDENTIALS);
-        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS);
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -114,8 +114,8 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
 
         Form parameters = new Form();
         //sent empty grant type
-        parameters.add(OAuth2.Params.GRANT_TYPE, "");
-        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, "");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -134,8 +134,8 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.CLIENT_CREDENTIALS);
-        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS);
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write");
         //add unrecognized param
         parameters.add("Unrecognized_Param", "Value");
         request.setEntity(parameters.getWebRepresentation());
@@ -148,11 +148,11 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN);
             }
         });
     }
@@ -169,10 +169,10 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
 
         Form parameters = new Form();
         //add multiple grant_types (will use first param)
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.CLIENT_CREDENTIALS);
-        parameters.add(OAuth2.Params.GRANT_TYPE, "");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS);
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, "");
         //add multiple scopes (will use first param)
-        parameters.add(OAuth2.Params.SCOPE, "read write");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -183,11 +183,11 @@ public class ClientCredentialsServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN);
             }
         });
     }

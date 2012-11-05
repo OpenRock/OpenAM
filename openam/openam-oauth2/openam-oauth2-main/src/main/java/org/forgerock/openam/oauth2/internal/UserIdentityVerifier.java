@@ -25,7 +25,7 @@
 package org.forgerock.openam.oauth2.internal;
 
 import com.iplanet.sso.SSOTokenManager;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
@@ -75,8 +75,8 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     protected String getIdentifier(Request request, Response response) {
         if (null != request.getChallengeResponse()){
             return request.getChallengeResponse().getIdentifier();
-        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2.Params.USERNAME, String.class)){
-            return OAuth2Utils.getRequestParameter(request, OAuth2.Params.USERNAME, String.class);
+        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.USERNAME, String.class)){
+            return OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.USERNAME, String.class);
         } else {
             return null;
         }
@@ -94,8 +94,8 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     protected char[] getSecret(Request request, Response response) {
         if (null != request.getChallengeResponse()){
             return request.getChallengeResponse().getSecret();
-        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2.Params.PASSWORD, String.class)){
-            return OAuth2Utils.getRequestParameter(request, OAuth2.Params.PASSWORD, String.class).toCharArray();
+        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.PASSWORD, String.class)){
+            return OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.PASSWORD, String.class).toCharArray();
         } else {
             return null;
         }

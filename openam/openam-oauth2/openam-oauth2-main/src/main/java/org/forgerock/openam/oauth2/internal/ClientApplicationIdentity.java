@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.ClientApplication;
 
 /**
@@ -71,7 +71,7 @@ public class ClientApplicationIdentity extends JsonValue implements ClientApplic
 
     @Override
     public String getAccessTokenType() {
-        return OAuth2.Bearer.BEARER;
+        return OAuth2Constants.Bearer.BEARER;
     }
 
     @Override

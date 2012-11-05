@@ -29,7 +29,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -88,7 +88,7 @@ public class ErrorServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.SAML20.GRANT_TYPE_URI);
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.SAML20.GRANT_TYPE_URI);
         request.setEntity(parameters.getWebRepresentation());
 
         // handle

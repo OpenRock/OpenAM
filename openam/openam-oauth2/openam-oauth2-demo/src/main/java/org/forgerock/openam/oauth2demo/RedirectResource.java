@@ -29,7 +29,7 @@ import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerAuthenticatorHelper;
@@ -101,7 +101,7 @@ public class RedirectResource extends Redirector {
 
                 // Request access_token for the code
                 if (null == token) {
-                    String code = parameters.getFirstValue(OAuth2.Params.CODE);
+                    String code = parameters.getFirstValue(OAuth2Constants.Params.CODE);
                     if (code instanceof String) {
                         BearerOAuth2Proxy proxy = BearerOAuth2Proxy.popOAuth2Proxy(getContext());
                         if (null != proxy) {
@@ -115,7 +115,7 @@ public class RedirectResource extends Redirector {
                             .setAttribute(BearerToken.class.getName(), token);
                 }
 
-                String state = parameters.getFirstValue(OAuth2.Params.STATE);
+                String state = parameters.getFirstValue(OAuth2Constants.Params.STATE);
                 if (state instanceof String) {
                     try {
                         String stateURL = new String(Base64.decode(state), "ISO-8859-1");

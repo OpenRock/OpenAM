@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -48,7 +48,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
 
         // Get the requested scope
         String scope_before =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
         // Validate the granted scope
         Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
@@ -59,7 +59,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2.Params.GRANT_TYPE };
+        return new String[] { OAuth2Constants.Params.GRANT_TYPE };
     }
 
     /**

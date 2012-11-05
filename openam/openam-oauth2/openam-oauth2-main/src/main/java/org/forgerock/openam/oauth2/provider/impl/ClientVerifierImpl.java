@@ -29,7 +29,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import com.sun.identity.shared.encode.Hash;
+
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
@@ -71,10 +71,10 @@ public class ClientVerifierImpl implements ClientVerifier{
             client = verify(request.getChallengeResponse());
         } else {
             client_secret =
-                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_SECRET,
+                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_SECRET,
                             String.class);
             client_id =
-                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.CLIENT_ID,
+                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_ID,
                             String.class);
             if (client_secret != null){
                 client = verify(client_id, client_secret);

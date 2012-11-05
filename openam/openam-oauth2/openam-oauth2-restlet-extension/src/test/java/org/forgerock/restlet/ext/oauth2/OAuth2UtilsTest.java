@@ -29,7 +29,7 @@ import static org.testng.Assert.assertNotNull;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -60,6 +60,6 @@ public class OAuth2UtilsTest {
         InputRepresentation representation = new InputRepresentation(is, MediaType.TEXT_PLAIN);
         Request request = new Request(Method.POST, "riap://test.json", representation);
         Map<String, String> form = OAuth2Utils.ParameterLocation.HTTP_BODY.getParameters(request);
-        assertEquals(form.get(OAuth2.Params.RESPONSE_TYPE), "code");
+        assertEquals(form.get(OAuth2Constants.Params.RESPONSE_TYPE), "code");
     }
 }

@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -37,7 +37,7 @@ import org.restlet.resource.ResourceException;
 public class ErrorServerResource extends AbstractFlow {
 
     public ErrorServerResource() {
-        endpointType = OAuth2.EndpointType.OTHER;
+        endpointType = OAuth2Constants.EndpointType.OTHER;
     }
 
     /**

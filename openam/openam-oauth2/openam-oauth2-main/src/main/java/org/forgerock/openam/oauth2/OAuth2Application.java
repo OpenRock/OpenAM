@@ -44,7 +44,6 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.routing.Router;
 import org.restlet.security.Verifier;
@@ -125,7 +124,7 @@ public class OAuth2Application extends Application {
 
         // Define Authorization Endpoint
         OAuth2FlowFinder finder =
-                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT)
+                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
         authorizer.setNext(finder);
@@ -137,7 +136,7 @@ public class OAuth2Application extends Application {
 
         // Define Token Endpoint
         finder =
-                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT)
+                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.TOKEN_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
         filter.setNext(finder);
@@ -222,7 +221,7 @@ public class OAuth2Application extends Application {
 
         @Override
         public String getAccessTokenType() {
-            return OAuth2.Bearer.BEARER;
+            return OAuth2Constants.Bearer.BEARER;
         }
 
         @Override

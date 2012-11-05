@@ -28,7 +28,7 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 /**
  * @author $author$
@@ -46,7 +46,7 @@ public interface Token {
      * 
      * @return unique identifier of the represented token
      */
-    @JsonProperty(OAuth2.Params.ACCESS_TOKEN)
+    @JsonProperty(OAuth2Constants.Params.ACCESS_TOKEN)
     public String getToken();
 
     /**

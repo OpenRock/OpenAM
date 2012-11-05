@@ -22,10 +22,9 @@ import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 
@@ -107,12 +106,12 @@ public class TokenResource implements CollectionResourceProvider {
             try {
                 Map query = new HashMap<String,String>();
                 String id = queryRequest.getQueryId();
-                if (id.equalsIgnoreCase(OAuth2.Params.REFRESH_TOKEN)){
-                    query.put(OAuth2.StoredToken.TYPE, id);
-                } else if (id.equalsIgnoreCase(OAuth2.Params.ACCESS_TOKEN)){
-                    query.put(OAuth2.StoredToken.TYPE, id);
-                } else if (id.equalsIgnoreCase(OAuth2.Params.CODE)){
-                    query.put(OAuth2.StoredToken.TYPE, id);
+                if (id.equalsIgnoreCase(OAuth2Constants.Params.REFRESH_TOKEN)){
+                    query.put(OAuth2Constants.StoredToken.TYPE, id);
+                } else if (id.equalsIgnoreCase(OAuth2Constants.Params.ACCESS_TOKEN)){
+                    query.put(OAuth2Constants.StoredToken.TYPE, id);
+                } else if (id.equalsIgnoreCase(OAuth2Constants.Params.CODE)){
+                    query.put(OAuth2Constants.StoredToken.TYPE, id);
                 } else {
                     query = null;
                 }
@@ -153,7 +152,7 @@ public class TokenResource implements CollectionResourceProvider {
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
             }
-            resource = new Resource(OAuth2.Params.ID, "1", response);
+            resource = new Resource(OAuth2Constants.Params.ID, "1", response);
             handler.handleResult(resource);
         } catch (ResourceException e){
             handler.handleError(e);

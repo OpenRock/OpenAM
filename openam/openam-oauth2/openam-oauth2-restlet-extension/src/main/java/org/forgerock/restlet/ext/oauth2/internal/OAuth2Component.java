@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
@@ -122,7 +122,7 @@ public class OAuth2Component {
 
         // Define Authorization Endpoint
         OAuth2FlowFinder finder =
-                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.AUTHORIZATION_ENDPOINT)
+                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
         ChallengeAuthenticator au =
@@ -135,7 +135,7 @@ public class OAuth2Component {
 
         // Define Token Endpoint
         finder =
-                new OAuth2FlowFinder(childContext, OAuth2.EndpointType.TOKEN_ENDPOINT)
+                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.TOKEN_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
         // Try to authenticate the client The verifier MUST set
@@ -144,8 +144,8 @@ public class OAuth2Component {
         filter.setNext(finder);
         root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
 
-        if (getConfiguration().get(OAuth2.Custom.REALM) instanceof String) {
-            realm = (String) getConfiguration().get(OAuth2.Custom.REALM);
+        if (getConfiguration().get(OAuth2Constants.Custom.REALM) instanceof String) {
+            realm = (String) getConfiguration().get(OAuth2Constants.Custom.REALM);
             realm = OAuth2Utils.isNotBlank(realm) ? realm : null;
         }
 

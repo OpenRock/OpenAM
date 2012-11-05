@@ -36,7 +36,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.oauth2.OAuth2;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -132,7 +131,7 @@ public class ValidationServerResource extends ServerResource implements
 
         try {
             Form call = getQuery();
-            String token = call.getFirstValue(OAuth2.Params.ACCESS_TOKEN);
+            String token = call.getFirstValue(OAuth2Constants.Params.ACCESS_TOKEN);
 
             if (null == token) {
                 OAuth2Utils.debug.error("ValidationServerResource::Missing access token in request");
@@ -196,7 +195,7 @@ public class ValidationServerResource extends ServerResource implements
     @Override
     public BearerToken verify(BearerToken token) throws OAuthProblemException {
         Reference reference = new Reference(validationServerRef);
-        reference.addQueryParameter(OAuth2.Params.ACCESS_TOKEN, token.getAccessToken());
+        reference.addQueryParameter(OAuth2Constants.Params.ACCESS_TOKEN, token.getAccessToken());
         ClientResource clientResource = new ClientResource(getContext(), reference);
         try {
             Request request = new Request(Method.GET, reference, null);
@@ -207,25 +206,25 @@ public class ValidationServerResource extends ServerResource implements
             // Throws OAuthProblemException
             Map remoteToken = BearerAuthenticatorHelper.extractToken(response);
 
-            Object o = remoteToken.get(OAuth2.Token.OAUTH_EXPIRES_IN);
+            Object o = remoteToken.get(OAuth2Constants.Token.OAUTH_EXPIRES_IN);
             Number expires_in = token.getExpiresIn();
             if (o instanceof Number) {
                 expires_in = (Number) o;
             }
 
-            o = remoteToken.get(OAuth2.Custom.AUDIENCE);
+            o = remoteToken.get(OAuth2Constants.Custom.AUDIENCE);
             String client_id = null;
             if (o instanceof String) {
                 client_id = (String) o;
             }
 
-            o = remoteToken.get(OAuth2.Custom.USER_ID);
+            o = remoteToken.get(OAuth2Constants.Custom.USER_ID);
             String username = null;
             if (o instanceof String) {
                 username = (String) o;
             }
 
-            o = remoteToken.get(OAuth2.Params.SCOPE);
+            o = remoteToken.get(OAuth2Constants.Params.SCOPE);
             Set<String> scope = null;
             if (o instanceof Collection) {
                 scope =

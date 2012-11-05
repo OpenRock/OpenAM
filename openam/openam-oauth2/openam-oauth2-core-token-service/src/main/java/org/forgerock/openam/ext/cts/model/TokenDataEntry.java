@@ -18,7 +18,7 @@ package org.forgerock.openam.ext.cts.model;
 
 import com.sun.identity.shared.Constants;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 
@@ -60,7 +60,7 @@ public class TokenDataEntry {
                attrList.add(new LDAPAttribute(key, valueList));
            }
        }
-       attrList.add(new LDAPAttribute(OAuth2.Params.ID, dn));
+       attrList.add(new LDAPAttribute(OAuth2Constants.Params.ID, dn));
        return attrList;
     }
 

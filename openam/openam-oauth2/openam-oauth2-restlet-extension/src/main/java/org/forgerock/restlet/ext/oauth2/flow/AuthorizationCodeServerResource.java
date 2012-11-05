@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
@@ -68,15 +68,15 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         // Validate Redirect URI throw exception
         sessionClient =
                 client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2.Params.REDIRECT_URI, String.class));
+                        OAuth2Constants.Params.REDIRECT_URI, String.class));
 
         String approval_prompt =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.APPROVAL_PROMPT,
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.APPROVAL_PROMPT,
                         String.class);
-        String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DECISION,
+        String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DECISION,
                 String.class);
 
-        if (!OAuth2.Custom.ALLOW.equalsIgnoreCase(decision)) {
+        if (!OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
             /*
              * APPROVAL_PROMPT = true AND NOT (CLIENT.AUTO_GRANT)
              */
@@ -85,12 +85,12 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             // The target contains the state
             String state =
                     OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
 
             // Get the requested scope
             String scope_before =
                     OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
             // Validate the granted scope
             Set<String> checkedScope = executeAuthorizationPageScopePlugin(scope_before);
@@ -109,7 +109,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         // Validate Redirect URI throw exception
         sessionClient =
                 client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2.Params.REDIRECT_URI, String.class));
+                        OAuth2Constants.Params.REDIRECT_URI, String.class));
         switch (endpointType) {
         case AUTHORIZATION_ENDPOINT: {
             resourceOwner = getAuthenticatedResourceOwner();
@@ -136,7 +136,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             // Get the granted scope
             String scope_after =
                     OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
             // Validate the granted scope
             Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
 
@@ -145,15 +145,15 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             AuthorizationCode token = createAuthorizationCode(checkedScope);
 
             Reference location = new Reference(sessionClient.getRedirectUri());
-            location.addQueryParameter(OAuth2.Params.CODE, token.getToken());
+            location.addQueryParameter(OAuth2Constants.Params.CODE, token.getToken());
             String state =
                     OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
             if (OAuth2Utils.isNotBlank(state)) {
-                location.addQueryParameter(OAuth2.Params.STATE, state);
+                location.addQueryParameter(OAuth2Constants.Params.STATE, state);
             }
             if (isScopeChanged()) {
-                location.addQueryParameter(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
+                location.addQueryParameter(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
                         .getScopeDelimiter(getContext())));
             }
             Redirector cb =
@@ -184,7 +184,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
         // Find code
         String code_p =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CODE, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CODE, String.class);
         AuthorizationCode code = getTokenStore().readAuthorizationCode(code_p);
 
         if (null == code) {
@@ -214,7 +214,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             code.setIssued(true);
             Map<String, Object> response = token.convertToMap();
             if (checkIfRefreshTokenIsRequired(getRequest())){
-                response.put(OAuth2.Params.REFRESH_TOKEN, token.getRefreshToken());
+                response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
             }
             return new JacksonRepresentation<Map>(response);
         }
@@ -224,9 +224,9 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
     protected boolean getDecision(Representation entity) {
         if (!decisionIsAllow) {
             String decision =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DECISION,
+                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DECISION,
                             String.class);
-            if (OAuth2.Custom.ALLOW.equalsIgnoreCase(decision)) {
+            if (OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
                 decisionIsAllow = true;
             } else {
                 OAuth2Utils.debug.error("AuthorizationCodeServerResource::Resource Owner did not authorize the request");
@@ -242,11 +242,11 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         Set<String> required = null;
         switch (endpointType) {
         case AUTHORIZATION_ENDPOINT: {
-            return new String[] { OAuth2.Params.RESPONSE_TYPE, OAuth2.Params.CLIENT_ID };
+            return new String[] { OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID };
         }
         case TOKEN_ENDPOINT: {
-            return new String[] { OAuth2.Params.GRANT_TYPE, OAuth2.Params.CODE,
-                OAuth2.Params.REDIRECT_URI };
+            return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.CODE,
+                OAuth2Constants.Params.REDIRECT_URI };
         }
         default: {
             return null;

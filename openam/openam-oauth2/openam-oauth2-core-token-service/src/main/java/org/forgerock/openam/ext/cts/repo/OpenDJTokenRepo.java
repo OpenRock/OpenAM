@@ -18,7 +18,6 @@ package org.forgerock.openam.ext.cts.repo;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -28,7 +27,7 @@ import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
 import org.forgerock.openam.ext.cts.model.TokenDataEntry;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.session.ha.amsessionstore.store.opendj.EmbeddedSearchResultIterator;
 import org.opends.server.core.AddOperation;
@@ -103,17 +102,17 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
         returnAttrs = new LinkedHashSet<String>();
         returnAttrs.add("dn");
-        returnAttrs.add(OAuth2.StoredToken.EXPIRYTIME);
-        returnAttrs.add(OAuth2.Params.SCOPE);
-        returnAttrs.add(OAuth2.StoredToken.PARENT);
-        returnAttrs.add(OAuth2.Params.USERNAME);
-        returnAttrs.add(OAuth2.Params.REDIRECTURI);
-        returnAttrs.add(OAuth2.Params.REFRESHTOKEN);
-        returnAttrs.add(OAuth2.StoredToken.ISSUED);
-        returnAttrs.add(OAuth2.StoredToken.TYPE);
-        returnAttrs.add(OAuth2.Params.REALM);
-        returnAttrs.add(OAuth2.Params.ID);
-        returnAttrs.add(OAuth2.Params.CLIENTID);
+        returnAttrs.add(OAuth2Constants.StoredToken.EXPIRYTIME);
+        returnAttrs.add(OAuth2Constants.Params.SCOPE);
+        returnAttrs.add(OAuth2Constants.StoredToken.PARENT);
+        returnAttrs.add(OAuth2Constants.Params.USERNAME);
+        returnAttrs.add(OAuth2Constants.Params.REDIRECTURI);
+        returnAttrs.add(OAuth2Constants.Params.REFRESHTOKEN);
+        returnAttrs.add(OAuth2Constants.StoredToken.ISSUED);
+        returnAttrs.add(OAuth2Constants.StoredToken.TYPE);
+        returnAttrs.add(OAuth2Constants.Params.REALM);
+        returnAttrs.add(OAuth2Constants.Params.ID);
+        returnAttrs.add(OAuth2Constants.Params.CLIENTID);
 
         RUNPERIOD = (CLEANUPPERIOD <= HEALTHCHECKPERIOD) ? CLEANUPPERIOD : HEALTHCHECKPERIOD;
         CLEANUPVALUE = CLEANUPPERIOD;
@@ -166,7 +165,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         attrList.addAll(token.getObjectClasses());
 
         StringBuilder dn = new StringBuilder();
-        dn.append(OAuth2.Params.ID).append(Constants.EQUALS).append(token.getDN());
+        dn.append(OAuth2Constants.Params.ID).append(Constants.EQUALS).append(token.getDN());
         dn.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
         AddOperation ao = icConn.processAdd(dn.toString(), attrList);
         ResultCode resultCode = ao.getResultCode();
@@ -179,7 +178,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                 String[] obs = {"CREATED_TOKEN", request.toString()};
                 OAuth2Utils.logAccessMessage("CREATED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
             }
-            request.get("value").put(OAuth2.Params.ID, token.getDN());
+            request.get("value").put(OAuth2Constants.Params.ID, token.getDN());
             return new JsonValue(request.get("values"));
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
             debug.warning("OpenDJTokenRepo::Token already exists");
@@ -208,7 +207,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
         StringBuilder baseDN = new StringBuilder();
         try {
-            baseDN.append(OAuth2.Params.ID).append(Constants.EQUALS);
+            baseDN.append(OAuth2Constants.Params.ID).append(Constants.EQUALS);
             baseDN.append(dn);
             baseDN.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
@@ -274,7 +273,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         }
         String id = request.get("id").required().asString();
         StringBuilder dn = new StringBuilder();
-        dn.append(OAuth2.Params.ID).append(Constants.EQUALS).append(id);
+        dn.append(OAuth2Constants.Params.ID).append(Constants.EQUALS).append(id);
         dn.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
         DeleteOperation dop = icConn.processDelete(dn.toString());
         ResultCode resultCode = dop.getResultCode();
@@ -416,7 +415,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                         Map<String, Set<String>> results =
                                 EmbeddedSearchResultIterator.convertLDAPAttributeSetToMap(attributes);
 
-                        Set<String> value = results.get(OAuth2.Params.ID);
+                        Set<String> value = results.get(OAuth2Constants.Params.ID);
 
                         if (value != null && !value.isEmpty()) {
                             for (String v : value) {
@@ -445,7 +444,7 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
 
     private void delete(String id) throws JsonResourceException {
         StringBuilder dn = new StringBuilder();
-        dn.append(OAuth2.Params.ID).append(Constants.EQUALS).append(id);
+        dn.append(OAuth2Constants.Params.ID).append(Constants.EQUALS).append(id);
         dn.append(Constants.COMMA).append(OAUTH2_TOKEN_STORE);
         DeleteOperation dop = icConn.processDelete(dn.toString());
         ResultCode resultCode = dop.getResultCode();
@@ -577,11 +576,11 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
         //and remove objectClass(by product of LDAP)
         for (String key : results.keySet()){
             if (key.equalsIgnoreCase("expirytime")){
-                results.put(OAuth2.StoredToken.EXPIRY_TIME, results.remove(key));
+                results.put(OAuth2Constants.StoredToken.EXPIRY_TIME, results.remove(key));
             } else if (key.equalsIgnoreCase("clientid")){
-                results.put(OAuth2.Params.CLIENT_ID, results.remove(key));
+                results.put(OAuth2Constants.Params.CLIENT_ID, results.remove(key));
             } else if (key.equalsIgnoreCase("redirecturi")){
-                results.put(OAuth2.Params.REDIRECT_URI, results.remove(key));
+                results.put(OAuth2Constants.Params.REDIRECT_URI, results.remove(key));
             } else if (key.equalsIgnoreCase("objectClass")){
                 results.remove(key);
             }

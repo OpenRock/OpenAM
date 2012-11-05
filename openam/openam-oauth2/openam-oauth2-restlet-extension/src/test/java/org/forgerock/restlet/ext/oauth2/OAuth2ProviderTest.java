@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.oauth2;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.internal.OAuth2Component;
 import org.forgerock.openam.oauth2.provider.OAuth2Provider;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;
@@ -87,7 +87,7 @@ public class OAuth2ProviderTest {
     // @Test
     public void testGetRequestParameter() throws Exception {
         OAuth2Component c = new OAuth2Component();
-        c.getConfiguration().put(OAuth2.Custom.REALM, "test");
+        c.getConfiguration().put(OAuth2Constants.Custom.REALM, "test");
         c.setProvider(pathProvider);
         c.activate();
 
@@ -111,8 +111,8 @@ public class OAuth2ProviderTest {
 
         client.handle(request, response);
         Form token = new Form(response.getLocationRef().getFragment());
-        assertNotNull(token.getFirstValue(OAuth2.Params.ACCESS_TOKEN));
-        assertEquals(token.getFirstValue(OAuth2.Params.TOKEN_TYPE), OAuth2.Bearer.BEARER);
+        assertNotNull(token.getFirstValue(OAuth2Constants.Params.ACCESS_TOKEN));
+        assertEquals(token.getFirstValue(OAuth2Constants.Params.TOKEN_TYPE), OAuth2Constants.Bearer.BEARER);
 
         /*
          * client.handle(request, new Uniform() {

@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
@@ -62,10 +62,10 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
                         "test", "admin", "cid");
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.Params.REFRESH_TOKEN);
-        parameters.add(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
-        parameters.add(OAuth2.Params.SCOPE, OAuth2Utils.join(refreshToken.getScope(), null));
-        parameters.add(OAuth2.Params.STATE, "random");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN);
+        parameters.add(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getToken());
+        parameters.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(refreshToken.getScope(), null));
+        parameters.add(OAuth2Constants.Params.STATE, "random");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -76,12 +76,12 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.REFRESH_TOKEN);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.REFRESH_TOKEN);
             }
         });
     }

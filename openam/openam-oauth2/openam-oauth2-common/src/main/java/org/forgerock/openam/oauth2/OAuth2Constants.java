@@ -31,7 +31,7 @@ package org.forgerock.openam.oauth2;
  * @author $author$
  * @version $Revision$ $Date$
  */
-public class OAuth2 {
+public class OAuth2Constants {
 
     public enum EndpointType {
         /**
@@ -653,4 +653,27 @@ public class OAuth2 {
             return name().toLowerCase();
         }
     }
+
+    /**
+     * Stores the constants for the OAuth2 Provider Service
+     * @author Jason Lemay
+     */
+    public class OAuth2ProviderService{
+        //service name and version
+        public static final String NAME = "OAuth2Provider";
+        public static final String VERSION = "1.0";
+
+        //service config fields
+        public static final String AUTHZ_CODE_LIFETIME_NAME = "forgerock-oauth2-provider-authorization-code-lifetime";
+        public static final String REFRESH_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-refresh-token-lifetime";
+        public static final String ACCESS_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-access-token-lifetime";
+        public static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
+        public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
+    }
+
+    /**
+     * Logger file names
+     */
+    public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
+    public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
 }

@@ -21,6 +21,7 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.ha.FAMPersisterManager;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.session.util.SessionUtils;
@@ -33,7 +34,6 @@ import org.forgerock.json.patch.JsonPatch;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
-import org.forgerock.openam.oauth2.OAuth2;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -172,8 +172,8 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
         String requestId = request.get("id").required().asString();
 
         String primaryKey = null;
-        String secondaryKey = request.get("value").get(OAuth2.StoredToken.PARENT).asString();
-        long expiryTime = request.get("value").get(OAuth2.StoredToken.EXPIRY_TIME).required().asLong();
+        String secondaryKey = request.get("value").get(OAuth2Constants.StoredToken.PARENT).asString();
+        long expiryTime = request.get("value").get(OAuth2Constants.StoredToken.EXPIRY_TIME).required().asLong();
 
         // Generate the token ID or set to the value provided in the request or payload
         if (requestId != null) {

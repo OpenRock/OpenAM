@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.security.AccessController;
 import java.util.*;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -37,7 +37,6 @@ import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceConfig;
@@ -68,7 +67,7 @@ import org.restlet.util.Series;
  */
 public abstract class AbstractFlow extends ServerResource {
 
-    protected OAuth2.EndpointType endpointType;
+    protected OAuth2Constants.EndpointType endpointType;
     protected OAuth2Client client = null;
     protected User resourceOwner = null;
     protected SessionClient sessionClient = null;
@@ -191,7 +190,7 @@ public abstract class AbstractFlow extends ServerResource {
         return super.doHandle();
     }
 
-    public void setEndpointType(OAuth2.EndpointType endpointType) {
+    public void setEndpointType(OAuth2Constants.EndpointType endpointType) {
         this.endpointType = endpointType;
     }
 
@@ -319,11 +318,11 @@ public abstract class AbstractFlow extends ServerResource {
     // display
     protected Representation getPage(String templateName, Object dataModel) {
         String display =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Custom.DISPLAY, String.class);
-        OAuth2.DisplayType displayType = OAuth2.DisplayType.PAGE;
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DISPLAY, String.class);
+        OAuth2Constants.DisplayType displayType = OAuth2Constants.DisplayType.PAGE;
         if (OAuth2Utils.isNotBlank(display)) {
             try {
-                displayType = Enum.valueOf(OAuth2.DisplayType.class, display.toUpperCase());
+                displayType = Enum.valueOf(OAuth2Constants.DisplayType.class, display.toUpperCase());
             } catch (IllegalArgumentException e) {
             }
         }
@@ -340,7 +339,7 @@ public abstract class AbstractFlow extends ServerResource {
         TemplateRepresentation result = null;
         Object factory = getContext().getAttributes().get(TemplateFactory.class.getName());
         String reference =
-                "templates/" + (null != display ? display : OAuth2.DisplayType.PAGE.getFolder())
+                "templates/" + (null != display ? display : OAuth2Constants.DisplayType.PAGE.getFolder())
                         + "/" + templateName;
         if (factory instanceof TemplateFactory) {
             result = ((TemplateFactory) factory).getTemplateRepresentation(reference);
@@ -368,7 +367,7 @@ public abstract class AbstractFlow extends ServerResource {
         switch (endpointType) {
         case AUTHORIZATION_ENDPOINT: {
             String client_id =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.CLIENT_ID,
+                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CLIENT_ID,
                             String.class);
             ClientApplication client = getClientVerifier().verify(getRequest(), getResponse());
             if (null != client) {

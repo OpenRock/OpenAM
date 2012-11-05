@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.restlet.data.Parameter;
 import org.restlet.util.Series;
 
@@ -65,6 +65,6 @@ public class BearerToken extends AbstractAccessToken {
 
     @Override
     public String getTokenType() {
-        return OAuth2.Bearer.BEARER;
+        return OAuth2Constants.Bearer.BEARER;
     }
 }

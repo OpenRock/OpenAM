@@ -34,7 +34,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
@@ -159,8 +159,8 @@ public class DemoResource extends ServerResource implements RequestCallbackHandl
         } catch (OAuthProblemException e) {
             response = e.getErrorMessage();
         } catch (ResourceException e) {
-            response.put(OAuth2.Error.ERROR, e.getMessage());
-            response.put(OAuth2.Error.ERROR_DESCRIPTION, e.getStatus().getDescription());
+            response.put(OAuth2Constants.Error.ERROR, e.getMessage());
+            response.put(OAuth2Constants.Error.ERROR_DESCRIPTION, e.getStatus().getDescription());
             response.put("status", e.getStatus().getCode());
         }
 

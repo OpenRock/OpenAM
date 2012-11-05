@@ -29,7 +29,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -155,9 +155,9 @@ public class RequestFactory {
         if (scope == null) {
             // Do nothing
         } else if (scope.isEmpty()) {
-            parameters.removeAll(OAuth2.Params.SCOPE);
+            parameters.removeAll(OAuth2Constants.Params.SCOPE);
         } else {
-            parameters.set(OAuth2.Params.SCOPE, OAuth2Utils.join(scope, OAuth2Utils
+            parameters.set(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(scope, OAuth2Utils
                     .getScopeDelimiter(context)));
         }
         return parameters;
@@ -168,7 +168,7 @@ public class RequestFactory {
     public class AuthorizationCodeRequest extends AuthorizationRequestFactory {
         public AuthorizationCodeRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.CODE);
+            parameters.set(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.CODE);
         }
 
         public AuthorizationCodeRequest addParameters(Series<Parameter> parameterSeries) {
@@ -177,17 +177,17 @@ public class RequestFactory {
         }
 
         public AuthorizationCodeRequest setState(String state) {
-            setParameterValue(OAuth2.Params.STATE, state);
+            setParameterValue(OAuth2Constants.Params.STATE, state);
             return this;
         }
 
         public AuthorizationCodeRequest setClientId(String client_id) {
-            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2Constants.Params.CLIENT_ID, client_id);
             return this;
         }
 
         public AuthorizationCodeRequest setRedirectUri(String redirectUri) {
-            setParameterValue(OAuth2.Params.REDIRECT_URI, redirectUri);
+            setParameterValue(OAuth2Constants.Params.REDIRECT_URI, redirectUri);
             return this;
         }
     }
@@ -195,7 +195,7 @@ public class RequestFactory {
     public class ImplicitRequest extends AuthorizationRequestFactory {
         public ImplicitRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
+            parameters.set(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
         }
 
         public ImplicitRequest addParameters(Series<Parameter> parameterSeries) {
@@ -204,17 +204,17 @@ public class RequestFactory {
         }
 
         public ImplicitRequest setState(String state) {
-            setParameterValue(OAuth2.Params.STATE, state);
+            setParameterValue(OAuth2Constants.Params.STATE, state);
             return this;
         }
 
         public ImplicitRequest setClientId(String client_id) {
-            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2Constants.Params.CLIENT_ID, client_id);
             return this;
         }
 
         public ImplicitRequest setRedirectUri(String redirectUri) {
-            setParameterValue(OAuth2.Params.REDIRECT_URI, redirectUri);
+            setParameterValue(OAuth2Constants.Params.REDIRECT_URI, redirectUri);
             return this;
         }
     }
@@ -224,7 +224,7 @@ public class RequestFactory {
     public class AuthorizationTokenRequest extends TokenRequestFactory {
         public AuthorizationTokenRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.AUTHORIZATION_CODE);
+            parameters.set(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.AUTHORIZATION_CODE);
         }
 
         public AuthorizationTokenRequest setChallengeResponse(ChallengeResponse challengeResponse) {
@@ -233,8 +233,8 @@ public class RequestFactory {
         }
 
         public AuthorizationTokenRequest setClientCredentials(String client_id, String client_secret) {
-            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
-            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2Constants.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2Constants.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -244,12 +244,12 @@ public class RequestFactory {
         }
 
         public AuthorizationTokenRequest setCode(String code) {
-            setParameterValue(OAuth2.Params.CODE, code);
+            setParameterValue(OAuth2Constants.Params.CODE, code);
             return this;
         }
 
         public AuthorizationTokenRequest setRedirectUri(String redirectUri) {
-            setParameterValue(OAuth2.Params.REDIRECT_URI, redirectUri);
+            setParameterValue(OAuth2Constants.Params.REDIRECT_URI, redirectUri);
             return this;
         }
     }
@@ -257,7 +257,7 @@ public class RequestFactory {
     public class PasswordRequest extends TokenRequestFactory {
         public PasswordRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+            parameters.set(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.PASSWORD);
         }
 
         public PasswordRequest setChallengeResponse(ChallengeResponse challengeResponse) {
@@ -266,8 +266,8 @@ public class RequestFactory {
         }
 
         public PasswordRequest setClientCredentials(String client_id, String client_secret) {
-            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
-            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2Constants.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2Constants.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -277,8 +277,8 @@ public class RequestFactory {
         }
 
         public PasswordRequest setResourceOwnerCredentials(String username, String password) {
-            setParameterValue(OAuth2.Params.USERNAME, username);
-            setParameterValue(OAuth2.Params.PASSWORD, password);
+            setParameterValue(OAuth2Constants.Params.USERNAME, username);
+            setParameterValue(OAuth2Constants.Params.PASSWORD, password);
             return this;
         }
     }
@@ -286,7 +286,7 @@ public class RequestFactory {
     public class ClientCredentialsRequest extends TokenRequestFactory {
         public ClientCredentialsRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.CLIENT_CREDENTIALS);
+            parameters.set(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS);
         }
 
         public ClientCredentialsRequest setChallengeResponse(ChallengeResponse challengeResponse) {
@@ -295,8 +295,8 @@ public class RequestFactory {
         }
 
         public ClientCredentialsRequest setClientCredentials(String client_id, String client_secret) {
-            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
-            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2Constants.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2Constants.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -309,7 +309,7 @@ public class RequestFactory {
     public class RefreshTokenRequest extends TokenRequestFactory {
         public RefreshTokenRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.REFRESH_TOKEN);
+            parameters.set(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.REFRESH_TOKEN);
         }
 
         public RefreshTokenRequest setChallengeResponse(ChallengeResponse challengeResponse) {
@@ -318,8 +318,8 @@ public class RequestFactory {
         }
 
         public RefreshTokenRequest setClientCredentials(String client_id, String client_secret) {
-            setParameterValue(OAuth2.Params.CLIENT_ID, client_id);
-            setParameterValue(OAuth2.Params.CLIENT_SECRET, client_secret);
+            setParameterValue(OAuth2Constants.Params.CLIENT_ID, client_id);
+            setParameterValue(OAuth2Constants.Params.CLIENT_SECRET, client_secret);
             return this;
         }
 
@@ -329,7 +329,7 @@ public class RequestFactory {
         }
 
         public RefreshTokenRequest setRefreshToken(String refreshToken) {
-            setParameterValue(OAuth2.Params.REFRESH_TOKEN, refreshToken);
+            setParameterValue(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken);
             return this;
         }
     }
@@ -337,7 +337,7 @@ public class RequestFactory {
     public class SAML20AssertionRequest extends TokenRequestFactory {
         public SAML20AssertionRequest(Reference endpoint) {
             super(endpoint);
-            parameters.set(OAuth2.Params.GRANT_TYPE, OAuth2.SAML20.GRANT_TYPE_URI);
+            parameters.set(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.SAML20.GRANT_TYPE_URI);
         }
 
         public SAML20AssertionRequest addParameters(Series<Parameter> parameterSeries) {
@@ -346,12 +346,12 @@ public class RequestFactory {
         }
 
         public SAML20AssertionRequest setAssertion(String assertion) {
-            parameters.add(OAuth2.SAML20.ASSERTION, assertion);
+            parameters.add(OAuth2Constants.SAML20.ASSERTION, assertion);
             return this;
         }
 
         public SAML20AssertionRequest setClientAssertion(String assertion) {
-            parameters.add(OAuth2.SAML20.CLIENT_ASSERTION, assertion);
+            parameters.add(OAuth2Constants.SAML20.CLIENT_ASSERTION, assertion);
             return this;
         }
     }

@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.restlet.data.Form;
@@ -68,17 +68,17 @@ public class ImplicitGrantServerResource extends AbstractFlow {
         // Validate Redirect URI throw exception
         sessionClient =
                 client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2.Params.REDIRECT_URI, String.class));
+                        OAuth2Constants.Params.REDIRECT_URI, String.class));
 
         // The target contains the state
         String state =
                 OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2.Params.STATE, String.class);
+                        .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
 
         // Get the requested scope
         String scope_before =
                 OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+                        .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
         // Validate the granted scope
         Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
@@ -91,11 +91,11 @@ public class ImplicitGrantServerResource extends AbstractFlow {
          * described by Section 3.3.
          */
         if (isScopeChanged()) {
-            tokenForm.add(OAuth2.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
+            tokenForm.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
                     .getScopeDelimiter(getContext())));
         }
         if (null != state) {
-            tokenForm.add(OAuth2.Params.STATE, state);
+            tokenForm.add(OAuth2Constants.Params.STATE, state);
         }
 
         Reference redirectReference = new Reference(sessionClient.getRedirectUri());
@@ -110,7 +110,7 @@ public class ImplicitGrantServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2.Params.RESPONSE_TYPE, OAuth2.Params.CLIENT_ID };
+        return new String[] { OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID };
     }
 
     /**

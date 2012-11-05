@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 /**
  * @author $author$
@@ -75,6 +75,6 @@ public class SAML20BearerServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2.Params.GRANT_TYPE };
+        return new String[] { OAuth2Constants.Params.GRANT_TYPE };
     }
 }

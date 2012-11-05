@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.restlet.Request;
@@ -53,10 +53,10 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
-        parameters.add(OAuth2.Params.USERNAME, "admin");
-        parameters.add(OAuth2.Params.PASSWORD, "admin");
-        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2Constants.Params.USERNAME, "admin");
+        parameters.add(OAuth2Constants.Params.PASSWORD, "admin");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write delete");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -67,11 +67,11 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN);
             }
         });
     }
@@ -94,10 +94,10 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
-        parameters.add(OAuth2.Params.USERNAME, "admin");
-        parameters.add(OAuth2.Params.PASSWORD, "admin");
-        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2Constants.Params.USERNAME, "admin");
+        parameters.add(OAuth2Constants.Params.PASSWORD, "admin");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write delete");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -115,11 +115,11 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.PASSWORD);
         //blank username
-        parameters.add(OAuth2.Params.USERNAME, "");
-        parameters.add(OAuth2.Params.PASSWORD, "admin");
-        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        parameters.add(OAuth2Constants.Params.USERNAME, "");
+        parameters.add(OAuth2Constants.Params.PASSWORD, "admin");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write delete");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle
@@ -138,10 +138,10 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
-        parameters.add(OAuth2.Params.USERNAME, "admin");
-        parameters.add(OAuth2.Params.PASSWORD, "admin");
-        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2Constants.Params.USERNAME, "admin");
+        parameters.add(OAuth2Constants.Params.PASSWORD, "admin");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write delete");
         //add unrecognized parameter
         parameters.add("Unrecognized_Param", "Value");
         request.setEntity(parameters.getWebRepresentation());
@@ -154,11 +154,11 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(representation.getObject()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN);
             }
         });
     }
@@ -174,13 +174,13 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
         Response response = new Response(request);
 
         Form parameters = new Form();
-        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.TokeEndpoint.PASSWORD);
         //add more usernames (uses the first param)
-        parameters.add(OAuth2.Params.USERNAME, "");
-        parameters.add(OAuth2.Params.USERNAME, "admin");
-        parameters.add(OAuth2.Params.USERNAME, "admin1");
-        parameters.add(OAuth2.Params.PASSWORD, "admin");
-        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        parameters.add(OAuth2Constants.Params.USERNAME, "");
+        parameters.add(OAuth2Constants.Params.USERNAME, "admin");
+        parameters.add(OAuth2Constants.Params.USERNAME, "admin1");
+        parameters.add(OAuth2Constants.Params.PASSWORD, "admin");
+        parameters.add(OAuth2Constants.Params.SCOPE, "read write delete");
         request.setEntity(parameters.getWebRepresentation());
 
         // handle

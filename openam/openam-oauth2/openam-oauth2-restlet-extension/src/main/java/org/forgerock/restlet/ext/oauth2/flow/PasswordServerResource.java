@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
@@ -52,9 +52,9 @@ public class PasswordServerResource extends AbstractFlow {
         client = getAuthenticatedClient();
 
         String username =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.USERNAME, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.USERNAME, String.class);
         String password =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.PASSWORD, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.PASSWORD, String.class);
 
         // Authenticate ResourceOwner
         if (getContext().getDefaultVerifier() instanceof SecretVerifier) {
@@ -73,7 +73,7 @@ public class PasswordServerResource extends AbstractFlow {
 
         // Get the requested scope
         String scope_before =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
         // Validate the granted scope
         Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
@@ -84,7 +84,7 @@ public class PasswordServerResource extends AbstractFlow {
             RefreshToken refreshToken = createRefreshToken(checkedScope);
             token = createAccessToken(checkedScope, refreshToken);
             result = token.convertToMap();
-            result.put(OAuth2.Params.REFRESH_TOKEN, refreshToken.getToken());
+            result.put(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getToken());
         } else {
             token = createAccessToken(checkedScope, null);
             result = token.convertToMap();
@@ -95,8 +95,8 @@ public class PasswordServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2.Params.GRANT_TYPE, OAuth2.Params.USERNAME,
-            OAuth2.Params.PASSWORD };
+        return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.USERNAME,
+            OAuth2Constants.Params.PASSWORD };
     }
 
     /**

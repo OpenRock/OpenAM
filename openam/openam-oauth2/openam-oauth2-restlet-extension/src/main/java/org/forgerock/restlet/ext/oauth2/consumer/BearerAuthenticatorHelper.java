@@ -29,7 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -56,7 +56,7 @@ import org.restlet.util.Series;
 public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken> {
 
     public final static ChallengeScheme HTTP_OAUTH_BEARER = new ChallengeScheme("HTTP_BEARER",
-            OAuth2.Bearer.BEARER, "OAuth 2.0 Authorization Protocol: Bearer Tokens");
+            OAuth2Constants.Bearer.BEARER, "OAuth 2.0 Authorization Protocol: Bearer Tokens");
 
     /**
      * Constructor.
@@ -250,11 +250,11 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
     }
 
     public static void saveToken(ChallengeResponse challenge, String token) {
-        challenge.getParameters().set(OAuth2.Token.OAUTH_ACCESS_TOKEN, token);
+        challenge.getParameters().set(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, token);
     }
 
     public static String retrieveToken(ChallengeResponse challenge) {
-        return challenge.getParameters().getFirstValue(OAuth2.Token.OAUTH_ACCESS_TOKEN);
+        return challenge.getParameters().getFirstValue(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN);
     }
 
     @Override
@@ -286,7 +286,7 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
                 if (null != exception) {
                     throw exception;
                 }
-                if (parameters.containsKey(OAuth2.Token.OAUTH_ACCESS_TOKEN)) {
+                if (parameters.containsKey(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
                     return new BearerToken(parameters);
                 }
             } catch (IOException e) {
@@ -300,7 +300,7 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
             if (null != exception) {
                 throw exception;
             }
-            if (null != parameters.getFirst(OAuth2.Token.OAUTH_ACCESS_TOKEN)) {
+            if (null != parameters.getFirst(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
                 return new BearerToken(parameters);
             }
         }
@@ -323,7 +323,7 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
             if (exception != null) {
                 throw exception;
             }
-            if (token.containsKey(OAuth2.Token.OAUTH_ACCESS_TOKEN)) {
+            if (token.containsKey(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
                 return new BearerToken(token);
             }
         }
@@ -336,7 +336,7 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
         if (null != exception) {
             throw exception;
         }
-        if (null != parameters.getFirst(OAuth2.Token.OAUTH_ACCESS_TOKEN)) {
+        if (null != parameters.getFirst(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
             return new BearerToken(parameters);
         }
         return null;
@@ -366,7 +366,7 @@ public class BearerAuthenticatorHelper extends AccessTokenExtractor<BearerToken>
     @Override
     public Form createForm(BearerToken token) {
         Form form = new Form();
-        form.add(OAuth2.Token.OAUTH_ACCESS_TOKEN, token.getAccessToken());
+        form.add(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, token.getAccessToken());
         return form;
     }
 

@@ -28,7 +28,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2User;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -61,7 +61,7 @@ public class OAuth2TokenResource extends ServerResource {
                 Reference tokenInfo =
                         new Reference(SystemProperties
                                 .get(OAuth2DemoApplication.OAUTH2_ENDPOINT_TOKENINFO));
-                tokenInfo.addQueryParameter(OAuth2.Params.ACCESS_TOKEN, user.getAccessToken());
+                tokenInfo.addQueryParameter(OAuth2Constants.Params.ACCESS_TOKEN, user.getAccessToken());
                 response.put("uri", tokenInfo.toString());
             }
             response.put("name", user.getIdentifier());

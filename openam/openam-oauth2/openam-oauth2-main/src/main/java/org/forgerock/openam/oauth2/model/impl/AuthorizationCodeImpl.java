@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AuthorizationCode;
 import org.forgerock.openam.oauth2.model.SessionClient;
@@ -87,7 +87,7 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     public void setIssued(boolean issued) {
         Set<String> s = new HashSet<String>();
         s.add(String.valueOf(issued));
-        this.put(OAuth2.StoredToken.ISSUED, s);
+        this.put(OAuth2Constants.StoredToken.ISSUED, s);
     }
 
     /**
@@ -97,7 +97,7 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
      */
     @Override
     public boolean isTokenIssued() {
-        Set issued_set = (Set) get(OAuth2.StoredToken.ISSUED).getObject();
+        Set issued_set = (Set) get(OAuth2Constants.StoredToken.ISSUED).getObject();
         if (issued_set != null){
             return Boolean.parseBoolean(issued_set.iterator().next().toString());
         }
@@ -110,8 +110,8 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
      */
     protected void setType() {
         Set<String> s = new HashSet<String>();
-        s.add(String.valueOf(OAuth2.Params.CODE));
-        this.put(OAuth2.StoredToken.TYPE, s);
+        s.add(String.valueOf(OAuth2Constants.Params.CODE));
+        this.put(OAuth2Constants.StoredToken.TYPE, s);
     }
 
 }

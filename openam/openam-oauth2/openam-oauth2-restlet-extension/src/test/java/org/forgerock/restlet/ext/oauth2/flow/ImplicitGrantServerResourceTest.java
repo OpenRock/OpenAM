@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
@@ -52,11 +52,11 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testValidRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.GET, reference);
@@ -70,22 +70,22 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
 
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         request = new Request(Method.GET, reference);
         request.setChallengeResponse(cr);
         response = new Response(request);
@@ -99,13 +99,13 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.SCOPE, "read write"),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.SCOPE, "read write"),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
     }
@@ -118,9 +118,9 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
         Request request = new Request(Method.GET, reference);
         request.setChallengeResponse(cr);
         Response response = new Response(request);
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "invalid_cid");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "invalid_cid");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         // handle
         getClient().handle(request, response);
@@ -129,7 +129,7 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
         assertTrue(response.getEntity() instanceof TemplateRepresentation);
         assertTrue(MediaType.TEXT_HTML.equals(response.getEntity().getMediaType()));
 
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "random_redirect_uri");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "random_redirect_uri");
         request.getAttributes().clear();
         response = new Response(request);
 
@@ -142,12 +142,12 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.ERROR, OAuth2.Error.INVALID_CLIENT),
-                MapAssert.entry(OAuth2.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.ERROR, OAuth2Constants.Error.INVALID_CLIENT),
+                MapAssert.entry(OAuth2Constants.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ERROR_DESCRIPTION)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ERROR_DESCRIPTION)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
 
@@ -160,11 +160,11 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testImplicitPostRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.POST, reference);
@@ -178,22 +178,22 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
 
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         request = new Request(Method.POST, reference);
         request.setChallengeResponse(cr);
         response = new Response(request);
@@ -207,13 +207,13 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.SCOPE, "read write"),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.SCOPE, "read write"),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
     }
@@ -225,12 +225,12 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testImplicitParametersWithoutValue() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
         //leave client_ID blank
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.GET, reference);
@@ -246,12 +246,12 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.ERROR, OAuth2.Error.INVALID_CLIENT),
-                MapAssert.entry(OAuth2.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.ERROR, OAuth2Constants.Error.INVALID_CLIENT),
+                MapAssert.entry(OAuth2Constants.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ERROR_DESCRIPTION)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ERROR_DESCRIPTION)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
     }
@@ -263,11 +263,11 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testUnrecognizedParametersInRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         //add an unrecognized parameter
         reference.addQueryParameter("UNRECOGNIZED_PARAM", "VALUE");
 
@@ -283,22 +283,22 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
 
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         //add an unrecognized parameter
         reference.addQueryParameter("UNRECOGNIZED_PARAM", "VALUE");
 
@@ -315,13 +315,13 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
-                MapAssert.entry(OAuth2.Params.SCOPE, "read write"),
-                MapAssert.entry(OAuth2.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER),
+                MapAssert.entry(OAuth2Constants.Params.SCOPE, "read write"),
+                MapAssert.entry(OAuth2Constants.Params.EXPIRES_IN, "3600")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ACCESS_TOKEN)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ACCESS_TOKEN)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
     }
@@ -333,14 +333,14 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testMultipleParametersWithSameNameInRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
         //add multiple client ids (the server will use the first id)
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "");
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid2");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid2");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.GET, reference);
@@ -356,25 +356,25 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.ERROR, OAuth2.Error.INVALID_CLIENT),
-                MapAssert.entry(OAuth2.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.ERROR, OAuth2Constants.Error.INVALID_CLIENT),
+                MapAssert.entry(OAuth2Constants.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ERROR_DESCRIPTION)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ERROR_DESCRIPTION)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
 
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
         //add multiple client ids (the server will use the first id)
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "");
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid2");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid2");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         request = new Request(Method.GET, reference);
         request.setChallengeResponse(cr);
         response = new Response(request);
@@ -388,12 +388,12 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // assert
         assertThat(fragment.getValuesMap()).includes(
-                MapAssert.entry(OAuth2.Params.ERROR, OAuth2.Error.INVALID_CLIENT),
-                MapAssert.entry(OAuth2.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
+                MapAssert.entry(OAuth2Constants.Params.ERROR, OAuth2Constants.Error.INVALID_CLIENT),
+                MapAssert.entry(OAuth2Constants.Params.STATE, "random")).is(new Condition<Map<?, ?>>() {
             @Override
             public boolean matches(Map<?, ?> value) {
-                return value.containsKey(OAuth2.Params.ERROR_DESCRIPTION)
-                        && value.containsKey(OAuth2.Params.STATE);
+                return value.containsKey(OAuth2Constants.Params.ERROR_DESCRIPTION)
+                        && value.containsKey(OAuth2Constants.Params.STATE);
             }
         });
     }
@@ -407,10 +407,10 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     public void testMissingResponseTypeParameterInRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
         //reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.GET, reference);
@@ -424,10 +424,10 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
         //reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         request = new Request(Method.GET, reference);
         request.setChallengeResponse(cr);
         response = new Response(request);
@@ -446,11 +446,11 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testMisunderstoodResponseTypeParameterInRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, "Misunderstood");
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, "Misunderstood");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.GET, reference);
@@ -463,11 +463,11 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
 
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, "Misunderstood");
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, "Misunderstood");
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         request = new Request(Method.GET, reference);
         request.setChallengeResponse(cr);
         response = new Response(request);
@@ -488,11 +488,11 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
     @Test
     public void testInvalidRedirectURIInRequest() throws Exception {
         Reference reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/a");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "http://localhost:8080/a");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
 
         ChallengeResponse cr = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "admin", "admin");
         Request request = new Request(Method.GET, reference);
@@ -505,15 +505,15 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
         Form fragment = response.getLocationRef().getQueryAsForm();
 
         // assert
-        assertThat(fragment.getValuesMap().get(OAuth2.Params.ERROR).equalsIgnoreCase(OAuth2.Error.REDIRECT_URI_MISMATCH));
+        assertThat(fragment.getValuesMap().get(OAuth2Constants.Params.ERROR).equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH));
 
         // Increase the scope
         reference = new Reference("riap://component/test/oauth2/authorize");
-        reference.addQueryParameter(OAuth2.Params.RESPONSE_TYPE, OAuth2.AuthorizationEndpoint.TOKEN);
-        reference.addQueryParameter(OAuth2.Params.CLIENT_ID, "cid");
-        reference.addQueryParameter(OAuth2.Params.REDIRECT_URI, "http://localhost:8080/a");
-        reference.addQueryParameter(OAuth2.Params.SCOPE, "read write execute");
-        reference.addQueryParameter(OAuth2.Params.STATE, "random");
+        reference.addQueryParameter(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.AuthorizationEndpoint.TOKEN);
+        reference.addQueryParameter(OAuth2Constants.Params.CLIENT_ID, "cid");
+        reference.addQueryParameter(OAuth2Constants.Params.REDIRECT_URI, "http://localhost:8080/a");
+        reference.addQueryParameter(OAuth2Constants.Params.SCOPE, "read write execute");
+        reference.addQueryParameter(OAuth2Constants.Params.STATE, "random");
         request = new Request(Method.GET, reference);
         request.setChallengeResponse(cr);
         response = new Response(request);
@@ -525,6 +525,6 @@ public class ImplicitGrantServerResourceTest extends AbstractFlowTest {
         fragment = response.getLocationRef().getQueryAsForm();
 
         // assert
-        assertThat(fragment.getValuesMap().get(OAuth2.Params.ERROR).equalsIgnoreCase(OAuth2.Error.REDIRECT_URI_MISMATCH));
+        assertThat(fragment.getValuesMap().get(OAuth2Constants.Params.ERROR).equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH));
     }
 }

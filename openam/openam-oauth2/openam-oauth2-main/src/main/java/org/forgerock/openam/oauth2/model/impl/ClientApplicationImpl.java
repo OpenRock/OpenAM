@@ -25,7 +25,7 @@
 package org.forgerock.openam.oauth2.model.impl;
 
 import com.sun.identity.idm.AMIdentity;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -105,7 +105,7 @@ public class ClientApplicationImpl implements ClientApplication{
         }
         return tokenTypesSet.iterator().next();
         */
-        return OAuth2.Bearer.BEARER;
+        return OAuth2Constants.Bearer.BEARER;
     }
 
     @Override

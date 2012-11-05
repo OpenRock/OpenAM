@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
@@ -55,7 +55,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
         client = getAuthenticatedClient();
         String refresh_token =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2.Params.REFRESH_TOKEN,
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.REFRESH_TOKEN,
                         String.class);
         // Find Token
         RefreshToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
@@ -77,7 +77,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
             // Get the requested scope
             String scope_before =
                     OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2.Params.SCOPE, String.class);
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
             // Get the granted scope
             Set<String> granted_after = new TreeSet<String>(refreshToken.getScope());
@@ -94,7 +94,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2.Params.GRANT_TYPE, OAuth2.Params.REFRESH_TOKEN };
+        return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN };
     }
 
     /**

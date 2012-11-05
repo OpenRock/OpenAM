@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.forgerock.openam.oauth2.model.Token;
 import org.forgerock.openam.oauth2.model.SessionClient;
@@ -102,13 +102,13 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     public void setParentToken(String parent) {
         Set<String> s = new HashSet<String>();
         s.add(parent);
-        this.put(OAuth2.StoredToken.PARENT, s);
+        this.put(OAuth2Constants.StoredToken.PARENT, s);
     }
 
     @Override
     public String getParentToken() {
         String parent = null;
-        Set parent_set = (Set) get(OAuth2.StoredToken.PARENT).getObject();
+        Set parent_set = (Set) get(OAuth2Constants.StoredToken.PARENT).getObject();
         if (parent_set != null){
             parent = parent_set.iterator().next().toString();
         }
@@ -124,9 +124,9 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     @Override
     public Map<String, Object> convertToMap() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(OAuth2.Params.ACCESS_TOKEN, getToken());
-        tokenMap.put(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER);
-        tokenMap.put(OAuth2.Params.EXPIRES_IN, getExpireTime());
+        tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, getToken());
+        tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
+        tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, getExpireTime());
         return tokenMap;
     }
 
@@ -135,8 +135,8 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
      */
     protected void setType() {
         Set<String> s = new HashSet<String>();
-        s.add(OAuth2.Params.ACCESS_TOKEN);
-        this.put(OAuth2.StoredToken.TYPE, s);
+        s.add(OAuth2Constants.Params.ACCESS_TOKEN);
+        this.put(OAuth2Constants.StoredToken.TYPE, s);
     }
 
 }

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.OAuth2;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -47,61 +47,61 @@ public class OAuthProblemException extends ResourceException {
 
     public enum OAuthError {
         METHOD_NOT_ALLOWED(
-                OAuth2.Error.METHOD_NOT_ALLOWED,
+                OAuth2Constants.Error.METHOD_NOT_ALLOWED,
                 "The Method is not allowed.",
                 "", 405),
         INVALID_REQUEST(
-                OAuth2.Error.INVALID_REQUEST,
+                OAuth2Constants.Error.INVALID_REQUEST,
                 "The request is missing a required parameter, includes an invalid parameter value, or is otherwise malformed.",
                 ""),
-        UNAUTHORIZED_CLIENT(OAuth2.Error.UNAUTHORIZED_CLIENT,
+        UNAUTHORIZED_CLIENT(OAuth2Constants.Error.UNAUTHORIZED_CLIENT,
                 "The client is not authorized to request an authorization code using this method.",
                 ""),
-        ACCESS_DENIED(OAuth2.Error.ACCESS_DENIED,
+        ACCESS_DENIED(OAuth2Constants.Error.ACCESS_DENIED,
                 "The resource owner or authorization server denied the request.", ""),
         UNSUPPORTED_RESPONSE_TYPE(
-                OAuth2.Error.UNSUPPORTED_RESPONSE_TYPE,
+                OAuth2Constants.Error.UNSUPPORTED_RESPONSE_TYPE,
                 "The authorization server does not support obtaining an authorization code using this method.",
                 ""),
-        INVALID_SCOPE(OAuth2.Error.INVALID_SCOPE,
+        INVALID_SCOPE(OAuth2Constants.Error.INVALID_SCOPE,
                 "The requested scope is invalid, unknown, or malformed.", ""),
         SERVER_ERROR(
-                OAuth2.Error.SERVER_ERROR,
+                OAuth2Constants.Error.SERVER_ERROR,
                 "The authorization server encountered an unexpected condition which prevented it from fulfilling the request.",
                 ""),
         TEMPORARILY_UNAVAILABLE(
-                OAuth2.Error.TEMPORARILY_UNAVAILABLE,
+                OAuth2Constants.Error.TEMPORARILY_UNAVAILABLE,
                 "The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.",
                 ""),
         INVALID_TOKEN(
-                OAuth2.Error.INVALID_TOKEN,
+                OAuth2Constants.Error.INVALID_TOKEN,
                 "The access token provided is expired, revoked, malformed, or invalid for other reasons.",
                 "", 401),
-        INSUFFICIENT_SCOPE(OAuth2.Error.INSUFFICIENT_SCOPE,
+        INSUFFICIENT_SCOPE(OAuth2Constants.Error.INSUFFICIENT_SCOPE,
                 "The request requires higher privileges than provided by the access token.", "",
                 403),
-        EXPIRED_TOKEN(OAuth2.Error.EXPIRED_TOKEN,
+        EXPIRED_TOKEN(OAuth2Constants.Error.EXPIRED_TOKEN,
                 "The request contains a token no longer valid.", "",
                 401),
         INVALID_CLIENT(
-                OAuth2.Error.INVALID_CLIENT,
+                OAuth2Constants.Error.INVALID_CLIENT,
                 "The client identifier provided is invalid, the client failed to authenticate, the client did not include its credentials, provided multiple client credentials, or used unsupported credentials type.",
                 "", 403),
         UNKNOWN_ERROR(
-                OAuth2.Error.UNKNOWN_ERROR,
+                OAuth2Constants.Error.UNKNOWN_ERROR,
                 "The authenticated client is not authorized to use the access grant type provided.",
                 "", 403),
-        INVALID_GRANT(OAuth2.Error.INVALID_GRANT,
+        INVALID_GRANT(OAuth2Constants.Error.INVALID_GRANT,
                 "The provided access grant is invalid, expired, or revoked.", "", 403),
         UNSUPPORTED_GRANT_TYPE(
-                OAuth2.Error.UNSUPPORTED_GRANT_TYPE,
+                OAuth2Constants.Error.UNSUPPORTED_GRANT_TYPE,
                 "The provided access grant is invalid, expired, or revoked (e.g. invalid assertion, expired authorization token, bad end-user password credentials, or mismatching authorization code and redirection URI).",
-                "", 403), INVALID_CODE(OAuth2.Error.INVALID_CODE, "The code provided is invalid.",
-                ""), REDIRECT_URI_MISMATCH(OAuth2.Error.REDIRECT_URI_MISMATCH,
+                "", 403), INVALID_CODE(OAuth2Constants.Error.INVALID_CODE, "The code provided is invalid.",
+                ""), REDIRECT_URI_MISMATCH(OAuth2Constants.Error.REDIRECT_URI_MISMATCH,
                 "The redirection URI provided does not match a pre-registered value.", ""),
-        UNSUPPORTED_AUTH_TYPE(OAuth2.Error.UNSUPPORTED_AUTH_TYPE,
+        UNSUPPORTED_AUTH_TYPE(OAuth2Constants.Error.UNSUPPORTED_AUTH_TYPE,
                 "The requested authentication type is not supported by the authorization server.",
-                ""), NOT_FOUND(OAuth2.Error.NOT_FOUND,
+                ""), NOT_FOUND(OAuth2Constants.Error.NOT_FOUND,
                 "The request is for data which does not exist.", "", 404);
         Status status;
 
@@ -148,13 +148,13 @@ public class OAuthProblemException extends ResourceException {
         this.request = request;
         if (null != this.request) {
             String redirect =
-                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.REDIRECT_URI,
+                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.REDIRECT_URI,
                             String.class);
             this.redirectTargetPattern = null != redirect ? URI.create(redirect) : null;
             this.state =
-                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.STATE, String.class);
+                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.STATE, String.class);
             this.scope =
-                    OAuth2Utils.getRequestParameter(request, OAuth2.Params.SCOPE, String.class);
+                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.SCOPE, String.class);
         } else {
             this.redirectTargetPattern = null;
             this.state = null;
@@ -290,12 +290,12 @@ public class OAuthProblemException extends ResourceException {
      */
     public Map<String, Object> getErrorMessage() {
         Map<String, Object> response = new HashMap<String, Object>(3);
-        response.put(OAuth2.Error.ERROR, getError());
+        response.put(OAuth2Constants.Error.ERROR, getError());
         if (OAuth2Utils.isNotBlank(getDescription())) {
-            response.put(OAuth2.Error.ERROR_DESCRIPTION, getDescription());
+            response.put(OAuth2Constants.Error.ERROR_DESCRIPTION, getDescription());
         }
         if (errorUri != null && errorUri.length() > 0) {
-            response.put(OAuth2.Error.ERROR_URI, getError().toString());
+            response.put(OAuth2Constants.Error.ERROR_URI, getError().toString());
         }
         return response;
     }
@@ -315,16 +315,16 @@ public class OAuthProblemException extends ResourceException {
      */
     public Form getErrorForm() {
         Form response = new Form();
-        response.add(OAuth2.Error.ERROR, getError());
+        response.add(OAuth2Constants.Error.ERROR, getError());
         if (OAuth2Utils.isNotBlank(getDescription())) {
-            response.add(OAuth2.Error.ERROR_DESCRIPTION, getDescription());
+            response.add(OAuth2Constants.Error.ERROR_DESCRIPTION, getDescription());
         }
         if (errorUri != null && errorUri.length() > 0) {
-            response.add(OAuth2.Error.ERROR_URI, errorUri);
+            response.add(OAuth2Constants.Error.ERROR_URI, errorUri);
         }
         // TODO could automatically check for state....
         if (OAuth2Utils.isNotBlank(getState())) {
-            response.add(OAuth2.Params.STATE, getState());
+            response.add(OAuth2Constants.Params.STATE, getState());
         }
         return response;
     }
@@ -350,7 +350,7 @@ public class OAuthProblemException extends ResourceException {
      * @return new instance of OAuthProblemException
      */
     public static OAuthProblemException handleOAuthProblemException(String message) {
-        return OAuthProblemException.error(OAuth2.Error.INVALID_REQUEST).description(message);
+        return OAuthProblemException.error(OAuth2Constants.Error.INVALID_REQUEST).description(message);
     }
 
     /**
