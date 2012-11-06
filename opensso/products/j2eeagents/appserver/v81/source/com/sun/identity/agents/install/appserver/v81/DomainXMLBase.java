@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 package com.sun.identity.agents.install.appserver.v81;
 
@@ -316,12 +316,12 @@ public class DomainXMLBase implements InstallConstants, IConfigKeys, IConstants 
             String preAgentDefaultRealm = (String) stateAccess.get(
                     STR_PRE_AGENT_DEFAULT_REALM);
 
-            // Store "" string if previous value not found or empty
-            preAgentDefaultRealm = (preAgentDefaultRealm != null
-                    && preAgentDefaultRealm.length() > 0) ? preAgentDefaultRealm : "";
+            if (preAgentDefaultRealm != null && preAgentDefaultRealm.length() > 0) {
+                securityService.updateAttribute(STR_DEFAULT_REALM_ATTR, preAgentDefaultRealm);
+            } else {
+                securityService.removeAttribute(STR_DEFAULT_REALM_ATTR);
+            }
 
-            securityService.updateAttribute(STR_DEFAULT_REALM_ATTR,
-                    preAgentDefaultRealm);
 
             // Remove the Agent Realm 
             XMLElement agentRealm = getAgentRealm(securityService);
