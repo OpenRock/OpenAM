@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.agents.filter;
 
@@ -103,9 +103,8 @@ public abstract class AmAgentBaseFilter implements Filter
                         				+ result.getStatus() + ":" 
                         				+ result.getStatus().getIntValue());
             }
-        } catch(Exception ex) {
-            throw new ServletException(
-                "AmAgentFilter: An exception has occured", ex);
+        } catch(AgentException ex) {
+            throw new ServletException("AmAgentFilter: An exception has occured", ex);
         }
     }
     
