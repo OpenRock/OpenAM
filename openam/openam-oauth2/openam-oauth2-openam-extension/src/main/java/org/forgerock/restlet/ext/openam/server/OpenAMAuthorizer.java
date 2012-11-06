@@ -47,8 +47,7 @@ import com.sun.identity.policy.client.PolicyEvaluatorFactory;
  * An OpenAMAuthorizer request for a Policy Decision.
  * <p/>
  * It use the remote {@link PolicyEvaluator}
- * 
- * @author Laszlo Hordos
+ *
  */
 public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
 
@@ -77,16 +76,19 @@ public class OpenAMAuthorizer extends AbstractOpenAMAuthorizer {
         try {
             pe = PolicyEvaluatorFactory.getInstance().getPolicyEvaluator(WEB_AGENT_SERVICE);
         } catch (SSOException e) {
-            OAuth2Utils.debug.error("Error getting policy for authorizer: ", e );
+            OAuth2Utils.DEBUG.error("Error getting policy for authorizer: ", e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getL10NMessage(Locale
                     .getDefault()), e);
         } catch (PolicyException e) {
-            OAuth2Utils.debug.error("Error getting policy for authorizer: ", e );
+            OAuth2Utils.DEBUG.error("Error getting policy for authorizer: ", e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e
                     .getCompleteL10NMessage(Locale.getDefault()), e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean getPolicyDecision(OpenAMUser user, Request request, Response response)
             throws SSOException, PolicyException {

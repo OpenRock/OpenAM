@@ -97,7 +97,7 @@ public class ClientAuthenticationFilter extends Authenticator {
             }
             result = true;
         } else {
-            OAuth2Utils.debug.warning("ClientAuthenticationFilter::Authentication failed. No verifier provided.");
+            OAuth2Utils.DEBUG.warning("ClientAuthenticationFilter::Authentication failed. No verifier provided.");
             response.setStatus(Status.SERVER_ERROR_INTERNAL,
                     "Authentication failed. No verifier provided.");
         }

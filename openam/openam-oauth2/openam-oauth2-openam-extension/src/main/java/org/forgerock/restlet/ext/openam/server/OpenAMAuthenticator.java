@@ -41,8 +41,7 @@ import com.iplanet.sso.SSOTokenManager;
  * {@link org.restlet.security.User}.
  * <p/>
  * This class depend on OpenAM SDK only and support non-servlet deployment.
- * 
- * @author Laszlo Hordos
+ *
  */
 public class OpenAMAuthenticator extends AbstractOpenAMAuthenticator {
 

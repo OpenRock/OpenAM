@@ -41,9 +41,8 @@ import org.restlet.data.Reference;
 import org.restlet.util.Series;
 
 /**
- * A NAME does ...
- * 
- * @author Laszlo Hordos
+ * Creates a request
+ *
  */
 public class RequestFactory {
 

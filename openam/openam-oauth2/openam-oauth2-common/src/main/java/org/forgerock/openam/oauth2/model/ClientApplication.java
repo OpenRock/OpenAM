@@ -28,8 +28,7 @@ import java.util.Set;
 
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Implements the interface that needs to be implemented to read the client settings
  */
 public interface ClientApplication {
 
@@ -37,8 +36,18 @@ public interface ClientApplication {
         CONFIDENTIAL, PUBLIC;
     }
 
+    /**
+     * Gets the client id
+     * @return a string representing the client id
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-2.2">2.2.  Client Identifier</a>
+     */
     public String getClientId();
 
+    /**
+     * Gets the client type
+     * @return a {@link ClientType} either confidential or public
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-2.1">2.1.  Client Types</a>
+     */
     public ClientType getClientType();
 
     /**
@@ -63,18 +72,34 @@ public interface ClientApplication {
      */
     public Set<URI> getRedirectionURIs();
 
+    /**
+     * Gets the access token type the client expects to recieve
+     * @return a string representing the access token type
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-7.1">7.1.  Access Token Types</a>
+     */
     public String getAccessTokenType();
 
+    /**
+     * Gets the authenticaiton schemes the
+     * @return a {@link ClientType} either confidential or public
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-7.1">7.1.  Access Token Types</a>
+     */
     public String getClientAuthenticationSchema();
 
-    public Set<String> allowedGrantScopes();
+    /**
+     * Gets the Scopes registered for a client
+     * @return a set of strings representing the Scopes of the client
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-3.3">3.3.  Access Token Scope</a>
+     */
+    public Set<String> getAllowedGrantScopes();
 
     /**
-     * We need this unless the max allowed is what's the default scope we allow.
+     * Gets the default Scopes assigned to tokens for this client
      * 
-     * @return
+     * @return a set of strings representing the default scopes for this client
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-3.3">3.3.  Access Token Scope</a>
      */
-    public Set<String> defaultGrantScopes();
+    public Set<String> getDefaultGrantScopes();
 
     /**
      * Get the auto_grant property of the client

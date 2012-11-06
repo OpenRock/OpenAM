@@ -80,13 +80,13 @@ public class ClientApplicationIdentity extends JsonValue implements ClientApplic
     }
 
     @Override
-    public Set<String> allowedGrantScopes() {
+    public Set<String> getAllowedGrantScopes() {
         return Collections.unmodifiableSet(new HashSet<String>(get("allowedGrantScopes").required()
                 .asList(String.class)));
     }
 
     @Override
-    public Set<String> defaultGrantScopes() {
+    public Set<String> getDefaultGrantScopes() {
         return Collections.unmodifiableSet(new HashSet<String>(get("defaultGrantScopes").required()
                 .asList(String.class)));
     }

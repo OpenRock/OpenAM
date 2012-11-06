@@ -44,6 +44,9 @@ import java.util.*;
  */
 public class ScopeImpl implements Scope {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
@@ -56,6 +59,9 @@ public class ScopeImpl implements Scope {
         return scopes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
@@ -68,6 +74,9 @@ public class ScopeImpl implements Scope {
         return scopes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScope,
                                                      Set<String> availableScopes,
@@ -83,6 +92,9 @@ public class ScopeImpl implements Scope {
         return scopes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, Object> retrieveTokenInfoEndPoint(AccessToken token){
         Map<String, Object> map = new HashMap<String, Object>();
@@ -94,7 +106,7 @@ public class ScopeImpl implements Scope {
             try {
             id = getIdentity(resourceOwner, token.getRealm());
             } catch (Exception e){
-                OAuth2Utils.debug.error("Unable to get user identity", e);
+                OAuth2Utils.DEBUG.error("Unable to get user identity", e);
             }
             if (id != null){
                 for (String scope : scopes){
@@ -104,7 +116,7 @@ public class ScopeImpl implements Scope {
                             map.put(scope, mail.iterator().next());
                         }
                     } catch (Exception e){
-                        OAuth2Utils.debug.error("Unable to get attribute", e);
+                        OAuth2Utils.DEBUG.error("Unable to get attribute", e);
                     }
                 }
             }
@@ -113,13 +125,6 @@ public class ScopeImpl implements Scope {
         return map;
     }
 
-    /**
-     * Gets the AMIdentity of user uname.
-     *
-     * @param uName username of the identity to get
-     * @return
-     * @throws OAuthProblemException
-     */
     private AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentity theID = null;
@@ -154,7 +159,7 @@ public class ScopeImpl implements Scope {
                 return null;
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
+            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
         }
     }

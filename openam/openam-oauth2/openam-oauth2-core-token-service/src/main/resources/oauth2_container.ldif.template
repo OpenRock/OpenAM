@@ -25,7 +25,7 @@
 dn: o=openam-oauth2,@SM_CONFIG_ROOT_SUFFIX@
 objectClass: organization
 objectClass: top
-o: OpenAM-OAuth2-Tokens
+o: openam-oauth2
 
 dn: ou=oauth2tokens,o=openam-oauth2,@SM_CONFIG_ROOT_SUFFIX@
 ou: oauth2tokens

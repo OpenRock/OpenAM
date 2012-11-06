@@ -35,6 +35,9 @@ import org.forgerock.openam.oauth2.model.AccessToken;
 import org.forgerock.openam.oauth2.model.Token;
 import org.forgerock.openam.oauth2.model.SessionClient;
 
+/**
+ * Implementation of AccessToken
+ */
 public class AccessTokenImpl extends TokenImpl implements AccessToken {
 
     /**
@@ -105,6 +108,9 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
         this.put(OAuth2Constants.StoredToken.PARENT, s);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getParentToken() {
         String parent = null;
@@ -115,12 +121,18 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
         return parent;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getRefreshToken() {
         //refresh tokens are stored as parent tokens
         return getParentToken();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, Object> convertToMap() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();

@@ -44,6 +44,7 @@ import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
 
 /**
+ * Finds the proper OAuth 2 flow given the end point parameters.
  * <p/>
  * If it request for Authorization Endpoint then the response_type [code,token]
  * <p/>
@@ -113,7 +114,7 @@ public class OAuth2FlowFinder extends Finder {
                 result = (AbstractFlow) targetClass.newInstance();
                 result.setEndpointType(endpointType);
             } catch (Exception e) {
-                OAuth2Utils.debug.warning("OAuth2FlowFinder::Exception while instantiating the target server resource.", e);
+                OAuth2Utils.DEBUG.warning("OAuth2FlowFinder::Exception while instantiating the target server resource.", e);
                 OAuthProblemException.OAuthError.SERVER_ERROR.handle(request, e.getMessage())
                         .pushException();
                 result = new ErrorServerResource();
@@ -135,7 +136,7 @@ public class OAuth2FlowFinder extends Finder {
                                 OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
                                         request, "Type is not supported: " + type).pushException();
                         */
-                        OAuth2Utils.debug.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
+                        OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
                                 + type);
                         OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
                                 request, "Type is not supported: " + type);
@@ -144,7 +145,7 @@ public class OAuth2FlowFinder extends Finder {
                                 OAuthProblemException.OAuthError.UNSUPPORTED_GRANT_TYPE.handle(
                                         request, "Type is not supported: " + type).pushException();
                         */
-                        OAuth2Utils.debug.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
+                        OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
                                 + type);
                         OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
                                 request, "Type is not supported: " + type);
@@ -156,7 +157,7 @@ public class OAuth2FlowFinder extends Finder {
                         OAuthProblemException.OAuthError.NOT_FOUND.handle(request,
                                 "Type is not set").pushException();
                 */
-                OAuth2Utils.debug.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: " + type);
+                OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: " + type);
                 OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
                         request, "Type is not supported: " + type);
             }

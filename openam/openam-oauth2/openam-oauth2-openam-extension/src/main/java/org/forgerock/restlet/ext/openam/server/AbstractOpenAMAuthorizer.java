@@ -42,8 +42,7 @@ import com.sun.identity.policy.PolicyException;
  * implementation because there is an internal
  * {@link com.sun.identity.policy.PolicyEvaluator} and a remote
  * {@link com.sun.identity.policy.client.PolicyEvaluator}
- * 
- * @author Laszlo Hordos
+ *
  */
 public abstract class AbstractOpenAMAuthorizer extends Authorizer {
 
@@ -68,8 +67,6 @@ public abstract class AbstractOpenAMAuthorizer extends Authorizer {
 
     /**
      * Attempts to authorize the request.
-     * <p/>
-     * IF application_identifier=OAUTH2 THEN realm=/
      * 
      * @param request
      *            The request sent.
@@ -84,11 +81,11 @@ public abstract class AbstractOpenAMAuthorizer extends Authorizer {
                 OpenAMUser user = (OpenAMUser) request.getClientInfo().getUser();
                 return getPolicyDecision(user, request, response);
             } catch (SSOException e) {
-                OAuth2Utils.debug.error("Error authorizing user: ", e );
+                OAuth2Utils.DEBUG.error("Error authorizing user: ", e );
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getL10NMessage(Locale
                         .getDefault()), e);
             } catch (PolicyException e) {
-                OAuth2Utils.debug.error("Error authorizing user: ", e );
+                OAuth2Utils.DEBUG.error("Error authorizing user: ", e );
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e
                         .getCompleteL10NMessage(Locale.getDefault()), e);
             }

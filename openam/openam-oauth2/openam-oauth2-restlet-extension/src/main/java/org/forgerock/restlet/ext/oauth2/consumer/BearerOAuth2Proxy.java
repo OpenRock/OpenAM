@@ -30,9 +30,8 @@ import org.restlet.Response;
 import org.restlet.Uniform;
 
 /**
- * A BearerOAuth2Proxy does ...
- * 
- * @author Laszlo Hordos
+ * A BearerOAuth2Proxy is a class used to test OAuth2 and by them demo application
+ *
  */
 public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, BearerToken> {
 

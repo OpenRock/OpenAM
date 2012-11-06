@@ -35,9 +35,9 @@ import org.restlet.routing.Redirector;
 import org.restlet.util.Series;
 
 /**
- * A RequestCallbackHandler does ...
- * 
- * @author Laszlo Hordos
+ * A RequestCallbackHandler handles the request and gets nessesary information.
+ * Used by the demo application.
+ *
  */
 public interface RequestCallbackHandler<T extends AbstractAccessToken> {
 

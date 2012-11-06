@@ -49,37 +49,7 @@ import org.restlet.routing.Router;
 import org.restlet.security.Verifier;
 
 /**
- * A NAME does ...
- * <p/>
- * 
- * <pre>
- * &lt;!-- Servlet to Restlet adapter declaration (Mandatory) --&gt;
- * &lt;servlet&gt;
- * &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
- * &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
- * 
- * &lt;!-- Your application class name (Optional - For mode 3) --&gt;
- * &lt;init-param&gt;
- * &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
- * &lt;param-value&gt;org.forgerock.openam.oauth2.OAuth2Application&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * 
- * &lt;!-- List of supported client protocols (Optional - Only in mode 3) --&gt;
- * &lt;init-param&gt;
- * &lt;param-name&gt;org.restlet.clients&lt;/param-name&gt;
- * &lt;param-value&gt;RIAP CLAP FILE&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * &lt;/servlet&gt;
- * 
- * &lt;!-- servlet declaration --&gt;
- * 
- * &lt;servlet-mapping&gt;
- * &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
- * &lt;url-pattern&gt;/oauth2/*&lt;/url-pattern&gt;
- * &lt;/servlet-mapping&gt;
- * </pre>
- * 
- * @author Laszlo Hordos
+ * Sets up the OAuth 2 provider end points and their handlers
  */
 public class OAuth2Application extends Application {
 
@@ -107,7 +77,7 @@ public class OAuth2Application extends Application {
     /**
      * Setups OAuth2 paths and handlers
      * 
-     * @return TODO Description
+     * @return a Restlet of the endpoints and their handlers
      */
     public Restlet activate() {
         Context childContext = getContext().createChildContext();
@@ -230,7 +200,7 @@ public class OAuth2Application extends Application {
         }
 
         @Override
-        public Set<String> allowedGrantScopes() {
+        public Set<String> getAllowedGrantScopes() {
             Set<String> scope = new HashSet<String>();
             scope.add("read");
             scope.add("write");
@@ -238,7 +208,7 @@ public class OAuth2Application extends Application {
         }
 
         @Override
-        public Set<String> defaultGrantScopes() {
+        public Set<String> getDefaultGrantScopes() {
             Set<String> scope = new HashSet<String>();
             scope.add("read");
             return Collections.unmodifiableSet(scope);

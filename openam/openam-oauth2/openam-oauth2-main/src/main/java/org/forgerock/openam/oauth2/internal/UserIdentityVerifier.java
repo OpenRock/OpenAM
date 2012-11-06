@@ -40,9 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * A UserIdentityVerifier does ...
- * 
- * @author Laszlo Hordos
+ * Verifies an OpenAMUser
  */
 public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
 
@@ -130,7 +128,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             token = mgr.createSSOToken(httpRequest);
         } catch (Exception e){
-            OAuth2Utils.debug.error("UserIdentityVerifier:: No SSO Token in request", e);
+            OAuth2Utils.DEBUG.error("UserIdentityVerifier:: No SSO Token in request", e);
         }
         if (token == null){
             return super.authenticate(username, password);
@@ -138,7 +136,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
             try {
                 return new OpenAMUser(token.getProperty("UserId"), token);
             } catch (Exception e){
-                OAuth2Utils.debug.error("UserIdentityVerifier:: Unable to create OpenAMUser", e);
+                OAuth2Utils.DEBUG.error("UserIdentityVerifier:: Unable to create OpenAMUser", e);
             }
         }
         return null;

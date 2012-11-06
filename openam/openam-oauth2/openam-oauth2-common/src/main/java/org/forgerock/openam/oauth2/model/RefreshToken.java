@@ -24,17 +24,15 @@
 package org.forgerock.openam.oauth2.model;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
- * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-6">6.
- *      Refreshing an Access Token</a>
+ * Implements the OAuth2 Refresh Token
+ * @see <a href="http://tools.ietf.org/html/rfc6749#section-1.5">1.5.  Refresh Token</a>
  */
 public interface RefreshToken extends Token {
 
     /**
      * Get parent token
      * 
-     * @return ID of parent token
+     * @return ID of parent token, will be null or an Access Code used to create this token
      */
     public String getParentToken();
 }

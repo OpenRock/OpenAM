@@ -32,8 +32,7 @@ import org.forgerock.openam.oauth2.model.SessionClient;
 import org.restlet.security.User;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Implements a OAuth2 client.
  */
 public class OAuth2Client extends User {
 
@@ -88,7 +87,7 @@ public class OAuth2Client extends User {
                 return new SessionClientImpl(getClient().getClientId(), getClient()
                         .getRedirectionURIs().iterator().next().toString());
             } else {
-                OAuth2Utils.debug.error("OAuth2Client::Missing parameter: redirect_uri");
+                OAuth2Utils.DEBUG.error("OAuth2Client::Missing parameter: redirect_uri");
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null,
                         "Missing parameter: redirect_uri");
             }
@@ -99,7 +98,7 @@ public class OAuth2Client extends User {
                     return new SessionClientImpl(getClient().getClientId(), uri.toString());
                 }
             }
-            OAuth2Utils.debug.error("OAuth2Client:: Redirect URI mismatch");
+            OAuth2Utils.DEBUG.error("OAuth2Client:: Redirect URI mismatch");
             throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
                     request);
         }

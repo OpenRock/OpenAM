@@ -29,8 +29,8 @@ import org.forgerock.openam.oauth2.model.Token;
 import org.restlet.security.User;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Object that represents an OAuth2User.
+ * Used in the demo.
  */
 public class OAuth2User extends User {
 

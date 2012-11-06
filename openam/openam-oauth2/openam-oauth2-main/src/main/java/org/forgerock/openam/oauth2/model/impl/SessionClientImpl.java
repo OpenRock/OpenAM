@@ -30,7 +30,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.model.SessionClient;
 
 /**
- * Implements a Session Client
+ * Implements a {@link SessionClient}
  */
 public class SessionClientImpl extends JsonValue implements SessionClient {
 
@@ -51,11 +51,17 @@ public class SessionClientImpl extends JsonValue implements SessionClient {
         this.redirectUri = redirectUri;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getClientId() {
         return clientId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getRedirectUri() {
         return redirectUri;

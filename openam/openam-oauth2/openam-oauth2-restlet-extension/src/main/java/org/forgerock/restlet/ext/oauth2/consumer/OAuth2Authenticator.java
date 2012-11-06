@@ -36,9 +36,8 @@ import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
 
 /**
- * An OAuth2Authenticator does ...
- * 
- * @author Laszlo Hordos
+ * An OAuth2Authenticator authenticates the subject sending the request and gets the token verifier.
+ * Used in the Demo application
  */
 public class OAuth2Authenticator extends ChallengeAuthenticator {
 

@@ -27,12 +27,18 @@ import java.io.Serializable;
 
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ *  Object used to store the client id and redirect url used during a end point request
  */
 public interface SessionClient extends Serializable {
-
+    /**
+     * Gets the stored client id
+     * @return a string representing the client id supplied
+     */
     public String getClientId();
 
+    /**
+     * Gets the stored client redirect uri
+     * @return a string representing the client redirect uri supplied
+     */
     public String getRedirectUri();
 }

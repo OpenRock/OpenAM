@@ -35,8 +35,9 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 
 /**
+ * Implements the Client Credentials Flow
  * @see <a
- *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.4>4.4.
+ *      href="http://tools.ietf.org/html/rfc6749#section-4.4>4.4.
  *      Client Credentials Grant</a>
  */
 public class ClientCredentialsServerResource extends AbstractFlow {

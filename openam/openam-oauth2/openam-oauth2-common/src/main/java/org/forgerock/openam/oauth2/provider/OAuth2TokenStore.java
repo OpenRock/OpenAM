@@ -35,8 +35,7 @@ import org.forgerock.openam.oauth2.model.SessionClient;
  * Interface to govern the high level store interactions, applying configuration
  * and business logic to token lifetimes, deletion of token chains, and other
  * storage-related issues.
- * 
- * @author Jonathan Scudder
+ *
  */
 public interface OAuth2TokenStore {
 
@@ -45,10 +44,10 @@ public interface OAuth2TokenStore {
      * having been used, and may be used once only in a call to
      * createAccessToken or createRefreshToken
      * 
-     * @param scopes
-     * @param realm
-     * @param uuid
-     * @param client
+     * @param scopes the scopes of the token
+     * @param realm the realm of this token
+     * @param uuid the user identifier (resource owner)
+     * @param client the client of this token
      * @return Generated authorization code
      * @throws OAuthProblemException
      * 

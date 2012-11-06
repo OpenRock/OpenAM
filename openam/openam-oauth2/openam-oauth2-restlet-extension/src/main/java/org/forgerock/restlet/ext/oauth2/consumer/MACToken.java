@@ -25,7 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.consumer;
 
 /**
- * A NAME does ...
+ * Implements a MACToken
  * <p/>
  * 
  * <pre>
@@ -38,8 +38,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
  *      "mac_algorithm":"hmac-sha-256"
  *  }
  * </pre>
- * 
- * @author Laszlo Hordos
+ *
  */
 public class MACToken {
 }

@@ -37,10 +37,6 @@ import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
-/**
- * @author $author$
- * @version $Revision$ $Date$
- */
 public class OAuthProblemException extends ResourceException {
 
     private static final long serialVersionUID = 1934721539808864898L;

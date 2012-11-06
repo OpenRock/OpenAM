@@ -43,10 +43,8 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 
 /**
- * An AbstractIdentityVerifier does ...
- * 
- * @param <T>
- * @author Laszlo Hordos TODO Do not use SecretVerifier or use properly
+ * Verifies user credentials
+ * @param <T> the type of object being verified
  */
 public abstract class AbstractIdentityVerifier<T extends User> extends SecretVerifier {
 
@@ -174,7 +172,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                     // package up the token for transport..
                     ret = createUser(lc);
                 } catch (Exception e) {
-                    OAuth2Utils.debug.error( "AbstractIdentityVerifier::authContext: "
+                    OAuth2Utils.DEBUG.error( "AbstractIdentityVerifier::authContext: "
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
@@ -182,7 +180,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
                 }
             }
         } catch (AuthLoginException le) {
-            OAuth2Utils.debug.error("AbstractIdentityVerifier::authContext AuthException", le);
+            OAuth2Utils.DEBUG.error("AbstractIdentityVerifier::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         }
         return ret;

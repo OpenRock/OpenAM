@@ -27,8 +27,8 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Implements a SAML 2.0 Flow. This is an Extension grant.
+ * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.5">4.5.  Extension Grants</a>
  */
 public class SAML20BearerServerResource extends AbstractFlow {
 

@@ -31,8 +31,7 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Implements an Unknown flow error
  */
 public class ErrorServerResource extends AbstractFlow {
 

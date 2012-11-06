@@ -34,7 +34,7 @@ import org.forgerock.openam.oauth2.model.Token;
 import org.restlet.Request;
 
 /**
- * Implements a Token
+ * Implements a {@link Token}
  */
 public abstract class TokenImpl extends JsonValue implements Token {
 
@@ -173,11 +173,17 @@ public abstract class TokenImpl extends JsonValue implements Token {
         this.put(OAuth2Constants.StoredToken.EXPIRY_TIME, s);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getToken() {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUserID() {
         String username = null;
@@ -188,6 +194,9 @@ public abstract class TokenImpl extends JsonValue implements Token {
         return username;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getRealm() {
         String realm = null;
@@ -198,6 +207,9 @@ public abstract class TokenImpl extends JsonValue implements Token {
         return realm;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SessionClient getClient() {
         Set client_id_set = (Set) get(OAuth2Constants.Params.CLIENT_ID).getObject();
@@ -218,12 +230,18 @@ public abstract class TokenImpl extends JsonValue implements Token {
         return new SessionClientImpl(client_id, redirect_url);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getScope() {
         // return convertScope(this.get(OAuth2.Params.SCOPE).asList());
         return (Set<String>) this.get(OAuth2Constants.Params.SCOPE).getObject();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getExpireTime() {
         return (getAbsoluteExpiryTime() - System.currentTimeMillis());
@@ -243,6 +261,9 @@ public abstract class TokenImpl extends JsonValue implements Token {
                 "Token has no expire time. Invalid Token");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isExpired() {
         return (System.currentTimeMillis() > getAbsoluteExpiryTime());

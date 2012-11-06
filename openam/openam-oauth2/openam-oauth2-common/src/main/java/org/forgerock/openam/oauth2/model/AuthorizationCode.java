@@ -24,8 +24,9 @@
 package org.forgerock.openam.oauth2.model;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ *
+ * This implements the Authorization Code used in OAuth2. The Authorization Code is described in see
+ * <a href="http://tools.ietf.org/html/rfc6749#section-4.1">http://tools.ietf.org/html/rfc6749#section-4.1</a>
  */
 public interface AuthorizationCode extends Token {
 
@@ -42,8 +43,10 @@ public interface AuthorizationCode extends Token {
      */
     public boolean isTokenIssued();
 
+    /**
+     * Sets the Authorization Code as having been used.
+     * @param issued
+     */
     public void setIssued(boolean issued);
 
-    // public lifetime A maximum authorization code lifetime of 10 minutes is
-    // RECOMMENDED
 }

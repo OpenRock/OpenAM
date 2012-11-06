@@ -50,7 +50,7 @@ import org.restlet.routing.Filter;
 
 /**
  * A OpenAMProxy transparently authenticates the client before the request. This
- * is a sample class and not optimized yet.
+ * is a sample class and not optimized yet. Used to Test OAuth 2.
  * 
  * @author Laszlo Hordos
  */

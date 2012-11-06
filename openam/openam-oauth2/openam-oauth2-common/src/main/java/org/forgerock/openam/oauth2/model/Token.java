@@ -31,11 +31,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
- * @see <a
- *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-10.10">10.10.
- *      Credentials Guessing Attacks</a>
+ * Implements the common methods and attributes of all standard OAuth 2 tokens
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public interface Token {
@@ -70,7 +66,7 @@ public interface Token {
      * Get tokens client
      * 
      * @return
-     *          the SessionClient for the client
+     *          the {@link SessionClient} for the token
      */
     @JsonIgnore
     public SessionClient getClient();

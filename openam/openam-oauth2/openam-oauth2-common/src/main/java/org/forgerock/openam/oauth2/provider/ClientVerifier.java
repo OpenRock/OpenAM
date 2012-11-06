@@ -53,14 +53,13 @@ public interface ClientVerifier {
     /**
      * Authenticates the client
      *
-     *
      * @param request
      *            the HTTP Request
      * @param response
      *            the HTTP Response
      * @return Client if the credentials are correct
      * @throws OAuthProblemException
-     *             when authentication failed
+     *             when authentication failed or null if authentication fails
      */
     public ClientApplication verify(Request request, Response response)
             throws OAuthProblemException;

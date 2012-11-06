@@ -35,9 +35,8 @@ import org.restlet.security.User;
 import org.restlet.security.Verifier;
 
 /**
- * A NAME does ...
- * 
- * @author Laszlo Hordos
+ * Verifies and a generic token.
+ *
  */
 public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken> {
 
@@ -98,7 +97,7 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                 }
 
             } catch (OAuthProblemException e) {
-                OAuth2Utils.debug.error("Unable to verify token", e);
+                OAuth2Utils.DEBUG.error("Unable to verify token", e);
                 throw e;
             }
             return result;

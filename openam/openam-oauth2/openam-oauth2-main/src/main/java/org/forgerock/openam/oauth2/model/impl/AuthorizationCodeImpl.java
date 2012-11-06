@@ -35,7 +35,7 @@ import org.forgerock.openam.oauth2.model.SessionClient;
 import org.restlet.Request;
 
 /**
- * Implements an Authorization Code Token
+ * Implements an {@link AuthorizationCode} Token
  */
 public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCode {
 
@@ -78,10 +78,7 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     }
 
     /**
-     * Set the tokens issue state
-     * 
-     * @param issued
-     *            true or false whether the token has been used already
+     * {@inheritDoc}
      */
     @Override
     public void setIssued(boolean issued) {
@@ -91,9 +88,7 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
     }
 
     /**
-     * Check if token has been used to generate an access token
-     * 
-     * @return true or false whether the token has been used already
+     * {@inheritDoc}
      */
     @Override
     public boolean isTokenIssued() {

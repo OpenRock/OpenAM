@@ -29,8 +29,7 @@ import com.iplanet.sso.SSOToken;
 
 /**
  * An OpenAMUser wraps the {@link SSOToken} of the authenticated {@link User}
- * 
- * @author Laszlo Hordos
+ *
  */
 public class OpenAMUser extends User {
     private SSOToken token;

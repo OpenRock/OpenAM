@@ -62,9 +62,8 @@ import org.restlet.routing.Redirector;
 import org.restlet.util.Series;
 
 /**
- * A NAME does ...
- * 
- * @author Laszlo Hordos
+ * Evaluates the url tokens and acts as a protected resource for the OAuth 2 flow demos
+ *
  */
 public class DemoResource extends ServerResource implements RequestCallbackHandler<BearerToken> {
 

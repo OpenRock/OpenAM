@@ -27,8 +27,7 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Used only to test the OAuth2 Provider
  */
 public interface OAuth2Provider {
 

@@ -50,39 +50,40 @@ import org.restlet.routing.Template;
 
 /**
  * A RedirectResource does ...
- * 
- * @author Laszlo Hordos
  */
 public class RedirectResource extends Redirector {
 
     private BearerAuthenticatorHelper helper = new BearerAuthenticatorHelper();
 
     /**
-     * TODO Description.
+     * Constructor for RedirectResource
      * 
      * @param context
-     *            TODO Description
+     *            context of the redirector
      * @param targetTemplate
-     *            TODO Description
+     *            template to display
      */
     public RedirectResource(Context context, String targetTemplate) {
         super(context, targetTemplate);
     }
 
     /**
-     * TODO Description.
+     * RedirectResource Constructor
      * 
      * @param context
-     *            TODO Description
+     *            context of the redirector
      * @param targetPattern
-     *            TODO Description
+     *            pattern to use
      * @param mode
-     *            TODO Description
+     *            mode to use
      */
     public RedirectResource(Context context, String targetPattern, int mode) {
         super(context, targetPattern, mode);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Reference getTargetRef(Request request, Response response) {
         Reference target = null;

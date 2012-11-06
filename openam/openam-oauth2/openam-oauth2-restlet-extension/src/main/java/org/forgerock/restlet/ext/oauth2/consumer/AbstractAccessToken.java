@@ -35,7 +35,7 @@ import org.restlet.data.Parameter;
 import org.restlet.util.Series;
 
 /**
- * A NAME does ...
+ * Defines an abstract access token
  * <p/>
  * 
  * <pre>
@@ -45,8 +45,7 @@ import org.restlet.util.Series;
  *      "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA"
  *  }
  * </pre>
- * 
- * @author Laszlo Hordos
+ *
  */
 public abstract class AbstractAccessToken implements Serializable {
 

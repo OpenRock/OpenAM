@@ -46,8 +46,7 @@ import org.restlet.util.Series;
  * An OpenAMAuthenticatorHelper generates the {@code WWW-Authenticate: OpenAM}
  * challenge request and parse the {@code Authorization: OpenAM } challenge
  * response to get the SSOToken ID.
- * 
- * @author Laszlo Hordos
+ *
  */
 public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
 
@@ -63,6 +62,9 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
         super(OpenAMAuthenticatorHelper.HTTP_OPENAM, true, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void formatRequest(ChallengeWriter cw, ChallengeRequest challenge, Response response,
             Series<Header> httpHeaders) throws IOException {
@@ -71,6 +73,9 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void formatResponse(ChallengeWriter cw, ChallengeResponse challenge, Request request,
             Series<Header> httpHeaders) {
@@ -83,14 +88,17 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
                 cw.append(Base64.encode(credentials.toCharArray(), "ISO-8859-1", false));
             }
         } catch (UnsupportedEncodingException e){
-            OAuth2Utils.debug.error("OpenAMAuthenticatorHelper::Unsupported encoding, unable to encode credentials", e);
+            OAuth2Utils.DEBUG.error("OpenAMAuthenticatorHelper::Unsupported encoding, unable to encode credentials", e);
             throw new RuntimeException("Unsupported encoding, unable to encode credentials");
         } catch (IOException e) {
-            OAuth2Utils.debug.error("OpenAMAuthenticatorHelper::Unexpected exception, unable to encode credentials", e);
+            OAuth2Utils.DEBUG.error("OpenAMAuthenticatorHelper::Unexpected exception, unable to encode credentials", e);
             throw new RuntimeException("Unexpected exception, unable to encode credentials", e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void parseRequest(ChallengeRequest challenge, Response response,
             Series<Header> httpHeaders) {
@@ -114,30 +122,33 @@ public class OpenAMAuthenticatorHelper extends AuthenticatorHelper {
                             param = null;
                         }
                     } catch (Exception e) {
-                        OAuth2Utils.debug.error(
+                        OAuth2Utils.DEBUG.error(
                                 "Unable to parse the challenge request header parameter", e);
                     }
                 }
             } catch (Exception e) {
-                OAuth2Utils.debug.error(
+                OAuth2Utils.DEBUG.error(
                         "Unable to parse the challenge request header parameter", e);
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void parseResponse(ChallengeResponse challenge, Request request,
             Series<Header> httpHeaders) {
         try {
             byte[] credentialsEncoded = Base64.decode(challenge.getRawValue());
             if (credentialsEncoded == null) {
-                OAuth2Utils.debug.warning("OpenAMAuthenticatorHelper::Cannot decode token: " + challenge.getRawValue());
+                OAuth2Utils.DEBUG.warning("OpenAMAuthenticatorHelper::Cannot decode token: " + challenge.getRawValue());
             }
             saveSSOToken(challenge, new String(credentialsEncoded, "ISO-8859-1"));
         } catch (UnsupportedEncodingException e) {
-            OAuth2Utils.debug.error("OpenAMAuthenticatorHelper::Unsupported OpenAM encoding error", e);
+            OAuth2Utils.DEBUG.error("OpenAMAuthenticatorHelper::Unsupported OpenAM encoding error", e);
         } catch (IllegalArgumentException e) {
-            OAuth2Utils.debug.error("OpenAMAuthenticatorHelper::Unable to decode the OpenAM token", e);
+            OAuth2Utils.DEBUG.error("OpenAMAuthenticatorHelper::Unable to decode the OpenAM token", e);
         }
     }
 

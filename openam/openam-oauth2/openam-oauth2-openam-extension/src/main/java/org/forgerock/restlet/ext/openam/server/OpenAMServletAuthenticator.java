@@ -42,8 +42,7 @@ import com.iplanet.sso.SSOTokenManager;
  * {@link org.restlet.security.User}.
  * <p/>
  * This class works with the Servlet Extension only!!!
- * 
- * @author Laszlo Hordos
+ *
  */
 public class OpenAMServletAuthenticator extends AbstractOpenAMAuthenticator {
 
@@ -65,6 +64,9 @@ public class OpenAMServletAuthenticator extends AbstractOpenAMAuthenticator {
         super(context, parameters, optional, enroler);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SSOToken getToken(Request request, Response response) throws SSOException {
         SSOToken token = null;

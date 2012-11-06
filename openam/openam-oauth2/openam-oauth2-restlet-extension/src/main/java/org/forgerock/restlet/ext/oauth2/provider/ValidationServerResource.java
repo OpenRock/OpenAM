@@ -61,7 +61,7 @@ import org.restlet.resource.ServerResource;
 import org.forgerock.openam.oauth2.provider.Scope;
 
 /**
- * A ValidationServerResource does ...
+ * Validates the token and returns to the subject the tokeninfo and scope evaluation if it is used.
  * <p/>
  * 
  * <pre>
@@ -112,7 +112,7 @@ public class ValidationServerResource extends ServerResource implements
         if (null != getRequest() && null != getContext()) {
             tokenStore = OAuth2Utils.getTokenStore(getContext());
             if (null == tokenStore) {
-                OAuth2Utils.debug.error("ValidationServerResource::Unable to get token store");
+                OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to get token store");
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                         "Missing required context attribute: " + OAuth2TokenStore.class.getName());
             }
@@ -121,8 +121,8 @@ public class ValidationServerResource extends ServerResource implements
 
     @Get("json")
     public Representation validate() throws ResourceException {
-        if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("ValidationServerResource::In Validator resource");
+        if (OAuth2Utils.DEBUG.messageEnabled()){
+            OAuth2Utils.DEBUG.message("ValidationServerResource::In Validator resource");
         }
 
         OAuthProblemException error = null;
@@ -134,7 +134,7 @@ public class ValidationServerResource extends ServerResource implements
             String token = call.getFirstValue(OAuth2Constants.Params.ACCESS_TOKEN);
 
             if (null == token) {
-                OAuth2Utils.debug.error("ValidationServerResource::Missing access token in request");
+                OAuth2Utils.DEBUG.error("ValidationServerResource::Missing access token in request");
                 error =
                         OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                                 "Missing access_token");
@@ -142,7 +142,7 @@ public class ValidationServerResource extends ServerResource implements
                 AccessToken t = tokenStore.readAccessToken(token);
 
                 if (t == null) {
-                    OAuth2Utils.debug.error("ValidationServerResource::Unable to read token from token store for id: " + token);
+                    OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to read token from token store for id: " + token);
                     error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                 } else {
                     try {
@@ -151,16 +151,16 @@ public class ValidationServerResource extends ServerResource implements
                     scopeClass = (Scope) Class.forName(pluginClass).newInstance();
                     } catch (Exception e){
                         error = OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
-                        OAuth2Utils.debug.error("ValidationServerResource::Unable to instantiate scope class");
+                        OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to instantiate scope class");
                     }
                     //call plugin class init
-                    if (OAuth2Utils.debug.messageEnabled()){
-                        OAuth2Utils.debug.message("ValidationServerResource::In Validator resource - got token = " + t);
+                    if (OAuth2Utils.DEBUG.messageEnabled()){
+                        OAuth2Utils.DEBUG.message("ValidationServerResource::In Validator resource - got token = " + t);
                     }
 
                     if (t.isExpired()) {
                         error = OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
-                        OAuth2Utils.debug.error("ValidationServerResource::Should response and refresh the token");
+                        OAuth2Utils.DEBUG.error("ValidationServerResource::Should response and refresh the token");
                     }
 
                     if (error == null) {
@@ -174,10 +174,10 @@ public class ValidationServerResource extends ServerResource implements
 
             }
         } catch (OAuthProblemException e) {
-            OAuth2Utils.debug.error("ValidationServerResource::Error occurred during validate", e);
+            OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during validate", e);
             error = e;
         } catch (Exception e){
-            OAuth2Utils.debug.error("ValidationServerResource::Error occurred during validate", e);
+            OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during validate", e);
             error = OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                     "Missing scope plugin class");
         }
@@ -233,10 +233,10 @@ public class ValidationServerResource extends ServerResource implements
             }
             return new BearerToken(token, expires_in, client_id, username, scope);
         } catch (OAuthProblemException e) {
-            OAuth2Utils.debug.error("ValidationServerResource::Error occurred during token verify", e);
+            OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during token verify", e);
             throw e;
         } catch (ResourceException e) {
-            OAuth2Utils.debug.error("ValidationServerResource::Error occurred during token verify", e);
+            OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during token verify", e);
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(null, e.getMessage());
         }
     }
@@ -250,7 +250,7 @@ public class ValidationServerResource extends ServerResource implements
             Map<String, Set<String>> attrs = scm.getAttributes();
             pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
         } catch (Exception e) {
-            OAuth2Utils.debug.error("ValidationServerResource::Unable to get plugin class", e);
+            OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to get plugin class", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);
         }

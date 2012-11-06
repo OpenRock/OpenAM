@@ -28,18 +28,15 @@ import java.util.Map;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * This implements the Access Token used in OAuth2. The Access Token is described in see
+ * <a href="http://tools.ietf.org/html/rfc6749#section-1.4">http://tools.ietf.org/html/rfc6749#section-1.4</a>
  */
 public interface AccessToken extends Token {
 
-    // public lifetime A maximum access token lifetime of 3600 seconds is
-    // RECOMMENDED
-
     /**
-     * TODO Description.
+     * Gets the parent of the access token. Either the {@link RefreshToken}, or {@link AuthorizationCode}.
      * 
-     * @return TODO Description
+     * @return the parent token
      */
     public String getParentToken();
 

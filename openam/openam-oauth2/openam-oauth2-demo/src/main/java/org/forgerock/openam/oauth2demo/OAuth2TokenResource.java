@@ -40,15 +40,13 @@ import org.restlet.security.User;
 import com.iplanet.am.util.SystemProperties;
 
 /**
- * A NAME does ...
- * 
- * @author Laszlo Hordos
+ * Returns token information in the demo
  */
 public class OAuth2TokenResource extends ServerResource {
     /**
-     * TODO Description.
+     * Creates a representation of the token to be displayed
      * 
-     * @return TODO Description
+     * @return Jackson representation of the token to be displayed.
      */
     @Get("json")
     public Representation getStatusInfo() {

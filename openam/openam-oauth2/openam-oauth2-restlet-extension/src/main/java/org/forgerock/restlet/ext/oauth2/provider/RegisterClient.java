@@ -44,7 +44,9 @@ import org.restlet.resource.ServerResource;
 import java.security.AccessController;
 import java.util.*;
 
-
+/**
+ * Registers an OAuth2 Client with OpenAM
+ */
 public class RegisterClient extends ServerResource {
 
     private Reference registerClientRef;

@@ -27,9 +27,8 @@ package org.forgerock.restlet.ext.oauth2.consumer;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 
 /**
- * An AccessTokenValidator does ...
- * 
- * @author Laszlo Hordos
+ * An AccessTokenValidator validates a token
+ *
  */
 public interface AccessTokenValidator<T extends AbstractAccessToken> {
     public T verify(T token) throws OAuthProblemException;

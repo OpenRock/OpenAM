@@ -133,8 +133,8 @@ public class AbstractFlowTest {
         ClientApplication client = mock(ClientApplication.class);
         when(client.getClientId()).thenReturn("cid");
         when(client.getAccessTokenType()).thenReturn(OAuth2Constants.Bearer.BEARER);
-        when(client.allowedGrantScopes()).thenReturn(OAuth2Utils.split("read write", null));
-        when(client.defaultGrantScopes()).thenReturn(OAuth2Utils.split("read", null));
+        when(client.getAllowedGrantScopes()).thenReturn(OAuth2Utils.split("read write", null));
+        when(client.getDefaultGrantScopes()).thenReturn(OAuth2Utils.split("read", null));
         Set<URI> redirectionURIs = new HashSet<URI>(1);
         redirectionURIs.add(URI.create("http://localhost:8080/oauth2/cb"));
         when(client.getRedirectionURIs()).thenReturn(redirectionURIs);

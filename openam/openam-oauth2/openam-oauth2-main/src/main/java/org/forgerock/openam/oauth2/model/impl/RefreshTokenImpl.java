@@ -34,7 +34,7 @@ import org.forgerock.openam.oauth2.model.SessionClient;
 import org.forgerock.openam.oauth2.model.Token;
 
 /**
- * Implements a Refresh Token
+ * Implements a {@link RefreshToken} Token
  */
 public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
 
@@ -107,6 +107,9 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
         this.put(OAuth2Constants.StoredToken.PARENT, s);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getParentToken() {
         String parent = null;

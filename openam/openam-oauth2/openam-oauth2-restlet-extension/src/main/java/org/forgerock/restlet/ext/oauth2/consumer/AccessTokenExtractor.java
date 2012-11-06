@@ -47,8 +47,7 @@ import org.restlet.util.Series;
 
 /**
  * An AccessTokenExtractor extracts the AccessToken from the Request.
- * 
- * @author Laszlo Hordos
+ *
  */
 public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extends
         AuthenticatorHelper {
@@ -220,7 +219,7 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
         if (null != token) {
             OAuthProblemException exception = extractException(token);
             if (exception != null) {
-                OAuth2Utils.debug.error("Unable to extract token from request", exception);
+                OAuth2Utils.DEBUG.error("Unable to extract token from request", exception);
                 throw exception;
             }
         }

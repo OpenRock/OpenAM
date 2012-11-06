@@ -35,7 +35,9 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * Implementation of a {@link ClientApplication}
+ */
 public class ClientApplicationImpl implements ClientApplication{
     private static final String CLIENT_TYPE = "com.forgerock.openam.oauth2provider.clientType";
     private static final String REDIRECTION_URIS = "com.forgerock.openam.oauth2provider.redirectionURIs";
@@ -52,11 +54,17 @@ public class ClientApplicationImpl implements ClientApplication{
         this.id = id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getClientId(){
         return id.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ClientType getClientType(){
         ClientType clientType = null;
@@ -68,13 +76,16 @@ public class ClientApplicationImpl implements ClientApplication{
                 clientType = ClientType.PUBLIC;
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get client type from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get client type from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get client type from repository");
         }
         return clientType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<URI> getRedirectionURIs(){
         Set<URI> redirectionURIs = null;
@@ -85,13 +96,16 @@ public class ClientApplicationImpl implements ClientApplication{
                 redirectionURIs.add(URI.create(uri));
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get redirection URLs from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get redirection URLs from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get redirection URLs from repository");
         }
         return redirectionURIs;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getAccessTokenType(){
         /*
@@ -108,37 +122,49 @@ public class ClientApplicationImpl implements ClientApplication{
         return OAuth2Constants.Bearer.BEARER;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getClientAuthenticationSchema(){
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Set<String> allowedGrantScopes(){
+    public Set<String> getAllowedGrantScopes(){
         Set<String> scopes = null;
         try {
             scopes = id.getAttribute(SCOPES);
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get allowed grant scopes from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get allowed grant scopes from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get allowed grant scopes from repository");
         }
         return scopes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Set<String> defaultGrantScopes(){
+    public Set<String> getDefaultGrantScopes(){
         Set<String> scopes = null;
         try {
             scopes = id.getAttribute(DEFAULT_SCOPES);
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get defualt grant scopes from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get defualt grant scopes from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get default grant scopes from repository");
         }
         return scopes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isAutoGrant(){
         Set<String> autoGrantSet = null;
@@ -147,33 +173,39 @@ public class ClientApplicationImpl implements ClientApplication{
             autoGrantSet = id.getAttribute(AUTO_GRANT);
             grant = Boolean.parseBoolean(autoGrantSet.iterator().next());
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get auto grant status from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get auto grant status from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get auto grant status from repository");
         }
         return grant;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getDisplayName(){
         Set<String> displayName = null;
         try {
             displayName = id.getAttribute(NAME);
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get display name from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get display name from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get display name from repository");
         }
         return displayName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getDisplayDescription(){
         Set<String> displayDescription = null;
         try {
             displayDescription = id.getAttribute(DESCRIPTION);
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientApplicationImpl::Unable to get display decription from repository", e);
+            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get display decription from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get display description from repository");
         }

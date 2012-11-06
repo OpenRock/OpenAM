@@ -38,8 +38,10 @@ import org.restlet.resource.Post;
 import org.restlet.routing.Redirector;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ *
+ * Implements the Implicit Flow
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.2">4.2.  Implicit Grant</a>
  */
 public class ImplicitGrantServerResource extends AbstractFlow {
 

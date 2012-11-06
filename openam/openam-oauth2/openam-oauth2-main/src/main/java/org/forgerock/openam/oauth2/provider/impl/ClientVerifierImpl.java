@@ -53,17 +53,23 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
+/**
+ * Implements a {@link ClientVerifier}
+ */
 public class ClientVerifierImpl implements ClientVerifier{
 
     private String realm = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ClientApplication verify(Request request, Response response){
         String client_id = null;
         String client_secret = null;
 
-        if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("ClientVerifierImpl::Verifying client application");
+        if (OAuth2Utils.DEBUG.messageEnabled()){
+            OAuth2Utils.DEBUG.message("ClientVerifierImpl::Verifying client application");
         }
         ClientApplication client = null;
         realm = OAuth2Utils.getRealm(request);
@@ -107,13 +113,13 @@ public class ClientVerifierImpl implements ClientVerifier{
         try {
             AMIdentity ret = authenticate(client_id, client_secret.toCharArray());
             if (ret == null){
-                OAuth2Utils.debug.error("ClientVerifierImpl::Unable to verify client password: " +
+                OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client password: " +
                     client_secret);
                 throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
             }
             user = new ClientApplicationImpl(ret);
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientVerifierImpl::Unable to verify client", e);
+            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
         }
         return user;
@@ -148,8 +154,8 @@ public class ClientVerifierImpl implements ClientVerifier{
                 lc.submitRequirements(callbacks);
             }
 
-            if (OAuth2Utils.debug.messageEnabled()) {
-                OAuth2Utils.debug.message("ClientVerifierImpl::authenticate returning an InvalidCredentials"
+            if (OAuth2Utils.DEBUG.messageEnabled()) {
+                OAuth2Utils.DEBUG.message("ClientVerifierImpl::authenticate returning an InvalidCredentials"
                         + " exception for invalid passwords.");
             }
 
@@ -158,7 +164,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                 try {
                     ret = IdUtils.getIdentity(lc.getSSOToken());
                 } catch (Exception e) {
-                    OAuth2Utils.debug.error( "ClientVerifierImpl::authContext: "
+                    OAuth2Utils.DEBUG.error( "ClientVerifierImpl::authContext: "
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
@@ -166,12 +172,15 @@ public class ClientVerifierImpl implements ClientVerifier{
                 }
             }
         } catch (AuthLoginException le) {
-            OAuth2Utils.debug.error("ClientVerifierImpl::authContext AuthException", le);
+            OAuth2Utils.DEBUG.error("ClientVerifierImpl::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         }
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String client_id){
 
@@ -224,7 +233,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                 return null;
             }
         } catch (Exception e){
-            OAuth2Utils.debug.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
+            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
         }
     }

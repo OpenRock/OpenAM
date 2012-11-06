@@ -40,8 +40,9 @@ import org.restlet.security.User;
 import org.restlet.security.Verifier;
 
 /**
+ * Implements the Resource Owner Password Credentials Flow
  * @see <a
- *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.3>4.3.
+ *      href="http://tools.ietf.org/html/rfc6749#section-4.3>4.3.
  *      Resource Owner Password Credentials Grant</a>
  */
 public class PasswordServerResource extends AbstractFlow {
@@ -62,11 +63,11 @@ public class PasswordServerResource extends AbstractFlow {
                     .verify(getRequest(), getResponse())) {
                 resourceOwner = new User(username, password.toCharArray());
             } else {
-                OAuth2Utils.debug.error("Unable to verify user: " + username + "password: " + password);
+                OAuth2Utils.DEBUG.error("Unable to verify user: " + username + "password: " + password);
                 throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest());
             }
         } else {
-            OAuth2Utils.debug.error("SecretVerifier is not set in the Context");
+            OAuth2Utils.DEBUG.error("SecretVerifier is not set in the Context");
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                     "SecretVerifier is not set in the Context");
         }

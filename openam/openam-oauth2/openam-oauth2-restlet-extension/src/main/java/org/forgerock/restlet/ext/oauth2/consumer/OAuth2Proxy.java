@@ -61,9 +61,8 @@ import org.restlet.routing.Redirector;
 import org.restlet.util.Series;
 
 /**
- * An OAuth2Proxy does ...
- * 
- * @author Laszlo Hordos
+ * Triggers the OAuth2 Flows for the demo
+ *
  */
 public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken>
         extends Restlet {

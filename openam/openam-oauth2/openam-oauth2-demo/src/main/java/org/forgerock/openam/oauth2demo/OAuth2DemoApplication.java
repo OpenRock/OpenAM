@@ -63,9 +63,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 /**
- * A NAME does ...
- * 
- * @author Laszlo Hordos
+ * Sets up the OAuth2DemoApplication
  */
 public class OAuth2DemoApplication extends Application {
 
@@ -221,10 +219,6 @@ public class OAuth2DemoApplication extends Application {
                 int serverPort = servletRequest.getServerPort(); // 8080
                 String contextPath = servletRequest.getContextPath(); // /openam
                 String servletPath = servletRequest.getServletPath(); // /oauth2demo
-                // String pathInfo = servletRequest.getPathInfo(); //
-                // /static/index.html
-                // String queryString = servletRequest.getQueryString(); //
-                // d=789
 
                 try {
                     root =

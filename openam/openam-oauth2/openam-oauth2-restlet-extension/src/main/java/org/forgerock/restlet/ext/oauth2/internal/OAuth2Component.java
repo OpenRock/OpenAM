@@ -46,7 +46,7 @@ import org.restlet.security.Verifier;
 
 /**
  * This class can initialise the OAuth2 Endpoint. IT can be a Spring Bean or an
- * OSGi component
+ * OSGi component. Used to test OAuth2
  * 
  * @author $author$
  * @version $Revision$ $Date$

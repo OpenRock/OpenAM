@@ -27,7 +27,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
 import org.restlet.security.User;
 
 /**
- * A BearerTokenVerifier does ...
+ * A BearerTokenVerifier verifies a {@link BearerToken}
  * 
  * @author Laszlo Hordos
  */

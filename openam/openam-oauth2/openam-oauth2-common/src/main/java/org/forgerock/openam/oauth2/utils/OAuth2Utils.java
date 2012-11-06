@@ -68,7 +68,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class OAuth2Utils {
 
-    public static Debug debug = Debug.getInstance("OAuth2Provider");
+    public static Debug DEBUG = Debug.getInstance("OAuth2Provider");
 
     private static LogMessageProvider msgProvider;
     private static Logger accessLogger;
@@ -102,8 +102,8 @@ public class OAuth2Utils {
                 msgProvider = MessageProviderFactory.getProvider("OAuth2Provider");
             }
         } catch (IOException e) {
-            debug.error("OAuth2Utils.logAccessMessage()", e);
-            debug.error("OAuth2Utils.logAccessMessage():"
+            DEBUG.error("OAuth2Utils.logAccessMessage()", e);
+            DEBUG.error("OAuth2Utils.logAccessMessage():"
                     + "disabling logging");
             logStatus = false;
         }
@@ -134,8 +134,8 @@ public class OAuth2Utils {
                 msgProvider = MessageProviderFactory.getProvider("OAuth2Provider");
             }
         } catch (IOException e) {
-            debug.error("OAuth2Utils.logErrorMessage()", e);
-            debug.error("OAuth2Utils.logAccessMessage():"
+            DEBUG.error("OAuth2Utils.logErrorMessage()", e);
+            DEBUG.error("OAuth2Utils.logAccessMessage():"
                     + "disabling logging");
             logStatus = false;
         }
@@ -155,7 +155,7 @@ public class OAuth2Utils {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             return mgr.createSSOToken(req);
         } catch (Exception e){
-            OAuth2Utils.debug.error("OAuth2Utils::Unable to get sso token: ", e);
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get sso token: ", e);
         }
         return null;
     }
@@ -168,6 +168,9 @@ public class OAuth2Utils {
             Map<String, String> result = null;
             switch (this) {
             case HTTP_FRAGMENT:
+                if (request.getReferrerRef() == null || request.getReferrerRef().getFragment() == null){
+                    return null;
+                }
                 return new Form(request.getReferrerRef().getFragment()).getValuesMap();
             case HTTP_HEADER:
                 if (null != request.getChallengeResponse()

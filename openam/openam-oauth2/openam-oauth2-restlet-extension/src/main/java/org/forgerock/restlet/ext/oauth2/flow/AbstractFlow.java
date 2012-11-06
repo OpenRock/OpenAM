@@ -62,8 +62,7 @@ import org.restlet.security.User;
 import org.restlet.util.Series;
 
 /**
- * @author $author$
- * @version $Revision$ $Date$
+ * Defines an abstract OAuth2 flow and the flow helper methods.
  */
 public abstract class AbstractFlow extends ServerResource {
 
@@ -93,7 +92,7 @@ public abstract class AbstractFlow extends ServerResource {
             Map<String, Set<String>> attrs = scm.getAttributes();
             issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
         } catch (Exception e) {
-            OAuth2Utils.debug.error("Could not get service settings", e);
+            OAuth2Utils.DEBUG.error("Could not get service settings", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                 "Service unavailable", "Could not get service settings", null);
         }
@@ -101,7 +100,7 @@ public abstract class AbstractFlow extends ServerResource {
     }
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {
-            OAuth2Utils.debug.error("AbstractFlow::ClientVerifier is not initialised");
+            OAuth2Utils.DEBUG.error("AbstractFlow::ClientVerifier is not initialised");
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                     "ClientVerifier is not initialised");
         }
@@ -110,7 +109,7 @@ public abstract class AbstractFlow extends ServerResource {
 
     public OAuth2TokenStore getTokenStore() throws OAuthProblemException {
         if (null == tokenStore) {
-            OAuth2Utils.debug.error("AbstractFlow::Token store is not initialised");
+            OAuth2Utils.DEBUG.error("AbstractFlow::Token store is not initialised");
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                     "Toekn store is not initialised");
         }
@@ -330,7 +329,7 @@ public abstract class AbstractFlow extends ServerResource {
         if (null != r) {
             return r;
         }
-        OAuth2Utils.debug.error("AbstractFlow::Server can not serve the content of authorization page");
+        OAuth2Utils.DEBUG.error("AbstractFlow::Server can not serve the content of authorization page");
         throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
                 "Server can not serve the content of authorization page");
     }
@@ -377,7 +376,7 @@ public abstract class AbstractFlow extends ServerResource {
                  * unauthorized_client The client is not authorized to request
                  * an authorization code using this method.
                  */
-                OAuth2Utils.debug.error("AbstractFlow::Unauthorized client accessing authorize endpoint");
+                OAuth2Utils.DEBUG.error("AbstractFlow::Unauthorized client accessing authorize endpoint");
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest());
             }
         }
@@ -395,7 +394,7 @@ public abstract class AbstractFlow extends ServerResource {
                 && getRequest().getClientInfo().isAuthenticated()) {
             return getRequest().getClientInfo().getUser();
         }
-        OAuth2Utils.debug.error("The authorization server can not authenticate the resource owner.");
+        OAuth2Utils.DEBUG.error("The authorization server can not authenticate the resource owner.");
         throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                 "The authorization server can not authenticate the resource owner.");
     }
@@ -407,7 +406,7 @@ public abstract class AbstractFlow extends ServerResource {
                 return (OAuth2Client) getRequest().getClientInfo().getUser();
             }
         }
-        OAuth2Utils.debug.error("The authorization server can not authenticate the client.");
+        OAuth2Utils.DEBUG.error("The authorization server can not authenticate the client.");
         throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                 "The authorization server can not authenticate the client.");
     }
@@ -417,7 +416,7 @@ public abstract class AbstractFlow extends ServerResource {
         data.put("target", getRequest().getResourceRef().toString());
         Set<String> displayNames = client.getClient().getDisplayName();
         Set<String> displayDescriptions = client.getClient().getDisplayDescription();
-        Set<String> allScopes = client.getClient().allowedGrantScopes();
+        Set<String> allScopes = client.getClient().getAllowedGrantScopes();
         String locale = OAuth2Utils.getLocale(getRequest());
         String displayName = "";
         String displayDescription = "";
@@ -482,7 +481,7 @@ public abstract class AbstractFlow extends ServerResource {
                         }
 
                     } else {
-                        OAuth2Utils.debug.warning("Scope was input into the client settings in the wrong format");
+                        OAuth2Utils.DEBUG.warning("Scope was input into the client settings in the wrong format");
                         continue;
                     }
 
@@ -525,7 +524,7 @@ public abstract class AbstractFlow extends ServerResource {
             if (!(null == getRequest().getEntity() || getRequest().getEntity() instanceof EmptyRepresentation)
                     && !MediaType.APPLICATION_WWW_FORM.equals(getRequest().getEntity()
                             .getMediaType())) {
-                OAuth2Utils.debug.error("AbstractFlow::Invalid Content Type for authorization endpoint");
+                OAuth2Utils.DEBUG.error("AbstractFlow::Invalid Content Type for authorization endpoint");
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                         "Invalid Content Type");
             }
@@ -534,7 +533,7 @@ public abstract class AbstractFlow extends ServerResource {
             if (!(null == getRequest().getEntity() || getRequest().getEntity() instanceof EmptyRepresentation)
                     && !MediaType.APPLICATION_WWW_FORM.equals(getRequest().getEntity()
                             .getMediaType())) {
-                OAuth2Utils.debug.error("AbstractFlow::Invalid Content Type for token endpoint");
+                OAuth2Utils.DEBUG.error("AbstractFlow::Invalid Content Type for token endpoint");
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                         "Invalid Content Type");
             }
@@ -558,7 +557,7 @@ public abstract class AbstractFlow extends ServerResource {
                 }
             }
             if (null != sb) {
-                OAuth2Utils.debug.error("AbstractFlow::Invlaid parameters in request: " + sb.toString());
+                OAuth2Utils.DEBUG.error("AbstractFlow::Invlaid parameters in request: " + sb.toString());
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), sb
                         .toString());
             }
@@ -576,7 +575,7 @@ public abstract class AbstractFlow extends ServerResource {
             Set<String> scopes = null;
             scopes = OAuth2Utils.parseScope(maximumScope);
             if (intersect.retainAll(scopes)) {
-                OAuth2Utils.debug.warning("AbstractFlow::Scope is different then requested");
+                OAuth2Utils.DEBUG.warning("AbstractFlow::Scope is different then requested");
                 scopeChanged = true;
                 return intersect;
             } else {
@@ -605,7 +604,7 @@ public abstract class AbstractFlow extends ServerResource {
             Map<String, Set<String>> attrs = scm.getAttributes();
             pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
         } catch (Exception e) {
-            OAuth2Utils.debug.error("AbstractFlow::Unable to get scope plugin class", e);
+            OAuth2Utils.DEBUG.error("AbstractFlow::Unable to get scope plugin class", e);
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);
         }
@@ -625,15 +624,15 @@ public abstract class AbstractFlow extends ServerResource {
             pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
             scopeClass = (Scope) Class.forName(pluginClass).newInstance();
         } catch (Exception e){
-            OAuth2Utils.debug.error("AbstractFlow::Exception during scope execution", e);
+            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
             scopeClass = null;
         }
         // Validate the granted scope
         if (scopeClass != null && pluginClass != null){
             checkedScope = scopeClass.scopeRequestedForAccessToken(requestedScopeSet,
-                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()),
-                    OAuth2Utils.parseScope(client.getClient().defaultGrantScopes()));
+                    OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
+                    OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
         }
 
         return checkedScope;
@@ -651,7 +650,7 @@ public abstract class AbstractFlow extends ServerResource {
             pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
             scopeClass = (Scope) Class.forName(pluginClass).newInstance();
         } catch (Exception e){
-            OAuth2Utils.debug.error("AbstractFlow::Exception during scope execution", e);
+            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
             scopeClass = null;
         }
@@ -659,8 +658,8 @@ public abstract class AbstractFlow extends ServerResource {
         if (scopeClass != null && pluginClass != null){
             checkedScope = scopeClass.scopeRequestedForRefreshToken(requestedScopeSet,
                     maxScope,
-                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()),
-                    OAuth2Utils.parseScope(client.getClient().defaultGrantScopes()));
+                    OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
+                    OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
         }
 
         return checkedScope;
@@ -678,7 +677,7 @@ public abstract class AbstractFlow extends ServerResource {
             pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
             scopeClass = (Scope) Class.forName(pluginClass).newInstance();
         } catch (Exception e){
-            OAuth2Utils.debug.error("AbstractFlow::Exception during scope execution", e);
+            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
             scopeClass = null;
         }
@@ -686,8 +685,8 @@ public abstract class AbstractFlow extends ServerResource {
         // Validate the granted scope
         if (scopeClass != null && pluginClass != null){
             checkedScope = scopeClass.scopeToPresentOnAuthorizationPage(requestedScopeSet,
-                    OAuth2Utils.parseScope(client.getClient().allowedGrantScopes()),
-                    OAuth2Utils.parseScope(client.getClient().defaultGrantScopes()));
+                    OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
+                    OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
         }
 
         return checkedScope;

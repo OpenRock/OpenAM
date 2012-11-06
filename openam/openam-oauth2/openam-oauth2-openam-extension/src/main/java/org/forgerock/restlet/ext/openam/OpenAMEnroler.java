@@ -36,15 +36,17 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 
 /**
- * An OpenAMEnroler gets the membership
+ * An OpenAMEnroler gets the membership. Used for the demo application.
  * {@link AMIdentity#getMemberships(com.sun.identity.idm.IdType)} of
  * {@link IdType#GROUP} and populates the
  * {@link org.restlet.data.ClientInfo#getRoles()} collection.
- * 
- * @author Laszlo Hordos
+ *
  */
 public class OpenAMEnroler implements Enroler {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void enrole(ClientInfo clientInfo) {
         if (clientInfo.getUser() instanceof OpenAMUser) {

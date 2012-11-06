@@ -45,9 +45,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 
 /**
- * A NAME does ...
- * 
- * @author Laszlo Hordos
+ * Used to authenticate to OpenAM and redirect to its login page.
  */
 public abstract class AbstractOpenAMAuthenticator extends Authenticator {
 
@@ -125,18 +123,18 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
                 return identity.isActive();
             }
         } catch (SSOException e) {
-            OAuth2Utils.debug.error("Error authenticating user against OpenAM: ", e );
+            OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e );
             redirect(request, response);
         } catch (IdRepoException e) {
-            OAuth2Utils.debug.error("Error authenticating user against OpenAM: ", e );
+            OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e );
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
         }
         return false;
     }
 
     protected void redirect(Request request, Response response) {
-        if (OAuth2Utils.debug.messageEnabled()){
-            OAuth2Utils.debug.message("Redirecting to OpenAM login page");
+        if (OAuth2Utils.DEBUG.messageEnabled()){
+            OAuth2Utils.DEBUG.message("Redirecting to OpenAM login page");
         }
         Reference amserver = new Reference(openamServer);
         realm = OAuth2Utils.getRealm(request);
