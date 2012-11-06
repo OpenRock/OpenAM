@@ -165,9 +165,9 @@ public class ValidationServerResource extends ServerResource implements
 
                     if (error == null) {
                         //call plugin class.process
-                        Map <String, Object> returnMap = scopeClass.retrieveTokenInfoEndPoint(t);
+                        Map <String, Object> scopeEvaluation = scopeClass.evaluateScope(t);
                         response.putAll(t.convertToMap());
-                        response.putAll(returnMap);
+                        response.putAll(scopeEvaluation);
                     }
 
                 }

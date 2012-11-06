@@ -96,7 +96,7 @@ public class ScopeImpl implements Scope {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> retrieveTokenInfoEndPoint(AccessToken token){
+    public Map<String, Object> evaluateScope(AccessToken token){
         Map<String, Object> map = new HashMap<String, Object>();
         Set<String> scopes = token.getScope();
         String resourceOwner = token.getUserID();

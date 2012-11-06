@@ -68,11 +68,12 @@ public interface Scope {
                                                      Set<String> defaultScopes);
 
     /**
-     * This method is called after the token is processed and before it is returned to the user as authenticated. This
-     * method should be used to implement your scope tasks.
+     * This method is called on the /tokeninfo endpoint. The purpose of this function is to evaluate scope and return
+     * to the client some information on the scope evaluation if nessesary.
      * @param token An AccessToken that contains all the information about the token
-     * @return returns a map of data to be added to the token json object that will be returned to the client
+     * @return returns a map of data to be added to the token json object that will be returned to the client,
+     *          can be null if no information needs to be returned.
      */
-    public Map<String, Object> retrieveTokenInfoEndPoint(AccessToken token);
+    public Map<String, Object> evaluateScope(AccessToken token);
 
 }
