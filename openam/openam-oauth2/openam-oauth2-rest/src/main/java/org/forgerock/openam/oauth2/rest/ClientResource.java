@@ -17,8 +17,10 @@
 
 package org.forgerock.openam.oauth2.rest;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.json.fluent.JsonValue;
@@ -27,6 +29,7 @@ import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.*;
 
@@ -69,26 +72,46 @@ public class ClientResource  implements CollectionResourceProvider {
 
         JsonValue response = null;
         Map< String, String> responseVal =new HashMap< String, String>();
+        String uid;
         try {
+            uid = getUid(context);
+            if (!uid.equals("amadmin")){
+                throw new PermanentException(402, "Unauthorized", null);
+            }
             AMIdentityRepository repo = new AMIdentityRepository(token , realm);
             repo.createIdentity(IdType.AGENTONLY, id, attrs);
             responseVal.put("success", "true");
-        } catch(Exception e){
+
+            response = new JsonValue(responseVal);
+
+            Resource resource = new Resource("results", "1", response);
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"CREATED_CLIENT", responseVal.toString()};
+                OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, null);
+            }
+            handler.handleResult(resource);
+        } catch(IdRepoException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
-                String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client"));
+        } catch (SSOException e){
+            responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
+            handler.handleError(new InternalServerErrorException("Unable to create client"));
+        } catch (PermanentException e){
+            responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
+            handler.handleError(e);
         }
-        response = new JsonValue(responseVal);
-
-        Resource resource = new Resource("results", "1", response);
-        if (OAuth2Utils.logStatus) {
-            String[] obs = {"CREATED_CLIENT", responseVal.toString()};
-            OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, null);
-        }
-        handler.handleResult(resource);
     }
 
     @Override
@@ -96,28 +119,55 @@ public class ClientResource  implements CollectionResourceProvider {
                                ResultHandler<Resource> handler){
         Map<String, String> responseVal = new HashMap<String, String>();
         JsonValue response = null;
+        String uid;
         try {
+            uid = getUid(context);
+            if (!uid.equals("amadmin")){
+                throw new PermanentException(402, "Unauthorized", null);
+            }
             AMIdentityRepository repo = new AMIdentityRepository(token , null);
             Set<AMIdentity> ids = new HashSet<AMIdentity>();
             ids.add(getIdentity(resourceId, null));
             repo.deleteIdentities(ids);
             responseVal.put("success", "true");
-        } catch(Exception e){
+
+            response = new JsonValue(responseVal);
+
+            Resource resource = new Resource("results", "1", response);
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"DELETED_CLIENT", response.toString()};
+                OAuth2Utils.logAccessMessage("DELETED_CLIENT", obs, null);
+            }
+            handler.handleResult(resource);
+        } catch(IdRepoException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client"));
+        } catch (SSOException e){
+            responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
+            handler.handleError(new InternalServerErrorException("Unable to create client"));
+        } catch (InternalServerErrorException e){
+            responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
+            handler.handleError(new InternalServerErrorException("Unable to create client"));
+        } catch (PermanentException e){
+            responseVal.put("success", "false");
+            if (OAuth2Utils.logStatus) {
+                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
+            handler.handleError(e);
         }
-        response = new JsonValue(responseVal);
-
-        Resource resource = new Resource("results", "1", response);
-        if (OAuth2Utils.logStatus) {
-            String[] obs = {"DELETED_CLIENT", response.toString()};
-            OAuth2Utils.logAccessMessage("DELETED_CLIENT", obs, null);
-        }
-        handler.handleResult(resource);
     }
 
     @Override
@@ -151,7 +201,7 @@ public class ClientResource  implements CollectionResourceProvider {
         handler.handleError(e);
     }
 
-    private AMIdentity getIdentity(String uName, String realm) throws ResourceException {
+    private AMIdentity getIdentity(String uName, String realm) throws InternalServerErrorException {
         AMIdentity theID = null;
         AMIdentityRepository amIdRepo = null;
         try{
@@ -185,5 +235,61 @@ public class ClientResource  implements CollectionResourceProvider {
             throw new InternalServerErrorException("Unable to get search results", e);
         }
         return theID;
+    }
+
+    /**
+     * Returns TokenID from headers
+     *
+     * @param context ServerContext which contains the headers.
+     * @return String with TokenID
+     */
+    private String getCookieFromServerContext(ServerContext context) {
+        List<String> cookies = null;
+        String cookieName = null;
+        HttpContext header = null;
+        try {
+            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
+            if (cookieName == null || cookieName.isEmpty()) {
+                return null;
+            }
+            header = context.asContext(HttpContext.class);
+            if (header == null) {
+                return null;
+            }
+            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
+            cookies = header.getHeaders().get(cookieName.toLowerCase());
+            if (cookies != null && !cookies.isEmpty()) {
+                for (String s : cookies) {
+                    if (s == null || s.isEmpty()) {
+                        return null;
+                    } else {
+                        return s;
+                    }
+                }
+            } else {  //get cookie from header parameter called cookie
+                cookies = header.getHeaders().get("cookie");
+                if (cookies != null && !cookies.isEmpty()) {
+                    for (String cookie : cookies) {
+                        String cookieNames[] = cookie.split(";"); //Split parameter up
+                        for (String c : cookieNames) {
+                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
+                                String amCookie = c.replace(cookieName + "=", "").trim();
+                                return amCookie; //return com.iplanet.am.cookie.name value
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    private String getUid(ServerContext context) throws SSOException, IdRepoException{
+        String cookie = getCookieFromServerContext(context);
+        SSOTokenManager mgr = SSOTokenManager.getInstance();
+        SSOToken token = mgr.createSSOToken(cookie);
+        AMIdentity id = IdUtils.getIdentity(token);
+        return id.getName();
     }
 }

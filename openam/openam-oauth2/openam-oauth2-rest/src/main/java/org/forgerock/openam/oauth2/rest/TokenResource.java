@@ -23,6 +23,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.sm.ldap.OpenDJTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 
@@ -31,7 +32,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.ext.cts.CoreTokenService;
-import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
