@@ -1089,16 +1089,6 @@
       <jsp-file>/oauth2/registerClient.jsp</jsp-file>
     </servlet>
 
-    <filter>
-        <filter-name>AuthenticationFilter</filter-name>
-        <filter-class>org.forgerock.openam.oauth2.rest.RestAuthentication</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/frrest/oauth2/*</url-pattern>
-    </filter-mapping>
-
     <servlet>
         <servlet-name>OAuth2Rest</servlet-name>
         <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>

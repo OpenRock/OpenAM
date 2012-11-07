@@ -65,8 +65,8 @@ public class ClientVerifierImpl implements ClientVerifier{
      */
     @Override
     public ClientApplication verify(Request request, Response response){
-        String client_id = null;
-        String client_secret = null;
+        String clientId = null;
+        String clientSecret = null;
 
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("ClientVerifierImpl::Verifying client application");
@@ -76,21 +76,21 @@ public class ClientVerifierImpl implements ClientVerifier{
         if (request.getChallengeResponse() != null) {
             client = verify(request.getChallengeResponse());
         } else {
-            client_secret =
+            clientSecret =
                     OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_SECRET,
                             String.class);
-            client_id =
+            clientId =
                     OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_ID,
                             String.class);
-            if (client_secret != null){
-                client = verify(client_id, client_secret);
+            if (clientSecret != null){
+                client = verify(clientId, clientSecret);
             } else {
-                client = findClient(client_id);
+                client = findClient(clientId);
             }
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
-                String[] obs = {"FAILED_AUTHENTICATE_CLIENT", client_id};
+                String[] obs = {"FAILED_AUTHENTICATE_CLIENT", clientId};
                 OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, OAuth2Utils.getSSOToken(request));
             } else {
                 String[] obs2 = {"AUTHENTICATED_CLIENT", client.getClientId()};
@@ -102,19 +102,19 @@ public class ClientVerifierImpl implements ClientVerifier{
 
     private ClientApplication verify(ChallengeResponse challengeResponse)
             throws OAuthProblemException{
-        String client_id = challengeResponse.getIdentifier();
-        String client_secret = String.valueOf(challengeResponse.getSecret());
-        return verify(client_id, client_secret);
+        String clientId = challengeResponse.getIdentifier();
+        String clientSecret = String.valueOf(challengeResponse.getSecret());
+        return verify(clientId, clientSecret);
     }
 
-    private ClientApplication verify(String client_id, String client_secret)
+    private ClientApplication verify(String clientId, String clientSecret)
             throws OAuthProblemException{
         ClientApplication user = null;
         try {
-            AMIdentity ret = authenticate(client_id, client_secret.toCharArray());
+            AMIdentity ret = authenticate(clientId, clientSecret.toCharArray());
             if (ret == null){
                 OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client password: " +
-                    client_secret);
+                        clientSecret);
                 throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
             }
             user = new ClientApplicationImpl(ret);
@@ -182,16 +182,16 @@ public class ClientVerifierImpl implements ClientVerifier{
      * {@inheritDoc}
      */
     @Override
-    public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String client_id){
+    public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String clientId){
 
         return null;
     }
 
-    private ClientApplication findClient(String client_id){
+    private ClientApplication findClient(String clientId){
 
         ClientApplication user = null;
         try {
-            AMIdentity id = getIdentity(client_id);
+            AMIdentity id = getIdentity(clientId);
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
             return user;

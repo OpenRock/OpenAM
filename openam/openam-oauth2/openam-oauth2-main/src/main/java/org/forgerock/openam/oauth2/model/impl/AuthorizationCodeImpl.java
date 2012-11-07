@@ -92,9 +92,9 @@ public class AuthorizationCodeImpl extends TokenImpl implements AuthorizationCod
      */
     @Override
     public boolean isTokenIssued() {
-        Set issued_set = (Set) get(OAuth2Constants.StoredToken.ISSUED).getObject();
-        if (issued_set != null){
-            return Boolean.parseBoolean(issued_set.iterator().next().toString());
+        Set issuedSet = (Set) get(OAuth2Constants.StoredToken.ISSUED).getObject();
+        if (issuedSet != null && !issuedSet.isEmpty()){
+            return Boolean.parseBoolean(issuedSet.iterator().next().toString());
         }
         throw OAuthProblemException.OAuthError.INVALID_TOKEN.handle(Request.getCurrent(),
                 "Access Code has no issued state. Invalid Token");

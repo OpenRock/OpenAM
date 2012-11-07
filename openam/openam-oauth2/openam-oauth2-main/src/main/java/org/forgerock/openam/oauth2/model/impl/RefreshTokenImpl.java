@@ -113,9 +113,9 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
     @Override
     public String getParentToken() {
         String parent = null;
-        Set parent_set = (Set) get(OAuth2Constants.StoredToken.PARENT).getObject();
-        if (parent_set != null){
-            parent = parent_set.iterator().next().toString();
+        Set parentSet = (Set) get(OAuth2Constants.StoredToken.PARENT).getObject();
+        if (parentSet != null && !parentSet.isEmpty()){
+            parent = parentSet.iterator().next().toString();
         }
         return parent;
     }
