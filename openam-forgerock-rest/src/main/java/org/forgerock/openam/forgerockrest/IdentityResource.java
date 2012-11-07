@@ -87,6 +87,8 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             //build resource
             result.put("id", amIdentity.getName());
+            result.put("realm", com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm()));
+            result.put("dn", amIdentity.getUniversalId());
             handler.handleResult(result);
 
         } catch (SSOException e) {
@@ -109,7 +111,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         if (action.equalsIgnoreCase("idFromSession")) {
             idFromSession(context, request, handler);
-        }else { //for now this is the only case coming in, so fail if otherwise
+        } else { //for now this is the only case coming in, so fail if otherwise
             final ResourceException e =
                     new NotSupportedException("Actions are not supported for resource instances");
             handler.handleError(e);
@@ -184,7 +186,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
                     exception);
-            handler.handleError(new NotFoundException("Token does not have privileges for this operation.", exception));
+            handler.handleError(new NotFoundException("Cannot complete request", exception));
         }
     }
 
@@ -231,7 +233,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     generalFailure.getMessage());
-            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
+            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE! " +
                     exception.getMessage());
@@ -377,10 +379,8 @@ public final class IdentityResource implements CollectionResourceProvider {
     public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
 
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-        Token ret = new Token();
-        ret.setId(adminToken.getTokenID().toString());
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
 
 
         String queryFilter = null;
@@ -393,7 +393,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 queryFilter = "*";
             }
             IdentityServicesImpl id = new IdentityServicesImpl();
-            List<String> users = id.search(queryFilter, idSvcsAttrList, ret);
+            List<String> users = id.search(queryFilter, idSvcsAttrList, admin);
 
             for (final String user : users) {
                 JsonValue val = new JsonValue(user);
@@ -441,7 +441,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     generalFailure);
-            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
+            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ! " +
                     exception);
@@ -510,7 +510,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
-            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
+            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
