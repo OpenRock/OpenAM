@@ -16,12 +16,18 @@
  */
 package org.forgerock.openam.oauth2.rest;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.openam.oauth2.OAuth2Constants;
@@ -29,6 +35,7 @@ import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,6 +77,17 @@ public class TokenResource implements CollectionResourceProvider {
     @Override
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler){
+        //only admin can delete
+        try {
+            String uid = getUid(context);
+            if (uid != "amadmin"){
+                throw new Exception("Unauthorized");
+            }
+        } catch (Exception e){
+            PermanentException ex = new PermanentException(402, "Unauthorized" ,e);
+            handler.handleError(ex);
+        }
+
         try{
             JsonValue query = new JsonValue(null);
             JsonValue response = null;
@@ -106,15 +124,32 @@ public class TokenResource implements CollectionResourceProvider {
             try {
                 Map query = new HashMap<String,String>();
                 String id = queryRequest.getQueryId();
-                if (id.equalsIgnoreCase(OAuth2Constants.Params.REFRESH_TOKEN)){
-                    query.put(OAuth2Constants.StoredToken.TYPE, id);
-                } else if (id.equalsIgnoreCase(OAuth2Constants.Params.ACCESS_TOKEN)){
-                    query.put(OAuth2Constants.StoredToken.TYPE, id);
-                } else if (id.equalsIgnoreCase(OAuth2Constants.Params.CODE)){
-                    query.put(OAuth2Constants.StoredToken.TYPE, id);
-                } else {
-                    query = null;
+
+                //get uid of submitter
+                String uid = null;
+                try {
+                    uid = getUid(context);
+                    query.put("username", uid);
+                } catch (Exception e){
+                    PermanentException ex = new PermanentException(402, "Unauthorized" ,e);
+                    handler.handleError(ex);
                 }
+
+                //split id into the query fields
+                String[] queries = id.split("\\,");
+                for (String q: queries){
+                    String[] params = q.split("=");
+                    if (params.length == 2){
+                        if (!params[0].equalsIgnoreCase("username")){
+                            query.put(params[0], params[1]);
+                        } else {
+                            if (uid != null && uid.equalsIgnoreCase("amadmin")){
+                                query.put(params[0], params[1]);
+                            }
+                        }
+                    }
+                }
+
                 JsonValue queryFilter = new JsonValue(new HashMap<String, HashMap<String, String>>());
                 if (query != null){
                     queryFilter.put("filter", query);
@@ -142,6 +177,18 @@ public class TokenResource implements CollectionResourceProvider {
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler){
+
+        //only admin can read
+        try {
+            String uid = getUid(context);
+            if (uid != "amadmin"){
+                throw new Exception("Unauthorized");
+            }
+        } catch (Exception e){
+            PermanentException ex = new PermanentException(402, "Unauthorized" ,e);
+            handler.handleError(ex);
+        }
+
         try{
             JsonValue response;
             Resource resource;
@@ -165,6 +212,62 @@ public class TokenResource implements CollectionResourceProvider {
         final ResourceException e =
                 new NotSupportedException("Update is not supported for resource instances");
         handler.handleError(e);
+    }
+
+    /**
+     * Returns TokenID from headers
+     *
+     * @param context ServerContext which contains the headers.
+     * @return String with TokenID
+     */
+    private String getCookieFromServerContext(ServerContext context) {
+        List<String> cookies = null;
+        String cookieName = null;
+        HttpContext header = null;
+        try {
+            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
+            if (cookieName == null || cookieName.isEmpty()) {
+                return null;
+            }
+            header = context.asContext(HttpContext.class);
+            if (header == null) {
+                return null;
+            }
+            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
+            cookies = header.getHeaders().get(cookieName.toLowerCase());
+            if (cookies != null && !cookies.isEmpty()) {
+                for (String s : cookies) {
+                    if (s == null || s.isEmpty()) {
+                        return null;
+                    } else {
+                        return s;
+                    }
+                }
+            } else {  //get cookie from header parameter called cookie
+                cookies = header.getHeaders().get("cookie");
+                if (cookies != null && !cookies.isEmpty()) {
+                    for (String cookie : cookies) {
+                        String cookieNames[] = cookie.split(";"); //Split parameter up
+                        for (String c : cookieNames) {
+                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
+                                String amCookie = c.replace(cookieName + "=", "").trim();
+                                return amCookie; //return com.iplanet.am.cookie.name value
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    private String getUid(ServerContext context) throws Exception{
+        String cookie = getCookieFromServerContext(context);
+        SSOTokenManager mgr = SSOTokenManager.getInstance();
+        SSOToken token = mgr.createSSOToken(cookie);
+        AMIdentity id = IdUtils.getIdentity(token);
+        return id.getName();
     }
 
 

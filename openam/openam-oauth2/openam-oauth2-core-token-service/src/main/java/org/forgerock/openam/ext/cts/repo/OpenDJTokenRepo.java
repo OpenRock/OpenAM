@@ -334,18 +334,18 @@ public class OpenDJTokenRepo extends GeneralTaskRunnable implements JsonResource
                 filter = null;
             } else {
                 filter = new StringBuilder();
+                filter.append("(&");
                 for(String key: filters.keySet()){
                     filter.append("(").append(key).append(Constants.EQUALS)
-                          .append(filters.get(key).toString()).append(")").append(" ").append("&").append(" ");
+                          .append(filters.get(key).toString()).append(")");
                 }
-                //remove last ampersand
-                filter.delete(filter.length()-3, filter.length());
+                filter.append(")");
             }
             StringBuilder baseDN = new StringBuilder();
             baseDN.append(OAUTH2_TOKEN_STORE);
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                    0, 0, false, (filter == null) ? "(objectClass=*)" : filter.toString(), returnAttrs);
+                    0, 0, false, (filter == null) ? TOKEN_FILTER : filter.toString(), returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {
