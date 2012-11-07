@@ -17,9 +17,11 @@
 package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
@@ -78,31 +80,42 @@ public class TokenResource implements CollectionResourceProvider {
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler){
         //only admin can delete
+        String uid = null;
         try {
-            String uid = getUid(context);
-            if (uid != "amadmin"){
-                throw new Exception("Unauthorized");
-            }
-        } catch (Exception e){
-            PermanentException ex = new PermanentException(402, "Unauthorized" ,e);
-            handler.handleError(ex);
-        }
+            uid = getUid(context);
 
-        try{
             JsonValue query = new JsonValue(null);
             JsonValue response = null;
             Resource resource = null;
             JsonResourceAccessor accessor =
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                response = accessor.delete(resourceId, "1");
+                response = accessor.read(resourceId);
+                Set<String> usernameSet = (Set<String>) response.get("username").getObject();
+                if(usernameSet == null || usernameSet.isEmpty()){
+                    PermanentException ex = new PermanentException(404, "Not Found", null);
+                    handler.handleError(ex);
+                }
+                if (usernameSet.iterator().next().equals(uid)){
+                    response = accessor.delete(resourceId, "1");
+                } else {
+                    PermanentException ex = new PermanentException(402, "Unauthorized", null);
+                    handler.handleError(ex);
+                }
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't delete token in CTS", null, e);
             }
-            resource = new Resource(request.getResourceName(), "1", response);
+            Map< String, String> responseVal = new HashMap< String, String>();
+            responseVal.put("success", "true");
+            response = new JsonValue(responseVal);
+            resource = new Resource(resourceId, "1", response);
             handler.handleResult(resource);
         } catch (ResourceException e){
             handler.handleError(e);
+        } catch (SSOException e){
+            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
+        } catch (IdRepoException e){
+            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
         }
     }
 
@@ -178,24 +191,26 @@ public class TokenResource implements CollectionResourceProvider {
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler){
 
-        //only admin can read
+        String uid = null;
         try {
-            String uid = getUid(context);
-            if (uid != "amadmin"){
-                throw new Exception("Unauthorized");
-            }
-        } catch (Exception e){
-            PermanentException ex = new PermanentException(402, "Unauthorized" ,e);
-            handler.handleError(ex);
-        }
+            uid = getUid(context);
 
-        try{
             JsonValue response;
             Resource resource;
             JsonResourceAccessor accessor =
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
                 response = accessor.read(resourceId);
+                Set<String> usernameSet = (Set<String>) response.get("username").getObject();
+                if(usernameSet == null || usernameSet.isEmpty()){
+                    PermanentException ex = new PermanentException(404, "Not Found", null);
+                    handler.handleError(ex);
+                }
+                if (!usernameSet.iterator().next().equals(uid)){
+                    PermanentException ex = new PermanentException(402, "Unauthorized", null);
+                    handler.handleError(ex);
+                }
+
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
             }
@@ -203,6 +218,10 @@ public class TokenResource implements CollectionResourceProvider {
             handler.handleResult(resource);
         } catch (ResourceException e){
             handler.handleError(e);
+        } catch (SSOException e){
+            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
+        } catch (IdRepoException e){
+            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
         }
     }
 
@@ -262,7 +281,7 @@ public class TokenResource implements CollectionResourceProvider {
         return null;
     }
 
-    private String getUid(ServerContext context) throws Exception{
+    private String getUid(ServerContext context) throws SSOException, IdRepoException{
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);
