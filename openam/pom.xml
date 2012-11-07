@@ -186,6 +186,11 @@
         <!-- Commenting out until it gets stable -->
         <!-- <module>openam-forgerock-rest</module> -->
 
+
+        <!-- OpenAM Forgerock REST - CORE Module -->
+        <!-- Commenting out until it gets stable -->
+        <module>openam-rhino</module>
+
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
@@ -447,6 +452,12 @@
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
             <url>http://maven.restlet.org</url>
+        </repository>
+
+        <repository>
+            <id>mozilla</id>
+            <name>Mozilla Maven2 repository</name>
+            <url>http://repo1.maven.org/maven2</url>
         </repository>
 
     </repositories>

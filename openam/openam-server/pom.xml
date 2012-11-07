@@ -422,6 +422,12 @@
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-rhino</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
         <!--dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-forgerock-rest</artifactId>
@@ -555,6 +561,11 @@
             <version>2.0.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>1.7R2</version>
+        </dependency>
 
         <!-- Oauth2 dependencies -->
 	<!--

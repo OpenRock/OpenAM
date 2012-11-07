@@ -1,0 +1,59 @@
+In order to use the intercept loader you need to:
+
+1.  Copy intercept-10.1.0-SNAPSHOT.jar into tomcat/lib
+2.  Copy Openam-Rhino into openam/WEB-INF/lib
+3.  Copy js-1.7R2.jar into openam/WEB-INF/lib
+4.  Copy intercept-10.1.0-SNAPSHOT.jar into openam/WEB-INF/lib
+5.  Copy context.xml into tomcat/conf/Catalina/localhost/openam.xml (or whatever your webapp contextroot is)
+
+IMPORTANT:  you should delete this xml file when done,  since it controls the loading of the patching classloader.
+
+
+How script interception works
+
+You can intercept any class in the "com.sun.identity", "com.iplanet" and "org.forgerock" namespaces.
+
+To Intercept a class,  you create a javascript file having the same name as the class you want to intercept.
+
+eg:   ServerConfig.js --> will intercept ServerConfig.class
+
+All methods, except the constructors will call the javascript file, with the following global values set:
+
+classname  -> name of the class being intercepted,
+methodname -> name of the method being inercepted,
+object     -> reference the the actual instance, (null if it is a static method)
+args       -> Array of arguments passed to the method
+globals    -> a java Map,  that is preserved across all calls.  You can store values in it, and retrieve later
+
+You have access to all the classes through the global name Packages.
+
+ie  Packages.org.forgerock.openam.foobar
+
+A useful one is java.lang.System.out ie
+java.lang.system.out.println("this will go to catalina.out");
+
+If a script file is modified on disk,  the intercept system will automatically reload it.
+
+Where to put script files?
+
+ As long as InterceptiorScripts/scriptname.js is on the classpath,  it will be found.
+
+ The easiest is to put them in Openam/WEB-INF/classes/InterceptorScripts
+
+An example javascript:
+
+----------------
+
+java.lang.System.out.println(" Intercepting class: " + classname);
+
+java.lang.System.out.print("           method = " + methodname +"( ");
+if (args.length > 0) {
+        for (var x in args)
+                java.lang.System.out.print(" " + args[x] + " ");
+
+}
+
+java.lang.System.out.println(")");
+java.lang.System.out.println("");
+
+~
