@@ -33,15 +33,11 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 
-import java.security.AccessController;
-
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.idm.IdUtils;
 //import com.sun.identity.idsvcs.IdentityServicesFactory;
 
 import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.opendj.ldap.LinkedAttribute;
 
 
 /**
@@ -526,7 +522,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {
-            content.asMap().put("_id", resource.getResourceName());
+            content.asMap().put("_id", resource.getId());
             content.asMap().put("_rev", resource.getRevision());
         } catch (final JsonValueException e) {
             throw new BadRequestException(
