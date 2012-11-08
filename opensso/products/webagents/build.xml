@@ -241,7 +241,6 @@
               tofile="${webagents.dist.dir}/proxy_v40_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
         <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
               tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <antcall target="all" inheritRefs="true"/>
 <!--
         <copy file="${webagents.docs.dir}/nightly.html" 
