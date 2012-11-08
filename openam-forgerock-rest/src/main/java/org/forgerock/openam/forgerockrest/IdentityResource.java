@@ -35,7 +35,6 @@ import com.iplanet.sso.SSOTokenManager;
 
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.idm.IdUtils;
-//import com.sun.identity.idsvcs.IdentityServicesFactory;
 
 import org.forgerock.json.resource.servlet.HttpContext;
 
@@ -51,7 +50,6 @@ public final class IdentityResource implements CollectionResourceProvider {
     private String realm = null;
     private String userType = null;
 
-    //private IdentityServicesFactory idsvcFactory = IdentityServicesFactory.getInstance();
 
     /**
      * Creates a backend
@@ -88,10 +86,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             handler.handleResult(result);
 
         } catch (SSOException e) {
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
             handler.handleError(new ForbiddenException("SSO Token cannot be retrieved.", e));
-            //hold on for now
         } catch (IdRepoException ex) {
-            //hold on for now
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
             handler.handleError(new ForbiddenException("Cannot retrieve id from session.", ex));
         }
     }
