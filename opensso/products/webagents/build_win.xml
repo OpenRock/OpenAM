@@ -40,7 +40,6 @@
 
 
     <import file="../products.xml" />
-    <import file="../installtools/installtools.xml" />
     <import file="webagents.xml" />
 
     <tstamp>
@@ -121,8 +120,6 @@
     <target name="preparebuild">
         <mkdir dir="${webagents.built.dir}"/>
         <mkdir dir="${webagents.dist.dir}"/>
-        <echo message="Dispatch to installtools to build install libraries"/>
-        <ant antfile="${installtools.base.dir}/build.xml" inheritRefs="true" />
     </target>
 
     <target name="clean">
@@ -193,7 +190,6 @@
         <echo message="Dispatch to apache"/>
         <property name="containername" value="apache"/>
         <antcall target="nmake" inheritRefs="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
              target="all" inheritRefs="true"/>
     </target>
@@ -202,7 +198,6 @@
         <echo message="Dispatch to SJSWS"/>
         <property name="containername" value="sjsws"/>
         <antcall target="nmake" inheritRefs="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
              target="all" inheritRefs="true"/>
     </target>
@@ -211,7 +206,6 @@
         <echo message="Dispatch to proxy40"/>
         <property name="containername" value="proxy40"/>
         <antcall target="nmake" inheritRefs="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
              target="all" inheritRefs="true"/>
     </target>
@@ -220,7 +214,6 @@
         <echo message="Dispatch to Apache 22"/>
         <property name="containername" value="apache22"/>
         <antcall target="nmake" inheritRefs="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
              target="all" inheritRefs="true"/>
     </target>
@@ -229,7 +222,6 @@
         <echo message="Dispatch to Apache 24"/>
         <property name="containername" value="apache24"/>
         <antcall target="nmake" inheritRefs="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml" 
              target="all" inheritRefs="true"/>
     </target>
@@ -254,7 +246,6 @@
         <echo message="Dispatch to domino"/>
         <property name="containername" value="domino"/>
         <antcall target="nmake" inheritRefs="true"/>
-        <antcall target="prenightly" inheritRefs="true"/>
         <ant antfile="${webagents.basedir}/build_agent.xml"
              target="all" inheritRefs="true"/>
     </target>
@@ -391,15 +382,6 @@
               tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
     </target>
 
-    <target name="prenightly" depends="preparebuild">
-        <copy todir="${webagents.basedir}/extlib" >
-            <fileset dir="${installtools.dist.dir}">
-                <include name="opensso-installtools.jar" />
-                <include name="opensso-installtools-launcher.jar" />
-            </fileset>
-        </copy>
-    </target>
-        
     <target name="postnightly">
         <copy todir="${prd.nightly.dist.dir}/webagents/${nightly.date}">
             <fileset dir="${webagents.dist.dir}" />
