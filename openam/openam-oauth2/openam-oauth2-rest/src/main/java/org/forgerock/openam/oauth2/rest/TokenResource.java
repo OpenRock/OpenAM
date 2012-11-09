@@ -23,7 +23,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.sm.ldap.OpenDJTokenRepo;
+import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 
@@ -96,7 +96,7 @@ public class TokenResource implements CollectionResourceProvider {
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (usernameSet.iterator().next().equals(uid)){
+                if (usernameSet.iterator().next().equals(uid) || uid.equals("amadmin")){
                     response = accessor.delete(resourceId, "1");
                 } else {
                     PermanentException ex = new PermanentException(402, "Unauthorized", null);
@@ -192,6 +192,7 @@ public class TokenResource implements CollectionResourceProvider {
                              ResultHandler<Resource> handler){
 
         String uid = null;
+        String username = null;
         try {
             uid = getUid(context);
 
@@ -206,16 +207,17 @@ public class TokenResource implements CollectionResourceProvider {
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (!usernameSet.iterator().next().equals(uid)){
-                    PermanentException ex = new PermanentException(402, "Unauthorized", null);
-                    handler.handleError(ex);
-                }
+                username = usernameSet.iterator().next();
 
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
             }
-            resource = new Resource(OAuth2Constants.Params.ID, "1", response);
-            handler.handleResult(resource);
+            if (uid.equals("amadmin") || username.equals(uid)){
+                resource = new Resource(OAuth2Constants.Params.ID, "1", response);
+                handler.handleResult(resource);
+            } else {
+                throw new PermanentException(402, "Unauthorized" ,null);
+            }
         } catch (ResourceException e){
             handler.handleError(e);
         } catch (SSOException e){

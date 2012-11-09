@@ -165,6 +165,9 @@
     <modules>
 
         <!-- OpenAM Shared - Common Module -->
+        <module>openam-locale</module>
+
+        <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
         <!-- OpenAM Entitlement Module -->
@@ -182,18 +185,17 @@
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
 
-        <!-- OpenAM Forgerock REST - CORE Module -->
+        <!-- OpenAM ForgeRock REST - CORE Module -->
         <!-- Commenting out until it gets stable -->
         <!-- <module>openam-forgerock-rest</module> -->
+
+        <module>openam-console</module>
 
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
         <!-- OpenAM Common Test Suite -->
         <module>openam-test</module>
-
-        <!-- OpenAM Session High-Availability FailOver Module -->
-        <module>openam-session-ha</module>
 
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
@@ -204,17 +206,21 @@
         <!-- OpenAM OAuth2 Token Service -->
         <module>openam-oauth2</module>
 
+        <module>openam-common-auth-ui</module>
+
+        <module>openam-server-auth-ui</module>
+
+        <module>openam-server-only</module>
+
         <!-- OpenAM Server -->
         <module>openam-server</module>
-
-        <!-- OpenAM Standalone Container Environment -->
-        <module>openam-server-engine</module>
 
         <!-- Tools Artifacts -->
         <module>openam-tools</module>
 
         <!-- Java Client SDK Artifacts -->
         <module>openam-clientsdk</module>
+        <module>openam-distauth</module>
 
         <!-- Documentation -->
         <!-- <module>openam-documentation</module> -->
@@ -870,8 +876,6 @@
                 <version>1.1.5.2</version>
             </dependency>
 
-            <!-- TODO opendj-ldap-sdk-3.0.0-M2 -->
-
             <!-- TODO publicsuffix -->
 
             <dependency>
@@ -968,7 +972,7 @@
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-ldap-sdk</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-OPENAMp3</version>
             </dependency>
 
             <!-- Legacy External Libraries for OpenAM -->
@@ -1518,9 +1522,14 @@
                     <version>2.2-beta-5</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.portals.jetspeed-2</groupId>
+                    <artifactId>jetspeed-unpack-maven-plugin</artifactId>
+                    <version>2.2.2</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.7</version>
+                    <version>2.0</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>

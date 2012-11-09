@@ -3,6 +3,7 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
@@ -10,6 +11,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="openam-distribution-amadmsetup" />
     <orderEntry type="module" module-name="openam-core" />
+    <orderEntry type="module" module-name="openam-locale" />
+    <orderEntry type="library" name="Maven: org.forgerock.commons:i18n-core:1.4.0" level="project" />
     <orderEntry type="module" module-name="openam-shared" />
     <orderEntry type="library" name="Maven: external:jss4:2007-08-11" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
@@ -39,6 +42,11 @@
     <orderEntry type="library" name="Maven: external:jdmkrt:2007-01-10" level="project" />
     <orderEntry type="module" module-name="openam-xacml3-schema" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-xjc:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: external:OpenDJ:2012-20-02" level="project" />
+    <orderEntry type="library" name="Maven: org.forgerock.opendj:opendj-ldap-sdk:3.0.0-OPENAMp3" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish.grizzly:grizzly-framework:2.1.11" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish.gmbal:gmbal-api-only:3.1.0-b001" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish.external:management-api:3.0.0-b012" level="project" />
     <orderEntry type="library" name="Maven: com.iplanet.jato:jato:2005-05-04" level="project" />
     <orderEntry type="library" name="Maven: com.sun.web.ui:cc:2008-08-08" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.web.ui:cc_de:2008-08-08" level="project" />
@@ -94,8 +102,6 @@
     <orderEntry type="library" name="Maven: com.sun.xml.ws:policy:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.sun.xml.txw2:txw2:20110809" level="project" />
     <orderEntry type="library" name="Maven: com.sun.istack:istack-commons-runtime:2.4" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.gmbal:gmbal-api-only:3.1.0-b001" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.external:management-api:3.0.0-b012" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.ha:ha-api:3.1.8" level="project" />
     <orderEntry type="library" name="Maven: com.sun.tools.ws:webservices-tools:2.1-b16" level="project" />
     <orderEntry type="library" name="Maven: javax.xml:webservices-api:2.1-b16" level="project" />
@@ -110,10 +116,6 @@
     <orderEntry type="library" name="Maven: external:authapi:2005-08-12" level="project" />
     <orderEntry type="library" name="Maven: external:FastInfoset:2006-26-09" level="project" />
     <orderEntry type="library" name="Maven: external:jsr173_api:2004-30-01" level="project" />
-    <orderEntry type="library" name="Maven: external:OpenDJ:2012-20-02" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.opendj:opendj-ldap-sdk:3.0.0-M2" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:i18n-core:1.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.grizzly:grizzly-framework:2.1.7" level="project" />
     <orderEntry type="library" name="Maven: external:publicsuffix:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: external:swec:2002-02-05" level="project" />
     <orderEntry type="library" name="Maven: external:webservices-extra:2008-03-12" level="project" />
@@ -125,8 +127,6 @@
     <orderEntry type="module" module-name="openam-wsfederation-schema" />
     <orderEntry type="module" module-name="openam-liberty-schema" />
     <orderEntry type="module" module-name="OpenFM" />
-    <orderEntry type="module" module-name="openam-session-ha-core" />
-    <orderEntry type="module" module-name="openam-session-ha-locale" />
     <orderEntry type="module" module-name="openam-oauth" />
     <orderEntry type="module" module-name="openam-dtd-schema" />
     <orderEntry type="module" module-name="openam-jaxrpc-schema" />

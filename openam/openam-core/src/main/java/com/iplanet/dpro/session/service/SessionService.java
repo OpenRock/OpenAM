@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
+
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -60,6 +61,7 @@ import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchResults;
@@ -1201,15 +1203,21 @@ public class SessionService {
      */
     private void addInternalSessionListener(InternalSession session, String url,
                                             SessionID sid) {
-
         if (session != null) {
             if (!sid.equals(session.getID())
                     && session.getRestrictionForToken(sid) == null) {
                 throw new IllegalArgumentException("Session id mismatch");
             }
 
-            Map urls = session.getSessionEventURLs();
-            urls.put(url, sid);
+            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();
+            Set<SessionID> sids = urls.get(url);
+
+            if (sids == null) {
+                sids = new HashSet<SessionID>();
+            }
+
+            sids.add(sid);
+            urls.put(url, sids);
             session.updateForFailover();
         }
     }
@@ -2101,33 +2109,21 @@ public class SessionService {
     }
 
     /**
-     * Utility method to obtain session repository reference
+     * Utility helper method to obtain session repository reference
      *
      * @return reference to session repository
      */
     protected static AMSessionRepository getRepository() {
-
         if (!getUseInternalRequestRouting()) {
             sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
             return null;
         }
-
         if (amSessionRepository == null) {
             try {   // Obtain our AM Session Repository Instance to provide Session HA and Failover.
-                    amSessionRepository = SessionRepository.getInstance();
-                if (amSessionRepository == null)
-                {
-                    sessionDebug.error("Unable to obtain an AMSessionRepository Implementation, please check Configuration!");
-                    return null;
-                }
-                if (sessionDebug.messageEnabled())
-                {
-                    sessionDebug.message("Obtained Session Repository Implementation: " +
-                            amSessionRepository.getClass().getSimpleName());
-                }
+                amSessionRepository = SessionRepositoryFactory.getInstance();
             } catch (Exception e) {
                 sessionDebug
-                        .error("Failed to initialize Session Repository", e);
+                        .error("Failed to initialize CTS BackEnd Repository", e);
             }
         }
         return amSessionRepository;
@@ -2250,27 +2246,6 @@ public class SessionService {
 
                     useInternalRequestRouting = true;
 
-                    // These are all for External Session Persistence.
-                    sessionStoreUserName = CollectionHelper.getMapAttr(
-                            sessionAttrs, SESSION_EXTERNAL_STORE_USERNAME, "cn=Directory Manager");
-                    sessionStorePassword = CollectionHelper.getMapAttr(
-                            sessionAttrs, SESSION_EXTERNAL_STORE_PASSWORD, "password");
-                    sessionExternalRepositoryURL = CollectionHelper.getMapAttr(
-                            sessionAttrs, SESSION_EXTERNAL_REPOSITORY_URL, "");
-                    sessionExternalRepositoryRootDN = CollectionHelper.getMapAttr(
-                            sessionAttrs, SESSION_EXTERNAL_REPOSITORY_ROOTDN, "");
-                    connectionMaxWaitTime = Integer.parseInt(
-                            CollectionHelper.getMapAttr(
-                                    sessionAttrs, CONNECT_MAX_WAIT_TIME, "5000"));
-                    externalMinPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
-                            sessionAttrs, EXTERNAL_MIN_POOL_SIZE, "8"));
-                    externalMaxPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
-                            sessionAttrs, EXTERNAL_MAX_POOL_SIZE, "32"));
-
-                    jdbcDriverClass = CollectionHelper.getMapAttr(
-                            sessionAttrs, JDBC_DRIVER_CLASS, "");
-
-
                     // *********************************************************
                     // Check for Type of Backend Persistent Store.
                     // *********************************************************
@@ -2291,17 +2266,6 @@ public class SessionService {
                     // (As Cluster Service uses Cluster Member Map).
                     initializationClusterService();
 
-                    // Show Configuration Attributes
-                    if (sessionDebug.messageEnabled()) {
-                        sessionDebug.message("UserName=" + sessionStoreUserName
-                                + " : " + "clusterServerList="
-                                + getClusterServerList() + ": "
-                                + "connectionMaxWaitTime=" + connectionMaxWaitTime
-                                + " :" + "jdbcDriverClass=" + jdbcDriverClass
-                                + " : " + "Session Repository URL=" + sessionExternalRepositoryURL + " : "
-                                + "externalMinPoolSize=" + externalMinPoolSize + " : "
-                                + "externalMaxPoolSize=" + externalMaxPoolSize);
-                    }
                     // ************************************************************************
                     // Now Bootstrap AMSessionRepository Implementation, if one was specified.
                     if (amSessionRepository == null) {
@@ -2415,6 +2379,8 @@ public class SessionService {
             // Only Associate one Server URL to a Single ServerID.
             // @since 10.1
             //
+            // Further investigate, as we should not get duplicates here...
+            //
             if (!clusterMemberMap.containsValue(serverURL))
                 { clusterMemberMap.put(serverID, serverURL); }
         }
@@ -2477,7 +2443,7 @@ public class SessionService {
          */
         boolean sendToLocal() {
             boolean remoteURLExists = false;
-            Map urls = session.getSessionEventURLs();
+            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();   
             // CHECK THE GLOBAL URLS FIRST
             if (!sessionService.sessionEventURLs.isEmpty()) {
                 Enumeration aenum = sessionService.sessionEventURLs.elements();
@@ -2510,31 +2476,27 @@ public class SessionService {
             // CHECK THE INDVIDUAL URL LIST
             if (!urls.isEmpty()) {
                 synchronized (urls) {
-
-                    Iterator iter = urls.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        Map.Entry entry = (Map.Entry) iter.next();
-                        String url = (String) entry.getKey();
+                    for (Map.Entry<String, Set<SessionID>> entry : urls.entrySet()) {
                         // ONLY SEND ONCE TO ONE LOCATION
+                        String url = entry.getKey();
+
                         try {
                             URL parsedUrl = new URL(url);
+
                             if (sessionService.isLocalSessionService(parsedUrl)) {
-                                SessionID sid = (SessionID) entry.getValue();
-                                SessionInfo info = makeSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(
-                                        info, eventType, System
-                                        .currentTimeMillis());
-                                SessionNotificationHandler.handler
-                                        .processNotification(sn);
+                                for (SessionID sid : entry.getValue()) {
+                                    SessionInfo info = makeSessionInfo(session, sid);
+                                    SessionNotification sn = new SessionNotification(
+                                            info, eventType, System.currentTimeMillis());
+                                    SessionNotificationHandler.handler.processNotification(sn);
+                                }
                             } else {
                                 remoteURLExists = true;
                             }
-
                         } catch (Exception e) {
                             sessionService.sessionDebug.error(
-                                    "Local Individual notification to " + url, e);
+                                "Local Individual notification to " + url, e);
                         }
-
                     }
                 }
             }
@@ -2545,7 +2507,7 @@ public class SessionService {
          * Thread which sends the Session Notification.
          */
         public void run() {
-            Map urls = session.getSessionEventURLs();
+            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();
             if (!sessionService.sessionEventURLs.isEmpty()) {
 
                 SessionNotification snGlobal = new SessionNotification(session
@@ -2577,28 +2539,27 @@ public class SessionService {
             // CHECK THE INDIVIDUAL URLS LIST
             if (!urls.isEmpty()) {
                 synchronized (urls) {
-                    Iterator iter = urls.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        Map.Entry entry = (Map.Entry) iter.next();
+                    for (Map.Entry<String, Set<SessionID>> entry: urls.entrySet()) {
                         String url = (String) entry.getKey();
                         // ONLY SEND ONCE TO ONE LOCATION
+
                         try {
                             URL parsedUrl = new URL(url);
+
                             if (!sessionService.isLocalSessionService(parsedUrl)) {
-                                SessionID sid = (SessionID) entry.getValue();
-                                SessionInfo info = makeSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(
+                                for (SessionID sid : entry.getValue()) {
+                                    SessionInfo info = makeSessionInfo(session, sid);
+                                    SessionNotification sn = new SessionNotification(
                                         info, eventType, System.currentTimeMillis());
-                                Notification not = new Notification(sn
-                                        .toXMLString());
-                                NotificationSet set = new NotificationSet(
-                                        SESSION_SERVICE);
-                                set.addNotification(not);
-                                PLLServer.send(parsedUrl, set);
+                                    Notification not = new Notification(sn.toXMLString());
+                                    NotificationSet set = new NotificationSet(SESSION_SERVICE);
+                                    set.addNotification(not);
+                                    PLLServer.send(parsedUrl, set);
+                                }
                             }
                         } catch (Exception e) {
                             sessionService.sessionDebug.error(
-                                    "Remote Individual notification to " + url, e);
+                                "Remote Individual notification to " + url, e);
                         }
                     }
                 }
@@ -2959,7 +2920,9 @@ public class SessionService {
             InternalSession sess = null;
             try {
                 sess = getRepository().retrieve(sid);
-                updateSessionMaps(sess);
+                if (sess != null) {
+                    updateSessionMaps(sess);
+                }
             } catch (Exception e) {
                 sessionDebug.error("Failed to retrieve new session", e);
             }

@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.iplanet.dpro.session.service;
 
@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -300,8 +301,10 @@ public class SessionCount {
      *
      */
     static void decrementSessionCount(InternalSession is) {
-
-        String uuid = (caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase();
+        String uuid = is.getUUID();
+        if (!caseSensitiveUUID && uuid != null) {
+            uuid = uuid.toLowerCase();
+        }
         SessionID sid = is.getID();
 
         if ((deploymentMode == SINGLE_SERVER_MODE) || 
