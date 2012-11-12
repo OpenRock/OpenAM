@@ -117,6 +117,8 @@ public interface IConstants {
     public static final String STR_TOMCAT_VERSION =
     	"org.apache.catalina.util.ServerInfo";
     public static final String TOMCAT_VER_60 = "Tomcat 6.0.x";
+    public static final String TOMCAT_VMWARE_7 = "VMware vFabric tc Runtime "
+            + "2.7.1.RELEASE/7.0.29.A.RELEASE";
     public static final String STR_WEBAPP_DIR = "webapps";
     public static final String STR_AGENT_APP_WAR_FILE = "agentapp.war";
     public static final String INSTANCE_CONFIG_DIR_NAME = "config";

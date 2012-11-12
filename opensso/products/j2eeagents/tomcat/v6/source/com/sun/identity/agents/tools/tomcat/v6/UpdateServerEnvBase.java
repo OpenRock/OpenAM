@@ -127,7 +127,7 @@ public class UpdateServerEnvBase implements IConstants, IConfigKeys {
 
     protected void getSetenvScriptFile(IStateAccess stateAccess) {
         if (_catalinaHomeDir == null) {
-            _catalinaHomeDir = (String) stateAccess.get(STR_KEY_CATALINA_HOME_DIR);
+            _catalinaHomeDir = (String) stateAccess.get(STR_KEY_CATALINA_BASE_DIR);
 
             String temp = _catalinaHomeDir + STR_FORWARD_SLASH
             				+ STR_BIN_DIRECTORY + STR_FORWARD_SLASH;

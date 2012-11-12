@@ -281,7 +281,7 @@ public class AmTomcatRealm extends RealmBase {
      * Return the Principal associated with the given user name.
      */
     protected Principal getPrincipal(String username) {
-        return new GenericPrincipal(this, username, null, null);
+        return instantiateGenericPrincipal(this, username, null, null);
     }
 
     /**
