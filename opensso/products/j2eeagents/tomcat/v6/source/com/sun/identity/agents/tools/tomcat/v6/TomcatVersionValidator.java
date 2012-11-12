@@ -177,7 +177,7 @@ public class TomcatVersionValidator extends ValidatorBase
                 int majorVersion = 0;
                 int minorVersion = 0;
 
-                //Accept VMware Tomcat Version
+                // Accept VMware Tomcat Version
                 if(temp.contains(TOMCAT_VMWARE_7)){
                     return true;
                 }
