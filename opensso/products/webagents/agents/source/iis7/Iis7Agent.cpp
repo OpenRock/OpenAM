@@ -1119,7 +1119,7 @@ am_status_t get_request_url(IHttpContext* pHttpContext,
     }
     // Get the port
     if (status == AM_SUCCESS) {
-        const char* colon_ptr = strchr(requestHostHeader, ':');
+        const char* colon_ptr = requestHostHeader != NULL ? strchr(requestHostHeader, ':') : NULL;
         if (colon_ptr != NULL) {
             requestPort = (PCSTR) pHttpContext->
                     AllocateRequestMemory((DWORD) (strlen(colon_ptr))
@@ -1231,13 +1231,18 @@ am_status_t GetVariable(IHttpContext* pHttpContext, PCSTR varName,
         } else {
             if (S_OK != (pHttpContext->GetServerVariable(varName, pVarVal, pVarValSize))) {
                 am_web_log_error("%s: %s is not a valid server variable.",
-                        thisfunc, pVarVal);
+                        thisfunc, varName);
                 status = AM_FAILURE;
             } else {
                 if (*pVarVal != NULL && strlen(*pVarVal) > 0) {
                     am_web_log_debug("%s: %s = %s", thisfunc, varName, *pVarVal);
                 } else {
-                    am_web_log_debug("%s: %s = ", thisfunc, varName);
+                    if (isRequired == TRUE) {
+                        am_web_log_error("%s: Could not get a value for header %s.", thisfunc, varName);
+                        status = AM_FAILURE;
+                    } else {
+                        am_web_log_debug("%s: %s = ", thisfunc, varName);
+                    }
                     if (*pVarVal != NULL && strlen(*pVarVal) == 0) {
                         *pVarVal = NULL;
                     }
