@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -51,6 +51,7 @@ import org.forgerock.json.resource.Router;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
+
 import java.security.AccessController;
 
 import com.sun.identity.security.AdminTokenAction;
@@ -127,7 +128,7 @@ public final class TestResource implements CollectionResourceProvider {
     public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
         JsonValue val = new JsonValue("Test:queryCollection");
-        Resource resource = new Resource("0","0",val)  ;
+        Resource resource = new Resource("0", "0", val);
         handler.handleResource(resource);
         handler.handleResult(new QueryResult());
 
@@ -142,7 +143,7 @@ public final class TestResource implements CollectionResourceProvider {
         //Inisde Context.java toJsonValue() is missing now
         //JsonValue val = context.toJsonValue();
         JsonValue val = new JsonValue("Dummy");
-        Resource resource = new Resource("0","0",val);
+        Resource resource = new Resource("0", "0", val);
         handler.handleResult(resource);
     }
 
@@ -182,7 +183,6 @@ public final class TestResource implements CollectionResourceProvider {
                     + "' encountered while updating a resource");
         }
     }
-
 
 
 }

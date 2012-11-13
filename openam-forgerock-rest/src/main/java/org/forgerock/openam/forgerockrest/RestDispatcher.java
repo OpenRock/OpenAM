@@ -11,11 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
-
-//import static org.forgerock.json.resource.Context;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -29,26 +27,25 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
-
-
-
+import org.forgerock.json.resource.ServiceUnavailableException;
 
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class RestDispatcher  {
+public final class RestDispatcher {
 
-    public static Debug debug = Debug.getInstance("forgerockrest");
+    public static Debug debug = Debug.getInstance("frRest");
 
     private static RestDispatcher instance = null;
     private RequestHandler handler = null;
     private ConnectionFactory factory = null;
+
     private RestDispatcher() {
 
     }
 
-    public final static RestDispatcher  getInstance() {
-        if (instance == null)  instance = new  RestDispatcher();
+    public final static RestDispatcher getInstance() {
+        if (instance == null) instance = new RestDispatcher();
         return instance;
     }
 
@@ -62,27 +59,31 @@ public final class RestDispatcher  {
                 final Method factoryMethod = cls.getMethod("initDispatcher", Router.class);
 
                 factoryMethod.invoke(null, router);
-                return ;
+                return;
             } catch (final Exception e) {
             }
         }
 
-    };
+    }
+
     /**
      * Build the initial dispatcher.
      * This is a separate method so that we can modify the dispatching
      * dynamically
-     * */
+     */
 
     public ConnectionFactory buildConnectionFactory(ServletConfig config) throws ResourceException {
         final Router router = new Router();
         String roots = config.getInitParameter("rootContexts");
 
-        if (roots != null)  {
+        if(roots == null){
+            throw new ServiceUnavailableException();
+        }
+        if (roots != null) {
             String[] initClasses = config.getInitParameter("rootContexts").split(","); // not really much to do
 
-            for (String ctx : initClasses)  {
-                callConfigClass(ctx.trim(),router);
+            for (String ctx : initClasses) {
+                callConfigClass(ctx.trim(), router);
             }
         }
         factory = Resources.newInternalConnectionFactory(router);
@@ -96,40 +97,4 @@ public final class RestDispatcher  {
             throw new ServletException(e);
         }
     }
-
-   /* private static void initSampleResources(ConnectionFactory factory) throws ResourceException {
-
-        // Populate with some test users and groups.
-        final Connection connection = factory.getConnection();
-
-        final JsonValue user1 = new JsonValue(new LinkedHashMap<String, Object>());
-        user1.add("userName", "alice");
-        user1.add("employeeNumber", 1234);
-        user1.add("email", "alice@example.com");
-
-        final JsonValue user2 = new JsonValue(new LinkedHashMap<String, Object>());
-        user2.add("userName", "bob");
-        user2.add("employeeNumber", 2468);
-        user2.add("email", "bob@example.com");
-
-        for (final JsonValue user : Arrays.asList(user1, user2)) {
-            final CreateRequest request = Requests.newCreateRequest("/users", user);
-            connection.create(new RootContext(), request);
-        }
-
-        final JsonValue group1 = new JsonValue(new LinkedHashMap<String, Object>());
-        group1.add("groupName", "users");
-        group1.add("members", Arrays.asList("alice", "bob"));
-
-        final JsonValue group2 = new JsonValue(new LinkedHashMap<String, Object>());
-        group2.add("groupName", "administrators");
-        group2.add("members", Arrays.asList("alice"));
-
-        for (final JsonValue user : Arrays.asList(group1, group2)) {
-            final CreateRequest request = Requests.newCreateRequest("/groups", user);
-            connection.create(new RootContext(), request);
-        }
-        connection.close();
-
-    }  */
 }

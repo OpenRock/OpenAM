@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -34,14 +34,16 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
+
 import static org.forgerock.json.resource.RoutingMode.EQUALS;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
-import java.security.AccessController;
-import com.sun.identity.security.AdminTokenAction;
 
+import java.security.AccessController;
+
+import com.sun.identity.security.AdminTokenAction;
 
 
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -49,7 +51,7 @@ import com.sun.identity.sm.OrganizationConfigManager;
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class RealmDispatcher  {
+public final class RealmDispatcher {
 
 
     private RealmDispatcher() {
@@ -84,7 +86,7 @@ public final class RealmDispatcher  {
         try {
             SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                     AdminTokenAction.getInstance());
-            OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken,"/");
+            OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken, "/");
             initRealmEndpoints(ocm, router);
         } catch (Exception e) {
 

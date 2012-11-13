@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -52,6 +52,7 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
+
 import java.security.AccessController;
 
 import com.sun.identity.security.AdminTokenAction;
@@ -85,6 +86,7 @@ public final class RealmResource implements CollectionResourceProvider {
         // No implementation required.
         this.subRealms = null;
     }
+
     public RealmResource(Set subRealms) {
         this.subRealms = subRealms;
     }
@@ -150,10 +152,10 @@ public final class RealmResource implements CollectionResourceProvider {
     public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
 
-        for (Object theRealm : subRealms ) {
+        for (Object theRealm : subRealms) {
             String realm = (String) theRealm;
             JsonValue val = new JsonValue(realm);
-            Resource resource = new Resource("0","0",val);
+            Resource resource = new Resource("0", "0", val);
             handler.handleResource(resource);
         }
         handler.handleResult(new QueryResult());
@@ -166,14 +168,14 @@ public final class RealmResource implements CollectionResourceProvider {
     public void readInstance(final ServerContext context, final String resourceId,
                              final ReadRequest request, final ResultHandler<Resource> handler) {
         JsonValue val = null;
-        for (Object theRealm : subRealms ) {
+        for (Object theRealm : subRealms) {
             String realm = (String) theRealm;
-            if(realm.equalsIgnoreCase(resourceId)){
+            if (realm.equalsIgnoreCase(resourceId)) {
                 val = new JsonValue(realm);
             }
         }
-        if(val != null){
-            Resource resource = new Resource("0","0",val);
+        if (val != null) {
+            Resource resource = new Resource("0", "0", val);
             handler.handleResult(resource);
         }
     }
@@ -182,21 +184,22 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final ServerContext context,final String resourceId,
+    public void updateInstance(final ServerContext context, final String resourceId,
                                final UpdateRequest request, final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Update operations are not supported for resource Realms");
         handler.handleError(e);
     }
+
     /*
-     * Add the ID and revision to the JSON content so that they are included
-     * with subsequent responses. We shouldn't really update the passed in
-     * content in case it is shared by other components, but we'll do it here
-     * anyway for simplicity.
-     */
+    * Add the ID and revision to the JSON content so that they are included
+    * with subsequent responses. We shouldn't really update the passed in
+    * content in case it is shared by other components, but we'll do it here
+    * anyway for simplicity.
+    */
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {
-            content.asMap().put("_id",resource.getId());
+            content.asMap().put("_id", resource.getId());
             content.asMap().put("_rev", resource.getRevision());
         } catch (final JsonValueException e) {
             throw new BadRequestException(

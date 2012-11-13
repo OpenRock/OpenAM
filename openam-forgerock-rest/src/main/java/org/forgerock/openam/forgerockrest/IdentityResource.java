@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -34,7 +34,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-import com.sun.identity.idm.IdUtils;
 
 import org.forgerock.json.resource.servlet.HttpContext;
 
@@ -149,22 +148,14 @@ public final class IdentityResource implements CollectionResourceProvider {
             //Create the resource
             CreateResponse success = idsvc.create(identity, admin);
             //Read created resource
-            try {
+            dtls = idsvc.read(identity.getName(), idSvcsAttrList, admin);
 
-                dtls = idsvc.read(identity.getName(), idSvcsAttrList, admin);
-            } catch (final ObjectNotFound notFound) {
-                RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot READ " +
-                        resourceId + ": Resource cannot be found." + notFound);
-                handler.handleError(new NotFoundException("Resource not found.", notFound));
-            } catch (final Exception e) {
-                throw e;//Deal with rest of the exceptions
-            }
             resource = new Resource(identity.getName(), "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    e);
-            handler.handleError(e);
+        } catch (final ObjectNotFound notFound) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot READ " +
+                    resourceId + ": Resource cannot be found." + notFound);
+            handler.handleError(new NotFoundException("Resource not found.", notFound));
         } catch (final DuplicateObject duplicateObject) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     resourceId + ": Resource already exists!" + duplicateObject);
@@ -180,7 +171,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
                     exception);
-            handler.handleError(new NotFoundException("Cannot complete request", exception));
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
     }
 
@@ -439,6 +430,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ! " +
                     exception);
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+
         }
     }
 
@@ -508,6 +501,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
     }
 

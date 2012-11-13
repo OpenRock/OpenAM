@@ -11,11 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
-
-//import static org.forgerock.json.resource.Context.newRootContext;
 
 import java.lang.String;
 import java.util.Arrays;
@@ -35,12 +33,10 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
 
 
-
-
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class TestDispatcher  {
+public final class TestDispatcher {
 
 
     private TestDispatcher() {
