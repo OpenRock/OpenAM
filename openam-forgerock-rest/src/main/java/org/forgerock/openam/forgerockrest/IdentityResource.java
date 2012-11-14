@@ -505,31 +505,4 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
-    /*
-     * Add the ID and revision to the JSON content so that they are included
-     * with subsequent responses. We shouldn't really update the passed in
-     * content in case it is shared by other components, but we'll do it here
-     * anyway for simplicity.
-     */
-    private void addIdAndRevision(final Resource resource) throws ResourceException {
-        final JsonValue content = resource.getContent();
-        try {
-            content.asMap().put("_id", resource.getId());
-            content.asMap().put("_rev", resource.getRevision());
-        } catch (final JsonValueException e) {
-            throw new BadRequestException(
-                    "The request could not be processed because the provided "
-                            + "content is not a JSON object");
-        }
-    }
-
-    private String getNextRevision(final String rev) throws ResourceException {
-        try {
-            return String.valueOf(Integer.parseInt(rev) + 1);
-        } catch (final NumberFormatException e) {
-            throw new InternalServerErrorException("Malformed revision number '" + rev
-                    + "' encountered while updating a resource");
-        }
-    }
-
 }
