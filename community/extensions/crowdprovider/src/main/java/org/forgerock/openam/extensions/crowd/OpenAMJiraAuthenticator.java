@@ -46,6 +46,41 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
     private static final Debug debug = Debug.getInstance("OpenAMJiraAuthenticator");
 
     @Override
+    public Principal getUserFromBasicAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        Principal p = super.getUserFromBasicAuthentication(request, response);
+        debug.error("ba: " + p);
+        return p;
+    }
+    
+    @Override
+    public Principal getUserFromCookie(HttpServletRequest request, HttpServletResponse response) {
+        Principal p = super.getUserFromCookie(request, response);
+        debug.error("fc: " + p);
+        
+        return p;
+    }
+    
+    @Override
+    public Principal getUserFromSession(HttpServletRequest request) {
+        Principal p = super.getUserFromSession(request);
+        debug.error("fs: " + p);
+        
+        return p;
+    }
+    
+    @Override
+    public boolean authenticate(Principal user, String password)
+    throws AuthenticatorException { 
+        try {
+            openAMAuthenticate(user.getName(), password);
+            return true;
+        } catch (Exception ex) {
+            debug.error("Unable to authenticate user", ex);
+            return false;
+        }
+    }
+    
+    @Override
     public Principal getUser(HttpServletRequest request, HttpServletResponse response) {
         Principal user = null;
 
@@ -95,6 +130,10 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
         return user;
 
     }
+    
+    private void openAMAuthenticate(String userName, String password) {
+        debug.error("found user=" + userName + " and password=" + password);
+    }
 
     private SSOToken getToken(HttpServletRequest request) {
         SSOToken token = null;
@@ -102,6 +141,8 @@ public class OpenAMJiraAuthenticator extends JiraSeraphAuthenticator {
         try {
             SSOTokenManager manager = SSOTokenManager.getInstance();
             token = manager.createSSOToken(request);
+        } catch (SSOException ssoe) {
+            debug.warning("Error creating SSOToken", ssoe);
         } catch (Exception ex) {
             debug.error("Error creating SSOToken", ex);
         }
