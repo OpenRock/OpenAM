@@ -218,7 +218,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     generalFailure.getMessage());
-            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE! " +
                     exception.getMessage());
@@ -426,7 +426,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     generalFailure);
-            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ! " +
                     exception);
@@ -483,8 +483,10 @@ public final class IdentityResource implements CollectionResourceProvider {
                 RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot CREATE " +
                         resourceId + ":" + tokenExpired);
                 handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
-            } catch (final Exception e) {
-                RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
+            }catch (final Exception exception) {
+                RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
+                        exception);
+                handler.handleError(new NotFoundException(exception.getMessage(), exception));
             }
         } catch (final NeedMoreCredentials needMoreCredentials) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
@@ -497,7 +499,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
-            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
