@@ -115,7 +115,7 @@
     </condition>
 
     <!-- agent version number appended to end of agent zip file name -->
-    <property name="agentversion" value="3"/>
+    <property name="agentversion" value="3.1.0-Xpress"/>
 
     <target name="preparebuild">
         <mkdir dir="${webagents.built.dir}"/>
@@ -313,8 +313,8 @@
               tofile="${webagents.basedir}/am/source/version.h" >
             <filterchain>
                 <replacetokens>
-                    <token key="AGENT_VER" value="3.0-04"/>
-                    <token key="AGENT_ER_VER" value="ER 6"/>
+                    <token key="AGENT_VER" value="3.1.0-Xpress"/>
+                    <token key="AGENT_ER_VER" value=""/>
                     <token key="AGENT_FVB_MARKER" value=""/>
                     <token key="SVN_REVISION" value="${svn.Revision}"/>
                     <token key="BUILD_DATE" value="${build.date}"/>

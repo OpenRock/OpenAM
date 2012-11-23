@@ -42,10 +42,10 @@ DEFINES_INCLUDED := true
 ###############
 
 AGENT_MAJOR_VER := 3
-AGENT_MINOR_VER := 0
-# Patch version, ex: AGENT_PATCH_VER := -01 (empty for RTM release)
-AGENT_PATCH_VER := -04
-AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER)$(AGENT_PATCH_VER)
+AGENT_MINOR_VER := 1
+AGENT_MICRO_VER := 0
+AGENT_RELEASE_NAME := Xpress
+AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER).$(AGENT_MICRO_VER)-$(AGENT_RELEASE_NAME)
 
 # Set RELEASE_TYPE to one of the following:
 #   empty: for RTM or patch release, ex: agent 3.0 or agent 3.0-01 
@@ -55,7 +55,7 @@ AGENT_VER := $(AGENT_MAJOR_VER).$(AGENT_MINOR_VER)$(AGENT_PATCH_VER)
 # If RELEASE_TYPE is set to ER, update AGENT_ER_VER.
 # If RELEASE_TYPE is set to FVB, update AGENT_FVB_MARKER.
 #
-RELEASE_TYPE = ER
+RELEASE_TYPE =
 
 # For ER set AGENT_ER_VER (ex: AGENT_ER_VER := ER 1)
 ifeq ($(RELEASE_TYPE), ER)
