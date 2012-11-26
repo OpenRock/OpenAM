@@ -1,6 +1,6 @@
 \@echo off
 
-   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+\@rem DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
 \@rem Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
   
@@ -25,19 +25,20 @@
 \@rem 
 \@rem $Id: setAgentEnv.cmd.template,v 1.6 2008/08/19 19:14:49 veiming Exp $
 \@rem
+\@rem Portions Copyrighted 2012 ForgeRock, Inc.
 \@rem
 
 \@rem *************************************************************************
-\@rem This script is used to set up your environment for OpenSSO 
-\@rem Policy Agent 3.0 for WebLogic 10.0.
+\@rem This script is used to set up your environment for OpenAM
+\@rem Policy Agent for WebLogic.
 \@rem Copy the server startup script to a server specific script. 
 \@rem e.g startWeblogic.sh
 \@rem Include this file in the server startup script after the 
 \@rem setDomainEnv.sh script inclusion. 
 \@rem Append AGENT_CLASSPATH and AGENT_JAVA_OPTIONS to the WebLogic server in 
 \@rem the startup script
-\@rem Please refer to 3.0 WebLogic 10.0 Agent Guide - Post-installation steps 
-\@rem for detailed instructions.
+\@rem Please refer to WebLogic Agent Installation Guide for detailed
+\@rem instructions.
 \@rem *************************************************************************
 
 \@rem Append AGENT_CLASSPATH to the WebLogic server classpath
