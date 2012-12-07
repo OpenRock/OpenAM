@@ -55,7 +55,7 @@ GCC_33 := $(shell $(CC) -v 2>&1 | grep version | /bin/awk '{print $$3}')
 CFLAGS += -DLINUX -pthread $(GCC_WARNING_FLAGS) -fexceptions
 CXXFLAGS += -DLINUX -pthread $(GCC_WARNING_FLAGS) -Woverloaded-virtual -fexceptions
 CXX_STD_LIBS := -lstdc++
-LDFLAGS += -pthread
+LDFLAGS += -pthread -lrt
 LD_ORIGIN_FLAG := -Xlinker '-R$$ORIGIN'
 LD_COMMON_ORIGIN_FLAG := -Xlinker '-R$$ORIGIN/../../lib'
 # NOTE: '-z defs' should probably be added to the following definition.
