@@ -44,7 +44,8 @@ PWD=`pwd`
 cd "${@}"
 cp ../${LDIF_FILE} ${LDIF}
 for i in ${CONFIG} config/upgrade/config.ldif.* ; do
-        ${SED} -i -e '/dn: cn=SNMP/,/^$/d' $i
+        ${SED} -e '/dn: cn=SNMP/,/^$/d' $i >  ${i}-tmp
+        mv ${i}-tmp $i
 done
 ${ZIP} -r -i@../${LIST} ../${ZIP_FILE} .
 cd ${PWD}

@@ -103,9 +103,7 @@ config/schema/05-solaris.ldif
 config/schema/06-compat.ldif
 config/servicetag/
 config/servicetag/opends.uuids.properties
-config/upgrade/
-config/upgrade/config.ldif.7743
-config/upgrade/schema.ldif.7743
+config/upgrade/*
 db/
 import-tmp/
 ldif/
