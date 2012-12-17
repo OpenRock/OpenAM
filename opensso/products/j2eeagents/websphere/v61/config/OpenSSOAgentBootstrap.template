@@ -95,6 +95,7 @@ am.encryption.pwd = @AGENT_ENCRYPT_KEY@
 #     if it is set to off.
 # Hot-Swap Enabled: No
 #
+com.iplanet.services.debug.level=error
 com.iplanet.services.debug.directory=@DEBUG_LOGS_DIR@
 com.sun.services.debug.mergeall=on
 

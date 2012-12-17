@@ -294,7 +294,7 @@ com.iplanet.am.cookie.name=iPlanetDirectoryPro
 # not black slashes "\". Also, do not use paths that contain spaces in 
 # directory names.
 # Hot-Swap Enabled: No
-com.iplanet.services.debug.level=message
+com.iplanet.services.debug.level=error
 com.iplanet.services.debug.directory=@DEBUG_LOGS_DIR@
 
 #
