@@ -1,0 +1,1 @@
+define(["./BrowserPluginsCollector","./ScreenInfoCollector","./TimezoneCollector","./GeolocationCollector"])

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="2.451" errors="0" skipped="0" tests="79" name="TestSuite">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries"/>
+    <property name="java.vm.version" value="20.12-b01-434"/>
+    <property name="awt.nativeDoubleBuffering" value="true"/>
+    <property name="gopherProxySet" value="false"/>
+    <property name="mrj.build" value="11M3909"/>
+    <property name="java.vm.vendor" value="Apple Inc."/>
+    <property name="java.vendor.url" value="http://www.apple.com/"/>
+    <property name="path.separator" value=":"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module"/>
+    <property name="java.runtime.version" value="1.6.0_37-b06-434-11M3909"/>
+    <property name="java.awt.graphicsenv" value="apple.awt.CGraphicsEnvironment"/>
+    <property name="basedir" value="/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module"/>
+    <property name="java.endorsed.dirs" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/endorsed"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="surefire.real.class.path" value="/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/surefire/surefirebooter2587194892011127944.jar"/>
+    <property name="java.io.tmpdir" value="/var/folders/fk/0rks5td15_j8pns0j8k4wybr0000gn/T/"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="sun.jnu.encoding" value="MacRoman"/>
+    <property name="java.library.path" value=".:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="surefire.test.class.path" value="/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/test-classes:/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/classes:/Users/allan/.m2/repository/com/forgerock/openam/amserver/10.0.0-EA/amserver-10.0.0-EA.jar:/Users/allan/.m2/repository/com/forgerock/openam/sharedlib/10.0.0-EA/sharedlib-10.0.0-EA.jar:/Users/allan/.m2/repository/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar:/Users/allan/.m2/repository/org/testng/testng/6.4/testng-6.4.jar:/Users/allan/.m2/repository/junit/junit/4.10/junit-4.10.jar:/Users/allan/.m2/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar:/Users/allan/.m2/repository/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar:/Users/allan/.m2/repository/com/beust/jcommander/1.12/jcommander-1.12.jar:/Users/allan/.m2/repository/org/yaml/snakeyaml/1.6/snakeyaml-1.6.jar:/Users/allan/.m2/repository/org/easymock/easymock/2.0/easymock-2.0.jar:/Users/allan/.m2/repository/org/codehaus/jackson/jackson-mapper-lgpl/1.9.5/jackson-mapper-lgpl-1.9.5.jar:/Users/allan/.m2/repository/org/codehaus/jackson/jackson-core-lgpl/1.9.5/jackson-core-lgpl-1.9.5.jar:/Users/allan/.m2/repository/org/mockito/mockito-all/1.9.0/mockito-all-1.9.0.jar:/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-common/target/openam-authnmodule-adaptive-common-10.0.0-EA.jar:/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-datastore/target/openam-authnmodule-adaptive-deviceprint-datastore-10.0.0-EA.jar:"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="10.7.5"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/allan"/>
+    <property name="user.timezone" value="America/Los_Angeles"/>
+    <property name="java.awt.printerjob" value="apple.awt.CPrinterJob"/>
+    <property name="java.specification.version" value="1.6"/>
+    <property name="file.encoding" value="MacRoman"/>
+    <property name="user.name" value="allan"/>
+    <property name="java.class.path" value="/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/test-classes:/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/classes:/Users/allan/.m2/repository/com/forgerock/openam/amserver/10.0.0-EA/amserver-10.0.0-EA.jar:/Users/allan/.m2/repository/com/forgerock/openam/sharedlib/10.0.0-EA/sharedlib-10.0.0-EA.jar:/Users/allan/.m2/repository/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar:/Users/allan/.m2/repository/org/testng/testng/6.4/testng-6.4.jar:/Users/allan/.m2/repository/junit/junit/4.10/junit-4.10.jar:/Users/allan/.m2/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar:/Users/allan/.m2/repository/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar:/Users/allan/.m2/repository/com/beust/jcommander/1.12/jcommander-1.12.jar:/Users/allan/.m2/repository/org/yaml/snakeyaml/1.6/snakeyaml-1.6.jar:/Users/allan/.m2/repository/org/easymock/easymock/2.0/easymock-2.0.jar:/Users/allan/.m2/repository/org/codehaus/jackson/jackson-mapper-lgpl/1.9.5/jackson-mapper-lgpl-1.9.5.jar:/Users/allan/.m2/repository/org/codehaus/jackson/jackson-core-lgpl/1.9.5/jackson-core-lgpl-1.9.5.jar:/Users/allan/.m2/repository/org/mockito/mockito-all/1.9.0/mockito-all-1.9.0.jar:/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-common/target/openam-authnmodule-adaptive-common-10.0.0-EA.jar:/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-datastore/target/openam-authnmodule-adaptive-deviceprint-datastore-10.0.0-EA.jar:"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home"/>
+    <property name="sun.java.command" value="/Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/surefire/surefirebooter2587194892011127944.jar /Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/surefire/surefire1123441679993096967tmp /Users/allan/Documents/maven/OpenAM/trunk/community/extensions/authnmodules/adaptive-deviceprint/adaptive-deviceprint-module/target/surefire/surefire286747800902909963tmp"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="user.language" value="en"/>
+    <property name="awt.toolkit" value="apple.awt.CToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.6.0_37"/>
+    <property name="java.ext.dirs" value="/Library/Java/Extensions:/System/Library/Java/Extensions:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext"/>
+    <property name="sun.boot.class.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsfd.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Frameworks/JavaRuntimeSupport.framework/Resources/Java/JavaRuntimeSupport.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/ui.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/laf.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/sunrsasign.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsse.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jce.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/charsets.jar"/>
+    <property name="java.vendor" value="Apple Inc."/>
+    <property name="localRepository" value="/Users/allan/.m2/repository"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.apple.com/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="mrj.version" value="1070.1.6.0_37-434"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase time="0.017" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testBothNullExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testDifferentCharsWithIgnoreVersionCharsNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testDifferentNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testDifferentNumbersNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testDifferentNumbersWithIgnoreVersionCharsExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testEmptyAndNullExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testNullAndEmptyNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testOneCharDifferentNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.AdvancedMatcherTest" name="testSameExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.AttributeComparatorTest" name="testAdditionalInfoInCurrentValue"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.AttributeComparatorTest" name="testAttributesDiffers"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.AttributeComparatorTest" name="testAttributesEqals"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.AttributeComparatorTest" name="testBothValuesNull"/>
+  <testcase time="0.003" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.requiredattributes.AttributesCheckerTest" name="falseWhenIncorrectAttributeName"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.requiredattributes.AttributesCheckerTest" name="hasNotRequiredAttribute"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.requiredattributes.AttributesCheckerTest" name="hasRequiredAttribute"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testBothNullExactMatch"/>
+  <testcase time="0.003" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testCalculateDistance1"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testCalculateDistance2"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testCalculateDistance3"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testCalculateDistance4"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testCurrentNullStoredNotNullNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testNotSameNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testSameExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.ColocationMatcherTest" name="testStoredNullCurrentNotNullNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.ComparisonResultComparatorTest" name="compareVariousPenaltyPointsValues"/>
+  <testcase time="0.378" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedComparatorTest" name="testExactMatch"/>
+  <testcase time="0.042" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedComparatorTest" name="testMissingCookie"/>
+  <testcase time="0.034" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedComparatorTest" name="testModifiedCookie"/>
+  <testcase time="0.038" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedComparatorTest" name="testNonExactMatch"/>
+  <testcase time="0.037" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedComparatorTest" name="testNonSuccessfulWithAdditionalInfo"/>
+  <testcase time="0.037" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedComparatorTest" name="testSuccessfulWithAdditionalInfo"/>
+  <testcase time="0.049" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="test10And40PercentDifferentFontsWith3ItemsOr30PercentIgnore"/>
+  <testcase time="0.045" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="test3DifferentFontsWith3ItemsOr30PercentIgnore"/>
+  <testcase time="0.043" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="test3DifferentFontsWithoutIgnore"/>
+  <testcase time="0.043" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="testBothNoFontsWithoutIgnore"/>
+  <testcase time="0.03" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="testDifferentFontsWithoutIgnore"/>
+  <testcase time="0.026" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="testMoreThen30PercentButLessThen3DifferencesWith3ItemsOr30PercentIgnore"/>
+  <testcase time="0.036" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledFontsComparatorTest" name="testNoDifferentsInFontsWithoutIgnore"/>
+  <testcase time="0.035" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="test10And40PercentDifferentPluginsWith3ItemsOr30PercentIgnore"/>
+  <testcase time="0.033" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="test3DifferentPluginsWith3ItemsOr30PercentIgnore"/>
+  <testcase time="0.029" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="test3DifferentPluginsWithoutIgnore"/>
+  <testcase time="0.014" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="testBothNoPluginsWithoutIgnore"/>
+  <testcase time="0.016" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="testDifferentPluginsWithoutIgnore"/>
+  <testcase time="0.024" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="testMoreThen30PercentButLessThen3DifferencesWith3ItemsOr30PercentIgnore"/>
+  <testcase time="0.018" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedInstalledPluginsComparatorTest" name="testNoDifferentsInPluginsWithoutIgnore"/>
+  <testcase time="0.02" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedUserAgentComparatorTest" name="testDifferentUserAgentByMultipleDifferentAttributeVersionsWithIgnore"/>
+  <testcase time="0.022" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedUserAgentComparatorTest" name="testDifferentUserAgentByOneDifferentAttributeVersion"/>
+  <testcase time="0.014" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.DevicePrintRiskBasedUserAgentComparatorTest" name="testDifferentUserAgentByOneDifferentAttributeVersionWithIgnore"/>
+  <testcase time="0.059" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.FormExtractorTest" name="aggregateDevicePrint"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.HttpHeadersExtractorTest" name="aggregateDevicePrint"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testBothNullExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testEmptyAndNullExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueAdditionalEmptyFieldsExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueAllDifferentWithMax100PercentToleranceExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueDifferentOrderSameExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueDifferentOrderWithWhiteSpacesSameExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueFirstMissingOneNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueOneDifferentNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueSameExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueSecondMissingOneNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithMax100PercentToleranceExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithMax10PercentToleranceNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithMax20PercentToleranceExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithMax30PercentToleranceExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithTolerateOneNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithTolerateTenNotExactMatch"/>
+  <testcase time="0" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithTolerateThreeNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testMultiValueTwoOfTenDifferentWithTolerateTwoNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testNullAndEmptyNotExactMatch"/>
+  <testcase time="0.001" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.matchingrunner.riskbased.attributematcher.matcher.MultiValueAttributeMatcherTest" name="testSameExactMatch"/>
+  <testcase time="0.005" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.PersistentCookieLogicTest" name="proceed"/>
+  <testcase time="0.003" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.requiredattributes.RequiredAttributesSetTest" name="check"/>
+  <testcase time="0.026" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.RiskBasedRunnerTest" name="testExactMatch"/>
+  <testcase time="0.022" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.RiskBasedRunnerTest" name="testNoMatch"/>
+  <testcase time="0.032" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.RiskBasedRunnerTest" name="testNoMatchAutomaticallyStoreProfile"/>
+  <testcase time="0.003" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.RiskBasedRunnerTest" name="testNoProfilesStored"/>
+  <testcase time="0.034" classname="org.forgerock.identity.authentication.modules.adaptivedeviceprint.logic.marchingrunner.riskbased.RiskBasedRunnerTest" name="testNonExactMatch"/>
+</testsuite>

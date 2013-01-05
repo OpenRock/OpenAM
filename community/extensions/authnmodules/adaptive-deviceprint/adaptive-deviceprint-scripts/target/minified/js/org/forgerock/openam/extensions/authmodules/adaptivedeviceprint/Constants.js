@@ -1,0 +1,1 @@
+define("org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/Constants",[],function(){var a={};return a.EVENT_RECOLLECT_DATA="adaptivedeviceprint.recollect_data",a.adaptiveDevicePrintCookieName="AdaptiveDevicePrintCookie",a})

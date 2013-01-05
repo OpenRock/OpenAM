@@ -1,0 +1,17 @@
+
+js/main.js
+----------------
+requirejs/order/1.0.5/order-1.0.5-min!org/codehaus/mojo/jquery-amd/1.7.1-SNAPSHOT/jquery-amd-1.7.1-SNAPSHOT
+js/org/forgerock/libwrappers/JQueryWrapper.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/AdaptiveDevicePrintView.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/DevicePrintInfoAggregator.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/Constants.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/EventManager.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/AdaptiveDevicePrintCtrl.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/AbstractDevicePrintInfoCollector.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/BrowserPluginsCollector.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/ScreenInfoCollector.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/TimezoneCollector.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/GeolocationCollector.js
+js/org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/main.js
+js/main.js
