@@ -1,1 +1,0 @@
-define([],function(){var a=function(){};return a.prototype.gatherInformation=function(){},a})
