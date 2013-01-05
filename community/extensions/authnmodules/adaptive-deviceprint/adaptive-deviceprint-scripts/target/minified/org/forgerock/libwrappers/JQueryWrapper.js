@@ -1,0 +1,1 @@
+define("org/forgerock/libwrappers/JQueryWrapper",["requirejs/order/1.0.5/order-1.0.5-min!org/codehaus/mojo/jquery-amd/1.7.1-SNAPSHOT/jquery-amd-1.7.1-SNAPSHOT"],function(a){return $})
