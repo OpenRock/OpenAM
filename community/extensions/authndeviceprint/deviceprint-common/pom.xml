@@ -23,7 +23,7 @@
     </parent>
 
     <name>Deviceprint common</name>
-	<artifactId>deviceprint-deviceprint-common</artifactId>
+	<artifactId>deviceprint-common</artifactId>
     <version>10.0.0-EA</version>
 
     <packaging>jar</packaging>
@@ -43,16 +43,19 @@
         <dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<scope>test</scope>
+            <version>6.4</version>
+            <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-lgpl</artifactId>
-		</dependency>
+            <version>1.9.5</version>
+        </dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
+            <version>2.5</version>
+            <scope>provided</scope>
 		</dependency>
 	</dependencies>
 	

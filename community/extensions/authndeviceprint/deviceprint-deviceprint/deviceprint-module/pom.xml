@@ -18,61 +18,69 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-		<artifactId>openam-authnmodule-adaptive-deviceprint-parent</artifactId>
-		<version>10.0.0-EA</version>
-	</parent>
-	<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-	<artifactId>openam-authnmodule-adaptive-deviceprint-module</artifactId>
+        <groupId>org.forgerock.extensions.authndeviceprint</groupId>
+        <artifactId>extensions-deviceprint-deviceprint-parent</artifactId>
+        <version>10.0.0-EA</version>
+    </parent>
+
+    <name>Device print module</name>
+    <artifactId>deviceprint-module</artifactId>
+
 	<packaging>jar</packaging>
-	<name>OpenAM - Adaptive authentication-device print module</name>
 
 	<description>
         Adaptive authentication module which leverages user device print profiles in order to test security levels. 
    	 </description>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.forgerock.openam</groupId>
-			<artifactId>amserver</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.forgerock.openam</groupId>
-			<artifactId>sharedlib</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
+            <version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
+            <version>6.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
+            <version>2.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-lgpl</artifactId>
+            <version>1.9.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
+            <version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-			<artifactId>openam-authnmodule-adaptive-common</artifactId>
-		</dependency>
+			<groupId>org.forgerock.extensions.authndeviceprint</groupId>
+			<artifactId>deviceprint-common</artifactId>
+            <version>10.0.0-EA</version>
+        </dependency>
 		<dependency>
-			<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-			<artifactId>openam-authnmodule-adaptive-deviceprint-datastore</artifactId>
-		</dependency>
+			<groupId>org.forgerock.extensions.authndeviceprint</groupId>
+			<artifactId>deviceprint-datastore</artifactId>
+            <version>10.0.0-EA</version>
+        </dependency>
 	</dependencies>
 </project>

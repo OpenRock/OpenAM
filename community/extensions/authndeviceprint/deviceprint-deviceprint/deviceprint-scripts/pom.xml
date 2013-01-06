@@ -18,14 +18,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-		<artifactId>openam-authnmodule-adaptive-deviceprint-parent</artifactId>
-		<version>10.0.0-EA</version>
-	</parent>
-	<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-	<artifactId>openam-authnmodule-adaptive-deviceprint-scripts</artifactId>
-	<version>10.0.0-EA</version>
-	<name>OpenAM - Adaptive authentication-device print module scripts</name>
+        <groupId>org.forgerock.extensions.authndeviceprint</groupId>
+        <artifactId>extensions-deviceprint-deviceprint-parent</artifactId>
+        <version>10.0.0-EA</version>
+    </parent>
+
+    <name>Device print module scripts</name>
+    <artifactId>deviceprint-scripts</artifactId>
+
 	<packaging>js</packaging>
 	
 	<description>
@@ -36,43 +36,51 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<dependencies>
+
+    <dependencies>
 		<dependency>
 			<groupId>requirejs</groupId>
 			<artifactId>requirejs</artifactId>
+            <version>1.0.7</version>
 			<type>js</type>
 			<classifier>min</classifier>
 		</dependency>
 		<dependency>
 			<groupId>requirejs</groupId>
 			<artifactId>order</artifactId>
+            <version>1.0.5</version>
 			<type>js</type>
 			<classifier>min</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.mojo</groupId>
 			<artifactId>jquery-amd</artifactId>
+            <version>1.7.1-SNAPSHOT</version>
 			<type>js</type>
 		</dependency>
 		<dependency>
 			<groupId>swfobject</groupId>
 			<artifactId>swfobject</artifactId>
+            <version>2.2</version>
 			<classifier>min</classifier>
 			<type>js</type>
 		</dependency>
 		<dependency>
 			<groupId>json2</groupId>
 			<artifactId>json2</artifactId>
+            <version>1.0</version>
 			<type>js</type>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+            <version>4.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jstestrunner</groupId>
 			<artifactId>jstestrunner-junit</artifactId>
+            <version>1.0.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

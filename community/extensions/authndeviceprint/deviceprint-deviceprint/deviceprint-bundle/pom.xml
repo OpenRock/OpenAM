@@ -18,14 +18,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-		<artifactId>openam-authnmodule-adaptive-deviceprint-parent</artifactId>
-    	<version>10.0.0-EA</version>
-	</parent>
-	<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-	<artifactId>openam-authnmodule-adaptive-deviceprint-bundle</artifactId>
+        <groupId>org.forgerock.extensions.authndeviceprint</groupId>
+        <artifactId>extensions-deviceprint-deviceprint-parent</artifactId>
+        <version>10.0.0-EA</version>
+    </parent>
+
+    <name>Device print bundle</name>
+    <artifactId>deviceprint-bundle</artifactId>
 	<packaging>pom</packaging>
-	<name>OpenAM - Adaptive authentication-device print bundle</name>
 
 	<description>
         Adaptive authentication module bundle. Containing compiled sources and configuration files. 
@@ -33,21 +33,25 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-			<artifactId>openam-authnmodule-adaptive-deviceprint-module</artifactId>
-		</dependency>
+			<groupId>org.forgerock.extensions.authndeviceprint</groupId>
+			<artifactId>deviceprint-module</artifactId>
+            <version>10.0.0-EA</version>
+        </dependency>
 		<dependency>
-			<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-			<artifactId>openam-authnmodule-adaptive-deviceprint-acceptance-module</artifactId>
-		</dependency>
+			<groupId>org.forgerock.extensions.authndeviceprint</groupId>
+			<artifactId>deviceprint-acceptance-module</artifactId>
+            <version>10.0.0-EA</version>
+        </dependency>
 		<dependency>
-			<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-			<artifactId>openam-authnmodule-adaptive-deviceprint-hotp-module</artifactId>
-		</dependency>
+			<groupId>org.forgerock.extensions.authndeviceprint</groupId>
+			<artifactId>deviceprint-hotp-module</artifactId>
+            <version>10.0.0-EA</version>
+        </dependency>
 		<dependency>
-			<groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-			<artifactId>openam-authnmodule-adaptive-deviceprint-scripts</artifactId>
-			<type>js</type>
+			<groupId>org.forgerock.extensions.authndeviceprint</groupId>
+			<artifactId>deviceprint-scripts</artifactId>
+            <version>10.0.0-EA</version>
+            <type>js</type>
 			<classifier>min</classifier>
 		</dependency>
 	</dependencies>

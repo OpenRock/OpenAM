@@ -26,12 +26,12 @@
     <packaging>pom</packaging>
 
     <modules>
-    	<module>adaptive-deviceprint-datastore</module>
-        <module>adaptive-deviceprint-bundle</module>
-        <module>adaptive-deviceprint-module</module>
-        <module>adaptive-deviceprint-scripts</module>
-        <module>adaptive-deviceprint-acceptance-module</module>
-        <module>adaptive-deviceprint-hotp-module</module>
+    	<module>deviceprint-datastore</module>
+        <module>deviceprint-bundle</module>
+        <module>deviceprint-module</module>
+        <module>deviceprint-scripts</module>
+        <module>deviceprint-acceptance-module</module>
+        <!--module>deviceprint-hotp-module</module -->
     </modules>
 
 </project>
