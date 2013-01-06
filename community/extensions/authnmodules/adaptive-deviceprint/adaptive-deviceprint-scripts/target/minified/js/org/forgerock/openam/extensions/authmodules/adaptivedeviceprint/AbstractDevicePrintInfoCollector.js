@@ -1,1 +1,0 @@
-define("org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/AbstractDevicePrintInfoCollector",[],function(){var a=function(){};return a.prototype.gatherInformation=function(){},a})
