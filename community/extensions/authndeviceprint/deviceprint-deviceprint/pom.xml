@@ -16,15 +16,14 @@
 --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.forgerock.openam.extensions.authnmodules</groupId>
-    	<artifactId>openam-authnmodules-parent</artifactId>
-    	<version>10.0.0-EA</version>
+        <groupId>org.forgerock.extensions.authndeviceprint</groupId>
+        <artifactId>extensions-deviceprint-parent</artifactId>
+        <version>10.0.0-EA</version>
     </parent>
-    <groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-	<artifactId>openam-authnmodule-adaptive-deviceprint-parent</artifactId>
-    <version>10.0.0-EA</version>
+
+    <name>Device print login module parent</name>
+    <artifactId>extensions-deviceprint-deviceprint-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Adaptive device print login module parent</name>
 
     <modules>
     	<module>adaptive-deviceprint-datastore</module>

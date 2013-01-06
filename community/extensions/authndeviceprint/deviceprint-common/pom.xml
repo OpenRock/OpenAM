@@ -17,28 +17,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.forgerock.openam.extensions.authnmodules</groupId>
-    	<artifactId>openam-authnmodules-parent</artifactId>
-    	<version>10.0.0-EA</version>
+        <groupId>org.forgerock.extensions.authndeviceprint</groupId>
+        <artifactId>extensions-deviceprint-parent</artifactId>
+        <version>10.0.0-EA</version>
     </parent>
-    <groupId>org.forgerock.openam.extensions.authnmodules.adaptiveauth</groupId>
-	<artifactId>openam-authnmodule-adaptive-common</artifactId>
+
+    <name>Deviceprint common</name>
+	<artifactId>deviceprint-deviceprint-common</artifactId>
     <version>10.0.0-EA</version>
+
     <packaging>jar</packaging>
-    <name>Adaptive modules common</name>
-	
+
 	<dependencies>
-		<dependency>
-			<groupId>com.forgerock.openam</groupId>
-			<artifactId>amserver</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.forgerock.openam</groupId>
-			<artifactId>sharedlib</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<scope>test</scope>
