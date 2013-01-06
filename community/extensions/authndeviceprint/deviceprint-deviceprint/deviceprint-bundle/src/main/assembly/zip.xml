@@ -30,34 +30,34 @@
     <dependencySets>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam.extensions.authnmodules.adaptiveauth:openam-authnmodule-adaptive-deviceprint-module</include>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-module</include>
             </includes>
             <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
         </dependencySet>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam.extensions.authnmodules.adaptiveauth:openam-authnmodule-adaptive-common</include>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-common</include>
             </includes>
             <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
         </dependencySet>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam.extensions.authnmodules.adaptiveauth:openam-authnmodule-adaptive-deviceprint-datastore</include>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-datastore</include>
             </includes>
             <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
         </dependencySet>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam.extensions.authnmodules.adaptiveauth:openam-authnmodule-adaptive-deviceprint-acceptance-module</include>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-acceptance-module</include>
             </includes>
             <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
         </dependencySet>
-        <dependencySet>
+        <!--dependencySet>
             <includes>
-                <include>org.forgerock.openam.extensions.authnmodules.adaptiveauth:openam-authnmodule-adaptive-deviceprint-hotp-module</include>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-hotp-module</include>
             </includes>
             <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
-        </dependencySet>
+        </dependencySet-->
         <dependencySet>
             <includes>
                 <include>net.sf.json-lib:json-lib</include>
@@ -84,7 +84,7 @@
         </dependencySet>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam.extensions.authnmodules.adaptiveauth:openam-authnmodule-adaptive-deviceprint-scripts</include>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-scripts</include>
             </includes>
             <outputDirectory>/openam/js</outputDirectory>
             <outputFileNameMapping>openam-authnmodule-adaptive-deviceprint-scripts-min.js</outputFileNameMapping>

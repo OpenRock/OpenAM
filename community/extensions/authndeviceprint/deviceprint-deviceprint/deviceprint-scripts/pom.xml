@@ -182,6 +182,7 @@
 										<java classname="org.mozilla.javascript.tools.shell.Main"
 											failonerror="true">
 											<classpath>
+                                                <pathelement location="/Users/allan/.m2/repository/rhino/js/1.7R2/js-1.7R2.jar" />
 												<pathelement location="${requirejs.dir}/js.jar" />
 												<pathelement location="${requirejs.dir}/compiler.jar" />
 											</classpath>
